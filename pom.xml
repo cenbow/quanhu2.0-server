@@ -15,7 +15,15 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>behavior</module>
+        <module>coterie</module>
+        <module>dymaic</module>
+        <module>message</module>
+        <module>order</module>
+        <module>resouce</module>
+        <module>support</module>
         <module>user</module>
+
         <module>openapi</module>
     </modules>
 
