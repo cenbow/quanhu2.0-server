@@ -6,7 +6,7 @@ package com.yryz.common.redis.utils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.yryz.common.context.SpringContextHolder;
+import com.yryz.common.context.SpringContextHelper;
 import com.yryz.common.utils.StringUtils;
 
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class JedisUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(JedisUtils.class);
 
-	private static JedisPool jedisPool = SpringContextHolder.getBean(JedisPool.class);
+	private static JedisPool jedisPool = SpringContextHelper.getBean(JedisPool.class);
 
 
 	/**

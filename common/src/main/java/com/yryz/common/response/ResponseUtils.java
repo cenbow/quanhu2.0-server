@@ -19,24 +19,28 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
  * @data 2017/10/30 0030 50
  */
 public class ResponseUtils {
+	
+    public static <T> Response<T> returnSuccess() {
+        return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
+    }
 
-    public static <T> QuanhuResponse<T> returnObjectSuccess(T t) {
+    public static <T> Response<T> returnObjectSuccess(T t) {
         if (t == null) {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
         } else {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
         }
     }
 
-    public static <T> QuanhuResponse<T> returnListSuccess(T t) {
+    public static <T> Response<T> returnListSuccess(T t) {
         if (t == null) {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new ArrayList());
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new ArrayList());
         } else {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
         }
     }
     
-    public static <T> QuanhuResponse<T> returnException(Exception e) {
+    public static <T> Response<T> returnException(Exception e) {
         if (e instanceof QuanhuException) {
         	QuanhuException qe = (QuanhuException) e;
             return new DubboResponse<T>(false, qe.getCode(), qe.getMsg(), qe.getErrorMsg(), null);

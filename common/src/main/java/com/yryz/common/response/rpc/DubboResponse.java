@@ -5,7 +5,7 @@ package com.yryz.common.response.rpc;
 
 import java.io.Serializable;
 
-import com.yryz.common.response.QuanhuResponse;
+import com.yryz.common.response.Response;
 
 /**
  * @author suyongcheng
@@ -13,33 +13,7 @@ import com.yryz.common.response.QuanhuResponse;
  * @Description: Dubbo实体返回对象
  * @date 2017年10月27日15:08:03
  */
-public class DubboResponse<T> implements QuanhuResponse, Serializable {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5079397072005472183L;
-
-    /**
-     * 调用结果
-     */
-    private Boolean status;
-    /**
-     * 错误编码
-     */
-    private String code;
-    /**
-     * 业务提示信息
-     */
-    private String msg;
-    /**
-     * 错误信息
-     */
-    private String errorMsg;
-    /**
-     * 数据
-     */
-    private T data;
+public class DubboResponse<T> extends Response<T> implements Serializable {
 
     public DubboResponse() {}
 

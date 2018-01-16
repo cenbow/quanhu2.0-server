@@ -3,7 +3,7 @@ package com.yryz.common.service;
 import com.yryz.common.dao.BaseDao;
 import com.yryz.common.entity.GenericEntity;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.response.QuanhuResponse;
+import com.yryz.common.response.Response;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.exceptions.TooManyResultsException;
@@ -109,7 +109,7 @@ public abstract class BaseServiceImpl implements BaseService {
      * @param <T>
      * @return
      */
-    public <T> T isSuccessNotNull(QuanhuResponse<T> rpcResponse) {
+    public <T> T isSuccessNotNull(Response<T> rpcResponse) {
         Assert.notNull(rpcResponse, "调用PRC接口异常！");
         if (rpcResponse.success()) {
             T t = rpcResponse.getData();
@@ -128,7 +128,7 @@ public abstract class BaseServiceImpl implements BaseService {
      * @param <T>
      * @return
      */
-    public <T> T isSuccess(QuanhuResponse<T> rpcResponse) {
+    public <T> T isSuccess(Response<T> rpcResponse) {
         Assert.notNull(rpcResponse, "调用PRC接口异常！");
         if (rpcResponse.success()) {
             return rpcResponse.getData();
