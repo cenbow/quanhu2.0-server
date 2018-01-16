@@ -1,19 +1,19 @@
 package com.yryz.quanhu.user.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.yryz.quanhu.user.dao.ContentAuditDao;
-import com.yryz.quanhu.user.entity.ContentAudit;
 import com.yryz.quanhu.user.vo.DemoVo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
-@Service
+@Service(interfaceClass = DemoService.class)
 public class DemoServiceImpl implements DemoService {
     protected final Log logger = LogFactory.getLog(DemoServiceImpl.class);
 
@@ -21,23 +21,12 @@ public class DemoServiceImpl implements DemoService {
     @Resource
     private RedisTemplate<String, DemoVo> redisTemplate;
 
-//    @Autowired
-    private ContentAuditDao contentAuditDao;
+    @Autowired
+    private ContentAuditService contentAuditService;
 
     @Override
-    @Transactional
     public void test() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("infoId", "1100");
-        map.put("type", 1);
-        List<ContentAudit> result = contentAuditDao.findByTypeAndInfoId(map);
-
-        contentAuditDao.deleteById(405L);
-        System.out.printf("");
-        if(1<2){
-            throw new RuntimeException("事务回滚");
-        }
-
+        contentAuditService.testTransactional();
     }
 
     @Override
