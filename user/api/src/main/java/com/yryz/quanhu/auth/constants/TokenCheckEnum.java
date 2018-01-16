@@ -5,7 +5,7 @@
  * Created on 2018年1月5日
  * Id: TokenCheckEnum.java, 2018年1月5日 下午3:42:47 Administrator
  */
-package com.yryz.common.constant;
+package com.yryz.quanhu.auth.constants;
 
 /**
  * token检查结果
@@ -13,7 +13,6 @@ package com.yryz.common.constant;
  * @version 1.0
  * @date 2018年1月5日 下午3:42:47
  */
-@Deprecated
 public enum TokenCheckEnum {
 	/**
      * token验证成功

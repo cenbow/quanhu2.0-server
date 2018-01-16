@@ -5,7 +5,7 @@
  * Created on 2017年11月10日
  * Id: SmsType.java, 2017年11月10日 下午1:48:41 Administrator
  */
-package com.yryz.common.constant;
+package com.yryz.quanhu.user.contants;
 
 /**
  * @author danshiyu
@@ -13,7 +13,6 @@ package com.yryz.common.constant;
  * @date 2017年11月10日 下午1:48:41
  * @Description 短信功能码类型
  */
-@Deprecated
 public enum SmsType {
 	/** check 注册 、 找回密码 */
 	CODE_UNKNOW(0),

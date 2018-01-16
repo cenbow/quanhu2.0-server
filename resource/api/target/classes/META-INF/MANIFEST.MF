@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: resource-api
+Implementation-Version: 2.0-SNAPSHOT
+Built-By: Administrator
+Implementation-Vendor-Id: com.yryz.quanhu
+Build-Jdk: 1.8.0_111
+Implementation-URL: http://projects.spring.io/spring-boot/parent/paren
+ t/resource-parent/resource-api/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

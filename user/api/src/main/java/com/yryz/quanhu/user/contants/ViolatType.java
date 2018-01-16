@@ -5,7 +5,7 @@
  * Created on 2017年11月10日
  * Id: ViolatType.java, 2017年11月10日 上午10:58:52 Administrator
  */
-package com.yryz.common.constant;
+package com.yryz.quanhu.user.contants;
 
 /**
  * @author danshiyu
@@ -13,7 +13,6 @@ package com.yryz.common.constant;
  * @date 2017年11月10日 上午10:58:52
  * @Description 违规操作类型
  */
-@Deprecated
 public enum ViolatType {
 	/** 警告 */
 	WARN(0),
