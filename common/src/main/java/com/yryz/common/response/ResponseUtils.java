@@ -3,7 +3,6 @@
  */
 package com.yryz.common.response;
 
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.rpc.DubboResponse;
 
