@@ -5,18 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yryz.quanhu</groupId>
-        <artifactId>support-parent</artifactId>
+        <artifactId>resource-parent</artifactId>
         <version>2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>resouce-service</artifactId>
-
+    <artifactId>resoucre-service</artifactId>
+	<properties>
+		<common.version>2.0-SNAPSHOT</common.version>
+	</properties>
     <dependencies>
         <!--公司内部库-->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
-            <artifactId>resouce-api</artifactId>
+            <artifactId>resource-api</artifactId>
             <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>quanhu-common</artifactId>
+            <version>${common.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yryz.framework</groupId>

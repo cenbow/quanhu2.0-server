@@ -9,7 +9,7 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>resouce-parent</artifactId>
+    <artifactId>resource-parent</artifactId>
     <packaging>pom</packaging>
     <modules>
         <module>api</module>

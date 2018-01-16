@@ -10,13 +10,20 @@
     </parent>
 
     <artifactId>behavior-service</artifactId>
-
+    <properties>
+		<common.version>2.0-SNAPSHOT</common.version>
+	</properties>
     <dependencies>
         <!--公司内部库-->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>behavior-api</artifactId>
             <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>quanhu-common</artifactId>
+            <version>${common.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yryz.framework</groupId>
