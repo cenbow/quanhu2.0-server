@@ -1,13 +1,11 @@
 package com.yryz.common.web;
 
-import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.component.rpc.ResponseCode;
 import com.yryz.component.rpc.ResponseProducer;
 import com.yryz.component.rpc.RpcResponse;
 import com.yryz.component.rpc.internal.DubboResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
 public class ResponseModel extends ResponseProducer {
