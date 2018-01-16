@@ -19,6 +19,10 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
  * @data 2017/10/30 0030 50
  */
 public class ResponseUtils {
+	
+    public static <T> Response<T> returnSuccess() {
+        return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
+    }
 
     public static <T> Response<T> returnObjectSuccess(T t) {
         if (t == null) {
