@@ -13,6 +13,7 @@ package com.yryz.common.constant;
  * @date 2017年11月10日 上午11:04:00
  * @Description 用户账户状态
  */
+@Deprecated
 public enum CustAccountStatus {
 	/** 正常 */
 	NORMAL(0),

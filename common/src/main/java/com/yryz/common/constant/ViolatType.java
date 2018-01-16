@@ -13,6 +13,7 @@ package com.yryz.common.constant;
  * @date 2017年11月10日 上午10:58:52
  * @Description 违规操作类型
  */
+@Deprecated
 public enum ViolatType {
 	/** 警告 */
 	WARN(0),

@@ -13,6 +13,7 @@ package com.yryz.common.constant;
  * @version 1.0
  * @date 2018年1月5日 下午3:42:47
  */
+@Deprecated
 public enum TokenCheckEnum {
 	/**
      * token验证成功

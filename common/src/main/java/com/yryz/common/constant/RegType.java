@@ -11,6 +11,7 @@ package com.yryz.common.constant;
 	 * 注册类型
 	 *
 	 */
+	@Deprecated
 	public enum RegType{
 		/** 微信 */
 		WEIXIN(1,"Weixin"),
