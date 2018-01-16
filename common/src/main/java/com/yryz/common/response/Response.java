@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @date 2017年10月27日15:08:03
  * @version 1.0
  */
-public interface QuanhuResponse<T> extends Serializable {
+public interface Response<T> extends Serializable {
 
     /**
      * 调用结果
