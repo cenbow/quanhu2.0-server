@@ -21,22 +21,22 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 public class ResponseUtils {
 	
     public static <T> Response<T> returnSuccess() {
-        return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
+        return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
     }
 
     public static <T> Response<T> returnObjectSuccess(T t) {
         if (t == null) {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
         } else {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
         }
     }
 
     public static <T> Response<T> returnListSuccess(T t) {
         if (t == null) {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new ArrayList());
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new ArrayList());
         } else {
-            return new DubboResponse<>(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
         }
     }
     
