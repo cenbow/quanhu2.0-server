@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2018 Wuhan Yryz Network Company LTD.
  */
-package com.yryz.component.rpc.dto;
+package com.yryz.common.response;
 
 import java.io.Serializable;
 import java.util.List;

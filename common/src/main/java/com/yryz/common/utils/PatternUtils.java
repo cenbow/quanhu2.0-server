@@ -3,7 +3,15 @@ package com.yryz.common.utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class PatternUtils {
+	
+	/**
+	 * 三大运营商手机号匹配正则表达式
+	 */
+	private static final String PHONE_REGEX = "^(13[0-9]|15[012356789]|16[6]|17[0135678]|18[0-9]|14[56789]|19[89])[0-9]{8}$";
+
 
     public static boolean matcher(Object obj, String regEx) {
         if(obj == null || regEx == null){
@@ -27,5 +35,19 @@ public class PatternUtils {
         Matcher m = p.matcher(email);
         return m.matches();
     }
+    
+	/**
+	 * 验证手机号码是否有效
+	 * @param phone
+	 * @return
+	 */
+	public static boolean checkPhone(String phone){
+		if(StringUtils.isBlank(phone)){
+			return false;
+		}
+		Pattern pattern = Pattern.compile(PHONE_REGEX);
+		Matcher matcher = pattern.matcher(phone);
+		return matcher.matches();
+	}
 
 }

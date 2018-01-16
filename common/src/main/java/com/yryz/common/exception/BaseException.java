@@ -1,7 +1,5 @@
 package com.yryz.common.exception;
 
-import com.yryz.common.web.ReturnCode;
-
 public class BaseException extends RuntimeException {
 	/**
 	 */

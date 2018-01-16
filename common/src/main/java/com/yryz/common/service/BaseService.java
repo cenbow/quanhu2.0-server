@@ -1,7 +1,7 @@
 package com.yryz.common.service;
 
 import com.yryz.common.entity.GenericEntity;
-import com.yryz.component.rpc.RpcResponse;
+import com.yryz.common.response.QuanhuResponse;
 
 import java.util.List;
 
@@ -69,7 +69,7 @@ public interface BaseService {
      * @param <T>
      * @return
      */
-    public <T> T isSuccessNotNull(RpcResponse<T> rpcResponse);
+    public <T> T isSuccessNotNull(QuanhuResponse<T> rpcResponse);
 
     /**
      * 判断PRC接口返回结果不判断null值，根据业务需求自己判断
@@ -78,6 +78,6 @@ public interface BaseService {
      * @param <T>
      * @return
      */
-    public <T> T isSuccess(RpcResponse<T> rpcResponse);
+    public <T> T isSuccess(QuanhuResponse<T> rpcResponse);
 
 }

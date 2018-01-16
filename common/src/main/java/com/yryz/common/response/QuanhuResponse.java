@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2018 Wuhan Yryz Network Company LTD.
  */
-package com.yryz.component.rpc;
+package com.yryz.common.response;
 
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @date 2017年10月27日15:08:03
  * @version 1.0
  */
-public interface RpcResponse<T> extends Serializable {
+public interface QuanhuResponse<T> extends Serializable {
 
     /**
      * 调用结果
