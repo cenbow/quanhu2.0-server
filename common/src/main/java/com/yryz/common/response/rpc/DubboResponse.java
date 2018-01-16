@@ -16,11 +16,6 @@ import com.yryz.common.response.Response;
 public class DubboResponse<T> implements Response, Serializable {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = -5079397072005472183L;
-
-    /**
      * 调用结果
      */
     private Boolean status;
