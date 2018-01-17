@@ -428,7 +428,7 @@ public class AccountProvider implements AccountApi{
 			if (CollectionUtils.isEmpty(userIds)) {
 				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "userIds不能为空");
 			}
-			return ResponseUtils.returnListSuccess(accountService.getLastLoginTime(userIds));
+			return ResponseUtils.returnObjectSuccess(accountService.getLastLoginTime(userIds));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
