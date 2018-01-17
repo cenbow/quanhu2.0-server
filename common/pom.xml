@@ -106,15 +106,18 @@
     <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>org.mybatis.spring.boot</groupId>
         <artifactId>mybatis-spring-boot-starter</artifactId>
+        <scope>provided</scope>
         <version>1.3.1</version>
     </dependency>
     <dependency>
         <groupId>com.alibaba</groupId>
         <artifactId>druid</artifactId>
+        <scope>provided</scope>
     </dependency>
     
     <!-- jedis工具以及分布式锁的引用 -->
@@ -128,12 +131,7 @@
     <dependency>
         <groupId>com.alibaba</groupId>
         <artifactId>dubbo</artifactId>
-        <exclusions>
-            <exclusion>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring</artifactId>
-            </exclusion>
-        </exclusions>
+        <scope>provided</scope>
     </dependency>
     
     <!-- httpclient封装 -->
@@ -146,6 +144,7 @@
     <dependency>
         <groupId>org.springframework.amqp</groupId>
         <artifactId>spring-rabbit</artifactId>
+        <scope>provided</scope>
     </dependency>
     
     <!-- elatic-job引用示例 
@@ -200,21 +199,23 @@
         <artifactId>log4j-core</artifactId>
     </dependency>
 
-    <!-- pagehelper分页 -->
+      <!-- pagehelper分页 -->
       <dependency>
           <groupId>com.github.pagehelper</groupId>
           <artifactId>pagehelper</artifactId>
       </dependency>
 
 
-<!-- mongodb基类以及日常用具类使用的引用 -->
+	  <!-- mongodb基类以及日常用具类使用的引用 -->
       <dependency>
           <groupId>org.mongodb</groupId>
           <artifactId>mongo-java-driver</artifactId>
+          <scope>provided</scope>
       </dependency>
       <dependency>
           <groupId>org.springframework.data</groupId>
           <artifactId>spring-data-mongodb</artifactId>
+          <scope>provided</scope>
       </dependency>
 
 <!-- model接口 -->
