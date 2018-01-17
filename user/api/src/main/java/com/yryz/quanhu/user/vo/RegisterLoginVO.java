@@ -9,8 +9,6 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
-import com.yryz.quanhu.auth.vo.AuthTokenVO;
-
 /**
  * @author danshiyu
  * @version 1.0

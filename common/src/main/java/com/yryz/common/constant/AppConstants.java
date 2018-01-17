@@ -1,6 +1,10 @@
 package com.yryz.common.constant;
 
 public interface AppConstants {
+	/**
+	 * 应用id
+	 */
+	public static final String APP_ID = "appId";
     /**
      * 平台用户ID
      */

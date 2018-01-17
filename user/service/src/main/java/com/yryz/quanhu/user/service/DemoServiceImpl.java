@@ -21,12 +21,12 @@ public class DemoServiceImpl implements DemoService {
     @Resource
     private RedisTemplate<String, DemoVo> redisTemplate;
 
-    @Autowired
-    private ContentAuditService contentAuditService;
+    //@Autowired
+    //private ContentAuditService contentAuditService;
 
     @Override
     public void test() {
-        contentAuditService.testTransactional();
+        //contentAuditService.testTransactional();
     }
 
     @Override

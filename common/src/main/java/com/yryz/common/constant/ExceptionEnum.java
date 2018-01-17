@@ -11,6 +11,7 @@ public enum ExceptionEnum {
     Exception("111","未知错误","网络开小差了，请稍后再试"),
     TOKEN_INVALID("122","无效token","请重新登录"),
     NO_TOKEN("123","token被后清掉了","请重新登录"),
+    NEED_PHONE("124","需要绑定手机号","需要绑定手机号"),
     ValidateException("2000","数据验证失败！","网络开小差了，请稍候再试！"),
     LockException("3000", "分布式锁异常", "网络开小差了，请稍候再试！"),
     BusiException("4000", "业务逻辑异常", "网络开小差了，请稍候再试！");
