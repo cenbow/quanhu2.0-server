@@ -35,17 +35,6 @@ public class DemoSender {
 	}
 	
 	/**
-	 * 发送并回复，该方法调用时会锁定当前线程，并且有可能会造成MQ的性能下降或者服务端/客户端出现死循环现象，请谨慎使用。
-	 */
-	public void sendAndReceive(){
-		String msg = "hello dirct demo mq";
-		rabbitTemplate.setExchange(AmqpConstant.DEMO_DIRECT_EXCHANGE);
-		rabbitTemplate.setRoutingKey(AmqpConstant.DEMO_RECEIVE_QUEUE);
-		Object back = rabbitTemplate.convertSendAndReceive(msg);
-		System.out.println("back msg : " + back.toString());
-	}
-	
-	/**
 	 * fanout exchange 广播，指定exchange-key即可
 	 */
 	public void fanoutSend(){
