@@ -98,7 +98,6 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
-
         <!--dubbo的filter引用以及基本的spring框架引入-->
         <dependency>
             <groupId>io.dubbo.springboot</groupId>
@@ -121,24 +120,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- jedis工具以及分布式锁的引用 -->
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-
-        <!--  components  -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>dubbo</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- httpclient封装 -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
         <!-- rabbitmq的基类和工具类引用 -->
@@ -146,6 +135,15 @@
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+
+
+        <!-- 常用工具包依赖  -->
+        <!-- httpclient封装 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
 
         <!-- servlet引入 -->
@@ -178,7 +176,6 @@
             <artifactId>json</artifactId>
         </dependency>
 
-
         <!-- elasticsearch log4j -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -187,18 +184,6 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-        </dependency>
-
-        <!-- mongodb基类以及日常用具类使用的引用 -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- model接口 -->
@@ -227,6 +212,7 @@
 				<artifactId>aliyun-sdk-oss</artifactId>
 				<version>${com.aliyun.oss.version}</version>
 		</dependency>
+
 		<!-- 阿里云滑动验证码 -->	
 		<dependency>
 			<groupId>com.aliyun.jaq</groupId>

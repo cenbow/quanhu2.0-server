@@ -100,13 +100,6 @@
 				<artifactId>json</artifactId>
 				<version>${org.json.version}</version>
 			</dependency>
-            
-            <!--mongo的jar包-->
-	        <dependency>
-	            <groupId>org.springframework.data</groupId>
-	            <artifactId>spring-data-mongodb</artifactId>
-	            <version>${spring.mongo.version}</version>
-	        </dependency>
 			
 			<!-- common-lang3 -->    
 			<dependency>
