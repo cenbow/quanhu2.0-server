@@ -14,6 +14,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <com.google.zxing.version>3.2.0</com.google.zxing.version>
+        <com.aliyun.jaq.version>1.0.0</com.aliyun.jaq.version>
+		<com.aliyun.oss.version>2.2.3</com.aliyun.oss.version>
     </properties>
     <dependencies>
 
@@ -229,7 +231,24 @@
             <artifactId>javase</artifactId>
             <version>${com.google.zxing.version}</version>
         </dependency>
-
+        
+        <!-- 阿里云oss -->
+		<dependency>
+				<groupId>com.aliyun.oss</groupId>
+				<artifactId>aliyun-sdk-oss</artifactId>
+				<version>${com.aliyun.oss.version}</version>
+		</dependency>
+		<!-- 阿里云滑动验证码 -->	
+		<dependency>
+			<groupId>com.aliyun.jaq</groupId>
+			<artifactId>aliyun-sdk-jaq</artifactId>
+			<version>${com.aliyun.jaq.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun.jaq</groupId>
+			<artifactId>aliyun-sdk-core</artifactId>
+			<version>${com.aliyun.jaq.version}</version>
+		</dependency>
 
     </dependencies>
 </project>

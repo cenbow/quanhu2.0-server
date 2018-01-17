@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.yryz.quanhu.modules.useraccount.dao.persistence.UserOperateInfoDao">
+	<resultMap id="BaseResultMap"
+		type="com.yryz.quanhu.modules.useraccount.entity.UserOperateInfo">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="kid" property="kid" jdbcType="BIGINT" />
+		<result column="user_id" property="userId" jdbcType="BIGINT" />
+		<result column="user_inviter_id" property="userInviterId"
+			jdbcType="BIGINT" />
+		<result column="user_reg_channel" property="userRegChannel"
+			jdbcType="VARCHAR" />
+		<result column="user_reg_inviter_code" property="userRegInviterCode"
+			jdbcType="VARCHAR" />
+		<result column="user_inviter_code" property="userInviterCode"
+			jdbcType="VARCHAR" />
+		<result column="user_reg_inviter_num" property="userRegInviterNum"
+			jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="last_update_date" property="lastUpdateDate"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		a.kid, a.user_id,a.user_inviter_id, a.user_reg_channel,
+		a.user_reg_inviter_code, a.user_inviter_code, a.user_reg_inviter_num,
+		a.create_date, a.last_update_date
+	</sql>
+	
+	<!-- 查询本人邀请码 -->
+	<select id="selectInviterCodeByUserId" resultType="java.lang.String">
+		select user_inviter_code
+		from user_operate_info
+		where user_id = #{userId}
+	</select>
+	
+	<!-- 查询本人邀请人数 -->
+	<select id="getInviterNum" resultType="java.lang.Integer">
+		select cust_reg_inviter_num
+		from user_operate_info
+		where user_id = #{userId}
+	</select>
+	
+	<!-- 根据本人邀请码获取用户id -->
+	<select id="selectUserIdByInviter" resultType="java.lang.String">
+		select user_id
+		from user_operate_info
+		where user_inviter_code = #{userInviterCode}
+	</select>
+
+	<select id="listByUserId" resultMap="BaseResultMap">
+		select
+		kid as kid,
+		user_id as userId,
+		create_date as createDate
+		from user_operate_info
+		where user_inviter_id = #{userInviterId}
+		<if test="kid != null">
+			and kid &lt; #{kid}
+		</if>
+		order by create_date desc
+		limit #{limit}
+	</select>
+
+	<select id="listByParams" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		<!-- b.score as eventScore, -->
+		from user_operate_info a
+		where 1=1
+		<if test="userId != null and userId != ''">
+			and a.user_id = #{userId}
+		</if>
+		<if test="userInviterId != null and userInviterId != ''">
+			and a.user_inviter_id = #{userInviterId}
+		</if>
+		<if test="startDate != null and startDate != '' ">
+			and a.create_date &gt; #{startDate}
+		</if>
+		<if test="endDate != null and endDate != '' ">
+			and a.create_date &lt; #{endDate}
+		</if>
+		order by a.create_date desc
+	</select>
+
+	<insert id="insert"
+		parameterType="com.yryz.quanhu.modules.useraccount.entity.UserOperateInfo">
+		insert into user_operate_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="kid != null">
+				kid,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="userRegChannel != null">
+				user_reg_channel,
+			</if>
+			<if test="userRegInviterCode != null">
+				user_reg_inviter_code,
+			</if>
+			<if test="userInviterCode != null">
+				user_inviter_code,
+			</if>
+			<if test="userRegInviterNum != null">
+				user_reg_inviter_num,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="lastUpdateDate != null">
+				last_update_date,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=BIGINT},
+			</if>
+			<if test="kid != null">
+				#{kid,jdbcType=BIGINT},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=BIGINT},
+			</if>
+			<if test="userRegChannel != null">
+				#{userRegChannel,jdbcType=VARCHAR},
+			</if>
+			<if test="userRegInviterCode != null">
+				#{userRegInviterCode,jdbcType=VARCHAR},
+			</if>
+			<if test="userInviterCode != null">
+				#{userInviterCode,jdbcType=VARCHAR},
+			</if>
+			<if test="userRegInviterNum != null">
+				#{userRegInviterNum,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastUpdateDate != null">
+				#{lastUpdateDate,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateInviterNum">
+		update user_operate_info cust_reg_inviter_num = cust_reg_inviter_num +
+		1 where user_inviter_code = #{userInviterCode}
+	</update>
+</mapper>

@@ -1,0 +1,291 @@
+package com.yryz.quanhu.user.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.user.dao.UserStarAuthDao;
+import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
+import com.yryz.quanhu.user.dto.StarAuthParamDTO;
+import com.yryz.quanhu.user.entity.UserStarAuth;
+import com.yryz.quanhu.user.entity.UserStarAuthLog;
+import com.yryz.quanhu.user.service.UserStarService;
+
+/**
+ * 用户达人管理
+ * 
+ * @author danshiyu
+ *
+ */
+@Service
+public class UserStarServiceImpl implements UserStarService {
+	private static final Logger logger = LoggerFactory.getLogger(UserStarServiceImpl.class);
+
+	@Autowired
+	private UserStarAuthDao persistenceDao;
+	@Autowired
+	private UserStarAuthLogDao starAuthLogDao;
+	//@Autowired
+	//private EventManager eventService;
+	//@Autowired
+	//MessageManager messageManager;
+	//@Autowired
+	//private CircleRemote circleService;
+	//@Autowired
+	//private UserService userService;
+
+	@Override
+	@Transactional
+	public int save(UserStarAuth record) {
+		record.setCreateDate(new Date());
+		record.setRecommendStatus((byte) 10);
+		record.setAuditStatus((byte) 10);
+		if(StringUtils.isEmpty(record.getRealName())){
+			record.setRealName("");
+		}
+		if(StringUtils.isEmpty(record.getResourceDesc())){
+			record.setResourceDesc("");
+		}
+		if(StringUtils.isEmpty(record.getLocation())){
+			record.setLocation("");
+		}
+		try {
+			// 平台设置直接通过
+			if (record.getAuthWay().intValue() == 11) {
+				record.setAuditStatus((byte) 11);
+				record.setAuthTime(record.getCreateDate());
+			}
+			int result = persistenceDao.save(record);
+			saveStarAuthLog(record);
+			if (record.getAuthWay().intValue() == 11) {
+				updateUserStar(record);
+				//circleService.updateExpert(record.getCustId(),(byte)1);
+				// 消息
+				//messageManager.starSuccess(record.getCustId());
+			}
+			return result;
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.save]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
+	public UserStarAuth get(String custId, String idCard) {
+		try {
+			return persistenceDao.get(custId, idCard,null);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.get]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
+	public List<UserStarAuth> get(List<String> custIds) {
+		try {
+			return persistenceDao.getByUserIds(custIds);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.getByCustIds]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public int update(UserStarAuth record) {
+		record.setAuditStatus((byte) 10);
+		record.setRecommendStatus((byte) 10);
+		record.setAuditFailReason("");
+		try {
+			// 平台设置直接通过
+			if (record.getAuthWay().intValue() == 11) {
+				record.setAuditStatus((byte) 11);
+				record.setAuthTime(new Date());
+			}
+			int result = persistenceDao.update(record);
+			saveStarAuthLog(record);
+			if (record.getAuthWay().intValue() == 11) {
+				updateUserStar(record);
+				//circleService.updateExpert(record.getCustId(),(byte)1);
+				// 消息
+				//messageManager.starSuccess(record.getCustId());
+			}else{
+				/*CustInfo info = new CustInfo();
+				info.setCustId(record.getCustId());
+				info.setStarRecommendStatus((byte) 0);
+				info.setCustRole((byte) 0);
+				userService.updateCustInfo(info);
+				circleService.updateExpert(record.getCustId(),(byte)0);*/
+			}
+			return result;
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.update]", e);
+			throw new MysqlOptException(e);
+		}
+
+	}
+
+	@Override
+	@Transactional
+	public int updateAudit(UserStarAuth reAuthModel) {
+		Byte auditStatus = reAuthModel.getAuditStatus();
+		try {
+
+			// 审核通过
+			if (auditStatus.intValue() == 11) {
+				reAuthModel.setAuditFailReason("");
+				reAuthModel.setAuthTime(new Date());
+			}
+			// 审核失败
+			if (auditStatus.intValue() == 12) {
+				reAuthModel.setAuditFailTime(new Date());
+			}
+			// 取消认证
+			if (auditStatus.intValue() == 13) {
+				reAuthModel.setRecommendStatus((byte) 10);
+				reAuthModel.setAuthCancelTime(new Date());
+
+			}
+			int result = persistenceDao.update(reAuthModel);
+			saveStarAuthLog(reAuthModel);
+			if (reAuthModel.getAuthTime() != null) {
+				updateUserStar(reAuthModel);
+				//circleService.updateExpert(reAuthModel.getCustId(),(byte)1);
+				// 消息
+				//messageManager.starSuccess(reAuthModel.getCustId());
+			}
+			if (reAuthModel.getAuditFailTime() != null) {
+				//messageManager.starFail(reAuthModel.getCustId(), reAuthModel.getAuditFailReason());
+			}
+
+			if (reAuthModel.getAuthCancelTime() != null) {
+				/*//CustInfo info = new CustInfo();
+				info.setCustId(reAuthModel.getCustId());
+				info.setStarRecommendStatus((byte) 0);
+				info.setCustRole((byte) 0);
+				userService.updateCustInfo(info);
+				circleService.updateExpert(reAuthModel.getCustId(),(byte)0);
+				// 消息
+				messageManager.starCancel(reAuthModel.getCustId());*/
+			}
+			return result;
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.update]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public int updateRecommend(UserStarAuth authModel) {
+		Byte starRecommendStatus = authModel.getRecommendStatus();
+		
+		// 取消推荐
+		if (starRecommendStatus.intValue() == 10) {
+			authModel.setRecommendTime(new Date());
+		}
+		// 设置推荐
+		if (starRecommendStatus.intValue() == 11) {
+			authModel.setRecommendCancelTime(new Date());
+			// 设置权重
+			Integer maxWeight = persistenceDao.getStarMaxWeight();
+			//info.setStarWeight((maxWeight == null ? 0 : maxWeight) + 10);
+		}
+		//userService.updateCustInfo(info);
+		try {
+			return persistenceDao.update(authModel);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.update]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
+	public Page<UserStarAuth> listByParams(Integer pageNo, Integer pageSize, StarAuthParamDTO paramDTO) {
+		@SuppressWarnings("unchecked")
+		Page<UserStarAuth> page = PageHelper.startPage(pageNo, pageSize);
+		try {
+			persistenceDao.listByParams(paramDTO);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.listByParams]", e);
+			throw new MysqlOptException(e);
+		}
+		return page;
+	}
+
+	@Override
+	public List<UserStarAuth> starList(StarAuthParamDTO paramDTO) {
+		try {
+			return persistenceDao.starList(paramDTO);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.starList]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
+	public Integer countStar() {
+		try {
+			return persistenceDao.countStar();
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.countStar]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	/**
+	 * 更新用户为达人
+	 * 
+	 * @param record
+	 */
+	private void updateUserStar(UserStarAuth record) {
+		/*CustInfo info = new CustInfo();
+		info.setCustId(record.getCustId());
+		info.setCustRole((byte)1);
+		userService.updateCustInfo(info);
+		eventService.starAuth(record.getCustId());*/
+	}
+	
+	/**
+	 * 保存达人审核日志
+	 * @param authModel
+	 */
+	private void saveStarAuthLog(UserStarAuth authModel){
+		UserStarAuth oldAuth = get(authModel.getUserId().toString(), null);
+		UserStarAuthLog logModel = new UserStarAuthLog();
+		if(oldAuth == null){
+			BeanUtils.copyProperties(oldAuth, logModel);
+		}else{
+			BeanUtils.copyProperties(authModel, oldAuth, BeanUtils.getNullPropertyNames(authModel));
+			BeanUtils.copyProperties(oldAuth, logModel);
+		}
+		try {
+			logModel.setCreateDate(new Date());
+			starAuthLogDao.insert(logModel);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthLogDao.insert]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+	
+	@Override
+	public List<UserStarAuthLog> listStarDetail(String custId) {
+		try {
+			return starAuthLogDao.selectByUserId(custId);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthLogDao.selectByCustId]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+}
