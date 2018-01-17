@@ -2,24 +2,28 @@ package com.yryz.common.distributed.lock;
 
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.redis.utils.JedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 分布式锁的动态代理，用于方法级别的分布式加解锁<br/>
- * 为@DistributedLock注解服务
- *
- * @author lifan
+ * 基于Redis的分布式锁
+ * @author xiepeng
+ * @version 1.0
+ * @date 2018年1月17日15:11:41
  */
-public class DistributedLockUtils {
+@Service
+public class DistributedLockManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DistributedLockUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DistributedLockManager.class);
 
     //纳秒和毫秒之间的转换率
     private static final long MILLI_NANO_TIME = 1000 * 1000L;
@@ -33,13 +37,16 @@ public class DistributedLockUtils {
     //锁失效时间，默认2s
     private static final int DEFAULT_EXPIRED_TIME = 2;
 
-    /**
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
+
+     /**
      * 组装分布式锁前缀
      *
      * @param prefix
      * @return
      */
-    private static String buildPrefix(String prefix) {
+    private String buildPrefix(String prefix) {
         return "QSOURCE_LOCK_" + prefix;
     }
 
@@ -50,7 +57,7 @@ public class DistributedLockUtils {
      * @param ids    加锁的业务ID，多个用英文逗号分隔
      * @return 已经加锁的ids
      */
-    public static String lock(String prefix, String ids) {
+    public String lock(String prefix, String ids) {
         return lock(prefix, ids, DEFAULT_TIMEOUT);
     }
 
@@ -62,7 +69,7 @@ public class DistributedLockUtils {
      * @param timeout 加锁超时时间
      * @return 已经加锁的ids
      */
-    public static String lock(String prefix, String ids, long timeout) {
+    public String lock(String prefix, String ids, long timeout) {
         return lock(prefix, ids, timeout, DEFAULT_EXPIRED_TIME);
     }
 
@@ -75,7 +82,7 @@ public class DistributedLockUtils {
      * @param expiredTime 锁失效时间
      * @return 已经加锁的ids
      */
-    public static String lock(String prefix, String ids, long timeout, int expiredTime) {
+    public String lock(String prefix, String ids, long timeout, int expiredTime) {
         String lockPrefix = buildPrefix(prefix);
         //批量
         if (ids.contains(",")) {
@@ -97,9 +104,7 @@ public class DistributedLockUtils {
                 throw new QuanhuException(ExceptionEnum.LockException.getCode(), ExceptionEnum.LockException.getShowMsg(),
                         "批量获取分布式锁失败");
             }
-        }
-        //单条
-        else {
+        } else {
             String key = lockPrefix + "_" + ids + "_lock";
             //加锁
             lockByKey(key, timeout, expiredTime);
@@ -113,7 +118,7 @@ public class DistributedLockUtils {
      * @param prefix 业务前缀
      * @param ids    加锁的业务ID，多个用英文逗号分隔
      */
-    public static void unlock(String prefix, String ids) {
+    public void unlock(String prefix, String ids) {
         String lockPrefix = buildPrefix(prefix);
         //批量
         if (ids.contains(",")) {
@@ -122,9 +127,7 @@ public class DistributedLockUtils {
                 //解锁
                 unlockByKey(key);
             }
-        }
-        //单条
-        else {
+        } else {
             String key = lockPrefix + "_" + ids + "_lock";
             //解锁
             unlockByKey(key);
@@ -138,7 +141,7 @@ public class DistributedLockUtils {
      * @param timeout 超时时间
      * @param expire  失效时间
      */
-    private static void lockByKey(String key, long timeout, int expire) {
+    private void lockByKey(String key, long timeout, int expire) {
         try {
             long nanoTime = System.nanoTime();
             long nanoTimeout = timeout * MILLI_NANO_TIME;
@@ -146,7 +149,7 @@ public class DistributedLockUtils {
             while (System.nanoTime() - nanoTime < nanoTimeout) {
                 //锁不存在的话，设置锁并设置锁过期时间，即加锁
                 //设置锁过期时间，REDIS到期自动释放，不会造成永久阻塞
-                if (JedisUtils.setnx(key, LOCKED, expire) == 1) {
+                if (setnx(key, LOCKED, expire)) {
                     LOG.info("获取分布式锁成功，KEY={}" + key);
                     return;
                 }
@@ -156,7 +159,6 @@ public class DistributedLockUtils {
             }
         } catch (Exception e) {
             LOG.info("获取分布式锁失败，KEY={}", key);
-
         }
         throw new QuanhuException(ExceptionEnum.LockException.getCode(), ExceptionEnum.LockException.getShowMsg(),
                 "获取分布式锁失败，KEY=" + key);
@@ -167,14 +169,33 @@ public class DistributedLockUtils {
      *
      * @param key redis的key
      */
-    private static void unlockByKey(String key) {
+    private void unlockByKey(String key) {
         try {
             //删除KEY解锁
-            JedisUtils.del(key);
-            LOG.info("释放分布式锁成功，KEY={}", key);
+            redisTemplate.delete(key);
         } catch (Throwable e) {
             LOG.error("释放分布式锁失败,KEY={}", key);
         }
+    }
+
+    /**
+     * 判断key是否存在，不存在则设置缓存返回true，存在则返回false
+     * @param key 键
+     * @param value 值
+     * @param cacheSeconds 失效时间，0为不失效
+     * @return
+     */
+    private boolean setnx(String key, String value, int cacheSeconds) {
+        boolean result = false;
+        try {
+            result = redisTemplate.opsForValue().setIfAbsent(key, value);
+            if (result && cacheSeconds != 0) {
+                redisTemplate.expire(key, cacheSeconds, TimeUnit.SECONDS);
+            }
+        } catch (Exception e) {
+            LOG.warn("setnx {} = {}", key, value, e);
+        }
+        return result;
     }
 
 }
