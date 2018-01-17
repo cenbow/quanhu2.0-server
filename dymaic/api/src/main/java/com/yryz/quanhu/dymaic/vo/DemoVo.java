@@ -1,4 +1,4 @@
-package com.yryz.quanhu.demo.vo;
+package com.yryz.quanhu.dymaic.vo;
 
 import java.io.Serializable;
 import java.util.Date;

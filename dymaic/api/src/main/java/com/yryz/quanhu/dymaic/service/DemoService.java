@@ -1,8 +1,8 @@
-package com.yryz.quanhu.demo.service;
-
-import com.yryz.quanhu.demo.vo.DemoVo;
+package com.yryz.quanhu.dymaic.service;
 
 import java.util.List;
+
+import com.yryz.quanhu.dymaic.vo.DemoVo;
 
 public interface DemoService {
     static String cacheKey(Long id) {
