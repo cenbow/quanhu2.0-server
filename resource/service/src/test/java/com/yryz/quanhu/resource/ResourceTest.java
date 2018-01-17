@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.resource.api.ResourceApi;
@@ -90,8 +92,8 @@ public class ResourceTest {
 		resource.setCustId("yehao-test-id");
 		resource.setTitle("title");
 		resource.setResourceType(ResourceTypeEnum.RELEASE + "," + ResourceTypeEnum.TOPIC );
-		List<ResourceVo> list = resourceApi.getResources(resource, "orderby", 0, 2, "2018-1-17 1:1:1", "2018-1-17 14:1:1");
-		System.out.println(GsonUtils.parseJson(list));
+		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "orderby", 0, 2, "2018-1-17 1:1:1", "2018-1-17 14:1:1");
+		System.out.println(GsonUtils.parseJson(resonse.getData()));
 	}
 
 }

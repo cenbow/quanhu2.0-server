@@ -9,6 +9,7 @@ package com.yryz.quanhu.resource.api;
 
 import java.util.List;
 
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
@@ -23,19 +24,19 @@ public interface ResourceApi {
 	 * 创建/更新核心资源信息
 	 * @param resources 资源信息实体
 	 */
-	public void commitResource(List<ResourceVo> resources);
+	public Response<?> commitResource(List<ResourceVo> resources);
 	
 	/**
 	 * 更新用户资源
 	 * @param resources
 	 */
-	public void updateResource(List<ResourceVo> resources);
+	public Response<?> updateResource(List<ResourceVo> resources);
 	
 	/**
 	 * 删除资源
 	 * @param resources
 	 */
-	public void deleteResource(List<ResourceVo> resources);
+	public Response<?> deleteResource(List<ResourceVo> resources);
 	
 	/**
 	 * 资源列表获取,如果有排序字段，默认按字段倒序排序
@@ -47,6 +48,6 @@ public interface ResourceApi {
 	 * @param endTime 结束时间，yyyy-MM-dd HH:mm:ss
 	 * @return
 	 */
-	public List<ResourceVo> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime);
+	public Response<List<ResourceVo>> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime);
 
 }

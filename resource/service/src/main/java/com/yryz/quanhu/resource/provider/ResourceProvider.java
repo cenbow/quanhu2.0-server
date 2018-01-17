@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.entity.ResourceModel;
@@ -35,24 +37,27 @@ public class ResourceProvider implements ResourceApi {
 	 * 创建/更新核心资源信息
 	 * @param resources 资源信息实体
 	 */
-	public void commitResource(List<ResourceVo> resources){
+	public Response<?> commitResource(List<ResourceVo> resources){
 		resourceService.commitResource(GsonUtils.parseList(resources, ResourceModel.class));
+		return ResponseUtils.returnSuccess();
 	}
 	
 	/**
 	 * 更新用户资源
 	 * @param resources
 	 */
-	public void updateResource(List<ResourceVo> resources){
+	public Response<?> updateResource(List<ResourceVo> resources){
 		resourceService.updateResource(GsonUtils.parseList(resources, ResourceModel.class));
+		return ResponseUtils.returnSuccess();
 	}
 	
 	/**
 	 * 删除资源
 	 * @param resources
 	 */
-	public void deleteResource(List<ResourceVo> resources){
+	public Response<?> deleteResource(List<ResourceVo> resources){
 		resourceService.deleteResource(GsonUtils.parseList(resources, ResourceModel.class));
+		return ResponseUtils.returnSuccess();
 	}
 	
 	/**
@@ -65,7 +70,7 @@ public class ResourceProvider implements ResourceApi {
 	 * @param endTime 结束时间，yyyy-MM-dd HH:mm:ss
 	 * @return
 	 */
-	public List<ResourceVo> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime){
+	public Response<List<ResourceVo>> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime){
 		if(start < 0){
 			start = 0;
 		}
@@ -73,7 +78,7 @@ public class ResourceProvider implements ResourceApi {
 			limit = CommonConstants.DEFAULT_SIZE;
 		}
 		List<ResourceModel> list = resourceService.getResources(GsonUtils.parseObj(resource, ResourceModel.class), orderColumn, start, limit, startTime, endTime);
-		return GsonUtils.parseList(list, ResourceVo.class);
+		return ResponseUtils.returnListSuccess(GsonUtils.parseList(list, ResourceVo.class));
 	}
 
 }

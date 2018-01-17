@@ -7,6 +7,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.rpc.DubboResponse;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -32,11 +33,11 @@ public class ResponseUtils {
         }
     }
 
-    public static <T> Response<T> returnListSuccess(T t) {
-        if (t == null) {
+    public static <T> Response<T> returnListSuccess(Collection<?> collection) {
+        if (collection == null) {
             return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new ArrayList());
         } else {
-            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
+            return new DubboResponse(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", collection);
         }
     }
     

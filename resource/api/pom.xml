@@ -10,9 +10,19 @@
     </parent>
 
     <artifactId>resource-api</artifactId>
+    
+    <properties>
+		<common.version>2.0-SNAPSHOT</common.version>
+	</properties>
 
     <!--api里面不写死依赖 全部设置为provided 以便部分使用api内容 例如仅仅使用vo的情况-->
     <dependencies>
+    	<dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>quanhu-common</artifactId>
+            <version>${common.version}</version>
+        </dependency>
+    
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
