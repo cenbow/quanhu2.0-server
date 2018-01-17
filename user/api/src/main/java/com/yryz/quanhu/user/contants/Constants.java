@@ -20,4 +20,16 @@ public class Constants {
 	 * 强制绑定手机号标识
 	 */
 	public static final String BIND_PHONE = "BIND_PHONE";
+	/**
+	 * 管理后台代理注册渠道
+	 */
+	public static final String ADMIN_REG_CHANNEL = "admin_agent";
+	/**
+	 * 管理后台马甲代理注册渠道
+	 */
+	public static final String ADMIN_REG_VEST_CHANNEL = "admin_vest_agent";
+	/**
+	 * 第三方应用appkey
+	 */
+	public static final String APP_KEY = "appKey";
 }

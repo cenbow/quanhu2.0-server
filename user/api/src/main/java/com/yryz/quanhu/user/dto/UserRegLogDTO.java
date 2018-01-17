@@ -168,6 +168,13 @@ public class UserRegLogDTO implements Serializable {
 		super();
 	}
 
+	public UserRegLogDTO(String appChannel, String appId, String channelCode) {
+		super();
+		this.appChannel = appChannel;
+		this.appId = appId;
+		this.channelCode = channelCode;
+	}
+
 	/**
 	 * @param userId
 	 * @param appChannel

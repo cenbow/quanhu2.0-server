@@ -159,6 +159,13 @@ public class RegisterDTO implements Serializable {
 		this.userEmail = UserEmail;
 		this.userPwd = UserPwd;
 	}
+	public RegisterDTO(String userChannel, String userPhone, String userPwd, UserRegLogDTO regLogDTO) {
+		super();
+		this.userChannel = userChannel;
+		this.userPhone = userPhone;
+		this.userPwd = userPwd;
+		this.regLogDTO = regLogDTO;
+	}
 	@Override
 	public String toString() {
 		return "RegisterDTO [cityCode=" + cityCode + ", UserChannel=" + userChannel + ", UserLocation=" + userLocation

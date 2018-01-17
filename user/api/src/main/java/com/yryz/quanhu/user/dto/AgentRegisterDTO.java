@@ -31,7 +31,14 @@ public class AgentRegisterDTO implements Serializable{
 	 * 登录密码
 	 */
 	private String userPwd;
-
+	/**
+	 * 是否马甲 0-否 1-是
+	 */
+	private Integer isVest;
+	/**
+	 * 应用id
+	 */
+	private String appId;
 	public String getUserLocation() {
 		return userLocation;
 	}
@@ -62,6 +69,18 @@ public class AgentRegisterDTO implements Serializable{
 	public void setUserPwd(String userPwd) {
 		this.userPwd = userPwd;
 	}
+	public Integer getIsVest() {
+		return isVest;
+	}
+	public void setIsVest(Integer isVest) {
+		this.isVest = isVest;
+	}
+	public String getAppId() {
+		return appId;
+	}
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
 	/**
 	 * 
 	 */
@@ -91,6 +110,44 @@ public class AgentRegisterDTO implements Serializable{
 		this.userNickName = userNickName;
 		this.userPhone = userPhone;
 		this.userPwd = userPwd;
+	}
+	/**
+	 * 马甲注册
+	 * @param userLocation
+	 * @param userNickName
+	 * @param userPhone
+	 * @param userEmail
+	 * @param userPwd
+	 * @param isVest
+	 */
+	public AgentRegisterDTO(String userLocation, String userNickName, String userPhone, String userEmail,
+			String userPwd, Integer isVest) {
+		super();
+		this.userLocation = userLocation;
+		this.userNickName = userNickName;
+		this.userPhone = userPhone;
+		this.userEmail = userEmail;
+		this.userPwd = userPwd;
+		this.isVest = isVest;
+	}
+	/**
+	 * 
+	 * @param userLocation
+	 * @param userNickName
+	 * @param userPhone
+	 * @param userPwd
+	 * @param isVest
+	 * @param appId
+	 */
+	public AgentRegisterDTO(String userLocation, String userNickName, String userPhone, String userPwd, Integer isVest,
+			String appId) {
+		super();
+		this.userLocation = userLocation;
+		this.userNickName = userNickName;
+		this.userPhone = userPhone;
+		this.userPwd = userPwd;
+		this.isVest = isVest;
+		this.appId = appId;
 	}
 	@Override
 	public String toString() {

@@ -1,7 +1,9 @@
 package com.yryz.quanhu.user.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -128,7 +130,13 @@ public interface AccountApi {
 	 * @Description 根据header信息获取登录方式
 	 */
 	public Response<List<LoginMethodVO>> getLoginMethod(String userId);
-
+	
+	/**
+	 * 查询用户最后登录时间
+	 * @param userIds
+	 * @return
+	 */
+	public Response<Map<String,Date>> getLastLoginTime(List<String> userIds);
 	/**
 	 * 退出登录
 	 * 

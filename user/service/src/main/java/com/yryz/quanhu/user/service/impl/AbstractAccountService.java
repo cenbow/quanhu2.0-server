@@ -18,6 +18,7 @@ import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.dao.UserAccountDao;
@@ -26,6 +27,7 @@ import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
+import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
@@ -76,16 +78,17 @@ public abstract class AbstractAccountService implements AccountService {
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public String agentRegister(AgentRegisterDTO registerDTO) {
-
 		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getUserEmail(), null);
 		if (checkAccount != null) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户已存在");
 		}
-
+		String regChannel = Constants.ADMIN_REG_CHANNEL;
+		if(registerDTO.getIsVest() == null || registerDTO.getIsVest() == 0){
+			regChannel = Constants.ADMIN_REG_VEST_CHANNEL;
+		}
+		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, regChannel);
 		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
-
-		Long userId = createUser(new RegisterDTO("admin_agent", registerDTO.getUserNickName(),
-				registerDTO.getUserPhone(), registerDTO.getUserEmail(), registerDTO.getUserPwd()));
+		Long userId = createUser(new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO));
 		return userId.toString();
 	}
 
@@ -100,9 +103,9 @@ public abstract class AbstractAccountService implements AccountService {
 
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号
-			// userService.updateCustInfo(new CustBaseInfo(account.getKid(),
-			// loginDTO.getDeviceId()));
+			 userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));;
 		}
+		
 		return account.getKid();
 	}
 
@@ -123,8 +126,7 @@ public abstract class AbstractAccountService implements AccountService {
 		// 更新设备号
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号
-			 userService.updateUserInfo(new UserBaseInfo(account.getKid(),
-			 loginDTO.getDeviceId()));
+			 userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));
 		}
 		return account.getKid();
 	}
@@ -228,9 +230,8 @@ public abstract class AbstractAccountService implements AccountService {
 		update(account);
 
 		// 同步手机号到用户基础信息表
-		// userService
-		// .updateCustInfo(new CustBaseInfo(userId, null, null, null, null,
-		// null, null, null, null, null, phone));
+		 userService
+		 .updateUserInfo(new UserBaseInfo(account.getKid(), phone, null, null));
 	}
 
 	@Override
@@ -398,7 +399,7 @@ public abstract class AbstractAccountService implements AccountService {
 			throw new MysqlOptException(e);
 		}
 	}
-
+	
 	/**
 	 * 创建用户账户相关信息
 	 * 

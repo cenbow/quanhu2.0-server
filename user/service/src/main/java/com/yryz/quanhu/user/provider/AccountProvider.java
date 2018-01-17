@@ -10,11 +10,14 @@ package com.yryz.quanhu.user.provider;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.distributed.lock.DistributedLockUtils;
+import com.yryz.common.distributed.lock.DistributedLockManager;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
@@ -51,6 +54,7 @@ import com.yryz.quanhu.user.manager.SmsManager;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AccountService;
 import com.yryz.quanhu.user.service.AuthService;
+import com.yryz.quanhu.user.service.OatuhQq;
 import com.yryz.quanhu.user.service.OatuhWeibo;
 import com.yryz.quanhu.user.service.OatuhWeixin;
 import com.yryz.quanhu.user.service.UserService;
@@ -81,7 +85,9 @@ public class AccountProvider implements AccountApi{
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
 	private static final String CHAR_63 = "?";
-
+	
+	@Autowired
+	private DistributedLockManager lockManager;
 	@Autowired
 	private AccountService accountService;
 	@Autowired
@@ -121,7 +127,7 @@ public class AccountProvider implements AccountApi{
 				throw QuanhuException.busiError("验证码错误");
 			}
 			// 手机号加锁
-			DistributedLockUtils.lock(Constants.BIND_PHONE, registerDTO.getUserPhone());
+			lockManager.lock(Constants.BIND_PHONE, registerDTO.getUserPhone());
 
 			boolean flag = accountService.checkUserByPhone(registerDTO.getUserPhone(),header.getAppId());
 			if (flag) {
@@ -130,8 +136,7 @@ public class AccountProvider implements AccountApi{
 
 			Long userId = accountService.register(registerDTO);
 
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(),
-					DevType.getEnumByType(header.getDevType(), header.getUserAgent()), header.getAppId()));
+			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(),header));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -142,7 +147,7 @@ public class AccountProvider implements AccountApi{
 			logger.error("注册未知异常", e);
 			return ResponseUtils.returnException(e);
 		} finally {
-			DistributedLockUtils.unlock(Constants.BIND_PHONE, registerDTO.getUserPhone());
+			lockManager.unlock(Constants.BIND_PHONE, registerDTO.getUserPhone());
 		}
 
 	}
@@ -169,7 +174,7 @@ public class AccountProvider implements AccountApi{
 			accountService.saveLoginLog(new UserLoginLog(userId, header.getDevType(), header.getDevName(),
 					header.getDevId(), header.getAppId()));
 			return ResponseUtils.returnObjectSuccess(
-					returnRegisterLoginVO(userId.toString(), DevType.getEnumByType(header.getDevType(), header.getUserAgent()), header.getAppId()));
+					returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -202,7 +207,7 @@ public class AccountProvider implements AccountApi{
 
 			Long userId = accountService.loginByVerifyCode(loginDTO,header.getAppId());
 			return ResponseUtils
-					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), DevType.getEnumByType(header.getDevType(), header.getUserAgent()), header.getAppId()));
+					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -234,7 +239,7 @@ public class AccountProvider implements AccountApi{
 			loginDTO.setRegLogDTO(logDTO);
 */			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
-			ThirdUser thirdUser = getThirdUser(loginDTO);
+			ThirdUser thirdUser = getThirdUser(loginDTO,header.getAppId());
 
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),header.getAppId());
 			Long userId = null;
@@ -246,8 +251,9 @@ public class AccountProvider implements AccountApi{
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			}
+			
 			return ResponseUtils
-					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), DevType.ANDROID, header.getAppId()));
+					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 		}  catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -281,7 +287,7 @@ public class AccountProvider implements AccountApi{
 			loginDTO.setDeviceId(header.getDevId());*/
 			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
-			ThirdUser thirdUser = getThirdUser(loginDTO);
+			ThirdUser thirdUser = getThirdUser(loginDTO,header.getAppId());
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),header.getAppId());
 			// 已存在账户直接登录
 			if (login != null) {
@@ -292,7 +298,7 @@ public class AccountProvider implements AccountApi{
 					throw QuanhuException.busiError("验证码错误");
 				}
 				// 手机号加锁
-				DistributedLockUtils.lock(Constants.BIND_PHONE, loginDTO.getPhone());
+				lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());
 
 				UserAccount account = accountService.checkUserByPhonePassword(loginDTO.getPhone(), null,header.getAppId());
 				if (account != null) {
@@ -300,7 +306,7 @@ public class AccountProvider implements AccountApi{
 				} else {
 					Long userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
 					return ResponseUtils
-							.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), DevType.ANDROID, header.getAppId()));
+							.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 				}
 			}
 		}  catch (MysqlOptException e) {
@@ -313,7 +319,7 @@ public class AccountProvider implements AccountApi{
 			logger.error("第三方登录绑定手机号未知异常", e);
 			return ResponseUtils.returnException(e);
 		} finally {
-			DistributedLockUtils.unlock(Constants.BIND_PHONE, loginDTO.getPhone());
+			lockManager.unlock(Constants.BIND_PHONE, loginDTO.getPhone());
 		}
 	}
 
@@ -415,7 +421,26 @@ public class AccountProvider implements AccountApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-
+	
+	@Override
+	public Response<Map<String, Date>> getLastLoginTime(List<String> userIds) {
+		try {
+			if (CollectionUtils.isEmpty(userIds)) {
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "userIds不能为空");
+			}
+			return ResponseUtils.returnListSuccess(accountService.getLastLoginTime(userIds));
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (RedisOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("查询最后登录时间未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
 	/**
 	 * 退出登录
 	 * 
@@ -446,7 +471,7 @@ public class AccountProvider implements AccountApi{
 				throw QuanhuException.busiError("验证码错误");
 			}
 			// 手机号加锁
-			DistributedLockUtils.lock(Constants.BIND_PHONE, phoneDTO.getPhone());
+			lockManager.lock(Constants.BIND_PHONE, phoneDTO.getPhone());
 
 			UserAccount account = accountService.checkUserByPhonePassword(phoneDTO.getPhone(), null,phoneDTO.getAppId());
 			if (account != null) {
@@ -464,7 +489,7 @@ public class AccountProvider implements AccountApi{
 			logger.error("绑定手机号未知异常", e);
 			return ResponseUtils.returnException(e);
 		} finally {
-			DistributedLockUtils.unlock(Constants.BIND_PHONE,  phoneDTO.getPhone());
+			lockManager.unlock(Constants.BIND_PHONE,  phoneDTO.getPhone());
 		}
 	}
 
@@ -485,7 +510,7 @@ public class AccountProvider implements AccountApi{
 			loginDTO.setAccessToken(thirdDTO.getAccessToken());
 			loginDTO.setOpenId(thirdDTO.getOpenId());
 			loginDTO.setType(thirdDTO.getThirdType());
-			ThirdUser thirdUser = getThirdUser(loginDTO);
+			ThirdUser thirdUser = getThirdUser(loginDTO,thirdDTO.getAppId());
 			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),thirdDTO.getAppId());
 			if (thirdLogin != null) {
 				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "第三方账户已存在");
@@ -763,15 +788,16 @@ public class AccountProvider implements AccountApi{
 	 * @param loginDTO
 	 * @return
 	 */
-	private ThirdUser getThirdUser(ThirdLoginDTO loginDTO) {
+	private ThirdUser getThirdUser(ThirdLoginDTO loginDTO,String appId) {
 		ThirdUser thirdUser = null;
+		
 		try {// 微博
 			if (loginDTO.getType() == RegType.SINA.getType()) {
 				thirdUser = OatuhWeibo.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
 			} // qq
 			else if (loginDTO.getType() == RegType.QQ.getType()) {
-				// thirdUser = OatuhQq.getUser(loginDTO.getOpenId(),
-				// loginDTO.getAccessToken());
+				thirdUser = OatuhQq.getUser(UserUtils.getThirdAppKey(appId, RegType.QQ), loginDTO.getOpenId(),
+				 loginDTO.getAccessToken());
 			} // 微信
 			else {
 				thirdUser = OatuhWeixin.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
@@ -819,7 +845,7 @@ public class AccountProvider implements AccountApi{
 			thirdLoginDTO.setUserChannel("web_weibo_login");
 			thirdLoginDTO.setType(RegType.SINA.getType());
 			thirdLoginDTO.setOpenId(weiboToken.getUid());
-			thirdUser = getThirdUser(thirdLoginDTO);
+			thirdUser = getThirdUser(thirdLoginDTO,appId);
 		} else {
 			// 微信登录
 			WxToken token = null;
@@ -832,7 +858,7 @@ public class AccountProvider implements AccountApi{
 			thirdLoginDTO.setUserChannel("web_weixin_login");
 			thirdLoginDTO.setOpenId(token.getOpenid());
 			thirdLoginDTO.setType(RegType.WEIXIN.getType());
-			thirdUser = getThirdUser(thirdLoginDTO);
+			thirdUser = getThirdUser(thirdLoginDTO,appId);
 		}
 		return thirdUser;
 	}
@@ -855,14 +881,17 @@ public class AccountProvider implements AccountApi{
 	 * @param tokenType
 	 * @return
 	 */
-	private RegisterLoginVO returnRegisterLoginVO(String userId, DevType devType, String appId) {
+	private RegisterLoginVO returnRegisterLoginVO(String userId, RequestHeader header) {
+		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
 		// web登陆，不刷新token
 		boolean refreshToken = (devType != DevType.ANDROID && devType != DevType.IOS) ? false : true;
 		// 查询用户信息
 		UserSimpleVO user = userService.getUserSimple(userId);
 
-		AuthTokenVO tokenVO = authService.getToken(new AuthTokenDTO(userId, devType, appId, refreshToken));
-
+		AuthTokenVO tokenVO = authService.getToken(new AuthTokenDTO(userId, devType, header.getAppId(), refreshToken));
+		
+		accountService.saveLoginLog(new UserLoginLog(NumberUtils.toLong(userId), devType.getType(), header.getDevName(), header.getDevId(), header.getAppId()));
+		
 		RegisterLoginVO loginVO = new RegisterLoginVO(tokenVO, user);
 
 		return loginVO;
@@ -919,5 +948,7 @@ public class AccountProvider implements AccountApi{
 		logDTO.setChannelCode(channelCode);
 		return logDTO;
 	}
+
+
 
 }

@@ -1,5 +1,8 @@
 package com.yryz.quanhu.user.utils;
 
+import com.yryz.quanhu.user.contants.Constants;
+import com.yryz.quanhu.user.contants.RegType;
+
 public class UserUtils {
 	 /**
      * 获取随机字符串
@@ -25,5 +28,15 @@ public class UserUtils {
 	public static String getReturnApiHost(String returnUrl) {
 		String[] array = returnUrl.split("/");		
 		return String.format("%s//%s",array[0], array[2].replaceAll("www", "api"));
+	}
+	
+	/**
+	 * 获取第三方应用appKey
+	 * @param appId
+	 * @param regType
+	 * @return
+	 */
+	public static String getThirdAppKey(String appId,RegType regType){
+		return String.format("%s.%s.%s",regType.getText(),appId, Constants.APP_KEY);
 	}
 }
