@@ -360,7 +360,6 @@ public class UserServiceImpl implements UserService {
 	 * @return Page<UserBaseInfo>
 	 * @Description 后台管理端分页查询用户信息
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public Page<UserBaseInfo> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
 		custInfoDTO.setNickName(replayStr(custInfoDTO.getNickName()));

@@ -7,7 +7,9 @@
  */
 package com.yryz.quanhu.user.service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
@@ -64,11 +66,11 @@ public interface AccountService {
 	 * 
 	 * @param loginDTO
 	 * @param thirdUser
-	 * @param custId
+	 * @param userId
 	 * @return 用户id
 	 * @Description 第三方登录两种实现，分为非强绑和强绑两种模式
 	 */
-	Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long custId);
+	Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId);
 
 	/**
 	 * （强制绑定手机号）第三方登录绑定手机号
@@ -90,11 +92,16 @@ public interface AccountService {
 	/**
 	 * 获取登录方式
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @return
 	 */
-	List<LoginMethodVO> getLoginMethod(String custId);
-
+	List<LoginMethodVO> getLoginMethod(String userId);
+	/**
+	 * 获取用户最后登录时间
+	 * @param userIds
+	 * @return
+	 */
+	Map<String,Date> getLastLoginTime(List<String> userIds); 
 	/**
 	 * (web)第三方登录
 	 * 
@@ -120,42 +127,42 @@ public interface AccountService {
 	/**
 	 * 绑定手机号
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param phone
 	 * @param password
 	 *            登录密码
 	 */
-	void bindPhone(Long custId, String phone, String password);
+	void bindPhone(Long userId, String phone, String password);
 
 	/**
 	 * 绑定第三方
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param thirdUser
 	 *            第三方用户对象
 	 * @param type
 	 *            1，微信 2，微博 3，qq
 	 */
-	void bindThird(Long custId, ThirdUser thirdUser, Integer type);
+	void bindThird(Long userId, ThirdUser thirdUser, Integer type);
 
 	/**
 	 * 解绑 第三方账户
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param thirdId
 	 * @param type
 	 *            1，微信 2，微博 3，qq
 	 */
-	void unbindThird(Long custId, String thirdId, Integer type,String appId);
+	void unbindThird(Long userId, String thirdId, Integer type,String appId);
 
 	/**
 	 * 修改密码
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param newPassword
 	 * @param oldPassword
 	 */
-	void editPassword(String custId, String newPassword, String oldPassword);
+	void editPassword(String userId, String newPassword, String oldPassword);
 
 	/**
 	 * 手机号重置密码

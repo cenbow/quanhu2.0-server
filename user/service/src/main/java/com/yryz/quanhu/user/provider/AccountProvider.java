@@ -48,6 +48,7 @@ import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserLoginLog;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
 import com.yryz.quanhu.user.manager.SmsManager;
+import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AccountService;
 import com.yryz.quanhu.user.service.AuthService;
 import com.yryz.quanhu.user.service.OatuhWeibo;
@@ -74,8 +75,8 @@ import com.yryz.quanhu.user.vo.WxToken;
  * @Description 考虑到不必要的事务回滚，注册、登录业务大部分校验、获取token、用户信息放到了controller里面，如果你的系统还有上一层
  *              ，可以把这些业务放到上一层处理
  */
-@Service
-public class AccountProvider {
+@Service(interfaceClass=AccountApi.class)
+public class AccountProvider implements AccountApi{
 	private static final Logger logger = LoggerFactory.getLogger(AccountProvider.class);
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
@@ -104,6 +105,7 @@ public class AccountProvider {
 	public Response<RegisterLoginVO> register(RegisterDTO registerDTO, RequestHeader header) {
 		try {
 			checkRegisterDTO(registerDTO, RegType.PHONE);
+			checkHeader(header);
 			/*
 			 * registerDTO.setDeviceId(header.getDevId()); DevType devType =
 			 * DevType.getEnumByType(header.getDevType(),
@@ -155,6 +157,7 @@ public class AccountProvider {
 	public Response<RegisterLoginVO> login(LoginDTO loginDTO, RequestHeader header) {
 		try {
 			checkLoginDTO(loginDTO, LoginType.PHONE);
+			checkHeader(header);
 			/*
 			 * RequestHeader header = WebUtil.getHeader(params); DevType devType
 			 * = DevType.getEnumByType(header.getDevType(),
@@ -189,6 +192,7 @@ public class AccountProvider {
 	public Response<RegisterLoginVO> loginByVerifyCode(LoginDTO loginDTO, RequestHeader header) {
 		try {
 			checkLoginDTO(loginDTO, LoginType.VERIFYCODE);
+			checkHeader(header);
 			/*
 			 * RequestHeader header = WebUtil.getHeader(params); DevType devType
 			 * = DevType.getEnumByType(header.getDevType(),
@@ -229,6 +233,7 @@ public class AccountProvider {
 					loginDTO.getLocation(), null, DevType.ANDROID, WebUtil.getClientIP(params));
 			loginDTO.setRegLogDTO(logDTO);
 */			checkThirdLoginDTO(loginDTO);
+			checkHeader(header);
 			ThirdUser thirdUser = getThirdUser(loginDTO);
 
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),header.getAppId());
@@ -275,6 +280,7 @@ public class AccountProvider {
 			loginDTO.setDevType(devType);
 			loginDTO.setDeviceId(header.getDevId());*/
 			checkThirdLoginDTO(loginDTO);
+			checkHeader(header);
 			ThirdUser thirdUser = getThirdUser(loginDTO);
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),header.getAppId());
 			// 已存在账户直接登录
@@ -618,7 +624,22 @@ public class AccountProvider {
 			 * return ReturnModel.returnException(); } return
 			 * ReturnModel.returnSuccess(ReturnCode.SUCCESSMSG); }
 			 */
-
+	
+	private void checkHeader(RequestHeader header){
+		if (header == null) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
+		}
+		if (StringUtils.isEmpty(header.getAppId())) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "应用id为空");
+		}
+		if (StringUtils.isBlank(header.getDevId())) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "设备号不能为空");
+		}
+		if (StringUtils.isBlank(header.getDevType())) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "设备类型不能为空");
+		}
+	}
+	
 	private void checkRegisterDTO(RegisterDTO registerDTO, RegType type) {
 		if (registerDTO == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");

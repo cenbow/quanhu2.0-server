@@ -2,7 +2,9 @@ package com.yryz.quanhu.user.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -171,7 +173,25 @@ public abstract class AbstractAccountService implements AccountService {
 
 		return list;
 	}
-
+	
+	@Override
+	public Map<String,Date> getLastLoginTime(List<String> userIds){
+		try {
+			Map<String, Date> map = new HashMap<>(userIds.size());
+			List<UserLoginLog> loginLogs = logDao.getLastLoginTime(userIds);
+			if(CollectionUtils.isNotEmpty(loginLogs)){
+				for(int i = 0 ; i < loginLogs.size(); i++){
+					UserLoginLog custLoginLog = loginLogs.get(i);
+					map.put(custLoginLog.getUserId().toString(), custLoginLog.getCreateDate());
+				}
+			}
+			return map;
+		} catch (Exception e) {
+			logger.error("[getLastLoginTime]", e);
+			throw new MysqlOptException("[getLastLoginTime]", e);
+		}
+	}
+	
 	@Override
 	public String webLoginThird(String loginType, String returnUrl) {
 		// 得到第三方登录回调的host

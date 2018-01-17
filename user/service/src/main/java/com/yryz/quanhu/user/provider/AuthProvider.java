@@ -32,7 +32,7 @@ import com.yryz.quanhu.user.vo.AuthTokenVO;
  * @version 1.0
  * @date 2018年1月5日 下午8:34:30
  */
-@Service
+@Service(interfaceClass=AuthApi.class)
 public class AuthProvider implements AuthApi {
 	private static final Logger logger = LoggerFactory.getLogger(AuthProvider.class);
 
