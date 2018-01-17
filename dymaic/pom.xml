@@ -14,5 +14,6 @@
     <modules>
         <module>api</module>
         <module>service</module>
+		<module>canal</module>
     </modules>
 </project>
