@@ -17,23 +17,23 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories(basePackages = "com.yryz.quanhu.dymaic")
 public class EsConfig {
 	@Value("${spring.elasticsearch.host}")
-    private String EsHost;
+    private String esHost;
 
     @Value("${spring.elasticsearch.port}")
-    private int EsPort;
+    private int esPort;
 
     @Value("${spring.elasticsearch.clusterName}")
-    private String EsClusterName;
+    private String esClusterName;
 
     @Bean
     public Client client() throws Exception {
         Settings esSettings = Settings.builder()
-                .put("cluster.name", EsClusterName)
+                .put("cluster.name", esClusterName)
                 .put("client.transport.sniff", true)
                 .build();
 
         PreBuiltTransportClient result = new PreBuiltTransportClient(esSettings);
-        return result.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(EsHost), EsPort));
+        return result.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), esPort));
     }
 
     @Bean

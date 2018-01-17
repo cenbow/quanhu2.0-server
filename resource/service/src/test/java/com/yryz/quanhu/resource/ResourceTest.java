@@ -27,7 +27,7 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
  * @author yehao
  * @version 2.0
  * @date 2018年1月17日 下午1:16:32
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 资源管理单元测试
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -67,6 +67,20 @@ public class ResourceTest {
 			System.out.println("resourceId:" + resource.getResourceId());
 			list.add(resource);
 		}
+		resourceApi.commitResource(list);
+	}
+	
+	@Test
+	public void updateResource(){
+		List<ResourceVo> list = new ArrayList<>();
+			ResourceVo resource = new ResourceVo();
+			resource.setResourceId("02d5cf323c3641779eeb2fff65b291b0");
+			resource.setAudio("yehao-audio" + "-update");
+			resource.setCityCode("100101");
+			resource.setCompleteTime(System.currentTimeMillis());
+			resource.setContent("yehao-content" + "-update");
+			resource.setCoterieId("coterieId");
+			list.add(resource);
 		resourceApi.commitResource(list);
 	}
 	
