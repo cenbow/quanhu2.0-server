@@ -1,6 +1,7 @@
-package com.yryz.quanhu.demo.service;
+package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.quanhu.demo.service.DemoService;
 import com.yryz.quanhu.demo.vo.DemoVo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
