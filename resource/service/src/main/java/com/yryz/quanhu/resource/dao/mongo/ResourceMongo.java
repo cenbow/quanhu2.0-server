@@ -126,7 +126,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 	 */
 	public ResourceModel get(ResourceModel resourceModel){
 		Query query = new Query();
-		query.addCriteria(Criteria.where("resourceId").is(resourceModel));
+		query.addCriteria(Criteria.where("resourceId").is(resourceModel.getResourceId()));
 		return findOne(query);
 	}
 	

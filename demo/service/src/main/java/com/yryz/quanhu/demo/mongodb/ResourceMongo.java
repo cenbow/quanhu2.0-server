@@ -124,7 +124,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 	 */
 	public ResourceModel get(ResourceModel resourceModel){
 		Query query = new Query();
-		query.addCriteria(Criteria.where("resourceId").is(resourceModel));
+		query.addCriteria(Criteria.where("resourceId").is(resourceModel.getResourceId()));
 		return findOne(query);
 	}
 	
@@ -246,7 +246,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				Order order = new Order(Direction.DESC, orderColumns[i]);
 				orders.add(order);
 			}
-			Sort sort = Sort.by(orders);
+			Sort sort = new Sort(orders);
 			query.with(sort);
 		}
 		query.skip(start);

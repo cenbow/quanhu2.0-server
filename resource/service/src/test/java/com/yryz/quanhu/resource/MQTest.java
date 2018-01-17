@@ -39,15 +39,6 @@ public class MQTest {
 	}
 	
 	@Test
-	public void receiveAndSend(){
-		String msg = "hello dirct demo mq";
-		rabbitTemplate.setExchange(AmqpConstant.DEMO_DIRECT_EXCHANGE);
-		rabbitTemplate.setRoutingKey(AmqpConstant.DEMO_RECEIVE_QUEUE);
-		Object back = rabbitTemplate.convertSendAndReceive(msg);
-		System.out.println("back msg : " + back.toString());
-	}
-	
-	@Test
 	public void fanoutSend(){
 		String msg = "hello fanout demo mq";
 		rabbitTemplate.setExchange(AmqpConstant.DEMO_FANOUT_EXCHANGE);
