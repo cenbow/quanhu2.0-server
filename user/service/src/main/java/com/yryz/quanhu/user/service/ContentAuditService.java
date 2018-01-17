@@ -1,5 +1,6 @@
 package com.yryz.quanhu.user.service;
 
+import com.github.pagehelper.PageHelper;
 import com.yryz.quanhu.user.dao.ContentAuditDao;
 import com.yryz.quanhu.user.entity.ContentAudit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class ContentAuditService {
     }
 
     public List<ContentAudit> findByTypeAndInfoId(Map<String, Object> map){
+        PageHelper.startPage(1, 2);
         return contentAuditDao.findByTypeAndInfoId(map);
     }
 
