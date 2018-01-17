@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
  * @date 2018年1月17日 下午3:01:00
  * @Description 消息队列声明枚举
  */
-@Configuration
 public class AmqpConstant {
 	
 	public static final String DEMO_QUEUE = "DEMO_QUEUE";
