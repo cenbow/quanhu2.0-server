@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +24,7 @@ import java.util.List;
 @Api(description = "示例管理")
 @RestController
 public class DemoController {
-    protected final Log logger = LogFactory.getLog(DemoController.class);
+    protected final Logger logger = LoggerFactory.getLogger(DemoController.class);
 
     @Reference
     private DemoService demoService;

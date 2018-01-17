@@ -5,12 +5,18 @@
  * Created on 2018年1月16日
  * Id: ResourceApiImpl.java, 2018年1月16日 下午4:21:51 yehao
  */
-package com.yryz.quanhu.resource.web;
+package com.yryz.quanhu.resource.provider;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.resource.api.ResourceApi;
+import com.yryz.quanhu.resource.entity.ResourceModel;
+import com.yryz.quanhu.resource.service.ResourceService;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
@@ -19,15 +25,18 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
  * @date 2018年1月16日 下午4:21:51
  * @Description 资源服务实现类
  */
-@Service
-public class ResourceApiImpl implements ResourceApi {
+@Service(interfaceClass = ResourceApi.class)
+public class ResourceProvider implements ResourceApi {
+	
+	@Autowired
+	private ResourceService resourceService;
 	
 	/**
 	 * 创建/更新核心资源信息
 	 * @param resources 资源信息实体
 	 */
 	public void commitResource(List<ResourceVo> resources){
-		
+		resourceService.commitResource(GsonUtils.parseList(resources, ResourceModel.class));
 	}
 	
 	/**
@@ -35,7 +44,7 @@ public class ResourceApiImpl implements ResourceApi {
 	 * @param resources
 	 */
 	public void updateResource(List<ResourceVo> resources){
-		
+		resourceService.updateResource(GsonUtils.parseList(resources, ResourceModel.class));
 	}
 	
 	/**
@@ -43,7 +52,7 @@ public class ResourceApiImpl implements ResourceApi {
 	 * @param resources
 	 */
 	public void deleteResource(List<ResourceVo> resources){
-		
+		resourceService.deleteResource(GsonUtils.parseList(resources, ResourceModel.class));
 	}
 	
 	/**
@@ -56,8 +65,15 @@ public class ResourceApiImpl implements ResourceApi {
 	 * @param endTime 结束时间，yyyy-MM-dd HH:mm:ss
 	 * @return
 	 */
-	public List<ResourceVo> getResources(ResourceVo resource , String orderColumn , long start , long limit ,String startTime ,String endTime){
-		return null;
+	public List<ResourceVo> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime){
+		if(start < 0){
+			start = 0;
+		}
+		if(limit <= 0){
+			limit = CommonConstants.DEFAULT_SIZE;
+		}
+		List<ResourceModel> list = resourceService.getResources(GsonUtils.parseObj(resource, ResourceModel.class), orderColumn, start, limit, startTime, endTime);
+		return GsonUtils.parseList(list, ResourceVo.class);
 	}
 
 }

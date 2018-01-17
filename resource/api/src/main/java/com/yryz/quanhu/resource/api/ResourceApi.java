@@ -47,6 +47,6 @@ public interface ResourceApi {
 	 * @param endTime 结束时间，yyyy-MM-dd HH:mm:ss
 	 * @return
 	 */
-	public List<ResourceVo> getResources(ResourceVo resource , String orderColumn , long start , long limit ,String startTime ,String endTime);
+	public List<ResourceVo> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime);
 
 }

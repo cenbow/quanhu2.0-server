@@ -9,6 +9,7 @@ package com.yryz.quanhu.resource.service.impl;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,40 +30,54 @@ public class ResourceServiceImpl implements ResourceService {
 	private ResourceMongo resourceMongo;
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 提交资源
 	 * @param resources
 	 * @see com.yryz.quanhu.resource.service.ResourceService#commitResource(java.util.List)
 	 */
 	@Override
 	public void commitResource(List<ResourceModel> resources) {
-		// TODO Auto-generated method stub
-		
+		if(CollectionUtils.isNotEmpty(resources)){
+			for (ResourceModel resourceModel : resources) {
+				if(resourceMongo.get(resourceModel) != null){
+					resourceMongo.update(resourceModel);
+				} else {
+					resourceMongo.save(resourceModel);
+				}
+			}
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 更新资源
 	 * @param resources
 	 * @see com.yryz.quanhu.resource.service.ResourceService#updateResource(java.util.List)
 	 */
 	@Override
 	public void updateResource(List<ResourceModel> resources) {
-		// TODO Auto-generated method stub
+		if(CollectionUtils.isNotEmpty(resources)){
+			for (ResourceModel resourceModel : resources) {
+				resourceMongo.update(resourceModel);
+			}
+		}
 		
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 删除资源
 	 * @param resources
 	 * @see com.yryz.quanhu.resource.service.ResourceService#deleteResource(java.util.List)
 	 */
 	@Override
 	public void deleteResource(List<ResourceModel> resources) {
-		// TODO Auto-generated method stub
-		
+		if(CollectionUtils.isNotEmpty(resources)){
+			for (ResourceModel resourceModel : resources) {
+				resourceMongo.delete(resourceModel);
+			}
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取资源对象
 	 * @param resource
 	 * @param orderColumn
 	 * @param start
@@ -70,13 +85,12 @@ public class ResourceServiceImpl implements ResourceService {
 	 * @param startTime
 	 * @param endTime
 	 * @return
-	 * @see com.yryz.quanhu.resource.service.ResourceService#getResources(com.yryz.quanhu.resource.entity.ResourceModel, java.lang.String, long, long, java.lang.String, java.lang.String)
+	 * @see com.yryz.quanhu.resource.service.ResourceService#getResources(com.yryz.quanhu.resource.entity.ResourceModel, java.lang.String, int, int, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<ResourceModel> getResources(ResourceModel resource, String orderColumn, long start, long limit,
+	public List<ResourceModel> getResources(ResourceModel resource, String orderColumn, int start, int limit,
 			String startTime, String endTime) {
-		// TODO Auto-generated method stub
-		return null;
+		return resourceMongo.getList(resource, orderColumn, startTime, endTime, start, limit);
 	}
 	
 	

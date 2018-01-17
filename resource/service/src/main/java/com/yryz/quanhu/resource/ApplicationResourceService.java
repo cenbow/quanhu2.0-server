@@ -1,11 +1,11 @@
-package com.yryz.quanhu.demo;
+package com.yryz.quanhu.resource;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApplicationDemoService {
+public class ApplicationResourceService {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationDemoService.class, args);
+        SpringApplication.run(ApplicationResourceService.class, args);
     }
 }

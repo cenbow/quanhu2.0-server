@@ -16,5 +16,10 @@ public class CommonConstants {
 	 * redis认证数据源
 	 */
 	public static final String REDIS_SOURCE_AUTH="AUTH";
+	
+	/**
+	 * 默认的列表长度
+	 */
+	public static int DEFAULT_SIZE = 20;
 		
 }
