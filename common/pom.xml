@@ -102,6 +102,7 @@
         <dependency>
             <groupId>io.dubbo.springboot</groupId>
             <artifactId>spring-boot-starter-dubbo</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- mysql和mybatis基类封装依赖 -->
@@ -113,6 +114,7 @@
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -123,6 +125,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- rabbitmq的基类和工具类引用 -->
@@ -131,8 +134,6 @@
             <artifactId>spring-rabbit</artifactId>
             <scope>provided</scope>
         </dependency>
-
-
 
         <!-- 常用工具包依赖  -->
         <!-- httpclient封装 -->

@@ -18,6 +18,13 @@ public class QuanhuException extends IllegalArgumentException {
         }
     }
 
+    public QuanhuException(String code, String msg, String errorMsg , Throwable cause) {
+        super(errorMsg,cause);
+        this.code = code;
+        this.msg = msg;
+        this.errorMsg = errorMsg;
+    }
+    
     public QuanhuException(String code, String msg, String errorMsg) {
         super(msg);
         this.code = code;
