@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.distributed.lock.DistributedLockManager;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
@@ -34,10 +33,12 @@ import com.yryz.common.exception.RedisOptException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.framework.core.lock.DistributedLockManager;
 import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.LoginType;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
+import com.yryz.quanhu.user.contants.UserAccountStatus;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.BindThirdDTO;
@@ -48,6 +49,7 @@ import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
+import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
 import com.yryz.quanhu.user.manager.SmsManager;
@@ -59,13 +61,13 @@ import com.yryz.quanhu.user.service.OatuhWeibo;
 import com.yryz.quanhu.user.service.OatuhWeixin;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserThirdLoginService;
-import com.yryz.quanhu.user.service.UserViolationService;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.ThirdLoginConfigVO;
 import com.yryz.quanhu.user.vo.ThirdUser;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import com.yryz.quanhu.user.vo.WeiboToken;
 import com.yryz.quanhu.user.vo.WxToken;
@@ -94,8 +96,6 @@ public class AccountProvider implements AccountApi{
 	private UserThirdLoginService thirdLoginService;
 	@Autowired
 	private SmsManager smsService;
-	@Autowired
-	private UserViolationService violationService;
 	@Autowired
 	private AuthService authService;
 	@Autowired
@@ -170,9 +170,12 @@ public class AccountProvider implements AccountApi{
 			 * loginDTO.setDeviceId(header.getDevId());
 			 */
 			Long userId = accountService.login(loginDTO);
-
-			accountService.saveLoginLog(new UserLoginLog(userId, header.getDevType(), header.getDevName(),
-					header.getDevId(), header.getAppId()));
+			
+			// 判断用户状态
+			if(checkUserDisable(userId.toString()).getData()){
+				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+			}
+			
 			return ResponseUtils.returnObjectSuccess(
 					returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
@@ -206,6 +209,11 @@ public class AccountProvider implements AccountApi{
 			 */
 
 			Long userId = accountService.loginByVerifyCode(loginDTO,header.getAppId());
+			
+			// 判断用户状态
+			if(checkUserDisable(userId.toString()).getData()){
+				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+			}
 			return ResponseUtils
 					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
@@ -247,7 +255,9 @@ public class AccountProvider implements AccountApi{
 			if (login != null) {
 				userId = login.getUserId();
 				// 判断用户状态
-				violationService.checkUserStatus(userId);
+				if(checkUserDisable(userId.toString()).getData()){
+					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+				}
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			}
@@ -620,7 +630,106 @@ public class AccountProvider implements AccountApi{
 		}
 		return ResponseUtils.returnObjectSuccess(true);
 	}
+	
+	/**
+	 * 检查用户是否被禁言
+	 * @param userId
+	 * @return
+	 */
+	public Response<Boolean> checkUserDisTalk(String userId){
+		try {
+			if(StringUtils.isBlank(userId)){
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+			}
+			UserBaseInfo baseInfo = userService.getUser(userId);
+			if(baseInfo == null){
+				throw new QuanhuException(ExceptionEnum.USER_MISSING);
+			}
+			if(checkUserDistory(userId).getData()){
+				return ResponseUtils.returnObjectSuccess(true);
+			}
+			if(baseInfo.getBanPostTime().getTime() > new Date().getTime()){
+				return ResponseUtils.returnObjectSuccess(true);
+			}else{
+				return ResponseUtils.returnObjectSuccess(false);
+			}
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (RedisOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("forgotPassword未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
 
+	/**
+	 * 检查用户是否冻结
+	 * @param userId
+	 * @return
+	 */
+	public Response<Boolean> checkUserDisable(String userId){
+		try {
+			if(StringUtils.isBlank(userId)){
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+			}
+			UserBaseInfo baseInfo = userService.getUser(userId);
+			if(baseInfo == null){
+				throw new QuanhuException(ExceptionEnum.USER_MISSING);
+			}
+			if(checkUserDistory(userId).getData()){
+				return ResponseUtils.returnObjectSuccess(true);
+			}
+			if(baseInfo.getUserStatus().intValue() == UserAccountStatus.FREEZE.getStatus()){
+				return ResponseUtils.returnObjectSuccess(true);
+			}else{
+				return ResponseUtils.returnObjectSuccess(false);
+			}
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (RedisOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("forgotPassword未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
+	/**
+	 * 检查用户是否注销
+	 * @param userId
+	 * @return
+	 */
+	public Response<Boolean> checkUserDistory(String userId){
+		try {
+			if(StringUtils.isBlank(userId)){
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+			}
+			UserBaseInfo baseInfo = userService.getUser(userId);
+			if(baseInfo == null){
+				throw new QuanhuException(ExceptionEnum.USER_MISSING);
+			}
+			if(baseInfo.getUserStatus().intValue() == UserAccountStatus.DISTORY.getStatus()){
+				return ResponseUtils.returnObjectSuccess(true);
+			}else{
+				return ResponseUtils.returnObjectSuccess(false);
+			}
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (RedisOptException e) {
+			return ResponseUtils.returnException(e);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("forgotPassword未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
 	/*	*//**
 			 * 邀请码补录
 			 * 
@@ -886,7 +995,7 @@ public class AccountProvider implements AccountApi{
 		// web登陆，不刷新token
 		boolean refreshToken = (devType != DevType.ANDROID && devType != DevType.IOS) ? false : true;
 		// 查询用户信息
-		UserSimpleVO user = userService.getUserSimple(userId);
+		UserLoginSimpleVO user = userService.getUserLoginSimpleVO(userId);
 
 		AuthTokenVO tokenVO = authService.getToken(new AuthTokenDTO(userId, devType, header.getAppId(), refreshToken));
 		

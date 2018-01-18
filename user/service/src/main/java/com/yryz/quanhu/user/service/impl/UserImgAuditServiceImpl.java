@@ -115,7 +115,6 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 	@Override
 	public Page<UserImgAudit> listByUserId(Integer pageNo, Integer pageSize, String userId, Integer auditStatus) {
 		try {
-			@SuppressWarnings("unchecked")
 			Page<UserImgAudit> page = PageHelper.startPage(pageNo, pageSize);
 			imgAuditDao.listByUserId(userId, auditStatus);
 			return page;

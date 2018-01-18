@@ -32,4 +32,12 @@ public class Constants {
 	 * 第三方应用appkey
 	 */
 	public static final String APP_KEY = "appKey";
+	/**
+	 * 禁言时间/小时
+	 */
+	public static final int NO_TALK_HOUR = 8;
+	/**
+	 * 警告禁言次数
+	 */
+	public static final int WARN_TIMES = 3;
 }
