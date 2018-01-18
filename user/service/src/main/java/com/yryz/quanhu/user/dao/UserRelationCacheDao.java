@@ -37,8 +37,8 @@ public class UserRelationCacheDao {
 
     /**
      * 获取唯一关系
-     * @param userSource
-     * @param userTarget
+     * @param userSourceId
+     * @param userTargetId
      * @return
      */
     public UserRelationDto getUserRelation(String userSourceId,String userTargetId){
@@ -64,17 +64,22 @@ public class UserRelationCacheDao {
             Query query = new Query();
             query.addCriteria(Criteria.where("userSourceId").is(userSourceId));
             query.addCriteria(Criteria.where("userTargetId").is(userTargetId));
+
             //查询
             List<UserRelationDto> array = mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
             if(null!=array&&array.size()>0){
                 return array.get(0);
             }
-            //查询数据库
+
+            /**
+             * 查询数据库
+             */
             UserRelationDto _dto = new UserRelationDto();
 
-            userRelationDao.getList(_dto);
-
-
+            array = userRelationDao.getList(_dto);
+            if(null!=array&&array.size()>0){
+                return array.get(0);
+            }
         }catch (Exception e){
             throw new RuntimeException(e);
         }

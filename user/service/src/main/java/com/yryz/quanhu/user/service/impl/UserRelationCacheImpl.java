@@ -2,8 +2,10 @@ package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.PageList;
+import com.yryz.quanhu.user.dao.UserRelationCacheDao;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
+import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.service.UserRelationService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,8 @@ import java.util.List;
 @Transactional
 public class UserRelationCacheImpl implements UserRelationService{
 
-
+    @Autowired
+    private UserRelationCacheDao userRelationCacheDao;
 
     @Resource
     private RedisTemplate<String,UserRelationDto> redisTemplate;
@@ -40,37 +43,84 @@ public class UserRelationCacheImpl implements UserRelationService{
 
     @Override
     public boolean setRelation(UserRelationDto dto) {
-
-
-        String key = getCacheKey("","");
         try{
             /**
-             * 查询redis是否存在
-             * 查询mongo记录是否存在
-             * 判断设置条件是否满足
+             * 用户单方操作时，不校验对方关系，
+             * 更新缓存，及时响应结果信息
              */
-            dto = redisTemplate.opsForValue().get(key);
+            UserRelationDto sourceDto = userRelationCacheDao.getUserRelation("","");
+            UserRelationDto targetDto = userRelationCacheDao.getUserRelation("","");
             if(dto == null){
 
-                //查询条件
-                Query query = new Query();
-                query.addCriteria(Criteria.where("userSource").is(""));
-                query.addCriteria(Criteria.where("userTarget").is(""));
-                //查询
-                List<UserRelationDto> array = mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
-                if(null!=array&&array.size()>0){
-                    dto = array.get(0);
-                }
             }
             /**
-             * 添加到mq进行消峰
+             * 判断操作条件是否成立
+             * 关注，拉黑
              */
-            rabbitTemplate
+
         }catch (Exception e){
 
         }
         return false;
     }
+
+    public boolean checkRelation(UserRelationDto sourceDto, UserRelationDto targetDto, UserRelationApi.TYPE type){
+
+        /**
+         * 主要判断逻辑，判断对方是否拉黑
+         */
+        if(type == UserRelationApi.TYPE.FOLLOW){                //关注
+            /**
+             * 设置 target 的 黑名单    否
+             * 设置 target 的 好友关系  判断target粉丝状态 是：是，否：否
+             * 设置 target 的 粉丝关系  保持不变
+             *
+             * 设置 source 的 黑名单    否
+             * 设置 source 的 好友关系   判断target粉丝状态 是：是，否：否
+             * 设置 source 的 粉丝关系   是
+             */
+
+        }else if(type == UserRelationApi.TYPE.CANCEL_FOLLOW){   //取消关注
+            /**
+             * 设置 target 的 黑名单    否
+             * 设置 target 的 好友关系  否
+             * 设置 target 的 粉丝关系  保持不变
+             *
+             * 设置 source 的 黑名单    否
+             * 设置 source 的 好友关系   否
+             * 设置 source 的 粉丝关系   否
+             */
+
+        }else if(type == UserRelationApi.TYPE.BLACK){           //拉黑
+            /**
+             * 设置 target 的 黑名单    是
+             * 设置 target 的 好友关系  否
+             * 设置 target 的 粉丝关系  否
+             *
+             * 设置 source 的 黑名单    是
+             * 设置 source 的 好友关系   否
+             * 设置 source 的 粉丝关系   否
+             */
+
+        }else if(type == UserRelationApi.TYPE.CANCEL_BLACK){    //取消拉黑
+
+            /**
+             * 设置 target 的 黑名单    否
+             * 设置 target 的 好友关系  否
+             * 设置 target 的 粉丝关系  否
+             *
+             * 设置 source 的 黑名单    否
+             * 设置 source 的 好友关系   否
+             * 设置 source 的 粉丝关系   否
+             */
+
+        }else{
+            return false;
+        }
+
+        return false;
+    }
+
 
     @Override
     public boolean checkRelation(UserRelationDto dto) {
