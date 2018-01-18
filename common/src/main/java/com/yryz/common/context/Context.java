@@ -8,6 +8,7 @@
 package com.yryz.common.context;
 
 import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.core.env.Environment;
  * @version 1.0 2011-3-8
  * @since 1.0
  */
+@Configuration
 public class Context implements EnvironmentAware {
 	
 	private static Environment env;
@@ -47,6 +49,14 @@ public class Context implements EnvironmentAware {
 
 	/** 默认替代词*/
 	public static final String SENSIT_REPLACE = "*";
+	
+	/**
+	 * 
+	 * @exception 
+	 */
+	public Context() {
+		super();
+	}
 
 	/**
 	 * Construct
