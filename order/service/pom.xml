@@ -12,18 +12,19 @@
     <artifactId>order-service</artifactId>
 
     <dependencies>
-        <!--项目内部依赖-->
+        <!-- 项目内部依赖 -->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>order-api</artifactId>
-            <version>${parent.version}</version>
+            <version>${quanhu.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>
         </dependency>
 
-        <!--公司内部库-->
+        <!-- 公司内部库 -->
         <dependency>
             <groupId>com.yryz.framework</groupId>
             <artifactId>service-starter</artifactId>
@@ -38,9 +39,24 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <!-- 第三方依赖 -->
+        <dependency>
+            <groupId>com.dangdang</groupId>
+            <artifactId>elastic-job-lite-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dangdang</groupId>
+            <artifactId>elastic-job-lite-spring</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
