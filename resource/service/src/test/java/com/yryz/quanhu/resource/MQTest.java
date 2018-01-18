@@ -8,6 +8,9 @@
 package com.yryz.quanhu.resource;
 
 
+import java.io.IOException;
+
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yryz.quanhu.resource.mq.AmqpConstant;
+import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
  * @author yehao
@@ -29,6 +35,7 @@ public class MQTest {
 	
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	
 	
 	@Test
 	public void directSend(){
