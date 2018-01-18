@@ -5,13 +5,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.MysqlOptException;
@@ -40,7 +38,6 @@ import com.yryz.quanhu.user.service.OatuhWeixin;
 import com.yryz.quanhu.user.service.UserOperateService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserThirdLoginService;
-import com.yryz.quanhu.user.service.UserViolationService;
 import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
@@ -64,8 +61,6 @@ public abstract class AbstractAccountService implements AccountService {
 	private SmsManager smsService;
 	@Autowired
 	private UserOperateService operateService;
-	@Autowired
-	private UserViolationService violationService;
 	@Autowired
 	protected UserService userService;
 
@@ -98,9 +93,7 @@ public abstract class AbstractAccountService implements AccountService {
 		if (account == null) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户不存在");
 		}
-		// 判断用户状态
-		violationService.checkUserStatus(account.getKid());
-
+		
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号
 			 userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));;
@@ -108,7 +101,7 @@ public abstract class AbstractAccountService implements AccountService {
 		
 		return account.getKid();
 	}
-
+	
 	/**
 	 * 手机验证码登录
 	 */
@@ -121,8 +114,6 @@ public abstract class AbstractAccountService implements AccountService {
 		if (!smsService.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(), SmsType.CODE_LOGIN,appId)) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "验证码错误");
 		}
-		// 判断用户状态
-		violationService.checkUserStatus(account.getKid());
 		// 更新设备号
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号
@@ -419,18 +410,16 @@ public abstract class AbstractAccountService implements AccountService {
 		userService
 				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
 						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode()));
-
+		
+		//异步处理
 		// 创建运营信息
 		operateService
 				.save(new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
-		registerDTO.getRegLogDTO().setUserId(userId);
-		operateService.saveRegLog(registerDTO.getRegLogDTO());
-
-		// 插入登录日志
-		saveLoginLog(new UserLoginLog(userId, registerDTO.getRegLogDTO().getDevType(),
-				registerDTO.getRegLogDTO().getDevName(), registerDTO.getDeviceId(),
-				registerDTO.getRegLogDTO().getAppId()));
-
+		if(registerDTO.getRegLogDTO() != null){
+			registerDTO.getRegLogDTO().setUserId(userId);
+			operateService.saveRegLog(registerDTO.getRegLogDTO());
+		}
+		//TODO:发送注册消息 加积分
 		return userId;
 	}
 

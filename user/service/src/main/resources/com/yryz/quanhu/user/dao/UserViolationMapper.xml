@@ -46,7 +46,7 @@
 	select
 	<include refid="Base_Column_List" />
 	from user_violation 
-	where status = 0
+	where status = 10
 	<if test="userIds != null">
 		and user_id in
 		<foreach item="item" index="index" collection="custIds" open="("
@@ -61,16 +61,16 @@
 		and create_date &lt;= #{endDate}
 	</if>		
 	<if test="banPost !=null ">
-		and violation_type = 1 and ban_post_time &gt;= now()
+		and violation_type = 11 and ban_post_time &gt;= now()
 	</if>
-	<if test="black !=null ">
-		and violation_type = 2
+	<if test="freeze !=null ">
+		and violation_type = 12
 	</if>
 	order by create_date desc
   </select>  
   
   <update id="updateViolation">
-		update user_violation set status = 1 where user_id = #{userId}
+		update user_violation set status = 11 where user_id = #{userId}
   </update>
   
   <insert id="insert" parameterType="com.yryz.quanhu.modules.useraccount.entity.UserViolation" >

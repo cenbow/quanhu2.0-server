@@ -11,24 +11,33 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.MysqlOptException;
-import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.exception.RedisOptException;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.user.contants.Constants;
+import com.yryz.quanhu.user.contants.UserAccountStatus;
 import com.yryz.quanhu.user.contants.ViolatType;
 import com.yryz.quanhu.user.dao.UserViolationDao;
+import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserViolation;
 import com.yryz.quanhu.user.service.AuthService;
+import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserViolationService;
+import com.yryz.quanhu.user.service.ViolationApi;
 
 /**
  * @author danshiyu
@@ -39,26 +48,14 @@ import com.yryz.quanhu.user.service.UserViolationService;
 @Service
 public class UserViolationServiceImpl implements UserViolationService {
 	private final static Logger logger = LoggerFactory.getLogger(UserViolationServiceImpl.class);
-	/**
-	 * 警告禁言次数
-	 */
-	private static final int WARN_TIMES = 3;
-	/**
-	 * 禁言时间（小时）
-	 */
-	private static final int NO_TALK_HOUR = 8;
-	
-	/** 禁言类型 */
-	private static final int NO_TALK_TYPE = 1;
-	/** 冻结类型 */
-	private static final int FREEZE_TYPE = 2;
 	@Autowired
 	private UserViolationDao mysqlDao;
-
+	@Resource 
+	private RedisTemplate<String, Long> redisTemplate;
 /*	@Autowired
 	private AccountRedisDao userRedisDao;*/
-/*	@Autowired
-	private UserService userService;*/
+	@Autowired
+	private UserService userService;
 	@Autowired
 	private AuthService authService;
 /*	@Autowired
@@ -81,20 +78,20 @@ public class UserViolationServiceImpl implements UserViolationService {
 
 		// 保存当前违规记录
 		saveViolationDao(violation);
-		updateUserStatus(violation);
+		updateUserStatus(violation,appId);
 
 		// 判断警告是否满足禁言
 		if (violation.getViolationType().intValue() == ViolatType.WARN.getType()) {
-			long times = 0;//userRedisDao.getUserWarnTimes(violation.getCustId());
-			if (times < WARN_TIMES) {
-				//times = userRedisDao.incrUserWarnTimes(violation.getCustId());
+			long times = getUserWarnTimes(violation.getUserId().toString());
+			if (times < Constants.WARN_TIMES) {
+				times = incrUserWarnTimes(violation.getUserId().toString());
 				// 禁言
-				if (times == WARN_TIMES) {
+				if (times == Constants.WARN_TIMES) {
 					UserViolation violation2 = (UserViolation) GsonUtils.parseObj(violation, UserViolation.class);
 					violation2.setStatus((byte) 0);
 					violation2.setViolationType((byte) ViolatType.NOTALK.getType());
 					saveViolationDao(violation2);
-					updateUserStatus(violation2);
+					updateUserStatus(violation2,appId);
 				}
 			}
 		}
@@ -104,20 +101,22 @@ public class UserViolationServiceImpl implements UserViolationService {
 	@Transactional(rollbackFor=RuntimeException.class)
 	public void updateViolation(UserViolation violation, String appId) {
 		// 解除禁言
-		if (violation.getViolationType().intValue() == WARN_TIMES) {
+		if (violation.getViolationType().intValue() == Constants.WARN_TIMES) {
 			// 同步用户状态
-			//userService.updateCustInfo(new CustBaseInfo(violation.getCustId(), (byte) 1, DateUtils.now()));
+			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(), null, null, null, null, new Date())
+					);
 			violation.setPushMessage("解除禁言");
 			violation.setReason("解除禁言");
 		} // 解冻
 		else {
 			// 同步用户状态
-			//userService.updateCustInfo(new CustBaseInfo(violation.getCustId(), (byte) 1, DateUtils.now()));
+			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(), null, null, null, null, new Date())
+					);
 			violation.setPushMessage("解冻");
 			violation.setReason("解冻");
 		}
 		saveViolation(violation, appId);
-		//userRedisDao.clearUserWarnTimes(violation.getCustId());
+		clearUserWarnTimes(violation.getUserId().toString());
 	}
 
 	@Override
@@ -149,7 +148,6 @@ public class UserViolationServiceImpl implements UserViolationService {
 	public Page<UserViolation> getCustViolationList(int pageNo, int pageSize, List<String> custIds, Integer type,
 			String startDate, String endDate) {
 		// 使用pagehelper 查询实现count 分页
-		@SuppressWarnings("unchecked")
 		Page<UserViolation> page = PageHelper.startPage(pageNo, pageSize);
 		listPageViolation(custIds, type, startDate, endDate);
 		return page;
@@ -205,10 +203,10 @@ public class UserViolationServiceImpl implements UserViolationService {
 			params.put("endDate", endDate);
 			if (type == null) {
 				params.put("violation", 1);
-			} else if (type.intValue() == NO_TALK_TYPE) {
+			} else if (type.intValue() == ViolatType.NOTALK.getType()) {
+				params.put("banPost", 1);
+			} else if (type.intValue() == ViolatType.FREEZE.getType()) {
 				params.put("freeze", 1);
-			} else if (type.intValue() == FREEZE_TYPE) {
-				params.put("black", 1);
 			}
 			return mysqlDao.listPageViolation(params);
 		} catch (Exception e) {
@@ -222,59 +220,78 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 * 
 	 * @param violation
 	 */
-	private void updateUserStatus(UserViolation violation) {
+	private void updateUserStatus(UserViolation violation,String appId) {
 		// 警告推送
 		if (violation.getViolationType() == ViolatType.WARN.getType()) {
 			//pushService.warn(violation.getCustId());
 		} // 禁言
 		else if (violation.getViolationType().intValue() == ViolatType.NOTALK.getType()) {
 			// 同步用户状态
-			//userService
-			//		.updateCustInfo(new CustBaseInfo(violation.getCustId(), (byte) 1, DateUtils.addHour(NO_TALK_HOUR)));
+			userService
+					.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(), null, null, null, null, DateUtils.addDays(new Date(), Constants.NO_TALK_HOUR))
+							);
 			// 消息
 			// messageManager.disTalk(violation.getCustId());
 		} // 冻结
 		else if (violation.getViolationType().intValue() == ViolatType.FREEZE.getType()) {
 			// 同步用户状态
-			//userService.updateCustInfo(new CustBaseInfo(violation.getCustId(), (byte) 0, null));
-			authService.delToken(violation.getUserId().toString(),"");
+			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.FREEZE.getStatus(), null, null, null, null, new Date())
+					);
+			authService.delToken(violation.getUserId().toString(),appId);
 		}
 	}
 
-	@Override
-	public boolean checkCustTalk(Long custId) {
-		UserViolation custViolation = getCustViolation(custId);
-		if (custViolation == null) {
-			return false;
-		}
-		if (custViolation.getViolationType() == ViolatType.NOTALK.getType()
-				&& custViolation.getBanPostTime().getTime() > System.currentTimeMillis()) {
-			return true;
-		}
-		if (custViolation.getViolationType() == ViolatType.FREEZE.getType()) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean checkCustFreeze(Long custId) {
-		UserViolation custViolation = getCustViolation(custId);
-		if (custViolation == null) {
-			return false;
-		}
-		if (custViolation.getViolationType() == ViolatType.FREEZE.getType()) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void checkUserStatus(Long custId) {
-		boolean flag = this.checkCustFreeze(custId);
-		if (flag) {
-			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "",ExceptionEnum.BusiException.getErrorMsg());
+	/**
+	 * 增加用户警告数 ，当用户警告数已存在且达到3后直接设置1
+	 * @param custId
+	 * @return
+	 */
+	private long incrUserWarnTimes(String custId){
+		String key = ViolationApi.warnTimesKey(custId);
+		try {
+			long times = redisTemplate.opsForValue().increment(key, 1);
+			if(times == 3){
+				redisTemplate.expire(key, Constants.NO_TALK_HOUR, TimeUnit.HOURS);
+			}
+			return times;
+		} catch (Exception e) {
+			logger.error("incrUserWarnTimes", e);
+			throw new RedisOptException(e);
 		}
 	}
-
+	
+	/**
+	 * 查询用户警告数
+	 * @param custId
+	 * @return
+	 */
+	private long getUserWarnTimes(String custId){
+		String key = ViolationApi.warnTimesKey(custId);
+		try {
+			Long times = redisTemplate.opsForValue().get(key);
+			if(times == null){
+				return 0;
+			}
+			return times;
+			
+		} catch (Exception e) {
+			logger.error("getUserWarnTimes", e);
+			throw new RedisOptException(e);
+		} 
+	}
+	
+	/**
+	 * 清除用户警告数
+	 * @param custId
+	 * @return
+	 */
+	private void clearUserWarnTimes(String custId){
+		String key = ViolationApi.warnTimesKey(custId);
+		try {
+			redisTemplate.delete(key);			
+		} catch (Exception e) {
+			logger.error("UserRedis.clearUserWarnTimes", e);
+			throw new RedisOptException(e);
+		} 
+	}
 }

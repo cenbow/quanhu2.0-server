@@ -28,12 +28,13 @@ public class MessageSender {
     @Autowired
 	private RabbitTemplate rabbitTemplate;
 
-    public Boolean sendMessage(String routingKey, CanalMsgContent message){
+    public Boolean sendMessage(CanalMsgContent message){
         try {
             String msg = MAPPER.writeValueAsString(message);
             rabbitTemplate.setExchange(AmqpConstant.CANAL_DIRECT_EXCHANGE);
-            rabbitTemplate.setRoutingKey(routingKey);
-            rabbitTemplate.setQueue(routingKey);
+//            设置 routingKey为direct ，否则为fanout
+//            rabbitTemplate.setRoutingKey(routingKey);
+//            rabbitTemplate.setQueue(routingKey);
             rabbitTemplate.convertAndSend(msg);
             return true;
         } catch (JsonProcessingException e) {

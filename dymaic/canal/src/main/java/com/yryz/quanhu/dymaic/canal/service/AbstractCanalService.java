@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 
 @Component
-public abstract class AbstractCanalClient {
-	protected final static Logger logger = LoggerFactory.getLogger(AbstractCanalClient.class);
+public abstract class AbstractCanalService {
+	protected final static Logger logger = LoggerFactory.getLogger(AbstractCanalService.class);
 	protected volatile boolean running = false;
 	protected Thread thread = null;
 	protected CanalConnector connector;
@@ -42,7 +42,7 @@ public abstract class AbstractCanalClient {
 		}
 	};
 
-	public AbstractCanalClient() {
+	public AbstractCanalService() {
 		
 	}
 	
@@ -93,7 +93,7 @@ public abstract class AbstractCanalClient {
 						} catch (InterruptedException e) {
 						}
 					} else {
-						printSummary(message, batchId, size);
+						//printSummary(message, batchId, size);
 						processEntry(message.getEntries(),batchId);
 					}
 
@@ -109,7 +109,7 @@ public abstract class AbstractCanalClient {
 		}
 	}
 
-	protected abstract void processEntry(List<Entry> entrys,long batchId);
+	protected abstract void processEntry(List<Entry> entrys,long batchId) throws Exception;
 	
 	protected void printSummary(Message message, long batchId, int size) {
 		long memsize = 0;

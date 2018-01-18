@@ -15,11 +15,11 @@ import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.CanalEntry.Entry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsg;
+import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 
 @Component
-public class SimpleCanalClient extends AbstractCanalClient {
-	private SimpleCanalClient client;
+public class SimpleCanalService extends AbstractCanalService {
+	private SimpleCanalService client;
 	@Value("${canal.host}")
 	private String canalHost;
 	@Value("${canal.port}")
@@ -32,7 +32,7 @@ public class SimpleCanalClient extends AbstractCanalClient {
 	
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	
-	public SimpleCanalClient(){
+	public SimpleCanalService(){
 		
 	}
 	
@@ -62,23 +62,18 @@ public class SimpleCanalClient extends AbstractCanalClient {
 
 	@Override
 	protected void processEntry(List<Entry> entrys,long batchId) {
-		List<CanalMsg> msgList=canalMsgHandler.convert(entrys);
-		if(!CollectionUtils.isEmpty(msgList)){
-			boolean success=true;
-			for (int i = 0; i < msgList.size(); i++) {
-				CanalMsg msg=msgList.get(i);
-				try {
-					logger.info(MAPPER.writeValueAsString(msg));
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-				//boolean s=canalMsgHandler.sendMq(msgList.get(i));
-//				if(!s){
-					success=false;
-//				}测试回滚
+		List<CanalMsgContent> msgList=canalMsgHandler.convert(entrys);
+		try {
+			if(logger.isInfoEnabled()){
+				logger.info(MAPPER.writeValueAsString(msgList));
 			}
-			if(!success){
-				connector.rollback(batchId);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		if(!CollectionUtils.isEmpty(msgList)){
+			for (int i = 0; i < msgList.size(); i++) {
+				CanalMsgContent msg=msgList.get(i);
+				canalMsgHandler.sendMq(msg);
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 package com.yryz.quanhu.dymaic.canal.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -15,11 +14,11 @@ import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.CanalEntry.Entry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsg;
+import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 
 //@Component
-public class ClusterCanalClient extends AbstractCanalClient {
-	private ClusterCanalClient client;
+public class ClusterCanalService extends AbstractCanalService {
+	private ClusterCanalService client;
 	
 	//canal.host=canal Zookeeper host
 	@Value("${canal.host}")
@@ -33,11 +32,13 @@ public class ClusterCanalClient extends AbstractCanalClient {
 	@Value("${canal.instance}")
 	private String canalInstance;
 	
-	@Resource
-	private CanalMsgHandler canalMsgHandler;
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	
-	public ClusterCanalClient() {
+	@Resource
+	private CanalMsgHandler canalMsgHandler;
+	
+	
+	public ClusterCanalService() {
 		
 	}
 	
@@ -66,23 +67,11 @@ public class ClusterCanalClient extends AbstractCanalClient {
 
 	@Override
 	protected void processEntry(List<Entry> entrys, long batchId) {
-		List<CanalMsg> msgList=canalMsgHandler.convert(entrys);
+		List<CanalMsgContent> msgList=canalMsgHandler.convert(entrys);
 		if(!CollectionUtils.isEmpty(msgList)){
-			boolean success=true;
 			for (int i = 0; i < msgList.size(); i++) {
-				CanalMsg msg=msgList.get(i);
-				try {
-					logger.info(MAPPER.writeValueAsString(msg));
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-				//boolean s=canalMsgHandler.sendMq(msgList.get(i));
-//				if(!s){
-					success=false;
-//				}测试回滚
-			}
-			if(!success){
-				connector.rollback(batchId);
+				CanalMsgContent msg=msgList.get(i);
+				canalMsgHandler.sendMq(msg);
 			}
 		}
 	}

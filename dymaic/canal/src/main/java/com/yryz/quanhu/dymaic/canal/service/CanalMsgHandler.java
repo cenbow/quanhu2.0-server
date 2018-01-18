@@ -3,7 +3,7 @@ package com.yryz.quanhu.dymaic.canal.service;
 import java.util.List;
 
 import com.alibaba.otter.canal.protocol.CanalEntry;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsg;
+import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 
 /**
  * canal消息处理
@@ -16,12 +16,12 @@ public interface CanalMsgHandler {
 	 * @param entries
 	 * @return
 	 */
-	List<CanalMsg> convert(List<CanalEntry.Entry> entries);
+	List<CanalMsgContent> convert(List<CanalEntry.Entry> entries);
 	
 	/**
 	 * 消息发送到rabbitMq
 	 * @param canalMsg
 	 * @return
 	 */
-	Boolean sendMq(CanalMsg canalMsg);
+	Boolean sendMq(CanalMsgContent canalMsg);
 }

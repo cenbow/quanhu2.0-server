@@ -34,10 +34,6 @@ public class UserSimpleVO implements Serializable {
      */
     private String userSignature;
     /**
-     * 年龄
-     */
-    private Integer userAge;
-    /**
      * 用户简介
      */
     private String userDesc;
@@ -45,10 +41,6 @@ public class UserSimpleVO implements Serializable {
      * 用户二维码地址
      */
     private String userQr;
-    /**
-     * 用户性别 0-女 1-男
-     */
-    private Byte userGenders;
     /**
      * 用户城市位置(湖北武汉)
      */
@@ -61,6 +53,27 @@ public class UserSimpleVO implements Serializable {
      * 用户角色 0:普通用户 1:实名用户
      */
     private Byte userRole;
+    
+    /**
+     * 好友备注名
+     */
+    private String nameNotes;
+    /**
+     * 关系类型 0-陌生人 1-关注 2-粉丝 3-好友 4-黑名单
+     */
+    private Integer relationStatus;
+	public String getNameNotes() {
+		return nameNotes;
+	}
+	public void setNameNotes(String nameNotes) {
+		this.nameNotes = nameNotes;
+	}
+	public Integer getRelationStatus() {
+		return relationStatus;
+	}
+	public void setRelationStatus(Integer relationStatus) {
+		this.relationStatus = relationStatus;
+	}
 	public String getUserId() {
 		return userId;
 	}
@@ -85,12 +98,6 @@ public class UserSimpleVO implements Serializable {
 	public void setUserSignature(String userSignature) {
 		this.userSignature = userSignature;
 	}
-	public Integer getUserAge() {
-		return userAge;
-	}
-	public void setUserAge(Integer userAge) {
-		this.userAge = userAge;
-	}
 	public String getUserDesc() {
 		return userDesc;
 	}
@@ -102,12 +109,6 @@ public class UserSimpleVO implements Serializable {
 	}
 	public void setUserQr(String userQr) {
 		this.userQr = userQr;
-	}
-	public Byte getUserGenders() {
-		return userGenders;
-	}
-	public void setUserGenders(Byte userGenders) {
-		this.userGenders = userGenders;
 	}
 	public String getUserLocation() {
 		return userLocation;
@@ -129,9 +130,8 @@ public class UserSimpleVO implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "userSimpleVO [ userId=" + userId + ", userNickName=" + userNickName + ", userImg="
-				+ userImg + ", userSignature=" + userSignature + ", userAge=" + userAge + ", userDesc=" + userDesc
-				+ ", userQr=" + userQr + ", userGenders=" + userGenders + ", userLocation=" + userLocation
-				+ ", cityCode=" + cityCode + ", userRole=" + userRole + "]";
+		return "UserSimpleVO [userId=" + userId + ", userNickName=" + userNickName + ", userImg=" + userImg
+				+ ", userSignature=" + userSignature + ", userDesc=" + userDesc + ", userQr=" + userQr
+				+ ", userLocation=" + userLocation + ", cityCode=" + cityCode + ", userRole=" + userRole + "]";
 	}
 }

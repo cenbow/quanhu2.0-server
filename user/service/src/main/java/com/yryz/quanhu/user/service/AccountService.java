@@ -10,7 +10,6 @@ package com.yryz.quanhu.user.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
@@ -192,5 +191,4 @@ public interface AccountService {
 	 * @return
 	 */
 	UserAccount checkUserByPhonePassword(String phone, String password,String appId);
-
 }
