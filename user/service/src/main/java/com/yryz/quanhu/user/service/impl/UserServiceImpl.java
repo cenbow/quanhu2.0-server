@@ -38,8 +38,10 @@ import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
 import com.yryz.quanhu.user.manager.QrManager;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserService;
+import com.yryz.quanhu.user.utils.ThreadPoolUtil;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
@@ -69,6 +71,7 @@ public class UserServiceImpl implements UserService {
 	 * @return
 	 */
 	@Override
+	@Transactional
 	public int updateUserInfo(UserBaseInfo baseInfo) {
 		// 检查电话、昵称
 		String nickName = baseInfo.getUserNickName();
@@ -102,6 +105,15 @@ public class UserServiceImpl implements UserService {
 
 	}
 
+	@Override
+	public UserLoginSimpleVO getUserLoginSimpleVO(String userId) {
+		UserBaseInfo baseInfo = getUser(userId);
+		UserLoginSimpleVO simpleVO = new UserLoginSimpleVO();
+		BeanUtils.copyProperties(simpleVO, baseInfo);
+		// TODO: 依赖积分系统，获取用户积分等级
+		return simpleVO;
+	}
+
 	/**
 	 * 查询单个用户信息
 	 * 
@@ -113,7 +125,7 @@ public class UserServiceImpl implements UserService {
 	public UserSimpleVO getUserSimple(String userId) {
 		// 查询单个用户基础信息
 		List<UserBaseInfo> baseInfos = getUserInfo(Sets.newHashSet(userId));
-		if(CollectionUtils.isEmpty(baseInfos)){
+		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
@@ -130,9 +142,9 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public UserSimpleVO getUserSimpleByPhone(String phone,String appId) {
+	public UserSimpleVO getUserSimpleByPhone(String phone, String appId) {
 		List<UserBaseInfo> baseInfos = getUserInfoByPhones(Sets.newHashSet(phone), appId);
-		if(CollectionUtils.isEmpty(baseInfos)){
+		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
@@ -212,30 +224,33 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public Map<String, UserBaseInfo> getUser(Set<String> userIds) {
+	public Map<String, UserBaseInfoVO> getUser(Set<String> userIds) {
 		if (CollectionUtils.isEmpty(userIds)) {
 			return new HashMap<>();
 		}
 		List<UserBaseInfo> list = getUserInfo(userIds);
-		Map<String, UserBaseInfo> map = new HashMap<String, UserBaseInfo>();
+		Map<String, UserBaseInfoVO> map = new HashMap<>(list.size());
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
-				map.put(vo.getUserId().toString(), vo);
+				UserBaseInfoVO infoVO = new UserBaseInfoVO();
+				BeanUtils.copyProperties(infoVO, vo);
+				map.put(vo.getUserId().toString(), infoVO);
 			}
 		}
 		return map;
 	}
-	
+
 	/**
 	 * 根据昵称获取用户信息
+	 * 
 	 * @param appId
 	 * @param nickName
 	 * @return
 	 */
-	private UserBaseInfo getUserByNickName(String appId,String nickName){
+	private UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
-	
+
 	/**
 	 * 获取用户基本信息
 	 * 
@@ -278,9 +293,9 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public UserBaseInfoVO getUserInfoByPhone(String phone,String appId) {
+	public UserBaseInfoVO getUserInfoByPhone(String phone, String appId) {
 		List<UserBaseInfo> baseInfos = getUserInfoByPhones(Sets.newHashSet(phone), appId);
-		if(CollectionUtils.isEmpty(baseInfos)){
+		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
@@ -298,7 +313,7 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public Map<String, UserBaseInfo> getUserInfoByPhone(Set<String> phones, String appId) {
+	public Map<String, UserBaseInfoVO> getUserInfoByPhone(Set<String> phones, String appId) {
 		if (CollectionUtils.isEmpty(phones)) {
 			return new HashMap<>();
 		}
@@ -306,10 +321,12 @@ public class UserServiceImpl implements UserService {
 		if (CollectionUtils.isEmpty(list)) {
 			return new HashMap<>();
 		}
-		Map<String, UserBaseInfo> map = new HashMap<>(list.size());
+		Map<String, UserBaseInfoVO> map = new HashMap<>(list.size());
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
-				map.put(vo.getUserId().toString(), vo);
+				UserBaseInfoVO infoVO = new UserBaseInfoVO();
+				BeanUtils.copyProperties(infoVO, vo);
+				map.put(vo.getUserId().toString(), infoVO);
 			}
 		}
 
@@ -390,20 +407,24 @@ public class UserServiceImpl implements UserService {
 		// 获取二维码预存地址
 		String qrUrl = QrManager.getQrUrl(baseInfo.getUserId().toString());
 		baseInfo.setUserQr(qrUrl);
-		if(StringUtils.isNotBlank(baseInfo.getUserPhone())){
+		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
 		baseInfo.setCreateDate(new Date());
 		custbaseinfoDao.insert(baseInfo);
 		// 异步上传二维码
-		// QrManager qr = QrManager.getInstance();
-		/*
-		 * ThreadPoolUtil.execute(new Runnable() {
-		 * 
-		 * @Override public void run() { try {
-		 * qr.createQr(baseInfo.getUserId()); } catch (RuntimeException e) { }
-		 * catch (Exception e) { } } });
-		 */
+
+		ThreadPoolUtil.insertApiLog(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					QrManager.getInstance().createQr(baseInfo.getUserId().toString());
+				} catch (RuntimeException e) {
+				} catch (Exception e) {
+				}
+			}
+		});
 
 		// 初始化用户头像审核信息
 		if (StringUtils.isNotBlank(baseInfo.getUserImg())) {
@@ -449,6 +470,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return str.replaceAll("\\\\", "\\\\\\\\").replaceAll("_", "\\\\_").replaceAll("%", "\\\\%");
 	}
+
 	/**
 	 * 根据手机号生成用户昵称
 	 * 
@@ -462,5 +484,5 @@ public class UserServiceImpl implements UserService {
 		}
 		return nickName;
 	}
-	
+
 }

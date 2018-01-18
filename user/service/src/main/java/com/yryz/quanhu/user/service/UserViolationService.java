@@ -53,26 +53,4 @@ public interface UserViolationService {
 	 */
 	public Page<UserViolation> getCustViolationList(int pageNo, int pageSize, List<String> userIds, Integer type,
 			String startDate, String endDate);
-
-	/**
-	 * 检查用户是否被禁言
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	public boolean checkCustTalk(Long userId);
-
-	/**
-	 * 检查用户是否被冻结
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	public boolean checkCustFreeze(Long userId);
-	
-	/**
-	 * 判断用户是否被冻结并返回提示信息
-	 * @param userId
-	 */
-	public void checkUserStatus(Long userId);
 }

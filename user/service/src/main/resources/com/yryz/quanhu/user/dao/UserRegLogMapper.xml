@@ -23,11 +23,27 @@
     ip, location, activity_channel_code, channel_code, create_date, last_update_date
   </sql>
   
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByParams" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
     from user_reg_log
-    where id = #{id,jdbcType=BIGINT}
+    where 1=1
+    <if test="channelCode ! = null">
+    	and channel_code like CONCAT('%',#{channelCode},'%')
+    </if>
+    <if test="userIds != null">
+    	and user_id in
+		<foreach item="item" index="index" collection="userIds" open="("
+					separator="," close=")">
+			#{item}
+		</foreach>
+    </if>
+    <if test="startDate != null">
+    	and create_date &gt; #{createDate}
+    </if>
+     <if test="endDate != null">
+    	and end_date &lt; #{endDate}
+    </if>
   </select>
   
   <insert id="insert" parameterType="com.yryz.quanhu.modules.useraccount.entity.UserRegLog" >

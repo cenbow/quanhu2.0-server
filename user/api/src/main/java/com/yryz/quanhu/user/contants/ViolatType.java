@@ -15,15 +15,19 @@ package com.yryz.quanhu.user.contants;
  */
 public enum ViolatType {
 	/** 警告 */
-	WARN(0),
+	WARN(10),
 	/** 禁言 */
-	NOTALK(1),
+	NOTALK(11),
 	/** 冻结 */
-	FREEZE(2),
+	FREEZE(12),
+	/**
+	 * 注销
+	 */
+	DISTORY(13),
 	/** 解除禁言 */
-	ALLTAIK(3),
+	ALLTAIK(14),
 	/** 解冻 */
-	NOFREEZE(4);
+	NOFREEZE(15);
 	
 	private int type;
 	

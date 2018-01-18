@@ -24,17 +24,17 @@ public class RegisterLoginVO implements Serializable {
 	/**
 	 * 用户基本信息
 	 */
-	private UserSimpleVO user;
+	private UserLoginSimpleVO user;
 	public AuthTokenVO getAuthInfo() {
 		return authInfo;
 	}
 	public void setAuthInfo(AuthTokenVO authInfo) {
 		this.authInfo = authInfo;
 	}
-	public UserSimpleVO getUser() {
+	public UserLoginSimpleVO getUser() {
 		return user;
 	}
-	public void setUser(UserSimpleVO user) {
+	public void setUser(UserLoginSimpleVO user) {
 		this.user = user;
 	}
 	/**
@@ -49,7 +49,7 @@ public class RegisterLoginVO implements Serializable {
 	 * @param user
 	 * @exception 
 	 */
-	public RegisterLoginVO(AuthTokenVO authInfo, UserSimpleVO user) {
+	public RegisterLoginVO(AuthTokenVO authInfo, UserLoginSimpleVO user) {
 		super();
 		this.authInfo = authInfo;
 		this.user = user;

@@ -15,6 +15,7 @@ import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
@@ -30,6 +31,12 @@ public interface UserService {
 	 * @return
 	 */
 	UserSimpleVO getUserSimple(String userId);
+	/**
+	 * 用户登录返回的用户信息
+	 * @param userId
+	 * @return
+	 */
+	UserLoginSimpleVO getUserLoginSimpleVO(String userId);
 	
 	/**
 	 * 根据电话检索用户简要信息
@@ -66,7 +73,7 @@ public interface UserService {
 	 * @param userIds
 	 * @return
 	 */
-	Map<String,UserBaseInfo> getUser(Set<String> userIds);
+	Map<String,UserBaseInfoVO> getUser(Set<String> userIds);
 	
 	/**
 	 * 根据电话检索用户
@@ -83,7 +90,7 @@ public interface UserService {
 	 * @param phones
 	 * @return
 	 */
-	Map<String, UserBaseInfo> getUserInfoByPhone(Set<String> phones,String appId);
+	Map<String, UserBaseInfoVO> getUserInfoByPhone(Set<String> phones,String appId);
 	
 	
 	/**

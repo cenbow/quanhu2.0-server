@@ -127,7 +127,6 @@ public class UserOperateServiceImpl implements UserOperateService {
 	@SuppressWarnings("unused")
 	@Override
 	public Page<UserOperateInfo> listByParams(Integer pageNo, Integer pageSize, UserRegQueryDTO queryDTO) {
-		@SuppressWarnings("unchecked")
 		Page<UserOperateInfo> page = PageHelper.startPage(pageNo, pageSize);
 		try {
 			List<UserOperateInfo> models = mysqlDao.listByParams(queryDTO);

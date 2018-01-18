@@ -15,9 +15,9 @@
                    max-sleep-time-milliseconds="3000" max-retries="5" />
 
     <!-- elasticjob simplejob任务 -->
-    <job:simple id="demoJob"
+   <!--  <job:simple id="demoJob"
                 class="com.yryz.quanhu.user.job.DemoJob"
                 disabled="false" overwrite="true" registry-center-ref="regCenter"
                 cron="* 0/3 * * * ? " sharding-total-count="1"
-                sharding-item-parameters="0=A" description="[framework]Demo任务"/>
+                sharding-item-parameters="0=A" description="[framework]Demo任务"/> -->
 </beans>

@@ -8,10 +8,10 @@
 package com.yryz.quanhu.user.contants;
 
 /**
- * @author Administrator
+ * redis前缀
+ * @author danshiyu
  * @version 1.0
  * @date 2018年1月5日 下午3:01:16
- * @Description TODO (这里用一句话描述这个方法的作用)
  */
 public class RedisConstants {
 	/**
@@ -22,5 +22,12 @@ public class RedisConstants {
 	 * 用户账户
 	 */
 	public static final String ACCOUNT_USER = "ACUSER";
-	
+	/**
+	 * 用户被警告次数
+	 */
+	public static final String USER_WARN_TIMES = "UWARN";
+	/**
+	 * 用户基础信息
+	 */
+	public static final String USER_INFO = "UINFO";
 }
