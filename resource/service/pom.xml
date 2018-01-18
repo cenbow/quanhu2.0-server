@@ -80,6 +80,7 @@
     </dependencies>
 
     <build>
+        <finalName>resoucre</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

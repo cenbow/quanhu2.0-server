@@ -21,7 +21,7 @@ import java.util.List;
 public class DemoReadService {
     protected final Log logger = LogFactory.getLog(DemoReadService.class);
 
-    @Autowired
+    @Reference(lazy = true)
     private DemoService demoService;
 
     @Resource

@@ -24,7 +24,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.mongodb.AbsBaseMongoDAO;
-import com.yryz.common.utils.DateUtil;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 
 /**
@@ -219,14 +219,14 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			if(StringUtils.isNotEmpty(startTime) || StringUtils.isNotEmpty(endTime)){
 				Criteria createTimeCriteria = Criteria.where("createTime");
 				if(startTime != null){
-					Date dstartTime = DateUtil.getDate(startTime);
+					Date dstartTime = DateUtils.parseDate(startTime);
 					if(dstartTime != null){
 						//大于等于开始时间
 						createTimeCriteria = createTimeCriteria.gte(dstartTime.getTime());
 					}
 				}
 				if(endTime != null){
-					Date dendTime = DateUtil.getDate(endTime);
+					Date dendTime = DateUtils.parseDate(endTime);
 					if(dendTime != null){
 						//大于等于结束时间
 						createTimeCriteria = createTimeCriteria.lt(dendTime.getTime());

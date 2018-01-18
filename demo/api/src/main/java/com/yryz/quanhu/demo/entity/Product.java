@@ -7,6 +7,18 @@ public class Product {
     private String description;
     private String imageurl;
 
+    public Product() {
+    }
+
+    public Product(Long id, Long categoryId, String name, String description, String imageurl) {
+        this();
+        this.id = id;
+        this.categoryId = categoryId;
+        this.name = name;
+        this.description = description;
+        this.imageurl = imageurl;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
