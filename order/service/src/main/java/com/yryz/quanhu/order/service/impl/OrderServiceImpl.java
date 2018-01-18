@@ -121,15 +121,15 @@ public class OrderServiceImpl implements OrderService {
 		if(StringUtils.isNotEmpty(custId)){
 			RrzOrderUserAccount account = userAccountService.getUserAccount(custId);
 			if (account == null){
-				throw new CommonException("账户不存在或者系统异常");
+				return ResponseUtils.returnException(new CommonException("账户不存在或者系统异常"));
 			}
 			if (account.getAccountState().intValue() == 0){
-				throw new CommonException("账户被冻结");
+				return ResponseUtils.returnException(new CommonException("账户被冻结"));
 			}
 			if ((account.getSmallNopass().intValue() == 0
 					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 5000)
 					&& StringUtils.isEmpty(payPassword)){
-				throw new CommonException("支付密码为空");
+				return ResponseUtils.returnException(new CommonException("支付密码为空"));
 			}
 			Response<?> return1 = userPhyService.checkPayPassword(custId, payPassword);
 			if (!return1.success()) {
@@ -186,11 +186,11 @@ public class OrderServiceImpl implements OrderService {
 					} else {
 						int orderState = orderInfo2.getOrderState() == null ? 0 : orderInfo2.getOrderState().intValue();
 						if(orderState == RrzOrderInfo.ORDER_STATE_ON){
-							throw new CommonException("该订单已经处理");
+							return ResponseUtils.returnException(new CommonException("该订单已经处理"));
 						}
 						if(!StringUtils.equals(orderInfo2.getCustId(), orderInfo.getCustId()) ||  
 								!StringUtils.equals(orderInfo2.getOrderId(), orderInfo.getOrderId())){
-							throw new CommonException("新旧订单信息不一致");
+							return ResponseUtils.returnException(new CommonException("新旧订单信息不一致"));
 						}
 						orderInfo2.setOrderState(RrzOrderInfo.ORDER_STATE_ON);
 					}
@@ -796,9 +796,9 @@ public class OrderServiceImpl implements OrderService {
 	public Response<?> executeOrder(String orderId, String custId, String password) {
 		RrzOrderVO orderVO = rrzOrderInfoRedis.getOrderVO(orderId);
 		if(orderVO == null){
-			throw new CommonException("无此订单信息或者订单已经执行");
+			return ResponseUtils.returnException(new CommonException("无此订单信息或者订单已经执行"));
 		}
-		Response return1 = executeOrder(orderVO.getOrderInfo(), orderVO.getAccounts(), orderVO.getIntegrals(), custId, password, null);
+		Response<?> return1 = executeOrder(orderVO.getOrderInfo(), orderVO.getAccounts(), orderVO.getIntegrals(), custId, password, null);
 		if(return1 != null && return1.success()){
 			notifyQueue.addOrderInfoNotify(orderVO.getOrderInfo());
 		} else {
