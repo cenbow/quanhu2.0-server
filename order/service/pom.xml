@@ -10,12 +10,9 @@
     </parent>
 
     <artifactId>order-service</artifactId>
-    <properties>
-		<common.version>2.0-SNAPSHOT</common.version>
-	</properties>
 
     <dependencies>
-        <!--公司内部库-->
+        <!--项目内部依赖-->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>order-api</artifactId>
@@ -27,11 +24,6 @@
         </dependency>
 
         <!--公司内部库-->
-        <dependency>
-            <groupId>com.yryz.framework</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.yryz.framework</groupId>
             <artifactId>service-starter</artifactId>
