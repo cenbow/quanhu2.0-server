@@ -32,11 +32,22 @@
     <!--圈乎微服务依赖先放在此处 经架构组评审后移动到parent-->
     <!--请遵循奥卡姆剃刀原则 如无充分理由禁止随意引入依赖 工具类优先使用spring自带-->
     <dependencyManagement>
+
         <dependencies>
 			<dependency>
-				<groupId>com.yryz.quanhu</groupId>
-				<artifactId>quanhu-common</artifactId>
-				<version>${quanhu.version}</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring.boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>4.3.6.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
 			</dependency>
 
             <dependency>
@@ -176,7 +187,6 @@
 		</dependencies>
     </dependencyManagement>
     <properties>
-		<quanhu.version>2.0-SNAPSHOT</quanhu.version>
 		<!-- dubbo setting -->
 		<dubbo.version>2.6.0</dubbo.version>
     

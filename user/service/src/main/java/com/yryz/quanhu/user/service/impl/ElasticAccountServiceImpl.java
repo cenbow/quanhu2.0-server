@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.service.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yryz.quanhu.user.dto.RegisterDTO;
@@ -14,6 +15,7 @@ import com.yryz.quanhu.user.vo.ThirdUser;
  * @data 2017/11/9 0009 46
  * @Description 非强制绑定手机号模式
  */
+@Service
 public class ElasticAccountServiceImpl extends AbstractAccountService {
 
 	/**

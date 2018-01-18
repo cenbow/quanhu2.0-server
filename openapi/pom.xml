@@ -11,6 +11,10 @@
 
     <artifactId>openapi</artifactId>
 
+    <properties>
+        <common.version>2.0-SNAPSHOT</common.version>
+    </properties>
+
     <!-- 运维要求打war包 mvn clean package -P war -U -->
     <packaging>war</packaging>
     <profiles>
@@ -19,8 +23,13 @@
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>provided</scope>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <!--<exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-tomcat</artifactId>
+                        </exclusion>
+                    </exclusions>-->
                 </dependency>
             </dependencies>
         </profile>
@@ -30,6 +39,7 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>
+            <version>${common.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -39,9 +49,16 @@
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
-            <artifactId>demo-api</artifactId>
-            <version>${quanhu.version}</version>
+            <artifactId>user-api</artifactId>
+            <version>${parent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>support-api</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.yryz.framework</groupId>
             <artifactId>core</artifactId>
@@ -59,7 +76,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <dependency>
@@ -98,6 +115,17 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

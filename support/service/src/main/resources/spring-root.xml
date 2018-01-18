@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+    <!-- 全局配置文件，依赖confige的bean需设定对此depends-on -->
+    <bean id="config" class="com.yryz.common.context.Context">
+        <constructor-arg index="0" value="component.properties"/>
+    </bean>
+
+
+    <!--id start-->
+    <bean class="com.yryz.quanhu.support.id.common.GenPrimaryKeyFactory">
+        <property name="generateKeyService" ref="generateKeyService"/>
+    </bean>
+
+    <bean id="expandKeyExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="2"/>
+        <property name="maxPoolSize" value="2"/>
+        <property name="queueCapacity" value="5"/>
+    </bean>
+
+    <bean id="loadPrepBuffExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="3"/>
+        <property name="maxPoolSize" value="3"/>
+        <property name="queueCapacity" value="5"/>
+    </bean>
+    <!--id start-->
+
+</beans>
