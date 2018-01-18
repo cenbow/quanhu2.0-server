@@ -6,18 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import com.yryz.quanhu.dymaic.canal.service.SimpleCanalClient;
+import com.yryz.quanhu.dymaic.canal.service.SimpleCanalService;
 
 @Component
 public class CanalStartupRunner implements CommandLineRunner {
 	private static Logger logger = LoggerFactory.getLogger(CanalStartupRunner.class);
 	@Resource
-	private SimpleCanalClient simpleCanalClient;
+	private SimpleCanalService simpleCanalService;
 	
 	@Override
 	public void run(String... args) throws Exception {
 		logger.info("CanalStartupRunner starting");
-		simpleCanalClient.startup();
+		simpleCanalService.startup();
 	}
 
 }

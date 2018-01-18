@@ -8,30 +8,11 @@ import java.util.List;
  * @author jk
  */
 public class CanalMsgContent {
-
-	private String binLogFile;
-	private Long binlogOffset;
 	private String dbName;
 	private String tableName;
 	private String eventType;
 	private List<CanalChangeInfo> dataBefore;
 	private List<CanalChangeInfo> dataAfter;
-
-	public String getBinLogFile() {
-		return binLogFile;
-	}
-
-	public void setBinLogFile(String binLogFile) {
-		this.binLogFile = binLogFile;
-	}
-
-	public Long getBinlogOffset() {
-		return binlogOffset;
-	}
-
-	public void setBinlogOffset(Long binlogOffset) {
-		this.binlogOffset = binlogOffset;
-	}
 
 	public String getDbName() {
 		return dbName;
@@ -57,20 +38,20 @@ public class CanalMsgContent {
 		this.eventType = eventType;
 	}
 
-	public List<CanalChangeInfo> getDataBefore() {
-		return dataBefore;
-	}
-
-	public void setDataBefore(List<CanalChangeInfo> dataBefore) {
-		this.dataBefore = dataBefore;
-	}
-
 	public List<CanalChangeInfo> getDataAfter() {
 		return dataAfter;
 	}
 
 	public void setDataAfter(List<CanalChangeInfo> dataAfter) {
 		this.dataAfter = dataAfter;
+	}
+
+	public List<CanalChangeInfo> getDataBefore() {
+		return dataBefore;
+	}
+
+	public void setDataBefore(List<CanalChangeInfo> dataBefore) {
+		this.dataBefore = dataBefore;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.catalina.mapper.Mapper;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,10 @@ import com.alibaba.otter.canal.protocol.CanalEntry.RowChange;
 import com.alibaba.otter.canal.protocol.CanalEntry.RowData;
 import com.alibaba.otter.canal.protocol.CanalEntry.TransactionBegin;
 import com.alibaba.otter.canal.protocol.CanalEntry.TransactionEnd;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.yryz.quanhu.dymaic.canal.entity.CanalChangeInfo;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsg;
 import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.rabbitmq.MessageSender;
 
@@ -35,6 +37,7 @@ public class CanalMsgMQHandlerImpl implements CanalMsgHandler {
     protected static final String SEP = SystemUtils.LINE_SEPARATOR;
     protected static String row_format = null;
 	protected static String transaction_format = null;
+	private static final ObjectMapper MAPPER = new ObjectMapper();
 	
     @Autowired
     private MessageSender messageSender;
@@ -45,20 +48,20 @@ public class CanalMsgMQHandlerImpl implements CanalMsgHandler {
 	}
     
     @Override
-	public Boolean sendMq(CanalMsg canalMsg) {
-		return messageSender.sendMessage(canalMsg.getKey(), canalMsg.getCanalMsgContent());
+	public Boolean sendMq(CanalMsgContent canalMsg) {
+//    	throw new RuntimeException("测试异常后消息是否会丢失");
+		return messageSender.sendMessage(canalMsg);
 	}
     
 	@Override
-	public List<CanalMsg> convert(List<Entry> entries) {
-		List<CanalMsg> msgList = new ArrayList<CanalMsg>();
-        CanalMsgContent canalMsgContent = null;
+	public List<CanalMsgContent> convert(List<Entry> entries) {
+		List<CanalMsgContent> msgList = new ArrayList<CanalMsgContent>();
         
 		for (Entry entry : entries) {
 			long executeTime = entry.getHeader().getExecuteTime();
 			long delayTime = new Date().getTime() - executeTime;
 			if (entry.getEntryType() == EntryType.TRANSACTIONBEGIN || entry.getEntryType() == EntryType.TRANSACTIONEND) {
-				printTransactionInfo(entry);
+				//printTransactionInfo(entry);
 				continue;
 			}
 
@@ -82,18 +85,15 @@ public class CanalMsgMQHandlerImpl implements CanalMsgHandler {
 					continue;
 				}
 
-				canalMsgContent = new CanalMsgContent();
-	            canalMsgContent.setBinLogFile(entry.getHeader().getLogfileName());
-	            canalMsgContent.setBinlogOffset(entry.getHeader().getLogfileOffset());
-	            canalMsgContent.setDbName(entry.getHeader().getSchemaName());
-	            canalMsgContent.setTableName(entry.getHeader().getTableName());
+				CanalMsgContent canalMsgContent = new CanalMsgContent();
+	            canalMsgContent.setDbName(entry.getHeader().getSchemaName().toLowerCase());
+	            canalMsgContent.setTableName(entry.getHeader().getTableName().toLowerCase());
 	            canalMsgContent.setEventType(eventType.toString().toLowerCase());
 	            
 				for (RowData rowData : rowChage.getRowDatasList()) {
 					canalMsgContent.setDataBefore(convertToCanalChangeInfoList(rowData.getBeforeColumnsList()));
 	                canalMsgContent.setDataAfter(convertToCanalChangeInfoList(rowData.getAfterColumnsList()));
-	                CanalMsg canalMsg = new CanalMsg(canalMsgContent);
-	                msgList.add(canalMsg);
+	                msgList.add(canalMsgContent);
 				}
 			}
 		}
@@ -104,11 +104,11 @@ public class CanalMsgMQHandlerImpl implements CanalMsgHandler {
 	private List<CanalChangeInfo> convertToCanalChangeInfoList(List<CanalEntry.Column> columnList) {
         List<CanalChangeInfo> canalChangeInfoList = new ArrayList<CanalChangeInfo>();
         for (CanalEntry.Column column : columnList) {
-            CanalChangeInfo canalChangeInfo = new CanalChangeInfo();
-            canalChangeInfo.setName(column.getName());
-            canalChangeInfo.setValue(column.getValue());
-            canalChangeInfo.setUpdate(column.getUpdated());
-            canalChangeInfoList.add(canalChangeInfo);
+        		CanalChangeInfo canalChangeInfo = new CanalChangeInfo();
+                canalChangeInfo.setName(column.getName());
+                canalChangeInfo.setValue(column.getValue());
+                canalChangeInfo.setUpdate(column.getUpdated());
+                canalChangeInfoList.add(canalChangeInfo);
         }
 
         return canalChangeInfoList;
