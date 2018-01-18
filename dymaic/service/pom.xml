@@ -12,7 +12,6 @@
     <artifactId>dymaic-service</artifactId>
     <properties>
     	<spring.boot.version>2.0.0.M7</spring.boot.version>
-		<common.version>2.0-SNAPSHOT</common.version>
 	</properties>
 
     <dependencies>
@@ -20,75 +19,74 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>dymaic-api</artifactId>
-            <version>${parent.version}</version>
+            <version>${quanhu.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>
-            <version>${common.version}</version>
         </dependency>
+
+        <!--公司内部库-->
         <dependency>
             <groupId>com.yryz.framework</groupId>
             <artifactId>core</artifactId>
         </dependency>
 
-        <!--spring-->
+        <dependency>
+            <groupId>com.yryz.framework</groupId>
+            <artifactId>service-starter</artifactId>
+        </dependency>
+
+        <!-- spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
-        <!--第三方开源库-->
         <dependency>
-            <groupId>io.dubbo.springboot</groupId>
-            <artifactId>spring-boot-starter-dubbo</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
-        
+
+        <!-- 第三方依赖 解决Springboot2.0的冲突-->
         <dependency>
-             <groupId>org.apache.zookeeper</groupId>
-             <artifactId>zookeeper</artifactId>
-             <version>3.4.7</version>
-             <!-- 与springboot包冲突 -->
-             <exclusions>
-                 <exclusion>
-                     <groupId>org.slf4j</groupId>
-                     <artifactId>slf4j-log4j12</artifactId>
-                 </exclusion>
-             </exclusions>
-         </dependency>
-            
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.4.7</version>
+            <!-- 与springboot包冲突 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <groupId>com.dangdang</groupId>
+            <artifactId>elastic-job-lite-core</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>com.dangdang</groupId>
+            <artifactId>elastic-job-lite-spring</artifactId>
         </dependency>
     </dependencies>
 

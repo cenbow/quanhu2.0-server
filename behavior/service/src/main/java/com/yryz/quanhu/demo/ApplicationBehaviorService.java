@@ -9,10 +9,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @ImportResource("classpath:META-INF/spring.xml")
-public class ApplicationDemoService {
-
-
+public class ApplicationBehaviorService {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationDemoService.class, args);
+        SpringApplication.run(ApplicationBehaviorService.class, args);
     }
 }
