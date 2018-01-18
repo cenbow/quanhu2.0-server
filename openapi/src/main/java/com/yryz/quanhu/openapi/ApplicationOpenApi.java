@@ -12,7 +12,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication(scanBasePackages="com.yryz.quanhu")
+@SpringBootApplication(scanBasePackages={"com.yryz.quanhu"})
 @EnableSwagger2
 public class ApplicationOpenApi extends SpringBootServletInitializer {
     public static final String CURRENT_VERSION = "v2";

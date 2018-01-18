@@ -15,6 +15,7 @@
 	</properties>
 
     <dependencies>
+        <!-- 项目内部依赖 -->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>demo-api</artifactId>
@@ -29,11 +30,6 @@
         <!--公司内部库-->
         <dependency>
             <groupId>com.yryz.framework</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.yryz.framework</groupId>
             <artifactId>service-starter</artifactId>
         </dependency>
 
@@ -42,11 +38,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <dependency>

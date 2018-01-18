@@ -1,15 +1,15 @@
 package com.yryz.quanhu.dymaic.canal.entity;
 
 /**
- *
+ *	字段的变更信息
  * @author jk
  */
 public class CanalChangeInfo {
-
+	//字段的名称
     private String name;
-
+    //字段的值
     private String value;
-
+    //该字段是否有变更
     private Object update;
 
 	public String getName() {

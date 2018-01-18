@@ -21,5 +21,40 @@ public class CommonConstants {
 	 * 默认的列表长度
 	 */
 	public static int DEFAULT_SIZE = 20;
+	
+	/**
+	 * 应用ID
+	 */
+	public static final String APP_ID="appId";
+	/**
+	 * 应用安全码
+	 */
+	public static final String APP_SECRET="appSecret";
+	/**
+	 *  设备ID
+	 */
+	public static final String DEVICE_ID="devId";
+	
+	/**
+	 * 请求来源 1-IOS 2-Android 3-PC
+	 */
+	public static final String DEV_TYPE = "devType";
+	
+	/**
+	 * token
+	 */
+	public static final String TOKEN = "token";
+	
+	/**
+	 * custId
+	 */
+	public static final String CUST_ID = "custId";
+	
+	/**
+	 * web 端dev类型
+	 */
+	public static final String DEV_TYPE_ANROID = "2";
+	public static final String DEV_TYPE_IOS = "1";
+	public static final String DEV_TYPE_PC = "3";
 		
 }

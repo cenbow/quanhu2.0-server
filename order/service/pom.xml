@@ -10,59 +10,52 @@
     </parent>
 
     <artifactId>order-service</artifactId>
-    <properties>
-		<common.version>2.0-SNAPSHOT</common.version>
-	</properties>
 
     <dependencies>
-        <!--公司内部库-->
+        <!-- 项目内部依赖 -->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>order-api</artifactId>
-            <version>${parent.version}</version>
+            <version>${quanhu.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>
-            <version>${common.version}</version>
         </dependency>
+
+        <!-- 公司内部库 -->
         <dependency>
             <groupId>com.yryz.framework</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>service-starter</artifactId>
         </dependency>
 
-        <!--spring-->
+        <!-- spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
-        <!--第三方开源库-->
         <dependency>
-            <groupId>io.dubbo.springboot</groupId>
-            <artifactId>spring-boot-starter-dubbo</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
+
+        <!-- 第三方依赖 -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.dangdang</groupId>
+            <artifactId>elastic-job-lite-core</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
+            <groupId>com.dangdang</groupId>
+            <artifactId>elastic-job-lite-spring</artifactId>
         </dependency>
     </dependencies>
 

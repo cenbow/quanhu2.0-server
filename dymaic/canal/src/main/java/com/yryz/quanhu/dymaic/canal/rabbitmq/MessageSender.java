@@ -31,7 +31,7 @@ public class MessageSender {
     public Boolean sendMessage(CanalMsgContent message){
         try {
             String msg = MAPPER.writeValueAsString(message);
-            rabbitTemplate.setExchange(AmqpConstant.CANAL_DIRECT_EXCHANGE);
+            rabbitTemplate.setExchange(AmqpConstant.CANAL_FANOUT_EXCHANGE);
 //            设置 routingKey为direct ，否则为fanout
 //            rabbitTemplate.setRoutingKey(routingKey);
 //            rabbitTemplate.setQueue(routingKey);
