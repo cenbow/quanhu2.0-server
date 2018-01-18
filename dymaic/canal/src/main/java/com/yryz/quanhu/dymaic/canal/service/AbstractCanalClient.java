@@ -8,26 +8,17 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import com.alibaba.otter.canal.client.CanalConnector;
-import com.alibaba.otter.canal.protocol.CanalEntry.Column;
 import com.alibaba.otter.canal.protocol.CanalEntry.Entry;
-import com.alibaba.otter.canal.protocol.CanalEntry.EntryType;
-import com.alibaba.otter.canal.protocol.CanalEntry.EventType;
-import com.alibaba.otter.canal.protocol.CanalEntry.RowChange;
 import com.alibaba.otter.canal.protocol.Message;
-import com.alibaba.otter.canal.protocol.CanalEntry.TransactionBegin;
-import com.alibaba.otter.canal.protocol.CanalEntry.TransactionEnd;
-import com.alibaba.otter.canal.protocol.CanalEntry.RowData;
 
 import org.apache.commons.lang.SystemUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.stereotype.Component;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsg;
 
 @Component
-public class AbstractCanalClient {
+public abstract class AbstractCanalClient {
 	protected final static Logger logger = LoggerFactory.getLogger(AbstractCanalClient.class);
 	protected volatile boolean running = false;
 	protected Thread thread = null;
@@ -51,15 +42,10 @@ public class AbstractCanalClient {
 		}
 	};
 
-	public AbstractCanalClient(String destination) {
-		this(destination, null);
+	public AbstractCanalClient() {
+		
 	}
-
-	public AbstractCanalClient(String destination, CanalConnector connector) {
-		this.destination = destination;
-		this.connector = connector;
-	}
-
+	
 	protected void start() {
 		Assert.notNull(connector, "connector is null");
 		thread = new Thread(new Runnable() {
@@ -103,11 +89,12 @@ public class AbstractCanalClient {
 					if (batchId == -1 || size == 0) {
 						try {
 							Thread.sleep(1000);
+							System.out.println("none");
 						} catch (InterruptedException e) {
 						}
 					} else {
 						printSummary(message, batchId, size);
-						processEntry(message.getEntries());
+						processEntry(message.getEntries(),batchId);
 					}
 
 					connector.ack(batchId); // 提交确认
@@ -122,11 +109,9 @@ public class AbstractCanalClient {
 		}
 	}
 
-	protected void processEntry(List<Entry> entrys) {
-		
-	}
+	protected abstract void processEntry(List<Entry> entrys,long batchId);
 	
-	private void printSummary(Message message, long batchId, int size) {
+	protected void printSummary(Message message, long batchId, int size) {
 		long memsize = 0;
 		for (Entry entry : message.getEntries()) {
 			memsize += entry.getHeader().getEventLength();
@@ -155,4 +140,9 @@ public class AbstractCanalClient {
 	public void setConnector(CanalConnector connector) {
 		this.connector = connector;
 	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+	
 }
