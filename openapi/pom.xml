@@ -46,6 +46,13 @@
             <groupId>com.yryz.framework</groupId>
             <artifactId>core</artifactId>
         </dependency>
+        
+        <!-- common-lang3 -->    
+		<dependency>
+	        <groupId>org.apache.commons</groupId>
+	        <artifactId>commons-lang3</artifactId>
+	    </dependency>
+	    
         <!-- framework -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -66,6 +73,8 @@
             <groupId>io.dubbo.springboot</groupId>
             <artifactId>spring-boot-starter-dubbo</artifactId>
         </dependency>
+        
+        
 
         <dependency>
             <groupId>io.springfox</groupId>
