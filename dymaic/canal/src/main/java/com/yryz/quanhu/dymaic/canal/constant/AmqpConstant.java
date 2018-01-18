@@ -14,5 +14,5 @@ package com.yryz.quanhu.dymaic.canal.constant;
  * @Description 消息队列声明枚举
  */
 public class AmqpConstant {
-	public static final String CANAL_DIRECT_EXCHANGE = "quanhu.canal.fanout";
+	public static final String CANAL_FANOUT_EXCHANGE = "quanhu.canal.fanout";
 }
