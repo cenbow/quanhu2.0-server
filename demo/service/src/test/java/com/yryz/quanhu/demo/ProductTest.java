@@ -20,17 +20,17 @@ public class ProductTest {
 
     @Test
     public void order10SelectAllTest() {
-        assertEquals(5, productService.selectAll(1, 5).size()); // 分页5条
+        assertEquals(5, productService.selectAll(1, 5, -1L).getData().getEntities().size()); // 分页5条
     }
 
     @Test
     public void order20DeleteTest() {
-        assertEquals(1, productService.delete(1L));
+        assertEquals(Integer.valueOf(1), productService.delete(1L).getData());
     }
 
     @Test
     public void order30SelectByIdTest() {
-        assertNull(productService.selectById(1L));// 事务正常, 查不到
+        assertNull(productService.selectById(1L).getData());// 事务正常, 查不到
     }
 
     @Test(expected = RuntimeException.class)    // 事务回滚, 查得到
@@ -40,6 +40,6 @@ public class ProductTest {
 
     @Test
     public void order50SelectByIdTest() {
-        assertNotNull(productService.selectById(2L));
+        assertNotNull(productService.selectById(2L).getData());
     }
 }

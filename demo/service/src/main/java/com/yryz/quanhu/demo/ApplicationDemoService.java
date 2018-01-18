@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@EnableTransactionManagement
+@EnableTransactionManagement(proxyTargetClass = true)   // 为了在dubbo impl服务中直接使用@Transactional注解 proxyTargetClass必须为true
 @ImportResource("classpath:META-INF/spring.xml")
 public class ApplicationDemoService {
 
