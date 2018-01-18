@@ -27,11 +27,11 @@ public interface UserBaseInfoDao {
     
     List<UserBaseInfo> getUserByParams(Map<String,Object> params);
     
-    List<UserBaseInfo> getByUserIds(List<String> userIds);
+    List<UserBaseInfo> getByUserIds(@Param("userIds")List<String> userIds);
     
     List<String> getByPhones(@Param("phones")List<String> phones,@Param("appId")String appId);
     
-    List<String> getDevIdByUserIds(List<String> userIds);
+    List<String> getDevIdByUserIds(@Param("userIds")List<String> userIds);
     
     List<UserBaseInfo> getAdminList(Map<String,Object> params);
     

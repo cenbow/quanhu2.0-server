@@ -10,6 +10,7 @@ package com.yryz.quanhu.user.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.yryz.quanhu.user.entity.UserLoginLog;
 @Mapper
@@ -22,5 +23,5 @@ public interface UserLoginLogDao {
 	 * @param custIds
 	 * @return
 	 */
-	public List<UserLoginLog> getLastLoginTime(List<String> userIds);
+	public List<UserLoginLog> getLastLoginTime(@Param("userIds")List<String> userIds);
 }

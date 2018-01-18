@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper
-	namespace="com.yryz.quanhu.modules.useraccount.dao.persistence.UserOperateInfoDao">
+	namespace="com.yryz.quanhu.user.dao.UserOperateInfoDao">
 	<resultMap id="BaseResultMap"
-		type="com.yryz.quanhu.modules.useraccount.entity.UserOperateInfo">
+		type="com.yryz.quanhu.user.entity.UserOperateInfo">
 		<id column="id" property="id" jdbcType="BIGINT" />
 		<result column="kid" property="kid" jdbcType="BIGINT" />
 		<result column="user_id" property="userId" jdbcType="BIGINT" />
@@ -84,7 +84,7 @@
 	</select>
 
 	<insert id="insert"
-		parameterType="com.yryz.quanhu.modules.useraccount.entity.UserOperateInfo">
+		parameterType="com.yryz.quanhu.user.entity.UserOperateInfo">
 		insert into user_operate_info
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">

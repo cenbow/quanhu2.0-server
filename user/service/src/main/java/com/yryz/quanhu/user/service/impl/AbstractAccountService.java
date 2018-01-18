@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.ExceptionEnum;
@@ -49,7 +50,8 @@ import com.yryz.quanhu.user.vo.ThirdUser;
  * @version 1.0
  * @data 2017/11/9 0009 45
  */
-public abstract class AbstractAccountService implements AccountService {
+@Service
+public class AbstractAccountService implements AccountService {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAccountService.class);
 	@Autowired
 	private UserAccountDao mysqlDao;
@@ -126,7 +128,16 @@ public abstract class AbstractAccountService implements AccountService {
 	 * 第三方登录两种实现，分为非强绑和强绑两种模式
 	 */
 	@Override
-	public abstract Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId);
+	public Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId){
+		if (userId != null) {
+			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+		}
+		// 更新设备号
+		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
+			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getDeviceId(), null));
+		}
+		return userId;	
+	}
 
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)

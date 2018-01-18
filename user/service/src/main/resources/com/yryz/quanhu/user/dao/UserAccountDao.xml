@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yryz.quanhu.modules.user.dao.persistence.UserAccountDao">
+<mapper namespace="com.yryz.quanhu.user.dao.UserAccountDao">
 	<resultMap id="BaseResultMap"
-		type="com.yryz.quanhu.modules.user.entity.UserAccount">
+		type="com.yryz.quanhu.user.entity.UserAccount">
 		<id column="id" property="id" jdbcType="BIGINT" />
 		<result column="kid" property="kid" jdbcType="BIGINT" />
 		<result column="app_id" property="appId" jdbcType="VARCHAR" />
@@ -58,7 +58,7 @@
 		</if>
 	</select>
 
-	<insert id="insert" parameterType="com.yryz.quanhu.modules.user.entity.UserAccount">
+	<insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserAccount">
 		insert into user_account
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
@@ -120,7 +120,7 @@
 		</trim>
 	</insert>
 
-	<update id="update" parameterType="com.yryz.quanhu.modules.user.entity.UserAccount">
+	<update id="update" parameterType="com.yryz.quanhu.user.entity.UserAccount">
 		update user_account
 		<set>
 			<if test="userPhone != null">
