@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yryz.quanhu.modules.user.dao.persistence.UserStarAuthLogDao" >
-  <resultMap id="BaseResultMap" type="com.yryz.quanhu.modules.user.entity.UserStarAuthLog" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserStarAuthLogDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserStarAuthLog" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="kid" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
@@ -44,7 +44,7 @@
     order by create_date desc
   </select>
 
-  <insert id="insert" parameterType="com.yryz.quanhu.modules.user.entity.UserStarAuthLog" >
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserStarAuthLog" >
     insert into user_star_auth_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

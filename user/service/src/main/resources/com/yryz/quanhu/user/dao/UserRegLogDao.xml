@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yryz.quanhu.modules.useraccount.dao.persistence.UserRegLogDao" >
-  <resultMap id="BaseResultMap" type="com.yryz.quanhu.modules.useraccount.entity.UserRegLog" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserRegLogDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserRegLog" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="kid" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
@@ -23,7 +23,7 @@
     ip, location, activity_channel_code, channel_code, create_date, last_update_date
   </sql>
   
-  <select id="selectByParams" resultMap="BaseResultMap" >
+<!--   <select id="selectByParams" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
     from user_reg_log
@@ -44,9 +44,9 @@
      <if test="endDate != null">
     	and end_date &lt; #{endDate}
     </if>
-  </select>
+  </select> -->
   
-  <insert id="insert" parameterType="com.yryz.quanhu.modules.useraccount.entity.UserRegLog" >
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserRegLog" >
     insert into user_reg_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

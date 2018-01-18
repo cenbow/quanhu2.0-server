@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yryz.quanhu.modules.user.dao.persistence.UserBaseInfoDao">
-  <resultMap id="BaseResultMap" type="com.yryz.quanhu.modules.user.entity.UserBaseInfo">
+<mapper namespace="com.yryz.quanhu.user.dao.UserBaseInfoDao">
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserBaseInfo">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="kid" jdbcType="BIGINT" property="kid" />
     <result column="user_id" jdbcType="BIGINT" property="userId" />
@@ -96,7 +96,7 @@
 	from user_baseinfo
 	where del_flag = 10 and app_id = #{appId} 
 	and user_phone in		
-	<foreach item="item" index="index" collection="userIds"
+	<foreach item="item" index="index" collection="phones"
 	open="(" separator="," close=")">
 		#{item}
 	</foreach>
@@ -104,7 +104,7 @@
   
   <select id="getAdminList" resultMap="BaseResultMap">
 	select
-	<include refid="yryzuserColumns" />	
+	<include refid="Base_Column_List" />	
 	from user_baseinfo
 	where (user_status =
 	10 and (ban_post_time is
@@ -184,7 +184,7 @@
 		</if>
 	</select>
   
-  <insert id="insert" parameterType="com.yryz.quanhu.modules.user.entity.UserBaseInfo">
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
     insert into user_baseinfo
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -360,7 +360,7 @@
     </trim>
   </insert>
   
-  <update id="update" parameterType="com.yryz.quanhu.modules.user.entity.UserBaseInfo">
+  <update id="update" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
     update user_baseinfo
     <set>
       <if test="appId != null">

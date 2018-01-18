@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yryz.quanhu.modules.useraccount.dao.persistence.UserLoginLogDao" >
-  <resultMap id="BaseResultMap" type="com.yryz.quanhu.modules.useraccount.entity.UserLoginLog" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserLoginLogDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserLoginLog" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="kid" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
@@ -31,7 +31,7 @@
 		GROUP BY userId 
   </select>
 
-  <insert id="insert" parameterType="com.yryz.quanhu.modules.useraccount.entity.UserLoginLog" >
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserLoginLog" >
     insert into user_login_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

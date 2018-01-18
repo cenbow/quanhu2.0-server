@@ -17,7 +17,6 @@ import com.yryz.quanhu.user.vo.ThirdUser;
  * @version 1.0
  * @data 2017/11/9 0009 46
  */
-@Service
 public class ForceAccountServiceImpl extends AbstractAccountService {
 
 	/**

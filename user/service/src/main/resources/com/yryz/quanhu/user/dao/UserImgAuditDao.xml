@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper
-	namespace="com.yryz.quanhu.modules.user.dao.persistence.UserImgAuditMapper">
+	namespace="com.yryz.quanhu.user.dao.UserImgAuditDao">
 	<resultMap id="BaseResultMap"
-		type="com.yryz.quanhu.modules.user.entity.UserImgAudit">
+		type="com.yryz.quanhu.user.entity.UserImgAudit">
 		<id column="id" property="id" jdbcType="BIGINT" />
 		<result column="kid" property="kid" jdbcType="BIGINT" />
 		<result column="user_id" property="userId" jdbcType="BIGINT" />
@@ -38,7 +38,7 @@
 		where user_id = #{userId}
 	</delete>
 
-	<insert id="save" parameterType="com.yryz.quanhu.modules.user.entity.UserImgAudit">
+	<insert id="save" parameterType="com.yryz.quanhu.user.entity.UserImgAudit">
 		insert into user_img_audit
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
@@ -107,7 +107,7 @@
 		</foreach>
 	</insert>
 
-	<update id="update" parameterType="com.yryz.quanhu.modules.user.entity.UserImgAudit">
+	<update id="update" parameterType="com.yryz.quanhu.user.entity.UserImgAudit">
 		update user_img_audit
 		<set>
 			<if test="userImg != null">

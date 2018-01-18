@@ -4,6 +4,7 @@
 package com.yryz.quanhu.user.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author danshiyu
@@ -27,6 +28,8 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 注册结束时间
 	 */
 	private String endDate;
+	
+	private List<String> custIds;
 	public String getNickName() {
 		return nickName;
 	}
@@ -50,6 +53,12 @@ public class AdminUserInfoDTO implements Serializable{
 	}
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
+	}
+	public List<String> getCustIds() {
+		return custIds;
+	}
+	public void setCustIds(List<String> custIds) {
+		this.custIds = custIds;
 	}
 	@Override
 	public String toString() {

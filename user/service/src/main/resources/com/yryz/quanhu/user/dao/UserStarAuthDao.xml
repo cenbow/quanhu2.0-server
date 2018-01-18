@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yryz.quanhu.modules.user.dao.persistence.UserStarAuthDao" >
-  <resultMap id="BaseResultMap" type="com.yryz.quanhu.modules.user.entity.UserStarAuth" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserStarAuthDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserStarAuth" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="kid" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
@@ -145,7 +145,7 @@
 		</if>
 	</select>
 	
-  <insert id="insert" parameterType="com.yryz.quanhu.modules.user.entity.UserStarAuth" >
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserStarAuth" >
     insert into user_star_auth
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -315,7 +315,7 @@
     </trim>
   </insert>
   
-  <update id="update" parameterType="com.yryz.quanhu.modules.user.entity.UserStarAuth" >
+  <update id="update" parameterType="com.yryz.quanhu.user.entity.UserStarAuth" >
     update user_star_auth
     <set >
       <if test="organizationName != null" >

@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import com.alibaba.dubbo.rpc.RpcContext;
-import com.yryz.common.constant.CommonConstants;
-import com.yryz.common.context.Context;
-import com.yryz.common.utils.StringUtils;
 
 /**
  * @author yehao
@@ -44,21 +40,8 @@ public class CommonInterceptor extends HandlerInterceptorAdapter implements Hand
 		System.out.println("hello CommonInterceptor ..." + request.getRequestURI());
 		String httpMethod=request.getMethod();
 		if(RequestMethod.OPTIONS.name().equals(httpMethod)){
-//			Cat.logEvent("Method", RequestMethod.OPTIONS.name());
 			return false;
 		}
-		//从request header中获取appid存入RpcContext,直接传递到dubbo服务
-		String appId = request.getHeader(CommonConstants.APP_ID);
-		if(StringUtils.isBlank(appId)){
-			appId = Context.getProperty("appId.default");
-		}
-		request.setAttribute(CommonConstants.APP_ID, appId);
-		RpcContext.getContext().setAttachment(CommonConstants.APP_ID, appId);
-		//RpcContext.getContext().setAttachment(Constants.APP_SECRET, request.getHeader(Constants.APP_SECRET));
-		RpcContext.getContext().setAttachment(CommonConstants.DEVICE_ID, request.getHeader(CommonConstants.DEVICE_ID));
-		RpcContext.getContext().setAttachment(CommonConstants.DEV_TYPE, request.getHeader(CommonConstants.DEV_TYPE));
-//		//Cat埋点
-//		CatLocal.get(request.getRequestURI());
 
 		return true;
 	}
@@ -72,7 +55,6 @@ public class CommonInterceptor extends HandlerInterceptorAdapter implements Hand
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, 
 			Object handler, Exception ex) throws Exception {
-//		CatLocal.complete();
 	}
 
 }

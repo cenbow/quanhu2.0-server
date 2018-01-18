@@ -15,11 +15,11 @@ import java.util.List;
  * API包不应该仅仅包含RPC接口,也应该包含SDK(方便消费端使用的相关类)
  * Demo读服务 尽可能直接访问redis缓存而不调用rpc 减少一次网络传输
  */
-@Service
+//@Service
 public class DemoReadService {
     protected final Log logger = LogFactory.getLog(DemoReadService.class);
 
-    @Reference
+    //@Reference
     private DemoService demoService;
 
     @Resource
