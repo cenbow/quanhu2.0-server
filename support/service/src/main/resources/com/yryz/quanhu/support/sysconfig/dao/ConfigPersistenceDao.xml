@@ -23,19 +23,19 @@
     </sql>
     
     <select id="listAllAppId" resultType="java.lang.String">
-        select config_value from sys_config where config_name = 'appId' group by config_value
+        select config_value from qh_sys_config where config_name = 'appId' group by config_value
     </select>
     
     <select id="countConfigType" resultType="java.lang.Integer">
         select
         count(DISTINCT(config_type))
-        from sys_config
+        from qh_sys_config
     </select>
 
     <select id="getByIndex" resultType="java.lang.String">
         select
         config_type
-        from sys_config
+        from qh_sys_config
         group by config_type
         order by config_type desc
         limit #{start},1
@@ -44,40 +44,40 @@
     <select id="getIdByConfigTypeConfigName" resultType="java.lang.String">
         select
         config_id
-        from sys_config where config_type = #{configType} and config_name =
+        from qh_sys_config where config_type = #{configType} and config_name =
         #{configName}
     </select>
 
     <select id="getByConfigType" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from sys_config
+        from qh_sys_config
         where config_type = #{configType}
     </select>
 
     <select id="get" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from sys_config
+        from qh_sys_config
         where config_id = #{configId}
     </select>
     
     <delete id="delete">
-    	delete from sys_config
+    	delete from qh_sys_config
         where config_type = #{configType}
     </delete>
     
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        insert into sys_config (ID, config_id, config_type,
+        insert into qh_sys_config (config_id, config_type,
         config_name, config_value, operation_name,
         create_date, update_date,config_desc)
-        values (#{id}, #{configId}, #{configType},
+        values (#{configId}, #{configType},
         #{configName}, #{configValue}, #{operationName},
         #{createDate}, #{updateDate},#{configDesc})
     </insert>
 
     <update id="update">
-        update sys_config
+        update qh_sys_config
         <set>
             <if test="configType != null">
                 config_type = #{configType},

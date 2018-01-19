@@ -57,6 +57,11 @@ public class ConfigServiceImpl implements ConfigService {
 	}
 
 	@Override
+	public void addConfig(Config config) {
+		persistenceDao.save(config);
+	}
+
+	@Override
 	public <T> void updateCongfigs(String configType, String operate, T configValue, T configDesc) {
 		List<Config> configValues = getListByObject(configValue, configDesc);
 		List<Config> oldConfigs = getConfigByConfigType(configType, false);

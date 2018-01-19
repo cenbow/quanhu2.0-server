@@ -63,4 +63,7 @@ public interface ConfigApi {
 	 * @Description RpcContext需要传平台分配的appId(应用id)
 	 */
 	public <T> Response<T> getConfig(String configType,T configValue);
+
+
+	public <T> Response<Boolean> addCongfig(String configType, String operate,T configValue,T configDesc);
 }

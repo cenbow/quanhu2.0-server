@@ -1,12 +1,14 @@
 package com.yryz.quanhu.support.sysconfig.service;
 
+import com.yryz.quanhu.support.sysconfig.entity.Config;
+
 public interface ConfigService {
 //	/**
 //	 * 添加配置
 //	 * @param config
 //	 * @throws DataBaseAccessException
 //	 */
-//	public void addConfig(Config config) throws DataBaseAccessException;
+	public void addConfig(Config config);
 	
 	/**
 	 * 按类型更新配置<br/>
@@ -27,5 +29,4 @@ public interface ConfigService {
 	 * @return
 	 */
 	public <T> void getConfig(String configType,T t);
-	
 }

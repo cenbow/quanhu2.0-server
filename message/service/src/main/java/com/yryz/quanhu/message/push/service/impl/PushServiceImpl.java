@@ -9,7 +9,10 @@ package com.yryz.quanhu.message.push.service.impl;
 
 import cn.jpush.api.report.ReceivedsResult.Received;
 
+import com.alibaba.dubbo.rpc.RpcContext;
+import com.alibaba.dubbo.rpc.support.RpcUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.yryz.common.constant.Constants;
 import com.yryz.common.context.Context;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.message.entity.CircleStatus;
@@ -102,7 +105,7 @@ public class PushServiceImpl implements PushService {
 
 	@Override
 	public void commonSendAlias(PushReqVo reqVo) {
-		String appId = null;//RpcUtils.getAppId();
+		String appId = RpcContext.getContext().getAttachment(Constants.APP_ID);
 		// 获取推送配置
 		PushConfigDTO configDTO = getPushConfig(appId);
 		if (!checkPushConfig(configDTO)) {

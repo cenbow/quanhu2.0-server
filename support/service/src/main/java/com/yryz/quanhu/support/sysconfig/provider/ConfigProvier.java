@@ -2,6 +2,9 @@ package com.yryz.quanhu.support.sysconfig.provider;
 
 import java.util.Date;
 
+import com.alibaba.fastjson.JSON;
+import com.yryz.common.utils.IdGen;
+import com.yryz.quanhu.support.sysconfig.entity.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +74,22 @@ public class ConfigProvier implements ConfigApi {
 			logger.error("updateCongfigs error", e);
 			return ResponseUtils.returnException(e);
 		}
+	}
+
+	@Override
+	public <T> Response<Boolean> addCongfig(String configType, String operate, T configValue, T configDesc) {
+		Config config = new Config();
+		config.setConfigId(IdGen.uuid());
+		config.setConfigType(configType);
+		config.setConfigName(configType + " name");
+		config.setOperationName(operate);
+		config.setConfigValue(JSON.toJSONString(configValue));
+		config.setConfigDesc(JSON.toJSONString(configDesc));
+		Date now = new Date();
+		config.setCreateDate(now);
+		config.setUpdateDate(now);
+		configService.addConfig(config);
+		return ResponseUtils.returnSuccess();
 	}
 
 }
