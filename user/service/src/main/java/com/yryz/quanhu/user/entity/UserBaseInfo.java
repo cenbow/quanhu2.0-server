@@ -109,18 +109,72 @@ public class UserBaseInfo extends GenericEntity{
     /**
      * 用户角色 10:普通用户 11:实名用户
      */
-    private Byte custRole;
-
+    private Byte userRole;
+    
+    public enum UserRole{
+    	/**
+    	 * 普通用户
+    	 */
+    	NORMAL((byte)10),
+    	/**
+    	 * 达人
+    	 */
+    	STAR((byte)11);
+    	private byte role;
+    	UserRole(byte role) {
+			this.role = role;
+		}
+    	public byte getRole(){
+    		return role;
+    	}
+    }
+    
     /**
      * 是否马甲 10:否 11:是
      */
-    private Byte custVest;
-
+    private Byte userVest;
+    
+    public enum UserVest{
+    	/**
+    	 * 否
+    	 */
+    	FALSE((byte)10),
+    	/**
+    	 * 是
+    	 */
+    	TRUE((byte)11);
+    	private byte vest;
+    	UserVest(byte vest) {
+			this.vest = vest;
+		}
+    	public byte getVest(){
+    		return vest;
+    	}
+    }
+    
     /**
      * 认证状态 10-未认证 11-已认证
      */
     private Byte authStatus;
-
+    
+    public enum UserAuthStatus{
+    	/**
+    	 * 未认证
+    	 */
+    	FALSE((byte)10),
+    	/**
+    	 * 已认证
+    	 */
+    	TRUE((byte)11);
+    	private byte staus;
+    	UserAuthStatus(byte staus) {
+			this.staus = staus;
+		}
+    	public byte getStatus(){
+    		return staus;
+    	}
+    }
+    
     /**
      * 最终热度值
      */
@@ -279,19 +333,19 @@ public class UserBaseInfo extends GenericEntity{
     }
 
     public Byte getCustRole() {
-        return custRole;
+        return userRole;
     }
 
-    public void setCustRole(Byte custRole) {
-        this.custRole = custRole;
+    public void setCustRole(Byte userRole) {
+        this.userRole = userRole;
     }
 
     public Byte getCustVest() {
-        return custVest;
+        return userVest;
     }
 
-    public void setCustVest(Byte custVest) {
-        this.custVest = custVest;
+    public void setCustVest(Byte userVest) {
+        this.userVest = userVest;
     }
 
     public Byte getAuthStatus() {
@@ -402,19 +456,19 @@ public class UserBaseInfo extends GenericEntity{
 	 * 用户状态、角色、认证、热度更新
 	 * @param userId
 	 * @param userStatus
-	 * @param custRole
-	 * @param custVest
+	 * @param userRole
+	 * @param userVest
 	 * @param authStatus
 	 * @param lastHeat
 	 * @param banPostTime
 	 */
-	public UserBaseInfo(Long userId, Byte userStatus, Byte custRole, Byte custVest, Byte authStatus, Integer lastHeat,
+	public UserBaseInfo(Long userId, Byte userStatus, Byte userRole, Byte userVest, Byte authStatus, Integer lastHeat,
 			Date banPostTime) {
 		super();
 		this.userId = userId;
 		this.userStatus = userStatus;
-		this.custRole = custRole;
-		this.custVest = custVest;
+		this.userRole = userRole;
+		this.userVest = userVest;
 		this.authStatus = authStatus;
 		this.lastHeat = lastHeat;
 		this.banPostTime = banPostTime;

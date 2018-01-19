@@ -18,7 +18,14 @@
             <artifactId>user-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
-
+        
+		<dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>support-api</artifactId>
+            <version>${quanhu.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>

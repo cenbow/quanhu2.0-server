@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.utils.HTTPWeb;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.user.contants.ThirdConstants;
+import com.yryz.quanhu.user.utils.HTTPWeb;
 import com.yryz.quanhu.user.vo.ThirdUser;
 import com.yryz.quanhu.user.vo.WxToken;
 import com.yryz.quanhu.user.vo.WxUser;

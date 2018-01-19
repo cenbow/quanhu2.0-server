@@ -9,6 +9,8 @@ package com.yryz.quanhu.order.dao.persistence;
 
 import java.util.Set;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
 
 /**
@@ -17,6 +19,7 @@ import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
  * @date 2018年1月18日 上午11:18:26
  * @Description 资金账户信息管理数据访问接口
  */
+@Mapper
 public interface RrzOrderUserAccountDao {
 	
 	/**

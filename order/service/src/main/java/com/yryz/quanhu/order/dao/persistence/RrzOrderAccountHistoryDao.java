@@ -10,6 +10,8 @@ package com.yryz.quanhu.order.dao.persistence;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzOrderAccountHistory;
 
 /**
@@ -18,6 +20,7 @@ import com.yryz.quanhu.order.entity.RrzOrderAccountHistory;
  * @date 2018年1月18日 上午11:14:34
  * @Description 消费订单流水数据库操作类
  */
+@Mapper
 public interface RrzOrderAccountHistoryDao {
 	
 	/**

@@ -8,6 +8,8 @@
 package com.yryz.quanhu.order.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yryz.quanhu.order.dao.persistence.NotifyRecordDao;
 import com.yryz.quanhu.order.entity.RrzNotifyRecord;
@@ -19,6 +21,8 @@ import com.yryz.quanhu.order.service.NotifyRecordService;
  * @date 2018年1月18日 下午2:17:25
  * @Description 回调记录管理
  */
+@Transactional
+@Service
 public class NotifyRecordServiceImpl implements NotifyRecordService {
 	
 	@Autowired

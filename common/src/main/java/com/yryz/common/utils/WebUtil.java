@@ -1,12 +1,17 @@
 package com.yryz.common.utils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.util.Map;
 
-import org.apache.commons.collections.MapUtils;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.yryz.common.constant.AppConstants;
+import com.yryz.common.constant.DevType;
+import com.yryz.common.context.Context;
 import com.yryz.common.entity.RequestHeader;
 
 /**
@@ -19,15 +24,13 @@ public class WebUtil {
 
 	private final static Logger logger = LoggerFactory.getLogger(WebUtil.class);
 
-	public static String getClientIP(Map<String, Object> params) {
-		String ip = params.get("header-x-forwarded-for") == null ? null
-				: params.get("header-x-forwarded-for").toString();
+	public static String getClientIP(HttpServletRequest request) {
+		String ip = request.getHeader("x-forwarded-for");
 		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-			ip = params.get("header-Proxy-Client-IP") == null ? null : params.get("header-Proxy-Client-IP").toString();
+			ip = request.getHeader("Proxy-Client-IP");
 		}
 		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-			ip = params.get("header-WL-Proxy-Client-IP") == null ? null
-					: params.get("header-WL-Proxy-Client-IP").toString();
+			ip = request.getHeader("WL-Proxy-Client-IP");
 		}
 		if (StringUtils.isBlank(ip)) {
 			return "";
@@ -54,31 +57,35 @@ public class WebUtil {
 	}
 
 	/**
-	 * 根据网关入参设置header
+	 * 设置header
 	 * 
 	 * @param params
 	 * @return
 	 */
-	public static RequestHeader getHeader(Map<String, Object> params) {
+	public static RequestHeader getHeader(HttpServletRequest request) {
 		RequestHeader header = new RequestHeader();
-		if (MapUtils.isEmpty(params)) {
-			return header;
+		Method[] methods = header.getClass().getMethods();
+		try {
+			for (Method m : methods) {
+				String methodName = m.getName();
+				if (!methodName.startsWith("set")) {
+					continue;
+				}
+				methodName = methodName.substring(3);
+				// 获取属性名称
+				methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+
+				if (methodName.equalsIgnoreCase("class")) {
+					continue;
+				}
+				String value = request.getHeader(methodName);
+
+				m.invoke(header, new Object[] { value });
+			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			header.setAppId(Context.getProperty(AppConstants.APP_ID));
+			header.setDevType(DevType.IOS.getType());
 		}
-		header.setAppId(params.get("header-appId") == null ? null : params.get("header-appId").toString());
-		header.setAppVersion(
-				params.get("header-appVersion") == null ? null : params.get("header-appVersion").toString());
-		header.setDevId(params.get("header-devId") == null ? null : params.get("header-devId").toString());
-		header.setDevName(params.get("header-devName") == null ? null : params.get("header-devName").toString());
-		header.setDevType(params.get("header-devType") == null ? null : params.get("header-devType").toString());
-		header.setDitchCode(params.get("header-ditchCode") == null ? null : params.get("header-ditchCode").toString());
-		header.setNet(params.get("header-net") == null ? null : params.get("header-net").toString());
-		header.setSign(params.get("header-sign") == null ? null : params.get("header-sign").toString());
-		header.setToken(params.get("header-token") == null ? null : params.get("header-token").toString());
-		header.setRefreshToken(
-				params.get("header-refreshToken") == null ? null : params.get("header-refreshToken").toString());
-		header.setUserAgent(
-				params.get("header-User-Agent") == null ? null : params.get("header-User-Agent").toString());
-		header.setUserId(params.get("header-userId") == null ? null : params.get("header-userId").toString());
 		return header;
 	}
 }

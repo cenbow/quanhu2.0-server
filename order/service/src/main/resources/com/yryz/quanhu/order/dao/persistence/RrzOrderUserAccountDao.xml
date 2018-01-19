@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.RrzOrderUserAccountDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzOrderUserAccount" id="userAccountMap">
+		<id column="cust_id" property="custId" />
+		<result column="account_sum" property="accountSum" />
+		<result column="integral_sum" property="integralSum" />
+		<result column="cost_sum" property="costSum" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="small_nopass" property="smallNopass" />
+		<result column="account_state" property="accountState" />
+	</resultMap>
+	
+	<sql id="columns">
+		cust_id,account_sum,integral_sum,cost_sum,create_time,update_time,small_nopass,account_state
+	</sql>
+    
+	<select id="get" resultMap="userAccountMap" parameterType="java.lang.String">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_user_account a
+		WHERE a.cust_id = #{custId}
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzOrderUserAccount">
+		INSERT INTO rrz_order_user_account(
+			<include refid="columns" />
+		) VALUES (
+			#{custId},
+			#{accountSum},
+			#{integralSum},
+			#{costSum},
+			#{createTime},
+			#{updateTime},
+			#{smallNopass},
+			#{accountState}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzOrderUserAccount">
+		UPDATE rrz_order_user_account SET 	
+			account_sum = #{accountSum},
+			integral_sum = #{integralSum},
+			cost_sum = #{costSum},
+			create_time = #{createTime},
+			update_time = #{updateTime},
+			small_nopass = #{smallNopass},
+			account_state = #{accountState}
+		WHERE cust_id = #{custId}
+	</update>
+	
+	<update id="updateAccountSource" parameterType="com.yryz.quanhu.order.entity.RrzOrderUserAccount">
+		UPDATE rrz_order_user_account SET 	
+			account_sum = #{accountSum},
+			cost_sum = #{costSum},
+			update_time = #{updateTime}
+		WHERE cust_id = #{custId}
+	</update>
+	
+	<update id="updateIntegralSource" parameterType="com.yryz.quanhu.order.entity.RrzOrderUserAccount">
+		UPDATE rrz_order_user_account SET 	
+			integral_sum = #{integralSum},
+			update_time = #{updateTime}
+		WHERE cust_id = #{custId}
+	</update>
+</mapper>

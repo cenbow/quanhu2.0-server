@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.user.dao.UserBaseInfoDao">
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserBaseInfo">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="kid" jdbcType="BIGINT" property="kid" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="app_id" jdbcType="VARCHAR" property="appId" />
+    <result column="user_nick_name" jdbcType="VARCHAR" property="userNickName" />
+    <result column="user_img" jdbcType="VARCHAR" property="userImg" />
+    <result column="user_signature" jdbcType="VARCHAR" property="userSignature" />
+    <result column="user_phone" jdbcType="VARCHAR" property="userPhone" />
+    <result column="user_desc" jdbcType="LONGVARCHAR" property="userDesc" />
+    <result column="user_age" jdbcType="TINYINT" property="userAge" />
+    <result column="user_qr" jdbcType="VARCHAR" property="userQr" />
+    <result column="user_genders" jdbcType="TINYINT" property="userGenders" />
+    <result column="user_birthday" jdbcType="VARCHAR" property="userBirthday" />
+    <result column="user_location" jdbcType="VARCHAR" property="userLocation" />
+    <result column="user_device_id" jdbcType="VARCHAR" property="userDeviceId" />
+    <result column="user_status" jdbcType="TINYINT" property="userStatus" />
+    <result column="user_country" jdbcType="VARCHAR" property="userCountry" />
+    <result column="user_province" jdbcType="VARCHAR" property="userProvince" />
+    <result column="user_city" jdbcType="VARCHAR" property="userCity" />
+    <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+    <result column="user_role" jdbcType="TINYINT" property="userRole" />
+    <result column="user_vest" jdbcType="TINYINT" property="userVest" />
+    <result column="auth_status" jdbcType="TINYINT" property="authStatus" />
+    <result column="last_heat" jdbcType="INTEGER" property="lastHeat" />
+    <result column="del_flag" jdbcType="TINYINT" property="delFlag" />
+    <result column="ban_post_time" jdbcType="TIMESTAMP" property="banPostTime" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, kid, user_id, app_id, user_nick_name, user_img, user_signature, user_phone, user_age, 
+    user_qr, user_desc,user_genders, user_birthday, user_location, user_device_id, user_status, 
+    user_country, user_province, user_city, city_code, user_role, user_vest, auth_status, 
+    last_heat, del_flag, ban_post_time, create_date, last_update_date
+  </sql>
+  
+  <select id="checkUserByNname" resultType="java.lang.String">
+	SELECT
+	<include refid="Base_Column_List" />
+	FROM user_baseinfo 
+	where 
+	 user_nick_name = #{nickName} and app_id = #{appId} and del_flag = 10
+	LIMIT 1
+  </select>
+  
+  <select id="selectByUserId" resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from user_baseinfo
+	where user_id = #{userId,jdbcType=VARCHAR} and del_flag = 10
+  </select>
+  
+  <select id="getDevIdByUserIds" resultType="java.lang.String">
+	select
+	user_device_id
+	from user_baseinfo
+	where  del_flag = 10 and user_id in
+	<foreach item="item" index="index" collection="userIds" open="("
+				separator="," close=")">
+		#{item}
+	</foreach>
+  </select>
+  
+  <select id="getUserByParams" resultMap="BaseResultMap">
+	select
+		<include refid="Base_Column_List" />
+	from user_baseinfo 
+	where app_id = #{appId}  and del_flag = 10
+	<if test="nickName != null and nickNname != '' ">
+		and a.user_nick_nname = #{nickName}
+	</if>
+	<if test="userPhone != null and userPhone != '' ">
+		and a.user_phone = #{userPhone}
+	</if>	
+  </select>
+  
+  <select id="getByUserIds" resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from user_baseinfo
+	where del_flag = 10 
+	and user_id in		
+	<foreach item="item" index="index" collection="userIds"
+		open="(" separator="," close=")">
+		#{item}
+	</foreach>
+  </select>  
+ 
+  <select id="getByPhones" resultType="java.lang.String">
+	select
+	user_id
+	from user_baseinfo
+	where del_flag = 10 and app_id = #{appId} 
+	and user_phone in		
+	<foreach item="item" index="index" collection="phones"
+	open="(" separator="," close=")">
+		#{item}
+	</foreach>
+  </select>  
+  
+  <select id="getAdminList" resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />	
+	from user_baseinfo
+	where (user_status =
+	10 and (ban_post_time is
+	null or ban_post_time
+	&lt; now()) )
+	and app_id = #{appId}  and del_flag = 10
+	<if test="nickName !=null and nickName != ''">
+		and user_nick_nname like CONCAT('%',#{nickName},'%')
+	</if>
+	<if test="phone !=null and phone != ''">
+		and user_phone like CONCAT('%',#{phone},'%')
+	</if>
+	<if test="startDate !=null and startDate != ''">
+		and create_date &gt;= #{startDate}
+	</if>
+	<if test="endDate !=null and endDate != ''">
+		and create_date &lt;= #{endDate}
+	</if>
+	<if test="userRole != null">
+		and user_role = #{userRole}
+	</if>
+	<if test="userIds != null">
+		and user_id in
+		<foreach item="item" index="index" collection="userIds" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</if>
+	order by create_date desc
+  </select>
+  
+  <select id="getUserIdList" resultType="java.lang.String">
+	select
+	user_id as userId
+	from user_baseinfo 
+	where app_id = #{appId} and del_flag = 10
+	<if test="nickName !=null and nickName != ''">
+		and a.user_nick_nname like CONCAT('%',#{nickName},'%')
+	</if>
+	<if test="phone !=null and phone != ''">
+		and a.user_phone like CONCAT('%',#{phone},'%')
+	</if>
+	<if test="startDate !=null and startDate != ''">
+		and a.create_date &gt;= #{startDate}
+	</if>
+	<if test="endDate !=null and endDate != ''">
+		and a.create_date &lt;= #{endDate}
+	</if>
+	<if test="location != null and location != ''">
+		and a.user_location like CONCAT('%',#{location},'%')
+	</if>
+	<if test="sex != null ">
+		and a.user_sex = #{sex}
+	</if>
+	<if test="userRole != null">
+		and a.user_role = #{userRole}
+	</if>
+  </select>  
+  
+  <select id="getUserIdByExactParam" resultType="java.lang.String">
+		select
+		a.user_id as userId
+		from user_baseinfo a
+		where app_id = #{appId} and del_flag = 10
+
+		<if test="nickName !=null and nickName != ''">
+			and a.user_nick_nname = #{nickName}
+		</if>
+		<if test="phone !=null and phone != ''">
+			and a.user_phone = #{phone}
+		</if>
+		<if test="startDate !=null and startDate != ''">
+			and a.create_date &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null and endDate != ''">
+			and a.create_date &lt;= #{endDate}
+		</if>
+	</select>
+  
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
+    insert into user_baseinfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="kid != null">
+        kid,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="appId != null">
+        app_id,
+      </if>
+      <if test="userNickName != null">
+        user_nick_name,
+      </if>
+      <if test="userImg != null">
+        user_img,
+      </if>
+      <if test="userSignature != null">
+        user_signature,
+      </if>
+      <if test="userPhone != null">
+        user_phone,
+      </if>
+      <if test="userAge != null">
+        user_age,
+      </if>
+      <if test="userQr != null">
+        user_qr,
+      </if>
+      <if test="userGenders != null">
+        user_genders,
+      </if>
+      <if test="userBirthday != null">
+        user_birthday,
+      </if>
+      <if test="userLocation != null">
+        user_location,
+      </if>
+      <if test="userDeviceId != null">
+        user_device_id,
+      </if>
+      <if test="userStatus != null">
+        user_status,
+      </if>
+      <if test="userCountry != null">
+        user_country,
+      </if>
+      <if test="userProvince != null">
+        user_province,
+      </if>
+      <if test="userCity != null">
+        user_city,
+      </if>
+      <if test="cityCode != null">
+        city_code,
+      </if>
+      <if test="userRole != null">
+        user_role,
+      </if>
+      <if test="userVest != null">
+        user_vest,
+      </if>
+      <if test="authStatus != null">
+        auth_status,
+      </if>
+      <if test="lastHeat != null">
+        last_heat,
+      </if>
+      <if test="delFlag != null">
+        del_flag,
+      </if>
+      <if test="banPostTime != null">
+        ban_post_time,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null">
+        last_update_date,
+      </if>
+      <if test="userDesc != null">
+        user_desc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="kid != null">
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null">
+        #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="userNickName != null">
+        #{userNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="userImg != null">
+        #{userImg,jdbcType=VARCHAR},
+      </if>
+      <if test="userSignature != null">
+        #{userSignature,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhone != null">
+        #{userPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="userAge != null">
+        #{userAge,jdbcType=TINYINT},
+      </if>
+      <if test="userQr != null">
+        #{userQr,jdbcType=VARCHAR},
+      </if>
+      <if test="userGenders != null">
+        #{userGenders,jdbcType=TINYINT},
+      </if>
+      <if test="userBirthday != null">
+        #{userBirthday,jdbcType=VARCHAR},
+      </if>
+      <if test="userLocation != null">
+        #{userLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="userDeviceId != null">
+        #{userDeviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="userStatus != null">
+        #{userStatus,jdbcType=TINYINT},
+      </if>
+      <if test="userCountry != null">
+        #{userCountry,jdbcType=VARCHAR},
+      </if>
+      <if test="userProvince != null">
+        #{userProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="userCity != null">
+        #{userCity,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="userRole != null">
+        #{userRole,jdbcType=TINYINT},
+      </if>
+      <if test="userVest != null">
+        #{userVest,jdbcType=TINYINT},
+      </if>
+      <if test="authStatus != null">
+        #{authStatus,jdbcType=TINYINT},
+      </if>
+      <if test="lastHeat != null">
+        #{lastHeat,jdbcType=INTEGER},
+      </if>
+      <if test="delFlag != null">
+        #{delFlag,jdbcType=TINYINT},
+      </if>
+      <if test="banPostTime != null">
+        #{banPostTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null">
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userDesc != null">
+        #{userDesc,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
+    update user_baseinfo
+    <set>
+      <if test="appId != null">
+        app_id = #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="userNickName != null">
+        user_nick_name = #{userNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="userImg != null">
+        user_img = #{userImg,jdbcType=VARCHAR},
+      </if>
+      <if test="userSignature != null">
+        user_signature = #{userSignature,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhone != null">
+        user_phone = #{userPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="userAge != null">
+        user_age = #{userAge,jdbcType=TINYINT},
+      </if>
+      <if test="userQr != null">
+        user_qr = #{userQr,jdbcType=VARCHAR},
+      </if>
+      <if test="userGenders != null">
+        user_genders = #{userGenders,jdbcType=TINYINT},
+      </if>
+      <if test="userBirthday != null">
+        user_birthday = #{userBirthday,jdbcType=VARCHAR},
+      </if>
+      <if test="userLocation != null">
+        user_location = #{userLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="userDeviceId != null">
+        user_device_id = #{userDeviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="userStatus != null">
+        user_status = #{userStatus,jdbcType=TINYINT},
+      </if>
+      <if test="userCountry != null">
+        user_country = #{userCountry,jdbcType=VARCHAR},
+      </if>
+      <if test="userProvince != null">
+        user_province = #{userProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="userCity != null">
+        user_city = #{userCity,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="userRole != null">
+        user_role = #{userRole,jdbcType=TINYINT},
+      </if>
+      <if test="userVest != null">
+        user_vest = #{userVest,jdbcType=TINYINT},
+      </if>
+      <if test="authStatus != null">
+        auth_status = #{authStatus,jdbcType=TINYINT},
+      </if>
+      <if test="lastHeat != null">
+        last_heat = #{lastHeat,jdbcType=INTEGER},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=TINYINT},
+      </if>
+      <if test="banPostTime != null">
+        ban_post_time = #{banPostTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userDesc != null">
+        user_desc = #{userDesc,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId}
+  </update>
+  
+</mapper>

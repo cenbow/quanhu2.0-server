@@ -10,12 +10,14 @@ package com.yryz.quanhu.order.dao.redis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.yryz.common.exception.RedisOptException;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.framework.core.lock.DistributedLockManager;
 import com.yryz.quanhu.order.entity.RrzOrderVO;
-
-import redis.clients.jedis.ShardedJedis;
 
 /**
  * @author yehao
@@ -28,14 +30,30 @@ public class RrzOrderInfoRedis {
 	
 	Logger logger = LoggerFactory.getLogger(getClass());
 	
-	RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+	
+	@Autowired
+	private DistributedLockManager distributedLockManager;
+	
+	public static final String RRZORDER_INFO_REDIS_PREFIX = "RrzOrderInfoRedis";
 	
 	/**
 	 * 保存订单
 	 * @param rrzOrderVO
 	 * @return
 	 */
-	public boolean saveOrderVO(com.yryz.quanhu.order.entity.RrzOrderVO rrzOrderVO){
+	public boolean saveOrderVO(RrzOrderVO rrzOrderVO){
+		String key = RedisKeyEnum.getOrderInfo(rrzOrderVO.getOrderInfo().getOrderId());
+		try {
+			distributedLockManager.lock(RRZORDER_INFO_REDIS_PREFIX, key);
+			redisTemplate.opsForValue().set(key, GsonUtils.parseJson(rrzOrderVO));
+			distributedLockManager.unlock(RRZORDER_INFO_REDIS_PREFIX, key);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RedisOptException("save OrderVO setting fault");
+		}
 //		ShardedJedis jedis = null;
 //		String key = RedisKeyEnum.getOrderInfo(rrzOrderVO.getOrderInfo().getOrderId());
 //		String lockKey = key + "_LOCK";
@@ -62,7 +80,7 @@ public class RrzOrderInfoRedis {
 //		} finally {
 //			shardedPool.releaseSession(jedis, "ORDER");
 //		}
-		return false;
+//		return false;
 	}
 	
 	/**
@@ -71,6 +89,13 @@ public class RrzOrderInfoRedis {
 	 * @return
 	 */
 	public RrzOrderVO getOrderVO(String orderId){
+		String key = RedisKeyEnum.getOrderInfo(orderId);
+		String val = redisTemplate.opsForValue().get(key);
+		if(StringUtils.isNotEmpty(val)){
+			RrzOrderVO orderVO = GsonUtils.json2Obj(val, RrzOrderVO.class);
+			return orderVO;
+		}
+		
 //		ShardedJedis jedis = null;
 //		String key = RedisKeyEnum.getOrderInfo(orderId);
 //		try {

@@ -18,6 +18,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.Response;
@@ -62,6 +64,8 @@ import com.yryz.quanhu.order.vo.PayInfo;
  * @date 2018年1月18日 上午11:12:11
  * @Description 订单管理接口服务实现
  */
+@Transactional
+@Service
 public class OrderServiceImpl implements OrderService {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());

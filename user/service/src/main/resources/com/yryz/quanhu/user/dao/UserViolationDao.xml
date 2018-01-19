@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserViolationDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserViolation" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="kid" property="kid" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="scope_desc" property="scopeDesc" jdbcType="VARCHAR" />
+    <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="push_message" property="pushMessage" jdbcType="VARCHAR" />
+    <result column="violation_type" property="violationType" jdbcType="TINYINT" />
+    <result column="operational" property="operational" jdbcType="VARCHAR" />
+    <result column="ban_post_time" property="banPostTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, kid, user_id, scope_desc, pic_url, reason, push_message, violation_type, operational, 
+    ban_post_time, status, create_date, last_update_date
+  </sql>
+  
+  <select id="listViolation"
+		resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from user_violation 
+	where user_id = #{userId}
+	order by create_date desc
+  </select>
+  
+  <select id="getCustViolation"
+		resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from user_violation 
+	where user_id = #{userId} and status = 10
+	order
+	by create_date desc
+	limit 1
+  </select>
+  
+  <select id="listPageViolation"
+		resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from user_violation 
+	where status = 10
+	<if test="userIds != null">
+		and user_id in
+		<foreach item="item" index="index" collection="userIds" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</if>
+	<if test="startDate != null and startDate != ''">
+		and create_date &gt;= #{startDate}
+	</if>
+	<if test="endDate != null and endDate != ''">
+		and create_date &lt;= #{endDate}
+	</if>		
+	<if test="banPost !=null ">
+		and violation_type = 11 and ban_post_time &gt;= now()
+	</if>
+	<if test="freeze !=null ">
+		and violation_type = 12
+	</if>
+	order by create_date desc
+  </select>  
+  
+  <update id="updateViolation">
+		update user_violation set status = 11 where user_id = #{userId}
+  </update>
+  
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserViolation" >
+    insert into user_violation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="scopeDesc != null" >
+        scope_desc,
+      </if>
+      <if test="picUrl != null" >
+        pic_url,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="pushMessage != null" >
+        push_message,
+      </if>
+      <if test="violationType != null" >
+        violation_type,
+      </if>
+      <if test="operational != null" >
+        operational,
+      </if>
+      <if test="banPostTime != null" >
+        ban_post_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="kid != null" >
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="scopeDesc != null" >
+        #{scopeDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="picUrl != null" >
+        #{picUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="pushMessage != null" >
+        #{pushMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="violationType != null" >
+        #{violationType,jdbcType=TINYINT},
+      </if>
+      <if test="operational != null" >
+        #{operational,jdbcType=VARCHAR},
+      </if>
+      <if test="banPostTime != null" >
+        #{banPostTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

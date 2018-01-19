@@ -33,8 +33,8 @@ public class DemoController {
     @Reference(check = false)
     private IdAPI idAPI;
 
-    @Autowired
-    private DemoReadService demoReadService;
+//    @Autowired
+//    private DemoReadService demoReadService;
 
     @ApiOperation("测试 发号器服务")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -58,7 +58,8 @@ public class DemoController {
         for (String strId : strIds) {
             idList.add(Long.parseLong(strId));
         }
-        return ResponseUtils.returnListSuccess(demoReadService.find(idList));
+        //demoReadService.find(idList)
+        return ResponseUtils.returnListSuccess(null);
     }
 
     @ApiOperation("测试 mybatis")
@@ -87,7 +88,8 @@ public class DemoController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/demo/{id:\\d+}")
     public Response<DemoVo> query(@PathVariable Long id) {
-        return ResponseUtils.returnObjectSuccess(demoReadService.find(id));
+        //demoReadService.find(id)
+        return ResponseUtils.returnObjectSuccess(null);
     }
 
     @ApiOperation("按条件AND查询示例")

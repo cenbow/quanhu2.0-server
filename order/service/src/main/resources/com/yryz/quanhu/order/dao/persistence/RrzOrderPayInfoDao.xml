@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.RrzOrderPayInfoDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzOrderPayInfo" id="rrzOrderPayInfoMap">
+		<id column="order_id" property="orderId" />
+		<result column="cust_id" property="custId" />
+		<result column="order_type" property="orderType" />
+		<result column="order_channel" property="orderChannel" />
+		<result column="cost" property="cost" />
+		<result column="cost_true" property="costTrue" />
+		<result column="cost_fee" property="costFee" />
+		<result column="currency" property="currency" />
+		<result column="product_id" property="productId" />
+		<result column="product_type" property="productType" />
+		<result column="product_desc" property="productDesc" />
+		<result column="start_desc" property="startDesc" />
+		<result column="end_desc" property="endDesc" />
+		<result column="order_desc" property="orderDesc" />
+		<result column="order_state" property="orderState" />
+		<result column="create_time" property="createTime" />
+		<result column="complete_time" property="completeTime" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+	
+	<sql id="columns">
+		order_id,cust_id,order_type,order_channel,cost,cost_true,cost_fee,currency,product_id,product_type,product_desc,start_desc,end_desc,order_desc,order_state,
+		create_time,complete_time,remarks
+	</sql>
+    
+	<select id="get" resultMap="rrzOrderPayInfoMap" parameterType="java.lang.String">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_pay_info a
+		where a.order_id=#{orderId}
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayInfo">
+		INSERT INTO rrz_order_pay_info (
+			<include refid="columns" />
+		) VALUES (
+			#{orderId},
+			#{custId},
+			#{orderType},
+			#{orderChannel},
+			#{cost},
+			#{costTrue},
+			#{costFee},
+			#{currency},
+			#{productId},
+			#{productType},
+			#{productDesc},
+			#{startDesc},
+			#{endDesc},
+			#{orderDesc},
+			#{orderState},
+			#{createTime},
+			#{completeTime},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayInfo">
+		UPDATE rrz_order_pay_info SET 
+		    cust_id = #{custId},
+		    order_type = #{orderType},
+			order_channel = #{orderChannel},
+			cost = #{cost},
+			cost_true = #{costTrue},
+			currency = #{currency},
+			product_id = #{productId},
+			product_type = #{productType},
+			product_desc = #{productDesc},
+			start_desc = #{startDesc},
+			end_desc = #{endDesc},
+			order_desc = #{orderDesc},
+			order_state = #{orderState},
+			create_time = #{createTime},
+			complete_time = #{completeTime},
+			remarks = #{remarks}	
+		WHERE order_id = #{orderId}
+	</update>
+	
+	<select id="getList" resultMap="rrzOrderPayInfoMap" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayInfo" >
+		SELECT 
+		<include refid="columns" />
+		FROM rrz_order_pay_info a
+		WHERE a.cust_id = #{custId}
+		<if test="productType != null ">
+			AND a.product_type = #{productType}
+		</if>
+		<if test="orderId != null and orderId != '' ">
+			AND a.order_id = #{orderId}
+		</if>
+		ORDER BY a.create_time desc
+		LIMIT #{start},#{limit}
+	</select>
+	
+	<!-- 分页用户列表 -->
+	<select id="getListWeb" resultMap="rrzOrderPayInfoMap" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayInfo" >
+		SELECT 
+		<include refid="columns" />
+		FROM rrz_order_pay_info a
+		WHERE a.cust_id = #{custId}
+		<if test="productType != null ">
+			AND a.product_type = #{productType}
+		</if>
+		<if test="orderId != null and orderId != '' ">
+			AND a.order_id = #{orderId}
+		</if>
+		ORDER BY a.create_time desc
+	</select>
+
+	<!-- 分页用户列表 -->
+	<select id="getListWeb_Count" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayInfo" >
+		SELECT 
+		count(order_id)
+		FROM rrz_order_pay_info a
+		WHERE a.cust_id = #{custId}
+		<if test="productType != null">
+			AND a.product_type = #{productType}
+		</if>
+		<if test="orderId != null and orderId != '' ">
+			AND a.order_id = #{orderId}
+		</if>
+	</select>
+	
+	
+</mapper>

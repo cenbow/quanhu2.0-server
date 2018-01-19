@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.RrzOrderInfoDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzOrderInfo" id="rrzOrderInfoMap">
+		<id column="order_id" property="orderId" />
+		<result column="cust_id" property="custId" />
+		<result column="cost" property="cost" />
+		<result column="order_type" property="orderType" />
+		<result column="type" property="type" />
+		<result column="product_id" property="productId" />
+		<result column="product_type" property="productType" />
+		<result column="product_desc" property="productDesc" />
+		<result column="order_desc" property="orderDesc" />
+		<result column="remarks" property="remarks" />
+		<result column="create_time" property="createTime" />
+		<result column="consume_type" property="consumeType" />
+		<result column="order_state" property="orderState" />
+		<result column="callback" property="callback" />
+		<result column="biz_content" property="bizContent" />
+	</resultMap>
+	
+	<sql id="columns">
+		order_id,cust_id,cost,order_type,type,product_id,product_type,product_desc,order_desc,remarks,create_time,consume_type,order_state,callback,biz_content
+	</sql>
+    
+	<select id="get" resultMap="rrzOrderInfoMap" parameterType="java.lang.String">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_info a
+		WHERE a.order_id = #{orderId}
+	</select>
+	
+	<select id="getForUpdate" resultMap="rrzOrderInfoMap" parameterType="java.lang.String">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_info a
+		WHERE a.order_id = #{orderId}
+		for update
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzOrderInfo">
+		INSERT INTO rrz_order_info (
+			<include refid="columns" />
+		) VALUES (
+			#{orderId},
+			#{custId},
+			#{cost},
+			#{orderType},
+			#{type},
+			#{productId},
+			#{productType},
+			#{productDesc},
+			#{orderDesc},
+			#{remarks},
+			#{createTime},
+			#{consumeType},
+			#{orderState},
+			#{callback},
+			#{bizContent}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzOrderInfo">
+		UPDATE rrz_order_info 
+		<set>
+			<if test="custId != null">
+				cust_id = #{custId},
+			</if>
+			<if test="cost != null">
+				cost = #{cost},
+			</if>
+			<if test="orderType != null">
+				order_type = #{orderType},
+			</if>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="productId != null">
+				product_id = #{productId},
+			</if>
+			<if test="productType != null">
+				product_type = #{productType},
+			</if>
+			<if test="productDesc != null">
+				product_desc = #{productDesc},
+			</if>
+			<if test="orderDesc != null">
+				order_desc = #{orderDesc},
+			</if>
+			<if test="consumeType != null">
+				consume_type = #{consumeType},
+			</if>
+			<if test="remarks != null">
+				remarks = #{remarks},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="orderState != null">
+				order_state = #{orderState},
+			</if>
+			<if test="callback != null">
+				callback = #{callback},
+			</if>
+			<if test="bizContent != null">
+				biz_content = #{bizContent},
+			</if>
+		</set>
+		WHERE order_id = #{orderId}
+	</update>
+</mapper>

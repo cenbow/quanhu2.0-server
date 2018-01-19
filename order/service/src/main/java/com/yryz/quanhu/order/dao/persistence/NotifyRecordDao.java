@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.order.dao.persistence;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzNotifyRecord;
 
 /**
@@ -15,6 +17,7 @@ import com.yryz.quanhu.order.entity.RrzNotifyRecord;
  * @date 2018年1月18日 上午11:14:03
  * @Description 回调管理
  */
+@Mapper
 public interface NotifyRecordDao {
 	
 	/**

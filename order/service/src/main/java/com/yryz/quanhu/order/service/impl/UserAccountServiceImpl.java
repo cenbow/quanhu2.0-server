@@ -10,6 +10,8 @@ package com.yryz.quanhu.order.service.impl;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.dao.persistence.RrzOrderUserAccountDao;
@@ -24,6 +26,8 @@ import com.yryz.quanhu.order.service.UserPhyService;
  * @date 2018年1月18日 下午2:24:31
  * @Description 账户账户信息管理服务实现
  */
+@Transactional
+@Service
 public class UserAccountServiceImpl implements UserAccountService {
 	
 	@Autowired

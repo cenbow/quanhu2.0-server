@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.RrzOrderIntegralHistoryDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzOrderIntegralHistory" id="rrzOrderIntegralHistoryMap">
+		<id column="id" property="historyId" />
+		<result column="cust_id" property="custId" />
+		<result column="order_id" property="orderId" />
+		<result column="order_type" property="orderType" />
+		<result column="cost" property="cost" />
+		<result column="account_sum" property="accountSum" />
+		<result column="product_id" property="productId" />
+		<result column="product_type" property="productType" />
+		<result column="product_desc" property="productDesc" />
+		<result column="order_desc" property="orderDesc" />
+		<result column="remarks" property="remarks" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+	
+	<sql id="columns">
+		id,cust_id,order_id,order_type,cost,account_sum,product_id,product_type,product_desc,order_desc,remarks,create_time
+	</sql>
+    
+	<select id="get" resultMap="rrzOrderIntegralHistoryMap" parameterType="com.yryz.quanhu.order.entity.RrzOrderIntegralHistory">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_integral_history a
+		WHERE a.id = #{historyId}
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzOrderIntegralHistory">
+		INSERT INTO rrz_order_integral_history (
+			<include refid="columns" />
+		) VALUES (
+			#{historyId},
+			#{custId},
+			#{orderId},
+			#{orderType},
+			#{cost},
+			#{accountSum},
+			#{productId},
+			#{productType},
+			#{productDesc},
+			#{orderDesc},
+			#{remarks},
+			#{createTime}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzOrderIntegralHistory">
+		UPDATE rrz_order_integral_history SET 	
+			cust_id = #{custId},
+			order_id = #{orderId},
+			order_type = #{orderType},
+			cost = #{cost},
+			account_sum = #{accountSum},
+			product_id = #{productId},
+			product_type = #{productType},
+			product_desc = #{productDesc},
+			order_desc = #{orderDesc},
+			remarks = #{remarks},
+			create_time = #{createTime}			
+		WHERE id = #{historyId}
+	</update>
+	
+	<select id="getList" resultMap="rrzOrderIntegralHistoryMap" parameterType="com.yryz.quanhu.order.entity.RrzOrderIntegralHistory" >
+		SELECT 
+		<include refid="columns" />
+		FROM rrz_order_integral_history a
+		WHERE a.cust_id = #{custId}
+		<if test="productType != null">
+			AND a.product_type = #{productType}
+		</if>
+		ORDER BY a.create_time desc
+		LIMIT #{start},#{limit}
+	</select>
+	
+	<select id="sumCost" resultType="java.lang.Long" parameterType="com.yryz.quanhu.order.entity.RrzOrderIntegralHistory" >
+		select sum(cost) 
+		from rrz_order_integral_history a
+		where  a.cust_id = #{custId}
+		<if test="productType != null ">
+			AND a.product_type = #{productType}
+		</if>
+	</select>
+	
+	<select id="sumCostByDate" resultType="java.lang.Long" parameterType="java.util.HashMap" >
+		select sum(cost) 
+		from rrz_order_integral_history a
+		where  a.cust_id = #{custId}
+		<if test="productType != null and productType != ''">
+			AND a.product_type = #{productType}
+		</if>
+		<if test="orderType != null and orderType != ''">
+			AND a.order_type = #{orderType}
+		</if>
+		<if test="startDate != null and startDate != '' ">
+			and a.create_time &gt;= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != '' ">
+			and a.create_time &lt;= #{endDate}
+		</if>
+	</select>
+	
+	<!-- 分页用户列表 -->
+	<select id="getListWeb" resultMap="rrzOrderIntegralHistoryMap" parameterType="java.util.HashMap" >
+		SELECT 
+		<include refid="columns" />
+		FROM rrz_order_integral_history a
+		WHERE a.cost != 0 and a.cust_id = #{custId}
+		<if test="productType != null ">
+			AND a.product_type = #{productType}
+		</if>
+		<if test="orderDesc != null and orderDesc != '' ">
+			and a.order_desc like CONCAT('%',#{orderDesc},'%')
+		</if>
+		<if test="startDate != null and startDate != '' ">
+			and a.create_time &gt;= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != '' ">
+			and a.create_time &lt;= #{endDate}
+		</if>
+		ORDER BY a.create_time desc
+	</select>
+
+	<!-- 分页用户列表 -->
+	<select id="getListWeb_Count" resultType="java.lang.Integer" parameterType="java.util.HashMap" >
+		SELECT 
+		count(id)
+		FROM rrz_order_integral_history a
+		WHERE a.cost != 0 and a.cust_id = #{custId}
+		<if test="productType != null ">
+			AND a.product_type = #{productType}
+		</if>
+		<if test="orderDesc != null and orderDesc != '' ">
+			and a.order_desc like CONCAT('%',#{orderDesc},'%')
+		</if>
+		<if test="startDate != null and startDate != '' ">
+			and a.create_time &gt;= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != '' ">
+			and a.create_time &lt;= #{endDate}
+		</if>
+	</select>
+	
+	<select id="userSum" resultType="java.util.HashMap" >
+		SELECT cust_id as CUST_ID , product_type as PRODUCT_TYPE , sum(cost) as COST
+		FROM rrz_order_integral_history a
+		WHERE 1 = 1
+		<if test="custId != null ">
+			<![CDATA[
+			AND a.cust_id = #{custId}
+			]]>
+		</if>
+		<if test="startTime != null ">
+			<![CDATA[
+			AND a.create_time >= #{startTime}
+			]]>
+		</if>
+		<if test="endTime != null ">
+			<![CDATA[
+			AND a.create_time < #{endTime}
+			]]>
+		</if>
+		GROUP BY cust_id , product_type
+	</select>
+	
+</mapper>

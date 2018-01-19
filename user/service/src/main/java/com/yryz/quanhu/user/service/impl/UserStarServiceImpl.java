@@ -9,16 +9,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
 import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
+import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserStarAuth;
+import com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus;
+import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthWay;
+import com.yryz.quanhu.user.entity.UserStarAuth.StarRecommendStatus;
 import com.yryz.quanhu.user.entity.UserStarAuthLog;
+import com.yryz.quanhu.user.entity.UserBaseInfo.UserAuthStatus;
+import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
+import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarService;
 
 /**
@@ -33,46 +43,47 @@ public class UserStarServiceImpl implements UserStarService {
 
 	@Autowired
 	private UserStarAuthDao persistenceDao;
+	@Reference(check=false)
+	private IdAPI idApi;
 	@Autowired
 	private UserStarAuthLogDao starAuthLogDao;
-	//@Autowired
-	//private EventManager eventService;
-	//@Autowired
-	//MessageManager messageManager;
-	//@Autowired
-	//private CircleRemote circleService;
-	//@Autowired
-	//private UserService userService;
+	// @Autowired
+	// private EventManager eventService;
+	// @Autowired
+	// MessageManager messageManager;
+	// @Autowired
+	// private CircleRemote circleService;
+	@Autowired
+	private UserService userService;
 
 	@Override
 	@Transactional
 	public int save(UserStarAuth record) {
 		record.setCreateDate(new Date());
-		record.setRecommendStatus((byte) 10);
-		record.setAuditStatus((byte) 10);
-		if(StringUtils.isEmpty(record.getRealName())){
+		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH));
+		record.setRecommendStatus(StarRecommendStatus.FALSE.getStatus());
+		record.setAuditStatus(StarAuditStatus.WAIT_AUDIT.getStatus());
+		if (StringUtils.isEmpty(record.getRealName())) {
 			record.setRealName("");
 		}
-		if(StringUtils.isEmpty(record.getResourceDesc())){
+		if (StringUtils.isEmpty(record.getResourceDesc())) {
 			record.setResourceDesc("");
 		}
-		if(StringUtils.isEmpty(record.getLocation())){
+		if (StringUtils.isEmpty(record.getLocation())) {
 			record.setLocation("");
 		}
 		try {
 			// 平台设置直接通过
-			if (record.getAuthWay().intValue() == 11) {
-				record.setAuditStatus((byte) 11);
+			if (record.getAuthWay().intValue() == StarAuthWay.ADMIN_SET.getWay()) {
+				record.setAuditStatus(StarAuditStatus.AUDIT_SUCCESS.getStatus());
 				record.setAuthTime(record.getCreateDate());
-			}
-			int result = persistenceDao.save(record);
-			saveStarAuthLog(record);
-			if (record.getAuthWay().intValue() == 11) {
-				updateUserStar(record);
-				//circleService.updateExpert(record.getCustId(),(byte)1);
+				updateUserStar(record.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
+				// circleService.updateExpert(record.getCustId(),(byte)1);
 				// 消息
-				//messageManager.starSuccess(record.getCustId());
+				// messageManager.starSuccess(record.getCustId());
 			}
+			saveStarAuthLog(record);
+			int result = persistenceDao.save(record);
 			return result;
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.save]", e);
@@ -83,7 +94,7 @@ public class UserStarServiceImpl implements UserStarService {
 	@Override
 	public UserStarAuth get(String custId, String idCard) {
 		try {
-			return persistenceDao.get(custId, idCard,null);
+			return persistenceDao.get(custId, idCard, null);
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.get]", e);
 			throw new MysqlOptException(e);
@@ -103,29 +114,25 @@ public class UserStarServiceImpl implements UserStarService {
 	@Override
 	@Transactional
 	public int update(UserStarAuth record) {
-		record.setAuditStatus((byte) 10);
-		record.setRecommendStatus((byte) 10);
+		record.setAuditStatus(StarAuditStatus.WAIT_AUDIT.getStatus());
+		record.setRecommendStatus(StarRecommendStatus.FALSE.getStatus());
 		record.setAuditFailReason("");
 		try {
 			// 平台设置直接通过
-			if (record.getAuthWay().intValue() == 11) {
-				record.setAuditStatus((byte) 11);
+			if (record.getAuthWay().intValue() == StarAuthWay.ADMIN_SET.getWay()) {
+				record.setAuditStatus(StarAuditStatus.AUDIT_SUCCESS.getStatus());
 				record.setAuthTime(new Date());
 			}
 			int result = persistenceDao.update(record);
 			saveStarAuthLog(record);
-			if (record.getAuthWay().intValue() == 11) {
-				updateUserStar(record);
-				//circleService.updateExpert(record.getCustId(),(byte)1);
+			if (record.getAuthWay() == StarAuthWay.ADMIN_SET.getWay()) {
+				updateUserStar(record.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
+				// circleService.updateExpert(record.getCustId(),(byte)1);
 				// 消息
-				//messageManager.starSuccess(record.getCustId());
-			}else{
-				/*CustInfo info = new CustInfo();
-				info.setCustId(record.getCustId());
-				info.setStarRecommendStatus((byte) 0);
-				info.setCustRole((byte) 0);
-				userService.updateCustInfo(info);
-				circleService.updateExpert(record.getCustId(),(byte)0);*/
+				// messageManager.starSuccess(record.getCustId());
+			} else {
+				updateUserStar(record.getUserId(), UserRole.NORMAL, UserAuthStatus.TRUE);
+				/* circleService.updateExpert(record.getCustId(),(byte)0); */
 			}
 			return result;
 		} catch (Exception e) {
@@ -142,16 +149,16 @@ public class UserStarServiceImpl implements UserStarService {
 		try {
 
 			// 审核通过
-			if (auditStatus.intValue() == 11) {
+			if (auditStatus == StarAuditStatus.AUDIT_SUCCESS.getStatus()) {
 				reAuthModel.setAuditFailReason("");
 				reAuthModel.setAuthTime(new Date());
 			}
 			// 审核失败
-			if (auditStatus.intValue() == 12) {
+			if (auditStatus == StarAuditStatus.AUDIT_FAIL.getStatus()) {
 				reAuthModel.setAuditFailTime(new Date());
 			}
 			// 取消认证
-			if (auditStatus.intValue() == 13) {
+			if (auditStatus == StarAuditStatus.CANCEL_AUTH.getStatus()) {
 				reAuthModel.setRecommendStatus((byte) 10);
 				reAuthModel.setAuthCancelTime(new Date());
 
@@ -159,24 +166,21 @@ public class UserStarServiceImpl implements UserStarService {
 			int result = persistenceDao.update(reAuthModel);
 			saveStarAuthLog(reAuthModel);
 			if (reAuthModel.getAuthTime() != null) {
-				updateUserStar(reAuthModel);
-				//circleService.updateExpert(reAuthModel.getCustId(),(byte)1);
+				updateUserStar(reAuthModel.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
+				// circleService.updateExpert(reAuthModel.getCustId(),(byte)1);
 				// 消息
-				//messageManager.starSuccess(reAuthModel.getCustId());
+				// messageManager.starSuccess(reAuthModel.getCustId());
 			}
 			if (reAuthModel.getAuditFailTime() != null) {
-				//messageManager.starFail(reAuthModel.getCustId(), reAuthModel.getAuditFailReason());
+				// messageManager.starFail(reAuthModel.getCustId(),
+				// reAuthModel.getAuditFailReason());
 			}
 
 			if (reAuthModel.getAuthCancelTime() != null) {
-				/*//CustInfo info = new CustInfo();
-				info.setCustId(reAuthModel.getCustId());
-				info.setStarRecommendStatus((byte) 0);
-				info.setCustRole((byte) 0);
-				userService.updateCustInfo(info);
-				circleService.updateExpert(reAuthModel.getCustId(),(byte)0);
+				updateUserStar(reAuthModel.getUserId(), UserRole.NORMAL, UserAuthStatus.TRUE);
+				// circleService.updateExpert(reAuthModel.getCustId(),(byte)0);
 				// 消息
-				messageManager.starCancel(reAuthModel.getCustId());*/
+				// messageManager.starCancel(reAuthModel.getCustId());*/
 			}
 			return result;
 		} catch (Exception e) {
@@ -189,19 +193,18 @@ public class UserStarServiceImpl implements UserStarService {
 	@Transactional
 	public int updateRecommend(UserStarAuth authModel) {
 		Byte starRecommendStatus = authModel.getRecommendStatus();
-		
+
 		// 取消推荐
-		if (starRecommendStatus.intValue() == 10) {
+		if (starRecommendStatus == StarRecommendStatus.FALSE.getStatus()) {
 			authModel.setRecommendTime(new Date());
 		}
 		// 设置推荐
-		if (starRecommendStatus.intValue() == 11) {
+		if (starRecommendStatus == StarRecommendStatus.TRUE.getStatus()) {
 			authModel.setRecommendCancelTime(new Date());
 			// 设置权重
 			Integer maxWeight = persistenceDao.getStarMaxWeight();
-			//info.setStarWeight((maxWeight == null ? 0 : maxWeight) + 10);
+			authModel.setRecommendHeight((maxWeight == null ? 0 : maxWeight) + 10);
 		}
-		//userService.updateCustInfo(info);
 		try {
 			return persistenceDao.update(authModel);
 		} catch (Exception e) {
@@ -212,7 +215,6 @@ public class UserStarServiceImpl implements UserStarService {
 
 	@Override
 	public Page<UserStarAuth> listByParams(Integer pageNo, Integer pageSize, StarAuthParamDTO paramDTO) {
-		@SuppressWarnings("unchecked")
 		Page<UserStarAuth> page = PageHelper.startPage(pageNo, pageSize);
 		try {
 			persistenceDao.listByParams(paramDTO);
@@ -248,28 +250,29 @@ public class UserStarServiceImpl implements UserStarService {
 	 * 
 	 * @param record
 	 */
-	private void updateUserStar(UserStarAuth record) {
-		/*CustInfo info = new CustInfo();
-		info.setCustId(record.getCustId());
-		info.setCustRole((byte)1);
-		userService.updateCustInfo(info);
-		eventService.starAuth(record.getCustId());*/
+	private void updateUserStar(Long userId, UserRole role, UserAuthStatus authStatus) {
+		userService.updateUserInfo(
+				new UserBaseInfo(userId, null, role.getRole(), null, authStatus.getStatus(), null, null));
+		// 设置达人等级
+		// eventService.starAuth(record.getCustId());*/
 	}
-	
+
 	/**
 	 * 保存达人审核日志
+	 * 
 	 * @param authModel
 	 */
-	private void saveStarAuthLog(UserStarAuth authModel){
+	private void saveStarAuthLog(UserStarAuth authModel) {
 		UserStarAuth oldAuth = get(authModel.getUserId().toString(), null);
 		UserStarAuthLog logModel = new UserStarAuthLog();
-		if(oldAuth == null){
+		if (oldAuth == null) {
 			BeanUtils.copyProperties(oldAuth, logModel);
-		}else{
+		} else {
 			BeanUtils.copyProperties(authModel, oldAuth, BeanUtils.getNullPropertyNames(authModel));
 			BeanUtils.copyProperties(oldAuth, logModel);
 		}
 		try {
+			logModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG));
 			logModel.setCreateDate(new Date());
 			starAuthLogDao.insert(logModel);
 		} catch (Exception e) {
@@ -277,7 +280,7 @@ public class UserStarServiceImpl implements UserStarService {
 			throw new MysqlOptException(e);
 		}
 	}
-	
+
 	@Override
 	public List<UserStarAuthLog> listStarDetail(String custId) {
 		try {

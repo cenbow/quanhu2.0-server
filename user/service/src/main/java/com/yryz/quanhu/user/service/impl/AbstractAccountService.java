@@ -5,17 +5,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
@@ -49,10 +56,13 @@ import com.yryz.quanhu.user.vo.ThirdUser;
  * @version 1.0
  * @data 2017/11/9 0009 45
  */
-public abstract class AbstractAccountService implements AccountService {
+@Service
+public class AbstractAccountService implements AccountService {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAccountService.class);
 	@Autowired
 	private UserAccountDao mysqlDao;
+	@Reference(check=false)
+	private IdAPI idApi;
 	@Autowired
 	private UserLoginLogDao logDao;
 	@Autowired
@@ -73,7 +83,7 @@ public abstract class AbstractAccountService implements AccountService {
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public String agentRegister(AgentRegisterDTO registerDTO) {
-		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getUserEmail(), null);
+		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getAppId(), null);
 		if (checkAccount != null) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户已存在");
 		}
@@ -88,12 +98,14 @@ public abstract class AbstractAccountService implements AccountService {
 	}
 
 	@Override
-	public Long login(LoginDTO loginDTO) {
-		UserAccount account = selectOne(null, loginDTO.getPhone(), null, loginDTO.getPassword());
+	public Long login(LoginDTO loginDTO,String appId) {
+		UserAccount account = selectOne(null, loginDTO.getPhone(), appId,null);
 		if (account == null) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户不存在");
 		}
-		
+		if(!StringUtils.equals(account.getUserPwd(),loginDTO.getPassword())){
+			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "登录密码错误");
+		}
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号
 			 userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));;
@@ -126,7 +138,16 @@ public abstract class AbstractAccountService implements AccountService {
 	 * 第三方登录两种实现，分为非强绑和强绑两种模式
 	 */
 	@Override
-	public abstract Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId);
+	public Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId){
+		if (userId != null) {
+			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+		}
+		// 更新设备号
+		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
+			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getDeviceId(), null));
+		}
+		return userId;	
+	}
 
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
@@ -383,6 +404,7 @@ public abstract class AbstractAccountService implements AccountService {
 	 */
 	public void saveLoginLog(UserLoginLog loginLog) {
 		loginLog.setCreateDate(new Date());
+		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG));
 		try {
 			logDao.insert(loginLog);
 		} catch (Exception e) {
@@ -401,9 +423,10 @@ public abstract class AbstractAccountService implements AccountService {
 	 */
 	@Transactional(rollbackFor = RuntimeException.class)
 	protected Long createUser(RegisterDTO registerDTO) {
-		Long userId = null;// idService.getUserId();
+		Long userId = NumberUtils.toLong(idApi.getUserId());
 		UserAccount account = new UserAccount(null, registerDTO.getUserPhone(), registerDTO.getUserPwd());
 		account.setKid(userId);
+		account.setAppId(registerDTO.getRegLogDTO().getAppId());
 		account.setCreateDate(new Date());
 		insert(account);
 		// 创建用户基础信息
@@ -413,8 +436,10 @@ public abstract class AbstractAccountService implements AccountService {
 		
 		//异步处理
 		// 创建运营信息
-		operateService
+		if(StringUtils.isNotBlank(registerDTO.getUserRegInviterCode())){
+			operateService
 				.save(new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
+		}
 		if(registerDTO.getRegLogDTO() != null){
 			registerDTO.getRegLogDTO().setUserId(userId);
 			operateService.saveRegLog(registerDTO.getRegLogDTO());

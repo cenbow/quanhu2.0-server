@@ -3,15 +3,16 @@ package com.yryz.quanhu.order.dao.redis;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.order.entity.RrzOrderUserPhy;
-
-import redis.clients.jedis.ShardedJedis;
 
 /**
  * @author yehao
@@ -24,9 +25,15 @@ public class RrzOrderUserPhyDaoRedis {
 
 	private Logger logger = Logger.getLogger(getClass());
 	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+	
 	public static final int BANCHECK_UPPER = 5;
 
 	public void save(RrzOrderUserPhy rrzOrderUserPhy) {
+		redisTemplate.opsForValue().set(RedisKeyEnum.getRrzOrderUserPhy(rrzOrderUserPhy.getCustId()),
+					GsonUtils.parseJson(rrzOrderUserPhy));
+		
 //		ShardedJedis jedis = null;
 //		try {
 //			jedis = shardedPool.getSession("ORDER");
@@ -38,6 +45,9 @@ public class RrzOrderUserPhyDaoRedis {
 	}
 
 	public void update(RrzOrderUserPhy rrzOrderUserPhy) {
+		redisTemplate.opsForValue().set(RedisKeyEnum.getRrzOrderUserPhy(rrzOrderUserPhy.getCustId()),
+				GsonUtils.parseJson(rrzOrderUserPhy));
+		
 //		ShardedJedis jedis = null;
 //		try {
 //			jedis = shardedPool.getSession("ORDER");
@@ -49,6 +59,13 @@ public class RrzOrderUserPhyDaoRedis {
 	}
 
 	public RrzOrderUserPhy get(String custId) {
+		String val = redisTemplate.opsForValue().get(RedisKeyEnum.getRrzOrderUserPhy(custId));
+		if(StringUtils.isNotEmpty(val)){
+			return GsonUtils.json2Obj(val, RrzOrderUserPhy.class);
+		} else {
+			return null;
+		}
+		
 //		ShardedJedis jedis = null;
 //		try {
 //			jedis = shardedPool.getSession("ORDER");
@@ -57,10 +74,24 @@ public class RrzOrderUserPhyDaoRedis {
 //		} finally {
 //			shardedPool.releaseSession(jedis, "ORDER");
 //		}
-		return null;
 	}
 
 	public boolean banCheck(String custId) {
+		boolean flag = false;
+		String val = redisTemplate.opsForValue().get(RedisKeyEnum.getBanCheck(custId));
+		if (StringUtils.isEmpty(val)) {
+			flag = true;
+		} else {
+			int i = Integer.parseInt(val);
+			if (i >= BANCHECK_UPPER) {
+				flag = false;
+			} else {
+				flag = true;
+			}
+		}
+		return flag;
+		
+		
 //		boolean flag = false;
 //		ShardedJedis jedis = null;
 //		try {
@@ -80,10 +111,19 @@ public class RrzOrderUserPhyDaoRedis {
 //			shardedPool.releaseSession(jedis, "ORDER");
 //		}
 //		return flag;
-		return false;
 	}
 
 	public int increaseBan(String custId) {
+		int i = 0;
+		String val = redisTemplate.opsForValue().get(RedisKeyEnum.getBanCheck(custId));
+		if (StringUtils.isEmpty(val)) {
+			i = 1;
+		} else {
+			i = Integer.parseInt(val) + 1;
+		}
+		redisTemplate.opsForValue().set(RedisKeyEnum.getBanCheck(custId), i + "", getExTime(),TimeUnit.SECONDS);
+		return i;
+		
 //		ShardedJedis jedis = null;
 //		int i = 0;
 //		try {
@@ -100,7 +140,6 @@ public class RrzOrderUserPhyDaoRedis {
 //			shardedPool.releaseSession(jedis, "ORDER");
 //		}
 //		return i;
-		return 0;
 	}
 
 	private static long getExTime() {
@@ -129,6 +168,8 @@ public class RrzOrderUserPhyDaoRedis {
 	}
 
 	public void clearBan(String custId) {
+		redisTemplate.delete(RedisKeyEnum.getBanCheck(custId));
+		
 //		ShardedJedis jedis = null;
 //		try {
 //			jedis = shardedPool.getSession("ORDER");

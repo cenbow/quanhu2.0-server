@@ -15,7 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserThirdLoginDao;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
 import com.yryz.quanhu.user.service.UserThirdLoginService;
@@ -32,7 +35,8 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	
 	@Autowired
 	private UserThirdLoginDao mysqlDao;
-	
+	@Reference(check=false)
+	private IdAPI idApi;
 	@Override
 	public int delete(String userId,String thirdId) {
 		try {
@@ -46,6 +50,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	@Override
 	public int insert(UserThirdLogin record) {
 		record.setCreateDate(new Date());
+		record.setKid(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN));
 		record.setLastUpdateDate(record.getCreateDate());
 		try {
 			return mysqlDao.insert(record);

@@ -84,6 +84,10 @@ public class UserAccount extends GenericEntity{
         this.delFlag = delFlag;
     }
 
+	public UserAccount() {
+		super();
+	}
+
 	/**
 	 * @param appId
 	 * @param userPhone

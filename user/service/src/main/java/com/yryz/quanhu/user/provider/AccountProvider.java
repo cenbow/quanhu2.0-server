@@ -81,13 +81,13 @@ import com.yryz.quanhu.user.vo.WxToken;
  * @Description 考虑到不必要的事务回滚，注册、登录业务大部分校验、获取token、用户信息放到了controller里面，如果你的系统还有上一层
  *              ，可以把这些业务放到上一层处理
  */
-@Service(interfaceClass=AccountApi.class)
-public class AccountProvider implements AccountApi{
+@Service(interfaceClass = AccountApi.class)
+public class AccountProvider implements AccountApi {
 	private static final Logger logger = LoggerFactory.getLogger(AccountProvider.class);
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
 	private static final String CHAR_63 = "?";
-	
+
 	@Autowired
 	private DistributedLockManager lockManager;
 	@Autowired
@@ -123,20 +123,20 @@ public class AccountProvider implements AccountApi{
 			 */
 
 			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
-					SmsType.CODE_REGISTER,header.getAppId())) {
+					SmsType.CODE_REGISTER, header.getAppId())) {
 				throw QuanhuException.busiError("验证码错误");
 			}
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, registerDTO.getUserPhone());
 
-			boolean flag = accountService.checkUserByPhone(registerDTO.getUserPhone(),header.getAppId());
+			boolean flag = accountService.checkUserByPhone(registerDTO.getUserPhone(), header.getAppId());
 			if (flag) {
 				throw QuanhuException.busiError("该用户已存在");
 			}
 
 			Long userId = accountService.register(registerDTO);
 
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(),header));
+			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -163,21 +163,15 @@ public class AccountProvider implements AccountApi{
 		try {
 			checkLoginDTO(loginDTO, LoginType.PHONE);
 			checkHeader(header);
-			/*
-			 * RequestHeader header = WebUtil.getHeader(params); DevType devType
-			 * = DevType.getEnumByType(header.getDevType(),
-			 * header.getUserAgent()); loginDTO.setDevType(devType);
-			 * loginDTO.setDeviceId(header.getDevId());
-			 */
-			Long userId = accountService.login(loginDTO);
-			
+			loginDTO.setDeviceId(header.getDevId());
+			Long userId = accountService.login(loginDTO,header.getAppId());
+
 			// 判断用户状态
-			if(checkUserDisable(userId.toString()).getData()){
+			if (checkUserDisable(userId.toString()).getData()) {
 				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 			}
-			
-			return ResponseUtils.returnObjectSuccess(
-					returnRegisterLoginVO(userId.toString(), header));
+
+			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -201,21 +195,14 @@ public class AccountProvider implements AccountApi{
 		try {
 			checkLoginDTO(loginDTO, LoginType.VERIFYCODE);
 			checkHeader(header);
-			/*
-			 * RequestHeader header = WebUtil.getHeader(params); DevType devType
-			 * = DevType.getEnumByType(header.getDevType(),
-			 * header.getUserAgent()); loginDTO.setDevType(devType);
-			 * loginDTO.setDeviceId(header.getDevId());
-			 */
+			loginDTO.setDeviceId(header.getDevId());
+			Long userId = accountService.loginByVerifyCode(loginDTO, header.getAppId());
 
-			Long userId = accountService.loginByVerifyCode(loginDTO,header.getAppId());
-			
 			// 判断用户状态
-			if(checkUserDisable(userId.toString()).getData()){
+			if (checkUserDisable(userId.toString()).getData()) {
 				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 			}
-			return ResponseUtils
-					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
+			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -235,36 +222,27 @@ public class AccountProvider implements AccountApi{
 	 * @return
 	 * @Description
 	 */
-	public Response<RegisterLoginVO> loginThird(ThirdLoginDTO loginDTO,RequestHeader header) {
+	public Response<RegisterLoginVO> loginThird(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
-			/*checkThirdLoginDTO(loginDTO);
-			RequestHeader header = WebUtil.getHeader(params);
-			DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
-			loginDTO.setDevType(devType);
-			loginDTO.setDeviceId(header.getDevId());
-			UserRegLogDTO logDTO = getUserRegLog(header, RegType.getEnumByTye(loginDTO.getType()),
-					loginDTO.getLocation(), null, DevType.ANDROID, WebUtil.getClientIP(params));
-			loginDTO.setRegLogDTO(logDTO);
-*/			checkThirdLoginDTO(loginDTO);
+			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
-			ThirdUser thirdUser = getThirdUser(loginDTO,header.getAppId());
+			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
 
-			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),header.getAppId());
+			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
 			Long userId = null;
 			// 已存在账户直接登录
 			if (login != null) {
 				userId = login.getUserId();
 				// 判断用户状态
-				if(checkUserDisable(userId.toString()).getData()){
+				if (checkUserDisable(userId.toString()).getData()) {
 					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 				}
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			}
-			
-			return ResponseUtils
-					.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
-		}  catch (MysqlOptException e) {
+
+			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
+		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
 			return ResponseUtils.returnException(e);
@@ -288,38 +266,33 @@ public class AccountProvider implements AccountApi{
 	 * @return
 	 * @Description
 	 */
-	public Response<RegisterLoginVO> loginThirdBindPhone(ThirdLoginDTO loginDTO,RequestHeader header) {
+	public Response<RegisterLoginVO> loginThirdBindPhone(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
-			/*RequestHeader header = WebUtil.getHeader(params);
-			checkThirdLoginDTO(loginDTO);
-			DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
-			loginDTO.setDevType(devType);
-			loginDTO.setDeviceId(header.getDevId());*/
 			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
-			ThirdUser thirdUser = getThirdUser(loginDTO,header.getAppId());
-			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),header.getAppId());
+			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
+			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
 			// 已存在账户直接登录
 			if (login != null) {
 				throw QuanhuException.busiError("该用户已存在");
 			} else {
 				if (!smsService.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
-						SmsType.CODE_CHANGE_PHONE,header.getAppId())) {
+						SmsType.CODE_CHANGE_PHONE, header.getAppId())) {
 					throw QuanhuException.busiError("验证码错误");
 				}
 				// 手机号加锁
 				lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());
 
-				UserAccount account = accountService.checkUserByPhonePassword(loginDTO.getPhone(), null,header.getAppId());
+				UserAccount account = accountService.checkUserByPhonePassword(loginDTO.getPhone(), null,
+						header.getAppId());
 				if (account != null) {
 					throw QuanhuException.busiError("该手机号已存在");
 				} else {
 					Long userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
-					return ResponseUtils
-							.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
+					return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
 				}
 			}
-		}  catch (MysqlOptException e) {
+		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
 			return ResponseUtils.returnException(e);
@@ -343,13 +316,12 @@ public class AccountProvider implements AccountApi{
 	 * @return
 	 * @Description
 	 */
-	public Response<String> webLoginThird(String loginType, String returnUrl){
+	public Response<String> webLoginThird(String loginType, String returnUrl) {
 		try {
-			if(StringUtils.isEmpty(loginType) || StringUtils.isEmpty(returnUrl)) {
+			if (StringUtils.isEmpty(loginType) || StringUtils.isEmpty(returnUrl)) {
 				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "longin returnUrl不能为空");
 			}
-			if (!RegType.SINA.getText().equals(loginType) &&
-					!RegType.WEIXIN.getText().equals(loginType)) {
+			if (!RegType.SINA.getText().equals(loginType) && !RegType.WEIXIN.getText().equals(loginType)) {
 				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "loginType不支持");
 			}
 			return ResponseUtils.returnObjectSuccess(accountService.webLoginThird(loginType, returnUrl));
@@ -431,7 +403,7 @@ public class AccountProvider implements AccountApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	@Override
 	public Response<Map<String, Date>> getLastLoginTime(List<String> userIds) {
 		try {
@@ -450,7 +422,7 @@ public class AccountProvider implements AccountApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	/**
 	 * 退出登录
 	 * 
@@ -458,9 +430,9 @@ public class AccountProvider implements AccountApi{
 	 * @return
 	 * @Description 获取header token的到userId退出登录
 	 *//*
-	public JSONObject loginOut(Map<String, Object> params) {
-		return ReturnModel.returnSuccess();
-	}*/
+		 * public JSONObject loginOut(Map<String, Object> params) { return
+		 * ReturnModel.returnSuccess(); }
+		 */
 
 	/**
 	 * 绑定手机号
@@ -477,13 +449,15 @@ public class AccountProvider implements AccountApi{
 	public Response<Boolean> bindPhone(BindPhoneDTO phoneDTO) {
 		try {
 			checkBindPhoneDTO(phoneDTO);
-			if (!smsService.checkVerifyCode(phoneDTO.getPhone(), phoneDTO.getVerifyCode(), SmsType.CODE_CHANGE_PHONE,phoneDTO.getAppId())) {
+			if (!smsService.checkVerifyCode(phoneDTO.getPhone(), phoneDTO.getVerifyCode(), SmsType.CODE_CHANGE_PHONE,
+					phoneDTO.getAppId())) {
 				throw QuanhuException.busiError("验证码错误");
 			}
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, phoneDTO.getPhone());
 
-			UserAccount account = accountService.checkUserByPhonePassword(phoneDTO.getPhone(), null,phoneDTO.getAppId());
+			UserAccount account = accountService.checkUserByPhonePassword(phoneDTO.getPhone(), null,
+					phoneDTO.getAppId());
 			if (account != null) {
 				throw QuanhuException.busiError("手机号已存在");
 			}
@@ -499,7 +473,7 @@ public class AccountProvider implements AccountApi{
 			logger.error("绑定手机号未知异常", e);
 			return ResponseUtils.returnException(e);
 		} finally {
-			lockManager.unlock(Constants.BIND_PHONE,  phoneDTO.getPhone());
+			lockManager.unlock(Constants.BIND_PHONE, phoneDTO.getPhone());
 		}
 	}
 
@@ -515,13 +489,13 @@ public class AccountProvider implements AccountApi{
 	public Response<Boolean> bindThird(BindThirdDTO thirdDTO) {
 		try {
 			checkBindThirdDTO(thirdDTO);
-			
+
 			ThirdLoginDTO loginDTO = new ThirdLoginDTO();
 			loginDTO.setAccessToken(thirdDTO.getAccessToken());
 			loginDTO.setOpenId(thirdDTO.getOpenId());
 			loginDTO.setType(thirdDTO.getThirdType());
-			ThirdUser thirdUser = getThirdUser(loginDTO,thirdDTO.getAppId());
-			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(),thirdDTO.getAppId());
+			ThirdUser thirdUser = getThirdUser(loginDTO, thirdDTO.getAppId());
+			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), thirdDTO.getAppId());
 			if (thirdLogin != null) {
 				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "第三方账户已存在");
 			}
@@ -551,8 +525,9 @@ public class AccountProvider implements AccountApi{
 	public Response<Boolean> unbindThird(UnBindThirdDTO thirdDTO) {
 		try {
 			checkUnBindThirdDTO(thirdDTO);
-			
-			accountService.unbindThird(NumberUtils.toLong(thirdDTO.getUserId()), thirdDTO.getThirdId(), thirdDTO.getType(),thirdDTO.getAppId());
+
+			accountService.unbindThird(NumberUtils.toLong(thirdDTO.getUserId()), thirdDTO.getThirdId(),
+					thirdDTO.getType(), thirdDTO.getAppId());
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -577,16 +552,19 @@ public class AccountProvider implements AccountApi{
 	 * @return
 	 * @Description 需要在header获取用户id
 	 */
-	public Response<Boolean> editPassword(String userId,String oldPassword,String newPassword) {
+	public Response<Boolean> editPassword(String userId, String oldPassword, String newPassword) {
 		try {
 			if (StringUtils.isBlank(userId)) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),
+						"please check paramter: userId ");
 			}
 			if (StringUtils.isBlank(oldPassword)) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: oldPassword ");
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),
+						"please check paramter: oldPassword ");
 			}
 			if (StringUtils.isBlank(newPassword)) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: newPassword");
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),
+						"please check paramter: newPassword");
 			}
 			accountService.editPassword(userId, newPassword, oldPassword);
 		} catch (MysqlOptException e) {
@@ -615,9 +593,9 @@ public class AccountProvider implements AccountApi{
 	public Response<Boolean> forgotPassword(ForgotPasswordDTO passwordDTO) {
 		try {
 			checkForgotPasswordDTO(passwordDTO);
-			
+
 			accountService.forgotPasswordByPhone(passwordDTO.getPhone(), passwordDTO.getPassword(),
-					passwordDTO.getVerifyCode(),passwordDTO.getAppId());
+					passwordDTO.getVerifyCode(), passwordDTO.getAppId());
 		} catch (MysqlOptException e) {
 			return ResponseUtils.returnException(e);
 		} catch (RedisOptException e) {
@@ -630,27 +608,29 @@ public class AccountProvider implements AccountApi{
 		}
 		return ResponseUtils.returnObjectSuccess(true);
 	}
-	
+
 	/**
 	 * 检查用户是否被禁言
+	 * 
 	 * @param userId
 	 * @return
 	 */
-	public Response<Boolean> checkUserDisTalk(String userId){
+	public Response<Boolean> checkUserDisTalk(String userId) {
 		try {
-			if(StringUtils.isBlank(userId)){
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+			if (StringUtils.isBlank(userId)) {
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),
+						"please check paramter: userId ");
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
-			if(baseInfo == null){
+			if (baseInfo == null) {
 				throw new QuanhuException(ExceptionEnum.USER_MISSING);
 			}
-			if(checkUserDistory(userId).getData()){
+			if (checkUserDistory(userId).getData()) {
 				return ResponseUtils.returnObjectSuccess(true);
 			}
-			if(baseInfo.getBanPostTime().getTime() > new Date().getTime()){
+			if (baseInfo.getBanPostTime().getTime() > new Date().getTime()) {
 				return ResponseUtils.returnObjectSuccess(true);
-			}else{
+			} else {
 				return ResponseUtils.returnObjectSuccess(false);
 			}
 		} catch (MysqlOptException e) {
@@ -667,24 +647,26 @@ public class AccountProvider implements AccountApi{
 
 	/**
 	 * 检查用户是否冻结
+	 * 
 	 * @param userId
 	 * @return
 	 */
-	public Response<Boolean> checkUserDisable(String userId){
+	public Response<Boolean> checkUserDisable(String userId) {
 		try {
-			if(StringUtils.isBlank(userId)){
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+			if (StringUtils.isBlank(userId)) {
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),
+						"please check paramter: userId ");
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
-			if(baseInfo == null){
+			if (baseInfo == null) {
 				throw new QuanhuException(ExceptionEnum.USER_MISSING);
 			}
-			if(checkUserDistory(userId).getData()){
+			if (checkUserDistory(userId).getData()) {
 				return ResponseUtils.returnObjectSuccess(true);
 			}
-			if(baseInfo.getUserStatus().intValue() == UserAccountStatus.FREEZE.getStatus()){
+			if (baseInfo.getUserStatus().intValue() == UserAccountStatus.FREEZE.getStatus()) {
 				return ResponseUtils.returnObjectSuccess(true);
-			}else{
+			} else {
 				return ResponseUtils.returnObjectSuccess(false);
 			}
 		} catch (MysqlOptException e) {
@@ -698,24 +680,26 @@ public class AccountProvider implements AccountApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	/**
 	 * 检查用户是否注销
+	 * 
 	 * @param userId
 	 * @return
 	 */
-	public Response<Boolean> checkUserDistory(String userId){
+	public Response<Boolean> checkUserDistory(String userId) {
 		try {
-			if(StringUtils.isBlank(userId)){
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "please check paramter: userId ");
+			if (StringUtils.isBlank(userId)) {
+				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),
+						"please check paramter: userId ");
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
-			if(baseInfo == null){
+			if (baseInfo == null) {
 				throw new QuanhuException(ExceptionEnum.USER_MISSING);
 			}
-			if(baseInfo.getUserStatus().intValue() == UserAccountStatus.DISTORY.getStatus()){
+			if (baseInfo.getUserStatus().intValue() == UserAccountStatus.DISTORY.getStatus()) {
 				return ResponseUtils.returnObjectSuccess(true);
-			}else{
+			} else {
 				return ResponseUtils.returnObjectSuccess(false);
 			}
 		} catch (MysqlOptException e) {
@@ -729,7 +713,7 @@ public class AccountProvider implements AccountApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	/*	*//**
 			 * 邀请码补录
 			 * 
@@ -758,8 +742,8 @@ public class AccountProvider implements AccountApi{
 			 * return ReturnModel.returnException(); } return
 			 * ReturnModel.returnSuccess(ReturnCode.SUCCESSMSG); }
 			 */
-	
-	private void checkHeader(RequestHeader header){
+
+	private void checkHeader(RequestHeader header) {
 		if (header == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
 		}
@@ -773,7 +757,7 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "设备类型不能为空");
 		}
 	}
-	
+
 	private void checkRegisterDTO(RegisterDTO registerDTO, RegType type) {
 		if (registerDTO == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
@@ -785,8 +769,8 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "验证码不能为空");
 		}
 	}
-	
-	private void checkBindPhoneDTO(BindPhoneDTO phoneDTO){
+
+	private void checkBindPhoneDTO(BindPhoneDTO phoneDTO) {
 		if (phoneDTO == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
 		}
@@ -803,8 +787,8 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "验证码为空");
 		}
 	}
-	
-	private void checkBindThirdDTO(BindThirdDTO thirdDTO){
+
+	private void checkBindThirdDTO(BindThirdDTO thirdDTO) {
 		if (thirdDTO == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
 		}
@@ -824,8 +808,8 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "第三方令牌为空");
 		}
 	}
-	
-	private void checkUnBindThirdDTO(UnBindThirdDTO thirdDTO){
+
+	private void checkUnBindThirdDTO(UnBindThirdDTO thirdDTO) {
 		if (StringUtils.isBlank(thirdDTO.getUserId())) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "用户id为空");
 		}
@@ -839,7 +823,7 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "第三方类型为空");
 		}
 	}
-	
+
 	private void checkLoginDTO(LoginDTO loginDTO, LoginType loginType) {
 		if (loginDTO == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
@@ -854,7 +838,7 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "验证码为空");
 		}
 	}
-	
+
 	private void checkForgotPasswordDTO(ForgotPasswordDTO passwordDTO) {
 		if (passwordDTO == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
@@ -872,7 +856,7 @@ public class AccountProvider implements AccountApi{
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "应用id为空");
 		}
 	}
-	
+
 	private void checkThirdLoginDTO(ThirdLoginDTO loginDTO) {
 		if (loginDTO == null || StringUtils.isBlank(loginDTO.getAccessToken())) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "accessToken为空");
@@ -897,16 +881,16 @@ public class AccountProvider implements AccountApi{
 	 * @param loginDTO
 	 * @return
 	 */
-	private ThirdUser getThirdUser(ThirdLoginDTO loginDTO,String appId) {
+	private ThirdUser getThirdUser(ThirdLoginDTO loginDTO, String appId) {
 		ThirdUser thirdUser = null;
-		
+
 		try {// 微博
 			if (loginDTO.getType() == RegType.SINA.getType()) {
 				thirdUser = OatuhWeibo.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
 			} // qq
 			else if (loginDTO.getType() == RegType.QQ.getType()) {
 				thirdUser = OatuhQq.getUser(UserUtils.getThirdAppKey(appId, RegType.QQ), loginDTO.getOpenId(),
-				 loginDTO.getAccessToken());
+						loginDTO.getAccessToken());
 			} // 微信
 			else {
 				thirdUser = OatuhWeixin.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
@@ -954,7 +938,7 @@ public class AccountProvider implements AccountApi{
 			thirdLoginDTO.setUserChannel("web_weibo_login");
 			thirdLoginDTO.setType(RegType.SINA.getType());
 			thirdLoginDTO.setOpenId(weiboToken.getUid());
-			thirdUser = getThirdUser(thirdLoginDTO,appId);
+			thirdUser = getThirdUser(thirdLoginDTO, appId);
 		} else {
 			// 微信登录
 			WxToken token = null;
@@ -967,7 +951,7 @@ public class AccountProvider implements AccountApi{
 			thirdLoginDTO.setUserChannel("web_weixin_login");
 			thirdLoginDTO.setOpenId(token.getOpenid());
 			thirdLoginDTO.setType(RegType.WEIXIN.getType());
-			thirdUser = getThirdUser(thirdLoginDTO,appId);
+			thirdUser = getThirdUser(thirdLoginDTO, appId);
 		}
 		return thirdUser;
 	}
@@ -998,9 +982,10 @@ public class AccountProvider implements AccountApi{
 		UserLoginSimpleVO user = userService.getUserLoginSimpleVO(userId);
 
 		AuthTokenVO tokenVO = authService.getToken(new AuthTokenDTO(userId, devType, header.getAppId(), refreshToken));
-		
-		accountService.saveLoginLog(new UserLoginLog(NumberUtils.toLong(userId), devType.getType(), header.getDevName(), header.getDevId(), header.getAppId()));
-		
+
+		accountService.saveLoginLog(new UserLoginLog(NumberUtils.toLong(userId), devType.getType(), header.getDevName(),
+				header.getDevId(), header.getAppId()));
+
 		RegisterLoginVO loginVO = new RegisterLoginVO(tokenVO, user);
 
 		return loginVO;
@@ -1057,7 +1042,5 @@ public class AccountProvider implements AccountApi{
 		logDTO.setChannelCode(channelCode);
 		return logDTO;
 	}
-
-
 
 }
