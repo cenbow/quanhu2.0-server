@@ -11,19 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.order.utils.CollectionUtils;
-
-import redis.clients.jedis.ShardedJedis;
 
 /**
  * @author yehao
@@ -38,8 +34,8 @@ public class RrzOrderIntegralHistoryRedis {
 	
 	private static final String LASTTIME_COLUMN = "_LASTTIME";
 	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
 	/**
 	 * 获取开始时间

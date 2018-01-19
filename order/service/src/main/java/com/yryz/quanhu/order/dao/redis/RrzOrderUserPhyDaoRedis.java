@@ -5,18 +5,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.order.entity.RrzOrderUserPhy;
-
-import redis.clients.jedis.ShardedJedis;
 
 /**
  * @author yehao
@@ -29,8 +25,8 @@ public class RrzOrderUserPhyDaoRedis {
 
 	private Logger logger = Logger.getLogger(getClass());
 	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
 	public static final int BANCHECK_UPPER = 5;
 

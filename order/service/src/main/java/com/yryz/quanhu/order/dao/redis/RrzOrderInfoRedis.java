@@ -7,13 +7,10 @@
  */
 package com.yryz.quanhu.order.dao.redis;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.exception.RedisOptException;
@@ -33,10 +30,10 @@ public class RrzOrderInfoRedis {
 	
 	Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
-	@Resource
+	@Autowired
 	private DistributedLockManager distributedLockManager;
 	
 	public static final String RRZORDER_INFO_REDIS_PREFIX = "RrzOrderInfoRedis";

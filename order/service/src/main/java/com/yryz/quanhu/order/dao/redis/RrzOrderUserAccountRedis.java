@@ -3,13 +3,11 @@ package com.yryz.quanhu.order.dao.redis;
 import java.util.Date;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.exception.RedisOptException;
@@ -18,8 +16,6 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
 import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.exception.SourceNotEnoughException;
-
-import redis.clients.jedis.ShardedJedis;
 
 /**
  * @author yehao
@@ -32,8 +28,8 @@ public class RrzOrderUserAccountRedis{
 	
 	private Logger logger = Logger.getLogger(getClass());
 	
-	@Resource
-	private RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 	
 	
 //	@Autowired
