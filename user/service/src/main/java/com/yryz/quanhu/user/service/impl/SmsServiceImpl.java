@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.SmsContants;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.manager.SmsManager;
@@ -35,6 +36,9 @@ public class SmsServiceImpl implements SmsService{
 
 		boolean accountFlag = accountService.checkUserByPhone(phone,appId);
 		SmsType smsType = null;
+		if(StringUtils.equals(type, SmsContants.CODE_LOGIN)){
+			smsType = accountFlag ? SmsType.CODE_LOGIN : SmsType.CODE_REGISTER;
+		}
 		if (type == null) {
 			smsType = accountFlag ? SmsType.CODE_REGISTER : SmsType.CODE_FIND_PWD;
 		} else {
@@ -88,7 +92,7 @@ public class SmsServiceImpl implements SmsService{
 
 	@Override
 	public boolean checkVerifyCode(String phone, String code, String verifyCode,String appId) {
-		return smsManager.checkVerifyCode(phone, verifyCode, code,appId);
+		return smsManager.checkVerifyCode(phone, verifyCode, code,appId,false);
 	}
 
 	/*@Override

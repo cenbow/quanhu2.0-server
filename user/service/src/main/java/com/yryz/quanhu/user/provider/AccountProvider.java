@@ -45,6 +45,7 @@ import com.yryz.quanhu.user.dto.BindThirdDTO;
 import com.yryz.quanhu.user.dto.ForgotPasswordDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
+import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
@@ -59,12 +60,14 @@ import com.yryz.quanhu.user.service.AuthService;
 import com.yryz.quanhu.user.service.OatuhQq;
 import com.yryz.quanhu.user.service.OatuhWeibo;
 import com.yryz.quanhu.user.service.OatuhWeixin;
+import com.yryz.quanhu.user.service.SmsService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserThirdLoginService;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
+import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 import com.yryz.quanhu.user.vo.ThirdLoginConfigVO;
 import com.yryz.quanhu.user.vo.ThirdUser;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
@@ -95,7 +98,9 @@ public class AccountProvider implements AccountApi {
 	@Autowired
 	private UserThirdLoginService thirdLoginService;
 	@Autowired
-	private SmsManager smsService;
+	private SmsManager smsManager;
+	@Autowired
+	private SmsService smsService;
 	@Autowired
 	private AuthService authService;
 	@Autowired
@@ -122,7 +127,7 @@ public class AccountProvider implements AccountApi {
 			 * WebUtil.getClientIP(params)); registerDTO.setRegLogDTO(logDTO);
 			 */
 
-			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
+			if (!smsManager.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, header.getAppId())) {
 				throw QuanhuException.busiError("验证码错误");
 			}
@@ -276,7 +281,7 @@ public class AccountProvider implements AccountApi {
 			if (login != null) {
 				throw QuanhuException.busiError("该用户已存在");
 			} else {
-				if (!smsService.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
+				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
 						SmsType.CODE_CHANGE_PHONE, header.getAppId())) {
 					throw QuanhuException.busiError("验证码错误");
 				}
@@ -449,7 +454,7 @@ public class AccountProvider implements AccountApi {
 	public Response<Boolean> bindPhone(BindPhoneDTO phoneDTO) {
 		try {
 			checkBindPhoneDTO(phoneDTO);
-			if (!smsService.checkVerifyCode(phoneDTO.getPhone(), phoneDTO.getVerifyCode(), SmsType.CODE_CHANGE_PHONE,
+			if (!smsManager.checkVerifyCode(phoneDTO.getPhone(), phoneDTO.getVerifyCode(), SmsType.CODE_CHANGE_PHONE,
 					phoneDTO.getAppId())) {
 				throw QuanhuException.busiError("验证码错误");
 			}
@@ -1041,6 +1046,35 @@ public class AccountProvider implements AccountApi {
 				logDTO.getRegType(), logDTO.getActivityChannelCode() }, " ");
 		logDTO.setChannelCode(channelCode);
 		return logDTO;
+	}
+	
+	
+	private void checkCodeDTO(SmsVerifyCodeDTO codeDTO) {
+		if (codeDTO == null) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
+		}
+		if (StringUtils.isEmpty(codeDTO.getPhone())) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "手机号为空");
+		}
+		if (StringUtils.isBlank(codeDTO.getCode())) {
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "功能码不能为空");
+		}
+		if(StringUtils.isBlank(codeDTO.getAppId())){
+			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "应用id不能为空");
+		}
+	}
+	
+	@Override
+	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
+		try {
+			checkCodeDTO(codeDTO);
+			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO.getPhone(), codeDTO.getCode(), codeDTO.getAppId()));
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("短信验证码发送异常", e);
+			return ResponseUtils.returnException(e);
+		}
 	}
 
 }

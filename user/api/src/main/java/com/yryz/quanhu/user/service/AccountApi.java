@@ -16,10 +16,12 @@ import com.yryz.quanhu.user.dto.BindThirdDTO;
 import com.yryz.quanhu.user.dto.ForgotPasswordDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
+import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
+import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 /**
  * 用户账户操作
  * @author danshiyu
@@ -52,6 +54,12 @@ public interface AccountApi {
 	static String thirdAccountKey(String thirdId,String appId){
 		return String.format("%s.third.%s", RedisConstants.ACCOUNT_USER,thirdId,appId);
 	}
+	/**
+	 * 发送短信验证码
+	 * @param codeDTO
+	 * @return
+	 */
+	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO);
 	
 	/**
 	 * 手机号注册
