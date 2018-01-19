@@ -24,5 +24,9 @@ public class UserRedis extends RedisSupport<User> {
 	public void save(User user){
 		redisTemplate.opsForValue().set("yehao-test", user);
 	}
+	
+	public User get(String id){
+		return redisTemplate.opsForValue().get(id);
+	}
 
 }
