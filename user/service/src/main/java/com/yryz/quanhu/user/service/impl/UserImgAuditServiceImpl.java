@@ -14,9 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
@@ -34,7 +37,8 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 
 	@Autowired
 	private UserImgAuditDao imgAuditDao;
-
+	@Reference(check=false)
+	private IdAPI idApi;
 	@Autowired
 	private UserService userService;
 
@@ -48,6 +52,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 			if (auditStatus.intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
 				delete(record.getUserId().toString());
 				record.setCreateDate(new Date());
+				record.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT));
 				result = imgAuditDao.save(record);
 			} else {
 				result = imgAuditDao.update(record);
@@ -83,6 +88,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 				// 待审核图片表示不存在
 				if (auditModel.getAuditStatus().intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
 					imgAuditModel.setCreateDate(new Date());
+					imgAuditModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT));
 					saveLists.add(imgAuditModel);
 					delete(imgAuditModel.getUserId().toString());
 				} else {
@@ -102,7 +108,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 					UserImgAudit auditModel = record.get(i);
 					userService.updateUserInfo(new UserBaseInfo(auditModel.getUserId(),""));
 				}
-				// 消息
+				// TODO:消息
 			}
 
 		} catch (Exception e) {

@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.exception.RedisOptException;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
 import com.yryz.quanhu.user.service.AuthApi;
@@ -32,7 +33,7 @@ public class AuthRedisDao {
 	private static Logger logger = LoggerFactory.getLogger(AuthRedisDao.class);
 
 	@Resource
-	private RedisTemplate<String, AuthTokenVO> redisTemplate;
+	private RedisTemplateBuilder redisTemplateBuilder;
 
 	/**
 	 * web端token设置
@@ -44,6 +45,7 @@ public class AuthRedisDao {
 		String key = AuthApi.cacheKey(tokenDTO.getUserId(), tokenDTO.getAppId(), tokenDTO.getType());
 		try {
 			AuthTokenVO tokenVO = new AuthTokenVO(tokenDTO.getUserId(), tokenDTO.getToken(), expireAt);
+			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			redisTemplate.opsForValue().set(key, tokenVO);
 		} catch (Exception e) {
 			logger.error("TokenRedis.addToken", e);
@@ -62,6 +64,7 @@ public class AuthRedisDao {
 		try {
 			AuthTokenVO tokenVO = new AuthTokenVO(refreshDTO.getUserId(), refreshDTO.getToken(), expireAt,
 					refreshDTO.getRefreshToken(), refreshExpireAt);
+			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			redisTemplate.opsForValue().set(key, tokenVO);
 		} catch (Exception e) {
 			logger.error("TokenRedis.addToken", e);
@@ -78,6 +81,7 @@ public class AuthRedisDao {
 	public AuthTokenVO getToken(AuthTokenDTO tokenDTO) {
 		String key = AuthApi.cacheKey(tokenDTO.getUserId(), tokenDTO.getAppId(), tokenDTO.getType());
 		try {
+			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			AuthTokenVO tokenVO = redisTemplate.opsForValue().get(key);
 				return tokenVO;
 		} catch (Exception e) {
@@ -96,6 +100,7 @@ public class AuthRedisDao {
 	public void delToken(AuthTokenDTO tokenDTO) {
 		String key = AuthApi.cacheKey(tokenDTO.getUserId(), tokenDTO.getAppId(), tokenDTO.getType());
 		try {
+			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			redisTemplate.delete(key);
 		} catch (Exception e) {
 			logger.error("TokenRedis.delToken", e);

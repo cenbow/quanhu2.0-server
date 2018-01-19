@@ -19,13 +19,13 @@
 		last_update_date
 	</sql>
 
-	<select id="selectByOne" resultMap="BaseResultMap">
+	<select id="selectOne" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
 		from user_account
 		where del_flag = 10
-		<if test="kid != null and kId != '' ">
-			and kid = #{kid}
+		<if test="userId != null and userId != '' ">
+			and kid = #{userId}
 		</if>
 		<if test="appId != null and appId != '' ">
 			and app_id = #{appId}
@@ -33,11 +33,8 @@
 		<if test="userPhone != null and userPhone != '' ">
 			and user_phone = #{userPhone}
 		</if>
-		<if test="userPwd != null and userPwd">
+		<if test="userPwd != null and userPwd !='' ">
 			and user_pwd = #{userPwd}
-		</if>
-		<if test="userEmail != null and userEmail != '' ">
-			and user_email = #{userEmail}
 		</if>
 	</select>
 

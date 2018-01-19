@@ -22,10 +22,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserOperateInfoDao;
 import com.yryz.quanhu.user.dao.UserRegLogDao;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
@@ -47,28 +50,30 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 @Service
 public class UserOperateServiceImpl implements UserOperateService {
 	private static final Logger logger = LoggerFactory.getLogger(UserOperateServiceImpl.class);
-	
+
 	@Autowired
 	private UserOperateInfoDao mysqlDao;
-	
+
 	@Autowired
 	private UserRegLogDao regLogDao;
-	
+	@Reference(check=false)
+	private IdAPI idApi;
 	@Autowired
 	private UserService userService;
-	
+
 	@Override
 	public int save(UserOperateInfo record) {
 		record.setCreateDate(new Date());
-		//record.setCustInviter(idService.getInviterCode());
-		if(StringUtils.isNotBlank(record.getUserRegInviterCode())){
+		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO));
+		record.setUserInviterCode(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO).toString());
+		if (StringUtils.isNotBlank(record.getUserRegInviterCode())) {
 			String userRegId = selectUserIdByInviter(record.getUserRegInviterCode());
 			record.setUserRegId(userRegId);
 		}
 		try {
 			return mysqlDao.save(record);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.save]",e);
+			logger.error("[UserRegDao.save]", e);
 			throw new MysqlOptException(e);
 		}
 	}
@@ -76,40 +81,42 @@ public class UserOperateServiceImpl implements UserOperateService {
 	@Override
 	public int saveRegLog(UserRegLogDTO logDTO) {
 		UserRegLog model = (UserRegLog) GsonUtils.parseObj(logDTO, UserRegLog.class);
-		if(model == null){
+		if (model == null) {
 			return 0;
 		}
+		model.setKid(idApi.getKid(IdConstants.QUANHU_USER_REG_LOG));
 		model.setCreateDate(new Date());
 		try {
 			return regLogDao.insert(model);
 		} catch (Exception e) {
-			logger.error("[UserRegLogDao.save]",e);
+			logger.error("[UserRegLogDao.save]", e);
 			throw new MysqlOptException(e);
 		}
 	}
-	
+
 	@Override
 	public String selectInviterByUserId(String userId) {
 		try {
 			return mysqlDao.selectInviterByUserId(userId);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.selectInviterByuserId]",e);
+			logger.error("[UserRegDao.selectInviterByuserId]", e);
 			throw new MysqlOptException(e);
 		}
 	}
-	
+
 	@Override
 	public String selectUserIdByInviter(String inviterCode) {
 		try {
 			return mysqlDao.selectUserIdByInviter(inviterCode);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.selectuserIdByInviter]",e);
+			logger.error("[UserRegDao.selectuserIdByInviter]", e);
 			throw new MysqlOptException(e);
 		}
 	}
 
 	/**
 	 * 查询我邀请的好友详情
+	 * 
 	 * @param userId
 	 * @param limit
 	 * @param inviterId
@@ -119,7 +126,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 		try {
 			return mysqlDao.listByUserId(userId, limit, inviterId);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.listByuserId]",e);
+			logger.error("[UserRegDao.listByuserId]", e);
 			throw new MysqlOptException(e);
 		}
 	}
@@ -131,7 +138,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 		try {
 			List<UserOperateInfo> models = mysqlDao.listByParams(queryDTO);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.listByParams]",e);
+			logger.error("[UserRegDao.listByParams]", e);
 			throw new MysqlOptException(e);
 		}
 		return page;
@@ -142,13 +149,14 @@ public class UserOperateServiceImpl implements UserOperateService {
 		try {
 			mysqlDao.updateInviterNum(inviterCode);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.updateInviterNum]",e);
+			logger.error("[UserRegDao.updateInviterNum]", e);
 			throw new MysqlOptException(e);
 		}
 	}
 
 	/**
 	 * 查询我邀请的好友数
+	 * 
 	 * @param userId
 	 * @return
 	 */
@@ -156,7 +164,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 		try {
 			return mysqlDao.getInviterNum(userId);
 		} catch (Exception e) {
-			logger.error("[UserRegDao.getInviterNum]",e);
+			logger.error("[UserRegDao.getInviterNum]", e);
 			throw new MysqlOptException(e);
 		}
 	}
@@ -165,28 +173,29 @@ public class UserOperateServiceImpl implements UserOperateService {
 	public MyInviterVO getMyInviter(String userId, Integer limit, Integer inviterId) {
 		List<UserOperateInfo> list = this.listByuserId(userId, limit, inviterId);
 		int regLength = list == null ? 0 : list.size();
-		if(regLength == 0){
+		if (regLength == 0) {
 			return null;
 		}
-		
+
 		int total = this.getInviterNum(userId);
-		
-		Set<String> userIds = new HashSet<>(regLength); 
-		Map<String,UserSimpleVO> custMap = new HashMap<>(regLength);		
-		
-		for(int i = 0 ; i < regLength; i++){
+
+		Set<String> userIds = new HashSet<>(regLength);
+		Map<String, UserSimpleVO> custMap = new HashMap<>(regLength);
+
+		for (int i = 0; i < regLength; i++) {
 			userIds.add(list.get(i).getUserId().toString());
 		}
-		if(CollectionUtils.isNotEmpty(userIds)){
+		if (CollectionUtils.isNotEmpty(userIds)) {
 			custMap = userService.getUserSimple(userIds);
 		}
-		
+
 		List<MyInviterDetailVO> detailVOs = new ArrayList<>(regLength);
-		for(int i = 0 ; i < regLength; i++){
+		for (int i = 0; i < regLength; i++) {
 			UserOperateInfo model = list.get(i);
 			UserSimpleVO simpleVo = custMap.get(model.getUserId());
-			if(simpleVo != null){
-				detailVOs.add(new MyInviterDetailVO(model.getKid().intValue(), simpleVo.getUserNickName(), model.getCreateDate().getTime()));
+			if (simpleVo != null) {
+				detailVOs.add(new MyInviterDetailVO(model.getKid().intValue(), simpleVo.getUserNickName(),
+						model.getCreateDate().getTime()));
 			}
 		}
 		return new MyInviterVO(total, detailVOs);
@@ -195,7 +204,8 @@ public class UserOperateServiceImpl implements UserOperateService {
 	@Override
 	public void commitInviterEvent(String inviterCode) {
 		String userId = this.selectUserIdByInviter(inviterCode);
-		//eventService.inviterRegister(userId);
+		// TODO:注册加积分
+		// eventService.inviterRegister(userId);
 	}
 
 }

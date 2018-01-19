@@ -20,15 +20,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserBaseInfoDao;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
@@ -57,7 +60,8 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserBaseInfoDao custbaseinfoDao;
-
+	@Reference(check=false)
+	IdAPI idApi;
 	@Autowired
 	UserImgAuditDao custImgAuditDao;
 
@@ -403,14 +407,17 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void createUser(UserBaseInfo baseInfo) {
-
+		
 		// 获取二维码预存地址
 		String qrUrl = QrManager.getQrUrl(baseInfo.getUserId().toString());
 		baseInfo.setUserQr(qrUrl);
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
+		baseInfo.setKid(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO));
 		baseInfo.setCreateDate(new Date());
+		baseInfo.setBanPostTime(new Date());
+		baseInfo.setUserDesc("");
 		custbaseinfoDao.insert(baseInfo);
 		// 异步上传二维码
 

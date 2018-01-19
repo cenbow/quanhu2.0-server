@@ -35,8 +35,8 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
 		// common.addPathPatterns("/**");
 		// 配置不拦截的路径
 		// common.excludePathPatterns("/**.html");
-		//common.addPathPatterns("/v2/**");
-		//common.excludePathPatterns("/2/user/refreshToken");
+		common.addPathPatterns("/v2/**");
+		common.excludePathPatterns("/v2/user/login");
 
 		// 还可以在这里注册其它的拦截器
 		// registry.addInterceptor(new

@@ -1,6 +1,11 @@
 package com.yryz.quanhu.dymaic.canal.entity;
 
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.util.CollectionUtils;
+
+import com.google.common.collect.Maps;
 
 /**
  * Canal 内容
@@ -8,15 +13,15 @@ import java.util.List;
  * @author jk
  */
 public class CanalMsgContent {
-	//数据库名称  小写
+	// 数据库名称 小写
 	private String dbName;
-	//表名称  小写
+	// 表名称 小写
 	private String tableName;
-	//事件类型三种("update","delete","insert")
+	// 事件类型三种("update","delete","insert")
 	private String eventType;
-	//变更前的数据
+	// 变更前的数据
 	private List<CanalChangeInfo> dataBefore;
-	//变更后的数据
+	// 变更后的数据
 	private List<CanalChangeInfo> dataAfter;
 
 	public String getDbName() {

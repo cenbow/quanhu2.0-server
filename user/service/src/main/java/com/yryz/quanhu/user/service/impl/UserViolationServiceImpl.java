@@ -23,11 +23,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.RedisOptException;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
 import com.yryz.quanhu.user.contants.ViolatType;
@@ -50,6 +53,8 @@ public class UserViolationServiceImpl implements UserViolationService {
 	private final static Logger logger = LoggerFactory.getLogger(UserViolationServiceImpl.class);
 	@Autowired
 	private UserViolationDao mysqlDao;
+	@Reference(check=false)
+	private IdAPI idApi;
 	@Resource 
 	private RedisTemplate<String, Long> redisTemplate;
 /*	@Autowired
@@ -68,12 +73,12 @@ public class UserViolationServiceImpl implements UserViolationService {
 		if (violation.getViolationType() == ViolatType.WARN.getType()
 				|| violation.getViolationType() == ViolatType.ALLTAIK.getType()
 				|| violation.getViolationType() == ViolatType.NOFREEZE.getType()) {
-			violation.setStatus((byte) 1);
+			violation.setStatus((byte) 11);
 		} else {
-			violation.setStatus((byte) 0);
+			violation.setStatus((byte) 10);
 		}
 		// 设置用户其他违规记录过期
-		violation.setCreateDate(new Date());
+		
 		updateViolation(violation.getUserId().toString());
 
 		// 保存当前违规记录
@@ -162,6 +167,8 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 */
 	private void saveViolationDao(UserViolation violation) {
 		try {
+			violation.setKid(idApi.getKid(IdConstants.QUANHU_USER_VIOLATION));
+			violation.setCreateDate(new Date());
 			mysqlDao.saveViolation(violation);
 		} catch (Exception e) {
 			logger.error("[violation save error]", e);

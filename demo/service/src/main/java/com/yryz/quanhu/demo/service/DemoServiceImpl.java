@@ -1,26 +1,24 @@
 package com.yryz.quanhu.demo.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.demo.vo.DemoVo;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 @Service(interfaceClass = DemoService.class)
 public class DemoServiceImpl implements DemoService {
 	protected final Log logger = LogFactory.getLog(DemoServiceImpl.class);
 
     // RedisTemplate 含有泛型,无法使用 @Autowired by type 注入,只能使用@Resource by name注入
-    @Resource
-    private RedisTemplate<String, DemoVo> redisTemplate;
+    @Autowired
+    private RedisTemplateBuilder redisTemplateBuilder;
 
     //@Autowired
     //private ContentAuditService contentAuditService;
@@ -39,26 +37,26 @@ public class DemoServiceImpl implements DemoService {
     @Override
     public DemoVo remove(Long id) {
         logger.info("remove: " + id);
-        redisTemplate.delete(DemoService.cacheKey(id));
+        redisTemplateBuilder.buildRedisTemplate(DemoVo.class).delete(DemoService.cacheKey(id));
         return new DemoVo(id, "name", 18, new Date());
     }
 
     @Override
     public DemoVo merge(DemoVo demoVo) {
         logger.info("merge: " + demoVo);
-        redisTemplate.opsForValue().set(DemoService.cacheKey(demoVo.getId()), demoVo);
+        redisTemplateBuilder.buildRedisTemplate(DemoVo.class).opsForValue().set(DemoService.cacheKey(demoVo.getId()), demoVo);
         return demoVo;
     }
 
     @Override
     public DemoVo find(Long id) {
         logger.info("find: " + id);
-        DemoVo cache = redisTemplate.opsForValue().get(DemoService.cacheKey(id));
+        DemoVo cache = redisTemplateBuilder.buildRedisTemplate(DemoVo.class).opsForValue().get(DemoService.cacheKey(id));
         if (null != cache) {
             return cache;
         }
         DemoVo demoVo = new DemoVo(id, "name", 18, new Date());
-        redisTemplate.opsForValue().set(DemoService.cacheKey(id), demoVo);
+        redisTemplateBuilder.buildRedisTemplate(DemoVo.class).opsForValue().set(DemoService.cacheKey(id), demoVo);
         return demoVo;
     }
 

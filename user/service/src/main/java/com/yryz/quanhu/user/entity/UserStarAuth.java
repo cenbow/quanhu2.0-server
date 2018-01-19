@@ -75,22 +75,90 @@ public class UserStarAuth extends GenericEntity{
      * 认证类型 10:个人认证 11:企业/机构认证
      */
     private Byte authType;
-
+    
+    public enum StarAuthType{
+    	/** 用户申请 */
+    	USER_APLLY((byte)10),
+    	/** 平台设置 */
+    	ADMIN_SET((byte)11);
+    	private byte type;
+    	StarAuthType(byte type) {
+			this.type = type;
+		}
+    	public byte getType(){
+    		return this.type;
+    	}
+    }
+    
     /**
      * 认证方式 10:用户申请 11:平台设置
      */
     private Byte authWay;
-
+    
+    public enum StarAuthWay{
+    	/** 用户申请 */
+    	USER_APLLY((byte)10),
+    	/** 平台设置 */
+    	ADMIN_SET((byte)11);
+    	private byte way;
+    	StarAuthWay(byte way) {
+			this.way = way;
+		}
+    	public byte getWay(){
+    		return this.way;
+    	}
+    }
+    
     /**
      * 审核状态 10:待审核 11:审核通过 12:审核失败 13:取消认证
      */
     private Byte auditStatus;
-
+    
+    public enum StarAuditStatus{
+    	/** 待申请 */
+    	WAIT_AUDIT((byte)10),
+    	/** 审核通过 */
+    	AUDIT_SUCCESS((byte)11),
+    	/** 审核失败 */
+    	AUDIT_FAIL((byte)12),
+    	/** 取消认证 */
+    	CANCEL_AUTH((byte)13);
+    	private byte status;
+    	StarAuditStatus(byte status) {
+			this.status = status;
+		}
+    	public byte getStatus(){
+    		return this.status;
+    	}
+    }
+    
     /**
      * 是否被推荐 10:否 11:是
      */
     private Byte recommendStatus;
-
+    
+    public enum StarRecommendStatus{
+    	/** 用户申请 */
+    	FALSE((byte)10),
+    	/** 平台设置 */
+    	TRUE((byte)11);
+    	private byte status;
+    	StarRecommendStatus(byte status) {
+			this.status = status;
+		}
+    	public byte getStatus(){
+    		return this.status;
+    	}
+    }
+    
+    /**
+     * 推荐语
+     */
+    private String recommendDesc;
+    /**
+     * 推荐排序权重
+     */
+    private Integer recommendHeight;
     /**
      * 操作人名称
      */
@@ -308,4 +376,20 @@ public class UserStarAuth extends GenericEntity{
     public void setRecommendCancelTime(Date recommendCancelTime) {
         this.recommendCancelTime = recommendCancelTime;
     }
+
+	public String getRecommendDesc() {
+		return recommendDesc;
+	}
+
+	public void setRecommendDesc(String recommendDesc) {
+		this.recommendDesc = recommendDesc;
+	}
+
+	public Integer getRecommendHeight() {
+		return recommendHeight;
+	}
+
+	public void setRecommendHeight(Integer recommendHeight) {
+		this.recommendHeight = recommendHeight;
+	}
 }
