@@ -19,11 +19,11 @@ public class CommonException extends QuanhuException {
 	private static final long serialVersionUID = -2468366252134385917L;
 	
 	public CommonException(String msg, Throwable cause) {
-		super(ResponseConstant.EXCEPTION.getCode(), msg, msg, cause);
+		super(ResponseConstant.SYS_EXCEPTION.getCode(), msg, msg, cause);
 	}
 
 	public CommonException(String msg) {
-		super(ResponseConstant.EXCEPTION.getCode(), msg, msg);
+		super(ResponseConstant.SYS_EXCEPTION.getCode(), msg, msg);
 	}
 
 }

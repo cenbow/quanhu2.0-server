@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.order.provider;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +21,15 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.entity.RrzOrderAccountHistory;
+import com.yryz.quanhu.order.entity.RrzOrderCust2bank;
 import com.yryz.quanhu.order.entity.RrzOrderInfo;
 import com.yryz.quanhu.order.entity.RrzOrderIntegralHistory;
 import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
 import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
+import com.yryz.quanhu.order.entity.RrzOrderUserPhy;
 import com.yryz.quanhu.order.exception.CommonException;
 import com.yryz.quanhu.order.exception.SourceNotEnoughException;
 import com.yryz.quanhu.order.service.OrderAccountHistoryService;
@@ -33,6 +37,7 @@ import com.yryz.quanhu.order.service.OrderIntegralHistoryService;
 import com.yryz.quanhu.order.service.OrderService;
 import com.yryz.quanhu.order.service.UserAccountService;
 import com.yryz.quanhu.order.service.UserPhyService;
+import com.yryz.quanhu.order.utils.Page;
 import com.yryz.quanhu.order.vo.AccountOrder;
 import com.yryz.quanhu.order.vo.CustBank;
 import com.yryz.quanhu.order.vo.IntegralOrder;
@@ -232,43 +237,66 @@ public class OrderProvider implements OrderApi {
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 验证密码
 	 * @param userPhy
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#checkSecurityProblem(com.yryz.quanhu.order.vo.UserPhy)
 	 */
 	@Override
 	public Response<?> checkSecurityProblem(UserPhy userPhy) {
-		// TODO Auto-generated method stub
-		return null;
+		logger.info("收到安全信息密码验证需求，custId：" + userPhy.getCustId());
+		try {
+			RrzOrderUserPhy rrzOrderUserPhy = (RrzOrderUserPhy) GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
+
+			return userPhyService.checkSecurityProblem(rrzOrderUserPhy);
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(new CommonException("数据提交失败"));
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnException(new CommonException("未知异常"));
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 锁定账户
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#lockUserAccount(java.lang.String)
 	 */
 	@Override
 	public Response<?> lockUserAccount(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			userAccountService.lockUserAccount(custId);
+			return ResponseUtils.returnSuccess();
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(new CommonException("数据提交失败"));
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnException(new CommonException("未知异常"));
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 解锁系统账户
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#unlockUserAccount(java.lang.String)
 	 */
 	@Override
 	public Response<?> unlockUserAccount(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			userAccountService.unlockUserAccount(custId);
+			return ResponseUtils.returnSuccess();
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(new CommonException("数据提交失败"));
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnException(new CommonException("未知异常"));
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 检查支付密码
 	 * @param custId
 	 * @param payPassword
 	 * @return
@@ -276,60 +304,96 @@ public class OrderProvider implements OrderApi {
 	 */
 	@Override
 	public Response<?> checkUserPayPassword(String custId, String payPassword) {
-		// TODO Auto-generated method stub
-		return null;
+		logger.info("收到支付密码验证需求，custId：" + custId + ",payPassword:" + payPassword);
+		try {
+			return userPhyService.checkPayPassword(custId, payPassword);
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnCommonException("数据提交失败");
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 处理安全信息
 	 * @param userPhy
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#dealUserPhy(com.yryz.quanhu.order.vo.UserPhy)
 	 */
 	@Override
 	public Response<?> dealUserPhy(UserPhy userPhy) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			if (StringUtils.isEmpty(userPhy.getCustId())){
+				return ResponseUtils.returnCommonException("客户ID不能为空");
+			}
+			RrzOrderUserPhy rrzOrderUserPhy = (RrzOrderUserPhy) GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
+			return userPhyService.dealUserPhy(rrzOrderUserPhy, userPhy.getOldPassword());
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知错误");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取物理信息
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#getUserPhy(java.lang.String)
 	 */
 	@Override
-	public UserPhy getUserPhy(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response<UserPhy> getUserPhy(String custId) {
+		try {
+			RrzOrderUserPhy orderUserPhy = userPhyService.getUserPhy(custId);
+			return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(orderUserPhy, UserPhy.class));
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnCommonException("数据库操作异常");
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知错误");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取用户银行卡信息
 	 * @param custBankId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#getCustBankById(java.lang.String)
 	 */
 	@Override
 	public Response<CustBank> getCustBankById(String custBankId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			RrzOrderCust2bank cust2bank = orderService.getCustBank(custBankId);
+			return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(cust2bank, CustBank.class));
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnCommonException("数据库操作异常");
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 返回绑定的银行卡
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#getCustBanks(java.lang.String)
 	 */
 	@Override
 	public Response<List<CustBank>> getCustBanks(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<RrzOrderCust2bank> list = orderService.getCustBanks(custId);
+			return ResponseUtils.returnListSuccess(GsonUtils.parseList(list, CustBank.class));
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnCommonException("数据库操作异常");
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 编辑银行卡信息
 	 * @param custBank
 	 * @param type
 	 * @return
@@ -337,12 +401,21 @@ public class OrderProvider implements OrderApi {
 	 */
 	@Override
 	public Response<?> dealCustBank(CustBank custBank, int type) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			RrzOrderCust2bank rrzOrderCust2bank = (RrzOrderCust2bank) GsonUtils.parseObj(custBank,
+					RrzOrderCust2bank.class);
+			RrzOrderCust2bank cust2bank = orderService.dealCustBank(rrzOrderCust2bank, type);
+			return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(cust2bank, CustBank.class));
+		} catch (CommonException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取订单列表
 	 * @param custId
 	 * @param orderDesc
 	 * @param startDate
@@ -357,12 +430,46 @@ public class OrderProvider implements OrderApi {
 	@Override
 	public Response<PageList<OrderListVo>> getOrderListWeb(String custId, String orderDesc, String startDate,
 			String endDate, Integer productType, int type, int pageNo, int pageSize) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			PageList<OrderListVo> listPage = new PageList<>();
+			listPage.setCurrentPage(pageNo);
+			listPage.setPageSize(pageSize);
+			Map<String, Object> params = new HashMap<>(5);
+			params.put("custId", custId);
+			params.put("orderDesc", orderDesc);
+			params.put("startDate", startDate);
+			params.put("endDate", endDate);
+			params.put("productType", productType);
+			if (type == 1) {
+				Page<RrzOrderAccountHistory> page = orderAccountHistoryService.getOrderAccountListWeb(params, pageNo, pageSize);
+				listPage.setCount(page.getTotalCount());
+				if (page.getResult() != null) {
+					List<RrzOrderAccountHistory> histories = page.getResult();
+					List<OrderListVo> list = GsonUtils.parseList(histories,
+							OrderListVo.class);
+					listPage.setEntities(list);
+				}
+			} else if (type == 2) {
+				Page<RrzOrderIntegralHistory> page = orderIntegralHistoryService.getOrderIntegralListWeb(params, pageNo, pageSize);
+				listPage.setCount(page.getTotalCount());
+				if (page.getResult() != null) {
+					List<RrzOrderIntegralHistory> histories = page.getResult();
+					List<OrderListVo> list = GsonUtils.parseList(histories,
+							OrderListVo.class);
+					listPage.setEntities(list);
+				}
+			}
+			return ResponseUtils.returnObjectSuccess(listPage);
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnCommonException("数据库操作异常");
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取资金信息
 	 * @param custId
 	 * @param date
 	 * @param orderId
@@ -375,12 +482,12 @@ public class OrderProvider implements OrderApi {
 	@Override
 	public Response<List<PayInfo>> getPayInfo(String custId, String date, String orderId, int type, long start,
 			long limit) {
-		// TODO Auto-generated method stub
-		return null;
+		List<RrzOrderPayInfo> list = orderService.getPayInfo(custId, date, orderId, start, limit);
+		return ResponseUtils.returnListSuccess(GsonUtils.parseList(list, PayInfo.class));
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取资金信息(web端)
 	 * @param custId
 	 * @param date
 	 * @param orderId
@@ -392,55 +499,70 @@ public class OrderProvider implements OrderApi {
 	@Override
 	public Response<PageList<PayInfo>> getPayInfoWeb(String custId, String date, String orderId, int pageNo,
 			int pageSize) {
-		// TODO Auto-generated method stub
-		return null;
+		PageList<PayInfo> listpage = new PageList<>();
+		listpage.setCurrentPage(pageNo);
+		listpage.setPageSize(pageSize);
+		try {
+			Page<RrzOrderPayInfo> page = orderService.getPayInfoWeb(custId, date, orderId, pageNo, pageSize);
+			listpage.setCount(page.getTotalCount());
+			if (page.getResult() != null) {
+				List<RrzOrderPayInfo> infos = page.getResult();
+				List<PayInfo> list = (List<PayInfo>) GsonUtils.parseList(infos, PayInfo.class);
+				listpage.setEntities(list);
+			}
+			return ResponseUtils.returnObjectSuccess(listpage);
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnCommonException("数据库操作异常");
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 执行统计信息
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#integralSum()
 	 */
 	@Override
 	public Response<?> integralSum() {
-		// TODO Auto-generated method stub
-		return null;
+		orderIntegralHistoryService.integralSum();
+		return ResponseUtils.returnSuccess();
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 获取用户统计信息
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#getUserIntegralSum(java.lang.String)
 	 */
 	@Override
 	public Response<Map<String, String>> getUserIntegralSum(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+		return ResponseUtils.returnObjectSuccess(orderIntegralHistoryService.getUserIntegralSum(custId));
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 初始化用户统计信息
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#integralSumByCustId(java.lang.String)
 	 */
 	@Override
 	public Response<?> integralSumByCustId(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+		orderIntegralHistoryService.integralSum(custId);
+		return ResponseUtils.returnSuccess();
 	}
 
 	/**
-	 * TODO (这里用一句话描述这个方法的作用)
+	 * 更新缓存
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#updateUserCache(java.lang.String)
 	 */
 	@Override
 	public Response<?> updateUserCache(String custId) {
-		// TODO Auto-generated method stub
-		return null;
+		userAccountService.updateUserAccountCache(custId);
+		return ResponseUtils.returnSuccess();
 	}
 
 	/**
