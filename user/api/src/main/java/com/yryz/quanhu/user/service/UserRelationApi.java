@@ -6,6 +6,7 @@ import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -16,19 +17,26 @@ import java.util.List;
  */
 public interface UserRelationApi {
 
-    public static enum TYPE{
+    public static final int YES = 11;
+    public static final int NO = 10;
+    /**
+     * 关系状态
+     */
+    public static enum STATUS{
+        FANS,                                   //粉丝
         FOLLOW,                                 //关注
-        CANCEL_FOLLOW,                          //取消关注
-        BLACK,                                  //拉黑
-        CANCEL_BLACK,                           //取消拉黑
-        FRIEND,                                 //好友
-        CANCEL_FRIEND                           //取消好友
+        TO_BLACK,                               //拉黑
+        FROM_BLACK,                             //被拉黑
+        FRIEND;                                 //好友
     }
-
-    public static enum REMARK_SOURCE{
-        PLATFORM,                               //平台
-        COTERIE,                                //私圈
-        IM                                      //云信IM
+    /**
+     * 操作事件
+     */
+    public static enum EVENT{
+        SET_FOLLOW,                             //关注
+        CANCEL_FOLLOW,                          //取消关注
+        SET_BLACK,                              //拉黑
+        CANCEL_BLACK,                           //取消拉黑
     }
 
     /**
@@ -46,20 +54,6 @@ public interface UserRelationApi {
     Response<Boolean> checkRelation(UserRelationDto dto);
 
     /**
-     * 设置备注名
-     * @param dto
-     * @return
-     */
-    Response<Boolean> setRemarkName(UserRelationDto dto);
-
-    /**
-     * 恢复备注名
-     * @param dto
-     * @return
-     */
-    Response<Boolean> recoverRemarkName(UserRelationDto dto);
-
-    /**
      * 查询用户关系
      * @param dto
      * @return
@@ -72,6 +66,14 @@ public interface UserRelationApi {
      * @return
      */
     Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto);
+
+    /**
+     * 查询用户指定关系
+     * @param sourceUserId
+     * @param status
+     * @return  返回所有用户ID
+     */
+    Response<Set<String>> selectBy(String sourceUserId, STATUS status);
 
     /**
      * 查询用户关系

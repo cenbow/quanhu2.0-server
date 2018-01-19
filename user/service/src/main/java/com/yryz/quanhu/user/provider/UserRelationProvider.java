@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -43,27 +44,7 @@ public class UserRelationProvider implements UserRelationApi{
     @Override
     public Response<Boolean> checkRelation(UserRelationDto dto) {
         try {
-            return ResponseUtils.returnObjectSuccess(userRelationService.checkRelation(dto));
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
-            return ResponseUtils.returnException(e);
-        }
-    }
-
-    @Override
-    public Response<Boolean> setRemarkName(UserRelationDto dto) {
-        try {
-            return ResponseUtils.returnObjectSuccess(userRelationService.setRemarkName(dto));
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
-            return ResponseUtils.returnException(e);
-        }
-    }
-
-    @Override
-    public Response<Boolean> recoverRemarkName(UserRelationDto dto) {
-        try {
-            return ResponseUtils.returnObjectSuccess(userRelationService.recoverRemarkName(dto));
+            return ResponseUtils.returnObjectSuccess(false);
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
@@ -84,6 +65,16 @@ public class UserRelationProvider implements UserRelationApi{
     public Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto) {
         try {
             return ResponseUtils.returnObjectSuccess(userRelationService.selectByPage(dto));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Set<String>> selectBy(String sourceUserId, STATUS status) {
+        try {
+            return ResponseUtils.returnObjectSuccess(userRelationService.selectBy(sourceUserId,status));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);

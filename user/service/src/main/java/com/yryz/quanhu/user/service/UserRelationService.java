@@ -6,6 +6,7 @@ import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -18,19 +19,19 @@ public interface UserRelationService{
 
     public boolean setRelation(UserRelationDto dto);
 
-    public boolean checkRelation(UserRelationDto dto);
+    public UserRelationDto getCacheRelation(String sourceUserId, String targetUserId);
 
-    public boolean setRemarkName(UserRelationDto dto);
-
-    public boolean recoverRemarkName(UserRelationDto dto);
+    public UserRelationDto getForceRelation(String sourceUserId, String targetUserId);
 
     public List<UserRelationDto> selectBy(UserRelationDto dto);
 
     public PageList<UserRelationDto> selectByPage(UserRelationDto dto);
 
-    public List<UserRelationDto> selectBy(String userSourceKid, String[] userTargetKids);
+    public List<UserRelationDto> selectBy(String sourceUserId, String[] targetUserIds);
 
-    public UserRelationCountDto totalBy(String userSourceKid);
+    public Set<String> selectBy(String sourceUserId, UserRelationApi.STATUS status);
+
+    public UserRelationCountDto totalBy(String userId);
 
 
 }

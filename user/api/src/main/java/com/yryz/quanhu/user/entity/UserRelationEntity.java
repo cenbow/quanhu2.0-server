@@ -10,4 +10,70 @@ import com.yryz.common.entity.GenericEntity;
  * Created by huangxy
  */
 public class UserRelationEntity extends GenericEntity {
+    /**
+     * 用户源
+     */
+    private String sourceUserId;
+    /**
+     * 用户目标
+     */
+    private String targetUserId;
+
+    /**
+     * 关注状态
+     * 10 否，11 是(source为target的粉丝)
+     *
+     */
+    private int followStatus;
+    /**
+     * 黑名单状态
+     * 10 否，11是(target在source黑名单中)
+     */
+    private int blackStatus;
+    /**
+     * 好友状态
+     * 10 否，11是(主要同步双方互粉情况下)
+     */
+    private int friendStatus;
+
+
+    public String getSourceUserId() {
+        return sourceUserId;
+    }
+
+    public void setSourceUserId(String sourceUserId) {
+        this.sourceUserId = sourceUserId;
+    }
+
+    public String getTargetUserId() {
+        return targetUserId;
+    }
+
+    public void setTargetUserId(String targetUserId) {
+        this.targetUserId = targetUserId;
+    }
+
+    public int getFollowStatus() {
+        return followStatus;
+    }
+
+    public void setFollowStatus(int followStatus) {
+        this.followStatus = followStatus;
+    }
+
+    public int getBlackStatus() {
+        return blackStatus;
+    }
+
+    public void setBlackStatus(int blackStatus) {
+        this.blackStatus = blackStatus;
+    }
+
+    public int getFriendStatus() {
+        return friendStatus;
+    }
+
+    public void setFriendStatus(int friendStatus) {
+        this.friendStatus = friendStatus;
+    }
 }
