@@ -26,10 +26,18 @@ public interface IdAPI {
 
 	
 	/**
-	 * 生成用户ID
-	 * 
+	 * 生成用户ID，目前使用Twitter Snowflake雪花算法实现
+	 * ID长度18位
 	 * @return
 	 */
 	String getUserId();
+
+	/**
+	 * 基于Twitter的分布式自增ID算法Snowflake实现分布式有序
+	 * @return 返回18位的自增ID
+	 *
+	 */
+	Long getSnowflakeId();
+
 
 }

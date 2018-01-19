@@ -20,9 +20,18 @@ public class IdTest {
     @Reference
     IdAPI idAPI;
 
+
     @Test
     public void getIdTest() {
         Long quanhuUser = idAPI.getKid("quanhu_user");
         System.out.println("quanhuUser " + quanhuUser);
+
+        String userId = idAPI.getUserId();
+        System.out.println("getUserId " + userId);
+        long uid = idAPI.getSnowflakeId();
+
+        System.out.println("get Uid " + uid);
     }
+
+
 }

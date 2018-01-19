@@ -12,10 +12,6 @@
            http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 
-    <!-- 全局配置文件，依赖confige的bean需设定对此depends-on -->
-    <bean id="config" class="com.yryz.common.context.Context">
-        <constructor-arg index="0" value="component.properties"/>
-    </bean>
 
 
     <!--id start-->
@@ -23,17 +19,35 @@
         <property name="generateKeyService" ref="generateKeyService"/>
     </bean>
 
-    <bean id="expandKeyExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    <!--<bean id="expandKeyExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="2"/>
         <property name="maxPoolSize" value="2"/>
         <property name="queueCapacity" value="5"/>
-    </bean>
+    </bean>-->
 
-    <bean id="loadPrepBuffExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    <!--<bean id="loadPrepBuffExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="3"/>
         <property name="maxPoolSize" value="3"/>
         <property name="queueCapacity" value="5"/>
+    </bean>-->
+
+
+    <!-- DefaultUidGenerator -->
+    <!--<bean id="defaultUidGenerator" class="com.yryz.quanhu.support.id.service.impl.DefaultUidServiceImpl"
+          lazy-init="false">
+        <property name="workerIdAssigner" ref="disposableWorkerIdAssigner" />
+
+        &lt;!&ndash; Specified bits & epoch as your demand. No specified the default value
+                will be used &ndash;&gt;
+        <property name="timeBits" value="${uid.timeBits}" />
+        <property name="workerBits" value="${uid.workerBits}" />
+        <property name="seqBits" value="${uid.seqBits}" />
+        <property name="epochStr" value="${uid.epochStr}" />
     </bean>
+
+    &lt;!&ndash; Disposable WorkerIdAssigner based on Database &ndash;&gt;
+    <bean id="disposableWorkerIdAssigner"
+          class="com.yryz.quanhu.support.id.service.impl.DisposableWorkerIdAssigner" />-->
     <!--id start-->
 
 </beans>
