@@ -17,7 +17,8 @@ import Decoder.BASE64Encoder;
 import com.alibaba.fastjson.JSON;
 
 /**
- * DES加密和解密工具,可以对字符串进行加密和解密操作  。 
+ * DES加密和解密工具,可以对字符串进行加密和解密操作  。 <br/>
+ * key的长度有限制8-10位
  * @author Pxie
  *
  */

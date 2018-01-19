@@ -21,7 +21,7 @@ import java.util.List;
  * Created on 2018/1/18 15:06
  * Created by huangxy
  */
-@Service(interfaceClass = UserRelationApi.class)
+//@Service(interfaceClass = UserRelationApi.class)
 public class UserRelationProvider implements UserRelationApi{
 
     private static final Logger logger = LoggerFactory.getLogger(UserRelationProvider.class);
