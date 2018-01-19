@@ -16,6 +16,7 @@
         <com.google.zxing.version>3.2.0</com.google.zxing.version>
         <com.aliyun.jaq.version>1.0.0</com.aliyun.jaq.version>
 		<com.aliyun.oss.version>2.2.3</com.aliyun.oss.version>
+        <cn.jpush.api.version>3.2.16</cn.jpush.api.version>
     </properties>
     <dependencies>
 
@@ -226,6 +227,17 @@
 			<artifactId>aliyun-sdk-core</artifactId>
 			<version>${com.aliyun.jaq.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>cn.jpush.api</groupId>
+            <artifactId>jpush-client</artifactId>
+            <version>${cn.jpush.api.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
     </dependencies>
 </project>
