@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2018-2019 Wuhan Yryz Network Company LTD.
+ * All rights reserved.
+ * 
+ * Created on 2018年1月19日
+ * Id: GsonUtils.java, 2018年1月19日 上午9:15:17 yehao
+ */
 package com.yryz.common.utils;
 
 import java.util.ArrayList;
@@ -6,11 +13,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * @author yehao
+ * @version 2.0
+ * @date 2018年1月19日 上午9:15:17
+ * @Description Gson序列化工具
+ */
 public class GsonUtils {
 	
 	/**
@@ -97,7 +111,6 @@ public class GsonUtils {
 		}
 	}
 	
-	
 	/**
 	 * @author admin
 	 * @date 2014年7月22日
@@ -108,26 +121,13 @@ public class GsonUtils {
 	 */
 	public static Object get(JSONObject json , String propertyName){
 		if(json.has(propertyName)){
-			return json.get(propertyName);
+			try {
+				return json.get(propertyName);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} 
 		return null;
 	}
 	
-	/**
-	 * @author admin
-	 * @date 2014年7月22日
-	 * @param fromJson
-	 * @param toJson
-	 * @return
-	 * @Description 操作原json到目标json
-	 */
-	public static JSONObject addJson(JSONObject fromJson , JSONObject toJson){
-		Set<String> keys = toJson.keySet();
-		for (String key : keys) {
-			fromJson.put(key, toJson.get(key));
-		}
-		return fromJson;
-	}
-
-
 }
