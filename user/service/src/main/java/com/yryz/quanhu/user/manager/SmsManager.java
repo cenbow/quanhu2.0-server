@@ -78,7 +78,7 @@ public class SmsManager {
 			smsLogger.info("[check_verifyCode]:phone->{},code->{},type->{},status->fail",phone,null,type);
 			//throw ExceptionUtils.throwWarnException("验证码校验失败");
 		}
-		return false;
+		return true;
 	}
 	
 	/**

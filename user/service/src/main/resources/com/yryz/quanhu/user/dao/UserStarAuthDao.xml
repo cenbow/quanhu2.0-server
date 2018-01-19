@@ -66,6 +66,11 @@
 		</foreach>
 	</select>	
 	
+	<select id="getStarMaxWeight" resultType="java.lang.Integer">
+		select max(recommend_weight)
+		from user_star_auth
+	</select>
+	
 	<select id="listByParams" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />,

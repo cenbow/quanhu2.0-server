@@ -51,4 +51,8 @@ public class IdConstants {
      * 圈乎用户达人认证日志表
      */
     public static final String QUANHU_USER_STAR_AUTH_LOG = "quanhu_user_star_log";
+    /**
+     * 圈乎用户头像审核表
+     */
+    public static final String QUANHU_USER_IMG_AUDIT = "quanhu_user_img_audit";
 }

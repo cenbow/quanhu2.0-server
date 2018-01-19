@@ -8,7 +8,7 @@
 		<result column="kid" property="kid" jdbcType="BIGINT" />
 		<result column="user_id" property="userId" jdbcType="BIGINT" />
 		<result column="user_inviter_id" property="userInviterId"
-			jdbcType="BIGINT" />
+			jdbcType="VARCHAR" />
 		<result column="user_reg_channel" property="userRegChannel"
 			jdbcType="VARCHAR" />
 		<result column="user_reg_inviter_code" property="userRegInviterCode"
@@ -83,7 +83,7 @@
 		order by a.create_date desc
 	</select>
 
-	<insert id="insert"
+	<insert id="save"
 		parameterType="com.yryz.quanhu.user.entity.UserOperateInfo">
 		insert into user_operate_info
 		<trim prefix="(" suffix=")" suffixOverrides=",">

@@ -47,9 +47,10 @@ public interface AccountService {
 	 * 手机号密码登录
 	 * 
 	 * @param loginDTO
+	 * @param appId
 	 * @return 用户id
 	 */
-	Long login(LoginDTO loginDTO);
+	Long login(LoginDTO loginDTO,String appId);
 
 	/**
 	 * 手机号验证码登录
