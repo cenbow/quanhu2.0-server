@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.RrzOrderUserPhyDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzOrderUserPhy" id="rrzOrderUserPhyMap">
+		<id column="cust_id" property="custId" />
+		<result column="phy_name" property="phyName" />
+		<result column="pay_password" property="payPassword" />
+		<result column="cust_idcard_no" property="custIdcardNo" />
+		<result column="cust_idcard_type" property="custIdcardType" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="small_nopass" property="smallNopass" />
+	</resultMap>
+	
+	<sql id="columns">
+		cust_id,phy_name,pay_password,cust_idcard_no,cust_idcard_type,create_time,update_time,small_nopass
+	</sql>
+    
+	<select id="get" resultMap="rrzOrderUserPhyMap" parameterType="java.lang.String">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_user_phy a
+		WHERE a.cust_id = #{custId}
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzOrderUserPhy">
+		INSERT INTO rrz_order_user_phy (
+			<include refid="columns" />
+		) VALUES (
+			#{custId},
+			#{phyName},
+			#{payPassword},
+			#{custIdcardNo},
+			#{custIdcardType},
+			#{createTime},
+			#{updateTime},
+			#{smallNopass}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzOrderUserPhy">
+		UPDATE rrz_order_user_phy SET 	
+			phy_name = #{phyName},
+			pay_password = #{payPassword},
+			cust_idcard_no = #{custIdcardNo},
+			cust_idcard_type = #{custIdcardType},
+			create_time = #{createTime},
+			update_time = #{updateTime},
+			small_nopass = #{smallNopass}
+		WHERE cust_id = #{custId}
+	</update>
+</mapper>

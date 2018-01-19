@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.order.dao.persistence;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzOrderInfo;
 
 /**
@@ -15,6 +17,7 @@ import com.yryz.quanhu.order.entity.RrzOrderInfo;
  * @date 2018年1月18日 上午11:15:55
  * @Description 订单信息操作类
  */
+@Mapper
 public interface RrzOrderInfoDao {
 	
 	/**

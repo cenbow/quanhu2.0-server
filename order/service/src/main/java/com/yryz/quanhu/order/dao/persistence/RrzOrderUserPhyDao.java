@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.order.dao.persistence;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzOrderUserPhy;
 
 /**
@@ -15,6 +17,7 @@ import com.yryz.quanhu.order.entity.RrzOrderUserPhy;
  * @date 2018年1月18日 上午11:20:20
  * @Description 用户安全信息数据操作接口
  */
+@Mapper
 public interface RrzOrderUserPhyDao {
 	
 	/**

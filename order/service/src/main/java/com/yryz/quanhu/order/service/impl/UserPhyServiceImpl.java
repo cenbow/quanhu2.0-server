@@ -10,6 +10,8 @@ package com.yryz.quanhu.order.service.impl;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -28,6 +30,8 @@ import com.yryz.quanhu.order.service.UserPhyService;
  * @date 2018年1月18日 下午2:27:03
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
+@Transactional
+@Service
 public class UserPhyServiceImpl implements UserPhyService{
 
 	@Autowired

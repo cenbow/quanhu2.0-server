@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.NotifyRecordDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzNotifyRecord" id="rrzNotifyRecordMap">
+		<id column="record_id" property="recordId" />
+		<result column="notify_times" property="notifyTimes" />
+		<result column="limit_notify_times" property="limitNotifyTimes" />
+		<result column="url" property="url" />
+		<result column="msg" property="msg" />
+		<result column="order_id" property="orderId" />
+		<result column="create_time" property="createTime" />
+		<result column="last_notify_time" property="lastNotifyTime" />
+	</resultMap>
+	
+	<sql id="columns">
+		record_id,notify_times,limit_notify_times,url,msg,order_id,create_time,last_notify_time
+	</sql>
+    
+	<select id="get" resultMap="rrzNotifyRecordMap" parameterType="java.lang.String">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_notify_record a
+		WHERE a.record_id = #{recordId}
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzNotifyRecord">
+		INSERT INTO rrz_notify_record (
+			<include refid="columns" />
+		) VALUES (
+			#{recordId},
+			#{notifyTimes},
+			#{limitNotifyTimes},
+			#{url},
+			#{msg},
+			#{orderId},
+			#{createTime},
+			#{lastNotifyTime}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzNotifyRecord">
+		UPDATE rrz_notify_record 
+		<set>
+			<if test="notifyTimes != null">
+				notify_times = #{notifyTimes},
+			</if>
+			<if test="limitNotifyTimes != null">
+				limit_notify_times = #{limitNotifyTimes},
+			</if>
+			<if test="url != null">
+				url = #{url},
+			</if>
+			<if test="msg != null">
+				msg = #{msg},
+			</if>
+			<if test="orderId != null">
+				order_id = #{orderId},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="lastNotifyTime != null">
+				last_notify_time = #{lastNotifyTime},
+			</if>
+		</set>
+		WHERE record_id = #{recordId}
+	</update>
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.dao.persistence.RrzOrderPayHistoryDao">
+
+	<resultMap type="com.yryz.quanhu.order.entity.RrzOrderPayHistory" id="rrzOrderPayHistoryMap">
+		<id column="id" property="historyId" />
+		<result column="cust_id" property="custId" />
+		<result column="order_id" property="orderId" />
+		<result column="order_type" property="orderType" />
+		<result column="order_channel" property="orderChannel" />
+		<result column="cost" property="cost" />
+		<result column="cost_true" property="costTrue" />
+		<result column="currency" property="currency" />
+		<result column="product_id" property="productId" />
+		<result column="product_type" property="productType" />
+		<result column="product_desc" property="productDesc" />
+		<result column="order_desc" property="orderDesc" />
+		<result column="create_time" property="createTime" />
+		<result column="remarks" property="remarks" />
+	</resultMap>
+	
+	<sql id="columns">
+		id,cust_id,order_id,order_type,order_channel,cost,cost_true,currency,product_id,product_type,product_desc,order_desc,
+		create_time,remarks
+	</sql>
+    
+	<select id="get" resultMap="rrzOrderPayHistoryMap" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayHistory">
+		SELECT 
+			<include refid="columns" />
+		FROM rrz_order_pay_history a
+		where a.id = #{historyId}
+	</select>
+	
+	<insert id="insert" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayHistory">
+		INSERT INTO rrz_order_pay_history (
+			<include refid="columns" />
+		) VALUES (
+			#{historyId},
+			#{custId},
+			#{orderId},
+			#{orderType},
+			#{orderChannel},
+			#{cost},
+			#{costTrue},
+			#{currency},
+			#{productId},
+			#{productType},
+			#{productDesc},
+			#{orderDesc},
+			#{createTime},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayHistory">
+		UPDATE rrz_order_pay_history SET 
+		    cust_id = #{custId},
+		    order_id = #{orderId},
+		    order_type = #{orderType},
+			order_channel = #{orderChannel},
+			cost = #{cost},
+			cost_true = #{costTrue},
+			currency = #{currency},
+			product_id = #{productId},
+			product_type = #{productType},
+			product_desc = #{productDesc},
+			order_desc = #{orderDesc},
+			create_time = #{createTime},
+			remarks = #{remarks}	
+		WHERE id = #{historyId}
+	</update>
+	
+	<select id="getList" resultMap="rrzOrderPayHistoryMap" parameterType="com.yryz.quanhu.order.entity.RrzOrderPayHistory" >
+		SELECT 
+		<include refid="columns" />
+		FROM rrz_order_pay_history a
+		<where>
+			<if test="historyId != null and historyId != ''">
+				AND a.id = #{historyId}
+			</if>
+			<if test="custId != null and custId != ''">
+				AND a.cust_id = #{custId}
+			</if>
+			<if test="orderId != null and orderId != ''">
+				AND a.order_id = #{orderId}
+			</if>
+			<if test="productType != null">
+				AND a.product_type = #{productType}
+			</if>
+		</where>
+		ORDER BY a.create_time desc
+		LIMIT #{start},#{limit}
+	</select>
+	
+</mapper>

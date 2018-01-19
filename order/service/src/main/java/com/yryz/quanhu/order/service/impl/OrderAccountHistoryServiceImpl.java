@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.utils.DateUtils;
@@ -27,6 +29,8 @@ import com.yryz.quanhu.order.utils.Page;
  * @date 2018年1月18日 下午2:18:55
  * @Description 用户消费流水数据统计
  */
+@Transactional
+@Service
 public class OrderAccountHistoryServiceImpl implements OrderAccountHistoryService {
 	
 	@Autowired

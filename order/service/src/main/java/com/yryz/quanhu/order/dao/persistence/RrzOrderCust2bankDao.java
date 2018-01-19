@@ -9,6 +9,8 @@ package com.yryz.quanhu.order.dao.persistence;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzOrderCust2bank;
 
 /**
@@ -17,6 +19,7 @@ import com.yryz.quanhu.order.entity.RrzOrderCust2bank;
  * @date 2018年1月18日 上午11:15:27
  * @Description 银行卡信息数据操作类
  */
+@Mapper
 public interface RrzOrderCust2bankDao {
 	
 	/**

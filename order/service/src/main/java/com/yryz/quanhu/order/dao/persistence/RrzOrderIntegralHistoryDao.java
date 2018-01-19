@@ -10,6 +10,8 @@ package com.yryz.quanhu.order.dao.persistence;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.yryz.quanhu.order.entity.RrzOrderIntegralHistory;
 
 /**
@@ -18,6 +20,7 @@ import com.yryz.quanhu.order.entity.RrzOrderIntegralHistory;
  * @date 2018年1月18日 上午11:16:33
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
+@Mapper
 public interface RrzOrderIntegralHistoryDao {
 	
 	/**
