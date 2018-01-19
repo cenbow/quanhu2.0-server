@@ -10,6 +10,7 @@ package com.yryz.quanhu.resource.vo;
 import java.io.Serializable;
 
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 
 /**
  * @author yehao
@@ -122,6 +123,11 @@ public class ResourceVo implements Serializable {
 	 * 删除状态，0未删除，1已删除
 	 */
 	private String delFlag;
+	
+	/**
+	 * 用户基类
+	 */
+	private UserBaseInfoVO user;
 
 	/**
 	 * 
@@ -129,7 +135,6 @@ public class ResourceVo implements Serializable {
 	 */
 	public ResourceVo() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -605,6 +610,20 @@ public class ResourceVo implements Serializable {
 	 */
 	public void setDelFlag(String delFlag) {
 		this.delFlag = delFlag;
+	}
+
+	/**
+	 * @return the user
+	 */
+	public UserBaseInfoVO getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user the user to set
+	 */
+	public void setUser(UserBaseInfoVO user) {
+		this.user = user;
 	}
 	
 }

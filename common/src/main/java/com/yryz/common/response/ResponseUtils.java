@@ -20,10 +20,19 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
  */
 public class ResponseUtils {
 	
+	/**
+	 * 返回成功
+	 * @return
+	 */
     public static <T> Response<T> returnSuccess() {
         return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
     }
 
+    /**
+     * 返回对象结果
+     * @param t
+     * @return
+     */
     public static <T> Response<T> returnObjectSuccess(T t) {
         if (t == null) {
             return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new HashMap());
@@ -32,6 +41,11 @@ public class ResponseUtils {
         }
     }
 
+    /**
+     * 返回列表结果
+     * @param collection
+     * @return
+     */
     public static <T> Response<T> returnListSuccess(Collection<?> collection) {
         if (collection == null) {
             return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", new ArrayList());
@@ -40,6 +54,11 @@ public class ResponseUtils {
         }
     }
     
+    /**
+     * 返回异常信息
+     * @param e
+     * @return
+     */
     public static <T> Response<T> returnException(Exception e) {
         if (e instanceof QuanhuException) {
         	QuanhuException qe = (QuanhuException) e;
@@ -65,6 +84,15 @@ public class ResponseUtils {
             		ResponseConstant.EXCEPTION.getErrorMsg(),
                     null);
         }
+    }
+    
+    /**
+     * 简化消息提示，客户端得到该错误只会直接显示消息内容
+     * @param msg
+     * @return
+     */
+    public static <T> Response<T> returnCommonException(String msg){
+    	return new Response<T>(false, ResponseConstant.SYS_EXCEPTION.getCode(), msg, msg, null);
     }
 
 }

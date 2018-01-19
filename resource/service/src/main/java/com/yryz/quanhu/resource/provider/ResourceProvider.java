@@ -78,7 +78,10 @@ public class ResourceProvider implements ResourceApi {
 			limit = CommonConstants.DEFAULT_SIZE;
 		}
 		List<ResourceModel> list = resourceService.getResources(GsonUtils.parseObj(resource, ResourceModel.class), orderColumn, start, limit, startTime, endTime);
-		return ResponseUtils.returnListSuccess(GsonUtils.parseList(list, ResourceVo.class));
+		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
+		
+		
+		return ResponseUtils.returnListSuccess(listVo);
 	}
 
 }
