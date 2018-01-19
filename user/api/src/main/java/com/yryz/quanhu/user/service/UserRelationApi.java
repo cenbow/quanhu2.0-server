@@ -54,13 +54,6 @@ public interface UserRelationApi {
     Response<Boolean> checkRelation(UserRelationDto dto);
 
     /**
-     * 查询用户关系
-     * @param dto
-     * @return
-     */
-    Response<List<UserRelationDto>> selectBy(UserRelationDto dto);
-
-    /**
      * 查询用户关系(分页)
      * @param dto
      * @return

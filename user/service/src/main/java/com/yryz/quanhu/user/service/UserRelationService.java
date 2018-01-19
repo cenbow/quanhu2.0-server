@@ -23,8 +23,6 @@ public interface UserRelationService{
 
     public UserRelationDto getForceRelation(String sourceUserId, String targetUserId);
 
-    public List<UserRelationDto> selectBy(UserRelationDto dto);
-
     public PageList<UserRelationDto> selectByPage(UserRelationDto dto);
 
     public List<UserRelationDto> selectBy(String sourceUserId, String[] targetUserIds);

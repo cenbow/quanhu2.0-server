@@ -50,7 +50,6 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
                 dbRemarkDto.setKid(idAPI.getKid("user_relation_remark"));
             }
 
-
         }catch (Exception e){
 
         }

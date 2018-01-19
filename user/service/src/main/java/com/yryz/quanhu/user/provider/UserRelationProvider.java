@@ -52,16 +52,6 @@ public class UserRelationProvider implements UserRelationApi{
     }
 
     @Override
-    public Response<List<UserRelationDto>> selectBy(UserRelationDto dto) {
-        try {
-            return ResponseUtils.returnObjectSuccess(userRelationService.selectBy(dto));
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
-            return ResponseUtils.returnException(e);
-        }
-    }
-
-    @Override
     public Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto) {
         try {
             return ResponseUtils.returnObjectSuccess(userRelationService.selectByPage(dto));

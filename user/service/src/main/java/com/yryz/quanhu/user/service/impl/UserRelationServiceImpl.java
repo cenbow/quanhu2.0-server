@@ -47,16 +47,17 @@ public class UserRelationServiceImpl implements UserRelationService{
 
     @Override
     public boolean setRelation(UserRelationDto dto) {
-
         try{
 
-            final String sourceUserId = dto.getSourceUserId();
-            final String targetUserId = dto.getTargetUserId();
+            String sourceUserId = dto.getSourceUserId();
+            String targetUserId = dto.getTargetUserId();
 
             /**
              * ★★★★★关键验证★★★★★
              * 自己不允许对自己设置任何关系
+             * ★★★★★★★★★★★★★★
              */
+
             if(sourceUserId.equalsIgnoreCase(targetUserId)){
                 throw new RuntimeException("don't allow set relation to self");
             }
@@ -179,7 +180,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         return true;
     }
 
-    public void setRelationMapping(UserRelationDto sourceDto, UserRelationDto targetDto, UserRelationApi.EVENT event){
+    private void setRelationMapping(UserRelationDto sourceDto, UserRelationDto targetDto, UserRelationApi.EVENT event){
 
         /**
          * 主要判断逻辑，判断对方是否拉黑
@@ -256,16 +257,13 @@ public class UserRelationServiceImpl implements UserRelationService{
     }
 
     @Override
-    public List<UserRelationDto> selectBy(UserRelationDto dto) {
-        return userRelationCacheDao.selectBy(dto);
-    }
-
-    @Override
     public PageList<UserRelationDto> selectByPage(UserRelationDto dto) {
         /**
          * 先查询sourceUserId的相关关系
          */
-        PageList<UserRelationDto> pageList = userRelationCacheDao.selectByPage(dto);
+        PageList<UserRelationDto> pageList = userRelationCacheDao.selectByPage(
+                dto.getCurrentPage(),dto.getPageSize(),dto.getTargetUserId(),dto.getStatusBy());
+
         /**
          * ★★★★★★★★★★
          * 如果结果集为空，或者当前登录用户和源用户一致，则直接返回，否则继续查询当前登录用户和列表之间的关系

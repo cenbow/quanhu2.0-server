@@ -1,10 +1,16 @@
 package com.yryz.quanhu.user.dao;
 
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.service.UserRelationApi;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -29,6 +36,7 @@ import java.util.concurrent.TimeUnit;
  * Created by huangxy
  */
 @Service
+@Transactional
 public class UserRelationCacheDao {
 
     private static final String TABLE_NAME = "user_relation";
@@ -102,10 +110,6 @@ public class UserRelationCacheDao {
         return "relation:"+sourceUserId+">"+targetUserId;
     }
 
-    public static String getCacheCountKey(String userId){
-        return "relationCount:"+userId;
-    }
-
     public void setUserRelation(UserRelationDto sourceDto,UserRelationDto targetDto){
         /**
          * redis单向关系缓存
@@ -118,20 +122,39 @@ public class UserRelationCacheDao {
 
     }
 
-
+    /**
+     * 发生到MQ异步处理
+     * @param userDto
+     */
     public void sendMQ(UserRelationDto userDto){
 
     }
 
+    /**
+     * MQ消费者处理
+     * @param data
+     */
+    @RabbitListener(bindings = @QueueBinding(
+            value= @Queue(value="",durable="true"),
+            exchange=@Exchange(value="",ignoreDeclarationExceptions="true",type= ExchangeTypes.FANOUT))
+    )
+    public void handleMessage(String data){
 
-    public List<UserRelationDto> selectBy(UserRelationDto dto) {
-        return mongoTemplate.find(buildQuery(dto),UserRelationDto.class,TABLE_NAME);
+        System.out.println("hello Fanout Message:" + data);
+        try{
+            //反序列化对象
+
+            //数据库存储
+
+        }catch (Exception e){
+
+        }
     }
 
-    public PageList<UserRelationDto> selectByPage(UserRelationDto dto) {
-        Query query = this.buildQuery(dto);
-        query.skip(dto.getCurrentPage()*dto.getPageSize());
-        query.limit(dto.getPageSize());
+    public PageList<UserRelationDto> selectByPage(int currentPage,int pageSize,String sourceUserId,UserRelationApi.STATUS status) {
+        Query query = this.buildQuery(sourceUserId,status);
+        query.skip(currentPage*pageSize);
+        query.limit(pageSize);
         /**
          * 查询数据
          */
@@ -144,8 +167,8 @@ public class UserRelationCacheDao {
 
         PageList pageList = new PageList();
         pageList.setEntities(resultArray);
-        pageList.setPageSize(dto.getPageSize());
-        pageList.setCurrentPage(dto.getCurrentPage());
+        pageList.setPageSize(resultArray.size());
+        pageList.setCurrentPage(currentPage);
         pageList.setCount(count);
 
         return pageList;
@@ -162,34 +185,7 @@ public class UserRelationCacheDao {
     }
 
     public List<UserRelationDto> selectBy(String sourceUserId, UserRelationApi.STATUS status){
-
-        Query query = new Query();
-        if(UserRelationApi.STATUS.FANS == status){                      //粉丝
-
-            query.addCriteria(Criteria.where("target_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("follow_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.FOLLOW == status){              //关注
-
-            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("follow_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.FRIEND == status){              //好友
-
-            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("friend_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.TO_BLACK == status){            //拉黑
-
-            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("black_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.FROM_BLACK == status){          //被拉黑
-
-            query.addCriteria(Criteria.where("target_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("black_status").is(UserRelationApi.YES));
-        }
-
+        Query query = this.buildQuery(sourceUserId,status);
         return mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
     }
 
@@ -245,16 +241,34 @@ public class UserRelationCacheDao {
     }
 
 
-    private Query buildQuery(UserRelationDto dto){
+    private Query buildQuery(String sourceUserId,UserRelationApi.STATUS status){
 
         Query query = new Query();
-        /**
-         * 只能按照用户维度查询，为必输
-         */
-        query.addCriteria(Criteria.where("source_user_id").is(dto.getSourceUserId()));
-        query.addCriteria(Criteria.where("follow_status").is(dto.getFollowStatus()));
-        query.addCriteria(Criteria.where("friend_status").is(dto.getFriendStatus()));
-        query.addCriteria(Criteria.where("black_status").is(dto.getBlackStatus()));
+        if(UserRelationApi.STATUS.FANS == status){                      //粉丝
+
+            query.addCriteria(Criteria.where("target_user_id").is(sourceUserId));
+            query.addCriteria(Criteria.where("follow_status").is(UserRelationApi.YES));
+
+        }else if(UserRelationApi.STATUS.FOLLOW == status){              //关注
+
+            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
+            query.addCriteria(Criteria.where("follow_status").is(UserRelationApi.YES));
+
+        }else if(UserRelationApi.STATUS.FRIEND == status){              //好友
+
+            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
+            query.addCriteria(Criteria.where("friend_status").is(UserRelationApi.YES));
+
+        }else if(UserRelationApi.STATUS.TO_BLACK == status){            //拉黑
+
+            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
+            query.addCriteria(Criteria.where("black_status").is(UserRelationApi.YES));
+
+        }else if(UserRelationApi.STATUS.FROM_BLACK == status){          //被拉黑
+
+            query.addCriteria(Criteria.where("target_user_id").is(sourceUserId));
+            query.addCriteria(Criteria.where("black_status").is(UserRelationApi.YES));
+        }
 
         return query;
     }

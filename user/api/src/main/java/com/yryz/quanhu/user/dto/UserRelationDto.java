@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.dto;
 
 import com.yryz.quanhu.user.entity.UserRelationEntity;
+import com.yryz.quanhu.user.service.UserRelationApi;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -19,6 +20,16 @@ public class UserRelationDto extends UserRelationEntity{
     private Integer currentPage = 1;
     /**每页大小*/
     private Integer pageSize = 10;
+
+    private UserRelationApi.STATUS statusBy;
+
+    public UserRelationApi.STATUS getStatusBy() {
+        return statusBy;
+    }
+
+    public void setStatusBy(UserRelationApi.STATUS statusBy) {
+        this.statusBy = statusBy;
+    }
 
     public String getCurrentUserId() {
         return currentUserId;
