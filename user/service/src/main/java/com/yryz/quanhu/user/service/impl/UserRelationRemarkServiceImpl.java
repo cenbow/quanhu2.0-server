@@ -49,7 +49,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
             UserRelationRemarkDto dbRemarkDto = userRelationRemarkDao.getUnion(remarkDto);
             if(null == dbRemarkDto){
                 dbRemarkDto = new UserRelationRemarkDto();
-                dbRemarkDto.setKid(idAPI.getKid("user_relation_remark"));
+                dbRemarkDto.setKid(idAPI.getKid("user_relation_remark").getData());
             }
 
         }catch (Exception e){

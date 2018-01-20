@@ -52,7 +52,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 			if (auditStatus.intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
 				delete(record.getUserId().toString());
 				record.setCreateDate(new Date());
-				record.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT));
+				record.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT).getData());
 				result = imgAuditDao.save(record);
 			} else {
 				result = imgAuditDao.update(record);
@@ -88,7 +88,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 				// 待审核图片表示不存在
 				if (auditModel.getAuditStatus().intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
 					imgAuditModel.setCreateDate(new Date());
-					imgAuditModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT));
+					imgAuditModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT).getData());
 					saveLists.add(imgAuditModel);
 					delete(imgAuditModel.getUserId().toString());
 				} else {

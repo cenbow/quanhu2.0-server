@@ -73,9 +73,10 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		try {
 			status = checkVerifyCodeSendTime(configVO, codeDTO);
 			code = CommonUtils.getRandomNum(configVO.getCodeNum());
-			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(), codeDTO.getCommonServiceType(), code,
+			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(),
+					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
-			infoModel.setKid(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE));
+			infoModel.setKid(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE).getData());
 			persistenceDao.insert(infoModel);
 		} catch (Exception e) {
 			Logger.error("getVerifyCode", e);
@@ -102,8 +103,9 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	public Integer checkVerifyCode(VerifyCodeDTO codeDTO) {
 		Integer exist = null;
 		try {
-			exist = persistenceDao.checkCode(new VerifyCode(codeDTO.getVerifyKey(), codeDTO.getCommonServiceType(),
-					codeDTO.getVerifyCode(), codeDTO.getServiceCode().byteValue(), new Date()));
+			exist = persistenceDao.checkCode(new VerifyCode(codeDTO.getVerifyKey(),
+					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), codeDTO.getVerifyCode(),
+					codeDTO.getServiceCode().byteValue(), new Date()));
 		} catch (Exception e) {
 			Logger.error("checkVerifyCode", e);
 			throw new MysqlOptException(e);
@@ -158,15 +160,16 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public boolean checkIpLimit(IpLimitDTO dto) {
-		/*IpLimitConfigVO configVO = null;//getIpLimitConfig(dto.getAppId(), dto.getServiceType());
-		int total = redisDao.getIpCount(dto.getIp(), dto.getAppId(), dto.getServiceType());
-		long lastTime = redisDao.getIpRunTime(dto.getIp(), dto.getAppId(), dto.getServiceType());
-		if (configVO.getIpLimitFlag() && total > configVO.getIpLimitMax()) {
-			return false;
-		}
-		if (configVO.getIpLimitFlag() && System.currentTimeMillis() - lastTime < configVO.getIpPerLimit()) {
-			return false;
-		}*/
+		/*
+		 * IpLimitConfigVO configVO = null;//getIpLimitConfig(dto.getAppId(),
+		 * dto.getServiceType()); int total = redisDao.getIpCount(dto.getIp(),
+		 * dto.getAppId(), dto.getServiceType()); long lastTime =
+		 * redisDao.getIpRunTime(dto.getIp(), dto.getAppId(),
+		 * dto.getServiceType()); if (configVO.getIpLimitFlag() && total >
+		 * configVO.getIpLimitMax()) { return false; } if
+		 * (configVO.getIpLimitFlag() && System.currentTimeMillis() - lastTime <
+		 * configVO.getIpPerLimit()) { return false; }
+		 */
 		return false;
 	}
 
@@ -183,29 +186,25 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		return configVO.getImgCodeNumLimit() < num;
 	}
 
-/*	*//**
-	 * 获取ip风控配置
-	 * 
-	 * @param appId
-	 * @param serviceType
-	 * @return
-	 *//*
-	private IpLimitConfigVO getIpLimitConfig(String appId, String serviceType) {
-		IpLimitConfigVO configVO = configService.getIpLimitConfig(appId, serviceType);
-		if (configVO == null) {
-			throw QuanhuException.busiError("ip限制配置不存在");
-		}
-		if (configVO.getIpLimitFlag() == null) {
-			throw QuanhuException.busiError("ip限制配置错误");
-		}
-		if (configVO.getIpLimitMax() == null || configVO.getIpLimitMax() < 0) {
-			throw QuanhuException.busiError("ip限制配置错误");
-		}
-		if (configVO.getIpPerLimit() == null || configVO.getIpPerLimit() < 0) {
-			throw QuanhuException.busiError("ip限制配置错误");
-		}
-		return configVO;
-	}*/
+	/*	*//**
+			 * 获取ip风控配置
+			 * 
+			 * @param appId
+			 * @param serviceType
+			 * @return
+			 *//*
+			 * private IpLimitConfigVO getIpLimitConfig(String appId, String
+			 * serviceType) { IpLimitConfigVO configVO =
+			 * configService.getIpLimitConfig(appId, serviceType); if (configVO
+			 * == null) { throw QuanhuException.busiError("ip限制配置不存在"); } if
+			 * (configVO.getIpLimitFlag() == null) { throw
+			 * QuanhuException.busiError("ip限制配置错误"); } if
+			 * (configVO.getIpLimitMax() == null || configVO.getIpLimitMax() <
+			 * 0) { throw QuanhuException.busiError("ip限制配置错误"); } if
+			 * (configVO.getIpPerLimit() == null || configVO.getIpPerLimit() <
+			 * 0) { throw QuanhuException.busiError("ip限制配置错误"); } return
+			 * configVO; }
+			 */
 
 	/**
 	 * 获取验证码配置
@@ -213,30 +212,26 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	 * @param codeDTO
 	 * @return
 	 *//*
-	private VerifyCodeConfigVO getVerifyCodeConfig(VerifyCodeDTO codeDTO) {
-		VerifyCodeConfigVO configVO = configService.getVerifyCodeConfig(codeDTO.getAppId(),
-				codeDTO.getCommonServiceType());
-		if (configVO == null) {
-			throw QuanhuException.busiError("验证码配置不存在");
-		}
-		if (configVO.getCodeNum() == null || configVO.getCodeNum() < 0) {
-			throw QuanhuException.busiError("验证码配置错误");
-		}
-		if (configVO.getNormalCodeExpireTime() == null || configVO.getNormalCodeExpireTime() < 0) {
-			throw QuanhuException.busiError("验证码配置错误");
-		}
-		if (configVO.getNormalCodeDelayTime() == null || configVO.getNormalCodeDelayTime() < 0) {
-			throw QuanhuException.busiError("验证码配置错误");
-		}
-		if (configVO.getImgCodeExpireTime() == null || configVO.getImgCodeExpireTime() < 0) {
-			throw QuanhuException.busiError("验证码配置错误");
-		}
-		if (configVO.getImgCodeNumLimit() == null || configVO.getImgCodeNumLimit() < 0) {
-			throw QuanhuException.busiError("验证码配置错误");
-		}
-		return configVO;
-	}
-*/
+		 * private VerifyCodeConfigVO getVerifyCodeConfig(VerifyCodeDTO codeDTO)
+		 * { VerifyCodeConfigVO configVO =
+		 * configService.getVerifyCodeConfig(codeDTO.getAppId(),
+		 * codeDTO.getCommonServiceType()); if (configVO == null) { throw
+		 * QuanhuException.busiError("验证码配置不存在"); } if (configVO.getCodeNum() ==
+		 * null || configVO.getCodeNum() < 0) { throw
+		 * QuanhuException.busiError("验证码配置错误"); } if
+		 * (configVO.getNormalCodeExpireTime() == null ||
+		 * configVO.getNormalCodeExpireTime() < 0) { throw
+		 * QuanhuException.busiError("验证码配置错误"); } if
+		 * (configVO.getNormalCodeDelayTime() == null ||
+		 * configVO.getNormalCodeDelayTime() < 0) { throw
+		 * QuanhuException.busiError("验证码配置错误"); } if
+		 * (configVO.getImgCodeExpireTime() == null ||
+		 * configVO.getImgCodeExpireTime() < 0) { throw
+		 * QuanhuException.busiError("验证码配置错误"); } if
+		 * (configVO.getImgCodeNumLimit() == null ||
+		 * configVO.getImgCodeNumLimit() < 0) { throw
+		 * QuanhuException.busiError("验证码配置错误"); } return configVO; }
+		 */
 	/**
 	 * 普通验证码风控检查
 	 * 

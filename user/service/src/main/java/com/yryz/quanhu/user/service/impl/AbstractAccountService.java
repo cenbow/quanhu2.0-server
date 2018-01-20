@@ -178,10 +178,10 @@ public class AbstractAccountService implements AccountService {
 				new TypeReference<List<LoginMethodVO>>() {
 				});
 
-		if (StringUtils.isBlank(account.getUserPhone())) {
+		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
 			LoginMethodVO methodVO = new LoginMethodVO(account.getKid().toString(),
-					PhoneUtils.getPhone(account.getUserPhone()), 4, havePwd);
+					account.getUserPhone(), RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
 
@@ -406,7 +406,7 @@ public class AbstractAccountService implements AccountService {
 		loginLog.setCreateDate(new Date());
 		loginLog.setLoginX(0l);
 		loginLog.setLoginY(0l);
-		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG));
+		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG).getData());
 		try {
 			logDao.insert(loginLog);
 		} catch (Exception e) {
@@ -425,7 +425,7 @@ public class AbstractAccountService implements AccountService {
 	 */
 	@Transactional(rollbackFor = RuntimeException.class)
 	protected Long createUser(RegisterDTO registerDTO) {
-		Long userId = NumberUtils.toLong(idApi.getUserId());
+		Long userId = NumberUtils.toLong(idApi.getUserId().getData());
 		UserAccount account = new UserAccount(null, registerDTO.getUserPhone(), registerDTO.getUserPwd());
 		account.setKid(userId);
 		account.setAppId(registerDTO.getRegLogDTO().getAppId());

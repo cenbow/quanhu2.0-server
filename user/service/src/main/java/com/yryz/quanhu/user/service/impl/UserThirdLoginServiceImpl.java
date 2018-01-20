@@ -50,7 +50,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	@Override
 	public int insert(UserThirdLogin record) {
 		record.setCreateDate(new Date());
-		record.setKid(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN));
+		record.setKid(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN).getData());
 		record.setLastUpdateDate(record.getCreateDate());
 		try {
 			return mysqlDao.insert(record);

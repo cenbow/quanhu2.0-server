@@ -167,7 +167,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 */
 	private void saveViolationDao(UserViolation violation) {
 		try {
-			violation.setKid(idApi.getKid(IdConstants.QUANHU_USER_VIOLATION));
+			violation.setKid(idApi.getKid(IdConstants.QUANHU_USER_VIOLATION).getData());
 			violation.setCreateDate(new Date());
 			mysqlDao.saveViolation(violation);
 		} catch (Exception e) {

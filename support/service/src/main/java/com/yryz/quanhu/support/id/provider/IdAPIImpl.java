@@ -2,9 +2,13 @@ package com.yryz.quanhu.support.id.provider;
 
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.support.id.service.DefaultUidService;
 import com.yryz.quanhu.support.id.service.IIdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -16,6 +20,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 @Service
 public class IdAPIImpl implements IdAPI {
+
+    private static final Logger logger = LoggerFactory.getLogger(IdAPIImpl.class);
+
     /**
      * 基于本地DB发号缓冲池的发号服务
      */
@@ -30,14 +37,24 @@ public class IdAPIImpl implements IdAPI {
     private DefaultUidService uidService;
 
     @Override
-    public String getId(String type) {
+    public Response<String> getId(String type) {
         String orderId = idService.getId(type);
-        return orderId;
+        try {
+            return ResponseUtils.returnObjectSuccess(orderId);
+        } catch (Exception e) {
+            logger.error("getId error", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     @Override
-    public Long getKid(String type) {
-        return idService.getKid(type);
+    public Response<Long> getKid(String type) {
+        try {
+            return ResponseUtils.returnObjectSuccess(idService.getKid(type));
+        } catch (Exception e) {
+            logger.error("getKid error", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     /**
@@ -46,13 +63,23 @@ public class IdAPIImpl implements IdAPI {
      */
 
     @Override
-    public String getUserId() {
-        String userId = String.valueOf(uidService.getUID());
-        return userId;
+    public Response<String> getUserId() {
+        try {
+            String userId = String.valueOf(uidService.getUID());
+            return ResponseUtils.returnObjectSuccess(userId);
+        } catch (Exception e) {
+            logger.error("getUserId error", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     @Override
-    public Long getSnowflakeId() {
-        return uidService.getUID();
+    public Response<Long> getSnowflakeId() {
+        try {
+            return ResponseUtils.returnObjectSuccess(uidService.getUID());
+        } catch (Exception e) {
+            logger.error("getSnowflakeId error", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 }
