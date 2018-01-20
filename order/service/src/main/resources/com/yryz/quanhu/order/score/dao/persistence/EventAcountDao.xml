@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.score.dao.persistence.EventAcountDao">
+
+	<sql id="columns">
+		 id as id ,
+		 cust_id as custId  ,
+		 score as  score  ,
+		 grow as  grow  ,
+		 grow_level  as  growLevel ,
+		 create_time as  createTime ,
+		 update_time as  updateTime 
+
+	</sql>
+
+	<!-- 新增用户事件账户记录 -->
+	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.score.vo.EventAcount">
+		INSERT INTO event_acount(
+		cust_id,
+		<if test="score != null">
+		score,
+		</if>
+		<if test="grow != null">
+		grow,
+		</if>
+		<if test="growLevel != null">
+		grow_level,
+		</if>
+		create_time,
+		update_time
+		) VALUES (
+		#{custId},
+		<if test="score != null">
+		#{score},
+		</if>
+		<if test="grow != null">
+		#{grow},
+		</if>
+		<if test="growLevel != null">
+		#{growLevel},
+		</if>
+		#{createTime},
+		#{updateTime}
+		)
+	</insert>
+	
+	<!-- 获取用户事件账户记录 -->
+	<select id="getLastAcount" resultType="com.yryz.quanhu.score.vo.EventAcount">
+		select <include refid="columns" /> from event_acount where cust_id = #{custId}
+	</select>
+
+	<!-- 更新用户事件账户记录 -->
+	<update id="update" parameterType="com.yryz.quanhu.score.vo.EventAcount">
+		UPDATE event_acount 
+		<trim prefix="set" prefixOverrides=",">
+			<if test="score != null">
+				score = score + #{score},
+			</if>
+			<if test="grow != null">
+				grow = grow + #{grow},
+			</if>
+			<if test="growLevel != null">
+				grow_level = #{growLevel},
+			</if>
+			update_time = #{updateTime}
+		</trim>
+		where cust_id = #{custId}
+	</update>
+
+</mapper>
