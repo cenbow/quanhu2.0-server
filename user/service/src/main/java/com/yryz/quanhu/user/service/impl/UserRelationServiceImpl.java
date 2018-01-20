@@ -97,8 +97,8 @@ public class UserRelationServiceImpl implements UserRelationService{
 
                 sourceDto.setDelFlag(NO);
                 sourceDto.setVersion(0);
-//                sourceDto.setCreateUserId(sourceUserId);
-//                sourceDto.setLastUpdateUserId(sourceUserId);
+                sourceDto.setCreateUserId(sourceUserId);
+                sourceDto.setLastUpdateUserId(targetUserId);
 
                 sourceDto.setKid(System.currentTimeMillis());
 //                sourceDto.setKid(idAPI.getKid("user_relation"));
@@ -113,7 +113,7 @@ public class UserRelationServiceImpl implements UserRelationService{
              */
             if(!targetDto.isNewRecord()&&
                     (UserRelationApi.EVENT.SET_FOLLOW == event || UserRelationApi.EVENT.CANCEL_FOLLOW == event)){
-//                targetDto.setLastUpdateUserId(sourceUserId);
+                targetDto.setLastUpdateUserId(sourceUserId);
                 userRelationCacheDao.sendMQ(targetDto);
             }
 

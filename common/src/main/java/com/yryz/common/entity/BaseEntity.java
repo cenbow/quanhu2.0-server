@@ -10,24 +10,24 @@ public abstract class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = -1599925460585783120L;
 
-    protected Long createUserId;
+    protected String createUserId;
     protected Date createDate;
-    protected Long lastUpdateUserId;
+    protected String lastUpdateUserId;
     protected Date lastUpdateDate;
 
-    public Long getCreateUserId() {
+    public String getCreateUserId() {
         return createUserId;
     }
 
-    public void setCreateUserId(Long createUserId) {
+    public void setCreateUserId(String createUserId) {
         this.createUserId = createUserId;
     }
 
-    public Long getLastUpdateUserId() {
+    public String getLastUpdateUserId() {
         return lastUpdateUserId;
     }
 
-    public void setLastUpdateUserId(Long lastUpdateUserId) {
+    public void setLastUpdateUserId(String lastUpdateUserId) {
         this.lastUpdateUserId = lastUpdateUserId;
     }
 
