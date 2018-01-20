@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user.dto;
 
+import java.io.Serializable;
+
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
@@ -7,7 +9,9 @@ package com.yryz.quanhu.user.dto;
  * Created on 2018/1/18 14:30
  * Created by huangxy
  */
-public class UserRelationCountDto {
+public class UserRelationCountDto implements Serializable{
+
+    private boolean isNewRecord;
 
     private String targetUserId;
     /**
@@ -30,6 +34,14 @@ public class UserRelationCountDto {
      * 好友数
      */
     private long friendCount;
+
+    public boolean isNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setNewRecord(boolean newRecord) {
+        isNewRecord = newRecord;
+    }
 
     public String getTargetUserId() {
         return targetUserId;

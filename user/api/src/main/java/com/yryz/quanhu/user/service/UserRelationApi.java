@@ -49,13 +49,6 @@ public interface UserRelationApi {
     Response<Boolean> setRelation(String sourceUserId,String targetUserId, UserRelationApi.EVENT event);
 
     /**
-     * 检查关系
-     * @param dto
-     * @return
-     */
-    Response<Boolean> checkRelation(UserRelationDto dto);
-
-    /**
      * 查询用户关系(分页)
      * @param dto
      * @return
