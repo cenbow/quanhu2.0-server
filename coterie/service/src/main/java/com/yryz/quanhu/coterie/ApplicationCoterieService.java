@@ -1,9 +1,9 @@
-package com.yryz.quanhu.demo;
+package com.yryz.quanhu.coterie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+        import org.springframework.context.annotation.ImportResource;
+        import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 // 为了在dubbo impl服务中直接使用@Transactional注解 proxyTargetClass必须为true
 @SpringBootApplication
