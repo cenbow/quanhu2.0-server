@@ -414,7 +414,7 @@ public class UserServiceImpl implements UserService {
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
-		baseInfo.setKid(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO));
+		baseInfo.setKid(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO).getData());
 		baseInfo.setCreateDate(new Date());
 		baseInfo.setBanPostTime(new Date());
 		baseInfo.setUserAge((byte)18);

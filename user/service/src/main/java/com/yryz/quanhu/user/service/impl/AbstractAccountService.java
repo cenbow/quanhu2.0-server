@@ -406,7 +406,7 @@ public class AbstractAccountService implements AccountService {
 		loginLog.setCreateDate(new Date());
 		loginLog.setLoginX(0l);
 		loginLog.setLoginY(0l);
-		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG));
+		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG).getData());
 		try {
 			logDao.insert(loginLog);
 		} catch (Exception e) {
@@ -425,7 +425,7 @@ public class AbstractAccountService implements AccountService {
 	 */
 	@Transactional(rollbackFor = RuntimeException.class)
 	protected Long createUser(RegisterDTO registerDTO) {
-		Long userId = NumberUtils.toLong(idApi.getUserId());
+		Long userId = NumberUtils.toLong(idApi.getUserId().getData());
 		UserAccount account = new UserAccount(null, registerDTO.getUserPhone(), registerDTO.getUserPwd());
 		account.setKid(userId);
 		account.setAppId(registerDTO.getRegLogDTO().getAppId());

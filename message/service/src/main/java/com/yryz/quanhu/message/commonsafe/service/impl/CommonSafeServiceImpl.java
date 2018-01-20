@@ -76,7 +76,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(),
 					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
-			infoModel.setKid(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE));
+			infoModel.setKid(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE).getData());
 			persistenceDao.insert(infoModel);
 		} catch (Exception e) {
 			Logger.error("getVerifyCode", e);

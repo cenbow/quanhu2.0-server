@@ -3,6 +3,7 @@ package com.yryz.quanhu.message.push.api;
 
 
 
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.push.entity.PushReceived;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 
@@ -16,59 +17,6 @@ import java.util.List;
  * @Description 极光接口
  */
 public interface PushAPI {
-	/**
-	 * jpush消息推送<br/>
-	 * 关闭通知
-	 * @param userId
-	 *            用户Id
-	 * @param notification
-	 *            通知
-	 * @param msg
-	 *            内容 (json字符串)
-	 * @return
-	 * @throws
-	 */
-	@Deprecated
-	public void sendByAlias(String userId, String notification, String msg);
-
-	/**
-	 * jpush消息推送<br/>
-	 * 关闭通知
-	 * @param userIds
-	 *            用户Ids
-	 * @param notification
-	 *            通知
-	 * @param msg
-	 *            内容(json字符串)
-	 * @return
-	 * @throws
-	 */
-	@Deprecated
-	public void sendByAlias(List<String> userIds, String notification, String msg);
-
-	/**
-	 * jpush消息推送 byTag<br/>
-	 * 关闭通知
-	 * @param tag
-	 * @param notification 通知
-	 * @param msg(json字符串)
-	 * @return
-	 * @throws
-	 */
-	@Deprecated
-	public void sendByTag(String tag, String notification, String msg);
-	
-	/**
-	 * jpush消息推送 byTag<br/>
-	 * 关闭通知
-	 * @param tags
-	 * @param notification 通知
-	 * @param msg(json字符串)
-	 * @return
-	 * @throws
-	 */
-	@Deprecated
-	public void sendByTag(List<String> tags, String notification, String msg);
 	
 	/**
 	 * 
@@ -79,7 +27,7 @@ public interface PushAPI {
 	 * @param reqVo
 	 * @throws
 	 */
-	public void commonSendAlias(PushReqVo reqVo);
+	Response<Boolean> commonSendAlias(PushReqVo reqVo);
 	
 	
 	/**
@@ -91,5 +39,5 @@ public interface PushAPI {
 	 * @throws
 	 * @Description 注意rpc context传入appId
 	 */
-	public List<PushReceived> getReceived(List<String> msgId);
+	Response<List<PushReceived>> getReceived(List<String> msgId);
 }
