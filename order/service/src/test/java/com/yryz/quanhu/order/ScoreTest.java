@@ -9,6 +9,7 @@ package com.yryz.quanhu.order;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
 
@@ -50,6 +52,16 @@ public class ScoreTest {
         eventAPI.commit(info);
 
         System.out.println("commit event result");
+    }
+	
+	
+	@Test
+    public void getScoreFlowList() {
+        EventInfo info = new EventInfo();
+        info.setCustId("21b32tixua");
+        List<ScoreFlow>   list =   eventAPI.getScoreFlowList(info);
+
+        System.out.println("ScoreFlow list: "+list.size());
     }
 	
 	
