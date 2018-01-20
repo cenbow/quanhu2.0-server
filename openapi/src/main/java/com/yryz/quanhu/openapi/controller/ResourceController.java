@@ -23,6 +23,7 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * @author yehao
@@ -30,7 +31,7 @@ import io.swagger.annotations.ApiOperation;
  * @date 2018年1月18日 下午6:02:50
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
-@Api(description = "资源管理管理 示例")
+@Api(tags = "资源管理")
 @RestController
 public class ResourceController {
 	
@@ -41,9 +42,9 @@ public class ResourceController {
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/appRecommend")
-	public Response<List<ResourceVo>> appRecommend(){
+	public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度")int limit){
     	ResourceVo resourceVo = new ResourceVo();
     	return resourceApi.getResources(resourceVo, null, 0, 10, null, null);
 	}
-
+    
 }

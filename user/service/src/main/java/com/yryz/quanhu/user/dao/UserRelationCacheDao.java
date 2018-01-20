@@ -92,18 +92,11 @@ public class UserRelationCacheDao {
             /**
              * 查询数据库
              */
-            UserRelationDto _dto = new UserRelationDto();
-            _dto.setSourceUserId(sourceUserId);
-            _dto.setTargetUserId(targetUserId);
+            return userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
 
-            array = userRelationDao.getList(_dto);
-            if(null!=array&&array.size()>0){
-                return array.get(0);
-            }
         }catch (Exception e){
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     public static String getCacheKey(String sourceUserId,String targetUserId){
@@ -127,17 +120,10 @@ public class UserRelationCacheDao {
      * @param userDto
      */
     public void sendMQ(UserRelationDto userDto){
-
+        userRelationDao.update(userDto);
     }
 
-    /**
-     * MQ消费者处理
-     * @param data
-     */
-    @RabbitListener(bindings = @QueueBinding(
-            value= @Queue(value="",durable="true"),
-            exchange=@Exchange(value="",ignoreDeclarationExceptions="true",type= ExchangeTypes.FANOUT))
-    )
+
     public void handleMessage(String data){
 
         System.out.println("hello Fanout Message:" + data);

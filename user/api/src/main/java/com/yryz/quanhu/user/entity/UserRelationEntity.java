@@ -36,6 +36,54 @@ public class UserRelationEntity extends GenericEntity {
      */
     private int friendStatus;
 
+    /**
+     * 删除标记
+     */
+    private int delFlag;
+    /**
+     * 版本号
+     */
+    private int version;
+    /**
+     * 创建用户ID
+     */
+    private String createUserId;
+    /**
+     * 最后修改用户ID
+     */
+    private String lastUpdateUserId;
+
+    public String getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public String getLastUpdateUserId() {
+        return lastUpdateUserId;
+    }
+
+    public void setLastUpdateUserId(String lastUpdateUserId) {
+        this.lastUpdateUserId = lastUpdateUserId;
+    }
+
+    public int getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(int delFlag) {
+        this.delFlag = delFlag;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
     public String getSourceUserId() {
         return sourceUserId;

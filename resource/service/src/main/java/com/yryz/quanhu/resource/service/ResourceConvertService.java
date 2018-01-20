@@ -19,11 +19,19 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
  */
 public interface ResourceConvertService {
 	
+	
 	/**
 	 * 批量添加
 	 * @param list
 	 * @return
 	 */
 	public List<ResourceVo> addUser(List<ResourceVo> list);
+	
+	/**
+	 * 单个添加
+	 * @param resource
+	 * @return
+	 */
+	public ResourceVo addUser(ResourceVo resource);
 
 }

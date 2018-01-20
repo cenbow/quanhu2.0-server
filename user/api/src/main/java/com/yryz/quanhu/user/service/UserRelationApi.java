@@ -41,10 +41,12 @@ public interface UserRelationApi {
 
     /**
      * 设置关系
-     * @param dto
+     * @param sourceUserId
+     * @param targetUserId
+     * @param event
      * @return
      */
-    Response<Boolean> setRelation(UserRelationDto dto);
+    Response<Boolean> setRelation(String sourceUserId,String targetUserId, UserRelationApi.EVENT event);
 
     /**
      * 检查关系

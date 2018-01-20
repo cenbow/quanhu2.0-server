@@ -31,10 +31,10 @@ public class UserRelationProvider implements UserRelationApi{
     private UserRelationService userRelationService;
 
     @Override
-    public Response<Boolean> setRelation(UserRelationDto dto) {
+    public Response<Boolean> setRelation(String sourceUserId,String targetUserId, UserRelationApi.EVENT event){
         try {
             logger.info("user:{}","");
-            return ResponseUtils.returnObjectSuccess(userRelationService.setRelation(dto));
+            return ResponseUtils.returnObjectSuccess(userRelationService.setRelation(sourceUserId,targetUserId,event));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
