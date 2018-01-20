@@ -41,7 +41,10 @@ public class ScoreTest {
         info.setCustId("21b32tixua");
         info.setCircleId("62jqe12bhauv");
         info.setCoterieId("ctf8gkwjvo1q");
-        info.setEventCode("1");
+//        info.setEventCode("11"); //ventType=1：一次性触发
+//        info.setEventCode("1"); //eventType=2：每次触发
+//        info.setEventCode("3"); //eventType=3：循环触发
+        info.setEventCode("15"); //eventType=4：签到区间循环
         info.setEventNum(1);
         info.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         eventAPI.commit(info);

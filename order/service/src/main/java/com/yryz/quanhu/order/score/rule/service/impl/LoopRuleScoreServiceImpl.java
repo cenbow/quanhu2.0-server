@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,8 +44,8 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
     
     
     // RedisTemplate 含有泛型,无法使用 @Autowired by type 注入,只能使用@Resource by name注入
-    @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
     
 
 

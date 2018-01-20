@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,8 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 	EventAcountService eventAcountService;
 	
     // RedisTemplate 含有泛型,无法使用 @Autowired by type 注入,只能使用@Resource by name注入
-    @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
     
 
 
@@ -65,7 +66,7 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		}
 		//	jedis.set(statusKey, String.valueOf(status), "NX", "PX", getRedisExpireMillis());
 		//redisTemplate.opsForValue().set(statusKey, "", getRedisExpireMillis(),TimeUnit.MILLISECONDS);
-		eventAcountService.redislocksset(redisTemplate, statusKey, String.valueOf(status), "XX", "PX", getRedisExpireMillis());
+		eventAcountService.redislocksset(redisTemplate, statusKey, String.valueOf(status), "NX", "PX", getRedisExpireMillis());
 		return true;
 	}
 
