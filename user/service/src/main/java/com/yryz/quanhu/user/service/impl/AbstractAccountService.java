@@ -178,10 +178,10 @@ public class AbstractAccountService implements AccountService {
 				new TypeReference<List<LoginMethodVO>>() {
 				});
 
-		if (StringUtils.isBlank(account.getUserPhone())) {
+		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
 			LoginMethodVO methodVO = new LoginMethodVO(account.getKid().toString(),
-					PhoneUtils.getPhone(account.getUserPhone()), 4, havePwd);
+					account.getUserPhone(), RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
 

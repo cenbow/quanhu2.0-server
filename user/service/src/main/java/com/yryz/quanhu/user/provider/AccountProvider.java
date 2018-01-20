@@ -39,6 +39,7 @@ import com.yryz.quanhu.user.contants.LoginType;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
+import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.BindThirdDTO;
@@ -986,8 +987,16 @@ public class AccountProvider implements AccountApi {
 		// 查询用户信息
 		UserLoginSimpleVO user = userService.getUserLoginSimpleVO(userId);
 
-		AuthTokenVO tokenVO = authService.getToken(new AuthTokenDTO(userId, devType, header.getAppId(), refreshToken));
-
+		AuthTokenDTO tokenDTO = new AuthTokenDTO(userId, devType, header.getAppId(), refreshToken);
+		
+		AuthTokenVO tokenVO = null;
+		if(devType == DevType.ANDROID || devType == DevType.IOS){
+			AuthRefreshDTO refreshDTO = (AuthRefreshDTO) tokenDTO;
+			tokenVO = authService.getToken(refreshDTO);
+		}else{
+			tokenVO = authService.getToken(tokenDTO);
+		}
+		
 		accountService.saveLoginLog(new UserLoginLog(NumberUtils.toLong(userId), devType.getType(), header.getDevName(),
 				header.getDevId(), header.getAppId()));
 
