@@ -1,7 +1,8 @@
 package com.yryz.quanhu.message;
 
-import com.yryz.quanhu.message.api.PushAPI;
-import com.yryz.quanhu.message.entity.PushReqVo;
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.quanhu.message.push.api.PushAPI;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;

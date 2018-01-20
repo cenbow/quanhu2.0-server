@@ -2,10 +2,10 @@ package com.yryz.quanhu.message.push.web;
 
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.yryz.quanhu.message.api.PushAPI;
-import com.yryz.quanhu.message.entity.PushReceived;
-import com.yryz.quanhu.message.entity.PushReqVo;
-import com.yryz.quanhu.message.entity.PushReqVo.*;
+import com.yryz.quanhu.message.push.api.PushAPI;
+import com.yryz.quanhu.message.push.entity.PushReceived;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
+import com.yryz.quanhu.message.push.entity.PushReqVo.*;
 import com.yryz.quanhu.message.push.exception.ServiceException;
 import com.yryz.quanhu.message.push.service.PushService;
 import org.apache.commons.collections.CollectionUtils;

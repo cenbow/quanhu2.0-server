@@ -18,12 +18,12 @@
   <select id="getWorkerNodeByHostPort" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from quanhu_worker_node
+    from qh_worker_node
     where HOST_NAME = #{host} AND PORT = #{port}
   </select>
 
   <insert id="addWorkerNode" useGeneratedKeys="true" keyProperty="id">
-    insert into quanhu_worker_node (HOST_NAME, PORT,
+    insert into qh_worker_node (HOST_NAME, PORT,
       TYPE, LAUNCH_DATE, CREATE_DATE, 
       LAST_UPDATE_DATE)
     values (#{hostName,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR}, 

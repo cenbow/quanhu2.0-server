@@ -10,20 +10,18 @@ package com.yryz.quanhu.message.push.service.impl;
 import cn.jpush.api.report.ReceivedsResult.Received;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.alibaba.dubbo.rpc.support.RpcUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.Constants;
 import com.yryz.common.context.Context;
 import com.yryz.common.utils.JsonUtils;
-import com.yryz.quanhu.message.entity.CircleStatus;
-import com.yryz.quanhu.message.entity.PushReceived;
-import com.yryz.quanhu.message.entity.config.AppConfig;
-import com.yryz.quanhu.message.entity.config.PushConfigDTO;
-import com.yryz.quanhu.message.entity.PushReqVo;
-import com.yryz.quanhu.message.entity.PushReqVo.CommonPushType;
+import com.yryz.quanhu.message.push.entity.PushConfigDTO;
+import com.yryz.quanhu.message.push.entity.PushReceived;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
+import com.yryz.quanhu.message.push.entity.PushReqVo.CommonPushType;
 import com.yryz.quanhu.message.push.entity.PushParamsDTO;
 import com.yryz.quanhu.message.push.exception.ServiceException;
 import com.yryz.quanhu.message.push.mq.PushMsgSender;
+import com.yryz.quanhu.message.push.remote.ConfigRemote;
 import com.yryz.quanhu.message.push.service.JPushService;
 import com.yryz.quanhu.message.push.service.PushService;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,6 +44,9 @@ public class PushServiceImpl implements PushService {
 
 	@Autowired
 	private PushMsgSender pushSender;
+
+	@Autowired
+	private ConfigRemote configRemote;
 
 //	@Autowired
 //	CircleRemot circleRemot;
@@ -161,13 +162,16 @@ public class PushServiceImpl implements PushService {
 		if (StringUtils.isBlank(appId)) {
 			appId = Context.getProperty("appId.default");
 		}
+		configDTO = configRemote.getPushConfig(appId);
+		/*
 		if (StringUtils.isNotEmpty(appId)) {
 			AppConfig config = null;//get..... //circleRemot.get(appId);
 			if (config != null && config.getPushStatus() != null
 					&& config.getPushStatus().intValue() == CircleStatus.SmsStatus.OPEN.getStatus()) {
 				configDTO = config.getPushConfigInfo();
 			}
-		}
+		}*/
+
 		return configDTO;
 	}
 
