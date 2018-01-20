@@ -9,8 +9,8 @@ package com.yryz.quanhu.order.score.service;
 
 import java.util.List;
 
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * @author xiepeng
@@ -31,5 +31,5 @@ public interface EventService {
      * 查询积分流水记录
      * @return List
      */
-    List<ScoreFlow> getScoreFlowList(EventInfo log);
+    List<EventReportVo> getScoreFlowList(EventInfo log);
 }
