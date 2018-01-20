@@ -18,9 +18,9 @@ import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
 import com.yryz.quanhu.order.score.service.SysEventManageService;
 import com.yryz.quanhu.order.score.type.EventTypeEnum;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.SysEventInfo;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * @author xiepeng
@@ -67,7 +67,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<ScoreFlow> getScoreFlowList(EventInfo log) {
+	public List<EventReportVo> getScoreFlowList(EventInfo log) {
 		return scoreFlowService.getAll(log.getCustId());
  
 	}

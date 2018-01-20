@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.quanhu.order.score.service.EventService;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * @author xiepeng
@@ -43,7 +43,7 @@ public class EventAPIImpl implements EventAPI {
 
 	    
 	@Override
-	public List<ScoreFlow> getScoreFlowList(EventInfo log) {
+	public List<EventReportVo> getScoreFlowList(EventInfo log) {
 		return eventService.getScoreFlowList(log);
 	}
 }

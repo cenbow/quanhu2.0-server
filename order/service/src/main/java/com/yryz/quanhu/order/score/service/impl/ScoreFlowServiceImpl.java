@@ -10,6 +10,7 @@ import com.yryz.quanhu.order.score.dao.persistence.ScoreFlowDao;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
 import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * Created by lsn on 2017/8/28.
@@ -34,7 +35,7 @@ public class ScoreFlowServiceImpl implements ScoreFlowService {
 	}
 
 	@Override
-	public List<ScoreFlow> getAll(String custId) {
+	public List<EventReportVo> getAll(String custId) {
 		return scoreFlowDao.getAll(custId);
 	}
 

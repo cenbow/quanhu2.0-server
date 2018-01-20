@@ -36,10 +36,11 @@ public class PushConfig {
     @Bean
     PushConfigDTO pushConfigDTO() {
         PushConfigDTO pushConfigDTO = new PushConfigDTO();
-       /* pushConfigDTO.setPushKey(pushKey);
+        pushConfigDTO.setPushKey(pushKey);
         pushConfigDTO.setPushSecret(pushSecret);
         pushConfigDTO.setPushType(pushType);
-        pushConfigDTO.setPushDesc(pushDesc);*/
+        pushConfigDTO.setPushDesc(pushDesc);
+        pushConfigDTO.setPushEvn(pushEvn);
         return pushConfigDTO;
     }
 

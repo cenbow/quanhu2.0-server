@@ -40,7 +40,7 @@
 	</insert>
 
 	<!-- 获取用户积分流水列表 -->
-	<select id="getAll" resultType="com.yryz.quanhu.score.entity.ScoreFlow">
+	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventReportVo">
 		select <include refid="columns" /> from score_flow where
 		cust_id = #{custId}
 	</select>
