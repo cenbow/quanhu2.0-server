@@ -58,13 +58,13 @@ public class UserController {
 
 	@ApiOperation("用户token刷新")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/user/refreshToken")
-	public Response<AuthTokenVO> refreshToken(String userId, HttpServletRequest request) {
+	@PostMapping(value = "/{version}/user/refreshToken")
+	public Response<AuthTokenVO> refreshToken(@RequestBody String refreshToken, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		AuthRefreshDTO refreshDTO = new AuthRefreshDTO(header.getRefreshToken(), true);
-		refreshDTO.setAppId(header.getToken());
+		AuthRefreshDTO refreshDTO = new AuthRefreshDTO(refreshToken, true);
+		refreshDTO.setAppId(header.getAppId());
 		refreshDTO.setToken(header.getToken());
-		refreshDTO.setUserId(userId);
+		refreshDTO.setUserId(header.getUserId());
 		refreshDTO.setType(DevType.getEnumByType(header.getDevType(), header.getUserAgent()));
 		return authApi.refreshToken(refreshDTO);
 	}

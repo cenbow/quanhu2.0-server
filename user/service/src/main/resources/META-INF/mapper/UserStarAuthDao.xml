@@ -40,7 +40,7 @@
 	<select id="get" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_star_auth a
+		from qh_user_star_auth a
 		where 1=1
 		<if test="userId != null and userId != ''">
 			and a.cust_id = #{custId}
@@ -58,7 +58,7 @@
 	<select id="getByUserIds" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_star_auth a
+		from qh_user_star_auth a
 		where user_id in
 		<foreach item="item" index="index" collection="userIds" open="("
 			separator="," close=")">
@@ -68,14 +68,14 @@
 	
 	<select id="getStarMaxWeight" resultType="java.lang.Integer">
 		select max(recommend_weight)
-		from user_star_auth
+		from qh_user_star_auth
 	</select>
 	
 	<select id="listByParams" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />,
 		r.star_weight
-		from user_star_auth a
+		from qh_user_star_auth a
 		left join user_baseinfo r on
 		a.user_id = r.user_id
 		left join event_acount ea on a.user_id =
@@ -130,7 +130,7 @@
 		a.user_id as userId,
 		a.trade_field as tradeField
 		from
-		user_star_auth a
+		qh_user_star_auth a
 		left join rrz_cust_baseinfo r on a.cust_id = r.cust_id
 		where 1=1
 		<if test="starRecommend != null ">
@@ -151,7 +151,7 @@
 	</select>
 	
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserStarAuth" >
-    insert into user_star_auth
+    insert into qh_user_star_auth
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -321,7 +321,7 @@
   </insert>
   
   <update id="update" parameterType="com.yryz.quanhu.user.entity.UserStarAuth" >
-    update user_star_auth
+    update qh_user_star_auth
     <set >
       <if test="organizationName != null" >
         organization_name = #{organizationName,jdbcType=VARCHAR},

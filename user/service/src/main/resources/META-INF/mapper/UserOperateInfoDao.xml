@@ -13,7 +13,7 @@
 			jdbcType="VARCHAR" />
 		<result column="user_reg_inviter_code" property="userRegInviterCode"
 			jdbcType="VARCHAR" />
-		<result column="user_inviter_code" property="userInviterCode"
+		<result column="qh_user_inviter_code" property="userInviterCode"
 			jdbcType="VARCHAR" />
 		<result column="user_reg_inviter_num" property="userRegInviterNum"
 			jdbcType="INTEGER" />
@@ -23,13 +23,13 @@
 	</resultMap>
 	<sql id="Base_Column_List">
 		a.kid, a.user_id,a.user_inviter_id, a.user_reg_channel,
-		a.user_reg_inviter_code, a.user_inviter_code, a.user_reg_inviter_num,
+		a.user_reg_inviter_code, a.qh_user_inviter_code, a.user_reg_inviter_num,
 		a.create_date, a.last_update_date
 	</sql>
 	
 	<!-- 查询本人邀请码 -->
 	<select id="selectInviterCodeByUserId" resultType="java.lang.String">
-		select user_inviter_code
+		select qh_user_inviter_code
 		from user_operate_info
 		where user_id = #{userId}
 	</select>
@@ -45,7 +45,7 @@
 	<select id="selectUserIdByInviter" resultType="java.lang.String">
 		select user_id
 		from user_operate_info
-		where user_inviter_code = #{userInviterCode}
+		where qh_user_inviter_code = #{userInviterCode}
 	</select>
 
 	<select id="listByUserId" resultMap="BaseResultMap">
@@ -103,7 +103,7 @@
 				user_reg_inviter_code,
 			</if>
 			<if test="userInviterCode != null">
-				user_inviter_code,
+				qh_user_inviter_code,
 			</if>
 			<if test="userRegInviterNum != null">
 				user_reg_inviter_num,
@@ -148,6 +148,6 @@
 
 	<update id="updateInviterNum">
 		update user_operate_info cust_reg_inviter_num = cust_reg_inviter_num +
-		1 where user_inviter_code = #{userInviterCode}
+		1 where qh_user_inviter_code = #{userInviterCode}
 	</update>
 </mapper>

@@ -1,9 +1,6 @@
 package com.yryz.quanhu.support;
 
-import com.yryz.quanhu.support.id.api.ConfigApi;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -17,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class ConfigTest {
 
-    @Autowired
+    /*@Autowired
     private ConfigApi configApi;
 
     @Test
@@ -25,5 +22,5 @@ public class ConfigTest {
         configApi.addCongfig("5qnyg4qksmho",
                 "kk", "{\"pushKey\":\"40869323ab400d45aa046896\",\"pushSecret\":\"3890e1ebabdb2056a18bbb04\",\"pushType\":0,\"pushDesc\":null}",
                 "dev-test");
-    }
+    }*/
 }

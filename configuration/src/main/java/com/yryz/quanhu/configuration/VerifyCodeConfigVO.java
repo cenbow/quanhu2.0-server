@@ -5,9 +5,11 @@
  * Created on 2017年12月6日
  * Id: VerifyCodeConfigVO.java, 2017年12月6日 上午9:39:22 Administrator
  */
-package com.yryz.quanhu.commonsafe.vo;
+package com.yryz.quanhu.configuration;
 
 import java.io.Serializable;
+
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 验证码配置
@@ -16,35 +18,36 @@ import java.io.Serializable;
  * @date 2017年12月6日 上午9:39:22
  */
 @SuppressWarnings("serial")
+@Configuration
 public class VerifyCodeConfigVO implements Serializable {
 	/**
 	 * 普通验证码过期时间 /秒
 	 */
-	private Integer normalCodeExpireTime;
+	private Integer normalCodeExpireTime = 300;
 	
 	/**
 	 * 普通验证码获取间隔时间 /秒
 	 */
-	private Integer normalCodeDelayTime;
+	private Integer normalCodeDelayTime = 300;
 	/**
 	 * 普通验证码每天获取总量限制
 	 */
-	private Integer normalCodeTotal;
+	private Integer normalCodeTotal = 1000;
 	
 	/**
 	 * 图形验证码过期时间 /秒
 	 */
-	private Integer imgCodeExpireTime;
+	private Integer imgCodeExpireTime = 300;
 	
 	/**
 	 * 不需要使用图形验证码要发送普通验证码的次数
 	 */
-	private Integer imgCodeNumLimit;
+	private Integer imgCodeNumLimit = 3;
 	
 	/**
 	 * 验证码位数
 	 */
-	private Integer codeNum;
+	private Integer codeNum = 4;
 	
 	public Integer getNormalCodeExpireTime() {
 		return normalCodeExpireTime;

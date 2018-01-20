@@ -1,133 +1,113 @@
-/**
- * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
+/*
+ * SmsTemplate.java
+ * Copyright (c) 2012,融众网络技术有限公司(www.11186.com)
  * All rights reserved.
- * 
- * Created on 2017年8月10日
- * Id: SmsTemplate.java, 2017年8月10日 下午5:11:11 Administrator
+ * ---------------------------------------------------------------------
+ * 2018-01-20 Created
  */
 package com.yryz.quanhu.sms.entity;
 
-import java.io.Serializable;
-import java.util.Date;
+import com.yryz.common.entity.GenericEntity;
+
 /**
  * 短信模板表
  * 
- * @author danshiyu
- * @version 1.0 2017-07-24
+ * @author xxx
+ * @version 1.0 2018-01-20
  * @since 1.0
  */
 @SuppressWarnings("serial")
-public class SmsTemplate implements Serializable{
+public class SmsTemplate extends GenericEntity{
+
     /**
-     * 主键
+     * 短信渠道id
      */
-    private Integer id;
+    private Long smsChannelId;
+
     /**
      * 模板名称
      */
     private String smsTemplateName;
-    
-    /**
-     * 模板类型 0:短信验证码 1:通知
-     */
-    private Byte templateType;
-    
+
     /**
      * 模板编码
      */
     private String smsTemplateCode;
+
     /**
      * 模板内容
      */
     private String smsTemplateContent;
+
     /**
      * 模板包含变量
      */
     private String smsTemplateParams;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
+
     /**
      * 操作人名称
      */
-    private String operational;
-    
+    private String operateName;
+
     /**
-     * 短信appKey
+     * 短信类型 0:验证码 1:通知
      */
-    private String appKey;
-    public Integer getId() {
-        return id;
+    private Byte templateType;
+
+
+    public Long getSmsChannelId() {
+        return smsChannelId;
     }
-    public void setId(Integer id) {
-        this.id = id;
+
+    public void setSmsChannelId(Long smsChannelId) {
+        this.smsChannelId = smsChannelId;
     }
+
     public String getSmsTemplateName() {
         return smsTemplateName;
     }
+
     public void setSmsTemplateName(String smsTemplateName) {
         this.smsTemplateName = smsTemplateName == null ? null : smsTemplateName.trim();
     }
+
     public String getSmsTemplateCode() {
         return smsTemplateCode;
     }
+
     public void setSmsTemplateCode(String smsTemplateCode) {
         this.smsTemplateCode = smsTemplateCode == null ? null : smsTemplateCode.trim();
     }
+
     public String getSmsTemplateContent() {
         return smsTemplateContent;
     }
+
     public void setSmsTemplateContent(String smsTemplateContent) {
         this.smsTemplateContent = smsTemplateContent == null ? null : smsTemplateContent.trim();
     }
+
     public String getSmsTemplateParams() {
         return smsTemplateParams;
     }
+
     public void setSmsTemplateParams(String smsTemplateParams) {
         this.smsTemplateParams = smsTemplateParams == null ? null : smsTemplateParams.trim();
     }
-    public Date getCreateTime() {
-        return createTime;
+
+    public String getOperateName() {
+        return operateName;
     }
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+
+    public void setOperateName(String operateName) {
+        this.operateName = operateName == null ? null : operateName.trim();
     }
-    public Date getUpdateTime() {
-        return updateTime;
+
+    public Byte getTemplateType() {
+        return templateType;
     }
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+
+    public void setTemplateType(Byte templateType) {
+        this.templateType = templateType;
     }
-    public String getOperational() {
-        return operational;
-    }
-    public void setOperational(String operational) {
-        this.operational = operational == null ? null : operational.trim();
-    }
-    
-	public String getAppKey() {
-		return appKey;
-	}
-	public void setAppKey(String appKey) {
-		this.appKey = appKey;
-	}
-	public Byte getTemplateType() {
-		return templateType;
-	}
-	public void setTemplateType(Byte templateType) {
-		this.templateType = templateType;
-	}
-	@Override
-	public String toString() {
-		return "SmsTemplate [id=" + id + ", smsTemplateName=" + smsTemplateName + ", templateType=" + templateType
-				+ ", smsTemplateCode=" + smsTemplateCode + ", smsTemplateContent=" + smsTemplateContent
-				+ ", smsTemplateParams=" + smsTemplateParams + ", createTime=" + createTime + ", updateTime="
-				+ updateTime + ", operational=" + operational + ", appKey=" + appKey + "]";
-	}
-    
 }

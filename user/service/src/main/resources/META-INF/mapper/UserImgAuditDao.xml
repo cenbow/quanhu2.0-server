@@ -24,7 +24,7 @@
 	<select id="selectByUserId" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_img_audit
+		from qh_user_img_audit
 		where user_id = #{userId}
 		<if test="auditStatus != null ">
 			and a.audit_status = #{auditStatus}
@@ -34,12 +34,12 @@
 
 
 	<delete id="delete" parameterType="java.lang.Long">
-		delete from user_img_audit
+		delete from qh_user_img_audit
 		where user_id = #{userId}
 	</delete>
 
 	<insert id="save" parameterType="com.yryz.quanhu.user.entity.UserImgAudit">
-		insert into user_img_audit
+		insert into qh_user_img_audit
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
 				id,
@@ -95,7 +95,7 @@
 	</insert>
 
 	<insert id="batchSave">
-		insert into user_img_audit (kid,user_id, cust_img,
+		insert into qh_user_img_audit (kid,user_id, cust_img,
 		audit_status,
 		create_date,
 		operational)
@@ -108,7 +108,7 @@
 	</insert>
 
 	<update id="update" parameterType="com.yryz.quanhu.user.entity.UserImgAudit">
-		update user_img_audit
+		update qh_user_img_audit
 		<set>
 			<if test="userImg != null">
 				user_img = #{userImg,jdbcType=VARCHAR},
