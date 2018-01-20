@@ -1,7 +1,5 @@
 package com.yryz.quanhu.support.activity.vo;
 
-import com.yryz.quanhu.support.activity.entity.ActivityInfo;
-
 /**
  * @ClassName: ActivityInfoVo
  * @Description: ActivityInfoVo

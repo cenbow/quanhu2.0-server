@@ -1,6 +1,5 @@
 package com.yryz.quanhu.support.activity.dao;
 
-import com.yryz.quanhu.support.activity.entity.ActivityInfo;
 import com.yryz.quanhu.support.activity.entity.ActivityPayRecord;
 import com.yryz.quanhu.support.activity.vo.ActivityPayRecordVo;
 import org.apache.ibatis.annotations.Mapper;

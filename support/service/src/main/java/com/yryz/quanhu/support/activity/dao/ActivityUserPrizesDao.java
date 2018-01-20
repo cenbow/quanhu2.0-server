@@ -1,15 +1,8 @@
 package com.yryz.quanhu.support.activity.dao;
 
-import com.yryz.quanhu.support.activity.entity.ActivityRecord;
 import com.yryz.quanhu.support.activity.entity.ActivityUserPrizes;
-import com.yryz.quanhu.support.activity.dto.ActivityUserPrizesDto;
-import com.yryz.common.dao.BaseDao;
-import com.yryz.quanhu.support.activity.vo.ActivityRecordVo;
 import com.yryz.quanhu.support.activity.vo.ActivityUserPrizesVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * 
