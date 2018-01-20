@@ -75,14 +75,14 @@ public class GsonUtils {
 	 * @param clazz
 	 * @return
 	 */
-	public static Map<String,?> parsetMap(Map<String,?>map,Class clazz)
+	public static <T> Map<String,T> parseMap(Map<String,?>map,Class<T> clazz)
 	{
 		if(map!=null)
 		{
-			Map newmap = new HashMap<>();
+			Map<String,T> newmap = new HashMap<>();
 			for(Map.Entry<String, ?> entry:map.entrySet())
 			{
-				Object obj = parseObj(entry.getValue(), clazz);
+				T obj = parseObj(entry.getValue(), clazz);
 				newmap.put(entry.getKey(), obj);
 			}
 			return newmap;

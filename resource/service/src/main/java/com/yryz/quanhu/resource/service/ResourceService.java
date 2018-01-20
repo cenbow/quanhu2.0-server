@@ -8,6 +8,8 @@
 package com.yryz.quanhu.resource.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.yryz.quanhu.resource.entity.ResourceModel;
 
@@ -48,5 +50,19 @@ public interface ResourceService {
 	 * @return
 	 */
 	public List<ResourceModel> getResources(ResourceModel resource , String orderColumn , int start , int limit ,String startTime ,String endTime);
+	
+	/**
+	 * 批量查询资源信息
+	 * @param resourceIds
+	 * @return
+	 */
+	public Map<String, ResourceModel> getResources(Set<String> resourceIds);
+	
+	/**
+	 * 单一查询资源信息
+	 * @param resourceId
+	 * @return
+	 */
+	public ResourceModel getResource(String resourceId);
 
 }
