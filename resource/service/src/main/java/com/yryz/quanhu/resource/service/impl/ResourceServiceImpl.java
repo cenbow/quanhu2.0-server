@@ -7,7 +7,10 @@
  */
 package com.yryz.quanhu.resource.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,38 @@ public class ResourceServiceImpl implements ResourceService {
 	public List<ResourceModel> getResources(ResourceModel resource, String orderColumn, int start, int limit,
 			String startTime, String endTime) {
 		return resourceMongo.getList(resource, orderColumn, startTime, endTime, start, limit);
+	}
+
+	/**
+	 * 批量获取资源信息
+	 * @param resourceIds
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceService#getResources(java.util.Set)
+	 */
+	@Override
+	public Map<String, ResourceModel> getResources(Set<String> resourceIds) {
+		Map<String, ResourceModel> map = new HashMap<>();
+		if(CollectionUtils.isNotEmpty(resourceIds)){
+			for (String resourceId : resourceIds) {
+				ResourceModel resource = resourceMongo.findById(resourceId);
+				if(resource != null){
+					map.put(resourceId, resource);
+				}
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * 单一获取资源信息
+	 * @param resourceId
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceService#getResource(java.lang.String)
+	 */
+	@Override
+	public ResourceModel getResource(String resourceId) {
+		ResourceModel resourceModel = resourceMongo.findById(resourceId);
+		return resourceModel;
 	}
 	
 	

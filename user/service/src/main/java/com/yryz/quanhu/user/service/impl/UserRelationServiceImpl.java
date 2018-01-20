@@ -1,7 +1,6 @@
 package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserRelationCacheDao;
@@ -13,6 +12,7 @@ import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.service.UserRelationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.yryz.quanhu.user.service.UserRelationApi.NO;
 import static com.yryz.quanhu.user.service.UserRelationApi.YES;
 
 /**
@@ -46,11 +47,8 @@ public class UserRelationServiceImpl implements UserRelationService{
     private IdAPI idAPI;
 
     @Override
-    public boolean setRelation(UserRelationDto dto) {
+    public boolean setRelation(String sourceUserId, String targetUserId,UserRelationApi.EVENT event){
         try{
-
-            String sourceUserId = dto.getSourceUserId();
-            String targetUserId = dto.getTargetUserId();
 
             /**
              * ★★★★★关键验证★★★★★
@@ -81,10 +79,10 @@ public class UserRelationServiceImpl implements UserRelationService{
              * 1，用户是否存在，防止刷接口
              * 2，任何一方存在拉黑关系，不允许操作(除取消拉黑)
              */
-            this.verifyRelationCondition(sourceDto,targetDto,null);
+            this.verifyRelationCondition(sourceDto,targetDto,event);
 
             //设置关系
-            this.setRelationMapping(sourceDto,targetDto,null);
+            this.setRelationMapping(sourceDto,targetDto,event);
 
             /**
              *
@@ -94,18 +92,31 @@ public class UserRelationServiceImpl implements UserRelationService{
              * 后续采用MQ消息方式
              */
             if(sourceDto.isNewRecord()){
-                sourceDto.setKid(idAPI.getKid("user_relation"));
+                sourceDto.setSourceUserId(sourceUserId);
+                sourceDto.setTargetUserId(targetUserId);
+
+                sourceDto.setDelFlag(NO);
+                sourceDto.setVersion(0);
+                sourceDto.setCreateUserId(sourceUserId);
+                sourceDto.setLastUpdateUserId(targetUserId);
+
+                sourceDto.setKid(System.currentTimeMillis());
+//                sourceDto.setKid(idAPI.getKid("user_relation"));
                 userRelationDao.insert(sourceDto);
             }else{
                 userRelationCacheDao.sendMQ(sourceDto);
             }
 
-            if(targetDto.isNewRecord()){
-                targetDto.setKid(idAPI.getKid("user_relation"));
-                userRelationDao.insert(targetDto);
-            }else{
+            /**
+             * 只有关注，取消关注的时候，并且target关系存在的情况下，才涉及到target数据更新
+             * 更新好友关系
+             */
+            if(!targetDto.isNewRecord()&&
+                    (UserRelationApi.EVENT.SET_FOLLOW == event || UserRelationApi.EVENT.CANCEL_FOLLOW == event)){
+                targetDto.setLastUpdateUserId(sourceUserId);
                 userRelationCacheDao.sendMQ(targetDto);
             }
+
             //同步单向关系至redis
             userRelationCacheDao.setUserRelation(sourceDto,targetDto);
 
@@ -270,7 +281,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          * ★★★★★★★★★★
          */
         if(CollectionUtils.isEmpty(pageList.getEntities())||
-                dto.getCurrentUserId().equalsIgnoreCase(dto.getSourceUserId())){
+                dto.getSourceUserId().equalsIgnoreCase(dto.getTargetUserId())){
             return pageList;
         }
 
@@ -281,7 +292,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             targetUserIds[i]=String.valueOf(queryArray.get(i).getTargetUserId());
         }
         //查询
-        List<UserRelationDto> currentArray = userRelationCacheDao.selectBy(dto.getCurrentUserId(),targetUserIds);
+        List<UserRelationDto> currentArray = userRelationCacheDao.selectBy(dto.getSourceUserId(),targetUserIds);
 
         /**
          * 匹配他人结果集与自己结果集
@@ -303,7 +314,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             //不存在，则重置与目标关系
             if(null == replaceDto){
                 replaceDto = new UserRelationDto();
-                replaceDto.setSourceUserId(dto.getCurrentUserId());
+                replaceDto.setSourceUserId(dto.getSourceUserId());
                 replaceDto.setTargetUserId(targetUserId);
                 replaceDto.setFollowStatus(UserRelationApi.NO);
                 replaceDto.setFriendStatus(UserRelationApi.NO);

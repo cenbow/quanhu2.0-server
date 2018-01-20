@@ -6,6 +6,7 @@ import com.yryz.quanhu.user.dao.UserRelationRemarkDao;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 import com.yryz.quanhu.user.service.UserRelationRemarkService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * Created on 2018/1/19 15:12
  * Created by huangxy
  */
+@Service
 public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
 
     @Autowired
