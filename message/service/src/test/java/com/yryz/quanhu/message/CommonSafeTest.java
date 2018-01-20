@@ -18,7 +18,7 @@ public class CommonSafeTest {
 	 @Autowired
 	 CommonSafeApi safeApi;
 	 
-	 //@Test
+	 @Test
 	 public void sendVerifyCode(){
 		 VerifyCodeDTO codeDTO = new VerifyCodeDTO(1, CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), "15088052677", "vebff12m1762");
 		 
@@ -26,7 +26,7 @@ public class CommonSafeTest {
 		 System.out.println(JsonUtils.toFastJson(codeVO));
 	 }
 	 
-	 @Test
+	 //@Test
 	 public void checkVerifyCode(){
 		 VerifyCodeDTO codeDTO = new VerifyCodeDTO(1, CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), "15088052677", "vebff12m1762","9831");
 		 

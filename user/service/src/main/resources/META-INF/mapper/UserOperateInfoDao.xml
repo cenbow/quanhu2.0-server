@@ -29,23 +29,23 @@
 	
 	<!-- 查询本人邀请码 -->
 	<select id="selectInviterCodeByUserId" resultType="java.lang.String">
-		select qh_user_inviter_code
-		from user_operate_info
+		select user_inviter_code
+		from qh_user_operate_info
 		where user_id = #{userId}
 	</select>
 	
 	<!-- 查询本人邀请人数 -->
 	<select id="getInviterNum" resultType="java.lang.Integer">
 		select cust_reg_inviter_num
-		from user_operate_info
+		from qh_user_operate_info
 		where user_id = #{userId}
 	</select>
 	
 	<!-- 根据本人邀请码获取用户id -->
 	<select id="selectUserIdByInviter" resultType="java.lang.String">
 		select user_id
-		from user_operate_info
-		where qh_user_inviter_code = #{userInviterCode}
+		from qh_user_operate_info
+		where user_inviter_code = #{userInviterCode}
 	</select>
 
 	<select id="listByUserId" resultMap="BaseResultMap">
@@ -53,7 +53,7 @@
 		kid as kid,
 		user_id as userId,
 		create_date as createDate
-		from user_operate_info
+		from qh_user_operate_info
 		where user_inviter_id = #{userInviterId}
 		<if test="kid != null">
 			and kid &lt; #{kid}
@@ -66,7 +66,7 @@
 		select
 		<include refid="Base_Column_List" />
 		<!-- b.score as eventScore, -->
-		from user_operate_info a
+		from qh_user_operate_info a
 		where 1=1
 		<if test="userId != null and userId != ''">
 			and a.user_id = #{userId}
@@ -85,7 +85,7 @@
 
 	<insert id="save"
 		parameterType="com.yryz.quanhu.user.entity.UserOperateInfo">
-		insert into user_operate_info
+		insert into qh_user_operate_info
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
 				id,
@@ -103,7 +103,7 @@
 				user_reg_inviter_code,
 			</if>
 			<if test="userInviterCode != null">
-				qh_user_inviter_code,
+				user_inviter_code,
 			</if>
 			<if test="userRegInviterNum != null">
 				user_reg_inviter_num,
@@ -147,7 +147,7 @@
 	</insert>
 
 	<update id="updateInviterNum">
-		update user_operate_info cust_reg_inviter_num = cust_reg_inviter_num +
+		update qh_user_operate_info cust_reg_inviter_num = cust_reg_inviter_num +
 		1 where qh_user_inviter_code = #{userInviterCode}
 	</update>
 </mapper>
