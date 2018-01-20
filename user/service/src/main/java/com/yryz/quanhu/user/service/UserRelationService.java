@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public interface UserRelationService{
 
-    public boolean setRelation(UserRelationDto dto);
+    public boolean setRelation(String sourceUserId,String targetUserId, UserRelationApi.EVENT event);
 
     public UserRelationDto getCacheRelation(String sourceUserId, String targetUserId);
 

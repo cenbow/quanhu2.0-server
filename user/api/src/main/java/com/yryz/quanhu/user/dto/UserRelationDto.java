@@ -12,9 +12,7 @@ import com.yryz.quanhu.user.service.UserRelationApi;
  */
 public class UserRelationDto extends UserRelationEntity{
 
-    private boolean isNewRecord;
-
-    private String currentUserId;
+    private boolean isNewRecord = false;
 
     /**页码*/
     private Integer currentPage = 1;
@@ -29,14 +27,6 @@ public class UserRelationDto extends UserRelationEntity{
 
     public void setStatusBy(UserRelationApi.STATUS statusBy) {
         this.statusBy = statusBy;
-    }
-
-    public String getCurrentUserId() {
-        return currentUserId;
-    }
-
-    public void setCurrentUserId(String currentUserId) {
-        this.currentUserId = currentUserId;
     }
 
     public boolean isNewRecord() {
