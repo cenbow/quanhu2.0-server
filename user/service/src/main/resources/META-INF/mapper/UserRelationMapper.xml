@@ -48,8 +48,8 @@
 
         UPDATE qh_user_relation SET
 
-        ,create_date= NOW()
-        ,create_date_user_id = #{lastUpdateUserId,jdbcType=VARCHAR}
+        create_date= NOW()
+        ,create_user_id = #{createUserId,jdbcType=VARCHAR}
         ,last_update_date = NOW()
         ,last_update_user_id = #{lastUpdateUserId,jdbcType=VARCHAR}
 

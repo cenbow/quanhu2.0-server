@@ -2,9 +2,12 @@ package com.yryz.quanhu.user.dao;
 
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
+import com.yryz.quanhu.user.entity.UserRelationEntity;
 import com.yryz.quanhu.user.service.UserRelationApi;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -44,8 +47,8 @@ public class UserRelationCacheDao {
     @Value("${user.relation.expireDays}")
     private int expireDays;
 
-    @Resource
-    private RedisTemplate<String,UserRelationDto> redisTemplate;
+    @Autowired
+    private RedisTemplateBuilder redisTemplateBuilder;
 
     @Resource
     private MongoTemplate mongoTemplate;
@@ -61,7 +64,8 @@ public class UserRelationCacheDao {
      */
     public UserRelationDto getUserRelation(String sourceUserId,String targetUserId){
 
-        UserRelationDto dto = null;
+        UserRelationDto dto = new UserRelationDto();
+        UserRelationEntity entity = null;
         /**
          * 获取唯一关系Key
          */
@@ -70,8 +74,12 @@ public class UserRelationCacheDao {
             /**
              * 查询redis
              */
-            dto = redisTemplate.opsForValue().get(key);
-            if(null != dto){
+            RedisTemplate<String,UserRelationEntity> redisTemplate =
+                    redisTemplateBuilder.buildRedisTemplate(UserRelationEntity.class);
+
+            entity = redisTemplate.opsForValue().get(key);
+            if(null != entity){
+                BeanUtils.copyProperties(dto,entity);
                 return dto;
             }
             /**
@@ -84,9 +92,10 @@ public class UserRelationCacheDao {
             query.addCriteria(Criteria.where("targetUserId").is(targetUserId));
 
             //查询
-            List<UserRelationDto> array = mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
+            List<UserRelationEntity> array = mongoTemplate.find(query,UserRelationEntity.class,TABLE_NAME);
             if(null!=array&&array.size()>0){
-                return array.get(0);
+                BeanUtils.copyProperties(dto,array.get(0));
+                return dto;
             }
 
             /**
@@ -100,15 +109,20 @@ public class UserRelationCacheDao {
     }
 
     public static String getCacheKey(String sourceUserId,String targetUserId){
-        return "relation:"+sourceUserId+">"+targetUserId;
+        return "relation/"+sourceUserId+"/"+targetUserId;
     }
 
     public void setUserRelation(UserRelationDto sourceDto,UserRelationDto targetDto){
+
+        RedisTemplate<String,UserRelationEntity> redisTemplate =
+                redisTemplateBuilder.buildRedisTemplate(UserRelationEntity.class);
+
         /**
          * redis单向关系缓存
          */
-        final String sourceKey = getCacheKey(sourceDto.getSourceUserId(),sourceDto.getTargetUserId());
-        final String targetKey = getCacheKey(targetDto.getSourceUserId(),targetDto.getTargetUserId());
+        String sourceKey = getCacheKey(sourceDto.getSourceUserId(),sourceDto.getTargetUserId());
+        String targetKey = getCacheKey(targetDto.getSourceUserId(),targetDto.getTargetUserId());
+
 
         redisTemplate.opsForValue().set(sourceKey,sourceDto,expireDays, TimeUnit.DAYS);
         redisTemplate.opsForValue().set(targetKey,targetDto,expireDays, TimeUnit.DAYS);
