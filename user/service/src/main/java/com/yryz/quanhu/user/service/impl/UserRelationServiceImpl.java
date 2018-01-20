@@ -85,9 +85,6 @@ public class UserRelationServiceImpl implements UserRelationService{
             this.setRelationMapping(sourceDto,targetDto,event);
 
             /**
-             *
-             * 指定方式 入库存储
-             *
              * 用户第一次建立关系，采用DB存储，保证实时准确唯一性，
              * 后续采用MQ消息方式
              */
@@ -101,7 +98,6 @@ public class UserRelationServiceImpl implements UserRelationService{
                 sourceDto.setLastUpdateUserId(targetUserId);
 
                 sourceDto.setKid(System.currentTimeMillis());
-//                sourceDto.setKid(idAPI.getKid("user_relation"));
                 userRelationDao.insert(sourceDto);
             }else{
                 userRelationCacheDao.sendMQ(sourceDto);
@@ -111,14 +107,17 @@ public class UserRelationServiceImpl implements UserRelationService{
              * 只有关注，取消关注的时候，并且target关系存在的情况下，才涉及到target数据更新
              * 更新好友关系
              */
+
             if(!targetDto.isNewRecord()&&
                     (UserRelationApi.EVENT.SET_FOLLOW == event || UserRelationApi.EVENT.CANCEL_FOLLOW == event)){
                 targetDto.setLastUpdateUserId(sourceUserId);
+
                 userRelationCacheDao.sendMQ(targetDto);
+                userRelationCacheDao.setUserRelation(targetDto);
             }
 
             //同步单向关系至redis
-            userRelationCacheDao.setUserRelation(sourceDto,targetDto);
+            userRelationCacheDao.setUserRelation(sourceDto);
 
         }catch (Exception e){
             throw new RuntimeException(e);
@@ -211,6 +210,8 @@ public class UserRelationServiceImpl implements UserRelationService{
             if(YES == targetDto.getFollowStatus()){
                 targetDto.setFriendStatus(YES);
                 sourceDto.setFriendStatus(YES);
+            }else{
+                sourceDto.setFriendStatus(NO);
             }
             sourceDto.setBlackStatus(UserRelationApi.NO);
             sourceDto.setFollowStatus(YES);
