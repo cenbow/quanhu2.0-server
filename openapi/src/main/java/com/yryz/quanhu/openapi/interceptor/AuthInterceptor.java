@@ -8,11 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.Annotation.Login;
+import com.yryz.common.Annotation.NotLogin;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
@@ -47,6 +50,16 @@ public class AuthInterceptor extends HandlerInterceptorAdapter implements Handle
 			return false;
 		}
 		try {
+			if(handler instanceof HandlerMethod){
+				Login login = ((HandlerMethod)handler).getMethodAnnotation(Login.class);
+				if(login != null){ //如果自带notLogin方法，就不检查登录状态
+				} else {
+					NotLogin notLogin = ((HandlerMethod)handler).getMethodAnnotation(NotLogin.class);
+					if(notLogin != null){ //如果自带notLogin方法，就不检查登录状态
+						return false;
+					}
+				}
+			}
 			checkToken(request);
 		} catch (QuanhuException e) {
 			PrintWriter out = response.getWriter();
@@ -83,18 +96,13 @@ public class AuthInterceptor extends HandlerInterceptorAdapter implements Handle
 			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 		}
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
-		if (devType == DevType.ANDROID || devType == DevType.IOS) {
-			if (StringUtils.isBlank(header.getRefreshToken())) {
-				throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
-			}
-		}
 		Integer checkEnum = TokenCheckEnum.SUCCESS.getStatus();
 		try {
-			if (StringUtils.isBlank(header.getRefreshToken())) {
+			if (devType != DevType.ANDROID && devType != DevType.IOS) {
 				AuthTokenDTO tokenDTO = new AuthTokenDTO(userId, devType, header.getAppId(),header.getToken());
 				checkEnum = authAPi.checkToken(tokenDTO).getData();
 			} else {
-				AuthRefreshDTO refreshDTO = new AuthRefreshDTO(header.getRefreshToken(), false);
+				AuthRefreshDTO refreshDTO = new AuthRefreshDTO(null, false);
 				refreshDTO.setAppId(header.getAppId());
 				refreshDTO.setUserId(userId);
 				refreshDTO.setType(devType);

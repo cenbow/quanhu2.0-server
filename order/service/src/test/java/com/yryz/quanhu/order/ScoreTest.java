@@ -17,9 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * @author syc
@@ -59,7 +59,7 @@ public class ScoreTest {
     public void getScoreFlowList() {
         EventInfo info = new EventInfo();
         info.setCustId("21b32tixua");
-        List<ScoreFlow>   list =   eventAPI.getScoreFlowList(info);
+        List<EventReportVo>   list =   eventAPI.getScoreFlowList(info);
 
         System.out.println("ScoreFlow list: "+list.size());
     }

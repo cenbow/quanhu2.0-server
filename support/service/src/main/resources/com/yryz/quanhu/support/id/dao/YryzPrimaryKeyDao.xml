@@ -16,12 +16,12 @@
 
 	<select id="getPrimaryKey" resultMap="BaseResultMap">
 		SELECT <include refid="Base_Column_List"/>
-		FROM quanhu_code
+		FROM qh_code
 		WHERE primary_name = #{type}
 	</select>
 
 	<update id="updatePrimaryKey">
-		UPDATE quanhu_code
+		UPDATE qh_code
 		SET current_value = #{currentValue} + #{step}
 		WHERE primary_name =
 		#{primaryName}
@@ -30,7 +30,7 @@
 
 
 	<insert id="insertPrimaryKey" parameterType="com.yryz.quanhu.support.id.entity.PrimaryKey">
-		insert into quanhu_code (
+		insert into qh_code (
 		`primary_name`,
 		`current_value`,
 		`step`

@@ -1,7 +1,8 @@
 package com.yryz.quanhu.message;
 
-import com.yryz.quanhu.message.api.PushAPI;
-import com.yryz.quanhu.message.entity.PushReqVo;
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.quanhu.message.push.api.PushAPI;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,7 @@ public class PushAPITest {
     public void commonSendAliasTest() {
         PushReqVo pushReqVo = new PushReqVo();
         List<String> usrIds = Lists.newArrayList();
-        usrIds.add("123456");
+        usrIds.add("626942183000989696");
         pushReqVo.setCustIds(usrIds);
         pushReqVo.setMsg("test");
         pushReqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);

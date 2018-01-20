@@ -11,8 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
-import com.yryz.quanhu.message.entity.PushReqVo;
-import com.yryz.quanhu.message.entity.PushReqVo.CommonPushType;
+import com.yryz.quanhu.message.push.entity.PushReqVo.CommonPushType;
 import com.yryz.quanhu.message.push.constants.AmqpConstants;
 import com.yryz.quanhu.message.push.entity.PushParamsDTO;
 import com.yryz.quanhu.message.push.service.JPushService;
@@ -28,7 +27,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhangkun

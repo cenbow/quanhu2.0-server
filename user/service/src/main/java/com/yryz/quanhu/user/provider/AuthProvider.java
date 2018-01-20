@@ -62,12 +62,6 @@ public class AuthProvider implements AuthApi {
 	public Response<Integer> checkToken(AuthRefreshDTO refreshDTO) {
 		try {
 			checkParam(refreshDTO);
-			if (StringUtils.isBlank(refreshDTO.getToken())) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"token不能为空");
-			}
-			if (StringUtils.isBlank(refreshDTO.getRefreshToken())) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"refreshToken不能为空");
-			}
 			return ResponseUtils.returnObjectSuccess(authService.checkToken(refreshDTO).getStatus());
 		} catch (RedisOptException e) {
 			return ResponseUtils.returnException(e);

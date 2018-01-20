@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserRegLogDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserRegLog" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="kid" property="kid" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="app_channel" property="appChannel" jdbcType="VARCHAR" />
+    <result column="app_version" property="appVersion" jdbcType="VARCHAR" />
+    <result column="reg_type" property="regType" jdbcType="VARCHAR" />
+    <result column="dev_type" property="devType" jdbcType="VARCHAR" />
+    <result column="dev_name" property="devName" jdbcType="VARCHAR" />
+    <result column="app_id" property="appId" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="activity_channel_code" property="activityChannelCode" jdbcType="VARCHAR" />
+    <result column="channel_code" property="channelCode" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, kid, user_id, app_channel, app_version, reg_type, dev_type, dev_name, app_id, 
+    ip, location, activity_channel_code, channel_code, create_date, last_update_date
+  </sql>
+  
+<!--   <select id="selectByParams" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from qh_user_reg_log
+    where 1=1
+    <if test="channelCode ! = null">
+    	and channel_code like CONCAT('%',#{channelCode},'%')
+    </if>
+    <if test="userIds != null">
+    	and user_id in
+		<foreach item="item" index="index" collection="userIds" open="("
+					separator="," close=")">
+			#{item}
+		</foreach>
+    </if>
+    <if test="startDate != null">
+    	and create_date &gt; #{createDate}
+    </if>
+     <if test="endDate != null">
+    	and end_date &lt; #{endDate}
+    </if>
+  </select> -->
+  
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserRegLog" >
+    insert into qh_user_reg_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="appChannel != null" >
+        app_channel,
+      </if>
+      <if test="appVersion != null" >
+        app_version,
+      </if>
+      <if test="regType != null" >
+        reg_type,
+      </if>
+      <if test="devType != null" >
+        dev_type,
+      </if>
+      <if test="devName != null" >
+        dev_name,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="location != null" >
+        location,
+      </if>
+      <if test="activityChannelCode != null" >
+        activity_channel_code,
+      </if>
+      <if test="channelCode != null" >
+        channel_code,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="kid != null" >
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="appChannel != null" >
+        #{appChannel,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null" >
+        #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="regType != null" >
+        #{regType,jdbcType=VARCHAR},
+      </if>
+      <if test="devType != null" >
+        #{devType,jdbcType=VARCHAR},
+      </if>
+      <if test="devName != null" >
+        #{devName,jdbcType=VARCHAR},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null" >
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="activityChannelCode != null" >
+        #{activityChannelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelCode != null" >
+        #{channelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -9,8 +9,8 @@ package com.yryz.quanhu.message.push.service;
 
 
 
-import com.yryz.quanhu.message.entity.PushReceived;
-import com.yryz.quanhu.message.entity.PushReqVo;
+import com.yryz.quanhu.message.push.entity.PushReceived;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
 
 import java.util.List;
 

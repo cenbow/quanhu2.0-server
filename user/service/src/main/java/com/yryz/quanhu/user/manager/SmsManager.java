@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.quanhu.commonsafe.api.CommonSafeApi;
-import com.yryz.quanhu.commonsafe.constants.CommonServiceType;
-import com.yryz.quanhu.commonsafe.dto.VerifyCodeDTO;
-import com.yryz.quanhu.commonsafe.vo.VerifyCodeVO;
+import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
+import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
+import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
+import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 

@@ -417,6 +417,9 @@ public class UserServiceImpl implements UserService {
 		baseInfo.setKid(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO));
 		baseInfo.setCreateDate(new Date());
 		baseInfo.setBanPostTime(new Date());
+		baseInfo.setUserAge((byte)18);
+		baseInfo.setUserBirthday("");
+		baseInfo.setUserGenders((byte)10);
 		baseInfo.setUserDesc("");
 		custbaseinfoDao.insert(baseInfo);
 		// 异步上传二维码

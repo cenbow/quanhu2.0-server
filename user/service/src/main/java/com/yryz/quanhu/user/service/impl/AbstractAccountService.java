@@ -404,6 +404,8 @@ public class AbstractAccountService implements AccountService {
 	 */
 	public void saveLoginLog(UserLoginLog loginLog) {
 		loginLog.setCreateDate(new Date());
+		loginLog.setLoginX(0l);
+		loginLog.setLoginY(0l);
 		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG));
 		try {
 			logDao.insert(loginLog);

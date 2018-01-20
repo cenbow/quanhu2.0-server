@@ -17,13 +17,13 @@ import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.configuration.AuthConfig;
 import com.yryz.quanhu.user.contants.TokenCheckEnum;
 import com.yryz.quanhu.user.dao.AuthRedisDao;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
 import com.yryz.quanhu.user.service.AuthService;
 import com.yryz.quanhu.user.utils.TokenUtils;
-import com.yryz.quanhu.user.vo.AuthConfig;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
 
 /**
@@ -38,7 +38,9 @@ public class AuthServiceImpl implements AuthService {
 
 	@Autowired
 	private AuthRedisDao redisDao;
-
+	@Autowired
+	private AuthConfig authConfig;
+	
 	@Override
 	public TokenCheckEnum checkToken(AuthTokenDTO tokenDTO) {
 		String token = null;
@@ -96,12 +98,16 @@ public class AuthServiceImpl implements AuthService {
 			if (System.currentTimeMillis() < tokenVO.getExpireAt()) {
 				return TokenCheckEnum.SUCCESS;
 			} else {
-				// 校验长期token
-				if (StringUtils.equals(refreshToken, tokenVO.getRefreshToken())
-						&& System.currentTimeMillis() < tokenVO.getRefreshExpireAt()) {
-					return TokenCheckEnum.EXPIRE;
+				// refreshToken存在时，校验长期token，否则判断token为过期
+				if(StringUtils.isBlank(refreshToken)){
+					if (StringUtils.equals(refreshToken, tokenVO.getRefreshToken())
+							&& System.currentTimeMillis() < tokenVO.getRefreshExpireAt()) {
+						return TokenCheckEnum.EXPIRE;
+					} else {
+						return TokenCheckEnum.ERROR;
+					}
 				} else {
-					return TokenCheckEnum.ERROR;
+					return TokenCheckEnum.EXPIRE;
 				}
 			}
 		} else {
@@ -113,7 +119,6 @@ public class AuthServiceImpl implements AuthService {
 	public AuthTokenVO getToken(AuthTokenDTO tokenDTO) {
 		String token = null;
 		// 拿配置
-		AuthConfig authConfig = new AuthConfig(2, 24, 30);
 		Long expireAt = authConfig.getWebTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
 		AuthTokenVO tokenVO;
 		tokenVO = redisDao.getToken(tokenDTO);
@@ -142,7 +147,7 @@ public class AuthServiceImpl implements AuthService {
 		String token = null;
 		String refreshToken = null;
 		// 拿配置
-		AuthConfig authConfig = new AuthConfig(2, 24, 30);
+		
 		Long expireAt = authConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
 		Long refreshExpireAt = authConfig.getRefreshExpire().longValue() * 3600 * 24 * 1000 + System.currentTimeMillis();
 		System.out.println("expireAt="+expireAt);
