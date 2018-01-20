@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.yryz.quanhu.order.score.manage.service.ScoreEventManageService;
@@ -38,8 +39,8 @@ public class ScoreEventConsumer   {
 //    ShardedRedisPool shardedRedisPool;
     
     // RedisTemplate 含有泛型,无法使用 @Autowired by type 注入,只能使用@Resource by name注入
-    @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
     
 	@Autowired
 	private RabbitTemplate rabbitTemplate; 
@@ -69,8 +70,6 @@ public class ScoreEventConsumer   {
         // 积分事件关注点： eventCode , custId
         String eventCode = data.get("eventCode");
         String custId = data.get("custId");
-        
-        
         if (StringUtils.isBlank(custId)) {
             logger.info("-------处理积分事件，结果：直接丢掉消息，原因：custId为空 , 传入数据：" + data.toString());
             return;
@@ -90,7 +89,6 @@ public class ScoreEventConsumer   {
             	//业务本身需要传入amount的场景不多，不做处理
             }
             String eventType = sei.getEventType();
-
            // ShardedJedis jedis = shardedRedisPool.getSession("EVENT");
             try {
                 ScoreTypeEnum ste = null;

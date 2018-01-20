@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.resource.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,25 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * 添加用户
+	 * @param resource
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceConvertService#addUser(com.yryz.quanhu.resource.vo.ResourceVo)
+	 */
+	@Override
+	public ResourceVo addUser(ResourceVo resource) {
+		if(resource != null){
+			List<ResourceVo> list = new ArrayList<>();
+			list.add(resource);
+			list = addUser(list);
+			if(CollectionUtils.isNotEmpty(list)){
+				return list.get(0);
+			}
+		}
+		return null;
 	}
 
 }

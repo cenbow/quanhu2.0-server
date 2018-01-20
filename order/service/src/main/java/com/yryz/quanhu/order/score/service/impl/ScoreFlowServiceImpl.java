@@ -34,8 +34,8 @@ public class ScoreFlowServiceImpl implements ScoreFlowService {
 	}
 
 	@Override
-	public List<ScoreFlow> getAll() {
-		return scoreFlowDao.getAll();
+	public List<ScoreFlow> getAll(String custId) {
+		return scoreFlowDao.getAll(custId);
 	}
 
 	@Override
