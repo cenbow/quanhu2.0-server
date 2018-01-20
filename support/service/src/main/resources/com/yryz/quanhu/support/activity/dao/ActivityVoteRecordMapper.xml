@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.support.activity.dao.ActivityVoteRecordDao">
+
+	<!--Base_Column_List-->
+	<sql id="Base_Column_List">id,kid,activity_info_id,candidate_id,vote_no,other_flag,create_date,create_user_id,last_update_date,free_vote_flag
+    </sql>
+
+     <!-- 查询ActivityVoteRecord详情 -->
+    <select id="selectByKid" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteRecordVo" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_activity_vote_record
+        where del_flag = 0
+		and kid = #{kid,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 删除ActivityVoteRecord-->
+    <delete id="delete" parameterType="java.lang.Long">
+   	 	delete from qh_activity_vote_record
+    	where kid = #{kid,jdbcType=BIGINT}
+    </delete>
+
+  	<!-- 新增ActivityVoteRecord-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteRecord">
+	    insert into qh_activity_vote_record (kid,activity_info_id,candidate_id,vote_no,other_flag,create_user_id,free_vote_flag)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{activityInfoId,jdbcType=BIGINT}
+				,#{candidateId,jdbcType=BIGINT}
+				,#{voteNo,jdbcType=INTEGER}
+				,#{otherFlag,jdbcType=TINYINT}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{freeVoteFlag,jdbcType=TINYINT}
+	    )
+	</insert>
+	
+	<!--按需新增ActivityVoteRecord-->
+    <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id"  parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteRecord">
+	    insert into qh_activity_vote_record 
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="activityInfoId != null">
+			activity_info_id,
+	    </if>
+        <if test="candidateId != null">
+			candidate_id,
+	    </if>
+        <if test="voteNo != null">
+			vote_no,
+	    </if>
+        <if test="otherFlag != null">
+			other_flag,
+	    </if>
+        <if test="createDate != null">
+			create_date,
+	    </if>
+        <if test="createUserId != null">
+			create_user_id,
+	    </if>
+        <if test="lastUpdateDate != null">
+			last_update_date,
+	    </if>
+        <if test="freeVoteFlag != null">
+			free_vote_flag,
+	    </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="activityInfoId != null">
+			#{activityInfoId,jdbcType=BIGINT},
+	    </if>
+        <if test="candidateId != null">
+			#{candidateId,jdbcType=BIGINT},
+	    </if>
+        <if test="voteNo != null">
+			#{voteNo,jdbcType=INTEGER},
+	    </if>
+        <if test="otherFlag != null">
+			#{otherFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="createDate != null">
+			#{createDate,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="createUserId != null">
+			#{createUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="lastUpdateDate != null">
+			#{lastUpdateDate,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="freeVoteFlag != null">
+			#{freeVoteFlag,jdbcType=TINYINT},
+	    </if>
+	    </trim>
+	</insert>
+	
+	
+	<!-- 按需修改ActivityVoteRecord-->   
+    <update id="update" parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteRecord">
+        update qh_activity_vote_record
+        <set>
+             <if test="kid != null">
+    			kid = #{kid,jdbcType=BIGINT},
+    		</if>
+             <if test="activityInfoId != null">
+    			activity_info_id = #{activityInfoId,jdbcType=BIGINT},
+    		</if>
+             <if test="candidateId != null">
+    			candidate_id = #{candidateId,jdbcType=BIGINT},
+    		</if>
+             <if test="voteNo != null">
+    			vote_no = #{voteNo,jdbcType=INTEGER},
+    		</if>
+             <if test="otherFlag != null">
+    			other_flag = #{otherFlag,jdbcType=TINYINT},
+    		</if>
+             <if test="createUserId != null">
+    			create_user_id = #{createUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="freeVoteFlag != null">
+    			free_vote_flag = #{freeVoteFlag,jdbcType=TINYINT},
+    		</if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+</mapper>

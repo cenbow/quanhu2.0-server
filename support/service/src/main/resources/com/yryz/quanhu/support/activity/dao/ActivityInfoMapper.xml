@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.support.activity.dao.ActivityInfoDao">
+
+	<!--Base_Column_List-->
+	<sql id="Base_Column_List">id,kid,title,content,content_sources,cover_plan,activity_type,online_time,begin_time,end_time,recommend,recommend_date,remark,sort,join_count,shelve_flag,create_date,create_user_id,last_update_date,last_update_user_id,prizes_announcement_flag,prizes_sources,introduce_sources,activity_channel_code,module_enum
+    </sql>
+
+     <!-- 查询ActivityInfo详情 -->
+    <select id="selectByKid" resultType="com.yryz.quanhu.support.activity.vo.ActivityInfoVo" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_activity_info
+        where del_flag = 0
+		and kid = #{kid,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 删除ActivityInfo-->
+    <delete id="delete" parameterType="java.lang.Long">
+   	 	delete from qh_activity_info
+    	where kid = #{kid,jdbcType=BIGINT}
+    </delete>
+  
+  	<!-- 新增ActivityInfo-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo">
+	    insert into qh_activity_info (kid,title,content,content_sources,cover_plan,activity_type,online_time,begin_time,end_time,recommend,recommend_date,remark,sort,join_count,shelve_flag,create_user_id,last_update_user_id,prizes_announcement_flag,prizes_sources,introduce_sources,activity_channel_code,module_enum)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{title,jdbcType=VARCHAR}
+				,#{content,jdbcType=VARCHAR}
+				,#{contentSources,jdbcType=VARCHAR}
+				,#{coverPlan,jdbcType=VARCHAR}
+				,#{activityType,jdbcType=TINYINT}
+				,#{onlineTime,jdbcType=TIMESTAMP}
+				,#{beginTime,jdbcType=TIMESTAMP}
+				,#{endTime,jdbcType=TIMESTAMP}
+				,#{recommend,jdbcType=TINYINT}
+				,#{recommendDate,jdbcType=TIMESTAMP}
+				,#{remark,jdbcType=VARCHAR}
+				,#{sort,jdbcType=INTEGER}
+				,#{joinCount,jdbcType=INTEGER}
+				,#{shelveFlag,jdbcType=TINYINT}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{lastUpdateUserId,jdbcType=BIGINT}
+				,#{prizesAnnouncementFlag,jdbcType=TINYINT}
+				,#{prizesSources,jdbcType=VARCHAR}
+				,#{introduceSources,jdbcType=VARCHAR}
+				,#{activityChannelCode,jdbcType=VARCHAR}
+				,#{moduleEnum,jdbcType=VARCHAR}
+	    )
+	</insert>
+	
+	<!--按需新增ActivityInfo-->
+    <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo">
+	    insert into qh_activity_info 
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="title != null and title != ''">
+			title,
+	    </if>
+        <if test="content != null and content != ''">
+			content,
+	    </if>
+        <if test="contentSources != null and contentSources != ''">
+			content_sources,
+	    </if>
+        <if test="coverPlan != null and coverPlan != ''">
+			cover_plan,
+	    </if>
+        <if test="activityType != null">
+			activity_type,
+	    </if>
+        <if test="onlineTime != null">
+			online_time,
+	    </if>
+        <if test="beginTime != null">
+			begin_time,
+	    </if>
+        <if test="endTime != null">
+			end_time,
+	    </if>
+        <if test="recommend != null">
+			recommend,
+	    </if>
+        <if test="recommendDate != null">
+			recommend_date,
+	    </if>
+        <if test="remark != null and remark != ''">
+			remark,
+	    </if>
+        <if test="sort != null">
+			sort,
+	    </if>
+        <if test="joinCount != null">
+			join_count,
+	    </if>
+        <if test="shelveFlag != null">
+			shelve_flag,
+	    </if>
+        <if test="createUserId != null">
+			create_user_id,
+	    </if>
+        <if test="lastUpdateUserId != null">
+			last_update_user_id,
+	    </if>
+        <if test="prizesAnnouncementFlag != null">
+			prizes_announcement_flag,
+	    </if>
+        <if test="prizesSources != null and prizesSources != ''">
+			prizes_sources,
+	    </if>
+        <if test="introduceSources != null and introduceSources != ''">
+			introduce_sources,
+	    </if>
+        <if test="activityChannelCode != null and activityChannelCode != ''">
+			activity_channel_code,
+	    </if>
+        <if test="moduleEnum != null and moduleEnum != ''">
+			module_enum,
+	    </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="title != null and title != ''">
+			#{title,jdbcType=VARCHAR},
+	    </if>
+        <if test="content != null and content != ''">
+			#{content,jdbcType=VARCHAR},
+	    </if>
+        <if test="contentSources != null and contentSources != ''">
+			#{contentSources,jdbcType=VARCHAR},
+	    </if>
+        <if test="coverPlan != null and coverPlan != ''">
+			#{coverPlan,jdbcType=VARCHAR},
+	    </if>
+        <if test="activityType != null">
+			#{activityType,jdbcType=TINYINT},
+	    </if>
+        <if test="onlineTime != null">
+			#{onlineTime,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="beginTime != null">
+			#{beginTime,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="endTime != null">
+			#{endTime,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="recommend != null">
+			#{recommend,jdbcType=TINYINT},
+	    </if>
+        <if test="recommendDate != null">
+			#{recommendDate,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="remark != null and remark != ''">
+			#{remark,jdbcType=VARCHAR},
+	    </if>
+        <if test="sort != null">
+			#{sort,jdbcType=INTEGER},
+	    </if>
+        <if test="joinCount != null">
+			#{joinCount,jdbcType=INTEGER},
+	    </if>
+        <if test="shelveFlag != null">
+			#{shelveFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="createUserId != null">
+			#{createUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="lastUpdateUserId != null">
+			#{lastUpdateUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="prizesAnnouncementFlag != null">
+			#{prizesAnnouncementFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="prizesSources != null and prizesSources != ''">
+			#{prizesSources,jdbcType=VARCHAR},
+	    </if>
+        <if test="introduceSources != null and introduceSources != ''">
+			#{introduceSources,jdbcType=VARCHAR},
+	    </if>
+        <if test="activityChannelCode != null and activityChannelCode != ''">
+			#{activityChannelCode,jdbcType=VARCHAR},
+	    </if>
+        <if test="moduleEnum != null and moduleEnum != ''">
+			#{moduleEnum,jdbcType=VARCHAR},
+	    </if>
+	    </trim>
+	</insert>
+
+	<!-- 按需修改ActivityInfo-->   
+    <update id="update" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo">
+        update qh_activity_info
+        <set>
+            <if test="title != null and title != ''">
+    			title = #{title,jdbcType=VARCHAR},
+    		</if>
+            <if test="content != null and content != ''">
+    			content = #{content,jdbcType=VARCHAR},
+    		</if>
+            <if test="contentSources != null and contentSources != ''">
+    			content_sources = #{contentSources,jdbcType=VARCHAR},
+    		</if>
+            <if test="coverPlan != null and coverPlan != ''">
+    			cover_plan = #{coverPlan,jdbcType=VARCHAR},
+    		</if>
+             <if test="activityType != null">
+    			activity_type = #{activityType,jdbcType=TINYINT},
+    		</if>
+             <if test="onlineTime != null">
+    			online_time = #{onlineTime,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="beginTime != null">
+    			begin_time = #{beginTime,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="endTime != null">
+    			end_time = #{endTime,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="recommend != null">
+    			recommend = #{recommend,jdbcType=TINYINT},
+    		</if>
+             <if test="recommendDate != null">
+    			recommend_date = #{recommendDate,jdbcType=TIMESTAMP},
+    		</if>
+            <if test="remark != null and remark != ''">
+    			remark = #{remark,jdbcType=VARCHAR},
+    		</if>
+             <if test="sort != null">
+    			sort = #{sort,jdbcType=INTEGER},
+    		</if>
+             <if test="joinCount != null">
+    			join_count = #{joinCount,jdbcType=INTEGER},
+    		</if>
+             <if test="shelveFlag != null">
+    			shelve_flag = #{shelveFlag,jdbcType=TINYINT},
+    		</if>
+             <if test="createUserId != null">
+    			create_user_id = #{createUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="lastUpdateUserId != null">
+    			last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="prizesAnnouncementFlag != null">
+    			prizes_announcement_flag = #{prizesAnnouncementFlag,jdbcType=TINYINT},
+    		</if>
+            <if test="prizesSources != null and prizesSources != ''">
+    			prizes_sources = #{prizesSources,jdbcType=VARCHAR},
+    		</if>
+            <if test="introduceSources != null and introduceSources != ''">
+    			introduce_sources = #{introduceSources,jdbcType=VARCHAR},
+    		</if>
+            <if test="activityChannelCode != null and activityChannelCode != ''">
+    			activity_channel_code = #{activityChannelCode,jdbcType=VARCHAR},
+    		</if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+    			module_enum = #{moduleEnum,jdbcType=VARCHAR},
+    		</if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+</mapper>
