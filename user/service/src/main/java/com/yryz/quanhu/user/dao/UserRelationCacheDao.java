@@ -116,6 +116,11 @@ public class UserRelationCacheDao {
         return "relation/"+sourceUserId+"/"+targetUserId;
     }
 
+    public static String getCacheTotalKey(String userId){
+        return "total/"+userId;
+    }
+
+
     public void setUserRelation(UserRelationDto dto){
 
         RedisTemplate<String,UserRelationEntity> redisTemplate =
@@ -133,6 +138,11 @@ public class UserRelationCacheDao {
         BeanUtils.copyProperties(entity,dto);
 
         redisTemplate.opsForValue().set(sourceKey,entity,expireDays, TimeUnit.DAYS);
+
+        /**
+         * 有修改关系的时候，同步刷新统计信息
+         */
+
 
     }
 
@@ -212,38 +222,53 @@ public class UserRelationCacheDao {
     public UserRelationCountDto totalBy(String userKid) {
 
         UserRelationCountDto dto = new UserRelationCountDto();
-        //分组条件
-        GroupBy groupBy = new GroupBy("follow_status","black_status","friend_status");
-        //查询当前用户
-        GroupByResults<HashMap> sourceResults =
-                mongoTemplate.group(Criteria.where("source_user_id").is(userKid),TABLE_NAME,groupBy, HashMap.class);
-        Iterator<HashMap> sourceIterator = sourceResults.iterator();
-        while(sourceIterator.hasNext()){
+//        /**
+//         * 查询redis缓存是否为最新数据
+//         *
+//         * 不是则从mongo中统计，刷新至redis
+//         */
+//        String key = getCacheTotalKey(userKid);
+//        RedisTemplate<String,UserRelationCountDto> redisTemplate =
+//                redisTemplateBuilder.buildRedisTemplate(UserRelationCountDto.class);
+//        dto = redisTemplate.opsForValue().get(key);
+//        if(null != dto && !dto.isNewRecord()){
+//            return dto;
+//        }
 
-            HashMap map = sourceIterator.next();
-            String followCount = (String) map.get("follow_status");
-            String blackStatus = (String) map.get("black_status");
-            String friendStatus = (String) map.get("friend_status");
+        /**
+         * 查询mongo进行统计
+         */
 
-            dto.setFollowCount(StringUtils.isBlank(followCount)?0:Long.parseLong(followCount));
-            dto.setToBlackCount(StringUtils.isBlank(blackStatus)?0:Long.parseLong(blackStatus));
-            dto.setFriendCount(StringUtils.isBlank(friendStatus)?0:Long.parseLong(friendStatus));
+        //关注数
+        Query query = this.buildQuery(userKid, UserRelationApi.STATUS.FOLLOW);
+        long count = mongoTemplate.count(query,TABLE_NAME);
+        dto.setFollowCount(count);
 
-        }
+        //黑名单数
+        query = this.buildQuery(userKid, UserRelationApi.STATUS.TO_BLACK);
+        count = mongoTemplate.count(query,TABLE_NAME);
+        dto.setToBlackCount(count);
 
-        //目标用户
-        GroupByResults<HashMap> targetResults =
-                mongoTemplate.group(Criteria.where("target_user_id").is(userKid),TABLE_NAME,groupBy, HashMap.class);
-        Iterator<HashMap> targetIterator = sourceResults.iterator();
-        while(targetIterator.hasNext()){
+        //好友数
+        query = this.buildQuery(userKid, UserRelationApi.STATUS.FRIEND);
+        count = mongoTemplate.count(query,TABLE_NAME);
+        dto.setFriendCount(count);
 
-            HashMap map = targetIterator.next();
-            String followCount = (String) map.get("follow_status");
-            String blackStatus = (String) map.get("black_status");
+        //粉丝数
+        query = this.buildQuery(userKid, UserRelationApi.STATUS.FANS);
+        count = mongoTemplate.count(query,TABLE_NAME);
+        dto.setFansCount(count);
 
-            dto.setFansCount(StringUtils.isBlank(followCount)?0:Long.parseLong(followCount));
-            dto.setFromBlackCount(StringUtils.isBlank(blackStatus)?0:Long.parseLong(blackStatus));
-        }
+        //被拉黑数
+        query = this.buildQuery(userKid, UserRelationApi.STATUS.FROM_BLACK);
+        count = mongoTemplate.count(query,TABLE_NAME);
+        dto.setFromBlackCount(count);
+
+//        /**
+//         * 设置成新数据，刷新至redis
+//         */
+//        dto.setNewRecord(true);
+//        redisTemplate.opsForValue().set(key,dto,expireDays);
 
         return dto;
     }
