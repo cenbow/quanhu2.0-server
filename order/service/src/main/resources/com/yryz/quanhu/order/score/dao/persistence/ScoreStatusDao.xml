@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.score.dao.persistence.ScoreStatusDao">
+
+   <sql id="columns">
+   	    id as id,
+   		cust_id as custId,
+		event_code as eventCode,
+		circle_id as circleId,
+		event_count as eventCount,
+		create_time as createTime,
+		update_time as updateTime
+	</sql>
+
+	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.order.score.entity.ScoreStatus">
+		insert into score_status (cust_id , circle_id , event_code , event_count , create_time , update_time)
+		values (#{custId} , #{circleId} , #{eventCode} , #{eventCount} , #{createTime} , #{updateTime})
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.score.entity.ScoreStatus">
+		update score_status set event_count = #{eventCount} , update_time = #{updateTime} 
+		where cust_id = #{custId} and event_code = #{eventCode} and
+		DATE_FORMAT(#{createTime} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
+	</update>
+	
+	<select id="getByCode" resultType="com.yryz.quanhu.order.score.entity.ScoreStatus">
+		select <include refid="columns" />  from score_status where cust_id = #{custId} and event_code = #{eventCode} and
+		DATE_FORMAT(#{createDate} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
+	</select>
+
+</mapper>

@@ -13,6 +13,12 @@
 
     <dependencies>
         <!--项目内部依赖-->
+        <!-- 项目内部依赖 -->
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>coterie-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>dymaic-api</artifactId>

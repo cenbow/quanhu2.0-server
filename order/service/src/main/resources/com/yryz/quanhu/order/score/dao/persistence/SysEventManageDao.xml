@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.score.dao.persistence.SysEventManageDao">
+
+	<sql id="columns">
+		 id as id ,
+		 event_code as eventCode  ,
+		 event_type as  eventType  ,
+		 event_name as  eventName  ,
+		 create_time as  createTime ,
+		 update_time as  updateTime 
+	</sql>
+
+
+	<!-- 新增系统事件 -->
+	<insert id="saveSysEvent" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.score.entity.SysEventInfo">
+		INSERT INTO event_sys(
+		event_code,
+		event_type,
+		event_name,
+		create_time,
+		update_time
+		) VALUES (
+		#{eventCode},
+		#{eventType},
+		#{eventName},
+		#{createTime},
+		#{updateTime}
+		)
+	</insert>
+	
+	<!-- 按事件编码获取系统事件 -->
+	<select id="getByCode" resultType="com.yryz.quanhu.score.entity.SysEventInfo">
+		select <include refid="columns" /> from event_sys where event_code = #{eventCode}
+	</select>
+	
+	<select id="getById" resultType="com.yryz.quanhu.score.entity.SysEventInfo">
+		select <include refid="columns" /> from event_sys where id = #{id}
+	</select>
+	
+	<select id="getAll" resultType="com.yryz.quanhu.score.entity.SysEventInfo">
+		select <include refid="columns" /> from event_sys
+	</select>
+	
+	<!-- 更新系统 事件 -->
+	<update id="updateSysEvent" parameterType="com.yryz.quanhu.score.entity.SysEventInfo">
+		UPDATE event_sys 
+		<trim prefix="set" prefixOverrides=",">
+			<if test="eventType != null">
+				event_type = #{eventType},
+			</if>
+			<if test="eventName != null">
+				event_name = #{eventName},
+			</if>
+			update_time = #{updateTime}
+		</trim>
+		where id = #{id}
+	</update>
+	
+	<delete id="delById" parameterType="java.lang.Long">
+		delete from event_sys where id = #{id}
+	</delete>
+
+</mapper>
