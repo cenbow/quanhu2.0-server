@@ -12,6 +12,8 @@ import java.io.Serializable;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author yehao
  * @version 2.0
@@ -26,6 +28,7 @@ public class ResourceVo implements Serializable {
 	private static final long serialVersionUID = -8234067721074858571L;
 	
 	/** 数据id */
+	@ApiModelProperty(value="资源ID",example="resource_idaaaaa")
 	private String resourceId;
 
 	/** 发布人ID */

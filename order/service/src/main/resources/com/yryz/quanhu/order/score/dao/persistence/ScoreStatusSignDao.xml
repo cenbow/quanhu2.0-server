@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.score.dao.persistence.ScoreStatusSignDao">
+
+   <sql id="columns">
+   	    id as id,
+   		cust_id as custId,
+		event_code as eventCode,
+		last_sign_time as lastSignTime,
+		sign_count as signCount,
+		create_time as createTime,
+		update_time as updateTime
+	</sql>
+
+	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.score.vo.EventSign">
+		insert into score_status_sign (cust_id , event_code , sign_count , last_sign_time , create_time , update_time)
+		values(#{custId} , #{eventCode} , #{signCount} , #{lastSignTime} , #{createTime} , #{updateTime})
+	</insert>
+	
+	<select id="getByCode" resultType="com.yryz.quanhu.score.vo.EventSign">
+		select <include refid="columns" /> from score_status_sign where cust_id = #{custId} and event_code = #{eventCode}
+	</select>
+	
+	<update id="update" parameterType="com.yryz.quanhu.score.vo.EventSign">
+		update score_status_sign set sign_count = #{signCount} , 
+		last_sign_time = #{lastSignTime} , update_time = #{updateTime} 
+		where cust_id = #{custId} and event_code = #{eventCode}
+	</update>
+	
+</mapper>

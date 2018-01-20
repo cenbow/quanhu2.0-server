@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yryz.framework</groupId>
@@ -27,7 +25,8 @@
         <module>openapi</module>
         <module>common</module>
 		<module>demo</module>
-    </modules>
+    <module>configuration</module>
+  </modules>
 
     <!--圈乎微服务依赖先放在此处 经架构组评审后移动到parent-->
     <!--请遵循奥卡姆剃刀原则 如无充分理由禁止随意引入依赖 工具类优先使用spring自带-->
