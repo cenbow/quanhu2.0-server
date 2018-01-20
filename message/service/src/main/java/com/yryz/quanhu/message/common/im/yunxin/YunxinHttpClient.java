@@ -38,7 +38,12 @@ public class YunxinHttpClient {
 	public static final String FRIEND_UPDATE = "https://api.netease.im/nimserver/friend/update.action";
 	public static final String FRIEND_DELETE = "https://api.netease.im/nimserver/friend/delete.action";
 	public static final String FRIEND_GET = "https://api.netease.im/nimserver/friend/get.action";
-	
+
+	public static final String setSpecialRelation = "https://api.netease.im/nimserver/user/setSpecialRelation.action";
+	public static final String LIST_BLACK_AND_MUTE_LIST = "https://api.netease.im/nimserver/user/listBlackAndMuteList.action";
+
+
+
 	public static final String TEAM_ADD = "https://api.netease.im/nimserver/team/create.action";
 	public static final String TEAM_QUERY = "https://api.netease.im/nimserver/team/query.action";
 	public static final String TEAM_UPDATE = "https://api.netease.im/nimserver/team/update.action";
@@ -49,7 +54,8 @@ public class YunxinHttpClient {
 	public static final String TEAM_REMOVEMANAGER = "https://api.netease.im/nimserver/team/removeManager.action";
 	public static final String TEAM_MUTETLIST = "https://api.netease.im/nimserver/team/muteTlist.action";
 	public static final String TEAM_MUTETLISTALL = "https://api.netease.im/nimserver/team/muteTlistAll.action";
-	
+
+
 	
 	private static Logger logger = LoggerFactory.getLogger(YunxinHttpClient.class);
 	
