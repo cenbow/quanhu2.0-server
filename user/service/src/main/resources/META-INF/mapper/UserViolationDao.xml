@@ -25,7 +25,7 @@
 		resultMap="BaseResultMap">
 	select
 	<include refid="Base_Column_List" />
-	from user_violation 
+	from qh_user_violation 
 	where user_id = #{userId}
 	order by create_date desc
   </select>
@@ -34,7 +34,7 @@
 		resultMap="BaseResultMap">
 	select
 	<include refid="Base_Column_List" />
-	from user_violation 
+	from qh_user_violation 
 	where user_id = #{userId} and status = 10
 	order
 	by create_date desc
@@ -45,7 +45,7 @@
 		resultMap="BaseResultMap">
 	select
 	<include refid="Base_Column_List" />
-	from user_violation 
+	from qh_user_violation 
 	where status = 10
 	<if test="userIds != null">
 		and user_id in
@@ -70,11 +70,11 @@
   </select>  
   
   <update id="updateViolation">
-		update user_violation set status = 11 where user_id = #{userId}
+		update qh_user_violation set status = 11 where user_id = #{userId}
   </update>
   
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserViolation" >
-    insert into user_violation
+    insert into qh_user_violation
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,

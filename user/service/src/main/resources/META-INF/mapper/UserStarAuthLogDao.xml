@@ -39,13 +39,13 @@
   <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
-    from user_star_auth_log
+    from qh_user_star_auth_log
     where user_id = #{userId}
     order by create_date desc
   </select>
 
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserStarAuthLog" >
-    insert into user_star_auth_log
+    insert into qh_user_star_auth_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,

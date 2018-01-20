@@ -24,7 +24,7 @@ public class SmsDTO implements Serializable {
 	/**
 	 * 通知类短信模板id,短信验证码不用传
 	 */
-	private String msgTemplateId;
+	private Long msgTemplateId;
 	/**
 	 * 短信模板传参，根据实际申请的模板内容来设置
 	 */
@@ -46,11 +46,11 @@ public class SmsDTO implements Serializable {
 		this.smsType = smsType;
 	}
 
-	public String getMsgTemplateId() {
+	public Long getMsgTemplateId() {
 		return msgTemplateId;
 	}
 
-	public void setMsgTemplateId(String msgTemplateId) {
+	public void setMsgTemplateId(Long msgTemplateId) {
 		this.msgTemplateId = msgTemplateId;
 	}
 
@@ -94,7 +94,7 @@ public class SmsDTO implements Serializable {
 	 * @param msgTemplateId
 	 * @param smsParams
 	 */
-	public SmsDTO(String phone,String appId, SmsType smsType, String msgTemplateId, Map<String, Object> smsParams) {
+	public SmsDTO(String phone,String appId, SmsType smsType, Long msgTemplateId, Map<String, Object> smsParams) {
 		super();
 		this.phone = phone;
 		this.appId = appId;
@@ -115,9 +115,9 @@ public class SmsDTO implements Serializable {
 	 */
 	public enum SmsType{
 		/** 短信验证码 */
-		VERIFY_CODE(0),
+		VERIFY_CODE(10),
 		/** 短信通知 */
-		SMS_MSG(1);
+		SMS_MSG(11);
 		private int type;
 		
 		SmsType(int type) {

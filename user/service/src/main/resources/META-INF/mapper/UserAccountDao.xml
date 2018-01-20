@@ -22,7 +22,7 @@
 	<select id="selectOne" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_account
+		from qh_user_account
 		where del_flag = 10
 		<if test="userId != null and userId != '' ">
 			and kid = #{userId}
@@ -41,7 +41,7 @@
 	<select id="selectByPhones" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_account
+		from qh_user_account
 		where del_flag = 10
 		<if test="phones != null ">
 			and kid in
@@ -56,7 +56,7 @@
 	</select>
 
 	<insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserAccount">
-		insert into user_account
+		insert into qh_user_account
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
 				id,
@@ -118,7 +118,7 @@
 	</insert>
 
 	<update id="update" parameterType="com.yryz.quanhu.user.entity.UserAccount">
-		update user_account
+		update qh_user_account
 		<set>
 			<if test="userPhone != null">
 				user_phone = #{userPhone,jdbcType=VARCHAR},

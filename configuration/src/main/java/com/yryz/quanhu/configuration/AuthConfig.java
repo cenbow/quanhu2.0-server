@@ -5,9 +5,11 @@
  * Created on 2018年1月5日
  * Id: AuthConfigVO.java, 2018年1月5日 下午4:00:11 Administrator
  */
-package com.yryz.quanhu.user.vo;
+package com.yryz.quanhu.configuration;
 
 import java.io.Serializable;
+
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 认证配置
@@ -16,19 +18,20 @@ import java.io.Serializable;
  * @date 2018年1月5日 下午4:00:11
  */
 @SuppressWarnings("serial")
+@Configuration
 public class AuthConfig implements Serializable{
 	/**
 	 * web端token过期时间/小时
 	 */
-	private Integer webTokenExpire;
+	private Integer webTokenExpire = 2;
 	/**
 	 * app端短期token过期时间/小时
 	 */
-	private Integer tokenExpire;
+	private Integer tokenExpire = 24;
 	/**
 	 * app端长期token过期时间/天
 	 */
-	private Integer refreshExpire;
+	private Integer refreshExpire = 30;
 	public Integer getWebTokenExpire() {
 		return webTokenExpire;
 	}

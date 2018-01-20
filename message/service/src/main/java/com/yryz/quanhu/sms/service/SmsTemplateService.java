@@ -47,7 +47,7 @@ public interface SmsTemplateService {
 	 * @param id
 	 * @return
 	 */
-	public SmsTemplate get(Integer id);
+	public SmsTemplate get(Long kid);
 	
 	/**
 	 * 

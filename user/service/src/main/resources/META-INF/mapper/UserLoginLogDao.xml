@@ -22,7 +22,7 @@
     SELECT 
 		userId as userId,
 		MAX(create_date) as createDate 
-		from user_login_log 
+		from qh_user_login_log 
 		where user_id in 
 		<foreach item="item" index="index" collection="list" open="("
 			separator="," close=")">
@@ -32,7 +32,7 @@
   </select>
 
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserLoginLog" >
-    insert into user_login_log
+    insert into qh_user_login_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.sms.dao.SmsLogDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.sms.entity.SmsLog" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="kid" property="kid" jdbcType="BIGINT" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="app_key" property="appKey" jdbcType="VARCHAR" />
+    <result column="sms_channel" property="smsChannel" jdbcType="VARCHAR" />
+    <result column="sms_sign" property="smsSign" jdbcType="VARCHAR" />
+    <result column="sms_template_code" property="smsTemplateCode" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, kid, phone, type, app_key, sms_channel, sms_sign, sms_template_code, create_date, 
+    last_update_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from qh_sms_log
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <insert id="insert" parameterType="com.yryz.quanhu.sms.entity.SmsLog" >
+    insert into qh_sms_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="appKey != null" >
+        app_key,
+      </if>
+      <if test="smsChannel != null" >
+        sms_channel,
+      </if>
+      <if test="smsSign != null" >
+        sms_sign,
+      </if>
+      <if test="smsTemplateCode != null" >
+        sms_template_code,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="kid != null" >
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="appKey != null" >
+        #{appKey,jdbcType=VARCHAR},
+      </if>
+      <if test="smsChannel != null" >
+        #{smsChannel,jdbcType=VARCHAR},
+      </if>
+      <if test="smsSign != null" >
+        #{smsSign,jdbcType=VARCHAR},
+      </if>
+      <if test="smsTemplateCode != null" >
+        #{smsTemplateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

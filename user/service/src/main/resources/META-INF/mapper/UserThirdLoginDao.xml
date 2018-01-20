@@ -25,7 +25,7 @@
 	<select id="selectByThirdId" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_third_login
+		from qh_user_third_login
 		where third_id = #{thirdId} and app_id = #{appId}
 		and del_flag = 10
 	</select>
@@ -33,12 +33,12 @@
 	<select id="selectByUserId" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
-		from user_third_login
+		from qh_user_third_login
 		where user_id = #{userId} and del_flag = 10
 	</select>
 
 	<update id="delete">
-		update user_third_login set del_flag = 11
+		update qh_user_third_login set del_flag = 11
 		where 1=1
 		<if test="userId != null and userId != ''">
 			and user_id = #{userId}
@@ -53,7 +53,7 @@
 
 	<insert id="insert"
 		parameterType="com.yryz.quanhu.user.entity.UserThirdLogin">
-		insert into user_third_login
+		insert into qh_user_third_login
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
 				id,

@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
@@ -30,17 +32,17 @@ import com.yryz.quanhu.commonsafe.dto.IpLimitDTO;
 import com.yryz.quanhu.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.commonsafe.entity.VerifyCode;
 import com.yryz.quanhu.commonsafe.service.CommonSafeService;
-import com.yryz.quanhu.commonsafe.service.ConfigRemote;
 import com.yryz.quanhu.commonsafe.utils.CommonUtils;
 import com.yryz.quanhu.commonsafe.utils.DateUtils;
-import com.yryz.quanhu.commonsafe.vo.VerifyCodeConfigVO;
 import com.yryz.quanhu.commonsafe.vo.VerifyCodeVO;
 import com.yryz.quanhu.commonsafe.vo.VerifyCodeVO.VerifyStatus;
+import com.yryz.quanhu.configuration.VerifyCodeConfigVO;
 import com.yryz.quanhu.message.entity.config.IpLimitConfigVO;
 import com.yryz.quanhu.message.enums.CheckVerifyCodeReturnCode;
 import com.yryz.quanhu.sms.dto.SmsDTO;
 import com.yryz.quanhu.sms.dto.SmsDTO.SmsType;
 import com.yryz.quanhu.sms.service.SmsService;
+import com.yryz.quanhu.support.id.api.IdAPI;
 
 /**
  * 公共安全业务管理
@@ -57,8 +59,10 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	private CommonSafeRedisDao redisDao;
 	@Autowired
 	private SmsService smsService;
+	@Reference
+	private IdAPI idApi;
 	@Autowired
-	private ConfigRemote configService;
+	private VerifyCodeConfigVO configVO;
 
 	@Autowired
 	private VerifyCodeDao persistenceDao;
@@ -68,14 +72,12 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	public VerifyCodeVO getVerifyCode(VerifyCodeDTO codeDTO) {
 		String code = null;
 		VerifyStatus status = VerifyStatus.SUCCESS;
-		VerifyCodeConfigVO configVO = new VerifyCodeConfigVO();
 		try {
-			configVO = getVerifyCodeConfig(codeDTO);
 			status = checkVerifyCodeSendTime(configVO, codeDTO);
 			code = CommonUtils.getRandomNum(configVO.getCodeNum());
 			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(), codeDTO.getCommonServiceType(), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
-
+			infoModel.setKid(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE));
 			persistenceDao.insert(infoModel);
 		} catch (Exception e) {
 			Logger.error("getVerifyCode", e);
@@ -124,7 +126,6 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public String getImgVerifyCode(VerifyCodeDTO codeDTO) {
-		VerifyCodeConfigVO configVO = getVerifyCodeConfig(codeDTO);
 		String code = CommonUtils.getRandomStr(configVO.getCodeNum());
 		redisDao.saveImgCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), code, configVO);
 		return code;
@@ -132,7 +133,6 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public boolean checkImgVerifyCode(VerifyCodeDTO codeDTO) {
-		VerifyCodeConfigVO configVO = getVerifyCodeConfig(codeDTO);
 		if (!checkNeedImgCode(codeDTO, configVO) && StringUtils.isBlank(codeDTO.getVerifyCode())) {
 			return false;
 		}
@@ -160,7 +160,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public boolean checkIpLimit(IpLimitDTO dto) {
-		IpLimitConfigVO configVO = getIpLimitConfig(dto.getAppId(), dto.getServiceType());
+		IpLimitConfigVO configVO = null;//getIpLimitConfig(dto.getAppId(), dto.getServiceType());
 		int total = redisDao.getIpCount(dto.getIp(), dto.getAppId(), dto.getServiceType());
 		long lastTime = redisDao.getIpRunTime(dto.getIp(), dto.getAppId(), dto.getServiceType());
 		if (configVO.getIpLimitFlag() && total > configVO.getIpLimitMax()) {
@@ -185,13 +185,13 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		return configVO.getImgCodeNumLimit() < num;
 	}
 
-	/**
+/*	*//**
 	 * 获取ip风控配置
 	 * 
 	 * @param appId
 	 * @param serviceType
 	 * @return
-	 */
+	 *//*
 	private IpLimitConfigVO getIpLimitConfig(String appId, String serviceType) {
 		IpLimitConfigVO configVO = configService.getIpLimitConfig(appId, serviceType);
 		if (configVO == null) {
@@ -207,14 +207,14 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			throw QuanhuException.busiError("ip限制配置错误");
 		}
 		return configVO;
-	}
+	}*/
 
 	/**
 	 * 获取验证码配置
 	 * 
 	 * @param codeDTO
 	 * @return
-	 */
+	 *//*
 	private VerifyCodeConfigVO getVerifyCodeConfig(VerifyCodeDTO codeDTO) {
 		VerifyCodeConfigVO configVO = configService.getVerifyCodeConfig(codeDTO.getAppId(),
 				codeDTO.getCommonServiceType());
@@ -238,7 +238,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		}
 		return configVO;
 	}
-
+*/
 	/**
 	 * 普通验证码风控检查
 	 * 

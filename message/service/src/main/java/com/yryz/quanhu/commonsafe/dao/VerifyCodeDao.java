@@ -7,7 +7,7 @@
  */
 package com.yryz.quanhu.commonsafe.dao;
 
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import com.yryz.quanhu.commonsafe.entity.VerifyCode;
 /**
@@ -16,7 +16,7 @@ import com.yryz.quanhu.commonsafe.entity.VerifyCode;
  * @version 1.0
  * @date 2017年12月10日 上午10:33:14
  */
-@Repository
+@Mapper
 public interface VerifyCodeDao {
 	/**
 	 * 新增验证码

@@ -48,7 +48,7 @@ public class SmsProvider implements SmsApi {
 		if(StringUtils.isBlank(smsDTO.getAppId())){
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "应用id不能为空");
 		}
-		if(smsDTO.getSmsType() == SmsType.SMS_MSG && StringUtils.isBlank(smsDTO.getMsgTemplateId())){
+		if(smsDTO.getSmsType() == SmsType.SMS_MSG && smsDTO.getMsgTemplateId() == null){
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "短信通知必须填模板id");
 		}
 	}

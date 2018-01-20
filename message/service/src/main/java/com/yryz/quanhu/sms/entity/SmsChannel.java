@@ -1,132 +1,80 @@
-/**
- * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
+/*
+ * SmsChannel.java
+ * Copyright (c) 2012,融众网络技术有限公司(www.11186.com)
  * All rights reserved.
- * 
- * Created on 2017年8月10日
- * Id: SmsChannel.java, 2017年8月10日 下午5:09:48 Administrator
+ * ---------------------------------------------------------------------
+ * 2018-01-20 Created
  */
 package com.yryz.quanhu.sms.entity;
 
-import java.io.Serializable;
-import java.util.Date;
+import com.yryz.common.entity.GenericEntity;
+
 /**
- * 短信通道表
+ * 短信渠道表
  * 
- * @author danshiyu
- * @version 1.0 2017-07-24
+ * @author xxx
+ * @version 1.0 2018-01-20
  * @since 1.0
  */
 @SuppressWarnings("serial")
-public class SmsChannel implements Serializable{
+public class SmsChannel extends GenericEntity{
+
     /**
-     * 主键
+     * 短信渠道名称
      */
-    private Integer id;
+    private String smsChannelName;
+
     /**
-     * 短信通道名
+     * 短信渠道key
      */
-    private String channel;
+    private String smsAppKey;
+
     /**
-     * 短信签名
+     * 短信渠道证书
      */
-    private String smsSign;
+    private String smsAppSecret;
+
     /**
-     * 短信发送总量
+     * 操作人名称
      */
-    private Integer totalCount;
-    /**
-     * 成功总数
-     */
-    private Integer successCount;
-    /**
-     * 失败总数
-     */
-    private Integer failCount;
-    /**
-     * 创建时间
-     */
-    private Date createDate;
-    /**
-     * 更新时间
-     */
-    private Date updateDate;
-    
-    /**
-     * 短信appkey
-     */
-    private String appKey;
-    
-    /**
-     * 短信appSecret
-     */
-    private String appSecret;
-    
-    public Integer getId() {
-        return id;
+    private String operateName;
+
+    public String getSmsChannelName() {
+        return smsChannelName;
     }
-    public void setId(Integer id) {
-        this.id = id;
+
+    public void setSmsChannelName(String smsChannelName) {
+        this.smsChannelName = smsChannelName == null ? null : smsChannelName.trim();
     }
-    public String getChannel() {
-        return channel;
+
+    public String getSmsAppKey() {
+        return smsAppKey;
     }
-    public void setChannel(String channel) {
-        this.channel = channel == null ? null : channel.trim();
+
+    public void setSmsAppKey(String smsAppKey) {
+        this.smsAppKey = smsAppKey == null ? null : smsAppKey.trim();
     }
-    public String getSmsSign() {
-        return smsSign;
+
+    public String getSmsAppSecret() {
+        return smsAppSecret;
     }
-    public void setSmsSign(String smsSign) {
-        this.smsSign = smsSign == null ? null : smsSign.trim();
+
+    public void setSmsAppSecret(String smsAppSecret) {
+        this.smsAppSecret = smsAppSecret == null ? null : smsAppSecret.trim();
     }
-    public Integer getTotalCount() {
-        return totalCount;
+
+    public String getOperateName() {
+        return operateName;
     }
-    public void setTotalCount(Integer totalCount) {
-        this.totalCount = totalCount;
+
+    public void setOperateName(String operateName) {
+        this.operateName = operateName == null ? null : operateName.trim();
     }
-    public Integer getSuccessCount() {
-        return successCount;
-    }
-    public void setSuccessCount(Integer successCount) {
-        this.successCount = successCount;
-    }
-    public Integer getFailCount() {
-        return failCount;
-    }
-    public void setFailCount(Integer failCount) {
-        this.failCount = failCount;
-    }
-    public Date getCreateDate() {
-        return createDate;
-    }
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-	public String getAppKey() {
-		return appKey;
-	}
-	public void setAppKey(String appKey) {
-		this.appKey = appKey;
-	}
-	public String getAppSecret() {
-		return appSecret;
-	}
-	public void setAppSecret(String appSecret) {
-		this.appSecret = appSecret;
-	}
+
 	@Override
 	public String toString() {
-		return "SmsChannel [id=" + id + ", channel=" + channel + ", smsSign=" + smsSign + ", totalCount=" + totalCount
-				+ ", successCount=" + successCount + ", failCount=" + failCount + ", createDate=" + createDate
-				+ ", updateDate=" + updateDate + ", appKey=" + appKey + ", appSecret=" + appSecret + "]";
+		return "SmsChannel [smsChannelName=" + smsChannelName + ", smsAppKey=" + smsAppKey + ", smsAppSecret="
+				+ smsAppSecret + ", operateName=" + operateName + "]";
 	}
-    
-    
+
 }

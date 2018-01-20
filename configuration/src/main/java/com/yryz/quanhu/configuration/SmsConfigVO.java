@@ -1,35 +1,38 @@
-package com.yryz.quanhu.sms.vo;
+package com.yryz.quanhu.configuration;
 
 import java.io.Serializable;
+
+import org.springframework.context.annotation.Configuration;
 /**
  * 短信配置
  * @author danshiyu
  *
  */
 @SuppressWarnings("serial")
+@Configuration
 public class SmsConfigVO implements Serializable {
 	/**
-     * 短信通道，对应签名
+     * 短信签名
      */
-    private String smsChannel;
+    private Long smsSignId = 1l;
     /**
      * 验证码模板id
      */
-    private String verifyTemplateId;
+    private Long verifyTemplateId = 1l;
     /**
      * 通知类模板id，json字符串
      */
-    private String msgTemplateIds;
-	public String getSmsChannel() {
-		return smsChannel;
+    private String msgTemplateIds = "[\"3\",\"4\"]";
+	public Long getSmsSignId() {
+		return smsSignId;
 	}
-	public void setSmsChannel(String smsChannel) {
-		this.smsChannel = smsChannel;
+	public void setSmsSignId(Long smsSignId) {
+		this.smsSignId = smsSignId;
 	}
-	public String getVerifyTemplateId() {
+	public Long getVerifyTemplateId() {
 		return verifyTemplateId;
 	}
-	public void setVerifyTemplateId(String verifyTemplateId) {
+	public void setVerifyTemplateId(Long verifyTemplateId) {
 		this.verifyTemplateId = verifyTemplateId;
 	}
 	public String getMsgTemplateIds() {

@@ -35,9 +35,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 	@Override
 	public int save(SmsTemplate template) {
 		try {
-			template.setCreateTime(new Date());
-			template.setUpdateTime(template.getCreateTime());
-			return dao.save(template);
+			template.setCreateDate(new Date());
+			return dao.insert(template);
 		} catch (Exception e) {
 			logger.error("[SmsTemplateDao.save]",e);
 			throw new MysqlOptException(e);
@@ -46,7 +45,6 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 	@Override
 	public int update(SmsTemplate template) {
 		try {
-			template.setUpdateTime(new Date());
 			return dao.update(template);
 		} catch (Exception e) {
 			logger.error("[SmsTemplateDao.update]",e);
@@ -56,16 +54,16 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 	@Override
 	public int delete(Integer id) {
 		try {
-			return dao.delete(id);
+			return 0;
 		} catch (Exception e) {
 			logger.error("[SmsTemplateDao.delete]",e);
 			throw new MysqlOptException(e);
 		}
 	}
 	@Override
-	public SmsTemplate get(Integer id) {
+	public SmsTemplate get(Long kid) {
 		try {
-			return dao.get(id);
+			return dao.selectOne(kid);
 		} catch (Exception e) {
 			logger.error("[SmsTemplateDao.get]",e);
 			throw new MysqlOptException(e);
@@ -74,7 +72,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 	@Override
 	public SmsTemplate getByParams(String smsTemplateCode) {
 		try {
-			return dao.getByParams(smsTemplateCode);
+			return null;//dao.getByParams(smsTemplateCode);
 		} catch (Exception e) {
 			logger.error("[SmsTemplateDao.getByParams]",e);
 			throw new MysqlOptException(e);
@@ -83,7 +81,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 	@Override
 	public List<SmsTemplate> listTemplate() {
 		try {
-			return dao.listTemplate();
+			return null;//dao.listTemplate();
 		} catch (Exception e) {
 			logger.error("[SmsTemplateDao.listTemplate]",e);
 			throw new MysqlOptException(e);

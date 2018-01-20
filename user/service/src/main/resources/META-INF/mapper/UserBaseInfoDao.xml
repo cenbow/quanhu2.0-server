@@ -41,7 +41,7 @@
   <select id="checkUserByNname" resultType="java.lang.String">
 	SELECT
 	<include refid="Base_Column_List" />
-	FROM user_baseinfo 
+	FROM qh_user_baseinfo 
 	where 
 	 user_nick_name = #{nickName} and app_id = #{appId} and del_flag = 10
 	LIMIT 1
@@ -50,14 +50,14 @@
   <select id="selectByUserId" resultMap="BaseResultMap">
 	select
 	<include refid="Base_Column_List" />
-	from user_baseinfo
+	from qh_user_baseinfo
 	where user_id = #{userId,jdbcType=VARCHAR} and del_flag = 10
   </select>
   
   <select id="getDevIdByUserIds" resultType="java.lang.String">
 	select
 	user_device_id
-	from user_baseinfo
+	from qh_user_baseinfo
 	where  del_flag = 10 and user_id in
 	<foreach item="item" index="index" collection="userIds" open="("
 				separator="," close=")">
@@ -68,7 +68,7 @@
   <select id="getUserByParams" resultMap="BaseResultMap">
 	select
 		<include refid="Base_Column_List" />
-	from user_baseinfo 
+	from qh_user_baseinfo 
 	where app_id = #{appId}  and del_flag = 10
 	<if test="nickName != null and nickNname != '' ">
 		and a.user_nick_nname = #{nickName}
@@ -81,7 +81,7 @@
   <select id="getByUserIds" resultMap="BaseResultMap">
 	select
 	<include refid="Base_Column_List" />
-	from user_baseinfo
+	from qh_user_baseinfo
 	where del_flag = 10 
 	and user_id in		
 	<foreach item="item" index="index" collection="userIds"
@@ -93,7 +93,7 @@
   <select id="getByPhones" resultType="java.lang.String">
 	select
 	user_id
-	from user_baseinfo
+	from qh_user_baseinfo
 	where del_flag = 10 and app_id = #{appId} 
 	and user_phone in		
 	<foreach item="item" index="index" collection="phones"
@@ -105,7 +105,7 @@
   <select id="getAdminList" resultMap="BaseResultMap">
 	select
 	<include refid="Base_Column_List" />	
-	from user_baseinfo
+	from qh_user_baseinfo
 	where (user_status =
 	10 and (ban_post_time is
 	null or ban_post_time
@@ -139,7 +139,7 @@
   <select id="getUserIdList" resultType="java.lang.String">
 	select
 	user_id as userId
-	from user_baseinfo 
+	from qh_user_baseinfo 
 	where app_id = #{appId} and del_flag = 10
 	<if test="nickName !=null and nickName != ''">
 		and a.user_nick_nname like CONCAT('%',#{nickName},'%')
@@ -167,7 +167,7 @@
   <select id="getUserIdByExactParam" resultType="java.lang.String">
 		select
 		a.user_id as userId
-		from user_baseinfo a
+		from qh_user_baseinfo a
 		where app_id = #{appId} and del_flag = 10
 
 		<if test="nickName !=null and nickName != ''">
@@ -185,7 +185,7 @@
 	</select>
   
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
-    insert into user_baseinfo
+    insert into qh_user_baseinfo
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -361,7 +361,7 @@
   </insert>
   
   <update id="update" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
-    update user_baseinfo
+    update qh_user_baseinfo
     <set>
       <if test="appId != null">
         app_id = #{appId,jdbcType=VARCHAR},

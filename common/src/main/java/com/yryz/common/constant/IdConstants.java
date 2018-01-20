@@ -55,4 +55,8 @@ public class IdConstants {
      * 圈乎用户头像审核表
      */
     public static final String QUANHU_USER_IMG_AUDIT = "quanhu_user_img_audit";
+    /**
+     * 验证码
+     */
+    public static final String QUANHU_VERIFY_CODE = "quanhu_verify_code";
 }

@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.quanhu.sms.dao.SmsChannelDao;
+import com.yryz.quanhu.sms.dao.SmsSignDao;
 import com.yryz.quanhu.sms.entity.SmsChannel;
+import com.yryz.quanhu.sms.entity.SmsSign;
 import com.yryz.quanhu.sms.service.SmsChannelService;
 /**
  * @author danshiyu
@@ -32,12 +34,14 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 	@Autowired
 	private SmsChannelDao dao;
 	
+	@Autowired
+	private SmsSignDao signDao;
+	
 	@Override
 	public int save(SmsChannel channel) {
 		try {
 			channel.setCreateDate(new Date());
-			channel.setUpdateDate(channel.getCreateDate());
-			return dao.save(channel);
+			return dao.insert(channel);
 		} catch (Exception e) {
 			logger.error("[SmsChannelDao.save]",e);
 			throw new MysqlOptException(e);
@@ -46,47 +50,31 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 	@Override
 	public int update(SmsChannel channel) {
 		try {
-			channel.setUpdateDate(new Date());
 			return dao.update(channel);
 		} catch (Exception e) {
 			logger.error("[SmsChannelDao.update]",e);
 			throw new MysqlOptException(e);
 		}
 	}
+
 	@Override
-	public int delete(Integer id) {
+	public SmsChannel get(Long channelId) {
 		try {
-			return dao.delete(id);
-		} catch (Exception e) {
-			logger.error("[SmsChannelDao.delete]",e);
-			throw new MysqlOptException(e);
-		}
-	}
-	@Override
-	public SmsChannel get(Integer id) {
-		try {
-			return dao.get(id);
+			return dao.selectOne(channelId);
 		} catch (Exception e) {
 			logger.error("[SmsChannelDao.get]",e);
 			throw new MysqlOptException(e);
 		}
 	}
 	@Override
-	public SmsChannel getByParams(String channel, String smsSign) {
-		try {
-			return dao.getByParams(channel, smsSign);
-		} catch (Exception e) {
-			logger.error("[SmsChannelDao.getByParams]",e);
-			throw new MysqlOptException(e);
-		}
+	public SmsSign getSign(Long signId) {
+		return signDao.selectOne(signId);
 	}
 	@Override
 	public List<SmsChannel> listChannel() {
-		try {
-			return dao.listChannel();
-		} catch (Exception e) {
-			logger.error("[SmsChannelDao.listChannel]",e);
-			throw new MysqlOptException(e);
-		}
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+
 }

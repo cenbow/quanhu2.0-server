@@ -26,7 +26,7 @@
 <!--   <select id="selectByParams" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
-    from user_reg_log
+    from qh_user_reg_log
     where 1=1
     <if test="channelCode ! = null">
     	and channel_code like CONCAT('%',#{channelCode},'%')
@@ -47,7 +47,7 @@
   </select> -->
   
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserRegLog" >
-    insert into user_reg_log
+    insert into qh_user_reg_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,

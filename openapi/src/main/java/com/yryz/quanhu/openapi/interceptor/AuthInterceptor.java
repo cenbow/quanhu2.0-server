@@ -96,18 +96,13 @@ public class AuthInterceptor extends HandlerInterceptorAdapter implements Handle
 			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 		}
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
-		if (devType == DevType.ANDROID || devType == DevType.IOS) {
-			if (StringUtils.isBlank(header.getRefreshToken())) {
-				throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
-			}
-		}
 		Integer checkEnum = TokenCheckEnum.SUCCESS.getStatus();
 		try {
-			if (StringUtils.isBlank(header.getRefreshToken())) {
+			if (devType != DevType.ANDROID && devType != DevType.IOS) {
 				AuthTokenDTO tokenDTO = new AuthTokenDTO(userId, devType, header.getAppId(),header.getToken());
 				checkEnum = authAPi.checkToken(tokenDTO).getData();
 			} else {
-				AuthRefreshDTO refreshDTO = new AuthRefreshDTO(header.getRefreshToken(), false);
+				AuthRefreshDTO refreshDTO = new AuthRefreshDTO(null, false);
 				refreshDTO.setAppId(header.getAppId());
 				refreshDTO.setUserId(userId);
 				refreshDTO.setType(devType);

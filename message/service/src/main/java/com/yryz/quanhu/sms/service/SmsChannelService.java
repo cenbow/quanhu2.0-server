@@ -9,6 +9,7 @@ package com.yryz.quanhu.sms.service;
 import java.util.List;
 
 import com.yryz.quanhu.sms.entity.SmsChannel;
+import com.yryz.quanhu.sms.entity.SmsSign;
 /**
  * @author danshiyu
  * @version 1.0
@@ -29,31 +30,19 @@ public interface SmsChannelService {
 	 * @return
 	 */
 	public int update(SmsChannel channel);
-	
-	/**
-	 * 
-	 * 删除短信通道
-	 * @param id
-	 * @return
-	 */
-	public int delete(Integer id);
-	
 	/**
 	 * 
 	 * 短信通道获取
 	 * @param id
 	 * @return
 	 */
-	public SmsChannel get(Integer id);
-	
+	public SmsChannel get(Long channelId);
 	/**
-	 * 
-	 * 获取短信通道
-	 * @param channel
-	 * @param smsSign
+	 * 获取签名
+	 * @param signId
 	 * @return
 	 */
-	public SmsChannel getByParams(String channel,String smsSign);
+	public SmsSign getSign(Long signId);
 	
 	/**
 	 * 
