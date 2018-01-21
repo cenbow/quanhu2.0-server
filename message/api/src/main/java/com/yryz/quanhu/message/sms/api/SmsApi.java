@@ -15,6 +15,6 @@ public interface SmsApi {
 	 * @param smsDTO
 	 * @return
 	 */
-	public Response<Boolean> sendVerifyCode(SmsDTO smsDTO);
+	public Response<Boolean> sendSms(SmsDTO smsDTO);
 }
 

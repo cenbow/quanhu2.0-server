@@ -27,17 +27,18 @@ public class SmsServiceImpl implements SmsService {
 	private SmsTemplateService smsTemplateService;
 	@Autowired
 	private SmsConfigVO configVO;
-	
+
 	@Override
-	public boolean sendVerifyCode(SmsDTO smsDTO) {
+	public boolean sendSms(SmsDTO smsDTO) {
 		SmsSign sign = smsChannelService.getSign(configVO.getSmsSignId());
 		SmsChannel channel = smsChannelService.get(sign.getSmsChannelId());
 		SmsTemplate template = smsTemplateService.get(configVO.getVerifyTemplateId());
-		if(smsDTO.getSmsType() != SmsType.VERIFY_CODE){
+		if (smsDTO.getSmsType() != SmsType.VERIFY_CODE) {
 			template = smsTemplateService.get(smsDTO.getMsgTemplateId());
 		}
-		boolean result = AlidayuMsg.sendVerifyCode(channel.getSmsAppKey(), channel.getSmsAppSecret(), smsDTO.getPhone(), JsonUtils.toFastJson(smsDTO.getSmsParams()), sign.getSmsSign(),template.getSmsTemplateCode());
+		boolean result = AlidayuMsg.sendVerifyCode(channel.getSmsAppKey(), channel.getSmsAppSecret(), smsDTO.getPhone(),
+				JsonUtils.toFastJson(smsDTO.getSmsParams()), sign.getSmsSign(), template.getSmsTemplateCode());
 		return result;
 	}
-	
+
 }

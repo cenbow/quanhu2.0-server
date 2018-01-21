@@ -23,10 +23,10 @@ public class SmsProvider implements SmsApi {
 	private SmsService smsService;
 	
 	@Override
-	public Response<Boolean> sendVerifyCode(SmsDTO smsDTO) {
+	public Response<Boolean> sendSms(SmsDTO smsDTO) {
 		try {
 			checkSmsDTO(smsDTO);
-			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(smsDTO));
+			return ResponseUtils.returnObjectSuccess(smsService.sendSms(smsDTO));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
