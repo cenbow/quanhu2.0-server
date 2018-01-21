@@ -234,6 +234,33 @@ public class UserLoginSimpleVO implements Serializable {
 	public void setRelationStatus(Integer relationStatus) {
 		this.relationStatus = relationStatus;
 	}
+	
+	
+	
+	public UserLoginSimpleVO() {
+		super();
+	}
+	public UserLoginSimpleVO(String userId, String userNickName, String userImg, String userSignature, String userPhone,
+			String userQr, Byte userAge, Byte userGenders, String userBirthday, String userLocation, String cityCode,
+			Byte userRole, Byte authStatus, Integer lastHeat, String userDesc, Date createDate) {
+		super();
+		this.userId = userId;
+		this.userNickName = userNickName;
+		this.userImg = userImg;
+		this.userSignature = userSignature;
+		this.userPhone = userPhone;
+		this.userQr = userQr;
+		this.userAge = userAge;
+		this.userGenders = userGenders;
+		this.userBirthday = userBirthday;
+		this.userLocation = userLocation;
+		this.cityCode = cityCode;
+		this.userRole = userRole;
+		this.authStatus = authStatus;
+		this.lastHeat = lastHeat;
+		this.userDesc = userDesc;
+		this.createDate = createDate;
+	}
 	@Override
 	public String toString() {
 		return "UserLoginSimpleVO [userId=" + userId + ", appId=" + appId + ", userNickName=" + userNickName

@@ -39,21 +39,21 @@ public interface UserService {
 	UserLoginSimpleVO getUserLoginSimpleVO(String userId);
 	
 	/**
-	 * 根据电话检索用户简要信息
+	 * 根据电话检索用户
 	 * 
 	 * @param phone
 	 * @return
 	 */
-	UserSimpleVO getUserSimpleByPhone(String phone,String appId);
+	String getUserByPhone(String phone,String appId);
 
 	
 	/**
-	 * 根据电话检索用户简要信息
+	 * 根据电话检索用户
 	 * 
 	 * @param phones
 	 * @return
 	 */
-	Map<String, UserSimpleVO> getUserSimpleByPhone(Set<String> phones,String appId);
+	Map<String, String> getUserByPhone(Set<String> phones,String appId);
 	
 	/**
 	 * 查询用户简要信息
@@ -74,24 +74,6 @@ public interface UserService {
 	 * @return
 	 */
 	Map<String,UserBaseInfoVO> getUser(Set<String> userIds);
-	
-	/**
-	 * 根据电话检索用户
-	 * 
-	 * @param phones
-	 * @return
-	 */
-	UserBaseInfoVO getUserInfoByPhone(String phone,String appId);
-	
-	
-	/**
-	 * 根据电话检索用户
-	 * 
-	 * @param phones
-	 * @return
-	 */
-	Map<String, UserBaseInfoVO> getUserInfoByPhone(Set<String> phones,String appId);
-	
 	
 	/**
 	 * 根据手机号、昵称、注册时间模糊查询用户id

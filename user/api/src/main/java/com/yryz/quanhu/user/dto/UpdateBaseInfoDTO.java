@@ -46,81 +46,63 @@ public class UpdateBaseInfoDTO implements Serializable{
      */
     private String userLocation;
     /**
-     * 用户推送设备号id
-     */
-    private String userDeviceId;
-    /**
      * 城市代码
      */
     private String cityCode;
-    /**
-     * 用户角色 0:普通用户 1:实名用户
-     */
-    private int userRole;
-    /**
-     * 删除标识 0:有效  1:删除
-     */
-    private int delFlag;
     
-    public String getCustId() {
+    public String getUserId() {
         return userId;
     }
-    public void setCustId(String userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
-    public String getCustNickName() {
+    public String getUserNickName() {
         return userNickName;
     }
-    public void setCustNickName(String userNickName) {
+    public void setUserNickName(String userNickName) {
         this.userNickName = userNickName;
     }
-    public String getCustImg() {
+    public String getUserImg() {
         return userImg;
     }
-    public void setCustImg(String userImg) {
+    public void setUserImg(String userImg) {
         this.userImg = userImg;
     }
-    public String getCustSignature() {
+    public String getUserSignature() {
         return userSignature;
     }
-    public void setCustSignature(String userSignature) {
+    public void setUserSignature(String userSignature) {
         this.userSignature = userSignature;
     }
-    public int getCustAge() {
+    public int getUserAge() {
         return userAge;
     }
-    public void setCustAge(int userAge) {
+    public void setUserAge(int userAge) {
         this.userAge = userAge;
     }
-    public String getCustDesc() {
+    public String getUserDesc() {
         return userDesc;
     }
-    public void setCustDesc(String userDesc) {
+    public void setUserDesc(String userDesc) {
         this.userDesc = userDesc;
     }
-    public String getCustQr() {
+    public String getUserQr() {
         return userQr;
     }
-    public void setCustQr(String userQr) {
+    public void setUserQr(String userQr) {
         this.userQr = userQr;
     }
-    public int getCustGenders() {
+    public int getUserGenders() {
         return userGenders;
     }
-    public void setCustGenders(int userGenders) {
+    public void setUserGenders(int userGenders) {
         this.userGenders = userGenders;
     }
-    public String getCustLocation() {
+    public String getUserLocation() {
         return userLocation;
     }
-    public void setCustLocation(String userLocation) {
+    public void setUserLocation(String userLocation) {
         this.userLocation = userLocation;
-    }
-    public String getCustDeviceId() {
-        return userDeviceId;
-    }
-    public void setCustDeviceId(String userDeviceId) {
-        this.userDeviceId = userDeviceId;
     }
     public String getCityCode() {
         return cityCode;
@@ -128,21 +110,11 @@ public class UpdateBaseInfoDTO implements Serializable{
     public void setCityCode(String cityCode) {
         this.cityCode = cityCode;
     }
-    public int getCustRole() {
-        return userRole;
-    }
-    public void setCustRole(int userRole) {
-        this.userRole = userRole;
-    }
-    public int getDelFlag() {
-        return delFlag;
-    }
-    public void setDelFlag(int delFlag) {
-        this.delFlag = delFlag;
-    }
+	public UpdateBaseInfoDTO() {
+		super();
+	}
 	public UpdateBaseInfoDTO(String userId, String userNickName, String userImg, String userSignature, int userAge,
-			String userDesc, String userQr, int userGenders, String userLocation, String userDeviceId, String cityCode,
-			int userRole) {
+			String userDesc, String userQr, int userGenders, String userLocation, String cityCode) {
 		super();
 		this.userId = userId;
 		this.userNickName = userNickName;
@@ -153,9 +125,7 @@ public class UpdateBaseInfoDTO implements Serializable{
 		this.userQr = userQr;
 		this.userGenders = userGenders;
 		this.userLocation = userLocation;
-		this.userDeviceId = userDeviceId;
 		this.cityCode = cityCode;
-		this.userRole = userRole;
 	}
 
 }

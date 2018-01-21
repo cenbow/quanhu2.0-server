@@ -43,7 +43,7 @@
 	<include refid="Base_Column_List" />
 	FROM qh_user_baseinfo 
 	where 
-	 user_nick_name = #{nickName} and app_id = #{appId} and del_flag = 10
+	 user_nick_name = #{nickName} and app_id = #{appId} and del_flag = 10 and user_status != 12
 	LIMIT 1
   </select>
   
@@ -51,14 +51,14 @@
 	select
 	<include refid="Base_Column_List" />
 	from qh_user_baseinfo
-	where user_id = #{userId,jdbcType=VARCHAR} and del_flag = 10
+	where user_id = #{userId,jdbcType=VARCHAR} and del_flag = 10 and user_status != 12
   </select>
   
   <select id="getDevIdByUserIds" resultType="java.lang.String">
 	select
 	user_device_id
 	from qh_user_baseinfo
-	where  del_flag = 10 and user_id in
+	where  del_flag = 10 and user_status != 12 and user_id in
 	<foreach item="item" index="index" collection="userIds" open="("
 				separator="," close=")">
 		#{item}
@@ -69,7 +69,7 @@
 	select
 		<include refid="Base_Column_List" />
 	from qh_user_baseinfo 
-	where app_id = #{appId}  and del_flag = 10
+	where app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName != null and nickNname != '' ">
 		and a.user_nick_nname = #{nickName}
 	</if>
@@ -82,7 +82,7 @@
 	select
 	<include refid="Base_Column_List" />
 	from qh_user_baseinfo
-	where del_flag = 10 
+	where del_flag = 10 and user_status != 12
 	and user_id in		
 	<foreach item="item" index="index" collection="userIds"
 		open="(" separator="," close=")">
@@ -90,11 +90,12 @@
 	</foreach>
   </select>  
  
-  <select id="getByPhones" resultType="java.lang.String">
+  <select id="getByPhones" resultType="com.yryz.quanhu.user.entity.UserBaseInfo">
 	select
-	user_id
+	user_id as userId,
+	user_phone as userPhone
 	from qh_user_baseinfo
-	where del_flag = 10 and app_id = #{appId} 
+	where del_flag = 10 and user_status != 12 and app_id = #{appId} 
 	and user_phone in		
 	<foreach item="item" index="index" collection="phones"
 	open="(" separator="," close=")">
@@ -110,7 +111,7 @@
 	10 and (ban_post_time is
 	null or ban_post_time
 	&lt; now()) )
-	and app_id = #{appId}  and del_flag = 10
+	and app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
 		and user_nick_nname like CONCAT('%',#{nickName},'%')
 	</if>
@@ -140,7 +141,7 @@
 	select
 	user_id as userId
 	from qh_user_baseinfo 
-	where app_id = #{appId} and del_flag = 10
+	where app_id = #{appId} and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
 		and a.user_nick_nname like CONCAT('%',#{nickName},'%')
 	</if>
@@ -168,7 +169,7 @@
 		select
 		a.user_id as userId
 		from qh_user_baseinfo a
-		where app_id = #{appId} and del_flag = 10
+		where app_id = #{appId} and del_flag = 10 and user_status != 12
 
 		<if test="nickName !=null and nickName != ''">
 			and a.user_nick_nname = #{nickName}

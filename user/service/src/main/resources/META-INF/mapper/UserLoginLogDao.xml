@@ -18,17 +18,16 @@
     id, kid, user_id, device_type, device_name, device_id, login_X, login_Y, app_id, 
     create_date, last_update_date
   </sql>
-  <select id="getLastLoginTime" resultMap="BaseResultMap" >
+  <select id="getLastLoginTime" resultType="com.yryz.quanhu.user.entity.UserLoginLog" >
     SELECT 
-		userId as userId,
+		user_id as userId,
 		MAX(create_date) as createDate 
 		from qh_user_login_log 
 		where user_id in 
-		<foreach item="item" index="index" collection="list" open="("
+		<foreach item="item" index="index" collection="userIds" open="("
 			separator="," close=")">
 			#{item}
 		</foreach>
-		GROUP BY userId 
   </select>
 
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserLoginLog" >

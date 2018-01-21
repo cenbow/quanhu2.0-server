@@ -29,7 +29,6 @@ import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserBaseInfoDao;
@@ -112,9 +111,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(String userId) {
 		UserBaseInfo baseInfo = getUser(userId);
-		UserLoginSimpleVO simpleVO = new UserLoginSimpleVO();
-		BeanUtils.copyProperties(simpleVO, baseInfo);
+		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		simpleVO.setUserLevel("1");
 		// TODO: 依赖积分系统，获取用户积分等级
+		
 		return simpleVO;
 	}
 
@@ -133,8 +133,9 @@ public class UserServiceImpl implements UserService {
 			return null;
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
-		UserSimpleVO simpleVO = new UserSimpleVO();
-		BeanUtils.copyProperties(simpleVO, baseInfo);
+		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
+		simpleVO.setUserLevel("1");
+		//TODO:获取等级
 		return simpleVO;
 	}
 
@@ -146,15 +147,12 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public UserSimpleVO getUserSimpleByPhone(String phone, String appId) {
-		List<UserBaseInfo> baseInfos = getUserInfoByPhones(Sets.newHashSet(phone), appId);
+	public String getUserByPhone(String phone, String appId) {
+		List<UserBaseInfo> baseInfos = getUserIdByPhone(Sets.newHashSet(phone), appId);
 		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
 		}
-		UserBaseInfo baseInfo = baseInfos.get(0);
-		UserSimpleVO simpleVO = new UserSimpleVO();
-		BeanUtils.copyProperties(simpleVO, baseInfo);
-		return simpleVO;
+		return baseInfos.get(0).getUserId().toString();
 	}
 
 	/**
@@ -166,17 +164,15 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public Map<String, UserSimpleVO> getUserSimpleByPhone(Set<String> phones, String appId) {
+	public Map<String, String> getUserByPhone(Set<String> phones, String appId) {
 		if (CollectionUtils.isEmpty(phones)) {
 			return new HashMap<>();
 		}
-		List<UserBaseInfo> list = getUserInfoByPhones(phones, appId);
-		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
+		List<UserBaseInfo> list = getUserIdByPhone(phones, appId);
+		Map<String, String> map = new HashMap<>();
 		if (list != null) {
-			for (UserBaseInfo vo : list) {
-				UserSimpleVO simpleVO = new UserSimpleVO();
-				BeanUtils.copyProperties(simpleVO, vo);
-				map.put(vo.getUserId().toString(), simpleVO);
+			for (UserBaseInfo info:list) {
+				map.put(info.getUserPhone(), info.getUserId().toString());
 			}
 		}
 		return map;
@@ -199,8 +195,9 @@ public class UserServiceImpl implements UserService {
 		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
-				UserSimpleVO simpleVO = new UserSimpleVO();
-				BeanUtils.copyProperties(vo, simpleVO);
+				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
+				simpleVO.setUserLevel("1");
+				//TODO:获取等级
 				map.put(vo.getUserId().toString(), simpleVO);
 			}
 		}
@@ -236,8 +233,8 @@ public class UserServiceImpl implements UserService {
 		Map<String, UserBaseInfoVO> map = new HashMap<>(list.size());
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
-				UserBaseInfoVO infoVO = new UserBaseInfoVO();
-				BeanUtils.copyProperties(infoVO, vo);
+				UserBaseInfoVO infoVO = UserBaseInfo.getUserBaseInfoVO(vo);
+				//TODO:获取等级
 				map.put(vo.getUserId().toString(), infoVO);
 			}
 		}
@@ -272,69 +269,8 @@ public class UserServiceImpl implements UserService {
 	 * @param appId
 	 * @return
 	 */
-	private List<String> getUserIdByPhone(Set<String> phones, String appId) {
+	private List<UserBaseInfo> getUserIdByPhone(Set<String> phones, String appId) {
 		return custbaseinfoDao.getByPhones(Lists.newArrayList(phones), appId);
-	}
-
-	/**
-	 * 根据手机号获取用户信息
-	 * 
-	 * @param phones
-	 * @return
-	 */
-	private List<UserBaseInfo> getUserInfoByPhones(Set<String> phones, String appId) {
-		List<String> userIds = getUserIdByPhone(phones, appId);
-		List<UserBaseInfo> list = getUserInfo(Sets.newHashSet(userIds));
-		return list;
-	}
-
-	/**
-	 * 根据手机号查询简单用户信息
-	 * 
-	 * @param Set<String>
-	 *            phones
-	 * @return Map<String, UserSimpleVO>
-	 * @Description
-	 */
-	@Override
-	public UserBaseInfoVO getUserInfoByPhone(String phone, String appId) {
-		List<UserBaseInfo> baseInfos = getUserInfoByPhones(Sets.newHashSet(phone), appId);
-		if (CollectionUtils.isEmpty(baseInfos)) {
-			return null;
-		}
-		UserBaseInfo baseInfo = baseInfos.get(0);
-		UserBaseInfoVO infoVO = new UserBaseInfoVO();
-		BeanUtils.copyProperties(infoVO, baseInfo);
-		return infoVO;
-	}
-
-	/**
-	 * 根据手机号查询简单用户信息
-	 * 
-	 * @param Set<String>
-	 *            phones
-	 * @return Map<String, UserSimpleVO>
-	 * @Description
-	 */
-	@Override
-	public Map<String, UserBaseInfoVO> getUserInfoByPhone(Set<String> phones, String appId) {
-		if (CollectionUtils.isEmpty(phones)) {
-			return new HashMap<>();
-		}
-		List<UserBaseInfo> list = getUserInfoByPhones(phones, appId);
-		if (CollectionUtils.isEmpty(list)) {
-			return new HashMap<>();
-		}
-		Map<String, UserBaseInfoVO> map = new HashMap<>(list.size());
-		if (list != null) {
-			for (UserBaseInfo vo : list) {
-				UserBaseInfoVO infoVO = new UserBaseInfoVO();
-				BeanUtils.copyProperties(infoVO, vo);
-				map.put(vo.getUserId().toString(), infoVO);
-			}
-		}
-
-		return map;
 	}
 
 	/**

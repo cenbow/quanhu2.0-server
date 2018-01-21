@@ -3,6 +3,7 @@
  */
 package com.yryz.quanhu.user.service;
 
+import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 
 /**
@@ -16,7 +17,7 @@ public interface SmsService {
 	 * @param type 验证码类型
 	 * @return
 	 */
-	public SmsVerifyCodeVO sendVerifyCode(String phone, String type,String appId);
+	public SmsVerifyCodeVO sendVerifyCode(SmsVerifyCodeDTO codeDTO);
 	
 	/**
 	 * 验证短信、成功后删除
