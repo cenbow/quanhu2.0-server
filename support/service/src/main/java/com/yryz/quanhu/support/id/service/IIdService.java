@@ -8,7 +8,7 @@ public interface IIdService {
 	 * @return
 	 * @param type
 	 */
-	public String getId(String type);
+	public String getOrderId(String type);
 
 	Long getKid(String type);
 	

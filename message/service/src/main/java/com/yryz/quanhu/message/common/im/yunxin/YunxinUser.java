@@ -187,7 +187,8 @@ public class YunxinUser {
 			// 7bl4ewi9r5
 			// 7wry37mjox
 			/* dev环境可用im账户 */
-			YunxinUser.getInstance().getUser("109ggoo9gh");
+//			YunxinUser.getInstance().getUser("109ggoo9gh");
+			YunxinUser.getInstance().addUser("626942183ifjeofjeo", "ff", "fefe");
 			// YunxinUser.getInstance().updateUser("guotlym3", "好好的荡荡悠悠药草香",
 			// "http://yryz-upload.oss-cn-hangzhou.aliyuncs.com/headImage/2F20161111010059563-3623.jpg");
 			// YunxinUser.getInstance().addUser("kwiddy3u", "苹果啦不鸟你牛肉粉公",

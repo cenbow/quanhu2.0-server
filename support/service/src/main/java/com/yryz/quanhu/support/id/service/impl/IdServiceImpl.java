@@ -17,7 +17,7 @@ import java.util.Date;
 @Service("idService")
 public class IdServiceImpl implements IIdService {
     @Override
-    public String getId(String type) {
+    public String getOrderId(String type) {
         long id = PrimaryUtils.getNextId(type);
         String head = DateFormatUtils.format(new Date(), "yyyyMMdd");
         return head + id;

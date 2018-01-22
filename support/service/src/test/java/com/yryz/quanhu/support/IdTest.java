@@ -24,6 +24,9 @@ public class IdTest {
 
     @Test
     public void getIdTest() {
+        Response<String> orderId = idAPI.getOrderId();
+        System.out.println("orderId: " + orderId);
+
         Response<Long> quanhuUser = idAPI.getKid("quanhu_user");
         System.out.println("quanhuUser " + quanhuUser.getData());
 
