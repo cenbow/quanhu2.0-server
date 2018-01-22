@@ -54,11 +54,11 @@ public class UserController {
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
 	private static final String CHAR_63 = "?";
-	@Reference
+	@Reference(lazy=true,check=false)
 	private AccountApi accountApi;
-	@Reference
+	@Reference(lazy=true,check=false)
 	private UserApi userApi;
-	@Reference
+	@Reference(lazy=true,check=false)
 	private AuthApi authApi;
 
 	@ApiOperation("用户token刷新")

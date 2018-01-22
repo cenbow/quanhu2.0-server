@@ -33,9 +33,9 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value="services/app")
 public class ComponentController {
-	@Reference
+	@Reference(lazy=true,check=false)
 	private AccountApi accountApi;
-	@Reference
+	@Reference(lazy=true,check=false)
 	private CommonSafeApi commonSafeApi;
 	@Autowired
 	private AuthService authService;
