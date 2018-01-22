@@ -39,7 +39,7 @@ public class YunxinHttpClient {
 	public static final String FRIEND_DELETE = "https://api.netease.im/nimserver/friend/delete.action";
 	public static final String FRIEND_GET = "https://api.netease.im/nimserver/friend/get.action";
 
-	public static final String setSpecialRelation = "https://api.netease.im/nimserver/user/setSpecialRelation.action";
+	public static final String SET_SPECIALRELATION = "https://api.netease.im/nimserver/user/setSpecialRelation.action";
 	public static final String LIST_BLACK_AND_MUTE_LIST = "https://api.netease.im/nimserver/user/listBlackAndMuteList.action";
 
 
