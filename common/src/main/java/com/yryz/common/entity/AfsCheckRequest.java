@@ -1,4 +1,4 @@
-package com.yryz.quanhu.message.push.entity;
+package com.yryz.common.entity;
 
 import java.io.Serializable;
 

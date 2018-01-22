@@ -2,6 +2,8 @@ package com.yryz.quanhu.openapi.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.yryz.common.entity.AfsCheckRequest;
+import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,5 +61,19 @@ public class ComponentController {
 		return commonSafeApi.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
 				codeDTO.getVeriCode(), false));
+	}
+
+
+	@ApiOperation("发送短信验证码（滑动验证）")
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/component/sendVerifyCodeForSlip")
+	public Response<VerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		codeDTO.setAppId(header.getAppId());
+		AfsCheckRequest afsCheckRequest = WebUtil.getAfsCheckRequest(request);
+
+		return commonSafeApi.sendVerifyCodeForSlip(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
+				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
+				codeDTO.getVeriCode(), false), afsCheckRequest);
 	}
 }
