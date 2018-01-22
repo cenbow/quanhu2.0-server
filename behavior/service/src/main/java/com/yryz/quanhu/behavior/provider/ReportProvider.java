@@ -2,9 +2,11 @@ package com.yryz.quanhu.behavior.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.contants.ReportConstatns;
+import com.yryz.quanhu.behavior.dto.ReportDTO;
 import com.yryz.quanhu.behavior.entity.Report;
 import com.yryz.quanhu.behavior.service.ReportApi;
 import com.yryz.quanhu.behavior.service.ReportService;
@@ -51,6 +53,16 @@ public class ReportProvider implements ReportApi {
             return ResponseUtils.returnException(e);
         }
 
+    }
+
+    @Override
+    public Response<PageList<Report>> queryReportForAdmin(ReportDTO reportDTO) {
+        try {
+            return ResponseUtils.returnObjectSuccess(reportService.queryReportForAdmin(reportDTO));
+        } catch (Exception e) {
+            logger.error("", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
 }

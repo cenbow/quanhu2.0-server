@@ -26,8 +26,13 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public PageList<Report> queryReportForAdmin(ReportDTO reportDTO) {
         PageHelper.startPage(reportDTO.getCurrentPage(),reportDTO.getPageSize());
+        PageList pageList=new PageList();
+        pageList.setCurrentPage(reportDTO.getCurrentPage());
+        pageList.setPageSize(reportDTO.getPageSize());
         List<Report> reports=reportDao.queryReportForAdmin(reportDTO);
-        return null;//new PageModel<Report>().getPageList(reports);
+        pageList.setCount(Long.valueOf(reports.size()));
+        pageList.setEntities(reports);
+        return pageList;
     }
 
     @Override

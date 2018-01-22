@@ -23,15 +23,15 @@
 
     <select id="queryReportForAdmin" parameterType="com.yryz.quanhu.behavior.dto.ReportDTO"
             resultMap="BaseReportResultMap">
-        SET
+        SELECT
         <include refid="Base_Report_Column_List"/>
         FROM qh_inform
         <where>
             1=1
-            <if test="informStatus != null">
+            <if test="informStatus != null and informStatus != ''">
                 AND inform_status=#{informStatus,jdbcType=TINYINT}
             </if>
-            <if test="informType != null">
+            <if test="informType != null and informType != ''">
                 AND inform_type=#{informType,jdbcType=TINYINT}
             </if>
             <if test="moduleEnum != null and moduleEnum != ''">

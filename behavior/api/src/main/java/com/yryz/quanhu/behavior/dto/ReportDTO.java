@@ -15,8 +15,17 @@ public class ReportDTO extends PageList implements Serializable {
     private String moduleEnum;
     private byte informType;
     private byte informStatus;
+    private String startTime;
     private String endTime;
-    private String problems;
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public ReportDTO setStartTime(String startTime) {
+        this.startTime = startTime;
+        return this;
+    }
 
     public String getModuleEnum() {
         return moduleEnum;
@@ -51,15 +60,6 @@ public class ReportDTO extends PageList implements Serializable {
 
     public ReportDTO setEndTime(String endTime) {
         this.endTime = endTime;
-        return this;
-    }
-
-    public String getProblems() {
-        return problems;
-    }
-
-    public ReportDTO setProblems(String problems) {
-        this.problems = problems;
         return this;
     }
 }
