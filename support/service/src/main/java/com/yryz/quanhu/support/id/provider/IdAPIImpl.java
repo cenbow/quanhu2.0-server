@@ -2,6 +2,7 @@ package com.yryz.quanhu.support.id.provider;
 
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -37,8 +38,8 @@ public class IdAPIImpl implements IdAPI {
     private DefaultUidService uidService;
 
     @Override
-    public Response<String> getId(String type) {
-        String orderId = idService.getId(type);
+    public Response<String> getOrderId() {
+        String orderId = idService.getOrderId("qh_order_id");
         try {
             return ResponseUtils.returnObjectSuccess(orderId);
         } catch (Exception e) {

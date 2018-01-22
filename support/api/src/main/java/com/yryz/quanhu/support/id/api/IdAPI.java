@@ -9,15 +9,16 @@ import com.yryz.common.response.Response;
 public interface IdAPI {
 	
 	/**
-	 * 生成订单ID
+	 * 生成订单ID,
+	 * ID中含有日期(yyyyMMdd)，如201801221965520
 	 * 
 	 * @return
 	 */
-	Response<String> getId(String type);
+	Response<String> getOrderId();
 
 
 	/**
-	 * 生产分布式唯一id，id为数字类型，初始时6位随机
+	 * 生成分布式唯一id，id为数字类型，初始时6位随机
 	 * 表中的kid字段统一调此接口，为了避免重复，建议type传表名，
 	 * type统一维护到com.yryz.common.constant.IdConstants
 	 * @param type
