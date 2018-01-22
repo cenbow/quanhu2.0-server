@@ -77,7 +77,7 @@ public class UserController {
 	public Response<UserLoginSimpleVO> findUser(String userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		if (StringUtils.isBlank(userId)) {
-			return userApi.getUserLoginSimpleVO(userId);
+			return userApi.getUserLoginSimpleVO(header.getUserId());
 		} else {
 			return userApi.getUserLoginSimpleVO(header.getUserId(), userId);
 		}
