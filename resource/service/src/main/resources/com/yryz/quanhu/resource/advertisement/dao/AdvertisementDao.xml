@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.resource.advertisement.dao.AdvertisementDao">
+
+    <!--BaseResultMap-->
+    <resultMap id="BaseResultMap" type="com.yryz.quanhu.resource.advertisement.entity.Advertisement">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="kid" property="kid" jdbcType="BIGINT"/>
+        <result column="img_url" property="imgUrl" jdbcType="VARCHAR"/>
+        <result column="adv_name" property="advName" jdbcType="VARCHAR"/>
+        <result column="adv_url" property="advUrl" jdbcType="VARCHAR"/>
+        <result column="skip_type" property="skipType" jdbcType="INTEGER"/>
+        <result column="adv_type" property="advType" jdbcType="TINYINT"/>
+        <result column="adv_sort" property="advSort" jdbcType="INTEGER"/>
+        <result column="adv_status" property="advStatus" jdbcType="TINYINT"/>
+        <result column="adv_def" property="advDef" jdbcType="TINYINT"/>
+        <result column="start_date" property="startDate" jdbcType="TIMESTAMP"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_date" property="endDate" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="create_user_id" property="createUserId" jdbcType="BIGINT"/>
+        <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="BIGINT"/>
+        <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--Base_Column_List-->
+    <sql id="Base_Column_List">kid,img_url,adv_name,adv_url,skip_type,adv_type,adv_sort,adv_status,adv_def,start_date,start_time,end_date,end_time,note,create_date,last_update_date,create_user_id,last_update_user_id,module_enum
+    </sql>
+
+    <!-- 查询Advertisement详情 -->
+    <select id="selectByKid" parameterType="java.lang.Long"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        where adv_status = 20
+        and kid = #{kid,jdbcType=BIGINT}
+    </select>
+
+    <!-- 删除Advertisement-->
+    <!--<delete id="delete" parameterType="java.lang.Long">
+        update qh_adv
+        set del_flag = 1
+        where kid = #{kid,jdbcType=BIGINT}
+    </delete>-->
+
+
+    <!-- 新增Advertisement-->
+    <insert id="insert" parameterType="com.yryz.quanhu.resource.advertisement.entity.Advertisement">
+	    insert into qh_adv (kid,img_url,adv_name,adv_url,skip_type,adv_type,adv_sort,adv_status,adv_def,start_date,start_time,end_date,end_time,note,create_user_id,last_update_user_id,module_enum)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{imgUrl,jdbcType=VARCHAR}
+				,#{advName,jdbcType=VARCHAR}
+				,#{advUrl,jdbcType=VARCHAR}
+				,#{skipType,jdbcType=INTEGER}
+				,#{advType,jdbcType=TINYINT}
+				,#{advSort,jdbcType=INTEGER}
+				,#{advStatus,jdbcType=TINYINT}
+				,#{advDef,jdbcType=TINYINT}
+				,#{startDate,jdbcType=TIMESTAMP}
+				,#{startTime,jdbcType=TIMESTAMP}
+				,#{endDate,jdbcType=TIMESTAMP}
+				,#{endTime,jdbcType=TIMESTAMP}
+				,#{note,jdbcType=VARCHAR}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{lastUpdateUserId,jdbcType=BIGINT}
+				,#{moduleEnum,jdbcType=VARCHAR}
+	    )
+	</insert>
+
+    <!--按需新增Advertisement-->
+    <insert id="insertByPrimaryKeySelective" parameterType="com.yryz.quanhu.resource.advertisement.entity.Advertisement">
+        insert into qh_adv
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="kid != null">
+                kid,
+            </if>
+            <if test="imgUrl != null and imgUrl != ''">
+                img_url,
+            </if>
+            <if test="advName != null and advName != ''">
+                adv_name,
+            </if>
+            <if test="advUrl != null and advUrl != ''">
+                adv_url,
+            </if>
+            <if test="skipType != null">
+                skip_type,
+            </if>
+            <if test="advType != null">
+                adv_type,
+            </if>
+            <if test="advSort != null">
+                adv_sort,
+            </if>
+            <if test="advStatus != null">
+                adv_status,
+            </if>
+            <if test="advDef != null">
+                adv_def,
+            </if>
+            <if test="startDate != null">
+                start_date,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endDate != null">
+                end_date,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="note != null and note != ''">
+                note,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="lastUpdateDate != null">
+                last_update_date,
+            </if>
+            <if test="createUserId != null">
+                create_user_id,
+            </if>
+            <if test="lastUpdateUserId != null">
+                last_update_user_id,
+            </if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+                module_enum,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="kid != null">
+                #{kid,jdbcType=BIGINT},
+            </if>
+            <if test="imgUrl != null and imgUrl != ''">
+                #{imgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="advName != null and advName != ''">
+                #{advName,jdbcType=VARCHAR},
+            </if>
+            <if test="advUrl != null and advUrl != ''">
+                #{advUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="skipType != null">
+                #{skipType,jdbcType=INTEGER},
+            </if>
+            <if test="advType != null">
+                #{advType,jdbcType=TINYINT},
+            </if>
+            <if test="advSort != null">
+                #{advSort,jdbcType=INTEGER},
+            </if>
+            <if test="advStatus != null">
+                #{advStatus,jdbcType=TINYINT},
+            </if>
+            <if test="advDef != null">
+                #{advDef,jdbcType=TINYINT},
+            </if>
+            <if test="startDate != null">
+                #{startDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endDate != null">
+                #{endDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="note != null and note != ''">
+                #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastUpdateDate != null">
+                #{lastUpdateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserId != null">
+                #{createUserId,jdbcType=BIGINT},
+            </if>
+            <if test="lastUpdateUserId != null">
+                #{lastUpdateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+                #{moduleEnum,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+
+    <!-- 按需修改Advertisement-->
+    <update id="update" parameterType="com.yryz.quanhu.resource.advertisement.entity.Advertisement">
+        update qh_adv
+        <set>
+            <if test="imgUrl != null and imgUrl != ''">
+                img_url = #{imgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="advName != null and advName != ''">
+                adv_name = #{advName,jdbcType=VARCHAR},
+            </if>
+            <if test="advUrl != null and advUrl != ''">
+                adv_url = #{advUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="skipType != null">
+                skip_type = #{skipType,jdbcType=INTEGER},
+            </if>
+            <if test="advType != null">
+                adv_type = #{advType,jdbcType=TINYINT},
+            </if>
+            <if test="advSort != null">
+                adv_sort = #{advSort,jdbcType=INTEGER},
+            </if>
+            <if test="advStatus != null">
+                adv_status = #{advStatus,jdbcType=TINYINT},
+            </if>
+            <if test="advDef != null">
+                adv_def = #{advDef,jdbcType=TINYINT},
+            </if>
+            <if test="startDate != null">
+                start_date = #{startDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="note != null and note != ''">
+                note = #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastUpdateDate != null">
+                last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserId != null">
+                create_user_id = #{createUserId,jdbcType=BIGINT},
+            </if>
+            <if test="lastUpdateUserId != null">
+                last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+                module_enum = #{moduleEnum,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+    <!-- 查询Advertisement列表 -->
+    <select id="selectList" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        where
+        adv_status = 20
+        and adv_type = #{advType}
+        <![CDATA[  AND start_date <= #{nowDate} ]]>
+        <![CDATA[  AND end_date > #{nowDate} ]]>
+        <![CDATA[  AND start_time <= #{nowTime} ]]>
+        <![CDATA[  AND end_time > #{nowTime} ]]>
+        order by adv_sort desc, create_date desc
+    </select>
+
+    <select id="selectDefaultAdvertisement"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        where adv_def = 10
+        order by adv_sort desc, create_date desc
+    </select>
+
+</mapper>
