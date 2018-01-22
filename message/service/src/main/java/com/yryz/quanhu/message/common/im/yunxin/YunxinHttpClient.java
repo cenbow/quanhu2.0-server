@@ -39,7 +39,7 @@ public class YunxinHttpClient {
 	public static final String FRIEND_DELETE = "https://api.netease.im/nimserver/friend/delete.action";
 	public static final String FRIEND_GET = "https://api.netease.im/nimserver/friend/get.action";
 
-	public static final String setSpecialRelation = "https://api.netease.im/nimserver/user/setSpecialRelation.action";
+	public static final String SET_SPECIALRELATION = "https://api.netease.im/nimserver/user/setSpecialRelation.action";
 	public static final String LIST_BLACK_AND_MUTE_LIST = "https://api.netease.im/nimserver/user/listBlackAndMuteList.action";
 
 
@@ -64,11 +64,11 @@ public class YunxinHttpClient {
     private static YunxinHttpClient client = null;
 	
     private YunxinHttpClient(){
-		appKey = Context.getProperty("YUNXIN_APPKEY");
-		appSecret  = Context.getProperty("YUNXIN_APPSECRET");
+//		appKey = Context.getProperty("YUNXIN_APPKEY");
+//		appSecret  = Context.getProperty("YUNXIN_APPSECRET");
 		
-//		appKey = "6392d34d5e184ff729bd159c657634e6";
-//		appSecret = "941f7f877b46";
+		appKey = "6206141b1378b670588546f5822cfb51";
+		appSecret = "011351144ee1";
 
 //online
 //		appKey = "6206141b1378b670588546f5822cfb51"; 
