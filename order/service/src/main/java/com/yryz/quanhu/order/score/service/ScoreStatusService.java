@@ -14,7 +14,7 @@ public interface ScoreStatusService {
 
     int update(ScoreStatus ss);
 
-    ScoreStatus getById(String custId , String appId , Long id , Date createDate);
+    ScoreStatus getById(String userId , String appId , Long id , Date createDate);
 
-    ScoreStatus getByCode(String custId , String appId , String eventCode , Date createDate);
+    ScoreStatus getByCode(String userId , String appId , String eventCode , Date createDate);
 }

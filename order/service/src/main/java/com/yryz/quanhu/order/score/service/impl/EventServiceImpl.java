@@ -68,7 +68,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<EventReportVo> getScoreFlowList(EventInfo log) {
-		return scoreFlowService.getAll(log.getCustId());
+		return scoreFlowService.getAll(log.getUserId());
  
 	}
 

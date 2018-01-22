@@ -15,7 +15,7 @@ public class ScoreStatus implements Serializable{
 
 	private Long id;
 
-    private String custId;
+    private String userId;
 
     private String circleId;
 
@@ -31,14 +31,14 @@ public class ScoreStatus implements Serializable{
     	
     }
     
-    public ScoreStatus(String custId , String eventCode , Integer eventCount){
-    	this.custId = custId;
+    public ScoreStatus(String userId , String eventCode , Integer eventCount){
+    	this.userId = userId;
     	this.eventCode = eventCode;
     	this.eventCount = eventCount;
     }
     
-    public ScoreStatus(String custId , String eventCode , Integer eventCount , String circleId){
-    	this.custId = custId;
+    public ScoreStatus(String userId , String eventCode , Integer eventCount , String circleId){
+    	this.userId = userId;
     	this.eventCode = eventCode;
     	this.eventCount = eventCount;
     	this.circleId = circleId;
@@ -52,12 +52,12 @@ public class ScoreStatus implements Serializable{
         this.id = id;
     }
 
-    public String getCustId() {
-        return custId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setCustId(String custId) {
-        this.custId = custId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getCircleId() {

@@ -10,5 +10,5 @@ public interface EventAcountDao {
 
 	int update(EventAcount ea);
 
-	EventAcount getLastAcount(String custId);
+	EventAcount getLastAcount(String userId);
 }

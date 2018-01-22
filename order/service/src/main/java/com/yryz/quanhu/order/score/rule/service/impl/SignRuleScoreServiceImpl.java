@@ -29,13 +29,13 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 	EventAcountService eventAcountService;
 
 	@Override
-	public boolean processStatus(String custId, String eventCode, ScoreEventInfo sei, 
+	public boolean processStatus(String userId, String eventCode, ScoreEventInfo sei, 
 			double amount) {
 		// 进来的签到事件都是拦截器根据Redis状态判定后放行的，数据有可能不准确
 		Date now = new Date();
-		String scoreSignKey = EventUtil.getScoreStatusKey(custId, eventCode, ScoreTypeEnum.Sign);
+		String scoreSignKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Sign);
 		// 1.查询数据库中当前用户的签到信息
-		EventSign sss = scoreStatusSignService.getByCode(custId, eventCode);
+		EventSign sss = scoreStatusSignService.getByCode(userId, eventCode);
 		if (sss != null && sss.getId() != null) {
 			// 数据库有签到信息
 			int eventScore = sei.getEventScore();
@@ -56,7 +56,7 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 				scoreStatusSignService.update(sss);
 				int eventLoopUnit = sei.getEventLoopUnit();
 				int newScore = newCount >= eventLoopUnit ? eventScore * eventLoopUnit : eventScore * newCount;
-				saveScoreFlow(custId, eventCode, sei, newScore, amount);
+				saveScoreFlow(userId, eventCode, sei, newScore, amount);
 				return updateStatus(scoreSignKey, true, true);
 			default:
 				// 其他情况都属于签到中断的情况，则重置连续区间起始时间与连续天数
@@ -65,19 +65,19 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 				sss.setUpdateTime(now);
 				scoreStatusSignService.update(sss);
 				// 记录本次的新增积分流水及总值
-				saveScoreFlow(custId, eventCode, sei, sei.getEventScore(), amount);
+				saveScoreFlow(userId, eventCode, sei, sei.getEventScore(), amount);
 				return updateStatus(scoreSignKey, true, true);
 			}
 		}
 
 		// 2.若数据库中不存在记录，则需要新增初始化用户签到数据
-		sss = new EventSign(custId, eventCode);
+		sss = new EventSign(userId, eventCode);
 		sss.setCreateTime(now);
 		sss.setUpdateTime(now);
 		sss.setLastSignTime(now);
 		sss.setSignCount(1);
 		scoreStatusSignService.save(sss);
-		saveScoreFlow(custId, eventCode, sei, sei.getEventScore(), amount);
+		saveScoreFlow(userId, eventCode, sei, sei.getEventScore(), amount);
 		return updateStatus(scoreSignKey, true, true);
 	}
 

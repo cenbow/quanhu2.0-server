@@ -20,7 +20,14 @@ public class UserStatsVo implements Serializable {
 	/**
 	 * 用户id	
 	 */
-	private String custId;
+	private String userId;
+
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 	/**
 	 * 付费(消费金额)
 	 */
@@ -95,19 +102,14 @@ public class UserStatsVo implements Serializable {
 		super();
 	}
 	/**
-	 * @param custId
+	 * @param userId
 	 * @exception 
 	 */
-	public UserStatsVo(String custId) {
+	public UserStatsVo(String userId) {
 		super();
-		this.custId = custId;
+		this.userId = userId;
 	}
-	public String getCustId() {
-		return custId;
-	}
-	public void setCustId(String custId) {
-		this.custId = custId;
-	}
+
 	public long getAccount() {
 		return account;
 	}

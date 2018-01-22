@@ -33,12 +33,12 @@ public class ScoreStatusServiceImpl implements ScoreStatusService{
 	}
 
 	@Override
-	public ScoreStatus getById(String custId, String appId, Long id , Date createDate) {
-		return scoreStatusDao.getById(custId, appId, id , createDate);
+	public ScoreStatus getById(String userId, String appId, Long id , Date createDate) {
+		return scoreStatusDao.getById(userId, appId, id , createDate);
 	}
 
 	@Override
-	public ScoreStatus getByCode(String custId, String appId, String eventType , Date createDate) {
-		return scoreStatusDao.getByCode(custId, appId, eventType , createDate);
+	public ScoreStatus getByCode(String userId, String appId, String eventType , Date createDate) {
+		return scoreStatusDao.getByCode(userId, appId, eventType , createDate);
 	}
 }

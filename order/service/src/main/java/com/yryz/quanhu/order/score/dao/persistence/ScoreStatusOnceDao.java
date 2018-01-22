@@ -10,5 +10,5 @@ public interface ScoreStatusOnceDao {
 
 	void save(ScoreStatusOnce sso);
 
-	ScoreStatusOnce getByCode(@Param("custId")String custId, @Param("eventCode")String eventCode);
+	ScoreStatusOnce getByCode(@Param("userId")String userId, @Param("eventCode")String eventCode);
 }

@@ -12,7 +12,7 @@ public class ScoreStatusOnce implements Serializable{
 
 	private Long id;
 	
-	private String custId;
+	private String userId;
 	
 	private String eventCode;
 	
@@ -26,8 +26,8 @@ public class ScoreStatusOnce implements Serializable{
 		
 	}
 	
-	public ScoreStatusOnce(String custId , String eventCode){
-		this.custId = custId;
+	public ScoreStatusOnce(String userId , String eventCode){
+		this.userId = userId;
 		this.eventCode = eventCode;
 	}
 
@@ -39,12 +39,12 @@ public class ScoreStatusOnce implements Serializable{
 		this.id = id;
 	}
 
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getEventCode() {

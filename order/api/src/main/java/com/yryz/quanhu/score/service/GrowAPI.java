@@ -60,10 +60,10 @@ public interface GrowAPI {
 	
 	/**
 	 * 手动提升用户成长等级
-	 * @param custId
+	 * @param userId
 	 * @param growLevel
 	 * @param eventCode 
 	 * @return
 	 */
-	public int promoteGrowLevel(String custId , String growLevel,String eventCode);
+	public int promoteGrowLevel(String userId , String growLevel,String eventCode);
 }

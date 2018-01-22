@@ -17,7 +17,7 @@ public class ScoreFlowQuery implements Serializable{
 	private static final long serialVersionUID = 3438993563315960305L;
 	
 	
-	private String custId;
+	private String userId;
 	
 	private String eventCode;
 	
@@ -31,12 +31,12 @@ public class ScoreFlowQuery implements Serializable{
 	
 	private int limit;
 
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getEventCode() {

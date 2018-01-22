@@ -4,7 +4,7 @@
 
 	<sql id="columns">
 		 id as id ,
-		 cust_id as custId  ,
+		 user_id as userId  ,
 		 score as  score  ,
 		 grow as  grow  ,
 		 grow_level  as  growLevel ,
@@ -16,7 +16,7 @@
 	<!-- 新增用户事件账户记录 -->
 	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.score.vo.EventAcount">
 		INSERT INTO event_acount(
-		cust_id,
+		user_id,
 		<if test="score != null">
 		score,
 		</if>
@@ -29,7 +29,7 @@
 		create_time,
 		update_time
 		) VALUES (
-		#{custId},
+		#{userId},
 		<if test="score != null">
 		#{score},
 		</if>
@@ -46,7 +46,7 @@
 	
 	<!-- 获取用户事件账户记录 -->
 	<select id="getLastAcount" resultType="com.yryz.quanhu.score.vo.EventAcount">
-		select <include refid="columns" /> from event_acount where cust_id = #{custId}
+		select <include refid="columns" /> from event_acount where user_id = #{userId}
 	</select>
 
 	<!-- 更新用户事件账户记录 -->
@@ -64,7 +64,7 @@
 			</if>
 			update_time = #{updateTime}
 		</trim>
-		where cust_id = #{custId}
+		where user_id = #{userId}
 	</update>
 
 </mapper>

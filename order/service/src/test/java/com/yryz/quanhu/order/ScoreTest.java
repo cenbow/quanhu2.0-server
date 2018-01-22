@@ -40,7 +40,7 @@ public class ScoreTest {
 	@Test
     public void commitTest() {
         EventInfo info = new EventInfo();
-        info.setCustId("21b32tixua");
+        info.setUserId("123456789");
         info.setCircleId("62jqe12bhauv");
         info.setCoterieId("ctf8gkwjvo1q");
 //        info.setEventCode("11"); //ventType=1：一次性触发
@@ -58,7 +58,7 @@ public class ScoreTest {
 	@Test
     public void getScoreFlowList() {
         EventInfo info = new EventInfo();
-        info.setCustId("21b32tixua");
+        info.setUserId("123456789");
         List<EventReportVo>   list =   eventAPI.getScoreFlowList(info);
 
         System.out.println("ScoreFlow list: "+list.size());
