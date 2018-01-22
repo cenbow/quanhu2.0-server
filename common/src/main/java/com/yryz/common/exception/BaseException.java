@@ -26,6 +26,11 @@ public class BaseException extends RuntimeException {
 		this.msg = msg;
 	}
 
+	public BaseException(String msg) {
+		super(msg);
+		this.msg = msg;
+	}
+
 	public BaseException(int code, Object ...agrs) {
 		param = agrs;
 		this.code = code;
