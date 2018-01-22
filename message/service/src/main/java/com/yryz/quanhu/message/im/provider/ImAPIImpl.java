@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.im.api.ImAPI;
+import com.yryz.quanhu.message.im.entity.BlackAndMuteListVo;
 import com.yryz.quanhu.message.im.entity.ImRelation;
 import com.yryz.quanhu.message.im.entity.ImUser;
 import com.yryz.quanhu.message.im.entity.TeamModel;
@@ -143,6 +144,19 @@ public class ImAPIImpl implements ImAPI {
             return ResponseUtils.returnException(e);
         }
 
+    }
+
+    @Override
+    public Response<BlackAndMuteListVo> listBlackAndMuteList(ImRelation imRelation) {
+        try {
+            logger.info("listBlackAndMuteList request: {}", JSON.toJSONString(imRelation));
+            BlackAndMuteListVo blackAndMuteListVo = imService.listBlackAndMuteList(imRelation);
+            logger.info("listBlackAndMuteList result: {}", JSON.toJSONString(blackAndMuteListVo));
+            return ResponseUtils.returnObjectSuccess(blackAndMuteListVo);
+        } catch (Exception e) {
+            logger.error("setSpecialRelation error", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     @Override

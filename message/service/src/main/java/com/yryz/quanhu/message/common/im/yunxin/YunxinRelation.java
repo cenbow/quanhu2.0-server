@@ -5,8 +5,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.message.im.entity.BlackAndMuteListVo;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,8 +181,11 @@ public class YunxinRelation {
      * @param userId
      * @throws Exception
      */
-    public List<String> listBlackAndMuteList(String userId) throws Exception {
+    public BlackAndMuteListVo listBlackAndMuteList(String userId) throws Exception {
+        BlackAndMuteListVo blackAndMuteList = new BlackAndMuteListVo();
+
         List<String> blackList = Lists.newArrayList();
+        List<String> muteList = Lists.newArrayList();
 
         Map<String, String> params = Maps.newHashMap();
         params.put("accid", userId);
@@ -199,19 +204,32 @@ public class YunxinRelation {
         JSONObject json = null;
         try {
             json = JSONObject.fromObject(result);
+            //黑名单列表
             JSONArray blackJSONArray = json.getJSONArray("blacklist");
             if (blackJSONArray != null && blackJSONArray.size() > 0) {
                 for (int i = 0; i < blackJSONArray.size(); i++) {
                     blackList.add((String) blackJSONArray.get(i));
-
                 }
             }
-//			blackJSONArray
+            //静音列表
+            JSONArray muteJSONArray = json.getJSONArray("mutelist");
+            if (muteJSONArray != null && muteJSONArray.size() > 0) {
+                for (int i = 0; i < muteJSONArray.size(); i++) {
+                    muteList.add((String) muteJSONArray.get(i));
+                }
+            }
         } catch (QuanhuException e) {
             throw QuanhuException.busiError("", "yunxin return code error");
         }
 
-        return blackList;
+        if (CollectionUtils.isNotEmpty(blackList)) {
+            blackAndMuteList.setBlackList(blackList);
+        }
+        if (CollectionUtils.isNotEmpty(muteList)) {
+            blackAndMuteList.setMuteList(muteList);
+        }
+
+        return blackAndMuteList;
     }
 
 
