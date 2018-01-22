@@ -4,6 +4,9 @@ import com.yryz.quanhu.support.activity.entity.ActivityRecord;
 import com.yryz.quanhu.support.activity.vo.ActivityRecordVo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 
   * @ClassName: ActivityRecordDao
@@ -25,4 +28,5 @@ public interface ActivityRecordDao {
 
     int update(ActivityRecord activityRecord);
 
+    List<ActivityRecord> getEnrolStatusByCustId(Map<String, Object> map);
 }

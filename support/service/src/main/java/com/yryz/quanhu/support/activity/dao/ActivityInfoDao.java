@@ -1,8 +1,12 @@
 package com.yryz.quanhu.support.activity.dao;
 
 import com.yryz.quanhu.support.activity.entity.ActivityInfo;
+import com.yryz.quanhu.support.activity.vo.ActivityInfoAppListVo;
 import com.yryz.quanhu.support.activity.vo.ActivityInfoVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 
@@ -25,4 +29,11 @@ public interface ActivityInfoDao {
 
     int update(ActivityInfo activityInfo);
 
+    List<ActivityInfoAppListVo> selectMyList(@Param("custId")Long custId);
+
+    Integer selectMylistCount(@Param("custId") Long custId);
+
+    List<ActivityInfoAppListVo> selectAppList(@Param("type") Integer type);
+
+    void updateJoinCount(ActivityInfo activityInfo);
 }

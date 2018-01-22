@@ -41,7 +41,19 @@ public class ActivityEnrolConfig extends GenericEntity{
 	 * 配置数据
 	 */	 
     private  String configSources;
-    
+
+	/**
+	 * 是否上下线（10上线 11下线）
+	 */
+	private  Integer shelveFlag;
+
+	public Integer getShelveFlag() {
+		return shelveFlag;
+	}
+
+	public void setShelveFlag(Integer shelveFlag) {
+		this.shelveFlag = shelveFlag;
+	}
 
 	public Long getActivityInfoId() {
 		return this.activityInfoId;
