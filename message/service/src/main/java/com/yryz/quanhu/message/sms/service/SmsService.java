@@ -4,10 +4,11 @@ import com.yryz.quanhu.message.sms.dto.SmsDTO;
 
 public interface SmsService {
 	/**
-	 * 发送验证码
+	 * 短信发送<br/>
+	 * 需要增加mq发送短信通知
 	 * @param smsDTO
 	 * @return
 	 */
-	public boolean sendVerifyCode(SmsDTO smsDTO);
+	public boolean sendSms(SmsDTO smsDTO);
 	
 }

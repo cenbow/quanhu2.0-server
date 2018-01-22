@@ -29,7 +29,7 @@ public interface UserBaseInfoDao {
     
     List<UserBaseInfo> getByUserIds(@Param("userIds")List<String> userIds);
     
-    List<String> getByPhones(@Param("phones")List<String> phones,@Param("appId")String appId);
+    List<UserBaseInfo> getByPhones(@Param("phones")List<String> phones,@Param("appId")String appId);
     
     List<String> getDevIdByUserIds(@Param("userIds")List<String> userIds);
     

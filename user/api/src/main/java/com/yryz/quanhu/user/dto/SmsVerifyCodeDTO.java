@@ -20,6 +20,10 @@ public class SmsVerifyCodeDTO implements Serializable{
 	 * 校验验证码
 	 */
 	private String veriCode;
+	/**
+	 * 用户id
+	 */
+	private String userId;
 	public String getPhone() {
 		return phone;
 	}
@@ -43,5 +47,11 @@ public class SmsVerifyCodeDTO implements Serializable{
 	}
 	public void setVeriCode(String veriCode) {
 		this.veriCode = veriCode;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

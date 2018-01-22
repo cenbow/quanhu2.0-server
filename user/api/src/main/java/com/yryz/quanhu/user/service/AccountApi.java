@@ -198,4 +198,10 @@ public interface AccountApi {
 	 * @param passwordDTO
 	 */
 	public Response<Boolean> forgotPassword(ForgotPasswordDTO passwordDTO);
+	/**
+	 * 检查用户是否被禁言
+	 * @param userId
+	 * @return
+	 */
+	public Response<Boolean> checkUserDisTalk(String userId);
 }

@@ -141,9 +141,9 @@ public interface AccountService {
 	 * @param thirdUser
 	 *            第三方用户对象
 	 * @param type
-	 *            1，微信 2，微博 3，qq
+	 *            10，微信 11，微博 12，qq
 	 */
-	void bindThird(Long userId, ThirdUser thirdUser, Integer type);
+	void bindThird(Long userId, ThirdUser thirdUser, Integer type,String appId);
 
 	/**
 	 * 解绑 第三方账户
@@ -192,4 +192,10 @@ public interface AccountService {
 	 * @return
 	 */
 	UserAccount checkUserByPhonePassword(String phone, String password,String appId);
+	/**
+	 * 查询用户账号
+	 * @param userId
+	 * @return
+	 */
+	UserAccount getUserAccountByUserId(String userId);
 }

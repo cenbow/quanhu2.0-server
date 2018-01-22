@@ -13,10 +13,6 @@ public class UserLoginSimpleVO implements Serializable {
      * 用户账户id
      */
     private String userId;
-    /**
-     * 应用id
-     */
-    private String appId;
 
     /**
      * 昵称
@@ -104,21 +100,11 @@ public class UserLoginSimpleVO implements Serializable {
      * 好友备注名
      */
     private String nameNotes;
-    /**
-     * 关系类型 0-陌生人 1-关注 2-粉丝 3-好友 4-黑名单
-     */
-    private Integer relationStatus;
 	public String getUserId() {
 		return userId;
 	}
 	public void setUserId(String userId) {
 		this.userId = userId;
-	}
-	public String getAppId() {
-		return appId;
-	}
-	public void setAppId(String appId) {
-		this.appId = appId;
 	}
 	public String getUserNickName() {
 		return userNickName;
@@ -223,20 +209,39 @@ public class UserLoginSimpleVO implements Serializable {
 		this.userLocation = userLocation;
 	}
 	public String getNameNotes() {
-		return nameNotes;
+		return nameNotes == null ? "" : nameNotes.trim();
 	}
 	public void setNameNotes(String nameNotes) {
-		this.nameNotes = nameNotes;
+		this.nameNotes = nameNotes == null ? "" : nameNotes.trim();
 	}
-	public Integer getRelationStatus() {
-		return relationStatus;
+	
+	public UserLoginSimpleVO() {
+		super();
 	}
-	public void setRelationStatus(Integer relationStatus) {
-		this.relationStatus = relationStatus;
+	public UserLoginSimpleVO(String userId, String userNickName, String userImg, String userSignature, String userPhone,
+			String userQr, Byte userAge, Byte userGenders, String userBirthday, String userLocation, String cityCode,
+			Byte userRole, Byte authStatus, Integer lastHeat, String userDesc, Date createDate) {
+		super();
+		this.userId = userId;
+		this.userNickName = userNickName;
+		this.userImg = userImg;
+		this.userSignature = userSignature;
+		this.userPhone = userPhone;
+		this.userQr = userQr;
+		this.userAge = userAge;
+		this.userGenders = userGenders;
+		this.userBirthday = userBirthday;
+		this.userLocation = userLocation;
+		this.cityCode = cityCode;
+		this.userRole = userRole;
+		this.authStatus = authStatus;
+		this.lastHeat = lastHeat;
+		this.userDesc = userDesc;
+		this.createDate = createDate;
 	}
 	@Override
 	public String toString() {
-		return "UserLoginSimpleVO [userId=" + userId + ", appId=" + appId + ", userNickName=" + userNickName
+		return "UserLoginSimpleVO [userId=" + userId + ", userNickName=" + userNickName
 				+ ", userImg=" + userImg + ", userSignature=" + userSignature + ", userPhone=" + userPhone + ", userQr="
 				+ userQr + ", cityCode=" + cityCode + ", userRole=" + userRole 
 				+ ", authStatus=" + authStatus + ", lastHeat=" + lastHeat + ", userDesc=" + userDesc + ", createDate="

@@ -39,7 +39,7 @@
 
 	<update id="delete">
 		update qh_user_third_login set del_flag = 11
-		where 1=1
+		where del_flag = 10
 		<if test="userId != null and userId != ''">
 			and user_id = #{userId}
 		</if>

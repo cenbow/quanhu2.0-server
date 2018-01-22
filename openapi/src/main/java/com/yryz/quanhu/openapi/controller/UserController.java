@@ -30,6 +30,7 @@ import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
+import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
@@ -37,6 +38,7 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import io.swagger.annotations.Api;
@@ -72,10 +74,24 @@ public class UserController {
 	@ApiOperation("用户信息查询")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/find")
-	public Response<UserSimpleVO> findUser(String userId) {
-		return userApi.getUserSimple(userId);
+	public Response<UserLoginSimpleVO> findUser(String userId, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		if (StringUtils.isBlank(userId)) {
+			return userApi.getUserLoginSimpleVO(header.getUserId());
+		} else {
+			return userApi.getUserLoginSimpleVO(header.getUserId(), userId);
+		}
 	}
-
+	
+	@ApiOperation("用户信息编辑")
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/user/update")
+	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		infoDTO.setUserId(header.getUserId());
+		return userApi.updateUserInfo(infoDTO);
+	}
+	
 	/**
 	 * 手机号注册
 	 * 
@@ -145,10 +161,9 @@ public class UserController {
 		String ip = WebUtil.getClientIP(request);
 		loginDTO.setDeviceId(header.getDevId());
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
-		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(),
-				null, devType, ip);
+		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
-		
+
 		return accountApi.loginThird(loginDTO, header);
 	}
 
@@ -170,10 +185,9 @@ public class UserController {
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
 		loginDTO.setDevType(devType);
 		loginDTO.setDeviceId(header.getDevId());
-		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(),
-				null, devType, ip);
+		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
-		
+
 		return accountApi.loginThird(loginDTO, header);
 	}
 
@@ -218,8 +232,9 @@ public class UserController {
 	@ApiOperation("获取登录方式")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/getLoginMethod")
-	public Response<List<LoginMethodVO>> getLoginMethod(String userId) {
-		return accountApi.getLoginMethod(userId);
+	public Response<List<LoginMethodVO>> getLoginMethod(HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		return accountApi.getLoginMethod(header.getUserId());
 	}
 
 	/**
@@ -231,7 +246,7 @@ public class UserController {
 	@ApiOperation("退出登录")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginOut")
-	public Response<Boolean> loginOut(@RequestBody String userId) {
+	public Response<Boolean> loginOut() {
 		return ResponseUtils.returnSuccess();
 	}
 
@@ -244,7 +259,9 @@ public class UserController {
 	@ApiOperation("绑定手机号")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/bindPhone")
-	public Response<Boolean> bindPhone(@RequestBody BindPhoneDTO phoneDTO) {
+	public Response<Boolean> bindPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		phoneDTO.setUserId(header.getUserId());
 		return accountApi.bindPhone(phoneDTO);
 	}
 
@@ -257,7 +274,9 @@ public class UserController {
 	@ApiOperation("绑定 第三方账户")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/bindThird")
-	public Response<Boolean> bindThird(@RequestBody BindThirdDTO thirdDTO) {
+	public Response<Boolean> bindThird(@RequestBody BindThirdDTO thirdDTO,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		thirdDTO.setUserId(header.getUserId());
 		return accountApi.bindThird(thirdDTO);
 	}
 
@@ -270,7 +289,9 @@ public class UserController {
 	@ApiOperation("绑定 第三方账户")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/unbindThird")
-	public Response<Boolean> unbindThird(@RequestBody UnBindThirdDTO thirdDTO) {
+	public Response<Boolean> unbindThird(@RequestBody UnBindThirdDTO thirdDTO,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		thirdDTO.setUserId(header.getUserId());
 		return accountApi.unbindThird(thirdDTO);
 	}
 
@@ -288,9 +309,10 @@ public class UserController {
 	@ApiOperation("修改密码")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/editPassword")
-	public Response<Boolean> editPassword(@RequestBody String userId, @RequestBody String oldPassword,
-			@RequestBody String newPassword) {
-		return accountApi.editPassword(userId, oldPassword, newPassword);
+	public Response<Boolean> editPassword(@RequestBody String oldPassword,
+			@RequestBody String newPassword,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		return accountApi.editPassword(header.getUserId(), oldPassword, newPassword);
 	}
 
 	/**
@@ -301,7 +323,9 @@ public class UserController {
 	@ApiOperation("手机短信重置密码")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/forgotPassword")
-	public Response<Boolean> forgotPassword(@RequestBody ForgotPasswordDTO passwordDTO) {
+	public Response<Boolean> forgotPassword(@RequestBody ForgotPasswordDTO passwordDTO,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		passwordDTO.setAppId(header.getAppId());
 		return accountApi.forgotPassword(passwordDTO);
 	}
 

@@ -11,6 +11,8 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.SmsContants;
 import com.yryz.quanhu.user.contants.SmsType;
+import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
+import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.manager.SmsManager;
 import com.yryz.quanhu.user.service.AccountService;
 import com.yryz.quanhu.user.service.SmsService;
@@ -30,19 +32,31 @@ public class SmsServiceImpl implements SmsService{
 	private AccountService accountService;
 	
 	@Override
-	public SmsVerifyCodeVO sendVerifyCode(String phone, String type,String appId) {
+	public SmsVerifyCodeVO sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
 		SmsVerifyCodeVO result = null;
 		String msg = null;
-
-		boolean accountFlag = accountService.checkUserByPhone(phone,appId);
+		boolean accountFlag = true;
+		
+		if(StringUtils.isBlank(codeDTO.getUserId())){
+		   accountFlag = accountService.checkUserByPhone(codeDTO.getPhone(),codeDTO.getAppId());
+		}else{
+		   UserAccount account = accountService.getUserAccountByUserId(codeDTO.getUserId());
+		   if(account == null){
+			   throw QuanhuException.busiError("用户不存在");
+		   }
+		   if(StringUtils.isBlank(account.getUserPhone())){
+			   throw QuanhuException.busiError("手机号码不存在");
+		   }		   
+		}
+		
 		SmsType smsType = null;
-		if(StringUtils.equals(type, SmsContants.CODE_LOGIN)){
+		if(StringUtils.equals(codeDTO.getCode(), SmsContants.CODE_LOGIN)){
 			smsType = accountFlag ? SmsType.CODE_LOGIN : SmsType.CODE_REGISTER;
 		}
-		if (type == null) {
+		if (codeDTO.getCode() == null) {
 			smsType = accountFlag ? SmsType.CODE_REGISTER : SmsType.CODE_FIND_PWD;
 		} else {
-			switch (type) {
+			switch (codeDTO.getCode()) {
 			case SmsContants.CODE_REGISTER:
 				smsType = SmsType.CODE_REGISTER;
 				msg = !accountFlag ? null : "该手机号已注册";
@@ -86,7 +100,7 @@ public class SmsServiceImpl implements SmsService{
 		if (msg != null) {
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,ExceptionEnum.BusiException.getErrorMsg());
 		}
-		result = this.smsManager.sendCode(phone, smsType,appId);
+		result = this.smsManager.sendCode(codeDTO.getPhone(), smsType,codeDTO.getAppId());
 		return result;
 	}
 

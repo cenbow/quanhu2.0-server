@@ -10,6 +10,9 @@ package com.yryz.quanhu.user.entity;
 import java.util.Date;
 
 import com.yryz.common.entity.GenericEntity;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
  * 用户基础信息表
@@ -19,382 +22,387 @@ import com.yryz.common.entity.GenericEntity;
  * @since 1.0
  */
 @SuppressWarnings("serial")
-public class UserBaseInfo extends GenericEntity{
+public class UserBaseInfo extends GenericEntity {
 
-    /**
-     * 用户id
-     */
-    private Long userId;
+	/**
+	 * 用户id
+	 */
+	private Long userId;
 
-    /**
-     * 应用id
-     */
-    private String appId;
+	/**
+	 * 应用id
+	 */
+	private String appId;
 
-    /**
-     * 昵称
-     */
-    private String userNickName;
+	/**
+	 * 昵称
+	 */
+	private String userNickName;
 
-    /**
-     * 头像
-     */
-    private String userImg;
+	/**
+	 * 头像
+	 */
+	private String userImg;
 
-    /**
-     * 用户签名
-     */
-    private String userSignature;
+	/**
+	 * 用户签名
+	 */
+	private String userSignature;
 
-    /**
-     * 用户手机号码
-     */
-    private String userPhone;
+	/**
+	 * 用户手机号码
+	 */
+	private String userPhone;
 
-    /**
-     * 年龄
-     */
-    private Byte userAge;
+	/**
+	 * 年龄
+	 */
+	private Byte userAge;
 
-    /**
-     * 用户二维码地址
-     */
-    private String userQr;
+	/**
+	 * 用户二维码地址
+	 */
+	private String userQr;
 
-    /**
-     * 用户性别 0-女 1-男
-     */
-    private Byte userGenders;
+	/**
+	 * 用户性别 0-女 1-男
+	 */
+	private Byte userGenders;
 
-    /**
-     * 出生年月日
-     */
-    private String userBirthday;
+	/**
+	 * 出生年月日
+	 */
+	private String userBirthday;
 
-    /**
-     * 用户城市位置(湖北武汉)
-     */
-    private String userLocation;
+	/**
+	 * 用户城市位置(湖北武汉)
+	 */
+	private String userLocation;
 
-    /**
-     * 用户推送设备号id
-     */
-    private String userDeviceId;
+	/**
+	 * 用户推送设备号id
+	 */
+	private String userDeviceId;
 
-    /**
-     * 用户状态 10-正常 11-冻结 12-黑名单
-     */
-    private Byte userStatus;
+	/**
+	 * 用户状态 10-正常 11-冻结 12-黑名单
+	 */
+	private Byte userStatus;
 
-    /**
-     * 国家
-     */
-    private String userCountry;
+	/**
+	 * 国家
+	 */
+	private String userCountry;
 
-    /**
-     * 省份
-     */
-    private String userProvince;
+	/**
+	 * 省份
+	 */
+	private String userProvince;
 
-    /**
-     * 城市
-     */
-    private String userCity;
+	/**
+	 * 城市
+	 */
+	private String userCity;
 
-    /**
-     * 城市代码
-     */
-    private String cityCode;
+	/**
+	 * 城市代码
+	 */
+	private String cityCode;
 
-    /**
-     * 用户角色 10:普通用户 11:实名用户
-     */
-    private Byte userRole;
-    
-    public enum UserRole{
-    	/**
-    	 * 普通用户
-    	 */
-    	NORMAL((byte)10),
-    	/**
-    	 * 达人
-    	 */
-    	STAR((byte)11);
-    	private byte role;
-    	UserRole(byte role) {
+	/**
+	 * 用户角色 10:普通用户 11:实名用户
+	 */
+	private Byte userRole;
+
+	public enum UserRole {
+		/**
+		 * 普通用户
+		 */
+		NORMAL((byte) 10),
+		/**
+		 * 达人
+		 */
+		STAR((byte) 11);
+		private byte role;
+
+		UserRole(byte role) {
 			this.role = role;
 		}
-    	public byte getRole(){
-    		return role;
-    	}
-    }
-    
-    /**
-     * 是否马甲 10:否 11:是
-     */
-    private Byte userVest;
-    
-    public enum UserVest{
-    	/**
-    	 * 否
-    	 */
-    	FALSE((byte)10),
-    	/**
-    	 * 是
-    	 */
-    	TRUE((byte)11);
-    	private byte vest;
-    	UserVest(byte vest) {
+
+		public byte getRole() {
+			return role;
+		}
+	}
+
+	/**
+	 * 是否马甲 10:否 11:是
+	 */
+	private Byte userVest;
+
+	public enum UserVest {
+		/**
+		 * 否
+		 */
+		FALSE((byte) 10),
+		/**
+		 * 是
+		 */
+		TRUE((byte) 11);
+		private byte vest;
+
+		UserVest(byte vest) {
 			this.vest = vest;
 		}
-    	public byte getVest(){
-    		return vest;
-    	}
-    }
-    
-    /**
-     * 认证状态 10-未认证 11-已认证
-     */
-    private Byte authStatus;
-    
-    public enum UserAuthStatus{
-    	/**
-    	 * 未认证
-    	 */
-    	FALSE((byte)10),
-    	/**
-    	 * 已认证
-    	 */
-    	TRUE((byte)11);
-    	private byte staus;
-    	UserAuthStatus(byte staus) {
+
+		public byte getVest() {
+			return vest;
+		}
+	}
+
+	/**
+	 * 认证状态 10-未认证 11-已认证
+	 */
+	private Byte authStatus;
+
+	public enum UserAuthStatus {
+		/**
+		 * 未认证
+		 */
+		FALSE((byte) 10),
+		/**
+		 * 已认证
+		 */
+		TRUE((byte) 11);
+		private byte staus;
+
+		UserAuthStatus(byte staus) {
 			this.staus = staus;
 		}
-    	public byte getStatus(){
-    		return staus;
-    	}
-    }
-    
-    /**
-     * 最终热度值
-     */
-    private Integer lastHeat;
 
-    /**
-     * 删除标识 10:有效  11:删除
-     */
-    private Byte delFlag;
+		public byte getStatus() {
+			return staus;
+		}
+	}
 
-    /**
-     * 冻结最大时间点
-     */
-    private Date banPostTime;
+	/**
+	 * 最终热度值
+	 */
+	private Integer lastHeat;
 
-    /**
-     * 用户简介
-     */
-    private String userDesc;
+	/**
+	 * 删除标识 10:有效 11:删除
+	 */
+	private Byte delFlag;
 
+	/**
+	 * 冻结最大时间点
+	 */
+	private Date banPostTime;
 
-    public Long getUserId() {
-        return userId;
-    }
+	/**
+	 * 用户简介
+	 */
+	private String userDesc;
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+	public Long getUserId() {
+		return userId;
+	}
 
-    public String getAppId() {
-        return appId;
-    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-    public void setAppId(String appId) {
-        this.appId = appId == null ? null : appId.trim();
-    }
+	public String getAppId() {
+		return appId;
+	}
 
-    public String getUserNickName() {
-        return userNickName;
-    }
+	public void setAppId(String appId) {
+		this.appId = appId == null ? null : appId.trim();
+	}
 
-    public void setUserNickName(String userNickName) {
-        this.userNickName = userNickName == null ? null : userNickName.trim();
-    }
+	public String getUserNickName() {
+		return userNickName;
+	}
 
-    public String getUserImg() {
-        return userImg;
-    }
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName == null ? null : userNickName.trim();
+	}
 
-    public void setUserImg(String userImg) {
-        this.userImg = userImg == null ? null : userImg.trim();
-    }
+	public String getUserImg() {
+		return userImg;
+	}
 
-    public String getUserSignature() {
-        return userSignature;
-    }
+	public void setUserImg(String userImg) {
+		this.userImg = userImg == null ? null : userImg.trim();
+	}
 
-    public void setUserSignature(String userSignature) {
-        this.userSignature = userSignature == null ? null : userSignature.trim();
-    }
+	public String getUserSignature() {
+		return userSignature;
+	}
 
-    public String getUserPhone() {
-        return userPhone;
-    }
+	public void setUserSignature(String userSignature) {
+		this.userSignature = userSignature == null ? null : userSignature.trim();
+	}
 
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone == null ? null : userPhone.trim();
-    }
+	public String getUserPhone() {
+		return userPhone;
+	}
 
-    public Byte getUserAge() {
-        return userAge;
-    }
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone == null ? null : userPhone.trim();
+	}
 
-    public void setUserAge(Byte userAge) {
-        this.userAge = userAge;
-    }
+	public Byte getUserAge() {
+		return userAge;
+	}
 
-    public String getUserQr() {
-        return userQr;
-    }
+	public void setUserAge(Byte userAge) {
+		this.userAge = userAge;
+	}
 
-    public void setUserQr(String userQr) {
-        this.userQr = userQr == null ? null : userQr.trim();
-    }
+	public String getUserQr() {
+		return userQr;
+	}
 
-    public Byte getUserGenders() {
-        return userGenders;
-    }
+	public void setUserQr(String userQr) {
+		this.userQr = userQr == null ? null : userQr.trim();
+	}
 
-    public void setUserGenders(Byte userGenders) {
-        this.userGenders = userGenders;
-    }
+	public Byte getUserGenders() {
+		return userGenders;
+	}
 
-    public String getUserBirthday() {
-        return userBirthday;
-    }
+	public void setUserGenders(Byte userGenders) {
+		this.userGenders = userGenders;
+	}
 
-    public void setUserBirthday(String userBirthday) {
-        this.userBirthday = userBirthday == null ? null : userBirthday.trim();
-    }
+	public String getUserBirthday() {
+		return userBirthday;
+	}
 
-    public String getUserLocation() {
-        return userLocation;
-    }
+	public void setUserBirthday(String userBirthday) {
+		this.userBirthday = userBirthday == null ? null : userBirthday.trim();
+	}
 
-    public void setUserLocation(String userLocation) {
-        this.userLocation = userLocation == null ? null : userLocation.trim();
-    }
+	public String getUserLocation() {
+		return userLocation;
+	}
 
-    public String getUserDeviceId() {
-        return userDeviceId;
-    }
+	public void setUserLocation(String userLocation) {
+		this.userLocation = userLocation == null ? null : userLocation.trim();
+	}
 
-    public void setUserDeviceId(String userDeviceId) {
-        this.userDeviceId = userDeviceId == null ? null : userDeviceId.trim();
-    }
+	public String getUserDeviceId() {
+		return userDeviceId;
+	}
 
-    public Byte getUserStatus() {
-        return userStatus;
-    }
+	public void setUserDeviceId(String userDeviceId) {
+		this.userDeviceId = userDeviceId == null ? null : userDeviceId.trim();
+	}
 
-    public void setUserStatus(Byte userStatus) {
-        this.userStatus = userStatus;
-    }
+	public Byte getUserStatus() {
+		return userStatus;
+	}
 
-    public String getUserCountry() {
-        return userCountry;
-    }
+	public void setUserStatus(Byte userStatus) {
+		this.userStatus = userStatus;
+	}
 
-    public void setUserCountry(String userCountry) {
-        this.userCountry = userCountry == null ? null : userCountry.trim();
-    }
+	public String getUserCountry() {
+		return userCountry;
+	}
 
-    public String getUserProvince() {
-        return userProvince;
-    }
+	public void setUserCountry(String userCountry) {
+		this.userCountry = userCountry == null ? null : userCountry.trim();
+	}
 
-    public void setUserProvince(String userProvince) {
-        this.userProvince = userProvince == null ? null : userProvince.trim();
-    }
+	public String getUserProvince() {
+		return userProvince;
+	}
 
-    public String getUserCity() {
-        return userCity;
-    }
+	public void setUserProvince(String userProvince) {
+		this.userProvince = userProvince == null ? null : userProvince.trim();
+	}
 
-    public void setUserCity(String userCity) {
-        this.userCity = userCity == null ? null : userCity.trim();
-    }
+	public String getUserCity() {
+		return userCity;
+	}
 
-    public String getCityCode() {
-        return cityCode;
-    }
+	public void setUserCity(String userCity) {
+		this.userCity = userCity == null ? null : userCity.trim();
+	}
 
-    public void setCityCode(String cityCode) {
-        this.cityCode = cityCode == null ? null : cityCode.trim();
-    }
+	public String getCityCode() {
+		return cityCode;
+	}
 
-    public Byte getCustRole() {
-        return userRole;
-    }
+	public void setCityCode(String cityCode) {
+		this.cityCode = cityCode == null ? null : cityCode.trim();
+	}
 
-    public void setCustRole(Byte userRole) {
-        this.userRole = userRole;
-    }
+	public Byte getUserRole() {
+		return userRole;
+	}
 
-    public Byte getCustVest() {
-        return userVest;
-    }
+	public void setUserRole(Byte userRole) {
+		this.userRole = userRole;
+	}
 
-    public void setCustVest(Byte userVest) {
-        this.userVest = userVest;
-    }
+	public Byte getUserVest() {
+		return userVest;
+	}
 
-    public Byte getAuthStatus() {
-        return authStatus;
-    }
+	public void setUserVest(Byte userVest) {
+		this.userVest = userVest;
+	}
 
-    public void setAuthStatus(Byte authStatus) {
-        this.authStatus = authStatus;
-    }
+	public Byte getAuthStatus() {
+		return authStatus;
+	}
 
-    public Integer getLastHeat() {
-        return lastHeat;
-    }
+	public void setAuthStatus(Byte authStatus) {
+		this.authStatus = authStatus;
+	}
 
-    public void setLastHeat(Integer lastHeat) {
-        this.lastHeat = lastHeat;
-    }
+	public Integer getLastHeat() {
+		return lastHeat;
+	}
 
-    public Byte getDelFlag() {
-        return delFlag;
-    }
+	public void setLastHeat(Integer lastHeat) {
+		this.lastHeat = lastHeat;
+	}
 
-    public void setDelFlag(Byte delFlag) {
-        this.delFlag = delFlag;
-    }
+	public Byte getDelFlag() {
+		return delFlag;
+	}
 
-    public Date getBanPostTime() {
-        return banPostTime;
-    }
+	public void setDelFlag(Byte delFlag) {
+		this.delFlag = delFlag;
+	}
 
-    public void setBanPostTime(Date banPostTime) {
-        this.banPostTime = banPostTime;
-    }
+	public Date getBanPostTime() {
+		return banPostTime;
+	}
 
+	public void setBanPostTime(Date banPostTime) {
+		this.banPostTime = banPostTime;
+	}
 
-    public String getUserDesc() {
-        return userDesc;
-    }
+	public String getUserDesc() {
+		return userDesc;
+	}
 
-    public void setUserDesc(String userDesc) {
-        this.userDesc = userDesc == null ? null : userDesc.trim();
-    }
+	public void setUserDesc(String userDesc) {
+		this.userDesc = userDesc == null ? null : userDesc.trim();
+	}
 
 	public UserBaseInfo() {
 		super();
 	}
-	
+
 	/**
 	 * 注册初始化用户信息
+	 * 
 	 * @param userId
 	 * @param appId
 	 * @param userPhone
@@ -415,6 +423,7 @@ public class UserBaseInfo extends GenericEntity{
 
 	/**
 	 * 昵称头像更新
+	 * 
 	 * @param userId
 	 * @param userNickName
 	 * @param userImg
@@ -428,6 +437,7 @@ public class UserBaseInfo extends GenericEntity{
 
 	/**
 	 * 头像更新
+	 * 
 	 * @param userId
 	 * @param userImg
 	 */
@@ -436,9 +446,10 @@ public class UserBaseInfo extends GenericEntity{
 		this.userId = userId;
 		this.userImg = userImg;
 	}
-	
+
 	/**
 	 * 手机号或者设备id更新
+	 * 
 	 * @param userId
 	 * @param userPhone
 	 * @param userDeviceId
@@ -451,9 +462,10 @@ public class UserBaseInfo extends GenericEntity{
 		this.userDeviceId = userDeviceId;
 		this.delFlag = delFlag;
 	}
-	
+
 	/**
 	 * 用户状态、角色、认证、热度更新
+	 * 
 	 * @param userId
 	 * @param userStatus
 	 * @param userRole
@@ -473,9 +485,10 @@ public class UserBaseInfo extends GenericEntity{
 		this.lastHeat = lastHeat;
 		this.banPostTime = banPostTime;
 	}
-	
+
 	/**
 	 * 用户基本信息更新
+	 * 
 	 * @param userId
 	 * @param userNickName
 	 * @param userImg
@@ -507,5 +520,48 @@ public class UserBaseInfo extends GenericEntity{
 		this.userCity = userCity;
 		this.cityCode = cityCode;
 		this.userDesc = userDesc;
+	}
+
+	/**
+	 * 
+	 * @param baseInfo
+	 * @return
+	 */
+	public static UserSimpleVO getUserSimpleVo(UserBaseInfo baseInfo) {
+		UserSimpleVO simpleVO = new UserSimpleVO(baseInfo.getUserId().toString(), baseInfo.getUserNickName(),
+				baseInfo.getUserImg(), baseInfo.getUserDesc(), baseInfo.getUserRole());
+		return simpleVO;
+	}
+
+	public static UserLoginSimpleVO getUserLoginSimpleVO(UserBaseInfo baseInfo) {
+		UserLoginSimpleVO loginSimpleVO = new UserLoginSimpleVO(baseInfo.getUserId().toString(),
+				baseInfo.getUserNickName(), baseInfo.getUserImg(), baseInfo.getUserSignature(), baseInfo.getUserPhone(),
+				baseInfo.getUserQr(), baseInfo.getUserAge(), baseInfo.getUserGenders(), baseInfo.getUserBirthday(),
+				baseInfo.getUserLocation(), baseInfo.getCityCode(), baseInfo.getUserRole(), baseInfo.getAuthStatus(),
+				baseInfo.getLastHeat(), baseInfo.getUserDesc(), baseInfo.getCreateDate());
+		return loginSimpleVO;
+	}
+
+	public static UserBaseInfoVO getUserBaseInfoVO(UserBaseInfo baseInfo) {
+		UserBaseInfoVO baseInfoVO = new UserBaseInfoVO(baseInfo.getUserId().toString(), baseInfo.getAppId(),
+				baseInfo.getUserNickName(), baseInfo.getUserImg(), baseInfo.getUserSignature(), baseInfo.getUserPhone(),
+				baseInfo.getUserAge(), baseInfo.getUserQr(), baseInfo.getUserGenders(), baseInfo.getUserBirthday(),
+				baseInfo.getUserLocation(), baseInfo.getUserDeviceId(), baseInfo.getUserStatus(),
+				baseInfo.getUserCountry(), baseInfo.getUserProvince(), baseInfo.getUserCity(), baseInfo.getCityCode(),
+				baseInfo.getUserRole(), baseInfo.getUserVest(), baseInfo.getAuthStatus(), baseInfo.getLastHeat(),
+				baseInfo.getBanPostTime(), baseInfo.getUserDesc(), baseInfo.getCreateDate());
+		return baseInfoVO;
+	}
+
+	@Override
+	public String toString() {
+		return "UserBaseInfo [userId=" + userId + ", appId=" + appId + ", userNickName=" + userNickName + ", userImg="
+				+ userImg + ", userSignature=" + userSignature + ", userPhone=" + userPhone + ", userAge=" + userAge
+				+ ", userQr=" + userQr + ", userGenders=" + userGenders + ", userBirthday=" + userBirthday
+				+ ", userLocation=" + userLocation + ", userDeviceId=" + userDeviceId + ", userStatus=" + userStatus
+				+ ", userCountry=" + userCountry + ", userProvince=" + userProvince + ", userCity=" + userCity
+				+ ", cityCode=" + cityCode + ", userRole=" + userRole + ", userVest=" + userVest + ", authStatus="
+				+ authStatus + ", lastHeat=" + lastHeat + ", delFlag=" + delFlag + ", banPostTime=" + banPostTime
+				+ ", userDesc=" + userDesc + "]";
 	}
 }

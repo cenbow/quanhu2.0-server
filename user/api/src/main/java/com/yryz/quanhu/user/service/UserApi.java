@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -69,23 +70,23 @@ public interface UserApi {
 	Response<UserLoginSimpleVO> getUserLoginSimpleVO(String userId,String friendId);
 	
 	/**
-	 * 根据电话检索用户简要信息
+	 * 根据电话检索用户
 	 * 
 	 * @param phone
 	 * @param appId 应用id
 	 * @return
 	 */
-	Response<UserSimpleVO> getUserSimpleByPhone(String phone,String appId);
+	Response<String> getUserIdByPhone(String phone,String appId);
 
 	
 	/**
-	 * 根据电话检索用户简要信息
+	 * 根据电话检索用户
 	 * 
 	 * @param phones
 	 * @param appId 应用id
 	 * @return
 	 */
-	Response<Map<String, UserSimpleVO>> getUserSimpleByPhone(Set<String> phones,String appId);
+	Response<Map<String, String>> getUserIdByPhone(Set<String> phones,String appId);
 	
 	/**
 	 * 查询用户基本信息
@@ -114,6 +115,12 @@ public interface UserApi {
 	 * @return
 	 */
 	Response<List<String>> getDeviceIdByUserId(List<String> userId);
+	/**
+	 * 用户信息更新
+	 * @param infoDTO
+	 * @return
+	 */
+	Response<Boolean> updateUserInfo(UpdateBaseInfoDTO infoDTO);
 	
 	/**
 	 * 管理后台查询用户列表
