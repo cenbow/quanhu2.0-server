@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.support.activity.dao.ActivityVoteDetailDao">
+
+	<!--Base_Column_List-->
+	<sql id="Base_Column_List">id,kid,activity_info_id,vote_no,obtain_integral,content,cover_plan,img_url,video_url,video_thumbnail_url,vote_count,add_vote,create_date,create_user_id,last_update_date,last_update_user_id,module_enum,shelve_flag,amount_of_access,content1,content2
+    </sql>
+
+     <!-- 查询ActivityVoteDetail详情 -->
+    <select id="selectByKid" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_activity_vote_detail
+        where del_flag = 0
+		and kid = #{kid,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 删除ActivityVoteDetail-->
+    <delete id="delete" parameterType="java.lang.Long">
+   	 	delete from qh_activity_vote_detail
+    	where kid = #{kid,jdbcType=BIGINT}
+    </delete>
+  
+  	<!-- 新增ActivityVoteDetail-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteDetail">
+	    insert into qh_activity_vote_detail (kid,activity_info_id,vote_no,obtain_integral,content,cover_plan,img_url,video_url,video_thumbnail_url,vote_count,add_vote,create_user_id,last_update_user_id,module_enum,shelve_flag,amount_of_access,content1,content2)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{activityInfoId,jdbcType=BIGINT}
+				,#{voteNo,jdbcType=INTEGER}
+				,#{obtainIntegral,jdbcType=INTEGER}
+				,#{content,jdbcType=VARCHAR}
+				,#{coverPlan,jdbcType=VARCHAR}
+				,#{imgUrl,jdbcType=VARCHAR}
+				,#{videoUrl,jdbcType=VARCHAR}
+				,#{videoThumbnailUrl,jdbcType=VARCHAR}
+				,#{voteCount,jdbcType=INTEGER}
+				,#{addVote,jdbcType=INTEGER}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{lastUpdateUserId,jdbcType=BIGINT}
+				,#{moduleEnum,jdbcType=VARCHAR}
+				,#{shelveFlag,jdbcType=TINYINT}
+				,#{amountOfAccess,jdbcType=INTEGER}
+				,#{content1,jdbcType=VARCHAR}
+				,#{content2,jdbcType=VARCHAR}
+	    )
+	</insert>
+	
+	<!--按需新增ActivityVoteDetail-->
+    <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteDetail">
+	    insert into qh_activity_vote_detail 
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="activityInfoId != null">
+			activity_info_id,
+	    </if>
+        <if test="voteNo != null">
+			vote_no,
+	    </if>
+        <if test="obtainIntegral != null">
+			obtain_integral,
+	    </if>
+        <if test="content != null and content != ''">
+			content,
+	    </if>
+        <if test="coverPlan != null and coverPlan != ''">
+			cover_plan,
+	    </if>
+        <if test="imgUrl != null and imgUrl != ''">
+			img_url,
+	    </if>
+        <if test="videoUrl != null and videoUrl != ''">
+			video_url,
+	    </if>
+        <if test="videoThumbnailUrl != null and videoThumbnailUrl != ''">
+			video_thumbnail_url,
+	    </if>
+        <if test="voteCount != null">
+			vote_count,
+	    </if>
+        <if test="addVote != null">
+			add_vote,
+	    </if>
+        <if test="createUserId != null">
+			create_user_id,
+	    </if>
+        <if test="lastUpdateUserId != null">
+			last_update_user_id,
+	    </if>
+        <if test="moduleEnum != null and moduleEnum != ''">
+			module_enum,
+	    </if>
+        <if test="shelveFlag != null">
+			shelve_flag,
+	    </if>
+        <if test="amountOfAccess != null">
+			amount_of_access,
+	    </if>
+        <if test="content1 != null and content1 != ''">
+			content1,
+	    </if>
+        <if test="content2 != null and content2 != ''">
+			content2,
+	    </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="activityInfoId != null">
+			#{activityInfoId,jdbcType=BIGINT},
+	    </if>
+        <if test="voteNo != null">
+			#{voteNo,jdbcType=INTEGER},
+	    </if>
+        <if test="obtainIntegral != null">
+			#{obtainIntegral,jdbcType=INTEGER},
+	    </if>
+        <if test="content != null and content != ''">
+			#{content,jdbcType=VARCHAR},
+	    </if>
+        <if test="coverPlan != null and coverPlan != ''">
+			#{coverPlan,jdbcType=VARCHAR},
+	    </if>
+        <if test="imgUrl != null and imgUrl != ''">
+			#{imgUrl,jdbcType=VARCHAR},
+	    </if>
+        <if test="videoUrl != null and videoUrl != ''">
+			#{videoUrl,jdbcType=VARCHAR},
+	    </if>
+        <if test="videoThumbnailUrl != null and videoThumbnailUrl != ''">
+			#{videoThumbnailUrl,jdbcType=VARCHAR},
+	    </if>
+        <if test="voteCount != null">
+			#{voteCount,jdbcType=INTEGER},
+	    </if>
+        <if test="addVote != null">
+			#{addVote,jdbcType=INTEGER},
+	    </if>
+        <if test="createUserId != null">
+			#{createUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="lastUpdateUserId != null">
+			#{lastUpdateUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="moduleEnum != null and moduleEnum != ''">
+			#{moduleEnum,jdbcType=VARCHAR},
+	    </if>
+        <if test="shelveFlag != null">
+			#{shelveFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="amountOfAccess != null">
+			#{amountOfAccess,jdbcType=INTEGER},
+	    </if>
+        <if test="content1 != null and content1 != ''">
+			#{content1,jdbcType=VARCHAR},
+	    </if>
+        <if test="content2 != null and content2 != ''">
+			#{content2,jdbcType=VARCHAR},
+	    </if>
+	    </trim>
+	</insert>
+
+	<!-- 按需修改ActivityVoteDetail-->   
+    <update id="update" parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteDetail">
+        update qh_activity_vote_detail
+        <set>
+             <if test="activityInfoId != null">
+    			activity_info_id = #{activityInfoId,jdbcType=BIGINT},
+    		</if>
+             <if test="voteNo != null">
+    			vote_no = #{voteNo,jdbcType=INTEGER},
+    		</if>
+             <if test="obtainIntegral != null">
+    			obtain_integral = #{obtainIntegral,jdbcType=INTEGER},
+    		</if>
+            <if test="content != null and content != ''">
+    			content = #{content,jdbcType=VARCHAR},
+    		</if>
+            <if test="coverPlan != null and coverPlan != ''">
+    			cover_plan = #{coverPlan,jdbcType=VARCHAR},
+    		</if>
+            <if test="imgUrl != null and imgUrl != ''">
+    			img_url = #{imgUrl,jdbcType=VARCHAR},
+    		</if>
+            <if test="videoUrl != null and videoUrl != ''">
+    			video_url = #{videoUrl,jdbcType=VARCHAR},
+    		</if>
+            <if test="videoThumbnailUrl != null and videoThumbnailUrl != ''">
+    			video_thumbnail_url = #{videoThumbnailUrl,jdbcType=VARCHAR},
+    		</if>
+             <if test="voteCount != null">
+    			vote_count = #{voteCount,jdbcType=INTEGER},
+    		</if>
+             <if test="addVote != null">
+    			add_vote = #{addVote,jdbcType=INTEGER},
+    		</if>
+             <if test="createUserId != null">
+    			create_user_id = #{createUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="lastUpdateUserId != null">
+    			last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+    		</if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+    			module_enum = #{moduleEnum,jdbcType=VARCHAR},
+    		</if>
+             <if test="shelveFlag != null">
+    			shelve_flag = #{shelveFlag,jdbcType=TINYINT},
+    		</if>
+             <if test="amountOfAccess != null">
+    			amount_of_access = #{amountOfAccess,jdbcType=INTEGER},
+    		</if>
+            <if test="content1 != null and content1 != ''">
+    			content1 = #{content1,jdbcType=VARCHAR},
+    		</if>
+            <if test="content2 != null and content2 != ''">
+    			content2 = #{content2,jdbcType=VARCHAR},
+    		</if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+</mapper>

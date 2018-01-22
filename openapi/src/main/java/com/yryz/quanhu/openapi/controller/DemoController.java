@@ -41,7 +41,7 @@ public class DemoController {
     @GetMapping(value = "/v1/demo/id")
     public Response<DemoVo> getId(String type) {
         for (int i = 0; i < 150; i++) {
-            Long id = idAPI.getKid(QUAN_HU_USER);
+            Long id = idAPI.getKid(QUAN_HU_USER).getData();
             logger.info("getId type: {}, result: {}", type, id);
         }
 

@@ -64,8 +64,8 @@ public class UserOperateServiceImpl implements UserOperateService {
 	@Override
 	public int save(UserOperateInfo record) {
 		record.setCreateDate(new Date());
-		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO));
-		record.setUserInviterCode(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO).toString());
+		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO).getData());
+		record.setUserInviterCode(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO).getData().toString());
 		if (StringUtils.isNotBlank(record.getUserRegInviterCode())) {
 			String userRegId = selectUserIdByInviter(record.getUserRegInviterCode());
 			record.setUserRegId(userRegId);
@@ -84,7 +84,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 		if (model == null) {
 			return 0;
 		}
-		model.setKid(idApi.getKid(IdConstants.QUANHU_USER_REG_LOG));
+		model.setKid(idApi.getKid(IdConstants.QUANHU_USER_REG_LOG).getData());
 		model.setCreateDate(new Date());
 		try {
 			return regLogDao.insert(model);

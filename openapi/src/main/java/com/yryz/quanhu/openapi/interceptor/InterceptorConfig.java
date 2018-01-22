@@ -26,21 +26,31 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
 	public AuthInterceptor authInterceptor() {
 		return new AuthInterceptor();
 	}
+	
+	@Bean
+	public CommonInterceptor commonInterceptor() {
+		return new CommonInterceptor();
+	}
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// 注册拦截器
-		InterceptorRegistration common = registry.addInterceptor(authInterceptor());
+		InterceptorRegistration auth = registry.addInterceptor(authInterceptor());
 		// 配置拦截的路径
 		// common.addPathPatterns("/**");
 		// 配置不拦截的路径
 		// common.excludePathPatterns("/**.html");
-		common.addPathPatterns("/v2/**");
-		common.excludePathPatterns("/v2/user/login");
+		auth.addPathPatterns("/v2/**");
+		auth.excludePathPatterns("/v2/user/login");
 
 		// 还可以在这里注册其它的拦截器
-		// registry.addInterceptor(new
-		// OtherInterceptor()).addPathPatterns("/**");
+		// 注册拦截器
+		InterceptorRegistration common = registry.addInterceptor(commonInterceptor());
+		// 配置拦截的路径
+		// common.addPathPatterns("/**");
+		// 配置不拦截的路径
+		// common.excludePathPatterns("/**.html");
+		common.addPathPatterns("/**");
 	}
 
 }

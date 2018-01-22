@@ -18,7 +18,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class SmsVerifyCodeVO implements Serializable{
 	/**
-	 * 验证码
+	 * 功能码
 	 */
 	private String code;
 	/**

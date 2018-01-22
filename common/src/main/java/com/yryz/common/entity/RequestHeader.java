@@ -30,10 +30,6 @@ public class RequestHeader implements Serializable{
 	 */
 	private String token; // 令牌
 	/**
-	 * 长期令牌
-	 */
-	private String refreshToken;
-	/**
 	 * app版本号
 	 */
 	private String appVersion;
@@ -90,14 +86,6 @@ public class RequestHeader implements Serializable{
 
 	public void setToken(String token) {
 		this.token = token;
-	}
-
-	public String getRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
 	}
 
 	public String getAppVersion() {
@@ -222,7 +210,7 @@ public class RequestHeader implements Serializable{
 
 	@Override
 	public String toString() {
-		return "RequestHeader [sign=" + sign + ", token=" + token + ", refreshToken=" + refreshToken + ", appVersion="
+		return "RequestHeader [sign=" + sign + ", token=" + token + ", appVersion="
 				+ appVersion + ", devType=" + devType + ", devName=" + devName + ", devId=" + devId + ", ditchCode="
 				+ ditchCode + ", userAgent=" + userAgent + ", net=" + net + ", xForwardedFor=" + xForwardedFor
 				+ ", proxyClientIP=" + proxyClientIP + ", xLProxyClientIP=" + xLProxyClientIP + ", HTT_PCLIENT_IP="

@@ -5,19 +5,21 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
-import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.exception.RedisOptException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
+import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -42,10 +44,6 @@ public class UserProvider implements UserApi{
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			return ResponseUtils.returnObjectSuccess(userService.getUserSimple(userId));
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -67,10 +65,6 @@ public class UserProvider implements UserApi{
 			}
 			
 			return ResponseUtils.returnObjectSuccess(simpleVO);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -88,10 +82,6 @@ public class UserProvider implements UserApi{
 			Map<String, UserSimpleVO> map = userService.getUserSimple(userIds);
 			
 			return ResponseUtils.returnObjectSuccess(map);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -111,10 +101,6 @@ public class UserProvider implements UserApi{
 				// TODO:聚合关系数据
 			}
 			return ResponseUtils.returnObjectSuccess(map);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -131,10 +117,6 @@ public class UserProvider implements UserApi{
 			}
 			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId);
 			return ResponseUtils.returnObjectSuccess(loginSimpleVO);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -154,10 +136,6 @@ public class UserProvider implements UserApi{
 				// TODO:聚合关系数据
 			}
 			return ResponseUtils.returnObjectSuccess(loginSimpleVO);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -167,7 +145,7 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<UserSimpleVO> getUserSimpleByPhone(String phone, String appId) {
+	public Response<String> getUserIdByPhone(String phone, String appId) {
 		try {
 			if(StringUtils.isEmpty(phone)){
 				throw QuanhuException.busiError("phone不能为空");
@@ -175,12 +153,7 @@ public class UserProvider implements UserApi{
 			if(StringUtils.isEmpty(appId)){
 				throw QuanhuException.busiError("appId不能为空");
 			}
-			UserSimpleVO UserSimpleVO = userService.getUserSimpleByPhone(phone, appId);
-			return ResponseUtils.returnObjectSuccess(UserSimpleVO);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
+			return ResponseUtils.returnObjectSuccess(userService.getUserByPhone(phone, appId));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -190,7 +163,7 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<Map<String, UserSimpleVO>> getUserSimpleByPhone(Set<String> phones, String appId) {
+	public Response<Map<String, String>> getUserIdByPhone(Set<String> phones, String appId) {
 		try {
 			if(CollectionUtils.isEmpty(phones)){
 				throw QuanhuException.busiError("phones不能为空");
@@ -198,12 +171,8 @@ public class UserProvider implements UserApi{
 			if(StringUtils.isEmpty(appId)){
 				throw QuanhuException.busiError("appId不能为空");
 			}
-			Map<String, UserSimpleVO> map = userService.getUserSimpleByPhone(phones, appId);
+			Map<String, String> map = userService.getUserByPhone(phones, appId);
 			return ResponseUtils.returnObjectSuccess(map);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -220,10 +189,6 @@ public class UserProvider implements UserApi{
 			}
 			Map<String, UserBaseInfoVO> map = userService.getUser(userIds);
 			return ResponseUtils.returnObjectSuccess(map);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -237,10 +202,6 @@ public class UserProvider implements UserApi{
 		try {
 			List<String> list = userService.getUserIdByParams(custInfoDTO);
 			return ResponseUtils.returnObjectSuccess(list);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -254,10 +215,6 @@ public class UserProvider implements UserApi{
 		try {
 			String devId = userService.getDeviceIdByUserId(userId);
 			return ResponseUtils.returnObjectSuccess(devId);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -271,10 +228,6 @@ public class UserProvider implements UserApi{
 		try {
 			List<String> devIds = userService.getDeviceIdByUserId(userIds);
 			return ResponseUtils.returnObjectSuccess(devIds);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -287,6 +240,29 @@ public class UserProvider implements UserApi{
 	public Response<Page<UserBaseInfoVO>> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Response<Boolean> updateUserInfo(UpdateBaseInfoDTO infoDTO) {
+		try {
+			if(infoDTO == null || StringUtils.isBlank(infoDTO.getUserId())){
+				throw QuanhuException.busiError("用户id不能为空");
+			}
+			UserSimpleVO info = userService.getUserSimple(infoDTO.getUserId());
+			if(info == null){
+				throw QuanhuException.busiError("用户不存在");
+			}
+			UserBaseInfo baseInfo = new UserBaseInfo();
+			BeanUtils.copyProperties(baseInfo, infoDTO);
+			baseInfo.setUserId(NumberUtils.toLong(infoDTO.getUserId()));
+			userService.updateUserInfo(baseInfo);
+			return ResponseUtils.returnObjectSuccess(true);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("用户信息更新异常", e);
+			return ResponseUtils.returnException(e);
+		}
 	}
 	
 }

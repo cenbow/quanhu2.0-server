@@ -60,7 +60,7 @@ public class UserStarServiceImpl implements UserStarService {
 	@Transactional
 	public int save(UserStarAuth record) {
 		record.setCreateDate(new Date());
-		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH));
+		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH).getData());
 		record.setRecommendStatus(StarRecommendStatus.FALSE.getStatus());
 		record.setAuditStatus(StarAuditStatus.WAIT_AUDIT.getStatus());
 		if (StringUtils.isEmpty(record.getRealName())) {
@@ -272,7 +272,7 @@ public class UserStarServiceImpl implements UserStarService {
 			BeanUtils.copyProperties(oldAuth, logModel);
 		}
 		try {
-			logModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG));
+			logModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG).getData());
 			logModel.setCreateDate(new Date());
 			starAuthLogDao.insert(logModel);
 		} catch (Exception e) {

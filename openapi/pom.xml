@@ -57,6 +57,16 @@
             <artifactId>support-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>message-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>order-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
         
         <dependency>
             <groupId>com.yryz.framework</groupId>

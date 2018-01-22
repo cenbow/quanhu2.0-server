@@ -8,6 +8,8 @@
 package com.yryz.quanhu.resource.api;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.vo.ResourceVo;
@@ -49,5 +51,19 @@ public interface ResourceApi {
 	 * @return
 	 */
 	public Response<List<ResourceVo>> getResources(ResourceVo resource , String orderColumn , int start , int limit ,String startTime ,String endTime);
+	
+	/**
+	 * 批量获取资源信息
+	 * @param resourceIds
+	 * @return
+	 */
+	public Response<Map<String, ResourceVo>> getResourcesByIds(Set<String> resourceIds);
+	
+	/**
+	 * 获取资源信息(单个)
+	 * @param resourceIds
+	 * @return
+	 */
+	public Response<ResourceVo> getResourcesById(String resourceId);
 
 }

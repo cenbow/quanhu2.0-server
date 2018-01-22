@@ -38,17 +38,9 @@ public class UserSimpleVO implements Serializable {
      */
     private String userDesc;
     /**
-     * 用户二维码地址
+     * 用户等级（这里的等级要从积分中心获取，不能以此为准）
      */
-    private String userQr;
-    /**
-     * 用户城市位置(湖北武汉)
-     */
-    private String userLocation;
-    /**
-     * 城市代码
-     */
-    private String cityCode;
+    private String userLevel;
     /**
      * 用户角色 0:普通用户 1:实名用户
      */
@@ -104,34 +96,33 @@ public class UserSimpleVO implements Serializable {
 	public void setUserDesc(String userDesc) {
 		this.userDesc = userDesc;
 	}
-	public String getUserQr() {
-		return userQr;
-	}
-	public void setUserQr(String userQr) {
-		this.userQr = userQr;
-	}
-	public String getUserLocation() {
-		return userLocation;
-	}
-	public void setUserLocation(String userLocation) {
-		this.userLocation = userLocation;
-	}
-	public String getCityCode() {
-		return cityCode;
-	}
-	public void setCityCode(String cityCode) {
-		this.cityCode = cityCode;
-	}
 	public Byte getUserRole() {
 		return userRole;
 	}
 	public void setUserRole(Byte userRole) {
 		this.userRole = userRole;
 	}
+	public String getUserLevel() {
+		return userLevel;
+	}
+	public void setUserLevel(String userLevel) {
+		this.userLevel = userLevel;
+	}
+	public UserSimpleVO() {
+		super();
+	}
+	public UserSimpleVO(String userId, String userNickName, String userImg, String userDesc, Byte userRole) {
+		super();
+		this.userId = userId;
+		this.userNickName = userNickName;
+		this.userImg = userImg;
+		this.userDesc = userDesc;
+		this.userRole = userRole;
+	}
 	@Override
 	public String toString() {
 		return "UserSimpleVO [userId=" + userId + ", userNickName=" + userNickName + ", userImg=" + userImg
-				+ ", userSignature=" + userSignature + ", userDesc=" + userDesc + ", userQr=" + userQr
-				+ ", userLocation=" + userLocation + ", cityCode=" + cityCode + ", userRole=" + userRole + "]";
+				+ ", userSignature=" + userSignature + ", userDesc=" + userDesc 
+				+ ", userRole=" + userRole + "]";
 	}
 }

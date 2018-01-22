@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yryz.quanhu.order.score.manage.dao.persistence.ScoreEventManageDao">
+
+	<sql id="columns">
+		 id as id ,
+		 event_code as eventCode ,
+		 event_type as  eventType ,
+		 event_loop_unit as  eventLoopUnit ,
+		 event_limit  as  eventLimit ,
+		 event_score as  eventScore ,
+		 create_time as  createTime ,
+		 update_time as  updateTime ,
+		 amount_power as  amountPower 
+	</sql>
+
+
+	<!-- 新增积分事件 -->
+	<insert id="save" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="com.yryz.quanhu.score.entity.ScoreEventInfo">
+		INSERT INTO event_score(
+		event_code,event_type,
+		<if test="eventLoopUnit != null">
+			event_loop_unit,
+		</if>
+		<if test="eventLimit != null">
+			event_limit,
+		</if>
+		<if test="amountPower != null">
+			amount_power,
+		</if>
+		event_score,
+		create_time , update_time
+		)
+		VALUES (
+		#{eventCode},#{eventType},
+		<if test="eventLoopUnit != null">
+			#{eventLoopUnit},
+		</if>
+		<if test="eventLimit != null">
+			#{eventLimit},
+		</if>
+		<if test="amountPower != null">
+			#{amountPower},
+		</if>
+		#{eventScore},
+		#{createTime} , #{updateTime}
+		)
+	</insert>
+
+	<!-- 根据事件编码查询事件信息 -->
+	<select id="getByCode"
+		resultType="com.yryz.quanhu.score.entity.ScoreEventInfo">
+		SELECT  <include refid="columns" />
+		FROM event_score where event_code = #{eventCode}
+	</select>
+
+	<!-- 获取积分事件列表 -->
+	<select id="getAll"
+		resultType="com.yryz.quanhu.score.entity.ScoreEventInfo">
+		SELECT a.id as id ,
+		 a.event_code as eventCode ,
+		 a.event_type as  eventType ,
+		 a.event_loop_unit as  eventLoopUnit ,
+		 a.event_limit  as  eventLimit ,
+		 a.event_score as  eventScore ,
+		 a.create_time as  createTime ,
+		 a.update_time as  updateTime ,
+		 a.amount_power as  amountPower , b.event_name as eventName
+		FROM event_score a inner join event_sys b on
+		a.event_code = b.event_code
+	</select>
+
+	<select id="getPage"
+		resultType="com.yryz.quanhu.score.entity.ScoreEventInfo">
+		SELECT a.id as id ,
+		 a.event_code as eventCode ,
+		 a.event_type as  eventType ,
+		 a.event_loop_unit as  eventLoopUnit ,
+		 a.event_limit  as  eventLimit ,
+		 a.event_score as  eventScore ,
+		 a.create_time as  createTime ,
+		 a.update_time as  updateTime ,
+		 a.amount_power as  amountPower , b.event_name as eventName
+		FROM event_score a inner join event_sys b on
+		a.event_code = b.event_code
+		limit #{limit} offset #{start}
+	</select>
+
+	<!-- 更新积分事件信息 -->
+	<update id="update">
+		UPDATE event_score
+		<trim prefix="set" suffixOverrides=",">
+			update_time = #{updateTime},
+			<if test="eventType != null">
+				event_type = #{eventType,jdbcType=VARCHAR},
+			</if>
+			<if test="eventLoopUnit != null">
+				event_loop_unit = #{eventLoopUnit,jdbcType=INTEGER},
+			</if>
+			<if test="eventLimit != null">
+				event_limit = #{eventLimit,jdbcType=INTEGER},
+			</if>
+			<if test="eventScore != null">
+				event_score = #{eventScore,jdbcType=VARCHAR},
+			</if>
+			<if test="amountPower != null">
+				amount_power = #{amountPower},
+			</if>
+		</trim>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 删除 -->
+	<update id="delById" parameterType="java.lang.Long">
+		DELETE FROM event_score
+		WHERE
+		id = #{id}
+	</update>
+
+</mapper>

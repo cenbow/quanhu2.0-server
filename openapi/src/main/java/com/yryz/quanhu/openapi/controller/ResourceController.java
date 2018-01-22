@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.Annotation.NotLogin;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -23,14 +24,15 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * @author yehao
  * @version 2.0
  * @date 2018年1月18日 下午6:02:50
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 资源管理API实现
  */
-@Api(description = "资源管理管理 示例")
+@Api(tags = "资源管理")
 @RestController
 public class ResourceController {
 	
@@ -38,12 +40,13 @@ public class ResourceController {
 	private ResourceApi resourceApi;
 	
 	
+	@NotLogin
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/appRecommend")
-	public Response<List<ResourceVo>> appRecommend(){
+	public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度")String limit){
     	ResourceVo resourceVo = new ResourceVo();
     	return resourceApi.getResources(resourceVo, null, 0, 10, null, null);
 	}
-
+    
 }

@@ -2,6 +2,7 @@ package com.yryz.quanhu.user.dao;
 
 import com.yryz.common.dao.BaseDao;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -12,5 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserRelationDao extends BaseDao{
+
+    <T> T selectByUser(Class<T> t, @Param("sourceUserId") String sourceUserId,@Param("targetUserId")String targetUserId);
 
 }

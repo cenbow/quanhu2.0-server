@@ -97,12 +97,12 @@ public class UserBaseInfoVO implements Serializable{
     /**
      * 用户角色 10:普通用户 11:实名用户
      */
-    private Byte custRole;
+    private Byte userRole;
 
     /**
      * 是否马甲 10:否 11:是
      */
-    private Byte custVest;
+    private Byte userVest;
 
     /**
      * 认证状态 10-未认证 11-已认证
@@ -229,17 +229,17 @@ public class UserBaseInfoVO implements Serializable{
 	public void setUserCity(String userCity) {
 		this.userCity = userCity;
 	}
-	public Byte getCustRole() {
-		return custRole;
+	public Byte getUserRole() {
+		return userRole;
 	}
-	public void setCustRole(Byte custRole) {
-		this.custRole = custRole;
+	public void setUserRole(Byte userRole) {
+		this.userRole = userRole;
 	}
-	public Byte getCustVest() {
-		return custVest;
+	public Byte getUserVest() {
+		return userVest;
 	}
-	public void setCustVest(Byte custVest) {
-		this.custVest = custVest;
+	public void setUserVest(Byte userVest) {
+		this.userVest = userVest;
 	}
 	public Byte getAuthStatus() {
 		return authStatus;
@@ -277,14 +277,56 @@ public class UserBaseInfoVO implements Serializable{
     public void setCityCode(String cityCode) {
         this.cityCode = cityCode;
     }
-    public int getUserRole() {
-        return custRole;
-    }
     public Date getCreateDate() {
         return createDate;
     }
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
-
+	public UserBaseInfoVO(String userId, String appId, String userNickName, String userImg, String userSignature,
+			String userPhone, Byte userAge, String userQr, Byte userGenders, String userBirthday, String userLocation,
+			String userDeviceId, Byte userStatus, String userCountry, String userProvince, String userCity,
+			String cityCode, Byte userRole, Byte userVest, Byte authStatus, Integer lastHeat, Date banPostTime,
+			String userDesc, Date createDate) {
+		super();
+		this.userId = userId;
+		this.appId = appId;
+		this.userNickName = userNickName;
+		this.userImg = userImg;
+		this.userSignature = userSignature;
+		this.userPhone = userPhone;
+		this.userAge = userAge;
+		this.userQr = userQr;
+		this.userGenders = userGenders;
+		this.userBirthday = userBirthday;
+		this.userLocation = userLocation;
+		this.userDeviceId = userDeviceId;
+		this.userStatus = userStatus;
+		this.userCountry = userCountry;
+		this.userProvince = userProvince;
+		this.userCity = userCity;
+		this.cityCode = cityCode;
+		this.userRole = userRole;
+		this.userVest = userVest;
+		this.authStatus = authStatus;
+		this.lastHeat = lastHeat;
+		this.banPostTime = banPostTime;
+		this.userDesc = userDesc;
+		this.createDate = createDate;
+	}
+	public UserBaseInfoVO() {
+		super();
+	}
+	@Override
+	public String toString() {
+		return "UserBaseInfoVO [userId=" + userId + ", appId=" + appId + ", userNickName=" + userNickName + ", userImg="
+				+ userImg + ", userSignature=" + userSignature + ", userPhone=" + userPhone + ", userAge=" + userAge
+				+ ", userQr=" + userQr + ", userGenders=" + userGenders + ", userBirthday=" + userBirthday
+				+ ", userLocation=" + userLocation + ", userDeviceId=" + userDeviceId + ", userStatus=" + userStatus
+				+ ", userCountry=" + userCountry + ", userProvince=" + userProvince + ", userCity=" + userCity
+				+ ", cityCode=" + cityCode + ", userRole=" + userRole + ", userVest=" + userVest + ", authStatus="
+				+ authStatus + ", lastHeat=" + lastHeat + ", delFlag=" + delFlag + ", banPostTime=" + banPostTime
+				+ ", userDesc=" + userDesc + ", createDate=" + createDate + "]";
+	}
+    
 }

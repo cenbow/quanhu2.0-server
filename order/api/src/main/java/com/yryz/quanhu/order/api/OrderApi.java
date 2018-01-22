@@ -119,7 +119,7 @@ public interface OrderApi {
 	 * @param custId 用户ID
 	 * @return
 	 */
-	public UserPhy getUserPhy(String custId);
+	public Response<UserPhy> getUserPhy(String custId);
 	
 	/**
 	 * 获取用户银行卡数据ID

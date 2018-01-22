@@ -10,6 +10,9 @@ package com.yryz.quanhu.resource.vo;
 import java.io.Serializable;
 
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author yehao
@@ -25,18 +28,23 @@ public class ResourceVo implements Serializable {
 	private static final long serialVersionUID = -8234067721074858571L;
 	
 	/** 数据id */
+	@ApiModelProperty(value="资源ID")
 	private String resourceId;
 
 	/** 发布人ID */
+	@ApiModelProperty(value="发布人ID")
 	private String custId;
 	
 	/** 是否达人:否(0)，是(1) */
+	@ApiModelProperty(value="是否达人:否(0)，是(1)")
 	private String talentType;
 
 	/** 私圈ID，如果有私圈ID，则表示此资源是私圈资源 */
+	@ApiModelProperty(value="私圈ID，如果有私圈ID，则表示此资源是私圈资源")
 	private String coterieId;
 
 	/** 功能ID 前端跳转专用  */
+	@ApiModelProperty(value="功能ID 前端跳转专用")
 	private String moduleEnum;
 	
 	/** 
@@ -44,84 +52,114 @@ public class ResourceVo implements Serializable {
 	 * 枚举：资源类型,枚举：文章(1000)、话题(1001)、帖子(1002)、问题(1003)、答案(1004)、活动(1005) 
 	 * @see ResourceTypeEnum
 	 */
+	@ApiModelProperty(value="资源类型 枚举：资源类型,枚举：文章(1000)、话题(1001)、帖子(1002)、问题(1003)、答案(1004)、活动(1005)")
 	private String resourceType;
 	
 	/** 资源标签 */
+	@ApiModelProperty(value="资源标签 ")
 	private String resourceTag;
 	
 	/** 地区城市，二级城市，地区编码  */
+	@ApiModelProperty(value="地区城市，二级城市，地区编码")
 	private String cityCode;
 
 	/** 信息标题 */
+	@ApiModelProperty(value="信息标题")
 	private String title;
 	
 	/** 简介 */ 
+	@ApiModelProperty(value="简介")
 	private String summary;
 
 	/** 信息简介 150字以内 */
+	@ApiModelProperty(value="正文")
 	private String content;
 
 	/** 信息缩略图 */
+	@ApiModelProperty(value="信息缩略图")
 	private String thumbnail;
 
 	/** 图片相册数据 */
+	@ApiModelProperty(value="图片相册数据")
 	private String pics;
 
 	/** 视频地址 */
+	@ApiModelProperty(value="视频地址")
 	private String video;
 
 	/** 视频预览图 */
+	@ApiModelProperty(value="视频预览图")
 	private String videoPic;
 
 	/** 音频地址 */
+	@ApiModelProperty(value="音频地址")
 	private String audio;
 	
 	/** 热度值 */
+	@ApiModelProperty(value="热度值")
 	private Long heat;
 	
 	/** 阅读数  */
+	@ApiModelProperty(value="阅读数")
 	private Long readNum;
 	
 	/** 参与数  */
+	@ApiModelProperty(value="参与数")
 	private Long partNum;
 
 	/** 创建时间 */
+	@ApiModelProperty(value="创建时间")
 	private Long createTime;
 	
 	/** 结束时间  */
+	@ApiModelProperty(value="结束时间")
 	private Long completeTime;
 	
 	/** 更新时间  */
+	@ApiModelProperty(value="更新时间")
 	private Long updateTime;
 	
 	/** 排序字段 */
+	@ApiModelProperty(value="排序字段")
 	private Long orderby;
 	
 	/** 用户GPS信息  */
+	@ApiModelProperty(value="GPS信息")
 	private String gps;
 	
 	/** 资源扩展展示信息  */
+	@ApiModelProperty(value="扩展参数")
 	private String extjson;
 	
 	/**
 	 * 资源价格
 	 */
+	@ApiModelProperty(value="资源价格")
 	private Long price;
 	
 	/**
 	 * 公开状态,0不公开；1公开
 	 */
+	@ApiModelProperty(value="公开状态,0不公开；1公开")
 	private Integer publicState;
 	
 	/**
 	 * 推荐类型，0不推荐，1推荐
 	 */
+	@ApiModelProperty(value="推荐类型，0不推荐，1推荐")
 	private String recommendType;
 	
 	/**
 	 * 删除状态，0未删除，1已删除
 	 */
+	@ApiModelProperty(value="删除状态，0未删除，1已删除")
 	private String delFlag;
+	
+	/**
+	 * 用户基类
+	 */
+	@ApiModelProperty(value="用户信息")
+	private UserBaseInfoVO user;
 
 	/**
 	 * 
@@ -129,7 +167,6 @@ public class ResourceVo implements Serializable {
 	 */
 	public ResourceVo() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -605,6 +642,20 @@ public class ResourceVo implements Serializable {
 	 */
 	public void setDelFlag(String delFlag) {
 		this.delFlag = delFlag;
+	}
+
+	/**
+	 * @return the user
+	 */
+	public UserBaseInfoVO getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user the user to set
+	 */
+	public void setUser(UserBaseInfoVO user) {
+		this.user = user;
 	}
 	
 }

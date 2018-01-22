@@ -83,9 +83,9 @@ public class WebUtil {
 				m.invoke(header, new Object[] { value });
 			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			header.setAppId(Context.getProperty(AppConstants.APP_ID));
 			header.setDevType(DevType.IOS.getType());
 		}
+		header.setAppId(Context.getProperty(AppConstants.APP_ID));
 		return header;
 	}
 }

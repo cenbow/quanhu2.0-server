@@ -13,13 +13,13 @@ package com.yryz.quanhu.user.contants;
  */
 public enum RegType{
 	/** 微信 */
-	WEIXIN(1,"Weixin"),
+	WEIXIN(10,"Weixin"),
 	/** 微博 */
-	SINA(2,"sina"),
+	SINA(11,"sina"),
 	/** qq */
-	QQ(3,"QQ"),
+	QQ(12,"QQ"),
 	/** 手机号 */
-	PHONE(4,"Phone");
+	PHONE(13,"Phone");
 	
 	private int type;
 	private String text;

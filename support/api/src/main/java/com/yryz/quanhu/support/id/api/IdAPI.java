@@ -1,5 +1,7 @@
 package com.yryz.quanhu.support.id.api;
 
+import com.yryz.common.response.Response;
+
 /**
  * Dubbo Service(id) API
  * @author
@@ -11,7 +13,7 @@ public interface IdAPI {
 	 * 
 	 * @return
 	 */
-	String getId(String type);
+	Response<String> getId(String type);
 
 
 	/**
@@ -21,7 +23,7 @@ public interface IdAPI {
 	 * @param type
 	 * @return
 	 */
-	Long getKid(String type);
+	Response<Long> getKid(String type);
 
 
 	
@@ -30,14 +32,14 @@ public interface IdAPI {
 	 * ID长度18位
 	 * @return
 	 */
-	String getUserId();
+	Response<String> getUserId();
 
 	/**
 	 * 基于Twitter的分布式自增ID算法Snowflake实现分布式有序
 	 * @return 返回18位的自增ID
 	 *
 	 */
-	Long getSnowflakeId();
+	Response<Long> getSnowflakeId();
 
 
 }

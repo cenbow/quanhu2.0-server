@@ -71,7 +71,7 @@ public class UserLoginSimpleVO implements Serializable {
     /**
      * 用户角色 10:普通用户 11:实名用户
      */
-    private Byte custRole;
+    private Byte userRole;
     
     /**
      * 认证状态 10-未认证 11-已认证
@@ -156,11 +156,11 @@ public class UserLoginSimpleVO implements Serializable {
 	public void setCityCode(String cityCode) {
 		this.cityCode = cityCode;
 	}
-	public Byte getCustRole() {
-		return custRole;
+	public Byte getUserRole() {
+		return userRole;
 	}
-	public void setCustRole(Byte custRole) {
-		this.custRole = custRole;
+	public void setUserRole(Byte userRole) {
+		this.userRole = userRole;
 	}
 	public Byte getAuthStatus() {
 		return authStatus;
@@ -234,11 +234,38 @@ public class UserLoginSimpleVO implements Serializable {
 	public void setRelationStatus(Integer relationStatus) {
 		this.relationStatus = relationStatus;
 	}
+	
+	
+	
+	public UserLoginSimpleVO() {
+		super();
+	}
+	public UserLoginSimpleVO(String userId, String userNickName, String userImg, String userSignature, String userPhone,
+			String userQr, Byte userAge, Byte userGenders, String userBirthday, String userLocation, String cityCode,
+			Byte userRole, Byte authStatus, Integer lastHeat, String userDesc, Date createDate) {
+		super();
+		this.userId = userId;
+		this.userNickName = userNickName;
+		this.userImg = userImg;
+		this.userSignature = userSignature;
+		this.userPhone = userPhone;
+		this.userQr = userQr;
+		this.userAge = userAge;
+		this.userGenders = userGenders;
+		this.userBirthday = userBirthday;
+		this.userLocation = userLocation;
+		this.cityCode = cityCode;
+		this.userRole = userRole;
+		this.authStatus = authStatus;
+		this.lastHeat = lastHeat;
+		this.userDesc = userDesc;
+		this.createDate = createDate;
+	}
 	@Override
 	public String toString() {
 		return "UserLoginSimpleVO [userId=" + userId + ", appId=" + appId + ", userNickName=" + userNickName
 				+ ", userImg=" + userImg + ", userSignature=" + userSignature + ", userPhone=" + userPhone + ", userQr="
-				+ userQr + ", cityCode=" + cityCode + ", custRole=" + custRole 
+				+ userQr + ", cityCode=" + cityCode + ", userRole=" + userRole 
 				+ ", authStatus=" + authStatus + ", lastHeat=" + lastHeat + ", userDesc=" + userDesc + ", createDate="
 				+ createDate + ", userLevel=" + userLevel + ", userScore=" + userScore + "]";
 	}

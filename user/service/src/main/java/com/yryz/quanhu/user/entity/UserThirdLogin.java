@@ -27,7 +27,10 @@ public class UserThirdLogin extends GenericEntity{
      * 第三方账户id
      */
     private String thirdId;
-
+    /**
+     * 应用id
+     */
+    private String appId;
     /**
      * 登录类型10-weixin  11-xinna  12-qq 13-phone 14-email
      */
@@ -81,6 +84,14 @@ public class UserThirdLogin extends GenericEntity{
 		this.loginType = loginType;
 		this.nickName = nickName;
 		this.delFlag = delFlag;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 
 	public Long getUserId() {

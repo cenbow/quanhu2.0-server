@@ -1,6 +1,7 @@
 package com.yryz.quanhu.support;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,14 +24,12 @@ public class IdTest {
 
     @Test
     public void getIdTest() {
-        Long quanhuUser = idAPI.getKid("quanhu_user");
-        System.out.println("quanhuUser " + quanhuUser);
+        Response<Long> quanhuUser = idAPI.getKid("quanhu_user");
+        System.out.println("quanhuUser " + quanhuUser.getData());
 
-        String userId = idAPI.getUserId();
-        System.out.println("getUserId " + userId);
-        long uid = idAPI.getSnowflakeId();
+        Response<Long> snowflakeId = idAPI.getSnowflakeId();
 
-        System.out.println("get Uid " + uid);
+        System.out.println("get Uid " + snowflakeId.getData());
     }
 
 

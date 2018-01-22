@@ -15,4 +15,5 @@ package com.yryz.quanhu.dymaic.canal.constant;
  */
 public class AmqpConstant {
 	public static final String CANAL_FANOUT_EXCHANGE = "quanhu.canal.fanout";
+	public static final String CANAL_TO_ES_QUEUE = "quanhu.canal.es";
 }

@@ -8,6 +8,8 @@
 package com.yryz.quanhu.resource.provider;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,6 +20,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.entity.ResourceModel;
+import com.yryz.quanhu.resource.service.ResourceConvertService;
 import com.yryz.quanhu.resource.service.ResourceService;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
@@ -32,6 +35,9 @@ public class ResourceProvider implements ResourceApi {
 	
 	@Autowired
 	private ResourceService resourceService;
+	
+	@Autowired
+	private ResourceConvertService resourceConvertService;
 	
 	/**
 	 * 创建/更新核心资源信息
@@ -78,7 +84,35 @@ public class ResourceProvider implements ResourceApi {
 			limit = CommonConstants.DEFAULT_SIZE;
 		}
 		List<ResourceModel> list = resourceService.getResources(GsonUtils.parseObj(resource, ResourceModel.class), orderColumn, start, limit, startTime, endTime);
-		return ResponseUtils.returnListSuccess(GsonUtils.parseList(list, ResourceVo.class));
+		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
+		listVo = resourceConvertService.addUser(listVo);
+		return ResponseUtils.returnListSuccess(listVo);
+	}
+
+	/**
+	 * 批量获取资源信息，通过ID列表
+	 * @param resourceIds
+	 * @return
+	 * @see com.yryz.quanhu.resource.api.ResourceApi#getResourcesByIds(java.util.Set)
+	 */
+	@Override
+	public Response<Map<String, ResourceVo>> getResourcesByIds(Set<String> resourceIds) {
+		Map<String, ResourceModel> modelMap = resourceService.getResources(resourceIds);
+		Map<String, ResourceVo> map = (Map<String, ResourceVo>) GsonUtils.parseMap(modelMap, ResourceVo.class);
+		return ResponseUtils.returnObjectSuccess(map);
+	}
+
+	/**
+	 * 单一ID获取资源
+	 * @param resourceId
+	 * @return
+	 * @see com.yryz.quanhu.resource.api.ResourceApi#getResourcesById(java.lang.String)
+	 */
+	@Override
+	public Response<ResourceVo> getResourcesById(String resourceId) {
+		ResourceModel resource = resourceService.getResource(resourceId);
+		ResourceVo resourceVo = resourceConvertService.addUser(GsonUtils.parseObj(resource, ResourceVo.class));
+		return ResponseUtils.returnObjectSuccess(resourceVo);
 	}
 
 }
