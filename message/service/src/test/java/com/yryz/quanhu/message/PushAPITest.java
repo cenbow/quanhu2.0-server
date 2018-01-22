@@ -33,7 +33,8 @@ public class PushAPITest {
         pushReqVo.setCustIds(usrIds);
         pushReqVo.setMsg("test");
         pushReqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
-
-        pushAPI.commonSendAlias(pushReqVo);
+        for (int i = 0; i < 20; i++) {
+            pushAPI.commonSendAlias(pushReqVo);
+        }
     }
 }
