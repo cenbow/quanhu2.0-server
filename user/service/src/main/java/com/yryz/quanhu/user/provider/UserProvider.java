@@ -131,7 +131,7 @@ public class UserProvider implements UserApi{
 			if(StringUtils.isEmpty(friendId)){
 				throw QuanhuException.busiError("friendId不能为空");
 			}
-			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId);
+			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(friendId);
 			if(StringUtils.isBlank(userId)){
 				// TODO:聚合关系数据
 			}

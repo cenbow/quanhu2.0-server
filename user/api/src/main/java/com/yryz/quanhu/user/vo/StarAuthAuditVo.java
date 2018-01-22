@@ -12,7 +12,7 @@ public class StarAuthAuditVo implements Serializable{
 	/**
 	 * 用户id
 	 */
-	private String custId;
+	private String userId;
 	/**
 	 * 审核状态 0:待审核 1:审核通过 2:审核失败 3:取消认证
 	 */
@@ -34,12 +34,12 @@ public class StarAuthAuditVo implements Serializable{
 		this.operational = operational;
 	}
 
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public Byte getAuditStatus() {
