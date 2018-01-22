@@ -11,8 +11,7 @@
         select
         <include refid="Base_Column_List"/>
         from qh_activity_record
-        where del_flag = 0
-		and kid = #{kid,jdbcType=BIGINT}
+        where kid = #{kid,jdbcType=BIGINT}
     </select>
     
     <!-- 删除ActivityRecord-->
@@ -116,5 +115,13 @@
         </set>
         where kid = #{kid,jdbcType=BIGINT}
     </update>
+
+	<!-- 当前用户在当前活动中的报名状态(1未参加    2已参加) -->
+	<select id="getEnrolStatusByCustId" resultType="com.yryz.quanhu.support.activity.entity.ActivityRecord">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_record
+		where create_user_id = #{custId,jdbcType=BIGINT} and activity_info_id = #{activityId,jdbcType=BIGINT}
+	</select>
 
 </mapper>

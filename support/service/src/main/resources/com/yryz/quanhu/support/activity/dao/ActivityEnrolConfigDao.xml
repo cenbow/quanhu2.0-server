@@ -11,8 +11,7 @@
         select
         <include refid="Base_Column_List"/>
         from qh_activity_enrol_config
-        where del_flag = 0
-		and kid = #{kid,jdbcType=BIGINT}
+        where kid = #{kid,jdbcType=BIGINT}
     </select>
     
     <!-- 删除ActivityEnrolConfig-->
@@ -137,5 +136,13 @@
         </set>
         where kid = #{kid,jdbcType=BIGINT}
     </update>
+
+	<!-- 查询ActivityEnrolConfig详情 -->
+	<select id="selectByActivityId" resultType="com.yryz.quanhu.support.activity.entity.ActivityEnrolConfig" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_enrol_config
+		where activity_info_id = #{activityKid,jdbcType=BIGINT}
+	</select>
 
 </mapper>

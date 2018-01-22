@@ -42,4 +42,5 @@ public class ApplicationOpenApi extends SpringBootServletInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationOpenApi.class, args);
     }
+
 }
