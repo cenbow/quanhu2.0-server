@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class ProductTest {
     @Autowired
     private ProductService productService;

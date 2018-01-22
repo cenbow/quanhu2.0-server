@@ -3,17 +3,15 @@ package com.yryz.quanhu.openapi.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.demo.service.DemoService;
+import com.yryz.quanhu.demo.vo.DemoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
-import com.yryz.quanhu.user.service.DemoReadService;
-import com.yryz.quanhu.user.service.DemoService;
-import com.yryz.quanhu.user.vo.DemoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -89,7 +87,7 @@ public class DemoController {
     @GetMapping(value = "/{version}/demo/{id:\\d+}")
     public Response<DemoVo> query(@PathVariable Long id) {
         //demoReadService.find(id)
-        return ResponseUtils.returnObjectSuccess(null);
+        return ResponseUtils.returnObjectSuccess(demoService.find(id));
     }
 
     @ApiOperation("按条件AND查询示例")

@@ -13,6 +13,8 @@ import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.message.push.constants.AmqpConstants;
 import com.yryz.quanhu.message.push.entity.PushParamsDTO;
 import org.apache.commons.collections.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ import java.util.Map;
  */
 @Service
 public class PushMsgSender {
+
+	private static final Logger logger = LoggerFactory.getLogger(PushMsgSender.class);
 	
 	/**
 	 * rabbitTemplate 可以直接注入，由spring-boot负责维护连接池对象
@@ -42,13 +46,14 @@ public class PushMsgSender {
 		rabbitTemplate.setExchange(AmqpConstants.JPUSH_QUANHU_DIRECT_EXCHANGE);
 		rabbitTemplate.setRoutingKey(AmqpConstants.JPUSH_QUANHU_DIRECT_QUEUE);
 		rabbitTemplate.convertAndSend(msg);
+		logger.info("directSend info: {}", msg);
 	}
 
 	/**
 	 * mq不通，先直接调用，后续删除
 	 */
-	@Autowired
-	private PushMsgConsumer pushMsgConsumer;
+//	@Autowired
+//	private PushMsgConsumer pushMsgConsumer;
 
 	/**
 	 * 消息推送
@@ -56,9 +61,9 @@ public class PushMsgSender {
 	 */
 	public void pushMessage(PushParamsDTO paramsDTO) {
 		if (null != paramsDTO) {
-//			String body = GsonUtils.parseJson(paramsDTO);
-//			this.directSend(body);
-			pushMsgConsumer.exceute(paramsDTO);
+			String body = GsonUtils.parseJson(paramsDTO);
+			this.directSend(body);
+//			pushMsgConsumer.exceute(paramsDTO);
 		}
 	}
 }
