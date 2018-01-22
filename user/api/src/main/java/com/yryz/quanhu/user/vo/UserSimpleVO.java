@@ -50,21 +50,11 @@ public class UserSimpleVO implements Serializable {
      * 好友备注名
      */
     private String nameNotes;
-    /**
-     * 关系类型 0-陌生人 1-关注 2-粉丝 3-好友 4-黑名单
-     */
-    private Integer relationStatus;
 	public String getNameNotes() {
-		return nameNotes;
+		return nameNotes == null ? "" : nameNotes.trim();
 	}
 	public void setNameNotes(String nameNotes) {
-		this.nameNotes = nameNotes;
-	}
-	public Integer getRelationStatus() {
-		return relationStatus;
-	}
-	public void setRelationStatus(Integer relationStatus) {
-		this.relationStatus = relationStatus;
+		this.nameNotes = nameNotes == null ? "" : nameNotes.trim();
 	}
 	public String getUserId() {
 		return userId;
@@ -106,7 +96,7 @@ public class UserSimpleVO implements Serializable {
 		return userLevel;
 	}
 	public void setUserLevel(String userLevel) {
-		this.userLevel = userLevel;
+		this.userLevel = userLevel == null ? "1" : userLevel;
 	}
 	public UserSimpleVO() {
 		super();
