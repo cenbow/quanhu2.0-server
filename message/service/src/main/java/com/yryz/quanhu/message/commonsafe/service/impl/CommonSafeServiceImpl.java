@@ -110,7 +110,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			Logger.error("checkVerifyCode", e);
 			throw new MysqlOptException(e);
 		}
-		if (exist == null) {
+		if (exist == null || exist == 0) {
 			return CheckVerifyCodeReturnCode.FAIL.getCode();
 		}
 		String verifyCode = redisDao.getVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(),

@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
 @Configuration
-@ComponentScan(basePackages = "com.yryz.quanhu.configuration")
+@ComponentScan(basePackages = "com.yryz.common.config")
 public class AutoConfig {
 
 }

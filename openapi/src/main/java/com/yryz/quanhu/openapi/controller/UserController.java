@@ -75,6 +75,7 @@ public class UserController {
 	}
 
 	@ApiOperation("用户信息查询")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/find")
 	public Response<UserLoginSimpleVO> findUser(String userId, HttpServletRequest request) {
