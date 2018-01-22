@@ -1,6 +1,7 @@
 package com.yryz.quanhu.message.im.api;
 
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.message.im.entity.BlackAndMuteListVo;
 import com.yryz.quanhu.message.im.entity.ImRelation;
 import com.yryz.quanhu.message.im.entity.ImUser;
 import com.yryz.quanhu.message.im.entity.TeamModel;
@@ -90,16 +91,24 @@ public interface ImAPI {
 
 
     /**
-     * 设置黑名单
+     * 设置/取消黑名单
      *
-     * @param imRelation 参数	类型	必须	说明
-     *                   userId	String	是	用户帐号，最大长度32字符，必须保证一个APP内唯一
-     *                   targetUserId	String	是	被加黑或加静音的帐号
-     *                   relationType	int	是	本次操作的关系类型,1:黑名单操作，2:静音列表操作
-     *                   relationValue	int	是	操作值，0:取消黑名单或静音，1:加入黑名单或静音
+     * @param imRelation
+     *参数	        类型	        必须	    说明
+     *userId	    String	    是	    用户帐号，最大长度32字符，必须保证一个APP内唯一
+     *targetUserId	String	    是	    被加黑或加静音的帐号
+     *relationType	String	    是	    本次操作的关系类型,1:黑名单操作，2:静音列表操作
+     *relationValue	String	    是	    操作值，0:取消黑名单或静音，1:加入黑名单或静音
      * @return
      */
     Response<Boolean> setSpecialRelation(ImRelation imRelation);
+
+    /**
+     * 查看用户的黑名单和静音列表
+     * @param imRelation
+     * @return
+     */
+    Response<BlackAndMuteListVo> listBlackAndMuteList(ImRelation imRelation);
 
 
     /**

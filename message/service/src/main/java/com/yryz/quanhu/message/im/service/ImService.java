@@ -9,6 +9,7 @@ import com.yryz.quanhu.message.common.im.yunxin.YunxinTeam;
 import com.yryz.quanhu.message.common.im.yunxin.YunxinUser;
 import com.yryz.quanhu.message.common.im.yunxin.vo.ImTeamInfoVo;
 import com.yryz.quanhu.message.common.im.yunxin.vo.ImTeamSearchResponseVo;
+import com.yryz.quanhu.message.im.entity.BlackAndMuteListVo;
 import com.yryz.quanhu.message.im.entity.ImRelation;
 import com.yryz.quanhu.message.im.entity.ImUser;
 import com.yryz.quanhu.message.im.entity.TeamModel;
@@ -172,12 +173,32 @@ public class ImService {
             String targetUserId = imRelation.getTargetUserId();
             String relationType = imRelation.getRelationType();
             String relationValue = imRelation.getRelationValue();
+            if (StringUtils.isBlank(userId) || StringUtils.isBlank(targetUserId)
+                    || StringUtils.isBlank(relationType) || StringUtils.isBlank(relationValue)) {
+                throw QuanhuException.busiError("userId targetUserId relationType relationValue can not null");
+            }
             YunxinRelation.getInstance().setSpecialRelation(userId, targetUserId, relationType, relationValue);
         } catch (Exception e) {
             logger.error("Im setSpecialRelation error", e);
             // throw new BaseException("sys error");
         }
 
+    }
+
+    public BlackAndMuteListVo listBlackAndMuteList(ImRelation imRelation) {
+        BlackAndMuteListVo blackAndMuteList = null;
+        try {
+            String userId = imRelation.getUserId();
+            if (StringUtils.isBlank(userId)) {
+                throw QuanhuException.busiError("userId can not null");
+            }
+            blackAndMuteList = YunxinRelation.getInstance().listBlackAndMuteList(userId);
+            return blackAndMuteList;
+        } catch (Exception e) {
+            logger.error("Im setSpecialRelation error", e);
+            // throw new BaseException("sys error");
+        }
+        return null;
     }
 
     public Response<String> addTeam(TeamModel model) {
