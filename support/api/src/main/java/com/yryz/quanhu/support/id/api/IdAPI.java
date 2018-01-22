@@ -37,7 +37,7 @@ public interface IdAPI {
 
 	/**
 	 * 基于Twitter的分布式自增ID算法Snowflake实现分布式有序
-	 * @return 返回18位的自增ID
+	 * @return 返回18位的递增ID
 	 *
 	 */
 	Response<Long> getSnowflakeId();
