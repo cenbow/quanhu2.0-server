@@ -1,5 +1,6 @@
 package com.yryz.quanhu.message.im.entity;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -22,12 +23,12 @@ public class BlackAndMuteListVo implements Serializable {
     /**
      * 加黑的帐号列表
      */
-    private List<String> blackList;
+    private List<String> blackList = Lists.newArrayList();
 
     /**
      * 被静音的帐号列表
      */
-    private List<String> muteList;
+    private List<String> muteList = Lists.newArrayList();
 
     public String getCode() {
         return code;

@@ -7,6 +7,6 @@ package com.yryz.quanhu.message.push.constants;
  * @description
  */
 public class AmqpConstants {
-    public static final String JPUSH_QUANHU_DIRECT_EXCHANGE = "jpush_quanhu_direct_exchange";
-    public static String JPUSH_QUANHU_DIRECT_QUEUE = "jpush_quanhu_direct_queue";
+    public static final String JPUSH_QUANHU_DIRECT_EXCHANGE = "quanhu.jpush.direct.exchange";
+    public static String JPUSH_QUANHU_DIRECT_QUEUE = "quanhujpush.direct.queue";
 }
