@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.Annotation.NotLogin;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
@@ -29,6 +31,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(description = "公共组件接口")
 @RestController
+@RequestMapping(value="services/app")
 public class ComponentController {
 	@Reference
 	private AccountApi accountApi;
@@ -38,6 +41,7 @@ public class ComponentController {
 	private AuthService authService;
 	
 	@ApiOperation("短信验证码发送")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/component/sendVerifyCode")
 	public Response<SmsVerifyCodeVO> sendVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
@@ -51,6 +55,7 @@ public class ComponentController {
 	}
 
 	@ApiOperation("验证码校验（只校验不删除）")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/component/checkVerifyCode")
 	public Response<Integer> checkVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {

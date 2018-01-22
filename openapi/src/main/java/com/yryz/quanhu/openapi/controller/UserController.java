@@ -11,9 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.Annotation.NotLogin;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
@@ -47,6 +49,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(description = "用户接口")
 @RestController
+@RequestMapping(value="services/app")
 public class UserController {
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
@@ -100,6 +103,7 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("手机号注册")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/register")
 	public Response<RegisterLoginVO> register(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
@@ -122,6 +126,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("手机号密码登录")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/login")
 	public Response<RegisterLoginVO> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
@@ -138,6 +143,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("手机号验证码登录")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginVerifyCode")
 	public Response<RegisterLoginVO> loginByVerifyCode(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
@@ -154,6 +160,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("app第三方登录")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginThird")
 	public Response<RegisterLoginVO> loginThird(@RequestBody ThirdLoginDTO loginDTO, HttpServletRequest request) {
@@ -176,6 +183,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("app第三方登录绑定手机号")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginThirdBindPhone")
 	public Response<RegisterLoginVO> loginThirdBindPhone(@RequestBody ThirdLoginDTO loginDTO,
@@ -202,6 +210,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("web第三方登录")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/webLoginThird")
 	public Response<String> webLoginThird(String loginType, String returnUrl) {
@@ -216,6 +225,7 @@ public class UserController {
 	 * @Description 第三方回调成功后跳转到web端登录时传的地址
 	 */
 	@ApiOperation("web第三方登录回调")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/thirdLoginNotify")
 	public void webThirdLoginNotify(HttpServletRequest request, HttpServletResponse response) {
@@ -321,6 +331,7 @@ public class UserController {
 	 * @param passwordDTO
 	 */
 	@ApiOperation("手机短信重置密码")
+	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/forgotPassword")
 	public Response<Boolean> forgotPassword(@RequestBody ForgotPasswordDTO passwordDTO,HttpServletRequest request) {

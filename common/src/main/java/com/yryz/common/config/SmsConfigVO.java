@@ -1,4 +1,4 @@
-package com.yryz.quanhu.configuration;
+package com.yryz.common.config;
 
 import java.io.Serializable;
 

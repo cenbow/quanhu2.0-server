@@ -5,7 +5,7 @@
  * Created on 2018年1月5日
  * Id: AuthConfigVO.java, 2018年1月5日 下午4:00:11 Administrator
  */
-package com.yryz.quanhu.configuration;
+package com.yryz.common.config;
 
 import java.io.Serializable;
 

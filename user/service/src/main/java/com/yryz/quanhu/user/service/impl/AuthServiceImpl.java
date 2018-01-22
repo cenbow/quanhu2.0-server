@@ -13,11 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.yryz.common.config.AuthConfig;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.configuration.AuthConfig;
 import com.yryz.quanhu.user.contants.TokenCheckEnum;
 import com.yryz.quanhu.user.dao.AuthRedisDao;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.utils.StringUtils;
@@ -36,7 +37,6 @@ import com.yryz.quanhu.message.commonsafe.utils.CommonUtils;
 import com.yryz.quanhu.message.commonsafe.utils.DateUtils;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO.VerifyStatus;
-import com.yryz.quanhu.configuration.VerifyCodeConfigVO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO.SmsType;
 import com.yryz.quanhu.message.sms.service.SmsService;

@@ -5,7 +5,7 @@
  * Created on 2017年12月6日
  * Id: VerifyCodeConfigVO.java, 2017年12月6日 上午9:39:22 Administrator
  */
-package com.yryz.quanhu.configuration;
+package com.yryz.common.config;
 
 import java.io.Serializable;
 

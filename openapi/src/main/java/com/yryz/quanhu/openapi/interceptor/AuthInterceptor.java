@@ -44,7 +44,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter implements Handle
 				} else {
 					NotLogin notLogin = ((HandlerMethod)handler).getMethodAnnotation(NotLogin.class);
 					if(notLogin != null){ //如果自带notLogin方法，就不检查登录状态
-						return false;
+						return true;
 					}
 				}
 			}
