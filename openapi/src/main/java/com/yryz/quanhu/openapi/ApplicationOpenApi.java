@@ -4,8 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+
+import com.alibaba.dubbo.config.ConsumerConfig;
+
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -22,7 +26,7 @@ public class ApplicationOpenApi extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(ApplicationOpenApi.class);
     }
-
+    
     @Bean
     public Docket docket(@Value("${swagger.enable:true}")boolean enableSwagger) {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -38,4 +42,5 @@ public class ApplicationOpenApi extends SpringBootServletInitializer {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationOpenApi.class, args);
     }
+
 }

@@ -25,4 +25,5 @@ public interface ActivityEnrolConfigDao {
 
     int update(ActivityEnrolConfig activityEnrolConfig);
 
+    ActivityEnrolConfig selectByActivityId(Long activityKid);
 }

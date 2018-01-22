@@ -17,13 +17,13 @@ import org.apache.commons.lang3.StringUtils;;
  */
 public enum DevType {
 	/** ios */
-	IOS("1","APP"),
+	IOS("11","APP"),
 	/** android */
-	ANDROID("2","APP"),
+	ANDROID("12","APP"),
 	/** wap */
-	WAP("3","Wap"),
+	WAP("13","Wap"),
 	/** web */
-	WEB("4","Web");
+	WEB("14","Web");
 	
 	private String type;
 	private String label;
@@ -52,13 +52,13 @@ public enum DevType {
 			type = DevType.IOS.getType();
 		}
 		switch(type){
-		case "1":
+		case "11":
 			devType = DevType.IOS;
 			break;
-		case "2":
+		case "12":
 			devType = DevType.ANDROID;
 			break;
-		case "3":
+		case "13":
 			if(StringUtils.contains(userAgent, AppConstants.MOBILE)){
 				devType = DevType.WAP;
 			} else{

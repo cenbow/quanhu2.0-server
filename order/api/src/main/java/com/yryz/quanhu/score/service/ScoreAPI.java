@@ -61,21 +61,21 @@ public interface ScoreAPI {
 	public List<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq , int flowType , int start , int limit);
 	/**
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param score
 	 * @param eventCode
 	 * @return
 	 * @Description 消费积分
 	 */
-	public int consumeScore(String custId , int score , String eventCode);
+	public int consumeScore(String userId , int score , String eventCode);
 	/**
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param score
 	 * @param eventCode
 	 * @return
 	 * @Description 增加积分
 	 */
-	public int addScore(String custId , int score , String eventCode);
+	public int addScore(String userId , int score , String eventCode);
 	
 }

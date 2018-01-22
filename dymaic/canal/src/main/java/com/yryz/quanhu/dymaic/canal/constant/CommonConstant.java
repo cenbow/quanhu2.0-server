@@ -10,7 +10,7 @@ public class CommonConstant {
     //TODO 值需要根据表情况更改
     public class UserDb{
     	public final static String DB_NAME="db1";
-        public final static String TABLE_USER="company";
+        public final static String TABLE_USER="qh_user_baseinfo";
     }
     
     public class EventType{

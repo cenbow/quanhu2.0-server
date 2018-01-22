@@ -6,7 +6,7 @@
 	
    <sql id="columns">
    	    id as id,
-   		cust_id as custId,
+   		user_id as userId,
 		event_code as eventCode,
 		new_score as newScore,
 		all_score as allScore,
@@ -20,7 +20,7 @@
 	<insert id="save" keyProperty="id" keyColumn="id"
 		useGeneratedKeys="true" parameterType="com.yryz.quanhu.score.entity.ScoreFlow">
 		INSERT INTO score_flow(
-		cust_id,
+		user_id,
 		event_code,
 		new_score,
 		all_score,
@@ -29,7 +29,7 @@
 		update_time
 		)
 		VALUES (
-		#{custId},
+		#{userId},
 		#{eventCode},
 		#{newScore},
 		#{allScore},
@@ -42,19 +42,19 @@
 	<!-- 获取用户积分流水列表 -->
 	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventReportVo">
 		select <include refid="columns" /> from score_flow where
-		cust_id = #{custId}
+		user_id = #{userId}
 	</select>
 
 	<select id="getPage" resultType="com.yryz.quanhu.score.entity.ScoreFlow">
 		select  a.id as id,
-   		a.cust_id as custId,
+   		a.user_id as userId,
 		a.event_code as eventCode,
 		a.new_score as newScore,
 		a.all_score as allScore,
 		a.consume_flag as consumeFlag,
 		a.create_time as createTime,
 		a.update_time as updateTime , b.event_name as  eventName  from (
-		select <include refid="columns" /> from score_flow where cust_id = #{sfq.custId}
+		select <include refid="columns" /> from score_flow where user_id = #{sfq.userId}
 		<if test="consumeFlag != -1">
 			and consume_flag = #{consumeFlag}
 		</if>
@@ -83,7 +83,7 @@
 			</if>
 			update_time = #{updateTime}
 		</trim>
-		where cust_id = #{custId} and event_code=#{eventCode}
+		where user_id = #{userId} and event_code=#{eventCode}
 	</update>
 
 </mapper>

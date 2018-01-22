@@ -58,7 +58,7 @@ public class AbstractAccountService implements AccountService {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAccountService.class);
 	@Autowired
 	private UserAccountDao mysqlDao;
-	@Reference(check = false)
+	@Reference(lazy=true,check=false)
 	private IdAPI idApi;
 	@Autowired
 	private UserLoginLogDao logDao;

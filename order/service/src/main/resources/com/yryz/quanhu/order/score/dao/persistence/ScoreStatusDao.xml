@@ -4,7 +4,7 @@
 
    <sql id="columns">
    	    id as id,
-   		cust_id as custId,
+   		user_id as userId,
 		event_code as eventCode,
 		circle_id as circleId,
 		event_count as eventCount,
@@ -13,18 +13,18 @@
 	</sql>
 
 	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.order.score.entity.ScoreStatus">
-		insert into score_status (cust_id , circle_id , event_code , event_count , create_time , update_time)
-		values (#{custId} , #{circleId} , #{eventCode} , #{eventCount} , #{createTime} , #{updateTime})
+		insert into score_status (user_id , circle_id , event_code , event_count , create_time , update_time)
+		values (#{userId} , #{circleId} , #{eventCode} , #{eventCount} , #{createTime} , #{updateTime})
 	</insert>
 	
 	<update id="update" parameterType="com.yryz.quanhu.order.score.entity.ScoreStatus">
 		update score_status set event_count = #{eventCount} , update_time = #{updateTime} 
-		where cust_id = #{custId} and event_code = #{eventCode} and
+		where user_id = #{userId} and event_code = #{eventCode} and
 		DATE_FORMAT(#{createTime} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
 	</update>
 	
 	<select id="getByCode" resultType="com.yryz.quanhu.order.score.entity.ScoreStatus">
-		select <include refid="columns" />  from score_status where cust_id = #{custId} and event_code = #{eventCode} and
+		select <include refid="columns" />  from score_status where user_id = #{userId} and event_code = #{eventCode} and
 		DATE_FORMAT(#{createDate} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
 	</select>
 

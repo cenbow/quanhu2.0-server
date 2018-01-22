@@ -30,7 +30,7 @@ public class EventReportVo implements Serializable {
     
 	/** 用户id */
     @ApiModelProperty(value = "用户id")
-    private String custId;
+    private String userId;
     
 	/** 事件编码 */
     @ApiModelProperty(value = "事件编码")
@@ -92,12 +92,12 @@ public class EventReportVo implements Serializable {
 		this.consumeFlag = consumeFlag;
 	}
 
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getEventCode() {

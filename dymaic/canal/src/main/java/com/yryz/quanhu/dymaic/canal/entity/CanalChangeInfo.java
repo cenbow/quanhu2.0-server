@@ -50,7 +50,7 @@ public class CanalChangeInfo {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			CanalChangeInfo changeInfo = list.get(i);
-			infoMap.put(changeInfo.getName(), changeInfo);
+			infoMap.put(changeInfo.getName().toLowerCase().replace("_", "").replace("-", ""), changeInfo);
 		}
 		return infoMap;
 	}

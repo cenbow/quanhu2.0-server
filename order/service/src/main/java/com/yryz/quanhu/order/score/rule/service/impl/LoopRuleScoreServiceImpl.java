@@ -51,9 +51,9 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean processStatus(String custId, String eventCode, ScoreEventInfo sei,  double amount) {
-        String recordKey = EventUtil.getScoreRecordKey(custId, eventCode);
-        String statusKey = EventUtil.getScoreStatusKey(custId, eventCode, ScoreTypeEnum.Loop);
+    public boolean processStatus(String userId, String eventCode, ScoreEventInfo sei,  double amount) {
+        String recordKey = EventUtil.getScoreRecordKey(userId, eventCode);
+        String statusKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Loop);
         Date now = new Date();
         Exception exception = null;
         if (redisTemplate.hasKey(recordKey)) {
@@ -68,7 +68,7 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
             boolean needScore = false;
             boolean status = false;
             try {
-                ScoreStatus scoreStatus = new ScoreStatus(custId, eventCode, eventCount);
+                ScoreStatus scoreStatus = new ScoreStatus(userId, eventCode, eventCount);
                 scoreStatus.setCreateTime(now); // 这里的createTime字段用于更新时的条件判断，并不实际更新字段值
                 scoreStatus.setUpdateTime(now);
                 int updateCount = scoreStatusService.update(scoreStatus);
@@ -87,13 +87,13 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
                     status = true;
                 }
                 if (needScore) {
-                    saveScoreFlow(custId, eventCode, sei, 0, amount);
+                    saveScoreFlow(userId, eventCode, sei, 0, amount);
                 }
             } catch (Exception e) {
                 //持久化出错后，要重置redis记录数
                 //jedis.decr(recordKey);
             	redisTemplate.opsForValue().increment(recordKey, -1);
-                logger.error("-----redis有记录时，持久化处理循环事件积分出错！传入数据custId=" + custId + ",eventCode=" + eventCode + ",amount=" + amount + "出错信息：" + e.getLocalizedMessage());
+                logger.error("-----redis有记录时，持久化处理循环事件积分出错！传入数据userId=" + userId + ",eventCode=" + eventCode + ",amount=" + amount + "出错信息：" + e.getLocalizedMessage());
                 exception = e;
 //				throw e;
             }
@@ -106,10 +106,10 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 
         // 以下处理redis中不存在状态数记录的情况，有两种情况：1.当日未操作 2.redis数据丢失
         // 预防redis数据丢失情况，从数据库中恢复记录的过程
-        ScoreStatus ss = scoreStatusService.getByCode(custId, "", eventCode, now);
+        ScoreStatus ss = scoreStatusService.getByCode(userId, "", eventCode, now);
         // 若数据库中存在状态记录
         if (ss != null && ss.getId() != null) {
-            logger.info("------DB中状态记录：ss.eventCount=" + ss.getEventCount() + "次.custId=" + custId);
+            logger.info("------DB中状态记录：ss.eventCount=" + ss.getEventCount() + "次.userId=" + userId);
             int newCount = ss.getEventCount() + 1;
             // 1. 同步状态记录到Redis中
             //jedis.set(recordKey, String.valueOf(newCount), "NX", "PX", getRedisExpireMillis());
@@ -122,20 +122,20 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
             try {
                 scoreStatusService.update(ss);
                 // 3. 同时更新Redis中的状态值
-                logger.info("------newCount=" + newCount + "。eventLimit=" + sei.getEventLimit() + "--------custId:" + custId);
+                logger.info("------newCount=" + newCount + "。eventLimit=" + sei.getEventLimit() + "--------userId:" + userId);
                 if (newCount <= sei.getEventLimit()) {
                     needScore = true;
                 }
                 if (newCount >= sei.getEventLimit()) {
                     status = true;
                 }
-                logger.info("------needScore=" + needScore + "。status=" + status + "--------custId:" + custId);
+                logger.info("------needScore=" + needScore + "。status=" + status + "--------userId:" + userId);
                 if (needScore) {
-                    saveScoreFlow(custId, eventCode, sei, 0, amount);
+                    saveScoreFlow(userId, eventCode, sei, 0, amount);
                 }
             } catch (Exception e) {
                 //jedis.decr(recordKey);
-                logger.error("-----redis无记录数据库有记录时，持久化处理循环事件积分出错！传入数据custId=" + custId + ",eventCode=" + eventCode + ",amount=" + amount + "出错信息：" + e.getLocalizedMessage());
+                logger.error("-----redis无记录数据库有记录时，持久化处理循环事件积分出错！传入数据userId=" + userId + ",eventCode=" + eventCode + ",amount=" + amount + "出错信息：" + e.getLocalizedMessage());
                 exception = e;
 //				throw e;
             }
@@ -149,7 +149,7 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 //        jedis.set(recordKey, String.valueOf(1), "NX", "PX", getRedisExpireMillis());
         //redisTemplate.opsForValue().set(recordKey, String.valueOf(1),getRedisExpireMillis(), TimeUnit.MILLISECONDS);
         eventAcountService.redislocksset(redisTemplate, recordKey, String.valueOf(1), "NX", "PX", getRedisExpireMillis());
-        ScoreStatus initScoreStatus = new ScoreStatus(custId, eventCode, 1);
+        ScoreStatus initScoreStatus = new ScoreStatus(userId, eventCode, 1);
         initScoreStatus.setCreateTime(now);
         // 同步保存数据库初始状态数记录
         boolean needScore = false;
@@ -163,12 +163,12 @@ public class LoopRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
                 status = true;
             }
             if (needScore) {
-                saveScoreFlow(custId, eventCode, sei, 0, amount);
+                saveScoreFlow(userId, eventCode, sei, 0, amount);
             }
         } catch (Exception e) {
             //jedis.del(recordKey);
             redisTemplate.opsForValue().increment(recordKey, -1);
-            logger.error("-----redis和数据库都无记录时，持久化处理循环事件积分出错！传入数据custId=" + custId + ",eventCode=" + eventCode + ",amount=" + amount + "出错信息：" + e.getLocalizedMessage());
+            logger.error("-----redis和数据库都无记录时，持久化处理循环事件积分出错！传入数据userId=" + userId + ",eventCode=" + eventCode + ",amount=" + amount + "出错信息：" + e.getLocalizedMessage());
             exception = e;
         }
         if(exception == null) {

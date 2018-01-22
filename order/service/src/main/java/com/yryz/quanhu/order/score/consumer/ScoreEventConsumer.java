@@ -67,11 +67,11 @@ public class ScoreEventConsumer   {
 	)
 	public void handleMessage(String message){
 		Map<String, String>  data =  AbsMQlistener.onMessage(message);
-        // 积分事件关注点： eventCode , custId
+        // 积分事件关注点： eventCode , userId
         String eventCode = data.get("eventCode");
-        String custId = data.get("custId");
-        if (StringUtils.isBlank(custId)) {
-            logger.info("-------处理积分事件，结果：直接丢掉消息，原因：custId为空 , 传入数据：" + data.toString());
+        String userId = data.get("userId");
+        if (StringUtils.isBlank(userId)) {
+            logger.info("-------处理积分事件，结果：直接丢掉消息，原因：userId为空 , 传入数据：" + data.toString());
             return;
         }
         // 判断是否积分事件
@@ -98,36 +98,36 @@ public class ScoreEventConsumer   {
                     case "1":
                         // 基于redis的积分状态判定
                         logger.info("-------处理积分事件，事件类型eventType=1：一次性触发 ,传入数据：" + data.toString());
-                        String statusOnceKey = EventUtil.getScoreStatusKey(custId, eventCode, ScoreTypeEnum.Once);
+                        String statusOnceKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Once);
                        // String statusOnce = JedisUtils.get(statusOnceKey);
                         String statusOnce = redisTemplate.opsForValue().get(statusOnceKey);
                         if (!"true".equals(statusOnce)) {
                             ste = ScoreTypeEnum.Once;
-                            ruleScoreServiceProvider.getService(ste).processStatus(custId, eventCode, sei,  amount);
+                            ruleScoreServiceProvider.getService(ste).processStatus(userId, eventCode, sei,  amount);
                         }
                         break;
                     case "2":
                         logger.info("-------处理积分事件，事件类型eventType=2：每次触发,传入数据：" + data.toString());
                         ste = ScoreTypeEnum.Pertime;
-                        ruleScoreServiceProvider.getService(ste).processStatus(custId, eventCode, sei,  amount);
+                        ruleScoreServiceProvider.getService(ste).processStatus(userId, eventCode, sei,  amount);
                         break;
                     case "3":
                         logger.info("-------处理积分事件，事件类型eventType=3：循环触发,传入数据：" + data.toString());
-                        String statusLoopKey = EventUtil.getScoreStatusKey(custId, eventCode, ScoreTypeEnum.Loop);
+                        String statusLoopKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Loop);
                         String statusLoop = redisTemplate.opsForValue().get(statusLoopKey);
                         if (!"true".equals(statusLoop)) {
                             ste = ScoreTypeEnum.Loop;
-                            ruleScoreServiceProvider.getService(ste).processStatus(custId, eventCode, sei,  amount);
+                            ruleScoreServiceProvider.getService(ste).processStatus(userId, eventCode, sei,  amount);
                         }
                         break;
                     case "4":
                         logger.info("-------处理积分事件，事件类型eventType=4：签到区间循环,传入数据：" + data.toString());
-                        String statusSignKey = EventUtil.getScoreStatusKey(custId, eventCode, ScoreTypeEnum.Sign);
+                        String statusSignKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Sign);
                         String statusSign = redisTemplate.opsForValue().get(statusSignKey);
-                        if (!"true".equals(statusSign)) {
+                       // if (!"true".equals(statusSign)) {
                             ste = ScoreTypeEnum.Sign;
-                            ruleScoreServiceProvider.getService(ste).processStatus(custId, eventCode, sei,  amount);
-                        }
+                            ruleScoreServiceProvider.getService(ste).processStatus(userId, eventCode, sei,  amount);
+                       // }
                         break;
                     default:
                         break;

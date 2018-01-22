@@ -11,6 +11,6 @@ public interface ScoreStatusSignService {
 	
 	int update(EventSign sss);
 	
-	EventSign getByCode(String custId , String eventCode);
+	EventSign getByCode(String userId , String eventCode);
 
 }

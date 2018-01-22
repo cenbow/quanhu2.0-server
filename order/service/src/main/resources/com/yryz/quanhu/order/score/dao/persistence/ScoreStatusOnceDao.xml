@@ -4,7 +4,7 @@
 
    <sql id="columns">
    	    id as id,
-   		cust_id as custId,
+   		user_id as userId,
 		event_code as eventCode,
 		score_flag as scoreFlag,
 		create_time as createTime,
@@ -12,11 +12,11 @@
 	</sql>
 	
 	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.order.score.entity.ScoreStatusOnce">
-		insert into score_status_once (cust_id , event_code , score_flag ,create_time , update_time)
-		values(#{custId} , #{eventCode} , #{scoreFlag} , #{createTime} , #{updateTime})
+		insert into score_status_once (user_id , event_code , score_flag ,create_time , update_time)
+		values(#{userId} , #{eventCode} , #{scoreFlag} , #{createTime} , #{updateTime})
 	</insert>
 	
 	<select id="getByCode" resultType="com.yryz.quanhu.order.score.entity.ScoreStatusOnce">
-		select <include refid="columns" /> from score_status_once where cust_id = #{custId} and event_code = #{eventCode}
+		select <include refid="columns" /> from score_status_once where user_id = #{userId} and event_code = #{eventCode}
 	</select>
 </mapper>

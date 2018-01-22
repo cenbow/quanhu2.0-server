@@ -17,7 +17,7 @@ public class ScoreFlow implements Serializable{
 
 	private int consumeFlag;
 	
-    private String custId;
+    private String userId;
 
     private String eventCode;
     
@@ -35,8 +35,8 @@ public class ScoreFlow implements Serializable{
     	
     }
     
-    public ScoreFlow(String custId , String eventCode , int newScore){
-    	this.custId = custId ;
+    public ScoreFlow(String userId , String eventCode , int newScore){
+    	this.userId = userId ;
     	this.eventCode = eventCode;
     	this.newScore = newScore;
     }
@@ -49,12 +49,12 @@ public class ScoreFlow implements Serializable{
         this.id = id;
     }
 
-    public String getCustId() {
-        return custId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setCustId(String custId) {
-        this.custId = custId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getEventCode() {

@@ -30,8 +30,8 @@ public class ScoreStatusSignServiceImpl implements ScoreStatusSignService {
 	}
 
 	@Override
-	public EventSign getByCode(String custId, String eventCode) {
-		EventSign es = scoreStatusSignDao.getByCode(custId, eventCode);
+	public EventSign getByCode(String userId, String eventCode) {
+		EventSign es = scoreStatusSignDao.getByCode(userId, eventCode);
 		if(es != null && es.getId() != null){
 			Date lastSign = es.getLastSignTime();
 			int daysInterval = EventUtil.daysInterval(lastSign, new Date());

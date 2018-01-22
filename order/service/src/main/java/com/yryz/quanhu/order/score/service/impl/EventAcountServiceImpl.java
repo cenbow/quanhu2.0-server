@@ -35,14 +35,14 @@ public class EventAcountServiceImpl implements EventAcountService {
 	}
 
 	@Override
-	public EventAcount getLastAcount(String custId) {
-		return eventAcountDao.getLastAcount(custId);
+	public EventAcount getLastAcount(String userId) {
+		return eventAcountDao.getLastAcount(userId);
 	}
 
 	@Override
-	public Long initAcount(String custId) {
+	public Long initAcount(String userId) {
 		Date now = new Date();
-		EventAcount ea = new EventAcount(custId);
+		EventAcount ea = new EventAcount(userId);
 		ea.setCreateTime(now);
 		ea.setUpdateTime(now);
 		ea.setGrowLevel("1");
