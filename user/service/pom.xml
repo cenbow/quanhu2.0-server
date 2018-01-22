@@ -23,20 +23,17 @@
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>support-api</artifactId>
             <version>${quanhu.version}</version>
-            <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>message-api</artifactId>
             <version>${quanhu.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>configuration</artifactId>
             <version>${quanhu.version}</version>
-            <scope>provided</scope>
         </dependency>
         
         <dependency>
