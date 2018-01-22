@@ -42,7 +42,7 @@ public class ResourceController {
 	
 	@NotLogin
     @ApiOperation("首页资源推荐")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/appRecommend")
 	public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度")String limit){
     	ResourceVo resourceVo = new ResourceVo();

@@ -11,7 +11,7 @@ package com.yryz.quanhu.order.enums;
  * @author yehao
  * @version 2.0
  * @date 2018年1月18日 下午1:32:30
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 资金管理枚举类
  */
 public class OrderConstant {
 	
