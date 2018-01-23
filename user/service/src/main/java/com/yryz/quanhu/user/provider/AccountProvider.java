@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSON;
+import com.yryz.common.utils.GsonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -156,7 +157,7 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> login(LoginDTO loginDTO, RequestHeader header) {
 		try {
-			logger.info("user login request: {}", JSON.toJSONString(loginDTO));
+			logger.info("user login request: {}", GsonUtils.parseJson(loginDTO));
 			checkLoginDTO(loginDTO, LoginType.PHONE);
 			checkHeader(header);
 			loginDTO.setDeviceId(header.getDevId());

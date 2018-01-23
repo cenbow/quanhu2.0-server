@@ -2,6 +2,7 @@ package com.yryz.quanhu.message.commonsafe.provider;
 
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.entity.AfsCheckRequest;
+import com.yryz.common.utils.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class CommonSafeProvider implements CommonSafeApi {
     public Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
         try {
             logger.info("sendVerifyCodeForSlip request, verifyCodeDTO: {}, afsCheckRequest: {}",
-                    JSON.toJSONString(verifyCodeDTO), JSON.toJSONString(afsCheckReq));
+                    GsonUtils.parseJson(verifyCodeDTO), GsonUtils.parseJson(afsCheckReq));
             checkSmsDTO(verifyCodeDTO);
             VerifyCodeVO verifyCodeVO = new VerifyCodeVO();
             if (!commonService.checkSmsSlipCode(verifyCodeDTO, afsCheckReq)) {
@@ -77,7 +78,7 @@ public class CommonSafeProvider implements CommonSafeApi {
             if (verifyCodeVO == null) {
                 verifyCodeVO = new VerifyCodeVO();
             }
-            logger.info("sendVerifyCodeForSlip result: {}", JSON.toJSONString(verifyCodeVO));
+            logger.info("sendVerifyCodeForSlip result: {}", GsonUtils.parseJson(verifyCodeVO));
             return ResponseUtils.returnObjectSuccess(verifyCodeVO);
 
 //			rrzMessageService.saveIpSendVerifyCodeCount(request);
