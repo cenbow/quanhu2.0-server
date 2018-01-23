@@ -393,6 +393,9 @@ public class UserStarProvider implements UserStarApi {
 		if (authInfo == null) {
 			throw QuanhuException.busiError("达人认证信息不能为空");
 		}
+		if (StringUtils.isEmpty(authInfo.getAppId())) {
+			throw QuanhuException.busiError("应用id不能为空");
+		}
 		if (StringUtils.isEmpty(authInfo.getUserId())) {
 			throw QuanhuException.busiError("用户id不能为空");
 		}

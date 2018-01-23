@@ -43,7 +43,7 @@
 		from qh_user_star_auth a
 		where 1=1
 		<if test="userId != null and userId != ''">
-			and a.cust_id = #{custId}
+			and a.user_id = #{userId}
 		</if>
 		<if test="idCard != null and idCard != ''">
 			and a.id_card = #{idCard}
@@ -105,12 +105,12 @@
 		<if test="authWay != null">
 			and a.auth_way = #{authWay}
 		</if>
-		<if test="custLevel != null">
-		   <if test="custLevel == 1">
+		<if test="userLevel != null">
+		   <if test="userLevel == 1">
 		     and (ea.grow_level IS NULL or ea.grow_level =1 ) 
 		   </if>
-		   <if test="custLevel != 1">
-		   	and ea.grow_level = #{custLevel} 
+		   <if test="userLevel != 1">
+		   	and ea.grow_level = #{userLevel} 
 		   </if>
 		</if>
 		order by
@@ -131,7 +131,7 @@
 		a.trade_field as tradeField
 		from
 		qh_user_star_auth a
-		left join rrz_cust_baseinfo r on a.cust_id = r.cust_id
+		left join qh_user_baseinfo r on a.user_id = r.user_id
 		where 1=1
 		<if test="starRecommend != null ">
 			and r.star_recommend_status = 11 and a.audit_status = 11
@@ -150,7 +150,7 @@
 		</if>
 	</select>
 	
-  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserStarAuth" >
+  <insert id="save" parameterType="com.yryz.quanhu.user.entity.UserStarAuth" >
     insert into qh_user_star_auth
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
