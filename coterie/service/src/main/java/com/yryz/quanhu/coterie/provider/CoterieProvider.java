@@ -225,9 +225,6 @@ public class CoterieProvider implements CoterieApi {
 		if (StringUtils.isEmpty(info.getOwnerId())) {
 			throw ServiceException.paramsError("ownerId");
 		}
-		if (StringUtils.isEmpty(info.getOwnerIntro())) {
-			throw ServiceException.paramsError("ownerIntro");
-		}
 		if (info.getJoinFee()!=null && info.getJoinFee()<100 && info.getJoinFee()>0) {//私圈单位为分，0表示免费，小于100的  单位必定错误
 			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "加入私圈金额设置不正确。");
 		}
