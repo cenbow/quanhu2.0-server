@@ -80,5 +80,12 @@ public class OatuhQq {
 
 		return user;
 	}
-
+	
+	public static void main(String args[]) {
+		try {
+			OatuhQq.getUser("101342737","F1E167B92BB7D1B1D093B1D44A9147E3", "162C9522156358786DE06E441E9C2A3F");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

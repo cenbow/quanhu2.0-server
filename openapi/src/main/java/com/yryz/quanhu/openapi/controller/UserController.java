@@ -147,9 +147,15 @@ public class UserController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginVerifyCode")
-	public Response<RegisterLoginVO> loginByVerifyCode(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+	public Response<RegisterLoginVO> loginByVerifyCode(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.loginByVerifyCode(loginDTO, header);
+		String ip = WebUtil.getClientIP(request);
+		registerDTO.setDeviceId(header.getDevId());
+		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
+		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, registerDTO.getUserLocation(),
+				registerDTO.getActivityChannelCode(), devType, ip);
+		registerDTO.setRegLogDTO(logDTO);
+		return accountApi.loginByVerifyCode(registerDTO,header);
 	}
 
 	/**

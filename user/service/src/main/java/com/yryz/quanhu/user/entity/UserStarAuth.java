@@ -138,9 +138,9 @@ public class UserStarAuth extends GenericEntity{
     private Byte recommendStatus;
     
     public enum StarRecommendStatus{
-    	/** 用户申请 */
+    	/** 否 */
     	FALSE((byte)10),
-    	/** 平台设置 */
+    	/** 是 */
     	TRUE((byte)11);
     	private byte status;
     	StarRecommendStatus(byte status) {
