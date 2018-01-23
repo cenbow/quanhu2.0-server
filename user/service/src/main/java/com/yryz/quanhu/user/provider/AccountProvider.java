@@ -186,6 +186,8 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> loginByVerifyCode(RegisterDTO registerDTO, RequestHeader header) {
 		try {
+			logger.info("loginByVerifyCode request, registerDTO: {}, header: {}", GsonUtils.parseJson(registerDTO),
+			GsonUtils.parseJson(header));
 			checkRegisterDTO(registerDTO, RegType.PHONE);
 			checkHeader(header);
 			registerDTO.setDeviceId(header.getDevId());
