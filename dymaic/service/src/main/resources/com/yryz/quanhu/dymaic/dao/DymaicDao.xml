@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yryz.quanhu.dymaic.vo.Dymaic">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="kid" property="kid" jdbcType="BIGINT"/>
-        <result column="create_user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="create_user_id" property="userId" jdbcType="BIGINT"/>
         <result column="module_enum" property="moduleEnum" jdbcType="TINYINT"/>
         <result column="target_id" property="resourceId" jdbcType="VARCHAR"/>
         <result column="classify_id" property="classifyId;" jdbcType="BIGINT"/>
@@ -80,7 +80,7 @@
         SELECT kid
         from qh_dymaic
         WHERE create_user_id IN
-        <foreach item="item" index="index" collection="kids" open="("
+        <foreach item="item" index="index" collection="userIds" open="("
                  separator="," close=")">
             #{item}
         </foreach>
@@ -91,7 +91,7 @@
     <insert id="insert" parameterType="com.yryz.quanhu.dymaic.vo.Dymaic">
         insert into qh_dymaic (kid, create_user_id, module_enum, target_id, classify_id, coterie_id,
           transmit_note, title, content, cover_plan_url, img_url, video_url, video_thumbnail_url, audio_url, release_note)
-        values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=VARCHAR},
+        values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},
             #{moduleEnum,jdbcType=TINYINT},#{resourceId,jdbcType=VARCHAR},
             #{classifyId,jdbcType=BIGINT},#{coterieId,jdbcType=VARCHAR},
             #{transmitNote,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR},

@@ -38,11 +38,11 @@ public class DymaicCache {
         return KEY_DYNAMIC_INFO + kid;
     }
 
-    private static String cacheSendListKey(String userId) {
+    private static String cacheSendListKey(Long userId) {
         return KEY_DYNAMIC_SENDLIST + userId;
     }
 
-    private static String cacheTimeLineKey(String userId) {
+    private static String cacheTimeLineKey(Long userId) {
         return KEY_DYNAMIC_TIMELINE + userId;
     }
 
@@ -56,6 +56,7 @@ public class DymaicCache {
     public void addDynamic(Dymaic dymaic) {
         RedisTemplate<String, Dymaic> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Dymaic.class);
         final String key = cacheDynamicKey(dymaic.getKid());
+
         redisTemplate.opsForValue().set(key, dymaic, EXPIRE_DAY, TimeUnit.DAYS);
     }
 
@@ -109,7 +110,7 @@ public class DymaicCache {
      * @param userId
      * @param kid
      */
-    public void addSendList(String userId, Long kid) {
+    public void addSendList(Long userId, Long kid) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
         redisTemplate.opsForZSet().add(key, kid, kid);
@@ -121,7 +122,7 @@ public class DymaicCache {
      * @param userId
      * @param kids
      */
-    public void addSendList(String userId, Set<Long> kids) {
+    public void addSendList(Long userId, Set<Long> kids) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
         for (Long kid : kids) {
@@ -135,7 +136,7 @@ public class DymaicCache {
      * @param userId
      * @param kid
      */
-    public void removeSendList(String userId, Long kid) {
+    public void removeSendList(Long userId, Long kid) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
         redisTemplate.opsForZSet().remove(key, kid);
@@ -149,7 +150,7 @@ public class DymaicCache {
      * @param limit
      * @return
      */
-    public Set<Long> rangeSendList(String userId, Long kid, Long limit) {
+    public Set<Long> rangeSendList(Long userId, Long kid, Long limit) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
         Set<Long> sendList = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid, 0, limit);
@@ -162,7 +163,7 @@ public class DymaicCache {
      * @param userId
      * @return
      */
-    public Set<Long> rangeAllSendList(String userId) {
+    public Set<Long> rangeAllSendList(Long userId) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
         Set<Long> sendList = redisTemplate.opsForZSet().range(key, 0, -1);
@@ -178,7 +179,7 @@ public class DymaicCache {
      * @param userId
      * @param kid
      */
-    public void addTimeLine(String userId, Long kid) {
+    public void addTimeLine(Long userId, Long kid) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
         redisTemplate.opsForZSet().add(key, kid, kid);
@@ -190,7 +191,7 @@ public class DymaicCache {
      * @param userId
      * @param kids
      */
-    public void addTimeLine(String userId, Set<Long> kids) {
+    public void addTimeLine(Long userId, Set<Long> kids) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
         Set<ZSetOperations.TypedTuple<Long>> values = null;
@@ -205,7 +206,7 @@ public class DymaicCache {
      * @param userId
      * @param kid
      */
-    public void removeTimeLine(String userId, Long kid) {
+    public void removeTimeLine(Long userId, Long kid) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
         redisTemplate.opsForZSet().remove(key, kid);
@@ -217,7 +218,7 @@ public class DymaicCache {
      * @param userId
      * @param kids
      */
-    public void removeTimeLine(String userId, Set<Long> kids) {
+    public void removeTimeLine(Long userId, Set<Long> kids) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
         redisTemplate.opsForZSet().remove(key, kids.toArray());
@@ -231,7 +232,7 @@ public class DymaicCache {
      * @param limit
      * @return
      */
-    public Set<Long> rangeTimeLine(String userId, Long kid, Long limit) {
+    public Set<Long> rangeTimeLine(Long userId, Long kid, Long limit) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
         Set<Long> timeLine = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid, 0, limit);

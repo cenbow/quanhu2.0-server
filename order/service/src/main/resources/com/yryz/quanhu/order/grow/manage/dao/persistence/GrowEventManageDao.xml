@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.grow.manage.dao.persistence.GrowEventManageDao">
+
+   <sql id="columns">
+		 id as id ,
+		 event_code as eventCode  ,
+		 event_type as  eventType  ,
+		 event_loop_unit as  eventLoopUnit  ,
+		 event_limit  as  eventLimit ,
+		 event_grow  as  eventGrow ,
+		 grow_type  as  growType ,
+		 amount_power  as  amountPower ,
+		 create_time as  createTime ,
+		 update_time as  updateTime
+	</sql>
+
+	<!-- 新增积分事件 -->
+	<insert id="save" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="com.yryz.quanhu.grow.entity.GrowEventInfo">
+		INSERT INTO event_grow(
+		event_code,event_type,
+		<if test="eventLoopUnit != null">
+			event_loop_unit,
+		</if>
+		<if test="eventLimit != null">
+			event_limit,
+		</if>
+		event_grow,
+		<if test="growType != null">
+			grow_type,
+		</if>
+		<if test="amountPower != null">
+			amount_power,
+		</if>
+		create_time , update_time
+		)
+		VALUES (
+		#{eventCode},#{eventType},
+		<if test="eventLoopUnit != null">
+			#{eventLoopUnit},
+		</if>
+		<if test="eventLimit != null">
+			#{eventLimit},
+		</if>
+		#{eventGrow} ,
+		<if test="growType != null">
+			#{growType},
+		</if>
+		<if test="amountPower != null">
+			#{amountPower},
+		</if>
+		#{createTime} , #{update_time}
+		)
+	</insert>
+
+	<!-- 根据事件编码查询事件信息 -->
+	<select id="getByCode"
+		resultType="com.yryz.quanhu.grow.entity.GrowEventInfo">
+		SELECT  <include refid="columns" /> 
+		FROM event_grow where event_code = #{eventCode}
+	</select>
+
+	<!-- 获取积分事件列表 -->
+	<select id="getAll"
+		resultType="com.yryz.quanhu.grow.entity.GrowEventInfo">
+		SELECT
+		 a.id as id ,
+		 a.event_code as eventCode  ,
+		 a.event_type as  eventType  ,
+		 a.event_loop_unit as  eventLoopUnit  ,
+		 a.event_limit  as  eventLimit ,
+		 a.event_grow  as  eventGrow ,
+		 a.grow_type  as  growType ,
+		 a.amount_power  as  amountPower ,
+		 a.create_time as  createTime ,
+		 a.update_time as  updateTime  
+		,b.event_name
+		FROM event_grow a inner join event_sys b on
+		a.event_code = b.event_code
+	</select>
+
+	<select id="getPage"
+		resultType="com.yryz.quanhu.grow.entity.GrowEventInfo">
+		SELECT  
+		 a.id as id ,
+		 a.event_code as eventCode  ,
+		 a.event_type as  eventType  ,
+		 a.event_loop_unit as  eventLoopUnit  ,
+		 a.event_limit  as  eventLimit ,
+		 a.event_grow  as  eventGrow ,
+		 a.grow_type  as  growType ,
+		 a.amount_power  as  amountPower ,
+		 a.create_time as  createTime ,
+		 a.update_time as  updateTime 
+		 , b.event_name
+		FROM event_grow a inner join event_sys b on
+		a.event_code = b.event_code
+		limit #{limit} offset #{start}
+	</select>
+
+	<!-- 更新积分事件信息 -->
+	<update id="update">
+		UPDATE event_grow
+		<trim prefix="set" suffixOverrides=",">
+			update_time = #{updateTime},
+			<if test="eventType != null">
+				event_type = #{eventType,jdbcType=VARCHAR},
+			</if>
+			<if test="eventLoopUnit != null">
+				event_loop_unit = #{eventLoopUnit,jdbcType=INTEGER},
+			</if>
+			<if test="eventLimit != null">
+				event_limit = #{eventLimit,jdbcType=INTEGER},
+			</if>
+			<if test="eventGrow != null">
+				event_grow = #{eventGrow,jdbcType=INTEGER},
+			</if>
+			<if test="growType != null">
+				grow_type = #{growType,jdbcType=VARCHAR},
+			</if>
+			<if test="amountPower != null">
+				amount_power = #{amountPower},
+			</if>
+		</trim>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 删除 -->
+	<update id="delById" parameterType="java.lang.Long">
+		DELETE FROM event_grow
+		WHERE
+		id = #{id}
+	</update>
+
+</mapper>
