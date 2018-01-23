@@ -20,8 +20,6 @@ public class ProviderDemoFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         String appId = RpcContext.getContext().getAttachment("appId");
 
-        logger.info("dubboFilter test...");
-        logger.info("dubboFilter rpcContext appId -" + appId);
         return invoker.invoke(invocation);
     }
 }
