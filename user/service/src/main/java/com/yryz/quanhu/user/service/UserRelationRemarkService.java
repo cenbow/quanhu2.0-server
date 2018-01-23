@@ -1,8 +1,6 @@
 package com.yryz.quanhu.user.service;
 
-import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
-import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 
 import java.util.List;
