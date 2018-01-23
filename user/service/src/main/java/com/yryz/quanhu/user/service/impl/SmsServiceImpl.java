@@ -85,10 +85,6 @@ public class SmsServiceImpl implements SmsService{
 				smsType = SmsType.CODE_CHANGE_PAYPWD;
 				msg = !accountFlag ? "该手机用户不存在" : null;
 				break;
-			case SmsContants.CODE_LOGIN:
-				smsType = SmsType.CODE_LOGIN;
-				msg = !accountFlag ? "该手机用户不存在" : null;
-				break;
 			case SmsContants.CODE_OTHER:	
 				smsType = SmsType.CODE_OTHER;
 				break;

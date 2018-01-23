@@ -9,16 +9,20 @@ package com.yryz.quanhu.openapi.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -37,11 +41,13 @@ import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.order.dto.FindPayPasswordDTO;
 import com.yryz.quanhu.openapi.order.dto.GetCashDTO;
 import com.yryz.quanhu.openapi.order.dto.PointsToAccountDTO;
+import com.yryz.quanhu.openapi.order.dto.UnbindBankCardDTO;
 import com.yryz.quanhu.openapi.order.dto.UserBankDTO;
 import com.yryz.quanhu.openapi.order.utils.BankUtil;
 import com.yryz.quanhu.openapi.order.utils.DataEnum;
 import com.yryz.quanhu.openapi.service.PayService;
 import com.yryz.quanhu.order.api.OrderApi;
+import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.AccountOrder;
@@ -69,13 +75,13 @@ public class OrderController {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Reference(lazy=true)
+	@Reference
 	private OrderApi orderApi;
 	
-	@Reference(lazy=true)
+	@Reference
 	private UserApi userApi;
 	
-	@Reference(lazy=true)
+	@Reference
 	private CommonSafeApi commonSafeApi;
 	
 	@Autowired
@@ -100,6 +106,7 @@ public class OrderController {
 			orderApi.checkUserPayPassword(userPhy.getCustId(), userPhy.getPayPassword());
 			Response<?> response = orderApi.dealUserPhy(userPhy);
 			if(response.success()){
+				//发送消息
 //				pushService.setSecurityProblem(custId, cost,appId);
 			}
 			return response;
@@ -427,5 +434,255 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("服务器正在打盹...");
 		}
 	}
+    
+    
+    /**
+     * 设置默认卡
+     * @param userBankDTO
+     * @return
+     */
+    @ApiOperation("设置默认卡")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/setDefaultBankCard")
+	public Response<?> setDefaultBankCard(@RequestBody UserBankDTO userBankDTO) {
+		if (StringUtils.isEmpty(userBankDTO.getCustId())) {
+			return ResponseUtils.returnCommonException("用户ID为必填");
+		}
+		if (StringUtils.isEmpty(userBankDTO.getCust2BankId())) {
+			return ResponseUtils.returnCommonException("关系ID：cust2BankId必填");
+		}
+
+		userBankDTO.setCreateBy(userBankDTO.getCustId());
+		userBankDTO.setDefaultCard(1);
+		try {
+			UserBankDTO userbank = payService.bindbankcard(userBankDTO);
+			if (userbank != null) {
+				return ResponseUtils.returnSuccess();
+			} else {
+				return ResponseUtils.returnCommonException("设置失败，请重试");
+			}
+		} catch (Exception e) {
+			return ResponseUtils.returnCommonException("设置失败，请重试");
+		}
+	}
+    
+    
+    /**
+     * 解绑银行卡
+     * @param unbindBankCardDTO
+     * @return
+     */
+    @ApiOperation("解绑银行卡")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/unbindBankCard")
+	public Response<?> unbindBankCard(@RequestBody UnbindBankCardDTO unbindBankCardDTO) {
+		if (StringUtils.isEmpty(unbindBankCardDTO.getCustId())) {
+			return ResponseUtils.returnCommonException("用户ID为必填");
+		}
+		if (StringUtils.isEmpty(unbindBankCardDTO.getCust2BankId())) {
+			return ResponseUtils.returnCommonException("关系ID：cust2BankId必填");
+		}
+		if (StringUtils.isEmpty(unbindBankCardDTO.getPayPassword())) {
+			return ResponseUtils.returnCommonException("验证密码：payPassword必填");
+		}
+
+		Response<?> return1 = payService.checkPassword(unbindBankCardDTO.getCustId(), unbindBankCardDTO.getPayPassword());
+		if (return1 == null || !return1.success()) {
+			return ResponseUtils.returnCommonException(return1.getMsg());
+		}
+
+		UserBankDTO userBankDTO = new UserBankDTO();
+		userBankDTO.setCust2BankId(unbindBankCardDTO.getCust2BankId());
+		userBankDTO.setCustId(unbindBankCardDTO.getCustId());
+		userBankDTO.setCreateBy(unbindBankCardDTO.getCustId());
+		userBankDTO.setDelFlag("1");
+		try {
+			if (payService.unbindbankcard(userBankDTO)) {
+				return ResponseUtils.returnSuccess();
+			} else {
+				return ResponseUtils.returnCommonException("解绑失败，请重试");
+			}
+		} catch (Exception e) {
+			logger.error("解绑失败", e);
+			return ResponseUtils.returnCommonException("解绑失败，请重试");
+		}
+	}
+    
+    /**
+     * 设置小额免密
+     * @param custId
+     * @param type
+     * @param password
+     * @return
+     */
+    @ApiOperation("设置小额免密")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/setFreePay")
+	public Response<?> setFreePay(String custId, Integer type, String password) {
+		if (StringUtils.isEmpty(custId)) {
+			return ResponseUtils.returnCommonException("用户ID为必填");
+		}
+		if (type == null) {
+			return ResponseUtils.returnCommonException("type必填");
+		}
+		if (StringUtils.isEmpty(password)) {
+			return ResponseUtils.returnCommonException("密码必填");
+		}
+		try {
+			if (!payService.checkPassword(custId, password).success()) {
+				return ResponseUtils.returnCommonException("支付密码验证失败");
+			}
+			if (payService.setFreePay(custId, type)) {
+				return ResponseUtils.returnSuccess();
+			} else {
+				return ResponseUtils.returnCommonException("设置失败，请重试");
+			}
+		} catch (Exception e) {
+			return ResponseUtils.returnCommonException("设置失败，请重试");
+		}
+	}
+    
+    /**
+     * 获取最低充值金额
+     * @return
+     */
+    @ApiOperation("获取最低充值金额")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/getMinChargeAmount")
+	public Response<?> getMinChargeAmount() {
+		Map<String, Object> map = DataEnum.getMinChargeAmount();
+		return ResponseUtils.returnObjectSuccess(map);
+	}
+    
+    /**
+     * 创建充值订单
+     * @param custId
+     * @param payWay
+     * @param orderSrc
+     * @param orderAmount
+     * @param currency
+     * @param request
+     * @return
+     */
+    @ApiOperation("创建充值订单")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/getNewPayFlowId")
+	public Response<?> getNewPayFlowId(String custId, String payWay, String orderSrc, long orderAmount, String currency,
+			HttpServletRequest request) {
+		if (StringUtils.isEmpty(custId)) {
+			return ResponseUtils.returnCommonException("用户ID为必填");
+		}
+		if (StringUtils.isEmpty(payWay)) {
+			return ResponseUtils.returnCommonException("支付方式：payWay必填");
+		}
+		if (StringUtils.isEmpty(orderSrc)) {
+			return ResponseUtils.returnCommonException("支付来源：orderSrc");
+		}
+		if (StringUtils.isEmpty(currency)) {
+			return ResponseUtils.returnCommonException("币种：currency必填");
+		}
+		if ( orderAmount < 100 || orderAmount % 100 != 0) {
+			return ResponseUtils.returnCommonException("请输入正常充值金额");
+		}
+		
+
+		String ipAddress = WebUtil.getClientIP(request);
+		long fee = DataEnum.countFee(payWay, orderAmount);
+//		OrderVO orderVO = payServcie.getNewPayFlowId(custId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
+//		return ReturnModel.beanToString(orderVO);
+		return ResponseUtils.returnSuccess();
+	}
+	
+    /**
+     * 阿里支付回调
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/alipayNotify")
+	public void alipayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//		logger.info("receive alipayNotify");
+//		PayResponse payResp = null;
+//		try {
+//			// payResp = Alipay.parsePayResult(request);
+//			payResp = YryzPaySDK.parseAliPayResult(request);
+//		} catch (Exception e) {
+//			logger.error("alipayNotify faild ", e);
+//			response.getWriter().write("alipayNotify faild ");
+//			response.getWriter().flush();
+//			return;
+//		}
+//		logger.info("收到支付宝回调并解析成功，结果为：" + payResp);
+//		if (payResp.getResult() == Response.SUCCESS || payResp.getResult() == Response.FAILURE) {
+//			System.out.println("支付宝回调成功");
+//
+//			int orderState = 2;
+//			if (payResp.getResult() == Response.SUCCESS) {
+//				orderState = 1;
+//			}
+//			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_ALIPAY, orderState);
+//
+//			response.getWriter().write("success");
+//		}
+		// logger.info("支付宝回调结束");
+	}
+    
+    /**
+     * 微信支付回调
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wxpayNotify")
+	public void wxpayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.info("receive wxpayNotify...");
+//		PayResponse payResp = null;
+//		try {
+//			// payResp = Wxpay.parsePayResult(request);
+//			payResp = YryzPaySDK.parseWxPayResult(request);
+//		} catch (Exception e) {
+//			logger.error("wxpayNotify faild ", e);
+//			response.getWriter().write("wxpayNotify faild ");
+//			response.getWriter().flush();
+//			return;
+//		}
+//		logger.info("收到微信回调并解析成功，结果为：" + payResp);
+//		if (payResp.getResult() == Response.SUCCESS || payResp.getResult() == Response.FAILURE) {
+//			int orderState = 2;
+//			if (payResp.getResult() == Response.SUCCESS) {
+//				orderState = 1;
+//			}
+//			payServcie.completePayInfo(payResp, Constant.PAY_WAY_WXPAY, orderState);
+//
+//			response.getWriter().write(Wxpay.buildReturnXML("SUCCESS", "OK"));
+//			response.getWriter().flush();
+//		}
+    }
+    
+    /**
+	 * 获取请求参数中所有的信息
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public static Map<String, String> getAllRequestParam(final HttpServletRequest request) {
+		Map<String, String> res = new HashMap<String, String>();
+		Enumeration<?> temp = request.getParameterNames();
+		if (null != temp) {
+			while (temp.hasMoreElements()) {
+				String en = (String) temp.nextElement();
+				String value = request.getParameter(en);
+				res.put(en, value);
+				// 在报文上送时，如果字段的值为空，则不上送<下面的处理为在获取所有参数数据时，判断若值为空，则删除这个字段>
+				// System.out.println("ServletUtil类247行 temp数据的键=="+en+"
+				// 值==="+value);
+				if (null == res.get(en) || "".equals(res.get(en))) {
+					res.remove(en);
+				}
+			}
+		}
+		return res;
+	}
+    
 	
 }

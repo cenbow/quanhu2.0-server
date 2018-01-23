@@ -1,9 +1,14 @@
 package com.yryz.quanhu.dymaic.canal.entity;
 
 import java.io.Serializable;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldIndex;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
  * 用户搜索实体
@@ -13,6 +18,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Document(indexName = "quanhu-v2", type = "userInfo", refreshInterval = "-1")
 public class UserInfo implements Serializable {
 	private static final long serialVersionUID = -2312110729335920029L;
+	@Field(type=FieldType.Long)
 	private Long kid;
 	/**
 	 * 用户账户id
@@ -23,121 +29,145 @@ public class UserInfo implements Serializable {
 	/**
 	 * 应用id
 	 */
+	@Field(type=FieldType.text)
 	private String appId;
 
 	/**
 	 * 昵称
 	 */
+	@Field(type=FieldType.text)
 	private String userNickName;
 
 	/**
 	 * 头像
 	 */
+	@Field(type=FieldType.text)
 	private String userImg;
 
 	/**
 	 * 用户签名
 	 */
+	@Field(type=FieldType.text)
 	private String userSignature;
 
 	/**
 	 * 用户手机号码
 	 */
+	@Field(type=FieldType.text)
 	private String userPhone;
 
 	/**
 	 * 年龄
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte userAge;
 
 	/**
 	 * 用户二维码地址
 	 */
+	@Field(type=FieldType.text)
 	private String userQr;
 
 	/**
 	 * 用户性别 0-女 1-男
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte userGenders;
 
 	/**
 	 * 出生年月日
 	 */
+	@Field(type=FieldType.text)
 	private String userBirthday;
 
 	/**
 	 * 用户城市位置(湖北武汉)
 	 */
+	@Field(type=FieldType.text)
 	private String userLocation;
 
 	/**
 	 * 用户推送设备号id
 	 */
+	@Field(type=FieldType.text)
 	private String userDeviceId;
 
 	/**
 	 * 用户状态 10-正常 11-冻结 12-黑名单
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte userStatus;
 
 	/**
 	 * 国家
 	 */
+	@Field(type=FieldType.text)
 	private String userCountry;
 
 	/**
 	 * 省份
 	 */
+	@Field(type=FieldType.text)
 	private String userProvince;
 
 	/**
 	 * 城市
 	 */
+	@Field(type=FieldType.text)
 	private String userCity;
 
 	/**
 	 * 城市代码
 	 */
+	@Field(type=FieldType.text)
 	private String cityCode;
 
 	/**
 	 * 用户角色 10:普通用户 11:实名用户
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte userRole;
 
 	/**
 	 * 是否马甲 10:否 11:是
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte userVest;
 
 	/**
 	 * 认证状态 10-未认证 11-已认证
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte authStatus;
 
 	/**
 	 * 最终热度值
 	 */
+	@Field(type=FieldType.Integer)
 	private Integer lastHeat;
 
 	/**
 	 * 删除标识 10:有效 11:删除
 	 */
+	@Field(type=FieldType.Integer)
 	private Byte delFlag;
 
 	/**
 	 * 冻结最大时间点
 	 */
-	private String banPostTime;
+	@Field(type=FieldType.Date)
+	private Date banPostTime;
 
 	/**
 	 * 用户简介
 	 */
+	@Field(type=FieldType.text)
 	private String userDesc;
 	/**
 	 * 注册时间
 	 */
-	private String createDate;
+	@Field(type=FieldType.Date)
+	private Date createDate;
 
 	public Long getKid() {
 		return kid;
@@ -331,19 +361,19 @@ public class UserInfo implements Serializable {
 		this.userDesc = userDesc;
 	}
 
-	public String getBanPostTime() {
+	public Date getBanPostTime() {
 		return banPostTime;
 	}
 
-	public void setBanPostTime(String banPostTime) {
+	public void setBanPostTime(Date banPostTime) {
 		this.banPostTime = banPostTime;
 	}
 
-	public String getCreateDate() {
+	public Date getCreateDate() {
 		return createDate;
 	}
 
-	public void setCreateDate(String createDate) {
+	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
 

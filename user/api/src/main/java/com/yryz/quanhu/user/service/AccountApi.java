@@ -19,6 +19,7 @@ import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
+import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
@@ -87,7 +88,7 @@ public interface AccountApi {
 	 * @return
 	 * @Description
 	 */
-	public Response<RegisterLoginVO> loginByVerifyCode(LoginDTO loginDTO, RequestHeader header);
+	public Response<RegisterLoginVO> loginByVerifyCode(RegisterDTO registerDTO, RequestHeader header);
 
 	/**
 	 * (app)第三方登录

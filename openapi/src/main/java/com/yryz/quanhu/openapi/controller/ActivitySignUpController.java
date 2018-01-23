@@ -1,7 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.Annotation.NotLogin;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.support.activity.api.ActivitySignUpApi;
@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by dell on 2018/1/22.
  */
-@Api("报名类活动相关接口")
+@Api(description = "报名类活动相关接口")
 @RestController
 public class ActivitySignUpController {
     @Reference(check = false, timeout = 30000)

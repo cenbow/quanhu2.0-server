@@ -2,6 +2,9 @@ package com.yryz.quanhu.dymaic.canal.rabbitmq.handler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -111,7 +114,14 @@ public class EntityParser {
 			return Float.valueOf(value);
 		} else if (paramType.equals(Character.class)) {
 			return value.charAt(0);
-		} else {
+		} else if (paramType.equals(Date.class)){
+			SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				return fmt.parse(value);
+			} catch (ParseException e) {
+				return null;
+			}
+		}else{
 			return null;
 		}
 	}

@@ -117,18 +117,22 @@ public class AbstractAccountService implements AccountService {
 	 * 手机验证码登录
 	 */
 	@Override
-	public Long loginByVerifyCode(LoginDTO loginDTO, String appId) {
-		UserAccount account = selectOne(null, loginDTO.getPhone(), appId, null);
+	public Long loginByVerifyCode(RegisterDTO registerDTO,String appId) {
+		UserAccount account = selectOne(null, registerDTO.getUserPhone(), appId, null);
+		//用户不存在直接注册
 		if (account == null) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户不存在");
+			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_REGISTER, appId)) {
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "验证码错误");
+			}
+			return createUser(registerDTO);
 		}
-		if (!smsService.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(), SmsType.CODE_LOGIN, appId)) {
+		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN, appId)) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "验证码错误");
 		}
 		// 更新设备号
-		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
+		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));
+			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getDeviceId(), null));
 		}
 		return account.getKid();
 	}

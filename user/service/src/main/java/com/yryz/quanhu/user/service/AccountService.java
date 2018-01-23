@@ -55,11 +55,11 @@ public interface AccountService {
 	/**
 	 * 手机号验证码登录
 	 * 
-	 * @param loginDTO
+	 * @param registerDTO
 	 * @param appId
 	 * @return 用户id
 	 */
-	Long loginByVerifyCode(LoginDTO loginDTO,String appId);
+	Long loginByVerifyCode(RegisterDTO registerDTO,String appId);
 
 	/**
 	 * 第三方登录
