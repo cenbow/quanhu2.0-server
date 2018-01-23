@@ -11,6 +11,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.yryz.common.aliyun.jaq.AfsCheckManager;
+import com.yryz.common.context.Context;
+import com.yryz.common.entity.AfsCheckRequest;
+import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.push.enums.CheckVerifyCodeReturnCode;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -21,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.utils.StringUtils;
@@ -36,7 +43,6 @@ import com.yryz.quanhu.message.commonsafe.utils.CommonUtils;
 import com.yryz.quanhu.message.commonsafe.utils.DateUtils;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO.VerifyStatus;
-import com.yryz.quanhu.configuration.VerifyCodeConfigVO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO.SmsType;
 import com.yryz.quanhu.message.sms.service.SmsService;
@@ -110,7 +116,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			Logger.error("checkVerifyCode", e);
 			throw new MysqlOptException(e);
 		}
-		if (exist == null) {
+		if (exist == null || exist == 0) {
 			return CheckVerifyCodeReturnCode.FAIL.getCode();
 		}
 		String verifyCode = redisDao.getVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(),
@@ -122,6 +128,42 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			return CheckVerifyCodeReturnCode.EXPIRE.getCode();
 		}
 		return CheckVerifyCodeReturnCode.SUCCESS.getCode();
+	}
+
+	@Override
+	public Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
+
+		VerifyCodeVO verifyCodeVO = new VerifyCodeVO();
+		if (!checkSmsSlipCode(verifyCodeDTO, afsCheckReq)) {
+			if (afsCheckReq == null) {
+				verifyCodeVO.setIsSendViewCode("1");
+				return ResponseUtils.returnObjectSuccess(verifyCodeVO);
+			}
+			return ResponseUtils.returnCommonException("验证码不通过");
+		}
+        /*if (org.apache.commons.lang.StringUtils.isBlank(code)) {
+            return ReturnModel.returnException(ReturnCode.ERROR, "please checkparamter: code");
+        }
+        if (!(Integer.valueOf(type) > 0 && Integer.valueOf(type) < 3)) {
+            return ReturnModel.returnException(ReturnCode.ERROR, "type must 1 or 2");
+        }
+        if (!org.apache.commons.lang.StringUtils.isEmpty(code) && !(Integer.valueOf(code) > 0 && Integer.valueOf(code) < 11)) {
+            return ReturnModel.returnException(ReturnCode.ERROR, "code must 1、2、3、4、5、6、7、8、9、10");
+        }*/
+		try {
+            /*if (!rrzMessageService.checkIpSendVerifyCodeLimit(request)) {
+                return ReturnModel.returnException("验证码发送失败");
+            }*/
+			VerifyCodeVO verifyCode = this.getVerifyCode(verifyCodeDTO);
+			if (verifyCode == null) {
+				verifyCode = new VerifyCodeVO();
+			}
+			return ResponseUtils.returnObjectSuccess(verifyCode);
+		} catch (Exception e) {
+			Logger.error("sendVerifyCodeForSlip error", e);
+			return ResponseUtils.returnException(e);
+		}
+//        rrzMessageService.saveIpSendVerifyCodeCount(request);
 	}
 
 	@Override
@@ -251,5 +293,32 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			}
 		}
 		return VerifyStatus.SUCCESS;
+	}
+
+
+	public boolean checkSmsSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
+		//不需要图像验证码直接成功
+		if (!checkVerifyCodeSendTime(configVO, verifyCodeDTO).equals(VerifyStatus.SUCCESS)
+				&& afsCheckReq == null) {
+			return true;
+		}
+		//图形码为空直接返回false
+		if (afsCheckReq == null) {
+			return false;
+		}
+
+		String accessKey = Context.getProperty("afs_check_accesskeyid");
+		String accessSecret = Context.getProperty("afs_check_accesssecret");
+		if (org.apache.commons.lang.StringUtils.isBlank(accessKey) || org.apache.commons.lang.StringUtils.isBlank(accessSecret)) {
+			throw QuanhuException.busiError("未获取到afs_check验证码的配置信息");
+		}
+		AfsCheckManager afsCheckManager = new AfsCheckManager(accessKey, accessSecret);
+		com.aliyuncs.jaq.model.v20161123.AfsCheckRequest req = new com.aliyuncs.jaq.model.v20161123.AfsCheckRequest();
+		req.setPlatform(afsCheckReq.getPlatform());
+		req.setSession(afsCheckReq.getSession());
+		req.setSig(afsCheckReq.getSig());
+		req.setToken(afsCheckReq.getToken());
+		req.setScene(afsCheckReq.getScene());
+		return afsCheckManager.afsCheck(req);
 	}
 }

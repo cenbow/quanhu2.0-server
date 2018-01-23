@@ -59,4 +59,12 @@ public class IdConstants {
      * 验证码
      */
     public static final String QUANHU_VERIFY_CODE = "quanhu_verify_code";
+    /**
+     * 报名类活动:报名表
+     */
+    public static final String QUANHU_ACTIVITY_SIGNUP = "quanhu_activity_signup";
+    /**
+     * 报名类活动:报名支付记录表
+     */
+    public static final String QUANHU_ACTIVITY_SIGNUP_PAY = "quanhu_activity_signup_pay";
 }

@@ -11,8 +11,7 @@
         select
         <include refid="Base_Column_List"/>
         from qh_activity_info
-        where del_flag = 0
-		and kid = #{kid,jdbcType=BIGINT}
+        where kid = #{kid,jdbcType=BIGINT}
     </select>
     
     <!-- 删除ActivityInfo-->
@@ -255,5 +254,75 @@
         </set>
         where kid = #{kid,jdbcType=BIGINT}
     </update>
-
+	<!-- (前台)所有上架我的活动 -->
+	<select id="selectMyList"  resultType="com.yryz.quanhu.support.activity.vo.ActivityInfoAppListVo">
+		select   id, title, cover_plan,activity_type,create_date from (
+		select  t.id, t.title, t.cover_plan,t.activity_type,R.create_date
+		from qh_activity_info T,qh_activity_record R
+		where t.id=R.activity_info_id and t.shelve_flag=10
+		<![CDATA[
+  	and t.online_time<=NOW() 
+  	]]>
+		and   R.create_user_id = #{custId,jdbcType=BIGINT}
+		UNION
+		select  t.id, t.title, t.cover_plan,t.activity_type,D.create_date
+		from qh_activity_info T,qh_activity_vote_detail D
+		where t.id=D.activity_info_id and t.shelve_flag=10
+		<![CDATA[
+  	and t.online_time<=NOW() 
+  	]]>
+		and  D.create_user_id = #{custId,jdbcType=BIGINT}) a
+		order by create_date desc
+	</select>
+	<!-- (前台)所有上架我的活动数 -->
+	<select id="selectMylistCount" resultType="java.lang.Integer">
+		select  count(1) from (
+		select  t.id, t.title, t.cover_plan,t.activity_type,R.create_date
+		from qh_activity_info T,qh_activity_record R
+		where t.id=R.activity_info_id and t.shelve_flag=10
+		<![CDATA[
+  	and t.online_time<=NOW() 
+  	]]>
+		and  R.create_user_id = #{custId,jdbcType=BIGINT}
+		UNION
+		select  t.id, t.title, t.cover_plan,t.activity_type,D.create_date
+		from qh_activity_info T,qh_activity_vote_detail D
+		where t.id=D.activity_info_id and t.shelve_flag=10
+		<![CDATA[
+  	and t.online_time<=NOW()
+  	]]>
+		and  D.create_user_id = #{custId,jdbcType=BIGINT}) a
+	</select>
+	<!-- (前台)所有上架未结束的活动 -->
+	<select id="selectAppList" resultType="com.yryz.quanhu.support.activity.vo.ActivityInfoAppListVo">
+		select
+		id, title, cover_plan,activity_type
+		from qh_activity_info where shelve_flag=10 and NOW()>=online_time
+		<if test="type ==1" >
+			<![CDATA[
+  	and end_time>NOW()
+  	order by recommend DESC ,end_time
+  	]]>
+		</if>
+		<if test="type ==2" >
+			<![CDATA[
+  	and end_time<=NOW()
+  	order by end_time desc
+  	]]>
+		</if>
+		<if test="type ==3" >
+			<![CDATA[
+  	and end_time>NOW()
+  	and recommend = 11
+  	order by end_time
+  	]]>
+		</if>
+	</select>
+	<update id="updateJoinCount" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo" >
+		update qh_activity_info set last_update_date = NOW()
+		<if test="joinCount != null" >
+			,join_count = #{joinCount,jdbcType=INTEGER}
+		</if>
+		where kid = #{kid,jdbcType=BIGINT}
+	</update>
 </mapper>

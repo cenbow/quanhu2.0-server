@@ -675,9 +675,6 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isEmpty(header.getAppId())) {
 			throw QuanhuException.busiError("应用id为空");
 		}
-		if (StringUtils.isBlank(header.getDevId())) {
-			throw QuanhuException.busiError("设备号不能为空");
-		}
 		if (StringUtils.isBlank(header.getDevType())) {
 			throw QuanhuException.busiError("设备类型不能为空");
 		}

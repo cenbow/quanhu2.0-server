@@ -1,5 +1,7 @@
 package com.yryz.quanhu.message.commonsafe.provider;
 
+import com.alibaba.fastjson.JSON;
+import com.yryz.common.entity.AfsCheckRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,21 @@ public class CommonSafeProvider implements CommonSafeApi {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
 			logger.error("验证码验证异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckRequest) {
+		try {
+			logger.info("sendVerifyCodeForSlip request, verifyCodeDTO: {}, afsCheckRequest: {}",
+					JSON.toJSONString(verifyCodeDTO), JSON.toJSONString(afsCheckRequest));
+			checkSmsDTO(verifyCodeDTO);
+			Response<VerifyCodeVO> verifyCodeVOResponse = commonService.sendVerifyCodeForSlip(verifyCodeDTO, afsCheckRequest);
+			logger.info("sendVerifyCodeForSlip result: {}", JSON.toJSONString(verifyCodeVOResponse));
+			return verifyCodeVOResponse;
+		} catch (Exception e) {
+			logger.error("sendVerifyCodeForSlip error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}

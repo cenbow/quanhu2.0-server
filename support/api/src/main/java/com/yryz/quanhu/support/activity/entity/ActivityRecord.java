@@ -36,7 +36,12 @@ public class ActivityRecord extends GenericEntity{
 	 * 报名数据
 	 */	 
     private  String enrolSources;
-    
+
+	/**
+	 * 是否上下线（10上线 11下线）
+	 */
+	private  Integer shelveFlag;
+
 
 	public Long getActivityInfoId() {
 		return this.activityInfoId;
@@ -77,5 +82,12 @@ public class ActivityRecord extends GenericEntity{
 	public void setEnrolSources(String enrolSources) {
 		this.enrolSources = enrolSources;
 	}
-		
+
+    public Integer getShelveFlag() {
+        return shelveFlag;
+    }
+
+    public void setShelveFlag(Integer shelveFlag) {
+        this.shelveFlag = shelveFlag;
+    }
 }

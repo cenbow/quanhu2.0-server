@@ -12,8 +12,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.yryz.common.Annotation.Login;
-import com.yryz.common.Annotation.NotLogin;
+import com.yryz.common.annotation.Login;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.quanhu.openapi.service.AuthService;
 
@@ -44,7 +44,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter implements Handle
 				} else {
 					NotLogin notLogin = ((HandlerMethod)handler).getMethodAnnotation(NotLogin.class);
 					if(notLogin != null){ //如果自带notLogin方法，就不检查登录状态
-						return false;
+						return true;
 					}
 				}
 			}

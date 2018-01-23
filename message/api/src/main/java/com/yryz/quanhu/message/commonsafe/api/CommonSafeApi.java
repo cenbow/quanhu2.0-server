@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.message.commonsafe.api;
 
+import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.commonsafe.constants.RedisConstants;
 import com.yryz.quanhu.message.commonsafe.dto.IpLimitDTO;
@@ -93,6 +94,15 @@ public interface CommonSafeApi {
 	 * @return 0:成功 1:校验失败 2:已过期
 	 */
 	Response<Integer> checkVerifyCode(VerifyCodeDTO codeDTO);
+
+
+	/**
+	 * 发送短信支持阿里滑动验证码
+	 * @param verifyCodeDTO
+	 * @param afsCheckRequest
+	 * @return
+	 */
+	Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckRequest);
 	
 	/**
 	 * 根据业务类型获取图形验证码
@@ -122,4 +132,6 @@ public interface CommonSafeApi {
 	 * @return 超过次数和发送频率返回false
 	 */
 	Response<Boolean> checkIpLimit(IpLimitDTO dto);
+
+
 }
