@@ -29,7 +29,7 @@ public class ActivityInfoController {
 
     @ApiOperation("我参加/报名的活动列表(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = " /services/app/{version}/activity/info/myList")
+    @GetMapping(value = "/services/app/{version}/activity/info/myList")
     public  Response<PageList<ActivityInfoAppListVo>>  myList(Integer pageNum, Integer pageSize, HttpServletRequest request) {
        String custId = request.getHeader("custId");
        Assert.notNull(custId, "custId is null");
@@ -39,7 +39,7 @@ public class ActivityInfoController {
     @NotLogin
     @ApiOperation("返回所有的上架活动列表 type:1当前活动 2:往期活动3.推荐活动列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = " /services/app/{version}/activity/info/list")
+    @GetMapping(value = "/services/app/{version}/activity/info/list")
     public  Response<PageList<ActivityInfoAppListVo>> appList(Integer pageNum, Integer pageSize, Integer type,HttpServletRequest request) {
         Assert.isTrue(PatternUtils.matcher(type, "1|2|3"), "未知类型！");
         return activityInfoApi.appList(pageNum,pageSize,type);
@@ -48,7 +48,7 @@ public class ActivityInfoController {
     @NotLogin
     @ApiOperation("获取活动基本信息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = " /services/app/{version}/activity/info/activityInfo")
+    @GetMapping(value = "/services/app/{version}/activity/info/activityInfo")
     public  Response<ActivityInfoVo> getActivityInfoVo(Long kid, Integer type, HttpServletRequest request) {
         Assert.isTrue(PatternUtils.matcher(type, "1|2|3"), "未知类型！");
         Assert.notNull(kid, "kid is null");
