@@ -18,7 +18,7 @@ public interface ScoreStatusDao {
 
     int update(ScoreStatus ss);
 
-    ScoreStatus getById(@Param("custId") String custId , @Param("appId") String appId , @Param("id") Long id , @Param("createDate") Date createDate);
+    ScoreStatus getById(@Param("userId") String userId , @Param("appId") String appId , @Param("id") Long id , @Param("createDate") Date createDate);
 
-    ScoreStatus getByCode(@Param("custId") String custId , @Param("appId") String appId , @Param("eventCode") String eventCode , @Param("createDate") Date createDate);
+    ScoreStatus getByCode(@Param("userId") String userId , @Param("appId") String appId , @Param("eventCode") String eventCode , @Param("createDate") Date createDate);
 }

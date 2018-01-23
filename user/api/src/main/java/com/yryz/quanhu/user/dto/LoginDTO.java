@@ -44,6 +44,14 @@ public class LoginDTO implements Serializable {
 	 */
 	private DevType devType;
 	
+	/**
+	 * 地区名称
+	 */
+	private String userLocation;
+	/**
+	 * 活动渠道码
+	 */
+	private String activityChannelCode;
 	public String getDeviceId() {
 		return deviceId;
 	}
@@ -79,6 +87,18 @@ public class LoginDTO implements Serializable {
 	}
 	public void setDevType(DevType devType) {
 		this.devType = devType;
+	}
+	public String getUserLocation() {
+		return userLocation;
+	}
+	public void setUserLocation(String userLocation) {
+		this.userLocation = userLocation;
+	}
+	public String getActivityChannelCode() {
+		return activityChannelCode;
+	}
+	public void setActivityChannelCode(String activityChannelCode) {
+		this.activityChannelCode = activityChannelCode;
 	}
 	@Override
 	public String toString() {

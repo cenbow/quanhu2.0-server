@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.message.commonsafe.service;
 
+import com.yryz.common.entity.AfsCheckRequest;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.commonsafe.dto.IpLimitDTO;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
@@ -31,6 +33,8 @@ public interface CommonSafeService {
 	 * @return 0:成功 1:校验失败 2:已过期
 	 */
 	Integer checkVerifyCode(VerifyCodeDTO codeDTO);
+
+	Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckRequest);
 	
 	/**
 	 * 根据业务类型获取图形验证码

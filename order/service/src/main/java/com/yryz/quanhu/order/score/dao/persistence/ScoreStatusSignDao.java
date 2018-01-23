@@ -12,6 +12,6 @@ public interface ScoreStatusSignDao {
 	
 	int update(EventSign sss);
 	
-	EventSign getByCode(@Param("custId")String custId , @Param("eventCode")String eventCode);
+	EventSign getByCode(@Param("userId")String userId , @Param("eventCode")String eventCode);
 
 }

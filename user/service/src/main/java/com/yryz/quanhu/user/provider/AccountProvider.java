@@ -34,6 +34,7 @@ import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.LoginType;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
+import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
@@ -45,6 +46,7 @@ import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
+import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
@@ -81,9 +83,6 @@ import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 @Service(interfaceClass = AccountApi.class)
 public class AccountProvider implements AccountApi {
 	private static final Logger logger = LoggerFactory.getLogger(AccountProvider.class);
-	private static final int CHAR_51 = 3;
-	private static final String CHAR_3F = "%3F";
-	private static final String CHAR_63 = "?";
 
 	@Autowired
 	private DistributedLockManager lockManager;
@@ -182,12 +181,13 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
-	public Response<RegisterLoginVO> loginByVerifyCode(LoginDTO loginDTO, RequestHeader header) {
+	public Response<RegisterLoginVO> loginByVerifyCode(RegisterDTO registerDTO, RequestHeader header) {
 		try {
-			checkLoginDTO(loginDTO, LoginType.VERIFYCODE);
+			checkRegisterDTO(registerDTO, RegType.PHONE);
 			checkHeader(header);
-			loginDTO.setDeviceId(header.getDevId());
-			Long userId = accountService.loginByVerifyCode(loginDTO, header.getAppId());
+			registerDTO.setDeviceId(header.getDevId());
+			
+			Long userId = accountService.loginByVerifyCode(registerDTO, header.getAppId());
 
 			// 判断用户状态
 			if (checkUserDisable(userId.toString()).getData()) {
@@ -675,10 +675,7 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isEmpty(header.getAppId())) {
 			throw QuanhuException.busiError("应用id为空");
 		}
-		if (StringUtils.isBlank(header.getDevId())) {
-			throw QuanhuException.busiError("设备号不能为空");
-		}
-		if (StringUtils.isBlank(header.getDevType())) {
+		if (StringUtils.isBlank(header.getDevType()) || DevType.getEnumByType(header.getDevType(), header.getUserAgent()) == null) {
 			throw QuanhuException.busiError("设备类型不能为空");
 		}
 	}
@@ -814,7 +811,7 @@ public class AccountProvider implements AccountApi {
 				thirdUser = OatuhWeibo.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
 			} // qq
 			else if (loginDTO.getType() == RegType.QQ.getType()) {
-				thirdUser = OatuhQq.getUser(UserUtils.getThirdAppKey(appId, RegType.QQ), loginDTO.getOpenId(),
+				thirdUser = OatuhQq.getUser(ThirdConstants.QQ_APP_ID, loginDTO.getOpenId(),
 						loginDTO.getAccessToken());
 			} // 微信
 			else {

@@ -16,7 +16,7 @@ public interface RuleScoreService {
 	
 	boolean updateStatus(String statusKey , boolean needScore , boolean status);
 
-	boolean processStatus(String custId , String eventCode , ScoreEventInfo sei ,  double amount);
+	boolean processStatus(String userId , String eventCode , ScoreEventInfo sei ,  double amount);
 	
-	Long saveScoreFlow(String custId , String eventCode , ScoreEventInfo sei , int newScore , double amout);
+	Long saveScoreFlow(String userId , String eventCode , ScoreEventInfo sei , int newScore , double amout);
 }

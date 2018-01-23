@@ -17,7 +17,7 @@ public class EventSign implements Serializable{
 
 	private Long id;
 	
-	private String custId;
+	private String userId;
 	
 	private String eventCode;
 	
@@ -35,8 +35,8 @@ public class EventSign implements Serializable{
 		
 	}
 	
-	public EventSign(String custId , String eventCode){
-		this.custId = custId;
+	public EventSign(String userId , String eventCode){
+		this.userId = userId;
 		this.eventCode = eventCode;
 	}
 
@@ -48,12 +48,12 @@ public class EventSign implements Serializable{
 		this.id = id;
 	}
 
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getEventCode() {

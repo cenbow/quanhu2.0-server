@@ -24,8 +24,8 @@ public class PertimeRuleScoreServiceImpl extends BaseRuleScoreServiceImpl
 	
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Override
-	public boolean processStatus(String custId, String eventCode , ScoreEventInfo sei , double amount) {
-		saveScoreFlow(custId, eventCode, sei , 0 , amount);
+	public boolean processStatus(String userId, String eventCode , ScoreEventInfo sei , double amount) {
+		saveScoreFlow(userId, eventCode, sei , 0 , amount);
 		return true;
 	}
 

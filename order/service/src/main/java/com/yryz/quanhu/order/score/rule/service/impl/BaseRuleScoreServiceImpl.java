@@ -72,7 +72,7 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 
 	// 规则判定的最终目标是要记录积分流水，记录积分流水与更新积分总值总是同步进行的
 	// @Transactional(propagation = Propagation.REQUIRED)
-	public Long saveScoreFlow(String custId, String eventCode, ScoreEventInfo sei, int newScore, double amount) {
+	public Long saveScoreFlow(String userId, String eventCode, ScoreEventInfo sei, int newScore, double amount) {
 		// 计算新增积分数
 		// 数据库记录的积分类型与编码中的枚举映射 关系 1：一次性触发 Once 2：每次触发 Pertime 3：条件日期循环触发 Loop
 		// 4:受连续区间影响的触发积分
@@ -94,11 +94,11 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		long allScore = 0;
 
 		// 会导致重复写入问题，初始化放到注册时统一初始化
-		EventAcount ea = eventAcountService.getLastAcount(custId);
+		EventAcount ea = eventAcountService.getLastAcount(userId);
 		// 总值表无数据 ，则初始化该表
 		if (ea == null || ea.getId() == null) {
 			allScore = 0L + newScore;
-			ea = new EventAcount(custId);
+			ea = new EventAcount(userId);
 			ea.setScore(allScore);
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
@@ -113,7 +113,7 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 			eventAcountService.update(ea);
 		}
 		// 无论总值表有无数据，流水是要记的
-		ScoreFlow sf = new ScoreFlow(custId, eventCode, newScore);
+		ScoreFlow sf = new ScoreFlow(userId, eventCode, newScore);
 		sf.setAllScore(allScore);
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);

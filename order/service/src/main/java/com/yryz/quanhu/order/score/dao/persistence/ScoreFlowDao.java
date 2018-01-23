@@ -19,7 +19,7 @@ public interface ScoreFlowDao {
 
 	int update(ScoreFlow sf);
 
-	List<EventReportVo> getAll(@Param("custId")String custId);
+	List<EventReportVo> getAll(@Param("userId")String userId);
 
 	List<ScoreFlow> getPage(@Param("sfq") ScoreFlowQuery sfq, @Param("consumeFlag") int consumeFlag,
 			@Param("start") int start, @Param("limit") int limit);

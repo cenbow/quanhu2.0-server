@@ -17,7 +17,7 @@ public class EventAcount implements Serializable{
 	
 	private Long id;
 	
-	private String custId;
+	private String userId;
 	
 	private Long score;
 	
@@ -31,8 +31,8 @@ public class EventAcount implements Serializable{
 
 	public EventAcount(){}
 	
-	public EventAcount(String custId){
-		this.custId = custId;
+	public EventAcount(String userId){
+		this.userId = userId;
 	}
 
 	public Long getId() {
@@ -43,12 +43,12 @@ public class EventAcount implements Serializable{
 		this.id = id;
 	}
 
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public Long getScore() {

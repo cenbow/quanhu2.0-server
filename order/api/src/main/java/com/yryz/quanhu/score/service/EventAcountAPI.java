@@ -21,32 +21,32 @@ import com.yryz.quanhu.score.vo.UserStatsVo;
 public interface EventAcountAPI {
 	/**
 	 * 事件统计获取
-	 * @param custId
+	 * @param userId
 	 * @return
 	 */
-	EventAcount getEventAcount(String custId);
+	EventAcount getEventAcount(String userId);
 	/**
 	 * 获取签到数据
-	 * @param custId
+	 * @param userId
 	 * @param eventCode
 	 * @return
 	 */
-	EventSign getEventSign(String custId, String eventCode);
+	EventSign getEventSign(String userId, String eventCode);
 	
 	/**
 	 * 用户维度数据统计
-	 * @param custId
+	 * @param userId
 	 * @return UserStatsVo
 	 * @throws ServiceException
 	 */
-	UserStatsVo getUserStats(String custId);
+	UserStatsVo getUserStats(String userId);
 	/**
 	 *  用户维度数据统计
-	 * @param custIds
+	 * @param userIds
 	 * @return Map<String,UserStatsVo>
 	 * @throws ServiceException
 	 */
-	Map<String,UserStatsVo> getUserStats(Set<String> custIds);
+	Map<String,UserStatsVo> getUserStats(Set<String> userIds);
 	
 	/**
 	 * 圈子维度数据统计查询
@@ -72,8 +72,8 @@ public interface EventAcountAPI {
 	
 	/**
 	 * 用于用户创建时，初始化事件账户表，避免对账户表过多状态判定
-	 * @param custId
+	 * @param userId
 	 * @return
 	 */
-	Long initAcount(String custId);
+	Long initAcount(String userId);
 }

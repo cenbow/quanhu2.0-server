@@ -17,12 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.exception.RedisOptException;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
 import com.yryz.quanhu.message.commonsafe.constants.Constants;
 import com.yryz.quanhu.message.commonsafe.utils.DateUtils;
-import com.yryz.quanhu.configuration.VerifyCodeConfigVO;
 import com.yryz.quanhu.support.id.constants.RedisConstants;
 
 

@@ -15,7 +15,7 @@ public class GrowFlow implements Serializable{
 
 	private Long id;
 
-    private String custId;
+    private String userId;
 
     private String eventCode;
     
@@ -33,8 +33,8 @@ public class GrowFlow implements Serializable{
     	
     }
     
-    public GrowFlow(String custId , String eventCode , int newGrow){
-    	this.custId = custId ;
+    public GrowFlow(String userId , String eventCode , int newGrow){
+    	this.userId = userId ;
     	this.eventCode = eventCode;
     	this.newGrow = newGrow;
     }
@@ -47,12 +47,12 @@ public class GrowFlow implements Serializable{
         this.id = id;
     }
 
-    public String getCustId() {
-        return custId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setCustId(String custId) {
-        this.custId = custId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getEventCode() {

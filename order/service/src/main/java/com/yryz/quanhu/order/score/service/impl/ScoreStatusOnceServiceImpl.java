@@ -21,8 +21,8 @@ public class ScoreStatusOnceServiceImpl implements ScoreStatusOnceService {
 	}
 
 	@Override
-	public ScoreStatusOnce getByCode(String custId, String eventCode) {
-		return scoreStatusOnceDao.getByCode(custId, eventCode);
+	public ScoreStatusOnce getByCode(String userId, String eventCode) {
+		return scoreStatusOnceDao.getByCode(userId, eventCode);
 	}
 
 }

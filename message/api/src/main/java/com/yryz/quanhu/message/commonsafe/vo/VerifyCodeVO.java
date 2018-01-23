@@ -37,6 +37,21 @@ public class VerifyCodeVO implements Serializable {
 	 * 验证码获取状态枚举
 	 */
 	private VerifyStatus status;
+
+	/**
+	 * 是否需要    图像验证码/滑动验证码
+	 * @return
+	 */
+	String isSendViewCode;
+
+	public String getIsSendViewCode() {
+		return isSendViewCode;
+	}
+
+	public void setIsSendViewCode(String isSendViewCode) {
+		this.isSendViewCode = isSendViewCode;
+	}
+
 	public Integer getServiceCode() {
 		return serviceCode;
 	}

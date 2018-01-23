@@ -12,9 +12,9 @@ public interface EventAcountService {
 	
 	int update(EventAcount ea);
 	
-	EventAcount getLastAcount(String custId);
+	EventAcount getLastAcount(String userId);
 	
-	Long initAcount(String custId);
+	Long initAcount(String userId);
 	
     String redislocksset(RedisTemplate<String, String> redisTemplate, String key, String value, String nxxx, String expx, long time );
 

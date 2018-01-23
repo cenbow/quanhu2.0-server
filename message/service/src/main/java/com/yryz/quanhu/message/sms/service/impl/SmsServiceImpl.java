@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.yryz.common.config.SmsConfigVO;
 import com.yryz.common.utils.JsonUtils;
-import com.yryz.quanhu.configuration.SmsConfigVO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO.SmsType;
 import com.yryz.quanhu.message.sms.entity.SmsChannel;

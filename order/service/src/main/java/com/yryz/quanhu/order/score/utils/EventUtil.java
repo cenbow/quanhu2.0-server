@@ -35,32 +35,32 @@ public abstract class EventUtil {
 	/**
 	 * 仅按次数循环的，才记录中间状态
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param eventCode
 	 * @return
 	 */
-	public static String getScoreRecordKey(String custId, String eventCode) {
+	public static String getScoreRecordKey(String userId, String eventCode) {
 		String now = sdf.format(new Date());
-		return SCORE_RECORD_PREFIX + "_" + custId + "_" + now + "_" + eventCode;
+		return SCORE_RECORD_PREFIX + "_" + userId + "_" + now + "_" + eventCode;
 	}
 
 	/**
 	 * 获取redis中的积分状态
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @param eventCode
 	 * @return
 	 */
-	public static String getScoreStatusKey(String custId, String eventCode, ScoreTypeEnum ste) {
+	public static String getScoreStatusKey(String userId, String eventCode, ScoreTypeEnum ste) {
 		String now = sdf.format(new Date());
 		switch (ste.getTypeCode()) {
 		// 一次性积分事件不记录日期
 		case "ONCE":
-			return SCORE_STATUS_PREFIX + "_" + ste.getTypeCode() + "_" + custId + "_" + eventCode;
+			return SCORE_STATUS_PREFIX + "_" + ste.getTypeCode() + "_" + userId + "_" + eventCode;
 		case "LOOP":
-			return SCORE_STATUS_PREFIX + "_" + ste.getTypeCode() + "_" + custId + "_" + now + "_" + eventCode;
+			return SCORE_STATUS_PREFIX + "_" + ste.getTypeCode() + "_" + userId + "_" + now + "_" + eventCode;
 		case "SIGN": //签到
-			return SCORE_SIGN_PREFIX + "_" + custId + "_" + now + "_" + eventCode;
+			return SCORE_SIGN_PREFIX + "_" + userId + "_" + now + "_" + eventCode;
 		// 每次触发的，无状态，直接记流水
 		default:
 			return "";

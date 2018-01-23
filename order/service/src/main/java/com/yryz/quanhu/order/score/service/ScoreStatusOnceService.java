@@ -7,6 +7,6 @@ public interface ScoreStatusOnceService {
 	
 	Long save(ScoreStatusOnce sso);
 	
-	ScoreStatusOnce getByCode(String custId , String eventCode);
+	ScoreStatusOnce getByCode(String userId , String eventCode);
 
 }
