@@ -34,7 +34,6 @@ public interface CommonSafeService {
 	 */
 	Integer checkVerifyCode(VerifyCodeDTO codeDTO);
 
-	Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckRequest);
 	
 	/**
 	 * 根据业务类型获取图形验证码
@@ -49,6 +48,14 @@ public interface CommonSafeService {
 	 * @return
 	 */
 	boolean checkImgVerifyCode(VerifyCodeDTO codeDTO);
+
+	/**
+	 * 检查 阿里滑动 校验码
+	 * @param verifyCodeDTO
+	 * @param afsCheckReq
+	 * @return
+	 */
+	boolean checkSmsSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq);
 	
 	/**
 	 * 根据业务类型记录对每个ip计数

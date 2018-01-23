@@ -29,15 +29,16 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(description = "用户达人接口")
 @RestController
-@RequestMapping(value="services/app")
+@RequestMapping(value = "services/app")
 public class UserStarController {
-private static final Logger logger = LoggerFactory.getLogger(UserStarController.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(UserStarController.class);
+
 	@Reference
 	private UserStarApi starApi;
-	
+
 	/**
 	 * 达人申请
+	 * 
 	 * @param info
 	 * @return
 	 */
@@ -45,26 +46,32 @@ private static final Logger logger = LoggerFactory.getLogger(UserStarController.
 	@ApiOperation("达人申请")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/star/starApply")
-	public Response<Boolean> save(@RequestBody StarAuthInfo info){
-			info.setAuthWay((byte)10);
-			return starApi.save(info);
+	public Response<Boolean> save(@RequestBody StarAuthInfo info, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		info.setAuthWay((byte) 10);
+		info.setAppId(header.getAppId());
+		return starApi.save(info);
 	}
-	
+
 	/**
 	 * 达人信息编辑
+	 * 
 	 * @param info
 	 * @return
 	 */
 	@ApiOperation(" 达人信息编辑")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/star/editStarAuth")
-	public Response<Boolean> update(@RequestBody StarAuthInfo info){
-			info.setAuthWay((byte)10);
-			return starApi.update(info);
+	public Response<Boolean> update(@RequestBody StarAuthInfo info, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		info.setAuthWay((byte) 10);
+		info.setAppId(header.getAppId());
+		return starApi.update(info);
 	}
-	
+
 	/**
 	 * 达人信息获取
+	 * 
 	 * @param custId
 	 * @return
 	 */
@@ -72,18 +79,19 @@ private static final Logger logger = LoggerFactory.getLogger(UserStarController.
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/star/getStarAuth")
-	public Response<StarAuthInfo> get(String userId,HttpServletRequest request){
+	public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		if(StringUtils.isNotBlank(userId)){
+		if (StringUtils.isNotBlank(userId)) {
 			return starApi.get(userId);
-		}else{
+		} else {
 			return starApi.get(header.getUserId());
 		}
-		
+
 	}
-	
+
 	/**
 	 * 达人推荐列表
+	 * 
 	 * @param custId
 	 * @return
 	 */
@@ -91,12 +99,13 @@ private static final Logger logger = LoggerFactory.getLogger(UserStarController.
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/star/starCommend")
-	public Response<List<StarAuthInfo>> recommendList(){
+	public Response<List<StarAuthInfo>> recommendList() {
 		return starApi.starList(11, 0);
 	}
-	
+
 	/**
 	 * 更多达人列表
+	 * 
 	 * @param custId
 	 * @return
 	 */
@@ -105,7 +114,7 @@ private static final Logger logger = LoggerFactory.getLogger(UserStarController.
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/star/getAllStar")
 	@RequestMapping(value = "/getAllStar", method = { RequestMethod.POST, RequestMethod.OPTIONS })
-	public Response<List<StarAuthInfo>> starList(String custId,Integer start){
+	public Response<List<StarAuthInfo>> starList(String custId, Integer start) {
 		return starApi.starList(10, 0);
 	}
 }

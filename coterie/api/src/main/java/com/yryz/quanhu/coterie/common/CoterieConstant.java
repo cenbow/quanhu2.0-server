@@ -15,19 +15,19 @@ public class CoterieConstant {
 		/**
 		 * 待审
 		 */
-		WAIT(0,"待审"),
+		WAIT(10,"待审"),
 		/**
 		 * 未通过
 		 */
-		NOTPASS(2,"未通过"),
+		NOTPASS(12,"未通过"),
 		/**
 		 * 上架
 		 */
-		PUTON(3,"上架"),
+		PUTON(13,"上架"),
 		/**
 		 * 下架
 		 */
-		PULLOFF(4,"下架");
+		PULLOFF(14,"下架");
 		private final int status;
 		private final String name;
 		Status(int status,String name){

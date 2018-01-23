@@ -35,10 +35,7 @@ public class Coterie implements Serializable {
 	 */
 	private String ownerId;
 
-	/**
-	 * 圈子ID
-	 */
-	private String circleId;
+
 
 	/**
 	 * 圈主姓名
@@ -159,13 +156,6 @@ public class Coterie implements Serializable {
 		this.ownerId = ownerId == null ? null : ownerId.trim();
 	}
 
-	public String getCircleId() {
-		return circleId;
-	}
-
-	public void setCircleId(String circleId) {
-		this.circleId = circleId == null ? null : circleId.trim();
-	}
 
 	public String getOwnerName() {
 		return ownerName;
@@ -343,8 +333,7 @@ public class Coterie implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Coterie [id=" + id + ", coterieId=" + coterieId + ", ownerId=" + ownerId + ", circleId=" + circleId
-				+ ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name
+		return "Coterie [id=" + id + ", coterieId=" + coterieId + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name
 				+ ", intro=" + intro + ", qrUrl=" + qrUrl + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee
 				+ ", joinCheck=" + joinCheck + ", memberNum=" + memberNum + ", status=" + status + ", createDate="
 				+ createDate + ", lastUpdateDate=" + lastUpdateDate + ", processTime=" + processTime + ", deleted="
