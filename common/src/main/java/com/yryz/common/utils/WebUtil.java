@@ -25,25 +25,36 @@ public class WebUtil {
     private final static Logger logger = LoggerFactory.getLogger(WebUtil.class);
 
     public static String getClientIP(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip)) {
-            return "";
-        }
-        // 多个路由时，取第一个非unknown的ip
-        final String[] arr = ip.split(",");
-        for (final String str : arr) {
-            if (!"unknown".equalsIgnoreCase(str)) {
-                ip = str;
-                break;
-            }
-        }
-        return ip;
+		String ip = request.getHeader("X-Forwarded-For");
+
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+				ip = request.getHeader("Proxy-Client-IP");
+			}
+			if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+				ip = request.getHeader("WL-Proxy-Client-IP");
+			}
+			if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+				ip = request.getHeader("HTTP_CLIENT_IP");
+			}
+			if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+				ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+			}
+			if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+				ip = request.getRemoteAddr();
+			}
+		} else if (ip.length() > 15) {
+			String[] ips = ip.split(",");
+			for (int index = 0; index < ips.length; index++) {
+				String strIp = (String) ips[index];
+				if (!("unknown".equalsIgnoreCase(strIp))) {
+					ip = strIp;
+					break;
+				}
+			}
+		}
+		ip = "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
+		return ip;
     }
 
     public static String getLocalIp() {
