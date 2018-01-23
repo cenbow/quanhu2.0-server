@@ -33,7 +33,7 @@ import java.util.List;
  */
 @Api(description = "私圈接口")
 @RestController
-public class coterieController {
+public class CoterieController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
@@ -105,8 +105,6 @@ public class coterieController {
 		}
 		 coterieApi.modifyCoterieInfo(record);
          return null;
-
-
 	}
 	
 	/**
