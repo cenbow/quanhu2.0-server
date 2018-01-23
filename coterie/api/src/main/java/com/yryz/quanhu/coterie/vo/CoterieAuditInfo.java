@@ -9,6 +9,7 @@ import java.io.Serializable;
  * @date 2017年10月18日 上午9:50:14
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
+@SuppressWarnings("serial")
 public class CoterieAuditInfo implements Serializable{
 	private static final long serialVersionUID = 8593772834773281708L;
     /**

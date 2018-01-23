@@ -9,7 +9,9 @@ import java.io.Serializable;
  * @date 2017年10月18日 上午9:50:23
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
-public class CoterieBaseInfo implements Serializable{
+
+@SuppressWarnings("serial")
+public class CoterieBasicInfo implements Serializable{
 	private static final long serialVersionUID = 2264458786258618711L;
     /**
      * 用户ID
@@ -117,7 +119,7 @@ public class CoterieBaseInfo implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CoterieBaseInfo [ownerId=" + ownerId + ",   ownerName=" + ownerName
+		return "CoterieBasicInfo [ownerId=" + ownerId + ",   ownerName=" + ownerName
 				+ ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
 				+ joinFee + ", joinCheck=" + joinCheck + "]";
 	}

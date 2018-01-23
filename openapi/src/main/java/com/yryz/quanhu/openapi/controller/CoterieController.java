@@ -6,7 +6,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.coterie.service.CoterieApi;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.user.service.AccountApi;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class CoterieController {
 	@ApiOperation("发布私圈")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/coterie/publish")
-	public Response<CoterieInfo> publish(@RequestBody CoterieBaseInfo info, String userId, HttpServletRequest request) {
+	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
 			info.setJoinCheck((byte) 1);

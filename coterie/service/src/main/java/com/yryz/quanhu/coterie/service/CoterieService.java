@@ -3,7 +3,7 @@ package com.yryz.quanhu.coterie.service;
 import com.yryz.quanhu.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.entity.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.vo.CoterieAdmin;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
 
@@ -17,15 +17,15 @@ import java.util.List;
 public interface CoterieService {
 	/**
 	 * 新建私圈
-	 * @return 
+	 * @return
 	 */
-	CoterieInfo save(CoterieBaseInfo info);
+	CoterieInfo save(CoterieBasicInfo info);
 	
 	/**
 	 * 编辑私圈
 	 */
 	void modify(CoterieInfo info);
-	
+
 	/**
 	 * 更新圈主的达人身份
 	 */
