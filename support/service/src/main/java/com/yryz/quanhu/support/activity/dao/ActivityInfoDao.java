@@ -38,5 +38,5 @@ public interface ActivityInfoDao {
 
     List<ActivityInfoAppListVo> selectAppList(@Param("type") Integer type);
 
-    void updateJoinCount(@Param("kid") Long kid, @Param("userNum") Integer userNum);
+    int updateJoinCount(@Param("kid") Long kid, @Param("userNum") Integer userNum);
 }
