@@ -50,6 +50,12 @@ public class Dymaic implements Serializable {
     private String transmitNote;
 
     /**
+     * 转发资源类型模块ID
+     * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
+     */
+    private Integer transmitType;
+
+    /**
      * 动态标题
      */
     private String title;
