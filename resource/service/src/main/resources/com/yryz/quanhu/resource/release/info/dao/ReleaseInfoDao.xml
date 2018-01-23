@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.resource.release.info.dao.ReleaseInfoDao">
+	<resultMap id="BaseResultMap" type="com.yryz.quanhu.resource.release.info.entity.ReleaseInfo">
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="kid" jdbcType="BIGINT" property="kid" />
+		<result column="classify_id" jdbcType="BIGINT" property="classifyId" />
+		<result column="cover_plan_url" jdbcType="VARCHAR" property="coverPlanUrl" />
+		<result column="title" jdbcType="VARCHAR" property="title" />
+		<result column="description" jdbcType="VARCHAR" property="description" />
+		<result column="audio_url" jdbcType="VARCHAR" property="audioUrl" />
+		<result column="video_url" jdbcType="VARCHAR" property="videoUrl" />
+		<result column="video_thumbnail_url" jdbcType="VARCHAR" property="videoThumbnailUrl" />
+		<result column="content_label" jdbcType="VARCHAR" property="contentLabel" />
+		<result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+		<result column="gps" jdbcType="VARCHAR" property="gps" />
+		<result column="coterie_id" jdbcType="BIGINT" property="coterieId" />
+		<result column="content_price" jdbcType="BIGINT" property="contentPrice" />
+		<result column="shelve_flag" jdbcType="TINYINT" property="shelveFlag" />
+		<result column="del_flag" jdbcType="TINYINT" property="delFlag" />
+		<result column="recommend" jdbcType="TINYINT" property="recommend" />
+		<result column="sort" jdbcType="INTEGER" property="sort" />
+		<result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+		<result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+		<result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+		<result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+		<result column="module_enum" jdbcType="VARCHAR" property="moduleEnum" />
+		<result column="app_id" jdbcType="VARCHAR" property="appId" />
+		<result column="revision" jdbcType="INTEGER" property="revision" />
+		<result column="content_source" jdbcType="LONGVARCHAR" property="contentSource" />
+		<result column="content" jdbcType="LONGVARCHAR" property="content" />
+		<result column="img_url" jdbcType="LONGVARCHAR" property="imgUrl" />
+		<result column="extend" jdbcType="LONGVARCHAR" property="extend" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, kid, classify_id, cover_plan_url, title, description, audio_url, video_url, video_thumbnail_url,
+		content_label, city_code, gps, coterie_id, content_price, shelve_flag, del_flag,
+		recommend, sort, create_date,
+		create_user_id, last_update_date, last_update_user_id,
+		module_enum, app_id, revision,
+		content_source, content, img_url,
+		extend
+	</sql>
+
+	<select id="selectByCondition" parameterType="com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto"
+		resultType="com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_release_info
+		<include refid="select_condition_where" />
+		<choose>
+			<when test="orderType != null and orderType == 2">
+				order by create_date ASC, id ASC
+			</when>
+			<otherwise>
+				order by create_date DESC, id DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="countByCondition" parameterType="com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto"
+		resultType="java.lang.Long">
+		select count(*) from qh_release_info
+		<include refid="select_condition_where" />
+	</select>
+
+	<sql id="select_condition_where">
+		<where>
+			1=1
+			<if test="coterieId != null">
+				and coterie_id = #{coterieId,jdbcType=BIGINT}
+			</if>
+			<if test="createUserId != null">
+				and create_user_id = #{createUserId,jdbcType=BIGINT}
+			</if>
+			<if test="lastUpdateUserId != null">
+				and last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+			</if>
+			<if test="createDate != null">
+				create_date &gt;= #{createDate}
+			</if>
+			<if test="lastUpdateDate != null">
+				last_update_date &lt;= #{lastUpdateDate}
+			</if>
+			<choose>
+				<when test="payFlag != null and payFlag == 0">
+					and content_price = 0
+				</when>
+				<otherwise>
+					and content_price > 0
+				</otherwise>
+			</choose>
+			<if test="classifyId != null">
+				and classify_id = #{classifyId,jdbcType=BIGINT}
+			</if>
+			<if test="shelveFlag != null">
+				and shelve_flag = #{shelveFlag,jdbcType=TINYINT}
+			</if>
+			<if test="delFlag != null">
+				and del_flag = #{delFlag,jdbcType=TINYINT}
+			</if>
+			<if test="moduleEnum != null">
+				and module_enum = #{moduleEnum,jdbcType=VARCHAR}
+			</if>
+			<if test="appId != null">
+				and app_id = #{appId,jdbcType=VARCHAR}
+			</if>
+			<if test="revision != null">
+				and = #{revision,jdbcType=INTEGER}
+			</if>
+			<if test="contentLabel != null">
+				and content_label = #{contentLabel,jdbcType=VARCHAR}
+			</if>
+			<if test="cityCode != null">
+				and city_code = #{cityCode,jdbcType=VARCHAR}
+			</if>
+			<if test="gps != null">
+				and gps = #{gps,jdbcType=VARCHAR}
+			</if>
+			<if test="recommend != null">
+				and recommend = #{recommend,jdbcType=TINYINT}
+			</if>
+		</where>
+	</sql>
+
+	<select id="selectByKid" parameterType="java.lang.Long" resultType="com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_release_info
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+		parameterType="com.yryz.quanhu.resource.release.info.entity.ReleaseInfo">
+		insert into qh_release_info (id, kid, classify_id,
+		cover_plan_url, title, description,
+		audio_url,
+		video_url, video_thumbnail_url,
+		content_label, city_code, gps,
+		coterie_id, content_price, shelve_flag,
+		del_flag,
+		recommend, sort,
+		create_date, create_user_id, last_update_date,
+		last_update_user_id, module_enum, app_id,
+		revision,
+		content_source, content,
+		img_url, extend)
+		values (#{id,jdbcType=BIGINT}, #{kid,jdbcType=BIGINT},
+		#{classifyId,jdbcType=BIGINT},
+		#{coverPlanUrl,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
+		#{description,jdbcType=VARCHAR},
+		#{audioUrl,jdbcType=VARCHAR}, #{videoUrl,jdbcType=VARCHAR},
+		#{videoThumbnailUrl,jdbcType=VARCHAR},
+		#{contentLabel,jdbcType=VARCHAR}, #{cityCode,jdbcType=VARCHAR},
+		#{gps,jdbcType=VARCHAR},
+		#{coterieId,jdbcType=BIGINT}, #{contentPrice,jdbcType=BIGINT}, #{shelveFlag,jdbcType=TINYINT},
+		#{delFlag,jdbcType=TINYINT}, #{recommend,jdbcType=TINYINT}, #{sort,jdbcType=INTEGER},
+		#{createDate,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=BIGINT}, #{lastUpdateDate,jdbcType=TIMESTAMP},
+		#{lastUpdateUserId,jdbcType=BIGINT}, #{moduleEnum,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR},
+		#{revision,jdbcType=INTEGER}, #{contentSource,jdbcType=LONGVARCHAR}, #{content,jdbcType=LONGVARCHAR},
+		#{imgUrl,jdbcType=LONGVARCHAR}, #{extend,jdbcType=LONGVARCHAR})
+	</insert>
+
+	<insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+		parameterType="com.yryz.quanhu.resource.release.info.entity.ReleaseInfo">
+		insert into qh_release_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<!-- <if test="id != null"> id, </if> -->
+			<if test="kid != null">
+				kid,
+			</if>
+			<if test="classifyId != null">
+				classify_id,
+			</if>
+			<if test="coverPlanUrl != null">
+				cover_plan_url,
+			</if>
+			<if test="title != null">
+				title,
+			</if>
+			<if test="description != null">
+				description,
+			</if>
+			<if test="audioUrl != null">
+				audio_url,
+			</if>
+			<if test="videoUrl != null">
+				video_url,
+			</if>
+			<if test="videoThumbnailUrl != null">
+				video_thumbnail_url,
+			</if>
+			<if test="contentLabel != null">
+				content_label,
+			</if>
+			<if test="cityCode != null">
+				city_code,
+			</if>
+			<if test="gps != null">
+				gps,
+			</if>
+			<if test="coterieId != null">
+				coterie_id,
+			</if>
+			<if test="contentPrice != null">
+				content_price,
+			</if>
+			<if test="shelveFlag != null">
+				shelve_flag,
+			</if>
+			<if test="delFlag != null">
+				del_flag,
+			</if>
+			<if test="recommend != null">
+				recommend,
+			</if>
+			<if test="sort != null">
+				sort,
+			</if>
+			create_date,
+			<if test="createUserId != null">
+				create_user_id,
+			</if>
+			last_update_date,
+			<if test="lastUpdateUserId != null">
+				last_update_user_id,
+			</if>
+			<if test="moduleEnum != null">
+				module_enum,
+			</if>
+			<if test="appId != null">
+				app_id,
+			</if>
+			<if test="revision != null">
+				revision,
+			</if>
+			<if test="contentSource != null">
+				content_source,
+			</if>
+			<if test="content != null">
+				content,
+			</if>
+			<if test="imgUrl != null">
+				img_url,
+			</if>
+			<if test="extend != null">
+				extend,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<!-- <if test="id != null"> #{id,jdbcType=BIGINT}, </if> -->
+			<if test="kid != null">
+				#{kid,jdbcType=BIGINT},
+			</if>
+			<if test="classifyId != null">
+				#{classifyId,jdbcType=BIGINT},
+			</if>
+			<if test="coverPlanUrl != null">
+				#{coverPlanUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="title != null">
+				#{title,jdbcType=VARCHAR},
+			</if>
+			<if test="description != null">
+				#{description,jdbcType=VARCHAR},
+			</if>
+			<if test="audioUrl != null">
+				#{audioUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="videoUrl != null">
+				#{videoUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="videoThumbnailUrl != null">
+				#{videoThumbnailUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="contentLabel != null">
+				#{contentLabel,jdbcType=VARCHAR},
+			</if>
+			<if test="cityCode != null">
+				#{cityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="gps != null">
+				#{gps,jdbcType=VARCHAR},
+			</if>
+			<if test="coterieId != null">
+				#{coterieId,jdbcType=BIGINT},
+			</if>
+			<if test="contentPrice != null">
+				#{contentPrice,jdbcType=BIGINT},
+			</if>
+			<if test="shelveFlag != null">
+				#{shelveFlag,jdbcType=TINYINT},
+			</if>
+			<if test="delFlag != null">
+				#{delFlag,jdbcType=TINYINT},
+			</if>
+			<if test="recommend != null">
+				#{recommend,jdbcType=TINYINT},
+			</if>
+			<if test="sort != null">
+				#{sort,jdbcType=INTEGER},
+			</if>
+			NOW(),
+			<if test="createUserId != null">
+				#{createUserId,jdbcType=BIGINT},
+			</if>
+			NOW(),
+			<if test="lastUpdateUserId != null">
+				#{lastUpdateUserId,jdbcType=BIGINT},
+			</if>
+			<if test="moduleEnum != null">
+				#{moduleEnum,jdbcType=VARCHAR},
+			</if>
+			<if test="appId != null">
+				#{appId,jdbcType=VARCHAR},
+			</if>
+			<if test="revision != null">
+				#{revision,jdbcType=INTEGER},
+			</if>
+			<if test="contentSource != null">
+				#{contentSource,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="content != null">
+				#{content,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="imgUrl != null">
+				#{imgUrl,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="extend != null">
+				#{extend,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateByUkSelective" parameterType="com.yryz.quanhu.resource.release.info.entity.ReleaseInfo">
+		update qh_release_info
+		<set>
+			<!-- <if test="record.id != null"> id = #{record.id,jdbcType=BIGINT}, </if> -->
+			<!-- <if test="record.kid != null"> kid = #{record.kid,jdbcType=BIGINT}, </if> -->
+			<if test="record.classifyId != null">
+				classify_id = #{record.classifyId,jdbcType=BIGINT},
+			</if>
+			<if test="record.coverPlanUrl != null">
+				cover_plan_url = #{record.coverPlanUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.title != null">
+				title = #{record.title,jdbcType=VARCHAR},
+			</if>
+			<if test="record.description != null">
+				description = #{record.description,jdbcType=VARCHAR},
+			</if>
+			<if test="record.audioUrl != null">
+				audio_url = #{record.audioUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.videoUrl != null">
+				video_url = #{record.videoUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.videoThumbnailUrl != null">
+				video_thumbnail_url = #{record.videoThumbnailUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="record.contentLabel != null">
+				content_label = #{record.contentLabel,jdbcType=VARCHAR},
+			</if>
+			<if test="record.cityCode != null">
+				city_code = #{record.cityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="record.gps != null">
+				gps = #{record.gps,jdbcType=VARCHAR},
+			</if>
+			<if test="record.coterieId != null">
+				coterie_id = #{record.coterieId,jdbcType=BIGINT},
+			</if>
+			<if test="record.contentPrice != null">
+				content_price = #{record.contentPrice,jdbcType=BIGINT},
+			</if>
+			<if test="record.shelveFlag != null">
+				shelve_flag = #{record.shelveFlag,jdbcType=TINYINT},
+			</if>
+			<if test="record.delFlag != null">
+				del_flag = #{record.delFlag,jdbcType=TINYINT},
+			</if>
+			<if test="record.recommend != null">
+				recommend = #{record.recommend,jdbcType=TINYINT},
+			</if>
+			<if test="record.sort != null">
+				sort = #{record.sort,jdbcType=INTEGER},
+			</if>
+			<if test="record.createDate != null">
+				create_date = #{record.createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.createUserId != null">
+				create_user_id = #{record.createUserId,jdbcType=BIGINT},
+			</if>
+			last_update_date = NOW(),
+			<if test="record.lastUpdateUserId != null">
+				last_update_user_id = #{record.lastUpdateUserId,jdbcType=BIGINT},
+			</if>
+			<if test="record.moduleEnum != null">
+				module_enum = #{record.moduleEnum,jdbcType=VARCHAR},
+			</if>
+			<if test="record.appId != null">
+				app_id = #{record.appId,jdbcType=VARCHAR},
+			</if>
+			<if test="record.revision != null">
+				revision = #{record.revision,jdbcType=INTEGER},
+			</if>
+			<if test="record.contentSource != null">
+				content_source = #{record.contentSource,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="record.content != null">
+				content = #{record.content,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="record.imgUrl != null">
+				img_url = #{record.imgUrl,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="record.extend != null">
+				extend = #{record.extend,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where kid = #{record.kid,jdbcType=BIGINT}
+	</update>
+
+	<update id="updateByCondition">
+		update qh_release_info
+		<set>
+			<if test="record.shelveFlag != null">
+				shelve_flag = #{record.shelveFlag,jdbcType=TINYINT},
+			</if>
+			<if test="record.delFlag != null">
+				del_flag = #{record.delFlag,jdbcType=TINYINT},
+			</if>
+			<if test="record.recommend != null">
+				recommend = #{record.recommend,jdbcType=TINYINT},
+			</if>
+			<if test="record.lastUpdateUserId != null">
+				last_update_user_id = #{record.lastUpdateUserId,jdbcType=BIGINT},
+			</if>
+			<if test="record.revision != null">
+				revision = #{record.revision,jdbcType=INTEGER},
+			</if>
+			<if test="record.contentLabel != null">
+				content_label = #{record.contentLabel,jdbcType=VARCHAR},
+			</if>
+			<if test="record.cityCode != null">
+				city_code = #{record.cityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="record.gps != null">
+				gps = #{record.gps,jdbcType=VARCHAR},
+			</if>
+			<if test="record.coterieId != null">
+				coterie_id = #{record.coterieId,jdbcType=BIGINT},
+			</if>
+			<if test="record.contentPrice != null">
+				content_price = #{contentPrice,jdbcType=BIGINT},
+			</if>
+		</set>
+		<include refid="update_condition_where" />
+	</update>
+
+	<sql id="update_condition_where">
+		<where>
+			1=1
+			<if test="dto.kid != null">
+				and kid = #{dto.kid,jdbcType=BIGINT}
+			</if>
+			<if test="dto.coterieId != null">
+				and coterie_id = #{dto.coterieId,jdbcType=BIGINT}
+			</if>
+			<if test="dto.createUserId != null">
+				and create_user_id = #{dto.createUserId,jdbcType=BIGINT}
+			</if>
+			<if test="dto.lastUpdateUserId != null">
+				and last_update_user_id = #{dto.lastUpdateUserId,jdbcType=BIGINT}
+			</if>
+			<if test="dto.classifyId != null">
+				and classify_id = #{dto.classifyId,jdbcType=BIGINT}
+			</if>
+			<if test="dto.shelveFlag != null">
+				and shelve_flag = #{dto.shelveFlag,jdbcType=TINYINT}
+			</if>
+			<if test="dto.delFlag != null">
+				and del_flag = #{dto.delFlag,jdbcType=TINYINT}
+			</if>
+			<if test="dto.contentLabel != null">
+				and content_label = #{dto.contentLabel,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.appId != null">
+				and app_id = #{dto.appId,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</sql>
+</mapper>
