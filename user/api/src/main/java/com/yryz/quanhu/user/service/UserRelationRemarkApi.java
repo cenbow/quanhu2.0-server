@@ -1,8 +1,7 @@
 package com.yryz.quanhu.user.service;
 
-import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.user.dto.UserRelationCountDto;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 
@@ -17,31 +16,35 @@ import java.util.List;
  */
 public interface UserRelationRemarkApi {
 
-    public static enum SOURCE{
-        PLATFORM,                               //平台
-        COTERIE,                                //私圈
-        IM                                      //云信IM
-    }
     /**
      * 设置备注名
      * @param dto
      * @return
      */
-    Response<Boolean> setRemarkName(UserRelationDto dto);
+    Response<Boolean> setRemarkName(UserRelationRemarkDto dto);
 
     /**
      * 恢复备注名
      * @param dto
      * @return
      */
-    Response<Boolean> cancelRemarkName(UserRelationDto dto);
+    Response<Boolean> resetRemarkName(UserRelationRemarkDto dto);
+
+    /**
+     * 查询备注信息
+     * @param sourceUserId
+     * @param targetUserId
+     * @param type
+     * @return
+     */
+    Response<UserRelationRemarkDto> getRemarkDto(String sourceUserId,String targetUserId,UserRelationConstant.TYPE type);
 
     /**
      * 查询用户所有备注信息
       * @param sourceUserId
-     * @param source
+     * @param type
      * @return
      */
-    Response<List<UserRelationRemarkDto>> selectBy(String sourceUserId,SOURCE source);
+    Response<List<UserRelationRemarkDto>> selectBy(String sourceUserId,UserRelationConstant.TYPE type);
 
 }

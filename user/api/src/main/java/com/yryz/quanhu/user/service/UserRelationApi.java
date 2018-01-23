@@ -2,6 +2,7 @@ package com.yryz.quanhu.user.service;
 
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 
@@ -17,28 +18,6 @@ import java.util.Set;
  */
 public interface UserRelationApi {
 
-    public static final int YES = 11;
-    public static final int NO = 10;
-    /**
-     * 关系状态
-     */
-    public static enum STATUS{
-        FANS,                                   //粉丝
-        FOLLOW,                                 //关注
-        TO_BLACK,                               //拉黑
-        FROM_BLACK,                             //被拉黑
-        FRIEND;                                 //好友
-    }
-    /**
-     * 操作事件
-     */
-    public static enum EVENT{
-        SET_FOLLOW,                             //关注
-        CANCEL_FOLLOW,                          //取消关注
-        SET_BLACK,                              //拉黑
-        CANCEL_BLACK,                           //取消拉黑
-    }
-
     /**
      * 设置关系
      * @param sourceUserId
@@ -46,14 +25,23 @@ public interface UserRelationApi {
      * @param event
      * @return
      */
-    Response<Boolean> setRelation(String sourceUserId,String targetUserId, UserRelationApi.EVENT event);
+    Response<UserRelationDto> setRelation(String sourceUserId,String targetUserId, UserRelationConstant.EVENT event);
+
+    /**
+     * 获取关系
+     * @param sourceUserId
+     * @param targetUserId
+     * @return
+     */
+    Response<UserRelationDto> getRelation(String sourceUserId,String targetUserId);
+
 
     /**
      * 查询用户关系(分页)
      * @param dto
      * @return
      */
-    Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto);
+    Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status);
 
     /**
      * 查询用户指定关系
@@ -61,21 +49,23 @@ public interface UserRelationApi {
      * @param status
      * @return  返回所有用户ID
      */
-    Response<Set<String>> selectBy(String sourceUserId, STATUS status);
+    Response<Set<String>> selectBy(String sourceUserId, UserRelationConstant.STATUS status);
 
     /**
      * 查询用户关系
-     * @param userSourceKid     用户
-     * @param userTargetKids    目标用户
+     * @param userSourceId     用户
+     * @param userTargetIds    目标用户
      * @return
      */
-    Response<List<UserRelationDto>> selectBy(String userSourceKid, String[] userTargetKids);
+    Response<List<UserRelationDto>> selectBy(String userSourceId, String[] userTargetIds);
+
+
 
     /**
      * 统计用户所有关系数量
-     * @param userSourceKid
+     * @param userSourceId
      * @return
      */
-    Response<UserRelationCountDto> totalBy(String userSourceKid);
+    Response<UserRelationCountDto> totalBy(String userSourceId);
 
 }
