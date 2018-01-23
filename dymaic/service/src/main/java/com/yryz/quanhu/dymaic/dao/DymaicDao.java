@@ -59,14 +59,14 @@ public interface DymaicDao {
      * @param userId
      * @return
      */
-    List<Long> getSendListIds(@Param("userId") String userId);
+    List<Long> getSendListIds(@Param("userId") Long userId);
 
     /**
      * 查询好友动态id列表
-     * @param kids
+     * @param userIds
      * @param limit
      * @return
      */
-    List<Long> getTimeLineIds(@Param("kids") List<String> kids, @Param("limit") Long limit);
+    List<Long> getTimeLineIds(@Param("userIds") List<Long> userIds, @Param("limit") Long limit);
 
 }

@@ -6,12 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
@@ -78,7 +73,7 @@ public class UserStarController {
 	@ApiOperation("达人信息获取")
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/star/getStarAuth")
+	@GetMapping(value = "/{version}/star/getStarAuth")
 	public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		if (StringUtils.isNotBlank(userId)) {
@@ -98,7 +93,7 @@ public class UserStarController {
 	@ApiOperation("达人推荐列表")
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/star/starCommend")
+	@GetMapping(value = "/{version}/star/starCommend")
 	public Response<List<StarAuthInfo>> recommendList() {
 		return starApi.starList(11, 0);
 	}

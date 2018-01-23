@@ -56,7 +56,8 @@ public class DymaicServiceImpl implements DymaicService {
     }
 
     @Override
-    public Response<Boolean> delete(String userId, Long kid) {
+    public Response<Boolean> delete(Long userId, Long kid) {
+        //write db
         Dymaic dymaic = new Dymaic();
         dymaic.setKid(kid);
         dymaic.setDelFlag(11);
@@ -132,13 +133,14 @@ public class DymaicServiceImpl implements DymaicService {
             for (Dymaic dymaic : dbList) {
                 if (dymaic.getDelFlag() == 10) {
                     writeCacheList.add(dymaic);
+                    result.put(dymaic.getKid(), dymaic);
                 } else {
                     Dymaic tmp = new Dymaic();
                     tmp.setKid(dymaic.getKid());
                     tmp.setDelFlag(dymaic.getDelFlag());
                     writeCacheList.add(tmp);
+                    result.put(dymaic.getKid(), tmp);
                 }
-                result.put(dymaic.getKid(), dymaic);
             }
 
             if (writeCacheList != null) {
@@ -151,7 +153,7 @@ public class DymaicServiceImpl implements DymaicService {
     }
 
     @Override
-    public Response<List<DymaicVo>> getSendList(String userId, Long kid, Long limit) {
+    public Response<List<DymaicVo>> getSendList(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeSendList(userId, kid, limit);
 
         List<DymaicVo> result;
@@ -165,7 +167,7 @@ public class DymaicServiceImpl implements DymaicService {
     }
 
     @Override
-    public Response<Boolean> rebuildSendList(String userId) {
+    public Response<Boolean> rebuildSendList(Long userId) {
         List<Long> kids = dymaicDao.getSendListIds(userId);
         if (kids != null && !kids.isEmpty()) {
             dymaicCache.addSendList(userId, new HashSet<>(kids));
@@ -176,7 +178,7 @@ public class DymaicServiceImpl implements DymaicService {
 
 
     @Override
-    public Response<List<DymaicVo>> getTimeLine(String userId, Long kid, Long limit) {
+    public Response<List<DymaicVo>> getTimeLine(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
         logger.info("dymaicIds size " + kids.size());
 
@@ -192,18 +194,19 @@ public class DymaicServiceImpl implements DymaicService {
 
     @Override
     public Response<Boolean> pushTimeLine(Dymaic dynamic) {
+        if (dynamic == null) {
+            return ResponseUtils.returnObjectSuccess(true);
+        }
+
         Long startTime = System.currentTimeMillis();
-        String userId = dynamic.getUserId();
+        Long userId = dynamic.getUserId();
         Long kid = dynamic.getKid();
 
         //获取粉丝列表
-        Set<String> followers = new HashSet<>();
-        followers.add("debar");
-        followers.add("xiepeng");
-        followers.add(userId);
+        List<Long> followers = getFollowers(userId);
 
         //push
-        for (String followerId : followers) {
+        for (Long followerId : followers) {
             dymaicCache.addTimeLine(followerId, kid);
         }
 
@@ -213,13 +216,9 @@ public class DymaicServiceImpl implements DymaicService {
     }
 
     @Override
-    public Response<Boolean> shuffleTimeLine(String userId, String debarUserId) {
-        //1, 检查custId的timeLine是否存在
-
-        //2，查询debarCust的sendList
+    public Response<Boolean> shuffleTimeLine(Long userId, Long debarUserId) {
         Set<Long> kids = dymaicCache.rangeAllSendList(debarUserId);
 
-        //3，批量删除custId的timeLine中的相关id
         if (kids != null && !kids.isEmpty()) {
             dymaicCache.removeTimeLine(userId, kids);
         }
@@ -228,19 +227,16 @@ public class DymaicServiceImpl implements DymaicService {
     }
 
     @Override
-    public Response<Boolean> rebuildTimeLine(String userId, Long limit) {
+    public Response<Boolean> rebuildTimeLine(Long userId, Long limit) {
         Long startTime = System.currentTimeMillis();
         //获取粉丝列表
-        List<String> followers = new ArrayList<>();
-        followers.add("xiepeng");
-        followers.add("debar");
-        followers.add(userId);
+        List<Long> followers = getFollowers(userId);
 
-        //2，通过In查询，从mysql中取limit条好友动态
+        //从mysql中取limit条好友动态
         int idsSize = 0;
         List<Long> kids = dymaicDao.getTimeLineIds(followers, limit);
 
-        //3，批量写入TimeLine
+        //批量写入TimeLine
         if (kids != null && !kids.isEmpty()) {
             dymaicCache.addTimeLine(userId, new HashSet<>(kids));
             idsSize = kids.size();
@@ -267,7 +263,7 @@ public class DymaicServiceImpl implements DymaicService {
         //2 用户信息
         Map<String, Dymaic> custInfos = null;
         if (dymaicMap != null) {
-            Set<String> userIds = new HashSet<>();
+            Set<Long> userIds = new HashSet<>();
             for (Dymaic dymaic : dymaicMap.values()) {
                 userIds.add(dymaic.getUserId());
             }
@@ -312,11 +308,21 @@ public class DymaicServiceImpl implements DymaicService {
         return result;
     }
 
+    /**
+     * 查询粉丝ID列表
+     *
+     * @param userId
+     * @return
+     */
+    private List<Long> getFollowers(Long userId) {
+        return Arrays.asList(new Long[]{100L, 200L, userId});
+    }
+
     public static class TimeLineMonitor {
 
         private Long startTime;
         private Long endTime;
-        private String userId;
+        private Long userId;
         private Integer followers;
         private Integer size;
 

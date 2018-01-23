@@ -30,7 +30,7 @@ public interface DymaicService {
      * @param kid
      * @return
      */
-    Response<Boolean> delete(String userId, Long kid);
+    Response<Boolean> delete(Long userId, Long kid);
 
     /**
      * 查询动态
@@ -56,7 +56,7 @@ public interface DymaicService {
      * @param limit
      * @return
      */
-    Response<List<DymaicVo>> getSendList(String userId, Long kid, Long limit);
+    Response<List<DymaicVo>> getSendList(Long userId, Long kid, Long limit);
 
     /**
      * 从数据库重建SendList到cache
@@ -64,7 +64,7 @@ public interface DymaicService {
      * @param userId
      * @return
      */
-    Response<Boolean> rebuildSendList(String userId);
+    Response<Boolean> rebuildSendList(Long userId);
 
     /**
      * 查询好友动态
@@ -74,7 +74,7 @@ public interface DymaicService {
      * @param limit
      * @return
      */
-    Response<List<DymaicVo>> getTimeLine(String userId, Long kid, Long limit);
+    Response<List<DymaicVo>> getTimeLine(Long userId, Long kid, Long limit);
 
     /**
      * push动态到好友的TimeLine
@@ -90,7 +90,7 @@ public interface DymaicService {
      * @param userId
      * @param debarUserId
      */
-    Response<Boolean> shuffleTimeLine(String userId, String debarUserId);
+    Response<Boolean> shuffleTimeLine(Long userId, Long debarUserId);
 
     /**
      * 从数据库重建timeLine到cache
@@ -99,5 +99,5 @@ public interface DymaicService {
      * @param limit
      * @return
      */
-    Response<Boolean> rebuildTimeLine(String userId, Long limit);
+    Response<Boolean> rebuildTimeLine(Long userId, Long limit);
 }

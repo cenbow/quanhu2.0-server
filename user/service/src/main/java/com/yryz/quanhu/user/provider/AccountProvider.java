@@ -213,6 +213,7 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> loginThird(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
+			logger.info("loginDTO request, loginDTO: {}, header: {}", JSON.toJSONString(loginDTO), JSON.toJSONString(header));
 			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
@@ -229,8 +230,9 @@ public class AccountProvider implements AccountApi {
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			}
-
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
+			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId.toString(), header);
+			logger.info("loginThird result: {}", JSON.toJSONString(registerLoginVO));
+			return ResponseUtils.returnObjectSuccess(registerLoginVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
