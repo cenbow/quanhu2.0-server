@@ -7,16 +7,14 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.Annotation.NotLogin;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.vo.ResourceVo;
@@ -42,7 +40,7 @@ public class ResourceController {
 	
 	@NotLogin
     @ApiOperation("首页资源推荐")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/appRecommend")
 	public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度")String limit){
     	ResourceVo resourceVo = new ResourceVo();

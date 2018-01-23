@@ -1,5 +1,9 @@
 package com.yryz.quanhu.dymaic.service;
 
+import java.util.List;
+
+import com.yryz.quanhu.dymaic.vo.UserSimpleVO;
+
 public interface ElasticsearchService {
-	String findUserName(Long userId);
+	List<UserSimpleVO> searchUser(String keyWord);
 }

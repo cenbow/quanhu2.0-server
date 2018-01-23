@@ -12,6 +12,7 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -28,6 +29,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class DirectExchangeConsumer {
 	
+	@Value("order.reply.queue")
+	private String replyQueue;
+	
 	/**
 	 * QueueBinding: exchange和queue的绑定
 	 * Queue:队列声明
@@ -36,9 +40,9 @@ public class DirectExchangeConsumer {
 	 * @param data
 	 */
 	@RabbitListener(bindings = @QueueBinding(
-			value= @Queue(value=AmqpConstant.DEMO_DIRECT_EXCHANGE,durable="true"),
+			value= @Queue(value="${order.reply.queue}",durable="true"),
 			exchange=@Exchange(value=AmqpConstant.DEMO_DIRECT_EXCHANGE,ignoreDeclarationExceptions="true",type=ExchangeTypes.DIRECT),
-			key=AmqpConstant.DEMO_QUEUE)
+			key="${order.reply.queue}")
 	)
 	public void handleMessage(String data){
 		System.out.println("hello exchange mq:" + data);
