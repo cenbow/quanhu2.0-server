@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by dell on 2018/1/22.
  */
-@Api("报名类活动相关接口")
+@Api(description = "报名类活动相关接口")
 @RestController
 public class ActivitySignUpController {
     @Reference(check = false, timeout = 30000)

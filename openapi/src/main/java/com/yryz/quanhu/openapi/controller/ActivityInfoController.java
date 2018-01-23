@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created by dell on 2018/1/22.
  */
-@Api("活动主体相关接口")
+@Api(description ="活动主体相关接口")
 @RestController
 public class ActivityInfoController {
     @Reference(check = false, timeout = 30000)
