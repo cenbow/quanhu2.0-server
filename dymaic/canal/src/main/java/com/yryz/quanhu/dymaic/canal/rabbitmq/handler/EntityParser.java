@@ -12,7 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import com.yryz.quanhu.dymaic.canal.entity.CanalChangeInfo;
-import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 
 public class EntityParser {
 	public static <T> T parse(List<CanalChangeInfo> changeInfoList, Class<T> classs) {
@@ -20,7 +19,7 @@ public class EntityParser {
 		try {
 			instance = classs.newInstance();
 			Map<String, CanalChangeInfo> infoMap = CanalChangeInfo.toMap(changeInfoList);
-			Method[] methods = UserInfo.class.getMethods();
+			Method[] methods = classs.getMethods();
 			for (int i = 0; i < methods.length; i++) {
 				Method md = methods[i];
 				if (!md.getName().startsWith("set")) {
@@ -59,7 +58,7 @@ public class EntityParser {
 			}
 
 			Map<String, CanalChangeInfo> infoMap = CanalChangeInfo.toMap(changeInfoList);
-			Method[] methods = UserInfo.class.getMethods();
+			Method[] methods = classs.getMethods();
 			for (int i = 0; i < methods.length; i++) {
 				Method md = methods[i];
 				if (!md.getName().startsWith("set")) {

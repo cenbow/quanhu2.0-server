@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
@@ -31,6 +32,9 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
 	@Resource
 	private UserEsRepository userEsRepository;
+	
+	@Resource
+	private ElasticsearchTemplate elasticsearchTemplate;
 
 	@PostConstruct
 	private void register() {
@@ -39,8 +43,8 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
 	@Override
 	public Boolean watch(CanalMsgContent msg) {
-		if (CommonConstant.UserDb.DB_NAME.equals(msg.getDbName())
-				&& CommonConstant.UserDb.TABLE_USER.equals(msg.getTableName())) {
+		if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
+				&& CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())) {
 			return true;
 		}
 		return false;
@@ -48,9 +52,12 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
 	@Override
 	public void handler(CanalMsgContent msg) {
+		boolean exists=elasticsearchTemplate.indexExists(UserInfo.class);
+		if(!exists){
+			elasticsearchTemplate.createIndex(UserInfo.class);
+		}
 		UserInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),UserInfo.class);
 		UserInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),UserInfo.class);
-
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
 			Optional<UserInfo> uinfo = userEsRepository.findById(uinfoBefore.getUserId());
 			if (uinfo.isPresent()) {

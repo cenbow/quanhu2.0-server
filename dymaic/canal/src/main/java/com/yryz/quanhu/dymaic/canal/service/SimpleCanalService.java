@@ -1,6 +1,8 @@
 package com.yryz.quanhu.dymaic.canal.service;
 
 import java.net.InetSocketAddress;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,12 +16,18 @@ public class SimpleCanalService extends AbstractCanalService {
 	@Value("${canal.host}")
 	private String canalHost;
 	@Value("${canal.port}")
-	private int canalPort;
+	private Integer canalPort;
 	@Value("${canal.instance}")
 	private String canalInstance;
 	
+	// 根据ip，直接创建链接，无HA的功能
 	public void startup() {
-		// 根据ip，直接创建链接，无HA的功能
+		if(StringUtils.isEmpty(canalHost) || canalPort==null){
+			logger.warn("-------------canal 直连--------------------");
+			logger.warn("-------canal host or port not found-------");
+			logger.warn("------------------------------------------");
+			return;
+		}
 		init();
 		String destination = canalInstance;
 		CanalConnector connector = CanalConnectors

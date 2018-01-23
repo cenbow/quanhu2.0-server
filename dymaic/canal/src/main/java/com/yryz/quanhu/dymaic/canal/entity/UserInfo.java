@@ -3,11 +3,9 @@ package com.yryz.quanhu.dymaic.canal.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldIndex;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
@@ -15,7 +13,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * 
  * @author jk
  */
-@Document(indexName = "quanhu-v2", type = "userInfo", refreshInterval = "-1")
+@Document(indexName = "quanhu-v2-userinfo", type = "userInfo", refreshInterval = "-1")
 public class UserInfo implements Serializable {
 	private static final long serialVersionUID = -2312110729335920029L;
 	@Field(type=FieldType.Long)
