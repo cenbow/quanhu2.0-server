@@ -20,9 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -607,7 +609,8 @@ public class OrderController {
      * @param response
      * @throws Exception
      */
-    @RequestMapping(value = "/alipayNotify")
+    @ApiOperation("支付宝支付回调")
+    @RequestMapping(value = "/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
 	public void alipayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
 //		logger.info("receive alipayNotify");
 //		PayResponse payResp = null;
@@ -641,7 +644,8 @@ public class OrderController {
      * @param response
      * @throws Exception
      */
-    @RequestMapping(value = "/wxpayNotify")
+    @ApiOperation("微信支付回调")
+    @RequestMapping(value = "/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
 	public void wxpayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("receive wxpayNotify...");
 //		PayResponse payResp = null;
@@ -856,7 +860,7 @@ public class OrderController {
 	 */
     @ApiOperation("支付宝网页支付")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-	@RequestMapping(value = "/toAlipay")
+	@GetMapping(value = "/toAlipay")
 	public void toAlipay(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String orderId = request.getParameter("orderId");
 		if (StringUtils.isEmpty(orderId)) {
