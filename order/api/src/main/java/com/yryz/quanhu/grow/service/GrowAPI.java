@@ -1,10 +1,10 @@
-package com.yryz.quanhu.score.service;
+package com.yryz.quanhu.grow.service;
 
 import java.util.List;
 
-import com.yryz.quanhu.score.entity.GrowEventInfo;
-import com.yryz.quanhu.score.entity.GrowFlow;
-import com.yryz.quanhu.score.entity.GrowFlowQuery;
+import com.yryz.quanhu.grow.entity.GrowEventInfo;
+import com.yryz.quanhu.grow.entity.GrowFlow;
+import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 
 /**
  * @author lsn 

@@ -1,4 +1,4 @@
-package com.yryz.quanhu.score.entity;
+package com.yryz.quanhu.grow.entity;
 
 import java.io.Serializable;
 import java.util.Date;

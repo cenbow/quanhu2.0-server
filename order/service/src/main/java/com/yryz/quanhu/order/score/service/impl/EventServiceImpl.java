@@ -12,7 +12,7 @@ import org.springframework.http.converter.json.GsonBuilderUtils;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.google.gson.Gson;
 import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.order.score.consumer.AmqpConstant;
+import com.yryz.quanhu.order.common.AmqpConstant;
 import com.yryz.quanhu.order.score.dao.mongo.EventLogDao;
 import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
@@ -100,7 +100,7 @@ public class EventServiceImpl implements EventService {
 		if (typeCodes.contains(EventTypeEnum.Grow.getTypeCode())) {
 			//mqSender.sendEvent(EventExchangeEnum.Direct, EventQueueEnum.QUEUE_EVENT_GROW, bodys);
 			rabbitTemplate.setExchange(AmqpConstant.EVENT_DIRECT_EXCHANGE);
-			rabbitTemplate.setRoutingKey(AmqpConstant.SCORE_RECEIVE_GROW);
+			rabbitTemplate.setRoutingKey(AmqpConstant.GROW_RECEIVE_QUEUE);
 			rabbitTemplate.convertAndSend(bodys);
 			logger.info("-----------分发事件至成长队列---------,传入数据："+ bodys.toString());
 		}
