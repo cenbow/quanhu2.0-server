@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.Annotation.NotLogin;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.score.service.EventAPI;

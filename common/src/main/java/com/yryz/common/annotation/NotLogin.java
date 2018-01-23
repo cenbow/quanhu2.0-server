@@ -1,4 +1,4 @@
-package com.yryz.common.Annotation;
+package com.yryz.common.annotation;
 
 import java.lang.annotation.*;
 

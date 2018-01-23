@@ -1,12 +1,11 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.Annotation.NotLogin;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.PatternUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
-import com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto;
 import com.yryz.quanhu.support.activity.api.ActivityInfoApi;
 import com.yryz.quanhu.support.activity.vo.ActivityInfoAppListVo;
 import com.yryz.quanhu.support.activity.vo.ActivityInfoVo;
