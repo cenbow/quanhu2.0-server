@@ -15,5 +15,5 @@ public interface ActivityInfoService {
 
     ActivityInfoVo getActivityInfoVo(Long kid, Integer type);
 
-    void updateJoinCount(ActivityInfo activityInfo);
+    void updateJoinCount(Long kid, Integer userNum);
 }

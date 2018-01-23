@@ -33,6 +33,7 @@ import java.util.List;
  */
 @Api(description = "用户关系接口")
 @RestController
+@RequestMapping(value="services/app")
 public class UserRelationController {
 
     @Reference(check = false)
@@ -172,7 +173,8 @@ public class UserRelationController {
             List<UserRelationDto> dtoList = rpc.getData().getEntities();
             for(int i = 0 ; i < dtoList.size() ; i++){
                 UserRelationQueryVo vo = new UserRelationQueryVo();
-                BeanUtils.copyProperties(dtoList.get(i),vo);
+                UserRelationDto _dto = dtoList.get(i);
+                BeanUtils.copyProperties(_dto,vo);
                 voList.add(vo);
             }
 

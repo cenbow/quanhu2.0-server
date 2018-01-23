@@ -222,6 +222,7 @@ public class AccountProvider implements AccountApi {
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
 
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
+			logger.info("thirdLoginService.selectByThirdId result: {}", GsonUtils.parseJson(login));
 			Long userId = null;
 			// 已存在账户直接登录
 			if (login != null) {
@@ -236,10 +237,8 @@ public class AccountProvider implements AccountApi {
 			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId.toString(), header);
 			logger.info("loginThird result: {}", JSON.toJSONString(registerLoginVO));
 			return ResponseUtils.returnObjectSuccess(registerLoginVO);
-		} catch (QuanhuException e) {
-			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-			logger.error("第三方登录未知异常", e);
+			logger.error("loginThird error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}
@@ -831,6 +830,8 @@ public class AccountProvider implements AccountApi {
 		if (thirdUser == null || StringUtils.isBlank(thirdUser.getThirdId())) {
 			throw QuanhuException.busiError("认证失败，thirdUser or thirdId is null !");
 		}
+		logger.info("getThirdUser result: {}", GsonUtils.parseJson(thirdUser));
+
 		return thirdUser;
 	}
 
@@ -985,6 +986,7 @@ public class AccountProvider implements AccountApi {
 	@Override
 	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
 		try {
+			logger.info("sendVerifyCode request codeDTO: {}", GsonUtils.parseJson(codeDTO));
 			checkCodeDTO(codeDTO);
 			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO));
 		} catch (QuanhuException e) {

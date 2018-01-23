@@ -11,8 +11,7 @@
         select
         <include refid="Base_Column_List"/>
         from qh_activity_vote_detail
-        where del_flag = 0
-		and kid = #{kid,jdbcType=BIGINT}
+        where kid = #{kid,jdbcType=BIGINT}
     </select>
     
     <!-- 删除ActivityVoteDetail-->
@@ -215,5 +214,35 @@
         </set>
         where kid = #{kid,jdbcType=BIGINT}
     </update>
+
+	<!-- 投票活动列表 -->
+	<select id="selectVoteList" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_vote_detail
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+		and shelve_flag = 10
+	</select>
+
+	<!-- 批量获取投票活动 -->
+	<select id="batchVote" parameterType="java.util.List" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_vote_detail
+		where kid in
+		<foreach collection="list" open="(" separator="," close=")" item="item">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 统计用户是否参与此活动 -->
+	<select id="selectCandidateCount" resultType="int">
+		select count(1)
+		from qh_activity_vote_detail
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+		<if test="createUserId != null">
+			and create_user_id = #{createUserId,jdbcType=BIGINT}
+		</if>
+	</select>
 
 </mapper>

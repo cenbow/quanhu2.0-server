@@ -1,7 +1,5 @@
 package com.yryz.quanhu.user.contants;
 
-import org.springframework.security.access.method.P;
-
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
@@ -76,6 +74,10 @@ public final class UserRelationConstant {
 
         STATUS(int code) {
             this.code = code;
+        }
+
+        public int getCode() {
+            return code;
         }
 
         public static STATUS get(int code){

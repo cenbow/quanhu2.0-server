@@ -1,7 +1,6 @@
 package com.yryz.quanhu.user.service;
 
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
@@ -26,7 +25,7 @@ public interface UserRelationService{
 
     public PageList<UserRelationDto> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status);
 
-    public List<UserRelationDto> selectBy(String sourceUserId, String[] targetUserIds);
+    public List<UserRelationDto> selectBy(String sourceUserId, Set<String> targetUserIds);
 
     public Set<String> selectBy(String sourceUserId, UserRelationConstant.STATUS status);
 

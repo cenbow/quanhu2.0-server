@@ -239,4 +239,12 @@
         where kid = #{kid,jdbcType=BIGINT}
     </update>
 
+	<!-- 查询ActivityVoteConfig详情 -->
+	<select id="selectByActivityInfoId" resultType="com.yryz.quanhu.support.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_vote_config
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+	</select>
+
 </mapper>

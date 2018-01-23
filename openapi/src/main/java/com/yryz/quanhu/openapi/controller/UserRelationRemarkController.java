@@ -29,9 +29,10 @@ import java.util.List;
  */
 @Api(description = "用户关系-备注名接口")
 @RestController
+@RequestMapping(value="services/app")
 public class UserRelationRemarkController {
 
-    @Reference(check = false)
+    @Reference(check = false,retries = 0)
     private UserRelationRemarkApi userRelationRemarkApi;
 
     /**
