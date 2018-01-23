@@ -273,7 +273,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
 
         // 更新主表的当前报名人人数信息
         activityInfo.setJoinCount(activityInfo.getJoinCount() + 1);
-        activityInfoService.updateJoinCount(activityInfo);
+        activityInfoService.updateJoinCount(activityInfo.getKid(),activityEnrolConfig.getEnrolUpper());
         return activityRecord;
     }
     public String replaceIllagelWordsEnrolSources(String text) {
