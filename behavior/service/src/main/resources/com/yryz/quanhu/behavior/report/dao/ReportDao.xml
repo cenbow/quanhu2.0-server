@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yryz.quanhu.behavior.dao.ReportDao">
-    <resultMap id="BaseReportResultMap" type="com.yryz.quanhu.behavior.entity.Report">
+<mapper namespace="com.yryz.quanhu.behavior.report.dao.ReportDao">
+    <resultMap id="BaseReportResultMap" type="com.yryz.quanhu.behavior.report.entity.Report">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="kid" property="kid" jdbcType="BIGINT"/>
         <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
@@ -21,7 +21,7 @@
         id, kid, module_enum,resource_id,inform_type,inform_desc,inform_status, report_user_id,be_report_user_id,dispose_time,create_date,last_update_user_id,last_update_date
     </sql>
 
-    <select id="queryReportForAdmin" parameterType="com.yryz.quanhu.behavior.dto.ReportDTO"
+    <select id="queryReportForAdmin" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO"
             resultMap="BaseReportResultMap">
         SELECT
         <include refid="Base_Report_Column_List"/>
@@ -48,7 +48,7 @@
         </where>
     </select>
 
-    <insert id="accretion" parameterType="com.yryz.quanhu.behavior.entity.Report">
+    <insert id="accretion" parameterType="com.yryz.quanhu.behavior.report.entity.Report">
         insert into qh_inform
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="kid != null">
@@ -122,7 +122,7 @@
         </trim>
     </insert>
 
-    <select id="querySingleReport" parameterType="com.yryz.quanhu.behavior.entity.Report"
+    <select id="querySingleReport" parameterType="com.yryz.quanhu.behavior.report.entity.Report"
             resultMap="BaseReportResultMap">
         SELECT
         <include refid="Base_Report_Column_List"/>

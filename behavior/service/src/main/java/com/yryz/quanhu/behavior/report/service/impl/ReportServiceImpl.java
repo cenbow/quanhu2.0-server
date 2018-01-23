@@ -1,11 +1,11 @@
-package com.yryz.quanhu.behavior.service.impl;
+package com.yryz.quanhu.behavior.report.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
-import com.yryz.quanhu.behavior.dao.ReportDao;
-import com.yryz.quanhu.behavior.dto.ReportDTO;
-import com.yryz.quanhu.behavior.entity.Report;
-import com.yryz.quanhu.behavior.service.ReportService;
+import com.yryz.quanhu.behavior.report.dao.ReportDao;
+import com.yryz.quanhu.behavior.report.dto.ReportDTO;
+import com.yryz.quanhu.behavior.report.entity.Report;
+import com.yryz.quanhu.behavior.report.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.yryz.quanhu.behavior.entity;
+package com.yryz.quanhu.behavior.report.entity;
 
 import com.yryz.common.entity.GenericEntity;
 

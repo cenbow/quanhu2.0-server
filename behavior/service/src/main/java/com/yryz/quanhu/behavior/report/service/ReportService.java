@@ -1,10 +1,8 @@
-package com.yryz.quanhu.behavior.service;
+package com.yryz.quanhu.behavior.report.service;
 
 import com.yryz.common.response.PageList;
-import com.yryz.quanhu.behavior.dto.ReportDTO;
-import com.yryz.quanhu.behavior.entity.Report;
-
-import java.util.List;
+import com.yryz.quanhu.behavior.report.dto.ReportDTO;
+import com.yryz.quanhu.behavior.report.entity.Report;
 
 /**
  * @Author:sun

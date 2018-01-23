@@ -1,4 +1,4 @@
-package com.yryz.quanhu.behavior.contants;
+package com.yryz.quanhu.behavior.report.contants;
 
 /**
  * @Author:sun

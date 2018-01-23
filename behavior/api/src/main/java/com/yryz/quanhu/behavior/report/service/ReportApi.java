@@ -1,9 +1,7 @@
-package com.yryz.quanhu.behavior.service;
+package com.yryz.quanhu.behavior.report.service;
 
-import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.behavior.dto.ReportDTO;
-import com.yryz.quanhu.behavior.entity.Report;
+import com.yryz.quanhu.behavior.report.entity.Report;
 
 import java.util.Map;
 
@@ -22,5 +20,5 @@ public interface ReportApi {
      **/
     Response<Map<String,Integer>> accretion(Report report);
 
-    Response<PageList<Report>>  queryReportForAdmin(ReportDTO reportDTO);
+
 }

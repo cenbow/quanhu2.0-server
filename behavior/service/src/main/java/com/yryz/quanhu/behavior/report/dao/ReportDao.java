@@ -1,7 +1,7 @@
-package com.yryz.quanhu.behavior.dao;
+package com.yryz.quanhu.behavior.report.dao;
 
-import com.yryz.quanhu.behavior.dto.ReportDTO;
-import com.yryz.quanhu.behavior.entity.Report;
+import com.yryz.quanhu.behavior.report.dto.ReportDTO;
+import com.yryz.quanhu.behavior.report.entity.Report;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

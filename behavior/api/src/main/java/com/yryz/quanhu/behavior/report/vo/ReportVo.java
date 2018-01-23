@@ -1,4 +1,4 @@
-package com.yryz.quanhu.behavior.vo;
+package com.yryz.quanhu.behavior.report.vo;
 
 
 /**

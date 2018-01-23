@@ -1,4 +1,4 @@
-package com.yryz.quanhu.behavior.dto;
+package com.yryz.quanhu.behavior.report.dto;
 
 import com.yryz.common.response.PageList;
 
