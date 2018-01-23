@@ -986,6 +986,7 @@ public class AccountProvider implements AccountApi {
 	@Override
 	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
 		try {
+			logger.info("sendVerifyCode request codeDTO: {}", GsonUtils.parseJson(codeDTO));
 			checkCodeDTO(codeDTO);
 			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO));
 		} catch (QuanhuException e) {
