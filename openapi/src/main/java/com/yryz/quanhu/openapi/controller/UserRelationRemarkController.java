@@ -31,7 +31,7 @@ import java.util.List;
 @RestController
 public class UserRelationRemarkController {
 
-    @Reference(check = false)
+    @Reference(check = false,retries = 0)
     private UserRelationRemarkApi userRelationRemarkApi;
 
     /**
