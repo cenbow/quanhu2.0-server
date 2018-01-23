@@ -49,7 +49,7 @@ public class CoterieController {
 
 	@ApiOperation("发布私圈")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/coterieInfo/single")
+	@GetMapping(value = "/{version}/coterieInfo/create")
 	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
@@ -63,7 +63,7 @@ public class CoterieController {
 	
 	@ApiOperation("设置私圈， 更新圈子的数据")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/coterieInfo/config")
+	@PostMapping (value = "/{version}/coterieInfo/config")
 	public Response<Boolean> config(String coterieId, @RequestBody CoterieInfo config, HttpServletRequest request) {
 		Response<CoterieInfo> rpcRecord = coterieApi.queryCoterieInfo(coterieId);
 		CoterieInfo  record=rpcRecord.getData();
@@ -113,7 +113,7 @@ public class CoterieController {
 	 */
 	@ApiOperation("获取私圈详情")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/coterieInfo/single")
+	@GetMapping(value = "/{version}/coterieInfo/single")
 	public Response<CoterieInfo> details(String coterieId, HttpServletRequest request) {
 		//Assert.notNull(coterieId, "私圈id不能为null！");
 		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
@@ -136,8 +136,8 @@ public class CoterieController {
 	 * @return
 	 */
 	@ApiOperation("获取我创建的私圈详情")
-	@PostMapping(value = "/{version}/coterieInfo/creator")
-	@Deprecated
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/coterieInfo/creator")
 	public Response<List<CoterieInfo>> getMyCreateCoterie(HttpServletRequest request) {
 
 		RequestHeader header = WebUtil.getHeader(request);
@@ -150,8 +150,8 @@ public class CoterieController {
 	 * @return
 	 */
 	@ApiOperation("获取我加入的私圈详情")
-	@PostMapping(value = "/{version}/coterieInfo/list/join")
-	@Deprecated
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/coterieInfo/list/join")
 	public Response<List<CoterieInfo>> getMyJoinCoterie(HttpServletRequest request) {
 
 		RequestHeader header = WebUtil.getHeader(request);
@@ -163,8 +163,8 @@ public class CoterieController {
  * @return
  */
  @ApiOperation("分页获取私圈列表")
- @PostMapping(value = "/{version}/coterieInfo/list/")
- @Deprecated
+ @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+ @GetMapping(value = "/{version}/coterieInfo/list/")
   public Response<List<CoterieInfo>> queryPage(Integer currentPage, Integer pageSize, HttpServletRequest request){
 			return coterieApi.queryPage(  currentPage,   pageSize);
   }
@@ -174,11 +174,10 @@ public class CoterieController {
 	 * @return
 	 */
 	@ApiOperation("获取热门私圈 ")
-	@PostMapping(value = "/{version}/coterieInfo/list/recommend")
-	@Deprecated
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/coterieInfo/list/recommend")
 	public Response<List<CoterieInfo>> getRecommendCoterie(Integer currentPage, Integer pageSize, HttpServletRequest request)
 	{
-
        return coterieApi.queryPageForApp(currentPage,pageSize);
 	}
 
