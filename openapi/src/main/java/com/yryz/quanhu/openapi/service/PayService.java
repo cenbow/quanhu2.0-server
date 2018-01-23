@@ -90,6 +90,7 @@ public class PayService {
 				return null;
 			}
 		} catch (Exception e) {
+			logger.info("调用IDRPC失败",e);
 			throw new RpcOptException("IDRPC，getOrderId调用异常", e.getCause());
 		}
 	}

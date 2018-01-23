@@ -37,6 +37,7 @@ import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.order.dto.BindBankCardDTO;
 import com.yryz.quanhu.openapi.order.dto.ExecuteOrderDTO;
 import com.yryz.quanhu.openapi.order.dto.FindPayPasswordDTO;
 import com.yryz.quanhu.openapi.order.dto.FreePayDTO;
@@ -157,28 +158,28 @@ public class OrderController {
 		if (StringUtils.isBlank(findPayPasswordDTO.getUserId()) || StringUtils.isBlank(findPayPasswordDTO.getVeriCode())) {
 			return ResponseUtils.returnCommonException("please check paramter: custId | veriCode");
 		}
-		if (StringUtils.isBlank(findPayPasswordDTO.getPhyName()) || StringUtils.isBlank(findPayPasswordDTO.getCustIdcardNo())) {
-			return ResponseUtils.returnCommonException("please check paramter: phyName | phyCardNo");
-		}
+//		if (StringUtils.isBlank(findPayPasswordDTO.getPhyName()) || StringUtils.isBlank(findPayPasswordDTO.getCustIdcardNo())) {
+//			return ResponseUtils.returnCommonException("please check paramter: phyName | phyCardNo");
+//		}
 
 		try {
 			String phone = findPayPasswordDTO.getPhone();
-			if(StringUtils.isEmpty(phone)){
-				Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(findPayPasswordDTO.getUserId());
-				UserLoginSimpleVO userBase = response.success() ? response.getData() : null;
-				if(userBase == null || StringUtils.isEmpty(userBase.getUserPhone())){
-					return ResponseUtils.returnCommonException("当前用户不存在或者没有绑定手机号码");
-				}
-				phone = userBase.getUserPhone();
-			}
-			
-
-			Response<Integer> checkCode = this.commonSafeApi.checkVerifyCode(new VerifyCodeDTO(SmsType.CODE_CHANGE_PAYPWD.getType(),
-					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, header.getAppId(),
-					findPayPasswordDTO.getVeriCode(), false));
-			if (!checkCode.success() || checkCode.getData() != 0 ) {
-				return ResponseUtils.returnCommonException("短信码错误");
-			}
+//			if(StringUtils.isEmpty(phone)){
+//				Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(findPayPasswordDTO.getUserId());
+//				UserLoginSimpleVO userBase = response.success() ? response.getData() : null;
+//				if(userBase == null || StringUtils.isEmpty(userBase.getUserPhone())){
+//					return ResponseUtils.returnCommonException("当前用户不存在或者没有绑定手机号码");
+//				}
+//				phone = userBase.getUserPhone();
+//			}
+//			
+//
+//			Response<Integer> checkCode = this.commonSafeApi.checkVerifyCode(new VerifyCodeDTO(SmsType.CODE_CHANGE_PAYPWD.getType(),
+//					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, header.getAppId(),
+//					findPayPasswordDTO.getVeriCode(), false));
+//			if (!checkCode.success() || checkCode.getData() != 0 ) {
+//				return ResponseUtils.returnCommonException("短信码错误");
+//			}
 			//重置支付密码
 			UserPhy userPhy = new UserPhy();
 			userPhy.setCustId(findPayPasswordDTO.getUserId());
@@ -186,6 +187,7 @@ public class OrderController {
 			orderApi.dealUserPhy(userPhy);
 			//设置新密码
 			userPhy = new UserPhy();
+			userPhy.setCustId(findPayPasswordDTO.getUserId());
 			userPhy.setPayPassword(findPayPasswordDTO.getPayPassword());
 			orderApi.dealUserPhy(userPhy);
 		} catch (Exception e) {
@@ -377,8 +379,12 @@ public class OrderController {
     @ApiOperation("绑定银行卡")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/bindBankCard")
-	public Response<?> bindBankCard(String custId, String bankCardNo, String fastPay, String phone, String bankCardType,
-			String name, String bankCode, String no_agree, String password) {
+	public Response<?> bindBankCard( @RequestBody BindBankCardDTO bindBankCardDTO , HttpServletRequest request ) {
+    	String custId = bindBankCardDTO.getCustId();
+    	String bankCardNo = bindBankCardDTO.getBankCardNo();
+    	String name = bindBankCardDTO.getName();
+    	String bankCode = bindBankCardDTO.getBankCode();
+    	
 		if (StringUtils.isEmpty(custId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
@@ -393,13 +399,10 @@ public class OrderController {
 
 		UserBankDTO userBankDTO = new UserBankDTO();
 		userBankDTO.setBankCardNo(bankCardNo.trim());
-		// orderCust2bank.setBankCardType(Integer.parseInt(bankCardType));
 		userBankDTO.setBankCode(bankCode.trim());
 		userBankDTO.setCreateBy(custId);
 		userBankDTO.setCustId(custId);
 		userBankDTO.setName(name.trim());
-		// orderCust2bank.setPhone(phone);
-		// orderCust2bank.setNoAgree(no_agree);
 		try {
 			UserBankDTO cust2bank = payService.bindbankcard(userBankDTO);
 			if (cust2bank != null) {
