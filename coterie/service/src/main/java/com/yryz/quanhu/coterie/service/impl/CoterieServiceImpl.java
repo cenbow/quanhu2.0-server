@@ -12,9 +12,10 @@ import com.yryz.quanhu.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.until.IdUtils;
 import com.yryz.quanhu.coterie.until.QrUtils;
 import com.yryz.quanhu.coterie.vo.CoterieAdmin;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -32,14 +33,14 @@ import java.util.List;
  */
 @Service
 public class CoterieServiceImpl implements CoterieService {
-	@Resource
+	@Autowired
 	private CoterieMapper coterieMapper;
 
-	@Resource
+	//@Resource
 	//private CoterieAuditRecordMapper coterieAuditRecordMapper;
 
 	@Override
-	public CoterieInfo save(CoterieBaseInfo info) {
+	public CoterieInfo save(CoterieBasicInfo info) {
 		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
 		coterie.setCoterieId(IdUtils.randomappId());
 		String qrUrl= QrUtils.createQr("",coterie.getCoterieId());

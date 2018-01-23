@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
+import com.yryz.common.utils.GsonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -200,6 +202,7 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<List<String>> getUserIdByParams(AdminUserInfoDTO custInfoDTO) {
 		try {
+			logger.info("getUserIdByParams custInfoDTO: {}", GsonUtils.parseJson(custInfoDTO));
 			List<String> list = userService.getUserIdByParams(custInfoDTO);
 			return ResponseUtils.returnObjectSuccess(list);
 		} catch (QuanhuException e) {
@@ -245,6 +248,7 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<Boolean> updateUserInfo(UpdateBaseInfoDTO infoDTO) {
 		try {
+			logger.info("updateUserInfo infoDTO: {}", GsonUtils.parseJson(infoDTO));
 			if(infoDTO == null || StringUtils.isBlank(infoDTO.getUserId())){
 				throw QuanhuException.busiError("用户id不能为空");
 			}
@@ -260,7 +264,7 @@ public class UserProvider implements UserApi{
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-			logger.error("用户信息更新异常", e);
+			logger.error("updateUserInfo error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}

@@ -3,7 +3,7 @@
 <mapper namespace="com.yryz.quanhu.coterie.dao.CoterieMapper" >
   <resultMap id="BaseResultMap" type="com.yryz.service.circle.modules.coterie.entity.Coterie" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="coterie_id" property="coterieId" jdbcType="CHAR" />
+    <result column="kid" property="coterieId" jdbcType="CHAR" />
     <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
     <result column="owner_name" property="ownerName" jdbcType="VARCHAR" />
     <result column="owner_intro" property="ownerIntro" jdbcType="VARCHAR" />
@@ -26,12 +26,12 @@
     <result column="last_info_time" property="lastInfoTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, coterie_id, owner_id,  owner_name, owner_intro, icon, coterie_name, intro,
+    id, kid, owner_id,  owner_name, owner_intro, icon, coterie_name, intro,
     qr_url, join_fee, consulting_fee, join_check, member_num, state, create_date, last_update_date,
     process_time, deleted,heat,is_expert,recommend,last_info_time
   </sql>
   <insert id="insert" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
-    insert into qh_coterie (id, coterie_id, owner_id,
+    insert into qh_coterie (id, kid, owner_id,
        owner_name, owner_intro,
       icon, coterie_name, intro,
       qr_url, join_fee, consulting_fee, 
@@ -53,7 +53,7 @@
         id,
       </if>
       <if test="coterieId != null" >
-        coterie_id,
+        kid,
       </if>
       <if test="ownerId != null" >
         owner_id,
@@ -192,7 +192,7 @@
     update qh_coterie
     <set >
       <if test="coterieId != null" >
-        coterie_id = #{coterieId,jdbcType=CHAR},
+        kid = #{coterieId,jdbcType=CHAR},
       </if>
       <if test="ownerId != null" >
         owner_id = #{ownerId,jdbcType=VARCHAR},
@@ -257,11 +257,11 @@
         last_info_time = #{lastInfoTime},
       </if>
     </set>
-    where coterie_id = #{coterieId,jdbcType=CHAR}
+    where kid = #{coterieId,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
     update qh_coterie
-    set coterie_id = #{coterieId,jdbcType=CHAR},
+    set kid = #{coterieId,jdbcType=CHAR},
       owner_id = #{ownerId,jdbcType=VARCHAR},
       owner_name = #{ownerName,jdbcType=VARCHAR},
       owner_intro = #{ownerIntro,jdbcType=VARCHAR},
@@ -289,7 +289,7 @@
     update coterie
     set member_num = #{newMemberNum,jdbcType=INTEGER},
       last_update_date = now()
-    where coterie_id = #{coterieId,jdbcType=CHAR} and member_num=#{oldMemberNum}
+    where kid = #{coterieId,jdbcType=CHAR} and member_num=#{oldMemberNum}
   </update>
   
   <update id="updateExpert">
@@ -301,7 +301,7 @@
   <update id="updateRecommend">
     update qh_coterie
     set recommend = #{recommend}
-    where coterie_id in 
+    where kid in
     <foreach item="item" index="index" collection="coterieIdList" open="("
 			separator="," close=")">
 			#{item}
@@ -312,14 +312,14 @@
     select 
     <include refid="Base_Column_List" />
     from qh_coterie
-    where coterie_id = #{coterieId}
+    where kid = #{coterieId}
   </select>
   
   <select id="selectListByCoterieIdList" resultMap="BaseResultMap" parameterType="java.util.List" >
     select 
     <include refid="Base_Column_List" />
     from qh_coterie
-    where coterie_id in 
+    where kid in
     <foreach item="item" index="index" collection="coterieIdList" open="("
 			separator="," close=")">
 			#{item}
@@ -340,7 +340,7 @@
     from qh_coterie
     <where>
 	      <if test="coterieId != null" >
-	        coterie_id = #{coterieId,jdbcType=CHAR},
+            kid = #{coterieId,jdbcType=CHAR},
 	      </if>
 	      <if test="ownerId != null" >
 	        owner_id = #{ownerId,jdbcType=VARCHAR},
@@ -443,7 +443,7 @@
   <select id="selectMyJoinCoterie" resultMap="BaseResultMap">
     SELECT c.* 
     FROM `qh_coterie` c, `qh_coterie_member` m
-    WHERE c.coterie_id=m.coterie_id 
+    WHERE c.kid=m.coterie_id
     AND c.state=3
     AND m.user_id=#{custId}
     ORDER BY m.create_date DESC
@@ -452,7 +452,7 @@
   <select id="selectMyJoinCoteriePage" resultMap="BaseResultMap">
     SELECT c.* 
     FROM `qh_coterie` c, `qh_coterie_member` m
-    WHERE c.coterie_id=m.coterie_id 
+    WHERE c.kid=m.coterie_id
     AND c.state=3
     AND m.user_id=#{custId}
     ORDER BY m.create_date DESC
@@ -462,7 +462,7 @@
   <select id="selectMyJoinCoterieCount" resultType="java.lang.Integer">
     SELECT count(*) 
     FROM `qh_coterie` c, `qh_coterie_member` m
-    WHERE c.coterie_id=m.coterie_id 
+    WHERE c.kid=m.coterie_id
     AND c.state=3
     AND m.user_id=#{custId}
   </select>
@@ -502,7 +502,7 @@
 	  s.consulting_fee consultingFee,
 	  s.owner_id ownerId,
 	  s.intro,
-	  s.coterie_id coterieId,
+	  s.kid coterieId,
 	  s.join_check joinCheck,
 	  s.status,
 	  s.recommend,
@@ -520,7 +520,7 @@
 	<if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
 	<if test="recommend !=null"> AND s.recommend = #{recommend}</if>
 	<if test="coterieIdList !=null"> 
-		AND s.coterie_id in 
+		AND s.kid in
 		<foreach item="item" index="index" collection="coterieIdList" open="("
 			separator="," close=")">
 			#{item}
@@ -539,7 +539,7 @@
 	<if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
 	<if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
 	<if test="coterieIdList !=null"> 
-		AND s.coterie_id in 
+		AND s.kid in
 		<foreach item="item" index="index" collection="coterieIdList" open="("
 			separator="," close=")">
 			#{item}
@@ -585,7 +585,7 @@
   
   <select id="selectCircleIdListByOwnerId" resultType="java.lang.String">
     select  DISTINCT 
-    coterie_id
+    kid
     from qh_coterie
     WHERE owner_id=#{ownerId} and (state = 3 or state = 0)
   </select>

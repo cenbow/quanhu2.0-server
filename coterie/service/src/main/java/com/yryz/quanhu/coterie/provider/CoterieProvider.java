@@ -17,7 +17,7 @@ import com.yryz.quanhu.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.until.ImageUtils;
 import com.yryz.quanhu.coterie.until.ZxingHandler;
 import com.yryz.quanhu.coterie.vo.CoterieAuditInfo;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
@@ -28,6 +28,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -49,7 +50,7 @@ public class CoterieProvider implements CoterieApi {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	//todo
 	private static final FrontendConfig frontendUrl = new FrontendConfig();
-	@Resource
+	@Autowired
 	private CoterieService coterieService;
 
 	 @Reference
@@ -191,7 +192,7 @@ public class CoterieProvider implements CoterieApi {
 	 * @throws ServiceException
 	 */
 	@Override
-	public Response<CoterieInfo> applyCreate(CoterieBaseInfo info) {
+	public Response<CoterieInfo> applyCreate(CoterieBasicInfo info) {
 		logger.info("CoterieApi.applyCreate params:" + info);
 		checkApplyCreateParam(info);
 		try {
@@ -207,7 +208,7 @@ public class CoterieProvider implements CoterieApi {
 		}
 	}
 
-	private void checkApplyCreateParam(CoterieBaseInfo info) {
+	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
 			throw ServiceException.paramsError();
 		}
@@ -223,9 +224,6 @@ public class CoterieProvider implements CoterieApi {
 		}
 		if (StringUtils.isEmpty(info.getOwnerId())) {
 			throw ServiceException.paramsError("ownerId");
-		}
-		if (StringUtils.isEmpty(info.getOwnerIntro())) {
-			throw ServiceException.paramsError("ownerIntro");
 		}
 		if (info.getJoinFee()!=null && info.getJoinFee()<100 && info.getJoinFee()>0) {//私圈单位为分，0表示免费，小于100的  单位必定错误
 			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "加入私圈金额设置不正确。");

@@ -13,5 +13,6 @@
         <module>api</module>
         <module>service</module>
     <module>order-sdk</module>
+    <module>order-pay-sdk</module>
   </modules>
 </project>
