@@ -5,5 +5,5 @@ import java.util.List;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVO;
 
 public interface ElasticsearchService {
-	List<UserSimpleVO> searchUser(String keyWord);
+	List<UserSimpleVO> searchUser(String keyWord,Integer page,Integer size);
 }

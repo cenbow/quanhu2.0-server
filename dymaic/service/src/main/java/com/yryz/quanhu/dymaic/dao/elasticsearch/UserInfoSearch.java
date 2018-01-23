@@ -13,5 +13,5 @@ import com.yryz.quanhu.dymaic.vo.UserSimpleVO;
  *
  */
 public interface UserInfoSearch {
-	List<UserInfo> search(String keyWord);
+	List<UserInfo> search(String keyWord,Integer page,Integer size);
 }
