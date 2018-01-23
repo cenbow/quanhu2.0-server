@@ -325,7 +325,7 @@
   	]]>
 		</if>
 	</select>
-	<update id="updateJoinCount" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo" >
+	<update id="updateJoinCount">
 		update qh_activity_info set last_update_date = NOW()
 		<if test="joinCount != null" >
 			,join_count = join_count + 1
