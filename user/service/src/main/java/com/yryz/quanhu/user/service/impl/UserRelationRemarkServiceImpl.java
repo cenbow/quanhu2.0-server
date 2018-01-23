@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
 
-    private static final String TABLE_NAME = "user_relation_remark";
+    private static final String TABLE_NAME = "qh_user_relation_remark";
 
     @Autowired
     private UserRelationRemarkDao userRelationRemarkDao;
@@ -60,9 +60,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
                 dbRemarkDto.setTargetUserId(targetUserId);
                 dbRemarkDto.setCreateUserId(Long.parseLong(sourceUserId));
                 dbRemarkDto.setRemarkType(remarkDto.getRemarkType());
-//                dbRemarkDto.setKid(idAPI.getKid(TABLE_NAME).getData());
-
-                dbRemarkDto.setKid(System.currentTimeMillis());
+                dbRemarkDto.setKid(idAPI.getKid(TABLE_NAME).getData());
             }else {
                 dbRemarkDto.setNewRecord(false);
             }

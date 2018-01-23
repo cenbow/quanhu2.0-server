@@ -84,7 +84,7 @@ public class UserRelationProvider implements UserRelationApi{
     }
 
     @Override
-    public Response<List<UserRelationDto>> selectBy(String userSourceKid, String[] userTargetKids) {
+    public Response<List<UserRelationDto>> selectBy(String userSourceKid, Set<String> userTargetKids) {
         try {
             logger.info("selectBy={}/{} start",userSourceKid,userTargetKids);
             return ResponseUtils.returnObjectSuccess(userRelationService.selectBy(userSourceKid,userTargetKids));

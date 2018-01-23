@@ -78,6 +78,10 @@ public final class UserRelationConstant {
             this.code = code;
         }
 
+        public int getCode() {
+            return code;
+        }
+
         public static STATUS get(int code){
             if(1 == code){
                 return FANS;
