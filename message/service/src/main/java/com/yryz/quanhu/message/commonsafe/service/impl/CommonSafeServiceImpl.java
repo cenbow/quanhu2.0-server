@@ -131,42 +131,6 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	}
 
 	@Override
-	public Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
-
-		VerifyCodeVO verifyCodeVO = new VerifyCodeVO();
-		if (!checkSmsSlipCode(verifyCodeDTO, afsCheckReq)) {
-			if (afsCheckReq == null) {
-				verifyCodeVO.setIsSendViewCode("1");
-				return ResponseUtils.returnObjectSuccess(verifyCodeVO);
-			}
-			return ResponseUtils.returnCommonException("验证码不通过");
-		}
-        /*if (org.apache.commons.lang.StringUtils.isBlank(code)) {
-            return ReturnModel.returnException(ReturnCode.ERROR, "please checkparamter: code");
-        }
-        if (!(Integer.valueOf(type) > 0 && Integer.valueOf(type) < 3)) {
-            return ReturnModel.returnException(ReturnCode.ERROR, "type must 1 or 2");
-        }
-        if (!org.apache.commons.lang.StringUtils.isEmpty(code) && !(Integer.valueOf(code) > 0 && Integer.valueOf(code) < 11)) {
-            return ReturnModel.returnException(ReturnCode.ERROR, "code must 1、2、3、4、5、6、7、8、9、10");
-        }*/
-		try {
-            /*if (!rrzMessageService.checkIpSendVerifyCodeLimit(request)) {
-                return ReturnModel.returnException("验证码发送失败");
-            }*/
-			VerifyCodeVO verifyCode = this.getVerifyCode(verifyCodeDTO);
-			if (verifyCode == null) {
-				verifyCode = new VerifyCodeVO();
-			}
-			return ResponseUtils.returnObjectSuccess(verifyCode);
-		} catch (Exception e) {
-			Logger.error("sendVerifyCodeForSlip error", e);
-			return ResponseUtils.returnException(e);
-		}
-//        rrzMessageService.saveIpSendVerifyCodeCount(request);
-	}
-
-	@Override
 	public String getImgVerifyCode(VerifyCodeDTO codeDTO) {
 		String code = CommonUtils.getRandomStr(configVO.getCodeNum());
 		redisDao.saveImgCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), code, configVO);

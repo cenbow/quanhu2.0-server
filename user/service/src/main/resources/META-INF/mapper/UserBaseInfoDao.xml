@@ -364,9 +364,6 @@
   <update id="update" parameterType="com.yryz.quanhu.user.entity.UserBaseInfo">
     update qh_user_baseinfo
     <set>
-      <if test="appId != null">
-        app_id = #{appId,jdbcType=VARCHAR},
-      </if>
       <if test="userNickName != null">
         user_nick_name = #{userNickName,jdbcType=VARCHAR},
       </if>
