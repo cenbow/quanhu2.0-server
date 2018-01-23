@@ -3,6 +3,7 @@ package com.yryz.quanhu.support.activity.dao;
 import com.yryz.quanhu.support.activity.entity.ActivityInfo;
 import com.yryz.quanhu.support.activity.vo.ActivityInfoAppListVo;
 import com.yryz.quanhu.support.activity.vo.ActivityInfoVo;
+import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,6 +22,8 @@ public interface ActivityInfoDao {
 
     ActivityInfoVo selectByKid(Long kid);
 
+    ActivityVoteInfoVo selectVoteByKid(Long kid);
+
     int delete(Long kid);
 
     void insert(ActivityInfo activityInfo);
@@ -35,5 +38,5 @@ public interface ActivityInfoDao {
 
     List<ActivityInfoAppListVo> selectAppList(@Param("type") Integer type);
 
-    void updateJoinCount(ActivityInfo activityInfo);
+    void updateJoinCount(@Param("kid") Long kid, @Param("userNum") Integer userNum);
 }

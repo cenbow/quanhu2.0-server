@@ -13,6 +13,13 @@
         from qh_activity_info
         where kid = #{kid,jdbcType=BIGINT}
     </select>
+
+	<select id="selectVoteByKid" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_info
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
     
     <!-- 删除ActivityInfo-->
     <delete id="delete" parameterType="java.lang.Long">
@@ -321,8 +328,9 @@
 	<update id="updateJoinCount" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo" >
 		update qh_activity_info set last_update_date = NOW()
 		<if test="joinCount != null" >
-			,join_count = #{joinCount,jdbcType=INTEGER}
+			,join_count = join_count + 1
 		</if>
 		where kid = #{kid,jdbcType=BIGINT}
+		and join_count &lt; #{userNum,jdbcType=BIGINT}
 	</update>
 </mapper>
