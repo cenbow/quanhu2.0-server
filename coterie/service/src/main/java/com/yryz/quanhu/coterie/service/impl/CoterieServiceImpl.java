@@ -1,30 +1,30 @@
 package com.yryz.quanhu.coterie.service.impl;
 
+import com.google.common.collect.Lists;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.coterie.common.CoterieConstant;
+import com.yryz.quanhu.coterie.dao.CoterieMapper;
+import com.yryz.quanhu.coterie.entity.Coterie;
+import com.yryz.quanhu.coterie.entity.CoterieAuditRecord;
+import com.yryz.quanhu.coterie.entity.CoterieSearch;
+import com.yryz.quanhu.coterie.exception.MysqlOptException;
+import com.yryz.quanhu.coterie.service.CoterieService;
+import com.yryz.quanhu.coterie.until.IdUtils;
+import com.yryz.quanhu.coterie.until.QrUtils;
+import com.yryz.quanhu.coterie.vo.CoterieAdmin;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Lists;
-import com.yryz.quanhu.coterie.common.CoterieConstant;
-import com.yryz.quanhu.coterie.exception.MysqlOptException;
-import com.yryz.quanhu.coterie.vo.CoterieAdmin;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
-import com.yryz.quanhu.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
 //import com.yryz.service.circle.modules.coterie.dao.persistence.CoterieAuditRecordMapper;
-import com.yryz.quanhu.coterie.dao.CoterieMapper;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.coterie.entity.Coterie;
-import com.yryz.quanhu.coterie.entity.CoterieAuditRecord;
-import com.yryz.quanhu.coterie.entity.CoterieSearch;
-import com.yryz.quanhu.coterie.service.CoterieService;
-import com.yryz.quanhu.coterie.until.IdUtils;
-import com.yryz.quanhu.coterie.until.QrUtils;
 
 /**
  * 私圈服务实现
@@ -33,15 +33,17 @@ import com.yryz.quanhu.coterie.until.QrUtils;
  */
 @Service
 public class CoterieServiceImpl implements CoterieService {
-
-	@Resource
+	@Autowired
 	private CoterieMapper coterieMapper;
 
+	//@Resource
+	//private CoterieAuditRecordMapper coterieAuditRecordMapper;
+
 	@Override
-	public CoterieInfo save(CoterieBaseInfo info) {
-		Coterie coterie=(Coterie)GsonUtils.parseObj(info, Coterie.class);
+	public CoterieInfo save(CoterieBasicInfo info) {
+		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
 		coterie.setCoterieId(IdUtils.randomappId());
-		String qrUrl=QrUtils.createQr(coterie.getCircleId(),coterie.getCoterieId());
+		String qrUrl= QrUtils.createQr("",coterie.getCoterieId());
 		coterie.setQrUrl(qrUrl);
 		coterie.setConsultingFee(0);
 		coterie.setCreateDate(new Date());
@@ -53,7 +55,7 @@ public class CoterieServiceImpl implements CoterieService {
 		coterie.setStatus(CoterieConstant.Status.WAIT.getStatus());
 		try{
 			coterieMapper.insertSelective(coterie);
-			return (CoterieInfo)GsonUtils.parseObj(coterie, CoterieInfo.class);
+			return (CoterieInfo) GsonUtils.parseObj(coterie, CoterieInfo.class);
 		}catch (Exception e) {
 			throw new MysqlOptException("param coterie:"+coterie,e);
 		}
@@ -61,7 +63,7 @@ public class CoterieServiceImpl implements CoterieService {
 
 	@Override
 	public void modify(CoterieInfo info) {
-		Coterie coterie=(Coterie)GsonUtils.parseObj(info, Coterie.class);
+		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
 		try{
 			coterieMapper.updateByCoterieIdSelective(coterie);
 		}catch (Exception e) {
@@ -89,7 +91,7 @@ public class CoterieServiceImpl implements CoterieService {
 		}catch (Exception e) {
 			throw new MysqlOptException("param coterieId:"+coterieId,e);
 		}
-		return (CoterieInfo)GsonUtils.parseObj(info, CoterieInfo.class);
+		return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 	}
 
 	@Override
@@ -100,7 +102,7 @@ public class CoterieServiceImpl implements CoterieService {
 		}catch (Exception e) {
 			throw new MysqlOptException("param status:"+status,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
@@ -111,20 +113,20 @@ public class CoterieServiceImpl implements CoterieService {
 		}catch (Exception e) {
 			throw new MysqlOptException("param coterie:"+coterie,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
-	public List<CoterieInfo> findPage(String circleId,Integer pageNum, Integer pageSize, Byte status) {
+	public List<CoterieInfo> findPage(Integer pageNum, Integer pageSize, Byte status) {
 		List<Coterie> list=Lists.newArrayList();
 		try{
 			Integer start=(pageNum-1)*pageSize;
-			list=coterieMapper.findPageByStatus(circleId,start, pageSize, status);
+			list=coterieMapper.findPageByStatus( start, pageSize, status);
 		}catch (Exception e) {
 			String msg="param pageNum:"+pageNum+"pageSize:"+pageSize+"status:"+status;
 			throw new MysqlOptException(msg,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
@@ -136,7 +138,7 @@ public class CoterieServiceImpl implements CoterieService {
 		}catch (Exception e) {
 			throw new MysqlOptException("param pageNum:"+pageNum+"pageSize:"+pageSize,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
@@ -147,29 +149,29 @@ public class CoterieServiceImpl implements CoterieService {
 		}catch (Exception e) {
 			throw new MysqlOptException("param coterieIdList:"+coterieIdList,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
-	public List<CoterieInfo> findMyCreateCoterie(String custId,String circleId) {
+	public List<CoterieInfo> findMyCreateCoterie(String custId ) {
 		List<Coterie> list=Lists.newArrayList();
 		try{
-			list=coterieMapper.selectMyCreateCoterie(custId,circleId);
+			list=coterieMapper.selectMyCreateCoterie(custId );
 		}catch (Exception e) {
 			throw new MysqlOptException("param custId:"+custId,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
-	public List<CoterieInfo> findMyJoinCoterie(String custId,String circleId) {
+	public List<CoterieInfo> findMyJoinCoterie(String custId ) {
 		List<Coterie> list=Lists.newArrayList();
 		try{
-			list=coterieMapper.selectMyJoinCoterie(custId,circleId);
+			list=coterieMapper.selectMyJoinCoterie(custId );
 		}catch (Exception e) {
 			throw new MysqlOptException("param custId:"+custId,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
@@ -180,14 +182,14 @@ public class CoterieServiceImpl implements CoterieService {
 		}catch (Exception e) {
 			throw new MysqlOptException("param name:"+name,e);
 		}
-		return (List<CoterieInfo>)GsonUtils.parseList(list, CoterieInfo.class);
+		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
 	public CoterieInfo find(String custId, String circleId) {
 		try{
 			Coterie info=coterieMapper.selectByCustIdAndCircleId(custId, circleId);
-			return (CoterieInfo)GsonUtils.parseObj(info, CoterieInfo.class);
+			return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 		}catch (Exception e) {
 			throw new MysqlOptException("find param custId:"+custId+",circleId:"+circleId,e);
 		}
@@ -196,18 +198,17 @@ public class CoterieServiceImpl implements CoterieService {
 	@Override
 	public void saveAuditRecord(CoterieAuditRecord record) {
 		try{
-		//	coterieAuditRecordMapper.insert(record);
+			//coterieAuditRecordMapper.insert(record);
 		}catch (Exception e) {
 			throw new MysqlOptException("param record:"+record,e);
 		}
 	}
 
 	@Override
-	public List<CoterieAuditRecord> findAuditRecordList(String coterieId,Integer pageNum, Integer pageSize) {
+	public List<CoterieAuditRecord> findAuditRecordList(String coterieId, Integer pageNum, Integer pageSize) {
 		try{
 			int start = (pageNum-1)*pageSize;
-			return null;
-			//return coterieAuditRecordMapper.selectPage(coterieId,start, pageSize);
+			return null;//coterieAuditRecordMapper.selectPage(coterieId,start, pageSize);
 		}catch (Exception e) {
 			throw new MysqlOptException("param pageNum:"+pageNum+",pageSize:"+pageSize,e);
 		}
@@ -216,7 +217,7 @@ public class CoterieServiceImpl implements CoterieService {
 	@Override
 	public List<CoterieAdmin> find(CoterieSearchParam param) {
 		try{
-			CoterieSearch searchParam=GsonUtils.parseObj(param, CoterieSearch.class);
+			CoterieSearch searchParam= GsonUtils.parseObj(param, CoterieSearch.class);
 			int start=(param.getPageNum()-1)*param.getPageSize();
 			searchParam.setStart(start);
 			List<Coterie> list=coterieMapper.selectBySearchParam(searchParam);
@@ -225,7 +226,6 @@ public class CoterieServiceImpl implements CoterieService {
 			for (int i = 0; i < list.size(); i++) {
 				Coterie c=list.get(i);
 				CoterieAdmin info=new CoterieAdmin();
-				info.setCircleId(c.getCircleId());
 				info.setConsultingFee(c.getConsultingFee());
 				info.setCoterieId(c.getCoterieId());
 				info.setCreateDate(c.getCreateDate());
@@ -259,7 +259,7 @@ public class CoterieServiceImpl implements CoterieService {
 	@Override
 	public Integer findCountBySearchParam(CoterieSearchParam param) {
 		try{
-			CoterieSearch searchParam=GsonUtils.parseObj(param, CoterieSearch.class);
+			CoterieSearch searchParam= GsonUtils.parseObj(param, CoterieSearch.class);
 			int start=(param.getPageNum()-1)*param.getPageSize();
 			searchParam.setStart(start);
 			return coterieMapper.selectCountBySearchParam(searchParam);
@@ -269,7 +269,7 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public List<CoterieInfo> findMyCreateCoterie(String custId, Integer pageNum, Integer pageSize,Integer status) {
+	public List<CoterieInfo> findMyCreateCoterie(String custId, Integer pageNum, Integer pageSize, Integer status) {
 		try{
 			int start=(pageNum-1)*pageSize;
 			List<Coterie> list=coterieMapper.selectMyCreateCoteriePage(custId, start, pageSize,status);
@@ -380,7 +380,7 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public List<CoterieInfo> getCoterieLikeName(String circleId,String name, Integer start, Integer pageSize) {
+	public List<CoterieInfo> getCoterieLikeName(String circleId, String name, Integer start, Integer pageSize) {
 		try{
 			List<Coterie> list=coterieMapper.selectLikeName(circleId,name, start, pageSize);
 			return GsonUtils.parseList(list, CoterieInfo.class);

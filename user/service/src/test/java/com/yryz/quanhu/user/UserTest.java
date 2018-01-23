@@ -109,10 +109,7 @@ public class UserTest {
 	
 	//@Test
 	public void loginByVerifyCode(){
-		LoginDTO loginDTO = new LoginDTO();
-		loginDTO.setPhone("16612345679");
-		//loginDTO.setPassword("a12345");
-		loginDTO.setVerifyCode("6421");
+		RegisterDTO registerDTO = new RegisterDTO();
 		RequestHeader header = new RequestHeader();
 		header.setAppId("vebff12m1762");
 		header.setAppVersion("2.0");
@@ -120,7 +117,20 @@ public class UserTest {
 		header.setDevName("HUAWEI");
 		header.setDevType("1");
 		header.setDitchCode("APP");
-		Response<RegisterLoginVO> response = accountApi.loginByVerifyCode(loginDTO, header);
+		registerDTO.setActivityChannelCode("quanhu-new");
+		registerDTO.setCityCode("431000");
+		registerDTO.setDeviceId("24456241457878");
+		registerDTO.setUserLocation("湖北 武汉");
+		registerDTO.setUserPhone("16612345679");
+		registerDTO.setUserPwd("");
+		registerDTO.setVeriCode("6700");
+		registerDTO.setUserRegInviterCode("48565247");
+		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(),
+				RegType.PHONE.getText(), DevType.ANDROID.getLabel(), header.getDevName(), header.getAppId(),
+				"127.0.0.1", registerDTO.getUserLocation(), registerDTO.getActivityChannelCode(), null);
+		registerDTO.setRegLogDTO(logDTO);
+
+		Response<RegisterLoginVO> response = accountApi.loginByVerifyCode(registerDTO, header);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	

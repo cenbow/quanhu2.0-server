@@ -1,13 +1,13 @@
 package com.yryz.quanhu.coterie.service;
 
-import java.util.List;
-
-import com.yryz.quanhu.coterie.vo.CoterieAdmin;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
-import com.yryz.quanhu.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.entity.CoterieAuditRecord;
+import com.yryz.quanhu.coterie.vo.CoterieAdmin;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
+
+import java.util.List;
 
 /**
  * 私圈service
@@ -17,15 +17,15 @@ import com.yryz.quanhu.coterie.entity.CoterieAuditRecord;
 public interface CoterieService {
 	/**
 	 * 新建私圈
-	 * @return 
+	 * @return
 	 */
-	CoterieInfo save(CoterieBaseInfo info);
+	CoterieInfo save(CoterieBasicInfo info);
 	
 	/**
 	 * 编辑私圈
 	 */
 	void modify(CoterieInfo info);
-	
+
 	/**
 	 * 更新圈主的达人身份
 	 */
@@ -59,19 +59,19 @@ public interface CoterieService {
 	/**
 	 * 分页查询私圈列表
 	 */
-	List<CoterieInfo> findPage(String circleId, Integer pageNum, Integer pageSize, Byte status);
-	
+	List<CoterieInfo> findPage(Integer pageNum, Integer pageSize, Byte status);
+
 	/**
 	 * 分页查询私圈列表  上架的私圈
 	 */
 	List<CoterieInfo> findPage(Integer pageNum, Integer pageSize);
-	
+
 	/**
 	 * 我创建的私圈列表
 	 * @param custId
 	 * @return
 	 */
-	List<CoterieInfo> findMyCreateCoterie(String custId, String circleId);
+	List<CoterieInfo> findMyCreateCoterie(String custId);
 	
 	/**
 	 * 我创建的私圈列表
@@ -106,7 +106,7 @@ public interface CoterieService {
 	 * @param custId
 	 * @return
 	 */
-	List<CoterieInfo> findMyJoinCoterie(String custId, String circleId);
+	List<CoterieInfo> findMyJoinCoterie(String custId);
 	
 	/**
 	 * 根据名称查私圈
@@ -200,8 +200,7 @@ public interface CoterieService {
 	
 	/**
 	 * 按圈子和热度查询私圈
-	 * @param circleId
-	 * @param start
+
 	 * @param pageSize
 	 * @return
 	 */
@@ -210,7 +209,7 @@ public interface CoterieService {
 	/**
 	 * 根据名称模糊所属私圈
 	 * @param name
-	 * @param pageNum
+
 	 * @param pageSize
 	 * @return
 	 */

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.grow.dao.persistence.GrowStatusDao">
+
+   <sql id="columns">
+		 id as id ,
+		 user_id as userId  ,
+		 event_code  as  eventCode ,
+		 event_count as  eventCount ,
+		 create_time as  createTime ,
+		 update_time as  updateTime 
+	</sql>
+	
+	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.order.grow.entity.GrowStatus">
+		insert into grow_status (user_id , event_code , event_count , create_time , update_time)
+		values (#{userId} , #{eventCode} , #{eventCount} , #{createTime} , #{updateTime})
+	</insert>
+	
+	<update id="update" parameterType="com.yryz.quanhu.order.grow.entity.GrowStatus">
+		update grow_status set event_count = #{eventCount} , update_time = #{updateTime} 
+		where user_id = #{userId} and event_code = #{eventCode} and
+		DATE_FORMAT(#{createDate} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
+	</update>
+	
+	<select id="getByCode" resultType="com.yryz.quanhu.order.grow.entity.GrowStatus">
+		select  <include refid="columns" />  from grow_status where user_id = #{userId} and event_code = #{eventCode} and
+		DATE_FORMAT(#{createDate} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
+	</select>
+
+</mapper>

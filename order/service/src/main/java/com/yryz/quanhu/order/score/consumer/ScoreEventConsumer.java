@@ -2,8 +2,6 @@ package com.yryz.quanhu.order.score.consumer;
 
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +12,11 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.yryz.quanhu.order.common.AbsMQlistener;
+import com.yryz.quanhu.order.common.AmqpConstant;
 import com.yryz.quanhu.order.score.manage.service.ScoreEventManageService;
 import com.yryz.quanhu.order.score.service.provider.RuleScoreServiceProvider;
 import com.yryz.quanhu.order.score.type.ScoreTypeEnum;

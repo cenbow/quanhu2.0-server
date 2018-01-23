@@ -50,7 +50,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 		int result = 0;
 		try {
 			if (auditStatus.intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
-				delete(record.getUserId().toString());
+				delete(record.getUserId());
 				record.setCreateDate(new Date());
 				record.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT).getData());
 				result = imgAuditDao.save(record);
@@ -75,7 +75,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 	public int batchAuditImg(List<UserImgAudit> record, Integer aduitActionStatus) {
 		int auditLength = record == null ? 0 : record.size();
 		List<UserImgAudit> saveLists = new ArrayList<>(auditLength);
-		List<String> userIds = new ArrayList<>();
+		List<Long> userIds = new ArrayList<>();
 
 		try {
 			for (int i = 0; i < auditLength; i++) {
@@ -90,9 +90,9 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 					imgAuditModel.setCreateDate(new Date());
 					imgAuditModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT).getData());
 					saveLists.add(imgAuditModel);
-					delete(imgAuditModel.getUserId().toString());
+					delete(imgAuditModel.getUserId());
 				} else {
-					userIds.add(auditModel.getUserId().toString());
+					userIds.add(auditModel.getUserId());
 				}
 			}
 
@@ -119,7 +119,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 	}
 
 	@Override
-	public Page<UserImgAudit> listByUserId(Integer pageNo, Integer pageSize, String userId, Integer auditStatus) {
+	public Page<UserImgAudit> listByUserId(Integer pageNo, Integer pageSize, Long userId, Integer auditStatus) {
 		try {
 			Page<UserImgAudit> page = PageHelper.startPage(pageNo, pageSize);
 			imgAuditDao.listByUserId(userId, auditStatus);
@@ -131,7 +131,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 	}
 
 	@Override
-	public int delete(String userId) {
+	public int delete(Long userId) {
 		try {
 			return imgAuditDao.delete(userId);
 		} catch (Exception e) {

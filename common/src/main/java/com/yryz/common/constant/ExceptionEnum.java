@@ -4,21 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ExceptionEnum {
-    SysException("100",  "系统异常", "网络开小差了，请稍候再试！"),
+    SysException("100", "系统异常", "网络开小差了，请稍候再试！"),
     LockException("300", "分布式锁异常", "网络开小差了，请稍候再试！"),
     BusiException("500", "业务逻辑异常", "网络开小差了，请稍候再试！"),
-    Exception("1000","未知错误","网络开小差了，请稍后再试"),
+    Exception("1000", "未知错误", "网络开小差了，请稍后再试"),
     NEEDTOKEN("1001", "用户未登录或者被挤掉了", "请重新登录"),
-    TOKEN_EXPIRE("1002","短期token过期","请重新登录"),
-    TOKEN_INVALID("1003","无效token","请重新登录"),
-    NO_TOKEN("1004","token被后清掉了","请重新登录"),
-    NEED_PHONE("1005","需要绑定手机号","需要绑定手机号"),
-    USER_MISSING("1006","用户不存在","用户不存在"),
-    USER_NO_TALK("1007","用户被禁言","用户被禁言"),
-    USER_FREEZE("1008","圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。","用户被冻结"),
-    USER_DISTORY("1009","圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。","用户被注销"),
-    ValidateException("2000","数据验证失败！","网络开小差了，请稍候再试！"),
-    PARAM_MISSING("2001","参数缺失","网络开小差了，请稍候再试！");
+    TOKEN_EXPIRE("1002", "短期token过期", "请重新登录"),
+    TOKEN_INVALID("1003", "无效token", "请重新登录"),
+    NO_TOKEN("1004", "token被后清掉了", "请重新登录"),
+    NEED_PHONE("1005", "需要绑定手机号", "需要绑定手机号"),
+    USER_MISSING("1006", "用户不存在", "用户不存在"),
+    USER_NO_TALK("1007", "用户被禁言", "用户被禁言"),
+    USER_FREEZE("1008", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被冻结"),
+    USER_DISTORY("1009", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被注销"),
+    ValidateException("2000", "数据验证失败！", "网络开小差了，请稍候再试！"),
+    PARAM_MISSING("2001", "参数缺失", "网络开小差了，请稍候再试！"),
+
+    MONGO_EXCEPTION("3000", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！");
+
     private String code;
 
     private String showmsg;
@@ -31,7 +34,7 @@ public enum ExceptionEnum {
         this.errorMsg = errorMsg;
     }*/
 
-    ExceptionEnum(String code, String errorMsg,String showmsg) {
+    ExceptionEnum(String code, String errorMsg, String showmsg) {
         this.code = code;
         this.showmsg = showmsg;
         this.errorMsg = errorMsg;

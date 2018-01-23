@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class CoterieSearch {
 	/**
-	 * 圈子状态 ：0待审核，2审批未通过，3上架，4下架
+	 * 圈子状态 ：10待审核，12审批未通过，13上架，14下架
 	 */
 	private Byte status;
 	

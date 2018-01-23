@@ -2,6 +2,7 @@ package com.yryz.quanhu.coterie.vo;
 
 import java.io.Serializable;
 import java.util.Date;
+
 /**
  * 
  * @author jiangkun
@@ -9,6 +10,7 @@ import java.util.Date;
  * @date 2017年10月18日 上午9:50:34
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
+@SuppressWarnings("serial")
 public class CoterieInfo implements Serializable{
 	private static final long serialVersionUID = 2137320647778802349L;
 
@@ -27,10 +29,7 @@ public class CoterieInfo implements Serializable{
      */
     private String custIcon;
 
-    /**
-     * 圈子ID
-     */
-    private String circleId;
+
     
     /**
      * 圈子名称
@@ -142,13 +141,7 @@ public class CoterieInfo implements Serializable{
 		this.ownerId = ownerId;
 	}
 
-	public String getCircleId() {
-		return circleId;
-	}
 
-	public void setCircleId(String circleId) {
-		this.circleId = circleId;
-	}
 
 	public String getOwnerName() {
 		return ownerName;
@@ -312,8 +305,7 @@ public class CoterieInfo implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CoterieInfo [coterieId=" + coterieId + ", ownerId=" + ownerId + ", custIcon=" + custIcon + ", circleId="
-				+ circleId + ", circleName=" + circleName + ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro
+		return "CoterieInfo [coterieId=" + coterieId + ", ownerId=" + ownerId + ", custIcon="   + ", circleName=" + circleName + ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro
 				+ ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", qrUrl=" + qrUrl + ", joinFee=" + joinFee
 				+ ", consultingFee=" + consultingFee + ", joinCheck=" + joinCheck + ", memberNum=" + memberNum
 				+ ", status=" + status + ", createDate=" + createDate + ", newMemberNum=" + newMemberNum

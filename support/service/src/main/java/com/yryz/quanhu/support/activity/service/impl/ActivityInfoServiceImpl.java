@@ -54,10 +54,10 @@ public class ActivityInfoServiceImpl implements ActivityInfoService {
             switch (type){
                 case 1:
                     activityInfoVo1.setTitle(activityInfoVo.getTitle());
-                    break;
+                    return activityInfoVo1;
                 case 2:
                     activityInfoVo1.setActivityChannelCode(activityInfoVo.getActivityChannelCode());
-                    break;
+                    return activityInfoVo1;
                 default:
                     activityInfoVo1 = activityInfoVo;
                     return activityInfoVo1;

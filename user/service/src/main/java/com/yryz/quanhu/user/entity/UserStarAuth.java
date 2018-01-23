@@ -75,7 +75,10 @@ public class UserStarAuth extends GenericEntity{
      * 认证类型 10:个人认证 11:企业/机构认证
      */
     private Byte authType;
-    
+    /**
+     * 应用id
+     */
+    private String appId;
     public enum StarAuthType{
     	/** 用户申请 */
     	USER_APLLY((byte)10),
@@ -138,9 +141,9 @@ public class UserStarAuth extends GenericEntity{
     private Byte recommendStatus;
     
     public enum StarRecommendStatus{
-    	/** 用户申请 */
+    	/** 否 */
     	FALSE((byte)10),
-    	/** 平台设置 */
+    	/** 是 */
     	TRUE((byte)11);
     	private byte status;
     	StarRecommendStatus(byte status) {
@@ -391,5 +394,13 @@ public class UserStarAuth extends GenericEntity{
 
 	public void setRecommendHeight(Integer recommendHeight) {
 		this.recommendHeight = recommendHeight;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 }

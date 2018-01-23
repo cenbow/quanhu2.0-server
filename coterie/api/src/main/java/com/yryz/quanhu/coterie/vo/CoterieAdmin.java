@@ -2,6 +2,7 @@ package com.yryz.quanhu.coterie.vo;
 
 import java.io.Serializable;
 import java.util.Date;
+
 /**
  * 
  * @author jiangkun
@@ -9,6 +10,7 @@ import java.util.Date;
  * @date 2017年10月18日 上午9:49:41
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
+@SuppressWarnings("serial")
 public class CoterieAdmin implements Serializable{
 	private static final long serialVersionUID = -3326016770793173068L;
 

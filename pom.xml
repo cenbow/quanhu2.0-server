@@ -25,7 +25,6 @@
         <module>openapi</module>
         <module>common</module>
 		<module>demo</module>
-    <module>configuration</module>
   </modules>
 
     <!--圈乎微服务依赖先放在此处 经架构组评审后移动到parent-->
@@ -170,7 +169,11 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.4.1</version>
+	        </dependency>
 
 		</dependencies>
     </dependencyManagement>

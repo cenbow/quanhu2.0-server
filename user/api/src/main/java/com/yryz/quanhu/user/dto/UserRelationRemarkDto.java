@@ -11,4 +11,13 @@ import com.yryz.quanhu.user.entity.UserRelationRemarkEntity;
  */
 public class UserRelationRemarkDto extends UserRelationRemarkEntity{
 
+    private boolean isNewRecord = false;
+
+    public boolean isNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setNewRecord(boolean newRecord) {
+        isNewRecord = newRecord;
+    }
 }

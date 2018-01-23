@@ -1,22 +1,30 @@
 package com.yryz.quanhu.user.dao;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.entity.UserRelationEntity;
+import com.yryz.quanhu.user.provider.UserRelationProvider;
 import com.yryz.quanhu.user.service.UserRelationApi;
+import org.apache.commons.collections.CollectionUtils;
 import org.bson.BSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,9 +37,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,16 +53,29 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class UserRelationCacheDao {
 
-    private static final String TABLE_NAME = "qh_user_relation";
-
+    private static final Logger logger = LoggerFactory.getLogger(UserRelationCacheDao.class);
+    /**
+     * 用户关系redis过期时间
+     */
     @Value("${user.relation.expireDays}")
     private int expireDays;
+
+    @Value("${user.relation.mq.direct.exchange}")
+    private String mqDirectExchange;
+
+    @Value("${user.relation.mq.queue}")
+    private String mqQueue;
+
+    public static String RELATION_KEY_PREFIX = "RELATION.";
+    public static String RELATION_COUNT_KEY_PREFIX = "RELATION.COUNT.";
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
-    @Resource
-    private MongoTemplate mongoTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private UserRelationDao userRelationDao;
@@ -65,7 +86,7 @@ public class UserRelationCacheDao {
      * @param targetUserId
      * @return
      */
-    public UserRelationDto getUserRelation(String sourceUserId,String targetUserId){
+    public UserRelationDto getCacheRelation(String sourceUserId, String targetUserId){
 
         UserRelationDto dto = new UserRelationDto();
         UserRelationEntity entity = null;
@@ -83,45 +104,61 @@ public class UserRelationCacheDao {
             entity = redisTemplate.opsForValue().get(key);
             if(null != entity){
                 BeanUtils.copyProperties(dto,entity);
+                dto.setNewRecord(false);
                 return dto;
             }
-            /**
-             * 查询mongo
-             */
-
-            //查询条件
-            Query query = new Query();
-            query.addCriteria(Criteria.where("sourceUserId").is(sourceUserId));
-            query.addCriteria(Criteria.where("targetUserId").is(targetUserId));
-            query.fields().exclude("_id");
-
-            //查询
-            List<UserRelationEntity> array = mongoTemplate.find(query,UserRelationEntity.class,TABLE_NAME);
-            if(null!=array&&array.size()>0){
-                BeanUtils.copyProperties(dto,array.get(0));
-                return dto;
-            }
-
             /**
              * 查询数据库
              */
-            return userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
-
+            dto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
+            if(null != dto){
+                dto.setNewRecord(false);
+            }
+            return dto;
         }catch (Exception e){
             throw new RuntimeException(e);
         }
     }
 
+
     public static String getCacheKey(String sourceUserId,String targetUserId){
-        return "relation/"+sourceUserId+"/"+targetUserId;
+        return RELATION_KEY_PREFIX+sourceUserId+"/"+targetUserId;
     }
 
-    public static String getCacheTotalKey(String userId){
-        return "total/"+userId;
+    public static String getCacheTotalCountKey(String userId){
+        return RELATION_COUNT_KEY_PREFIX+userId;
     }
 
+    public UserRelationCountDto getCacheCount(String userId){
+        /**
+         * 查询redis中计数对象，
+         */
+        RedisTemplate<String,UserRelationCountDto> redisTemplate =
+                redisTemplateBuilder.buildRedisTemplate(UserRelationCountDto.class);
 
-    public void setUserRelation(UserRelationDto dto){
+        String key = getCacheTotalCountKey(userId);
+
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 刷新缓存统计数据
+     * @param sourceUserId
+     * @param dto
+     */
+    public void refreshCacheCount(String sourceUserId,UserRelationCountDto dto){
+        /**
+         * 查询redis中计数对象，
+         */
+        RedisTemplate<String,UserRelationCountDto> redisTemplate =
+                redisTemplateBuilder.buildRedisTemplate(UserRelationCountDto.class);
+
+        String key = getCacheTotalCountKey(sourceUserId);
+
+        redisTemplate.opsForValue().set(key,dto,expireDays,TimeUnit.DAYS);
+    }
+
+    public void refreshCacheRelation(UserRelationDto dto){
 
         RedisTemplate<String,UserRelationEntity> redisTemplate =
                 redisTemplateBuilder.buildRedisTemplate(UserRelationEntity.class);
@@ -138,172 +175,94 @@ public class UserRelationCacheDao {
         BeanUtils.copyProperties(entity,dto);
 
         redisTemplate.opsForValue().set(sourceKey,entity,expireDays, TimeUnit.DAYS);
-
-        /**
-         * 有修改关系的时候，同步刷新统计信息
-         */
-
-
     }
+
 
     /**
      * 发生到MQ异步处理
      * @param userDto
      */
     public void sendMQ(UserRelationDto userDto){
-        userRelationDao.update(userDto);
-    }
+        try {
+            logger.info("sendMQ={}/{} start",userDto.getSourceUserId(),userDto.getTargetUserId());
+            //转换消息
+            String msg = MAPPER.writeValueAsString(userDto);
+            logger.info("sendMQ.convert={}",msg);
+            //发送消息
+            rabbitTemplate.setExchange(mqDirectExchange);
+            rabbitTemplate.setRoutingKey(mqQueue);
 
-
-    public void handleMessage(String data){
-
-        System.out.println("hello Fanout Message:" + data);
-        try{
-            //反序列化对象
-
-            //数据库存储
-
-        }catch (Exception e){
-
+            rabbitTemplate.convertAndSend(msg);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }finally {
+            logger.info("sendMQ={}/{} finish",userDto.getSourceUserId(),userDto.getTargetUserId());
         }
-    }
-
-    public PageList<UserRelationDto> selectByPage(int currentPage,int pageSize,String sourceUserId,UserRelationApi.STATUS status) {
-        Query query = this.buildQuery(sourceUserId,status);
-        query.skip(currentPage*pageSize);
-        query.limit(pageSize);
-        query.fields().exclude("_id");
-
-        /**
-         * 查询数据
-         */
-        List<UserRelationDto> resultArray = mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
-        /**
-         * 查询总数
-         */
-        long count = mongoTemplate.count(query,TABLE_NAME);
-
-        PageList pageList = new PageList();
-        pageList.setEntities(resultArray);
-        pageList.setPageSize(resultArray.size());
-        pageList.setCurrentPage(currentPage);
-        pageList.setCount(count);
-
-        return pageList;
-
-    }
-
-    public List<UserRelationDto> selectBy(String sourceUserId, String[] targetUserIds) {
-        Query query = new Query();
-
-        query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-        query.addCriteria(Criteria.where("target_user_id").in(targetUserIds));
-
-        return mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
-    }
-
-    public List<UserRelationDto> selectBy(String sourceUserId, UserRelationApi.STATUS status){
-        Query query = this.buildQuery(sourceUserId,status);
-        return mongoTemplate.find(query,UserRelationDto.class,TABLE_NAME);
     }
 
     /**
-     * 统计用户关系数量
-     * {
-     *     粉丝数
-     *     被拉黑
-     *     关注数
-     *     黑名单
-     *     好友数
-     * }
-     * @param userSourceKid
-     * @return
+     * 异步MQ处理
+     * @param data
      */
-    public UserRelationCountDto totalBy(String userKid) {
+
+    /**
+     * QueueBinding: exchange和queue的绑定
+     * Queue:队列声明
+     * Exchange:声明exchange
+     * key:routing-key
+     * @param data
+     */
+    @RabbitListener(bindings = @QueueBinding(
+            value= @Queue(value="${user.relation.mq.queue}",durable="true"),
+            exchange=@Exchange(value="${user.relation.mq.direct.exchange}",ignoreDeclarationExceptions="true",type=ExchangeTypes.DIRECT),
+            key="${user.relation.mq.queue}")
+    )
+    public void handleMessage(String data){
+        logger.info("handleMessage={} start",data);
+        try{
+            //反序列化对象
+            UserRelationDto relationDto = MAPPER.readValue(data,UserRelationDto.class);
+            logger.info("handleMessage.convert={}",JSON.toJSON(relationDto));
+            //数据库存储
+            userRelationDao.update(relationDto);
+            //同步调用第三方建立关系
+
+            //统计数据
+            logger.info("handleMessage.totalCount={} start",relationDto.getSourceUserId());
+            UserRelationCountDto dto = this.forceTotalCount(relationDto.getSourceUserId());
+            logger.info("handleMessage.totalCount={} finish",JSON.toJSON(dto));
+
+            //刷新至缓存
+            logger.info("handleMessage.refreshCache={} start",relationDto.getSourceUserId());
+            this.refreshCacheCount(relationDto.getSourceUserId(),dto);
+            logger.info("handleMessage.refreshCache={} finish",relationDto.getSourceUserId());
+
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }finally {
+            logger.info("handleMessage={} finish",data);
+        }
+    }
+
+    public UserRelationCountDto forceTotalCount(String userId){
 
         UserRelationCountDto dto = new UserRelationCountDto();
-//        /**
-//         * 查询redis缓存是否为最新数据
-//         *
-//         * 不是则从mongo中统计，刷新至redis
-//         */
-//        String key = getCacheTotalKey(userKid);
-//        RedisTemplate<String,UserRelationCountDto> redisTemplate =
-//                redisTemplateBuilder.buildRedisTemplate(UserRelationCountDto.class);
-//        dto = redisTemplate.opsForValue().get(key);
-//        if(null != dto && !dto.isNewRecord()){
-//            return dto;
-//        }
-
-        /**
-         * 查询mongo进行统计
-         */
-
-        //关注数
-        Query query = this.buildQuery(userKid, UserRelationApi.STATUS.FOLLOW);
-        long count = mongoTemplate.count(query,TABLE_NAME);
-        dto.setFollowCount(count);
-
-        //黑名单数
-        query = this.buildQuery(userKid, UserRelationApi.STATUS.TO_BLACK);
-        count = mongoTemplate.count(query,TABLE_NAME);
-        dto.setToBlackCount(count);
-
-        //好友数
-        query = this.buildQuery(userKid, UserRelationApi.STATUS.FRIEND);
-        count = mongoTemplate.count(query,TABLE_NAME);
-        dto.setFriendCount(count);
-
-        //粉丝数
-        query = this.buildQuery(userKid, UserRelationApi.STATUS.FANS);
-        count = mongoTemplate.count(query,TABLE_NAME);
+        //粉丝
+        long count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FANS.getCode());
         dto.setFansCount(count);
-
-        //被拉黑数
-        query = this.buildQuery(userKid, UserRelationApi.STATUS.FROM_BLACK);
-        count = mongoTemplate.count(query,TABLE_NAME);
+        //关注
+        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FOLLOW.getCode());
+        dto.setFollowCount(count);
+        //拉黑
+        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.TO_BLACK.getCode());
+        dto.setToBlackCount(count);
+        //被拉黑
+        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FROM_BLACK.getCode());
         dto.setFromBlackCount(count);
-
-//        /**
-//         * 设置成新数据，刷新至redis
-//         */
-//        dto.setNewRecord(true);
-//        redisTemplate.opsForValue().set(key,dto,expireDays);
+        //好友
+        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FRIEND.getCode());
+        dto.setFriendCount(count);
 
         return dto;
     }
-
-
-    private Query buildQuery(String sourceUserId,UserRelationApi.STATUS status){
-
-        Query query = new Query();
-        if(UserRelationApi.STATUS.FANS == status){                      //粉丝
-
-            query.addCriteria(Criteria.where("target_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("follow_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.FOLLOW == status){              //关注
-
-            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("follow_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.FRIEND == status){              //好友
-
-            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("friend_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.TO_BLACK == status){            //拉黑
-
-            query.addCriteria(Criteria.where("source_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("black_status").is(UserRelationApi.YES));
-
-        }else if(UserRelationApi.STATUS.FROM_BLACK == status){          //被拉黑
-
-            query.addCriteria(Criteria.where("target_user_id").is(sourceUserId));
-            query.addCriteria(Criteria.where("black_status").is(UserRelationApi.YES));
-        }
-
-        return query;
-    }
-
 }

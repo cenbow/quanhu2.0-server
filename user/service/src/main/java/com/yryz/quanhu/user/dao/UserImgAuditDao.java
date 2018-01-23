@@ -39,7 +39,7 @@ public interface UserImgAuditDao {
 	 * @param id
 	 * @return
 	 */
-	List<UserImgAudit> listByUserId(@Param("userId") String userId, @Param("auditStatus") Integer auditStatus);
+	List<UserImgAudit> listByUserId(@Param("userId") Long userId, @Param("auditStatus") Integer auditStatus);
 
 	/**
 	 * 更新头像审核信息
@@ -57,7 +57,7 @@ public interface UserImgAuditDao {
 	 * @param updateTime
 	 * @return
 	 */
-	int batchUpdate(@Param("userIds") List<String> userIds, @Param("auditStatus") Integer auditStatus,
+	int batchUpdate(@Param("userIds") List<Long> userIds, @Param("auditStatus") Integer auditStatus,
 			@Param("updateTime") Date updateTime);
 	
 	/**
@@ -65,5 +65,5 @@ public interface UserImgAuditDao {
 	 * @param userId
 	 * @return
 	 */
-	int delete(@Param("userId")String userId);
+	int delete(@Param("userId")Long userId);
 }

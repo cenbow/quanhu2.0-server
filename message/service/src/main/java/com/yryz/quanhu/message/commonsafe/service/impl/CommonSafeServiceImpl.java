@@ -11,6 +11,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.yryz.common.aliyun.jaq.AfsCheckManager;
+import com.yryz.common.context.Context;
+import com.yryz.common.entity.AfsCheckRequest;
+import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.push.enums.CheckVerifyCodeReturnCode;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -251,5 +257,32 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			}
 		}
 		return VerifyStatus.SUCCESS;
+	}
+
+
+	public boolean checkSmsSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
+		//不需要图像验证码直接成功
+		if (!checkVerifyCodeSendTime(configVO, verifyCodeDTO).equals(VerifyStatus.SUCCESS)
+				&& afsCheckReq == null) {
+			return true;
+		}
+		//图形码为空直接返回false
+		if (afsCheckReq == null) {
+			return false;
+		}
+
+		String accessKey = Context.getProperty("afs_check_accesskeyid");
+		String accessSecret = Context.getProperty("afs_check_accesssecret");
+		if (org.apache.commons.lang.StringUtils.isBlank(accessKey) || org.apache.commons.lang.StringUtils.isBlank(accessSecret)) {
+			throw QuanhuException.busiError("未获取到afs_check验证码的配置信息");
+		}
+		AfsCheckManager afsCheckManager = new AfsCheckManager(accessKey, accessSecret);
+		com.aliyuncs.jaq.model.v20161123.AfsCheckRequest req = new com.aliyuncs.jaq.model.v20161123.AfsCheckRequest();
+		req.setPlatform(afsCheckReq.getPlatform());
+		req.setSession(afsCheckReq.getSession());
+		req.setSig(afsCheckReq.getSig());
+		req.setToken(afsCheckReq.getToken());
+		req.setScene(afsCheckReq.getScene());
+		return afsCheckManager.afsCheck(req);
 	}
 }

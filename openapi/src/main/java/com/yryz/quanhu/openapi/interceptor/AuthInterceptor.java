@@ -12,8 +12,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.yryz.common.Annotation.Login;
-import com.yryz.common.Annotation.NotLogin;
+import com.yryz.common.annotation.Login;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.quanhu.openapi.service.AuthService;
 

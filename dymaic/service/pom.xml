@@ -11,14 +11,21 @@
 
     <artifactId>dymaic-service</artifactId>
     <properties>
-    	<spring.boot.version>2.0.0.M7</spring.boot.version>
-	</properties>
+        <spring.boot.version>2.0.0.M7</spring.boot.version>
+        <spring.cloud.version>Finchley.M5</spring.cloud.version>
+    </properties>
 
     <dependencies>
         <!--项目内部依赖-->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>dymaic-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>user-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
 
@@ -34,6 +41,16 @@
         </dependency>
 
         <!-- spring -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

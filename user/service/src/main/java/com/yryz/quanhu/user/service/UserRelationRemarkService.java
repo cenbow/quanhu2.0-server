@@ -1,5 +1,8 @@
 package com.yryz.quanhu.user.service;
 
+import com.yryz.common.response.Response;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
+import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 
 import java.util.List;
@@ -13,10 +16,13 @@ import java.util.List;
  */
 public interface UserRelationRemarkService {
 
-    public boolean setRemarkName(UserRelationRemarkDto remarkDto);
+    public Boolean setRemarkName(UserRelationRemarkDto remarkDto);
 
-    public String getRemarkName(UserRelationRemarkDto remarkDto);
+    public Boolean resetRemarkName(UserRelationRemarkDto remarkDto);
 
-    public List<UserRelationRemarkDto> selectBy(UserRelationRemarkDto remarkDto);
+    public UserRelationRemarkDto getRemarkDto(String sourceUserId, String targetUserId, UserRelationConstant.TYPE source);
+
+    public List<UserRelationRemarkDto> selectBy(String sourceUserId, UserRelationConstant.TYPE source);
+
 
 }

@@ -2,6 +2,7 @@ package com.yryz.quanhu.user.service;
 
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 
@@ -17,17 +18,17 @@ import java.util.Set;
  */
 public interface UserRelationService{
 
-    public boolean setRelation(String sourceUserId,String targetUserId, UserRelationApi.EVENT event);
+    public UserRelationDto setRelation(String sourceUserId,String targetUserId, UserRelationConstant.EVENT event);
 
     public UserRelationDto getCacheRelation(String sourceUserId, String targetUserId);
 
     public UserRelationDto getForceRelation(String sourceUserId, String targetUserId);
 
-    public PageList<UserRelationDto> selectByPage(UserRelationDto dto);
+    public PageList<UserRelationDto> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status);
 
-    public List<UserRelationDto> selectBy(String sourceUserId, String[] targetUserIds);
+    public List<UserRelationDto> selectBy(String sourceUserId, Set<String> targetUserIds);
 
-    public Set<String> selectBy(String sourceUserId, UserRelationApi.STATUS status);
+    public Set<String> selectBy(String sourceUserId, UserRelationConstant.STATUS status);
 
     public UserRelationCountDto totalBy(String userId);
 
