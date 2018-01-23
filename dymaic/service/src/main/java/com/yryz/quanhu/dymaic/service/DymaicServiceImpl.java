@@ -1,5 +1,6 @@
 package com.yryz.quanhu.dymaic.service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -8,6 +9,8 @@ import com.yryz.quanhu.dymaic.dao.redis.DymaicCache;
 import com.yryz.quanhu.dymaic.mq.DymaicSender;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.dymaic.vo.DymaicVo;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +23,7 @@ import java.util.*;
  * @version 1.0
  * @data 2018/1/19 0019 04
  * <p>
+ *
  * TODO
  * 对接动态写入
  * 对接粉丝、用户、统计系统
@@ -37,6 +41,9 @@ public class DymaicServiceImpl implements DymaicService {
 
     @Autowired
     DymaicSender dymaicSender;
+
+    @Reference
+    UserApi userApi;
 
     @Override
     public Response<Boolean> send(Dymaic dymaic) {
@@ -176,7 +183,6 @@ public class DymaicServiceImpl implements DymaicService {
         return ResponseUtils.returnObjectSuccess(true);
     }
 
-
     @Override
     public Response<List<DymaicVo>> getTimeLine(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
@@ -261,22 +267,22 @@ public class DymaicServiceImpl implements DymaicService {
         Map<Long, Dymaic> dymaicMap = this.getBatch(kidList);
 
         //2 用户信息
-        Map<String, Dymaic> custInfos = null;
+        Map<String, UserSimpleVO> users = null;
         if (dymaicMap != null) {
             Set<Long> userIds = new HashSet<>();
             for (Dymaic dymaic : dymaicMap.values()) {
                 userIds.add(dymaic.getUserId());
             }
             if (!userIds.isEmpty()) {
-                //todo调用用户系统
-                custInfos = new HashMap<>();
+                //todo rpcInvoke
+                users = new HashMap<>();
             }
         }
 
         //3 统计数据
         Map<String, Dymaic> statistics = null;
         if (!kids.isEmpty()) {
-            //todo调用统计系统
+            //todo rpcInvoke
             statistics = new HashMap<>();
         }
 
@@ -289,10 +295,10 @@ public class DymaicServiceImpl implements DymaicService {
                     DymaicVo vo = new DymaicVo();
                     BeanUtils.copyProperties(dymaic, vo);
 
-                    if (custInfos != null && custInfos.containsKey(dymaic.getUserId())) {
-                        vo.setUser(custInfos.get(dymaic.getUserId()));
+                    if (users != null && users.containsKey(dymaic.getUserId())) {
+                        vo.setUser(users.get(dymaic.getUserId()));
                     } else {
-                        vo.setUser(new Dymaic());
+                        vo.setUser(new UserSimpleVO());
                     }
 
                     if (statistics != null && statistics.containsKey(kid)) {
@@ -315,6 +321,7 @@ public class DymaicServiceImpl implements DymaicService {
      * @return
      */
     private List<Long> getFollowers(Long userId) {
+        //todo rpcInvoke
         return Arrays.asList(new Long[]{100L, 200L, userId});
     }
 

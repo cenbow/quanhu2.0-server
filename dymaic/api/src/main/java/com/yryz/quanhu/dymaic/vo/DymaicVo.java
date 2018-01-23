@@ -1,5 +1,7 @@
 package com.yryz.quanhu.dymaic.vo;
 
+import com.yryz.quanhu.user.vo.UserSimpleVO;
+
 import java.io.Serializable;
 
 /**
@@ -12,19 +14,18 @@ public class DymaicVo extends Dymaic implements Serializable {
     /**
      * 用户信息
      */
-    private Dymaic user;
+    private UserSimpleVO user;
 
     /**
      * 统计信息（评论、转发、点赞）
      */
     private Dymaic statistics;
 
-
-    public Dymaic getUser() {
+    public UserSimpleVO getUser() {
         return user;
     }
 
-    public void setUser(Dymaic user) {
+    public void setUser(UserSimpleVO user) {
         this.user = user;
     }
 
