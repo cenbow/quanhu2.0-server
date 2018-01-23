@@ -14,7 +14,10 @@ public class StarAuthInfo implements Serializable {
      * 主键
      */
     private Integer id;
-
+    /**
+     * 应用id
+     */
+    private String appId;
     /**
      * 机构名称
      */
@@ -344,5 +347,13 @@ public class StarAuthInfo implements Serializable {
 
 	public void setRecommendCancelTime(Date recommendCancelTime) {
 		this.recommendCancelTime = recommendCancelTime;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 }

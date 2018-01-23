@@ -1,7 +1,7 @@
 package com.yryz.quanhu.coterie.vo;
 
 import java.io.Serializable;
-import java.util.Date;
+
 /**
  * 
  * @author jiangkun
@@ -32,7 +32,7 @@ public class CoterieAuditInfo implements Serializable{
     private String coterieId;
 
     /**
-     * 审核结果:2审批未通过，3上架，4下架
+     * 审核结果:12审批未通过，13上架，14下架
      */
     private Byte status;
 

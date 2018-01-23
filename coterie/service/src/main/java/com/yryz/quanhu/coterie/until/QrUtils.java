@@ -1,12 +1,11 @@
 package com.yryz.quanhu.coterie.until;
 
-import java.io.File;
-
+import com.google.gson.JsonObject;
+import com.yryz.quanhu.coterie.exception.BaseException;
+import com.yryz.quanhu.coterie.oss.OssManager;
 import org.apache.log4j.Logger;
 
-import com.google.gson.JsonObject;
-import com.yryz.quanhu.coterie.oss.OssManager;
-import com.yryz.quanhu.coterie.exception.BaseException;
+import java.io.File;
 
 /**
  * 二维码

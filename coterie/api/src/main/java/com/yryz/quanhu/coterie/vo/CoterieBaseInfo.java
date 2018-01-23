@@ -1,6 +1,7 @@
 package com.yryz.quanhu.coterie.vo;
 
 import java.io.Serializable;
+
 /**
  * 
  * @author jiangkun
@@ -14,11 +15,6 @@ public class CoterieBaseInfo implements Serializable{
      * 用户ID
      */
     private String ownerId;
-
-    /**
-     * 圈子ID
-     */
-    private String circleId;
 
     /**
      * 姓名
@@ -61,14 +57,6 @@ public class CoterieBaseInfo implements Serializable{
 
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
-	}
-
-	public String getCircleId() {
-		return circleId;
-	}
-
-	public void setCircleId(String circleId) {
-		this.circleId = circleId;
 	}
 
 	public String getOwnerName() {
@@ -129,7 +117,7 @@ public class CoterieBaseInfo implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CoterieBaseInfo [ownerId=" + ownerId + ", circleId=" + circleId + ", ownerName=" + ownerName
+		return "CoterieBaseInfo [ownerId=" + ownerId + ",   ownerName=" + ownerName
 				+ ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
 				+ joinFee + ", joinCheck=" + joinCheck + "]";
 	}

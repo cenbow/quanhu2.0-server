@@ -7,18 +7,19 @@
  */
 package com.yryz.quanhu.coterie.dao;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.yryz.quanhu.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.entity.CoterieSearch;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 私圈信息
  * @author jk
  *
  */
+@Mapper
 public interface CoterieMapper {
     int insert(Coterie record);
 
@@ -32,25 +33,25 @@ public interface CoterieMapper {
     
     List<Coterie> selectListByCoterie(Coterie record);
     
-    List<Coterie> findPageByStatus(@Param("circleId") String circleId, @Param("start") Integer start, @Param("pageSize") Integer pageSize, @Param("status") Byte status);
-    
+    List<Coterie> findPageByStatus(@Param("start") Integer start, @Param("pageSize") Integer pageSize, @Param("status") Byte status);
+
     List<Coterie> findPage(@Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
     int updateByCoterieIdSelective(Coterie record);
 
     int updateByPrimaryKey(Coterie record);
-    
+
     int updateExpert(@Param("custId") String custId, @Param("isExpert") Byte isExpert);
-    
+
     int updateMemberNum(@Param("coterieId") String coterieId, @Param("newMemberNum") Integer newMemberNum, @Param("oldMemberNum") Integer oldMemberNum);
-    
-    List<Coterie> selectMyCreateCoterie(@Param("custId") String custId, @Param("circleId") String circleId);
-    
+
+    List<Coterie> selectMyCreateCoterie(@Param("custId") String custId);
+
     List<Coterie> selectMyCreateCoteriePage(@Param("custId") String custId, @Param("start") Integer start, @Param("pageSize") Integer pageSize, @Param("status") Integer status);
-    
+
     Integer selectMyCreateCoterieCount(@Param("custId") String custId, @Param("status") Integer status);
-    
-    List<Coterie> selectMyJoinCoterie(@Param("custId") String custId, @Param("circleId") String circleId);
+
+    List<Coterie> selectMyJoinCoterie(@Param("custId") String custId);
     
     List<Coterie> selectMyJoinCoteriePage(@Param("custId") String custId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
     
