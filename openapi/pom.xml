@@ -77,7 +77,11 @@
             <artifactId>behavior-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>dymaic-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.yryz.framework</groupId>
             <artifactId>core</artifactId>

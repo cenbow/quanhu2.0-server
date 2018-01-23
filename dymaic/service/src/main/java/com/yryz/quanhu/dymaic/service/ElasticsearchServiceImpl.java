@@ -18,8 +18,8 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	private UserRepository userRepository;
 	
 	@Override
-	public List<UserSimpleVO> searchUser(String keyWord) {
-		List<UserInfo> list=userRepository.search(keyWord);
+	public List<UserSimpleVO> searchUser(String keyWord,Integer page,Integer size) {
+		List<UserInfo> list=userRepository.search(keyWord,page,size);
 		List<UserSimpleVO> rstList=Lists.newArrayList();
 		for (int i = 0; i < list.size(); i++) {
 			UserInfo info=list.get(i);
