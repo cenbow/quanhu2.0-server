@@ -1,14 +1,13 @@
 package com.yryz.quanhu.coterie.oss;
 
-import java.io.File;
-
-import org.apache.log4j.Logger;
-
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectResult;
 import com.yryz.quanhu.coterie.until.Context;
+import org.apache.log4j.Logger;
+
+import java.io.File;
 
 /**
  * OSS文件上传Client (Singleton Pattern)

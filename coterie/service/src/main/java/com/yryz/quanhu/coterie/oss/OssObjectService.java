@@ -1,12 +1,12 @@
 package com.yryz.quanhu.coterie.oss;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectResult;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 阿里云上传文件操作类
@@ -41,7 +41,7 @@ public class OssObjectService {
 	
 	
 	
-	public OssPicture uploadPicture(String fileName,InputStream input){
+	public OssPicture uploadPicture(String fileName, InputStream input){
 		OssPicture ossPicture = new OssPicture();
 		try {
 			String fullPath = picture_path + "/" + fileName;//windows系统和linux系统都固定为/

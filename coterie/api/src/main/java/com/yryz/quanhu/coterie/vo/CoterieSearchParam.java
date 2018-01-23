@@ -2,6 +2,7 @@ package com.yryz.quanhu.coterie.vo;
 
 import java.io.Serializable;
 import java.util.List;
+
 /**
  * 
  * @author jiangkun
