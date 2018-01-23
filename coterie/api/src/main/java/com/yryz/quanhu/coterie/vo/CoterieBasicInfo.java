@@ -19,16 +19,6 @@ public class CoterieBasicInfo implements Serializable{
     private String ownerId;
 
     /**
-     * 姓名
-     */
-    private String ownerName;
-
-    /**
-     * 个人简介
-     */
-    private String ownerIntro;
-
-    /**
      * 封面图
      */
     private String icon;
@@ -59,22 +49,6 @@ public class CoterieBasicInfo implements Serializable{
 
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
-	}
-
-	public String getOwnerName() {
-		return ownerName;
-	}
-
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
-	}
-
-	public String getOwnerIntro() {
-		return ownerIntro;
-	}
-
-	public void setOwnerIntro(String ownerIntro) {
-		this.ownerIntro = ownerIntro;
 	}
 
 	public String getIcon() {
@@ -119,9 +93,7 @@ public class CoterieBasicInfo implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CoterieBasicInfo [ownerId=" + ownerId + ",   ownerName=" + ownerName
-				+ ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
+		return "CoterieBasicInfo [ownerId=" + ownerId   + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
 				+ joinFee + ", joinCheck=" + joinCheck + "]";
 	}
-
 }

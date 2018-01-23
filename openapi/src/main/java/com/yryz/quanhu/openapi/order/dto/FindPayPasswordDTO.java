@@ -28,7 +28,7 @@ public class FindPayPasswordDTO implements Serializable {
 	/**
 	 * 手机号
 	 */
-	@ApiModelProperty(value="手机号")
+	@ApiModelProperty(value="手机号，可选")
 	private String phone;
 	
 	/**
@@ -40,7 +40,7 @@ public class FindPayPasswordDTO implements Serializable {
 	/**
 	 * 支付密码
 	 */
-	@ApiModelProperty(value="支付密码")
+	@ApiModelProperty(value="支付密码，新密码")
 	private String payPassword;
 	
 	/**
