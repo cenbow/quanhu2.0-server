@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yryz.quanhu.order.grow.manage.dao.persistence.GrowLevelManageDao">
+
+   <sql id="columns">
+		 id as id ,
+		 grade as grade ,
+		 level  as level ,
+		 level_start  as levelStart ,
+		 level_end   as  levelEnd  ,
+		 create_time as  createTime ,
+		 update_time as  updateTime
+	</sql>
+	
+	<!-- 新增积分事件 -->
+	<insert id="save" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="com.yryz.quanhu.order.grow.entity.GrowLevel">
+		INSERT INTO grow_level(
+		grade,level,level_start ,
+		<if test="levelEnd != null">
+			level_end ,
+		</if>
+		create_time , update_time
+		)
+		VALUES (
+		#{grade},#{level},
+		#{levelStart},
+		<if test="levelEnd != null">
+			#{levelEnd},
+		</if>
+		#{createTime} , #{update_time}
+		)
+	</insert>
+
+	<!-- 根据事件编码查询事件信息 -->
+	<select id="getByLevelValue" parameterType="java.lang.Integer"
+		resultType="com.yryz.quanhu.order.grow.entity.GrowLevel">
+		SELECT  <include refid="columns" /> 
+		FROM grow_level where level_start &lt;= #{levelValue} and (level_end &gt;= #{levelValue} or level_end is null )
+	</select>
+	
+	<select id="getByLevel" resultType="com.yryz.quanhu.order.grow.entity.GrowLevel">
+		SELECT  <include refid="columns" /> 
+		FROM grow_level where level = #{level}
+	</select>
+
+	<!-- 获取积分事件列表 -->
+	<select id="getAll"
+		resultType="com.yryz.quanhu.order.grow.entity.GrowLevel">
+		SELECT  <include refid="columns" />  from grow_level
+	</select>
+
+	<select id="getPage"
+		resultType="com.yryz.quanhu.order.grow.entity.GrowLevel">
+		SELECT  <include refid="columns" />  from grow_level
+		limit #{limit} offset #{start}
+	</select>
+
+	<!-- 更新积分事件信息 -->
+	<update id="update">
+		UPDATE grow_level
+		<trim prefix="set" suffixOverrides=",">
+			update_time = #{updateTime},
+			<if test="grade != null">
+				grade = #{grade,jdbcType=VARCHAR},
+			</if>
+			<if test="level != null">
+				level = #{level,jdbcType=VARCHAR},
+			</if>
+			<if test="levelStart != null">
+				level_start = #{levelStart,jdbcType=INTEGER},
+			</if>
+			<if test="levelEnd != null">
+				level_end = #{levelEnd,jdbcType=INTEGER},
+			</if>
+		</trim>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 删除 -->
+	<update id="delById" parameterType="java.lang.Long">
+		DELETE FROM grow_level
+		WHERE
+		id = #{id}
+	</update>
+
+</mapper>

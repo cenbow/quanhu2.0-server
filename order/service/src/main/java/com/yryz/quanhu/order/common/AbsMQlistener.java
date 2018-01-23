@@ -1,4 +1,4 @@
-package com.yryz.quanhu.order.score.consumer;
+package com.yryz.quanhu.order.common;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -57,7 +57,7 @@ public interface UserRelationApi {
      * @param userTargetIds    目标用户
      * @return
      */
-    Response<List<UserRelationDto>> selectBy(String userSourceId, String[] userTargetIds);
+    Response<List<UserRelationDto>> selectBy(String userSourceId, Set<String> userTargetIds);
 
 
 

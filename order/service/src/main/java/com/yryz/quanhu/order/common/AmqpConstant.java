@@ -5,7 +5,7 @@
  * Created on 2018年1月17日
  * Id: AmqpConstant.java, 2018年1月17日 下午3:01:00 yehao
  */
-package com.yryz.quanhu.order.score.consumer;
+package com.yryz.quanhu.order.common;
 
 /**
  * @author syc
@@ -15,16 +15,24 @@ package com.yryz.quanhu.order.score.consumer;
  */
 public class AmqpConstant {
 	
-	public static final String SCORE_QUEUE = "SCORE_QUEUE";
+//	public static final String SCORE_QUEUE = "SCORE_QUEUE";
 	
 	public static final String SCORE_RECEIVE_QUEUE = "SCORE_RECEIVE_QUEUE";  //积分
+	
+	public static final String SCORE_RECEIVE_QUEUE_DEMO = "SCORE_RECEIVE_QUEUE_DEMO";  //积分
 
-	public static final String SCORE_RECEIVE_GROW = "SCORE_RECEIVE_GROW";  //成长值
+	public static final String GROW_RECEIVE_QUEUE = "GROW_RECEIVE_QUEUE";  //成长值
 	
 	public static final String EVENT_DIRECT_EXCHANGE = "EVENT_DIRECT_EXCHANGE";//exchange
 	
-	public static final String Fanout =  "Fanout" ;
-	public static final String QUEUE_EVENT =   "QUEUE_EVENT";
+	
+	public static final String EVENT_DIRECT_EXCHANGE_DEMO = "EVENT_DIRECT_EXCHANGE_DEMO";//exchange
+	
+//	public static final String Fanout =  "Fanout" ;
+	
+//	public static final String QUEUE_EVENT =   "QUEUE_EVENT";
+	
+	
 	
 	
 	

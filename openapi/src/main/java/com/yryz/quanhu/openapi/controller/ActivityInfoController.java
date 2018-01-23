@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,8 +31,7 @@ public class ActivityInfoController {
     @ApiOperation("我参加/报名的活动列表(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/myList")
-    public  Response<PageList<ActivityInfoAppListVo>>  myList(Integer pageNum, Integer pageSize, HttpServletRequest request) {
-       String custId = request.getHeader("custId");
+    public  Response<PageList<ActivityInfoAppListVo>>  myList(Integer pageNum, Integer pageSize, @RequestHeader("custId") String custId, HttpServletRequest request) {
        Assert.notNull(custId, "custId is null");
        return activityInfoApi.myList(pageNum,pageSize,Long.valueOf(custId));
     }

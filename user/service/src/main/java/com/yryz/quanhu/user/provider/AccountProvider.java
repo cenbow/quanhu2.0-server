@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSON;
+import com.yryz.common.utils.GsonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -156,7 +157,7 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> login(LoginDTO loginDTO, RequestHeader header) {
 		try {
-			logger.info("user login request: {}", JSON.toJSONString(loginDTO));
+			logger.info("user login request: {}", GsonUtils.parseJson(loginDTO));
 			checkLoginDTO(loginDTO, LoginType.PHONE);
 			checkHeader(header);
 			loginDTO.setDeviceId(header.getDevId());
@@ -185,6 +186,8 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> loginByVerifyCode(RegisterDTO registerDTO, RequestHeader header) {
 		try {
+			logger.info("loginByVerifyCode request, registerDTO: {}, header: {}", GsonUtils.parseJson(registerDTO),
+			GsonUtils.parseJson(header));
 			checkRegisterDTO(registerDTO, RegType.PHONE);
 			checkHeader(header);
 			registerDTO.setDeviceId(header.getDevId());
@@ -219,6 +222,7 @@ public class AccountProvider implements AccountApi {
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
 
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
+			logger.info("thirdLoginService.selectByThirdId result: {}", GsonUtils.parseJson(login));
 			Long userId = null;
 			// 已存在账户直接登录
 			if (login != null) {
@@ -233,10 +237,8 @@ public class AccountProvider implements AccountApi {
 			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId.toString(), header);
 			logger.info("loginThird result: {}", JSON.toJSONString(registerLoginVO));
 			return ResponseUtils.returnObjectSuccess(registerLoginVO);
-		} catch (QuanhuException e) {
-			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-			logger.error("第三方登录未知异常", e);
+			logger.error("loginThird error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}
@@ -828,6 +830,8 @@ public class AccountProvider implements AccountApi {
 		if (thirdUser == null || StringUtils.isBlank(thirdUser.getThirdId())) {
 			throw QuanhuException.busiError("认证失败，thirdUser or thirdId is null !");
 		}
+		logger.info("getThirdUser result: {}", GsonUtils.parseJson(thirdUser));
+
 		return thirdUser;
 	}
 

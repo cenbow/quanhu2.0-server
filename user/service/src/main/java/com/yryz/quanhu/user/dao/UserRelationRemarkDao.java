@@ -14,8 +14,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserRelationRemarkDao extends BaseDao{
 
-    public UserRelationRemarkDto selectByUser(UserRelationRemarkDto remarkDto);
+    <T> T selectByUser(T t);
 
-    public int resetByUser(UserRelationRemarkDto remarkDto);
+    <T> int resetByUser(T t);
 
 }
