@@ -5,6 +5,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.notice.dto.NoticeDto;
 import com.yryz.quanhu.message.notice.entity.Notice;
+import com.yryz.quanhu.message.notice.vo.NoticeDetailVo;
 import com.yryz.quanhu.message.notice.vo.NoticeVo;
 
 /**
@@ -16,27 +17,17 @@ import com.yryz.quanhu.message.notice.vo.NoticeVo;
 public interface NoticeAPI {
 
     /**
-     * 获取Notice明细
-     *
-     * @param id
-     * @return
-     */
-    Response<Notice> get(Long id);
-
-    /**
-     * 获取Notice明细
-     *
-     * @param id
-     * @return
-     */
-    Response<NoticeVo> detail(Long id);
-
-    /**
      * 获取Notice列表
      *
      * @param noticeDto
      * @return
      */
-    Response<PageList<NoticeVo>> list(NoticeDto noticeDto);
+    Response<NoticeVo> list(NoticeDto noticeDto);
 
+    /**
+     * 获取Notice详情
+     * @param noticeDto
+     * @return
+     */
+    Response<NoticeDetailVo> detail(NoticeDto noticeDto);
 }
