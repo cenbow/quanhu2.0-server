@@ -89,7 +89,7 @@ public class UserController {
 	
 	@ApiOperation("用户信息编辑")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/user/update")
+	@PostMapping(value = "/{version}/user/update")
 	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		infoDTO.setUserId(header.getUserId());

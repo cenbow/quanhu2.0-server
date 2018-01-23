@@ -31,23 +31,25 @@ import com.yryz.common.exception.RpcOptException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.order.dto.ExecuteOrderDTO;
 import com.yryz.quanhu.openapi.order.dto.FindPayPasswordDTO;
+import com.yryz.quanhu.openapi.order.dto.FreePayDTO;
 import com.yryz.quanhu.openapi.order.dto.GetCashDTO;
+import com.yryz.quanhu.openapi.order.dto.OrderListDTO;
 import com.yryz.quanhu.openapi.order.dto.PointsToAccountDTO;
 import com.yryz.quanhu.openapi.order.dto.UnbindBankCardDTO;
 import com.yryz.quanhu.openapi.order.dto.UserBankDTO;
+import com.yryz.quanhu.openapi.order.dto.UserPhyDTO;
 import com.yryz.quanhu.openapi.order.utils.BankUtil;
 import com.yryz.quanhu.openapi.order.utils.DataEnum;
 import com.yryz.quanhu.openapi.service.PayService;
 import com.yryz.quanhu.order.api.OrderApi;
-import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.AccountOrder;
@@ -69,7 +71,7 @@ import io.swagger.annotations.ApiOperation;
  * @date 2018年1月20日 上午11:04:02
  * @Description 资金管理
  */
-@Api("资金管理 ")
+@Api(tags="资金管理 ")
 @RestController
 public class OrderController {
 	
@@ -518,7 +520,10 @@ public class OrderController {
     @ApiOperation("设置小额免密")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/setFreePay")
-	public Response<?> setFreePay(String custId, Integer type, String password) {
+	public Response<?> setFreePay(HttpServletRequest request, @RequestBody FreePayDTO freePayDTO) {
+    	String custId = WebUtil.getHeader(request).getUserId();
+    	Integer type = freePayDTO.getType();
+    	String password = freePayDTO.getPayPassword();
 		if (StringUtils.isEmpty(custId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
@@ -683,6 +688,241 @@ public class OrderController {
 		}
 		return res;
 	}
+	
+	/**
+	 * 获取安全信息
+	 * @param custId
+	 * @return
+	 */
+    @ApiOperation("获取安全信息")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/getUserPhy")
+	public Response<?> getUserPhy(String custId) {
+		if (StringUtils.isEmpty(custId)) {
+			return ResponseUtils.returnCommonException("用户ID为必填");
+		}
+		try {
+			UserPhyDTO userPhy = payService.getUserPhy(custId);
+			UserAccount account = payService.getUserAccount(custId);
+			if (userPhy == null || account == null) {
+				return ResponseUtils.returnCommonException("当前用户数据不存在，请重试");
+			}
+			Map<String, Object> json = new HashMap<>(5);
+			json.put("custId", userPhy.getCustId());
+			json.put("phyName", replaceStr(userPhy.getPhyName(), 1));
+			json.put("phyCardNo", replaceStr(userPhy.getCustIdcardNo(), 4));
+			if (userPhy != null && StringUtils.isEmpty(userPhy.getPayPassword())) {
+				json.put("isPayPassword", 0);
+			} else {
+				json.put("isPayPassword", 1);
+			}
+			if (account != null) {
+				json.put("smallNopass", account.getSmallNopass());
+			}
+			return ResponseUtils.returnObjectSuccess(json);
+		} catch (Exception e) {
+			logger.error("查询用户安全信息", e);
+			return ResponseUtils.returnCommonException("用户不存在");
+		}
+	}
+
+	private static String replaceStr(String str, int num) {
+		if (StringUtils.isEmpty(str)) {
+			return null;
+		}
+		char[] chars = str.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			if (i >= num) {
+				char chat = chars[i];
+				chat = '*';
+				chars[i] = chat;
+			}
+		}
+		return new String(chars);
+	}
+	
+	/**
+	 * 获取订单列表
+	 * @param custId
+	 * @param date
+	 * @param productType
+	 * @param type
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+    @ApiOperation("获取订单列表")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/getOrderList")
+	public Response<?> getOrderList(String custId, String date, Integer productType, Integer type, Long start,
+			Long limit) {
+		if (StringUtils.isEmpty(custId)) {
+			return ResponseUtils.returnCommonException("用户ID为必填");
+		}
+		if (type == null) {
+			return ResponseUtils.returnCommonException("请输入查询类型：1，消费流水；2，积分流水");
+		}
+		if (start == null) {
+			start = 0L;
+		}
+		if (limit == null) {
+			limit = 20L;
+		}
+		try {
+			List<OrderListDTO> list = payService.getOrderList(custId, date, productType, type, start, limit);
+			return ResponseUtils.returnListSuccess(list);
+		} catch (Exception e) {
+			logger.error("查询用户账单信息失败", e);
+			return ResponseUtils.returnCommonException("无数据");
+		}
+	}
+    
+    /**
+     * 苹果内购
+     * @param orderId
+     * @param orderAmount
+     * @param receipt
+     * @param custId
+     * @return
+     */
+    @ApiOperation("苹果内购支付")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/checkIOSPay")
+    public Response<?> checkIOSPay(String orderId, Long orderAmount, String receipt, String custId) {
+		if (orderAmount == null || orderAmount.intValue() < 100 || orderAmount.intValue() % 100 != 0) {
+			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
+		}
+		
+//		boolean isSandbox = false;
+//		if ("575155838165196903".equals(custId)) {
+//			isSandbox = true;
+//		}
+//
+//		String result = IosVerify.verifyReceipt(receipt, isSandbox);
+//		logger.info("ios check receipt : " + result);
+//		logger.info("ios check receive result : " + result);
+//		try {
+//			JSONObject json = new JSONObject(result);
+//			if (json.getInt("status") != 0) {
+//				if (json.getInt("status") == 21005) { // 苹果服务不可用，需要再次测试
+//					return ReturnModel.returnException(ReturnCode.WARN, "验证苹果服务超时");
+//				} else {
+//					return ReturnModel.returnException(ReturnCode.WARN, "验证苹果服务失败");
+//				}
+//			}
+//			String productId = json.getJSONObject("receipt").getJSONArray("in_app").getJSONObject(0)
+//					.getString("product_id");
+//			PayResponse payResp = new PayResponse();
+//			payResp.setSn(orderId);
+//			String payAmount = DataEnum.getIosProductConfig(productId).getCost() + "";
+//			payResp.setPayAmount(payAmount);
+//			int orderState = 1;
+//			payResp.setEndDesc(receipt);
+//			payServcie.completePayInfo(payResp, Constant.PAY_WAY_IOS_IAP, orderState);
+//		} catch (Exception e) {
+//			logger.error("苹果内购验证失败", e);
+//			return ReturnModel.returnException(ReturnCode.WARN, "验证苹果服务失败");
+//		}
+		return ResponseUtils.returnSuccess();
+	}
+    
+    /**
+     * 获取统计信息
+     * @param custId
+     * @return
+     */
+	public Response<?> getStatistics(String custId) {
+		if (StringUtils.isEmpty(custId)) {
+			return ResponseUtils.returnCommonException("custId为空");
+		}
+		return ResponseUtils.returnSuccess();
+//		try {
+//			UserStatistics statistics = payServcie.getIntegralStatistics(custId);
+//			return ReturnModel.beanToString(statistics);
+//		} catch (Exception e) {
+//			logger.error("查询积分统计失败", e);
+//			return ReturnModel.returnException(ReturnCode.WARN, "无数据");
+//		}
+	}
+
+	/**
+	 * 支付宝网页支付
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+    @ApiOperation("支付宝网页支付")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@RequestMapping(value = "/toAlipay")
+	public void toAlipay(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String orderId = request.getParameter("orderId");
+		if (StringUtils.isEmpty(orderId)) {
+			return;
+		}
+//		String ipAddress = WebUtil.getClientIP(request);
+//		String requestHtml = payService.buildAlipayRequest(orderId, null, 0L, 0L, "156", ipAddress, null, false);
+//		logger.warn("requestHtml:" + requestHtml);
+//		response.setContentType("text/html; charset=" + AlipayConfig.input_charset);
+//		response.getWriter().println(requestHtml);
+//		response.getWriter().flush();
+	}
+	
+    
+    /**
+     * 执行异步订单
+     * @param orderId
+     * @param custId
+     * @param password
+     * @return
+     */
+    @ApiOperation("执行异步订单")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/executeOrder")
+    public Response<?> executeOrder(@RequestBody ExecuteOrderDTO executeOrderDTO) {
+    	String orderId = executeOrderDTO.getOrderId();
+    	String custId = executeOrderDTO.getCustId();
+    	String password = executeOrderDTO.getPayPassord();
+		if (StringUtils.isEmpty(orderId)) {
+			return ResponseUtils.returnCommonException("orderId必填");
+		}
+		if (StringUtils.isEmpty(custId)) {
+			return ResponseUtils.returnCommonException("custId必填");
+		}
+		try {
+			return payService.executeOrder(orderId, custId, password);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
+	}
+    
+    /**
+     * 查询订单状态
+     * @param orderId
+     * @return
+     */
+    @ApiOperation("查询订单状态")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/getOrderInfo")
+	public Response<?> getOrderInfo(String orderId) {
+		if (StringUtils.isEmpty(orderId)) {
+			return ResponseUtils.returnCommonException("orderId必填");
+		}
+		try {
+			OrderInfo orderInfo = payService.getOrderInfo(orderId);
+			if (orderInfo != null) {
+				orderInfo.setBizContent(null);
+				orderInfo.setCallback(null);
+				return ResponseUtils.returnObjectSuccess(orderInfo);
+			} else {
+				return ResponseUtils.returnCommonException("无订单数据");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return ResponseUtils.returnCommonException("未知异常");
+		}
+	}
+	
     
 	
 }
