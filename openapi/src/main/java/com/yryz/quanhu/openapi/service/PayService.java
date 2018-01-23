@@ -139,6 +139,20 @@ public class PayService {
 		}
 		return ResponseUtils.returnSuccess();
 	}
+	
+	/**
+	 * 获取账户消息
+	 * @param custId
+	 * @return
+	 */
+	public UserAccount getUserAccount(String custId) {
+		try {
+			UserAccount userAccount = orderAPI.getUserAccount(custId).getData();
+			return userAccount;
+		} catch (Exception e) {
+			throw new RpcOptException("资金RPC，getUserAccount调用异常", e.getCause());
+		}
+	}
 
 	/**
 	 * 绑定银行卡
