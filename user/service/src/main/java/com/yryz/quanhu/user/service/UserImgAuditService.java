@@ -44,12 +44,12 @@ public interface UserImgAuditService {
 	 * @param auditStatus 0:待审核 1:通过 2:拒绝
 	 * @return
 	 */
-	Page<UserImgAudit> listByUserId(Integer pageNo,Integer pageSize,String userId, Integer auditStatus);
+	Page<UserImgAudit> listByUserId(Integer pageNo,Integer pageSize,Long userId, Integer auditStatus);
 	
 	/**
 	 * 更新头像审核信息
 	 * @param userId
 	 * @return
 	 */
-	public int delete(String userId);
+	public int delete(Long userId);
 }
