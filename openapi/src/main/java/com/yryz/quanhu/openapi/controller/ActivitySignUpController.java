@@ -29,7 +29,7 @@ public class ActivitySignUpController {
     @NotLogin
     @ApiOperation("报名活动详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = " /services/app/{version}/activity/signUp/activitySignUpHome")
+    @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpHome")
     public Response<ActivitySignUpHomeAppVo> getActivityInfoVo(Long activityInfoId, @RequestHeader("custId") String custId, HttpServletRequest request) {
         Assert.notNull(activityInfoId, "activityInfoId is null");
         Assert.notNull(custId, "custId is null");
@@ -38,7 +38,7 @@ public class ActivitySignUpController {
 
     @ApiOperation("确认报名-提交报名信息(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = " /services/app/{version}/activity/signUp/activitySignUpSubmit")
+    @PostMapping(value = "/services/app/{version}/activity/signUp/activitySignUpSubmit")
     public Response<ActivityRecord> activitySignUpSubmit(@RequestBody ActivityRecord activityRecord, HttpServletRequest request) {
         Assert.notNull(activityRecord, "activityRecord is null");
         String custId = request.getHeader("custId");
@@ -48,7 +48,7 @@ public class ActivitySignUpController {
 
     @ApiOperation("参与报名-获取活动配置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = " /services/app/{version}/activity/signUp/activitySignUpFrom")
+    @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpFrom")
     public Response<ActivityEnrolConfig> getActivitySignUpFrom(Long activityInfoId, HttpServletRequest request) {
         Assert.notNull(activityInfoId, "activityInfoId is null");
         String custId = request.getHeader("custId");
@@ -58,7 +58,7 @@ public class ActivitySignUpController {
 
     @ApiOperation("查询报名状态(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = " /services/app/{version}/activity/signUp/activitySignUpStatus")
+    @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpStatus")
     public Response<Map<String,Integer>> getActivitySignUpStatus(Long activityInfoId, HttpServletRequest request) {
         Assert.notNull(activityInfoId, "activityInfoId is null");
         String custId = request.getHeader("custId");

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -27,6 +28,7 @@ import com.yryz.quanhu.order.vo.PreOrderVo;
  * @date 2018年1月18日 上午9:36:41
  * @Description 异步订单接口实现
  */
+@Service(interfaceClass=OrderAsynApi.class)
 public class OrderAsynProvider implements OrderAsynApi {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());

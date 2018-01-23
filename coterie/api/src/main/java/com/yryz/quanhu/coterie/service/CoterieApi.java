@@ -3,7 +3,7 @@ package com.yryz.quanhu.coterie.service;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.exception.ServiceException;
 import com.yryz.quanhu.coterie.vo.CoterieAuditInfo;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public interface CoterieApi {
 	 * @return 
 	 * @throws ServiceException
 	 */
-	public Response<CoterieInfo> applyCreate(CoterieBaseInfo info) throws ServiceException;
+	public Response<CoterieInfo> applyCreate(CoterieBasicInfo info) throws ServiceException;
 	
 	/**
 	 * 我创建的私圈

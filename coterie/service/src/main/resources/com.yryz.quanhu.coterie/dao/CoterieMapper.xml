@@ -46,7 +46,7 @@
       #{createDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{processTime,jdbcType=TIMESTAMP}, 
       #{deleted,jdbcType=TINYINT},#{heat},#{isExpert},#{recommend},#{lastInfoTime)
   </insert>
-  <insert id="insertSelective" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <insert id="insertSelective" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     insert into qh_coterie
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -188,7 +188,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByCoterieIdSelective" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <update id="updateByCoterieIdSelective" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     update qh_coterie
     <set >
       <if test="coterieId != null" >
@@ -259,7 +259,7 @@
     </set>
     where coterie_id = #{coterieId,jdbcType=CHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <update id="updateByPrimaryKey" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     update qh_coterie
     set coterie_id = #{coterieId,jdbcType=CHAR},
       owner_id = #{ownerId,jdbcType=VARCHAR},
@@ -334,7 +334,7 @@
     where state = #{status}
   </select>
   
-  <select id="selectListByCoterie" resultMap="BaseResultMap" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <select id="selectListByCoterie" resultMap="BaseResultMap" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     select 
     <include refid="Base_Column_List" />
     from qh_coterie
@@ -493,7 +493,7 @@
     	and (state=0 or state=3)
   </select>
   
-  <select id="selectBySearchParam" resultType="com.yryz.service.circle.modules.coterie.entity.Coterie" parameterType="com.yryz.service.circle.modules.coterie.entity.CoterieSearch">
+  <select id="selectBySearchParam" resultType="com.yryz.service.circle.modules.coterie.entity.Coterie" parameterType="com.yryz.quanhu.coterie.entity.CoterieSearch">
     SELECT s.owner_name ownerName,
 	  s.owner_intro ownerIntro,
 	  s.coterie_name,
@@ -530,7 +530,7 @@
 	limit #{start},#{pageSize}
   </select>
   
-  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.service.circle.modules.coterie.entity.CoterieSearch">
+  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.coterie.entity.CoterieSearch">
     SELECT count(*)
 	FROM `qh_coterie` s
 	WHERE 1=1

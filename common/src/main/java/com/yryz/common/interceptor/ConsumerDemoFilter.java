@@ -17,7 +17,6 @@ public class ConsumerDemoFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         RpcContext.getContext().setAttachment("appId", "hello rpcContext");
-        logger.info("dubboFilter test consumer...");
         return invoker.invoke(invocation);
     }
 }

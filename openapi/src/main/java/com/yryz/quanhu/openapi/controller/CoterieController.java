@@ -6,7 +6,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.coterie.service.CoterieApi;
-import com.yryz.quanhu.coterie.vo.CoterieBaseInfo;
+import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.user.service.AccountApi;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -33,7 +32,7 @@ import java.util.List;
  */
 @Api(description = "私圈接口")
 @RestController
-public class coterieController {
+public class CoterieController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
@@ -50,8 +49,8 @@ public class coterieController {
 
 	@ApiOperation("发布私圈")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/coterie/publish")
-	public Response<CoterieInfo> publish(@RequestBody CoterieBaseInfo info, String userId, HttpServletRequest request) {
+	@GetMapping(value = "/{version}/coterieInfo/single")
+	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
 			info.setJoinCheck((byte) 1);
@@ -64,7 +63,7 @@ public class coterieController {
 	
 	@ApiOperation("设置私圈， 更新圈子的数据")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/coterie/config")
+	@GetMapping(value = "/{version}/coterieInfo/config")
 	public Response<Boolean> config(String coterieId, @RequestBody CoterieInfo config, HttpServletRequest request) {
 		Response<CoterieInfo> rpcRecord = coterieApi.queryCoterieInfo(coterieId);
 		CoterieInfo  record=rpcRecord.getData();
@@ -73,7 +72,6 @@ public class coterieController {
 		if (StringUtils.isNotBlank(tempStr = config.getIcon())) {
 			record.setIcon(tempStr);
 		}
-
 		if (StringUtils.isNotBlank(tempStr = config.getName())) {
 			record.setName(tempStr);
 		}
@@ -105,8 +103,6 @@ public class coterieController {
 		}
 		 coterieApi.modifyCoterieInfo(record);
          return null;
-
-
 	}
 	
 	/**
@@ -117,7 +113,7 @@ public class coterieController {
 	 */
 	@ApiOperation("获取私圈详情")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/coterie/getDetails")
+	@PostMapping(value = "/{version}/coterieInfo/single")
 	public Response<CoterieInfo> details(String coterieId, HttpServletRequest request) {
 		//Assert.notNull(coterieId, "私圈id不能为null！");
 		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
@@ -140,9 +136,9 @@ public class coterieController {
 	 * @return
 	 */
 	@ApiOperation("获取我创建的私圈详情")
-	@PostMapping(value = "/{version}/coterie/getMyCreateCoterie")
+	@PostMapping(value = "/{version}/coterieInfo/creator")
 	@Deprecated
-	public Response<List<CoterieInfo>> getMyCreateCoterie(String userId, HttpServletRequest request) {
+	public Response<List<CoterieInfo>> getMyCreateCoterie(HttpServletRequest request) {
 
 		RequestHeader header = WebUtil.getHeader(request);
 		String userid=header.getUserId();
@@ -154,9 +150,9 @@ public class coterieController {
 	 * @return
 	 */
 	@ApiOperation("获取我加入的私圈详情")
-	@PostMapping(value = "/{version}/coterie/getMyJoinCoterie")
+	@PostMapping(value = "/{version}/coterieInfo/list/join")
 	@Deprecated
-	public Response<List<CoterieInfo>> getMyJoinCoterie(String userId, HttpServletRequest request) {
+	public Response<List<CoterieInfo>> getMyJoinCoterie(HttpServletRequest request) {
 
 		RequestHeader header = WebUtil.getHeader(request);
 		String userid=header.getUserId();
@@ -166,10 +162,26 @@ public class coterieController {
  * 分页获取私圈列表
  * @return
  */
- @ApiOperation("获取我加入的私圈详情")
- @PostMapping(value = "/{version}/coterie/queryPage")
+ @ApiOperation("分页获取私圈列表")
+ @PostMapping(value = "/{version}/coterieInfo/list/")
  @Deprecated
-  public Response<List<CoterieInfo>> queryPage(Integer pageNum, Integer pageSize, HttpServletRequest request){
-			return coterieApi.queryPage(  pageNum,   pageSize);
+  public Response<List<CoterieInfo>> queryPage(Integer currentPage, Integer pageSize, HttpServletRequest request){
+			return coterieApi.queryPage(  currentPage,   pageSize);
   }
+	/**
+	 *  首页 热门 私圈
+	 * @param
+	 * @return
+	 */
+	@ApiOperation("获取热门私圈 ")
+	@PostMapping(value = "/{version}/coterieInfo/list/recommend")
+	@Deprecated
+	public Response<List<CoterieInfo>> getRecommendCoterie(Integer currentPage, Integer pageSize, HttpServletRequest request)
+	{
+
+       return coterieApi.queryPageForApp(currentPage,pageSize);
+	}
+
+
+
 }

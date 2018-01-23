@@ -27,12 +27,12 @@
     </sql>
 
     <!-- 查询Notice详情 -->
-    <select id="selectByKid" parameterType="java.lang.Long" resultType="com.yryz.quanhu.message.notice.vo.NoticeVo">
+    <select id="detail" parameterType="com.yryz.quanhu.message.notice.dto.NoticeDto"
+            resultType="com.yryz.quanhu.message.notice.vo.NoticeDetailVo">
         select
         <include refid="Base_Column_List"/>
         from qh_notice
-        where del_flag = 0
-        and kid = #{kid,jdbcType=BIGINT}
+        where kid = #{kid,jdbcType=BIGINT}
     </select>
 
     <!-- 删除Notice-->
@@ -229,7 +229,29 @@
             resultType="com.yryz.quanhu.message.notice.vo.NoticeVo">
         select
         <include refid="Base_Column_List"/>
-        from qh_notice where del_flag = 0
+        from qh_notice
     </select>
+
+    <select id="selectOnlineList" parameterType="com.yryz.quanhu.message.notice.dto.NoticeDto"
+    resultType="com.yryz.quanhu.message.notice.entity.Notice">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from qh_notice
+        where notice_status = 1
+        <![CDATA[ AND last_update_date > #{searchDate} ]]>
+        ORDER BY create_date DESC, last_update_date DESC
+        limit 0, 100
+    </select>
+
+    <select id="selectOfflineList" parameterType="com.yryz.quanhu.message.notice.dto.NoticeDto"
+            resultType="java.lang.Long">
+        SELECT
+        kid
+        from qh_notice
+        where notice_status = 0
+        <![CDATA[ AND last_update_date > #{searchDate} ]]>
+        ORDER BY create_date DESC, last_update_date DESC
+    </select>
+
 
 </mapper>

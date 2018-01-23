@@ -9,22 +9,14 @@ import java.io.Serializable;
  * @date 2017年10月18日 上午9:50:23
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
-public class CoterieBaseInfo implements Serializable{
+
+@SuppressWarnings("serial")
+public class CoterieBasicInfo implements Serializable{
 	private static final long serialVersionUID = 2264458786258618711L;
     /**
      * 用户ID
      */
     private String ownerId;
-
-    /**
-     * 姓名
-     */
-    private String ownerName;
-
-    /**
-     * 个人简介
-     */
-    private String ownerIntro;
 
     /**
      * 封面图
@@ -57,22 +49,6 @@ public class CoterieBaseInfo implements Serializable{
 
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
-	}
-
-	public String getOwnerName() {
-		return ownerName;
-	}
-
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
-	}
-
-	public String getOwnerIntro() {
-		return ownerIntro;
-	}
-
-	public void setOwnerIntro(String ownerIntro) {
-		this.ownerIntro = ownerIntro;
 	}
 
 	public String getIcon() {
@@ -117,9 +93,7 @@ public class CoterieBaseInfo implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CoterieBaseInfo [ownerId=" + ownerId + ",   ownerName=" + ownerName
-				+ ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
+		return "CoterieBasicInfo [ownerId=" + ownerId   + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
 				+ joinFee + ", joinCheck=" + joinCheck + "]";
 	}
-
 }
