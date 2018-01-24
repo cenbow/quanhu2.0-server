@@ -26,8 +26,11 @@ import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
+import com.yryz.quanhu.user.dto.UserTagDTO;
+import com.yryz.quanhu.user.dto.UserTagDTO.UserTagType;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserTagApi;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
@@ -46,6 +49,8 @@ public class UserTest {
 	private AccountApi accountApi;
 	@Reference
 	private UserApi userApi;
+	@Reference
+	private UserTagApi tagApi;
 	//
 	// @Test
 	// public void exampleTest(){
@@ -167,7 +172,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void login() {
 		LoginDTO loginDTO = new LoginDTO();
 		loginDTO.setPhone("16612345679");
@@ -216,6 +221,16 @@ public class UserTest {
 	//@Test
 	public void getUserLoginSimpleVO(){
 		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(724007310011252736l);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	@Test
+	public void saveBatch(){
+		UserTagDTO dto = new UserTagDTO();
+		dto.setTagIds("1,2,3");
+		dto.setTagType(UserTagType.US_SELECT.getType());
+		dto.setUserId(729671306726400000l);
+		Response<Boolean> response = tagApi.batchSaveUserTag(dto);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 }

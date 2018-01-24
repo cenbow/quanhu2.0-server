@@ -62,7 +62,7 @@ public class UserTagServiceImpl implements UserTagService {
 			Long tagId = NumberUtils.toLong(tagIdArray[i]);
 			UserTag tag = new UserTag();
 			tag.setCreateDate(nowTime);
-			tag.setCreateUserId(tagDTO.getUpdateUserId() == null ? 0l : tagDTO.getUpdateUserId());
+			tag.setLastUpdateUserId(tagDTO.getUpdateUserId() == null ? 0l : tagDTO.getUpdateUserId());
 			tag.setTagId(tagId);
 			tag.setUserId(tagDTO.getUserId());
 			tag.setTagType(tagDTO.getTagType());
@@ -72,7 +72,7 @@ public class UserTagServiceImpl implements UserTagService {
 				boolean tagFlag = false;
 				Long oldTagId = null;
 				for(int j = 0 ; j < tags.size() ; j++){
-					oldTagId = NumberUtils.toLong(tags.get(i));
+					oldTagId = NumberUtils.toLong(tags.get(j));
 					if(tagId == oldTagId){
 						tagFlag = true;
 					}
@@ -82,6 +82,14 @@ public class UserTagServiceImpl implements UserTagService {
 				}
 			}else{
 				userTags.add(tag);
+			}
+		}
+		if(CollectionUtils.isNotEmpty(userTags)){
+			try {
+				mysqlDao.batchSave(userTags);
+			} catch (Exception e) {
+				logger.error("[userTag.batch]",e);
+				throw new MysqlOptException(e);
 			}
 		}
 	}
