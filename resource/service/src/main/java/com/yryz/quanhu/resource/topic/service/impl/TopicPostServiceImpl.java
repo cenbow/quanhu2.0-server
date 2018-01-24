@@ -13,7 +13,10 @@ import com.yryz.quanhu.resource.topic.entity.TopicPost;
 import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
+import com.yryz.quanhu.resource.topic.service.TopicService;
+import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -36,6 +39,9 @@ public class TopicPostServiceImpl implements TopicPostService {
 
     @Reference
     private IdAPI idAPI;
+
+    @Autowired
+    private TopicService topicService;
 
 
     /**
@@ -76,8 +82,8 @@ public class TopicPostServiceImpl implements TopicPostService {
      * @return
      */
     @Override
-    public TopicPostVo getDetail(Long kid, Long userId) {
-
+    public TopicAndPostVo getDetail(Long kid, Long userId) {
+        TopicAndPostVo topicAndPostVo=new TopicAndPostVo();
         /**
          * 检验参数
          */
@@ -88,6 +94,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         if(null==topicPostWithBLOBs){
             throw  QuanhuException.busiError("查询的帖子不存在");
         }
+
         Long createUserId=topicPostWithBLOBs.getCreateUserId();
         TopicPostVo vo=new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs,vo);
@@ -98,7 +105,14 @@ public class TopicPostServiceImpl implements TopicPostService {
                 vo.setUser(userSimpleVO);
             }
         }
-        return vo;
+
+        topicAndPostVo.setPost(vo);
+
+        if(topicPostWithBLOBs.getTopicId()!=null){
+            TopicVo topicVo=topicService.queryDetail(topicPostWithBLOBs.getTopicId(),0l);
+            topicAndPostVo.setTopic(topicVo);
+        }
+        return topicAndPostVo;
     }
 
     /**

@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@ImportResource("classpath*:spring-beans.xml")
 public class ApplicationSupportService {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationSupportService.class, args);

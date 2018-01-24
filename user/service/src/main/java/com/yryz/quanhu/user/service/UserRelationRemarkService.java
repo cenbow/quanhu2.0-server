@@ -4,6 +4,7 @@ import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -22,5 +23,6 @@ public interface UserRelationRemarkService {
 
     public List<UserRelationRemarkDto> selectBy(String sourceUserId, UserRelationConstant.TYPE source);
 
+    public List<UserRelationRemarkDto> selectBy(String sourceUserId, UserRelationConstant.TYPE type,Set<String> targetUserIds);
 
 }

@@ -10,8 +10,11 @@ import com.yryz.quanhu.resource.topic.api.TopicApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
+import com.yryz.quanhu.resource.topic.entity.TopicPost;
+import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
+import org.aspectj.weaver.ast.And;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,7 +100,9 @@ public class TopicPostTest {
         topicPostApi.savePost(dto);
     }
 
-
+    /**
+     * 查询帖子列表
+     */
     @Test
     public void queryListTopicPost() {
         TopicPostDto dto = new TopicPostDto();
@@ -106,5 +111,14 @@ public class TopicPostTest {
         dto.setPageSize(5);
         Response<PageList<TopicPostVo>> data = topicPostApi.listPost(dto);
         System.out.println("===============" + JSON.toJSONString(data.getData()));
+    }
+
+
+    /**
+     * 帖子详情
+     */
+    @Test  public void queryPostDetail(){
+       Response<TopicAndPostVo> data= topicPostApi.quetyDetail(164439L,0L);
+        System.out.println("========"+ JSON.toJSONString(data));
     }
 }

@@ -22,6 +22,11 @@
             <groupId>com.yryz.framework</groupId>
             <artifactId>core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>dymaic-elasticsearch</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
         
     	<dependency>
             <groupId>org.springframework.boot</groupId>

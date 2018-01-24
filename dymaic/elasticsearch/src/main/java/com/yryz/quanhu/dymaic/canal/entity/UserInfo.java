@@ -1,4 +1,4 @@
-package com.yryz.quanhu.dymaic.entity;
+package com.yryz.quanhu.dymaic.canal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,7 +13,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * 
  * @author jk
  */
-@Document(indexName = "quanhu-v2", type = "userInfo", refreshInterval = "-1")
+@Document(indexName = "quanhu-v2-userinfo", type = "userInfo", refreshInterval = "-1")
 public class UserInfo implements Serializable {
 	private static final long serialVersionUID = -2312110729335920029L;
 	@Field(type=FieldType.Long)
@@ -141,8 +141,8 @@ public class UserInfo implements Serializable {
 	/**
 	 * 最终热度值
 	 */
-	@Field(type=FieldType.Integer)
-	private Integer lastHeat;
+	@Field(type=FieldType.Long)
+	private Long lastHeat;
 
 	/**
 	 * 删除标识 10:有效 11:删除
@@ -335,11 +335,11 @@ public class UserInfo implements Serializable {
 		this.authStatus = authStatus;
 	}
 
-	public Integer getLastHeat() {
+	public Long getLastHeat() {
 		return lastHeat;
 	}
 
-	public void setLastHeat(Integer lastHeat) {
+	public void setLastHeat(Long lastHeat) {
 		this.lastHeat = lastHeat;
 	}
 

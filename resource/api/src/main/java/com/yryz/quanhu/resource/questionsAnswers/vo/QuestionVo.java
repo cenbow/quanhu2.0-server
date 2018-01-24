@@ -2,9 +2,10 @@ package com.yryz.quanhu.resource.questionsAnswers.vo;
 
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class QuestionVo {
+public class QuestionVo  implements Serializable {
 
     private Long kid;
 

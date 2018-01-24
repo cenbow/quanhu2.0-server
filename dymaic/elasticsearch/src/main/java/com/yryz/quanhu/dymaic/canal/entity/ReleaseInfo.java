@@ -12,11 +12,9 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * @author jk
  * @table qh_release_info
  */
-@Document(indexName = "quanhu-v2-releaseinfo", type = "releaseInfo", refreshInterval = "-1")
 public class ReleaseInfo implements Serializable {
 	private static final long serialVersionUID = 2924158707369787205L;
 	// 唯一ID
-	@Id
 	private Long kid;
 	/**
 	 * 分类ID

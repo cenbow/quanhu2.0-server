@@ -102,7 +102,7 @@ public class UserStarController {
 	public Response<List<StarInfoVO>> recommendList(Integer start,Integer limit,HttpServletRequest request)  {
 		RequestHeader header = WebUtil.getHeader(request);
 		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
-		paramDTO.setUserId(NumberUtils.toLong(header.getUserId()));
+		paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		paramDTO.setStart(start);
 		paramDTO.setLimit(limit);
 		return starApi.starList(paramDTO);

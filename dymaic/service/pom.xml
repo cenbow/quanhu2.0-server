@@ -33,6 +33,12 @@
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>
         </dependency>
+        
+       <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>dymaic-elasticsearch</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
 
         <!--公司内部库-->
         <dependency>
@@ -57,10 +63,10 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

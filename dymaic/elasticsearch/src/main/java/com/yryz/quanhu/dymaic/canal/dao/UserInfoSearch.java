@@ -1,15 +1,13 @@
-package com.yryz.quanhu.dymaic.dao.elasticsearch;
+package com.yryz.quanhu.dymaic.canal.dao;
 
 import java.util.List;
-import java.util.Map;
 
-import com.yryz.quanhu.dymaic.entity.UserInfo;
-import com.yryz.quanhu.dymaic.vo.UserSimpleVO;
+import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 
 /**
  * 复杂的查询  用ElasticsearchTemplate
  * @author jk
- * @param <UserSimpleVO>
+ * @param <UserSimpleVo>
  *
  */
 public interface UserInfoSearch {

@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
-public class QuestionAnswerVo {
+import java.io.Serializable;
+
+public class QuestionAnswerVo implements Serializable {
     private  QuestionVo question;
 
     private  AnswerVo answer;
