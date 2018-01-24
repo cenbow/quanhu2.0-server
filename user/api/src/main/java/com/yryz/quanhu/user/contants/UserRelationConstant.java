@@ -1,6 +1,6 @@
 package com.yryz.quanhu.user.contants;
 
-import org.springframework.security.access.method.P;
+//import org.springframework.security.access.method.P;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.

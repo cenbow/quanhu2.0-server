@@ -1,15 +1,12 @@
 package com.yryz.quanhu.dymaic;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.yryz.quanhu.dymaic.service.ElasticsearchService;
-import com.yryz.quanhu.dymaic.vo.UserSimpleVO;
 
 /**
  * 按照下面模板可以进行单元测试 测试dubbo提供者直接@Autowired
@@ -17,12 +14,17 @@ import com.yryz.quanhu.dymaic.vo.UserSimpleVO;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class EsTest {
+//	    @Autowired
+//	    private ElasticsearchService elasticsearchService;
+	    
 	    @Autowired
-	    private ElasticsearchService elasticsearchService;
-	
+	    private ElasticsearchTemplate elasticsearchTemplate;
+	    
 	    @Test
 	    public void exampleTest(){
-	    	 List<UserSimpleVO> list=elasticsearchService.searchUser("姜昆",0,3);
-	        System.out.println(list);
+//	    	List<UserSimpleVo> list=elasticsearchService.searchUser("姜昆",0,3);
+//	        System.out.println(list);
+	    	elasticsearchTemplate.deleteIndex("quanhu-v2-resourceinfo");
+	    	elasticsearchTemplate.deleteIndex("quanhu-v2");
 	    }
 }

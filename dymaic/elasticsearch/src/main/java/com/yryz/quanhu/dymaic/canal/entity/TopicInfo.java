@@ -4,15 +4,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "quanhu-v2-topicinfo", type = "topicInfo", refreshInterval = "-1")
 public class TopicInfo implements Serializable{
 	private static final long serialVersionUID = -7955581440447209892L;
 
-	@Id
+//	@Id
     private Long kid;
 	
 	@Field(type = FieldType.text)
@@ -65,6 +63,10 @@ public class TopicInfo implements Serializable{
 	
 	@Field(type = FieldType.text)
     private String gps;
+	
+	//最终热度
+	@Field(type=FieldType.Long)
+	private Long lastHeat;
 
 	public TopicInfo(){
 		

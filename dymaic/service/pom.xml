@@ -26,6 +26,12 @@
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>dymaic-elasticsearch</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
 
         <!--公司内部库-->
         <dependency>

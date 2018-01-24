@@ -2,8 +2,8 @@ package com.yryz.quanhu.dymaic.vo;
 
 import java.io.Serializable;
 
-public class UserSimpleVO implements Serializable{
-	private static final long serialVersionUID = 897568446072158324L;
+public class UserSimpleVo implements Serializable{
+	private static final long serialVersionUID = 8315586242856230666L;
 	/**
 	 * 用户账户id
 	 */
