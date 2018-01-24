@@ -60,23 +60,23 @@ public class QrUtils {
 			throw new BaseException("sys error");
 		}
 
-		// 上传至oss 删除本地
-		File file = null;
-		String uploadPath = OssManager.PIC + OssManager.Coterie_QR;
-		try {
-			file = new File(localPath);
-			qrUrl = OssManager.getInstance().uploadFile(fileName, file, uploadPath);
-			System.out.println(qrUrl);
-		} catch (Exception e) {
-			logger.error("[Qr create]", e);
-			throw new BaseException("sys error");
-		} finally {
-			// 删除本地文件
-			logger.debug("====>delete tmpQr " + localPath);
-			if (file != null){
-				file.deleteOnExit();
-			}
-		}
+		//  todo 上传至oss 删除本地
+//		File file = null;
+//		String uploadPath = OssManager.PIC + OssManager.Coterie_QR;
+//		try {
+//			file = new File(localPath);
+//			qrUrl = OssManager.getInstance().uploadFile(fileName, file, uploadPath);
+//			System.out.println(qrUrl);
+//		} catch (Exception e) {
+//			logger.error("[Qr create]", e);
+//			throw new BaseException("sys error");
+//		} finally {
+//			// 删除本地文件
+//			logger.debug("====>delete tmpQr " + localPath);
+//			if (file != null){
+//				file.deleteOnExit();
+//			}
+//		}
 
 		return qrUrl;
 	}
