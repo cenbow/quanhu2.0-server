@@ -3,13 +3,13 @@
  */
 package com.yryz.common.response;
 
-import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.exception.QuanhuException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
+import org.springframework.web.bind.MissingServletRequestParameterException;
+
+import com.yryz.common.exception.QuanhuException;
 
 /**
  * 返回对象工具
@@ -96,14 +96,13 @@ public class ResponseUtils {
     }
 
     /**
-     * @param @param  res
-     * @param @return
+     * @param  res
      * @return T
      * @throws
      * @Description: 获取返回对象中对象
      * @author wangheng
      */
-    public static <T> T getResponseObject(Response<T> res) {
+    public static <T> T getResponseData(Response<T> res) {
         if (null == res) {
             throw QuanhuException.busiError("getResponseObject() , res is null !");
         }
@@ -116,14 +115,13 @@ public class ResponseUtils {
     }
 
     /**
-     * @param @param  res
-     * @param @return
+     * @param  res
      * @return Collection<?>
      * @throws
      * @Description: 获取返回对象中List对象
      * @author wangheng
      */
-    public static <T> Collection<?> getResponseList(Response<Collection<?>> res) {
+    public static <T> Collection<?> getResponseDataList(Response<Collection<?>> res) {
         if (null == res) {
             throw QuanhuException.busiError("getResponseObject() , res is null !");
         }
@@ -133,37 +131,5 @@ public class ResponseUtils {
         }
 
         return res.getData();
-    }
-
-    /**
-     * 检查Response对象
-     *
-     * @param response
-     * @param <T>
-     * @return
-     */
-    public static <T> T checkResponse(Response<T> response) {
-        if (response != null && response.success()) {
-            return response.getData();
-        }
-        throw new QuanhuException(response.getCode(), response.getMsg(), response.getErrorMsg());
-    }
-
-    /**
-     * 检查Response对象且检查data数据对象
-     *
-     * @param response
-     * @param <T>
-     * @return
-     */
-    public static <T> T checkResponseNotNull(Response<T> response) {
-        if (response != null && response.success()) {
-            T t = response.getData();
-            if (t == null) {
-                throw new QuanhuException(ExceptionEnum.RPC_RESPONSE_DATA_EXCEPTION);
-            }
-            return t;
-        }
-        throw new QuanhuException(response.getCode(), response.getMsg(), response.getErrorMsg());
     }
 }
