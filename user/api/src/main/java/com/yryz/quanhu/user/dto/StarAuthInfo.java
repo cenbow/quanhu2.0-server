@@ -140,7 +140,11 @@ public class StarAuthInfo implements Serializable {
     /**
      * 达人推荐权重值
      */
-    private Integer starWeight;
+    private Integer recommendHeight;
+    /**
+     * 达人推荐语
+     */
+    private String recommendDesc;
     public Integer getId() {
         return id;
     }
@@ -229,12 +233,21 @@ public class StarAuthInfo implements Serializable {
         this.organizationPaper = organizationPaper == null ? null : organizationPaper.trim();
     }
 
-    public Integer getStarWeight() {
-		return starWeight;
+
+	public Integer getRecommendHeight() {
+		return recommendHeight;
 	}
 
-	public void setStarWeight(Integer starWeight) {
-		this.starWeight = starWeight;
+	public void setRecommendHeight(Integer recommendHeight) {
+		this.recommendHeight = recommendHeight;
+	}
+
+	public String getRecommendDesc() {
+		return recommendDesc;
+	}
+
+	public void setRecommendDesc(String recommendDesc) {
+		this.recommendDesc = recommendDesc;
 	}
 
 	public Byte getAuthType() {
@@ -356,4 +369,54 @@ public class StarAuthInfo implements Serializable {
 	public void setAppId(String appId) {
 		this.appId = appId;
 	}
+	
+	
+	public StarAuthInfo() {
+		super();
+	}
+
+	/**
+	 * 达人审核
+	 * @param userId
+	 * @param auditStatus
+	 * @param operational
+	 * @param auditFailReason
+	 */
+	public StarAuthInfo(String userId, Byte auditStatus, String operational, String auditFailReason) {
+		super();
+		this.userId = userId;
+		this.auditStatus = auditStatus;
+		this.operational = operational;
+		this.auditFailReason = auditFailReason;
+	}
+
+	/**
+	 * 达人推荐
+	 * @param userId
+	 * @param recommendStatus
+	 * @param operational
+	 * @param recommendOperate
+	 * @param recommendDesc
+	 */
+	public StarAuthInfo(String userId, Byte recommendStatus, String operational, String recommendOperate,
+			String recommendDesc) {
+		super();
+		this.userId = userId;
+		this.recommendStatus = recommendStatus;
+		this.operational = operational;
+		this.recommendOperate = recommendOperate;
+		this.recommendDesc = recommendDesc;
+	}
+
+	/**
+	 * 达人推荐权重更新
+	 * @param userId
+	 * @param recommendHeight
+	 */
+	public StarAuthInfo(String userId, Integer recommendHeight) {
+		super();
+		this.userId = userId;
+		this.recommendHeight = recommendHeight;
+	}
+
 }
