@@ -15,7 +15,6 @@ import com.yryz.quanhu.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.vo.CoterieSearchParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,22 +32,23 @@ import java.util.List;
  */
 @Service
 public class CoterieServiceImpl implements CoterieService {
-	@Autowired
+	@Resource
 	private CoterieMapper coterieMapper;
 
-	//@Resource
+
 	//private CoterieAuditRecordMapper coterieAuditRecordMapper;
 
 	@Override
 	public CoterieInfo save(CoterieBasicInfo info) {
 		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
-		coterie.setCoterieId(IdUtils.randomappId());
+		//todo
+		//coterie.setCoterieId(IdUtils.randomappId());
 		String qrUrl= QrUtils.createQr("",coterie.getCoterieId());
 		coterie.setQrUrl(qrUrl);
 		coterie.setConsultingFee(0);
 		coterie.setCreateDate(new Date());
 		coterie.setDeleted((byte)0);
-		coterie.setJoinCheck(info.getJoinCheck()==null?((byte)1):info.getJoinCheck());
+		coterie.setJoinCheck(info.getJoinCheck()==null? 1 : info.getJoinCheck() );
 		coterie.setJoinFee(info.getJoinFee()==null?0:info.getJoinFee());
 		coterie.setLastUpdateDate(new Date());
 		coterie.setMemberNum(0);

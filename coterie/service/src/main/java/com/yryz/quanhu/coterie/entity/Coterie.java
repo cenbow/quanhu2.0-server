@@ -80,7 +80,7 @@ public class Coterie implements Serializable {
 	/**
 	 * 成员加入是否需要审核（0不审核，1审核）
 	 */
-	private Byte joinCheck;
+	private Integer joinCheck;
 
 	/**
 	 * 成员数量
@@ -221,11 +221,11 @@ public class Coterie implements Serializable {
 		this.consultingFee = consultingFee;
 	}
 
-	public Byte getJoinCheck() {
+	public Integer getJoinCheck() {
 		return joinCheck;
 	}
 
-	public void setJoinCheck(Byte joinCheck) {
+	public void setJoinCheck(Integer joinCheck) {
 		this.joinCheck = joinCheck;
 	}
 
