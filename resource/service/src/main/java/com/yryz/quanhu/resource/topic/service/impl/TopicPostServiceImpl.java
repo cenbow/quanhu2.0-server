@@ -92,7 +92,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         TopicPostVo vo=new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs,vo);
         if(null!=createUserId){
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
             if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                 UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
                 vo.setUser(userSimpleVO);
@@ -135,7 +135,7 @@ public class TopicPostServiceImpl implements TopicPostService {
             BeanUtils.copyProperties(topicPost,vo);
             Long crateUserId=topicPost.getCreateUserId();
             if(null!=crateUserId){
-                Response<UserSimpleVO> userSimpleVOResponse=userApi.getUserSimple(String.valueOf(crateUserId));
+                Response<UserSimpleVO> userSimpleVOResponse=userApi.getUserSimple(crateUserId);
                 if(ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())){
                     vo.setUser(userSimpleVOResponse.getData());
                 }

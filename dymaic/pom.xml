@@ -15,5 +15,6 @@
         <module>api</module>
         <module>service</module>
 		<module>canal</module>
+		<module>elasticsearch</module>
     </modules>
 </project>

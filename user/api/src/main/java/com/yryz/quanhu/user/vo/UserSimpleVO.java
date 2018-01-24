@@ -20,7 +20,7 @@ public class UserSimpleVO implements Serializable {
     /**
      * 用户账户id
      */
-    private String userId;
+    private Long userId;
     /**
      * 昵称
      */
@@ -42,7 +42,7 @@ public class UserSimpleVO implements Serializable {
      */
     private String userLevel;
     /**
-     * 用户角色 0:普通用户 1:实名用户
+     * 用户角色 10:普通用户 11:实名用户
      */
     private Byte userRole;
     
@@ -50,16 +50,20 @@ public class UserSimpleVO implements Serializable {
      * 好友备注名
      */
     private String nameNotes;
+    /**
+     * 关系状态 0-陌生人 1-关注 2-粉丝 3-黑名单
+     */
+    private Integer relationStatus;
 	public String getNameNotes() {
 		return nameNotes == null ? "" : nameNotes.trim();
 	}
 	public void setNameNotes(String nameNotes) {
 		this.nameNotes = nameNotes == null ? "" : nameNotes.trim();
 	}
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public String getUserNickName() {
@@ -98,10 +102,16 @@ public class UserSimpleVO implements Serializable {
 	public void setUserLevel(String userLevel) {
 		this.userLevel = userLevel == null ? "1" : userLevel;
 	}
+	public Integer getRelationStatus() {
+		return relationStatus;
+	}
+	public void setRelationStatus(Integer relationStatus) {
+		this.relationStatus = relationStatus == null ? 0 : relationStatus;
+	}
 	public UserSimpleVO() {
 		super();
 	}
-	public UserSimpleVO(String userId, String userNickName, String userImg, String userDesc, Byte userRole) {
+	public UserSimpleVO(Long userId, String userNickName, String userImg, String userDesc, Byte userRole) {
 		super();
 		this.userId = userId;
 		this.userNickName = userNickName;

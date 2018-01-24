@@ -38,7 +38,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	@Reference(check=false)
 	private IdAPI idApi;
 	@Override
-	public int delete(String userId,String thirdId) {
+	public int delete(Long userId,String thirdId) {
 		try {
 			return mysqlDao.delete(userId,thirdId);
 		} catch (Exception e) {
@@ -61,7 +61,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	}
 
 	@Override
-	public List<UserThirdLogin> selectByUserId(String userId) {
+	public List<UserThirdLogin> selectByUserId(Long userId) {
 		try {
 			return mysqlDao.selectByUserId(userId);
 		} catch (Exception e) {

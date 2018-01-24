@@ -171,7 +171,7 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionVo questionVo = new QuestionVo();
         BeanUtils.copyProperties(questionVo, questionBysearch);
         if (null != createUserId) {
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
             if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                 UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
                 questionVo.setUser(userSimpleVO);
@@ -257,7 +257,7 @@ public class QuestionServiceImpl implements QuestionService {
             BeanUtils.copyProperties(question,questionVo);
             Long questionCreateUserId=question.getCreateUserId();
             if(null==questionCreateUserId){
-               Response<UserSimpleVO> simpleVOResponse= userApi.getUserSimple(String.valueOf(questionCreateUserId));
+               Response<UserSimpleVO> simpleVOResponse= userApi.getUserSimple(questionCreateUserId);
                 if(ResponseConstant.SUCCESS.getCode().equals(simpleVOResponse.getCode())){
                     questionVo.setUser(simpleVOResponse.getData());
                 }

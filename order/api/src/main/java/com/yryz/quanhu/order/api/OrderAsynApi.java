@@ -21,10 +21,10 @@ public interface OrderAsynApi {
 	
 	/**
 	 * 创建预处理订单
-	 * @param preOrderVo
+	 * @param orderVO
 	 * @return
 	 */
-	Response<PreOrderVo> createOrder(PreOrderVo preOrderVo);
+	public Response<PreOrderVo> createOrder(PreOrderVo preOrderVo);
 	
 	/**
 	 * 执行订单
@@ -33,13 +33,13 @@ public interface OrderAsynApi {
 	 * @param password
 	 * @return
 	 */
-	Response<?> executeOrder(String orderId ,String custId ,String password);
+	public Response<?> executeOrder(String orderId ,String custId ,String password);
 	
 	/**
 	 * 获取订单详情
 	 * @param orderId
 	 * @return
 	 */
-	Response<OrderInfo> getOrderInfo(String orderId);
+	public Response<OrderInfo> getOrderInfo(String orderId);
 
 }

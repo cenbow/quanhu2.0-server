@@ -1,4 +1,4 @@
-package com.yryz.quanhu.dymaic.dao.elasticsearch;
+package com.yryz.quanhu.dymaic.canal.dao;
 
 import java.util.List;
 import javax.annotation.Resource;
@@ -14,7 +14,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Repository;
 
-import com.yryz.quanhu.dymaic.entity.UserInfo;
+import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 
 @Repository
 public class UserInfoSearchImpl implements UserInfoSearch {
@@ -31,7 +31,6 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 		QueryBuilder query3 = QueryBuilders.termQuery("delFlag", 10);
 		QueryBuilder query4 = QueryBuilders.termQuery("appId", quanhu_app_id);
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "lastHeat"));
-		;
 		SearchQuery query = new NativeSearchQueryBuilder()
 				.withFilter(QueryBuilders.boolQuery().must(query3).must(query4)
 						.must(QueryBuilders.boolQuery().should(query1).should(query2)))

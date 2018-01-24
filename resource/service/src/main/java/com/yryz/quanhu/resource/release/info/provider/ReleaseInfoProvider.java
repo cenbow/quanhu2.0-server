@@ -58,7 +58,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isTrue(0L == record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
 
             // 校验用户是否存在
-            ResponseUtils.getResponseData(userApi.getUserSimple(String.valueOf(record.getCreateUserId())));
+            ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
 
             ReleaseConfigVo cfgVo = releaseConfigService.getTemplate(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             Assert.notNull(cfgVo, "平台发布文章，发布模板不存在！classifyId：" + ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
@@ -98,7 +98,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             // TODO 创建者用户信息
             UserSimpleVO user = ResponseUtils
-                    .getResponseData(userApi.getUserSimple(String.valueOf(infoVo.getCreateUserId())));
+                    .getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
 
             // TODO 资源互动信息
 

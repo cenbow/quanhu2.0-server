@@ -12,7 +12,7 @@ public class UpdateBaseInfoDTO implements Serializable{
     /**
      * 用户账户id
      */
-    private String userId;
+    private Long userId;
     /**
      * 昵称
      */
@@ -50,10 +50,10 @@ public class UpdateBaseInfoDTO implements Serializable{
      */
     private String cityCode;
     
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
     public String getUserNickName() {
@@ -113,7 +113,7 @@ public class UpdateBaseInfoDTO implements Serializable{
 	public UpdateBaseInfoDTO() {
 		super();
 	}
-	public UpdateBaseInfoDTO(String userId, String userNickName, String userImg, String userSignature, int userAge,
+	public UpdateBaseInfoDTO(Long userId, String userNickName, String userImg, String userSignature, int userAge,
 			String userDesc, String userQr, int userGenders, String userLocation, String cityCode) {
 		super();
 		this.userId = userId;

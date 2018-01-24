@@ -10,10 +10,6 @@ import java.util.Date;
  */
 @SuppressWarnings("serial")
 public class StarAuthInfo implements Serializable {
-	/**
-     * 主键
-     */
-    private Integer id;
     /**
      * 应用id
      */
@@ -145,13 +141,6 @@ public class StarAuthInfo implements Serializable {
      * 达人推荐语
      */
     private String recommendDesc;
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getOrganizationName() {
         return organizationName;

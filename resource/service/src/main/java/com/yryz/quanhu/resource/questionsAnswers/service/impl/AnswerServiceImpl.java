@@ -94,7 +94,7 @@ public class AnswerServiceImpl implements AnswerService {
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
         Long createUserId = answerWithBLOBs.getCreateUserId();
         if (null != createUserId) {
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
             if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                 UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
                 answerVo.setUser(userSimpleVO);
@@ -115,7 +115,7 @@ public class AnswerServiceImpl implements AnswerService {
             BeanUtils.copyProperties(answerWithBLOBs, answerVo);
             Long createUserId = answerWithBLOBs.getCreateUserId();
             if (null != createUserId) {
-                Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+                Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
                 if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                     UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
                     answerVo.setUser(userSimpleVO);

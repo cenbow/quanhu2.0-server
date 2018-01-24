@@ -101,7 +101,7 @@ public class TopicServiceImpl implements TopicService {
         BeanUtils.copyProperties(topic, topicVo);
         Long createUserId = topic.getCreateUserId();
         if (null != createUserId) {
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
             if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                 UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
                 topicVo.setUser(userSimpleVO);
@@ -134,7 +134,7 @@ public class TopicServiceImpl implements TopicService {
             BeanUtils.copyProperties(topic, vo);
             Long createUserId = topic.getCreateUserId();
             if (createUserId != null) {
-                Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+                Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
                 if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                     vo.setUser(userSimpleVOResponse.getData());
                 }

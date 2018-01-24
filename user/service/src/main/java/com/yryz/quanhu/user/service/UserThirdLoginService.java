@@ -24,7 +24,7 @@ public interface UserThirdLoginService {
 	 * @param thirdId
 	 * @return
 	 */
-    int delete(String userId,String thirdId);
+    int delete(Long userId,String thirdId);
     
     /**
      * 新增第三方账户信息
@@ -38,7 +38,7 @@ public interface UserThirdLoginService {
      * @param userId
      * @return
      */
-    List<UserThirdLogin> selectByUserId(String userId);
+    List<UserThirdLogin> selectByUserId(Long userId);
     
     /**
      * 根据第三方id查询第三方账户信息
