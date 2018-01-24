@@ -4,6 +4,8 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.IdGen;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.message.message.dto.MessageDto;
 import com.yryz.quanhu.message.message.service.MessageService;
@@ -80,6 +82,45 @@ public class MessageProvider implements MessageAPI {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
             LOGGER.error("查询消息总览异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Boolean> sendMessage(MessageVo messageVo) {
+        try {
+            return ResponseUtils.returnObjectSuccess(messageService.sendMessage(messageVo));
+        } catch (QuanhuException e) {
+            LOGGER.error("推送消息异常", e);
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            LOGGER.error("推送消息异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Boolean> sendMessage(MessageVo messageVo, boolean flag) {
+        try {
+            return ResponseUtils.returnObjectSuccess(messageService.sendMessage(messageVo,flag));
+        } catch (QuanhuException e) {
+            LOGGER.error("推送消息异常", e);
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            LOGGER.error("推送消息异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<MessageVo> get(String messageId) {
+        try {
+            return ResponseUtils.returnObjectSuccess(messageService.get(messageId));
+        } catch (QuanhuException e) {
+            LOGGER.error("推送消息异常", e);
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            LOGGER.error("推送消息异常", e);
             return ResponseUtils.returnException(e);
         }
     }

@@ -24,4 +24,11 @@ public interface MessageService {
     List<MessageVo> getList(MessageDto messageDto);
 
     Map<Integer, MessageVo> getMessageCommon(Long userId);
+
+    Boolean sendMessage(MessageVo messageVo);
+
+    Boolean sendMessage(MessageVo messageVo, boolean flag);
+
+    MessageVo get(String messageId);
+
 }

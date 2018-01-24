@@ -19,6 +19,21 @@ import java.util.Map;
 public interface MessageAPI {
 
     /**
+     * 发布消息，默认不同步推送消息
+     *
+     * @param messageVo
+     */
+     Response<Boolean> sendMessage(MessageVo messageVo);
+
+    /**
+     * 发布消息
+     *
+     * @param messageVo
+     * @param flag      false：不同步推送消息；true：同步推送消息
+     */
+    Response<Boolean> sendMessage(MessageVo messageVo, boolean flag);
+
+    /**
      * 获取未读消息
      *
      * @param userId
@@ -48,5 +63,12 @@ public interface MessageAPI {
      * @param userId
      * @return
      */
-    Response<Map<Integer,MessageVo>> getMessageCommon(Long userId);
+    Response<Map<Integer, MessageVo>> getMessageCommon(Long userId);
+
+    /**
+     * 获取消息主体
+     * @param messageId
+     * @return
+     */
+    Response<MessageVo> get(String messageId);
 }

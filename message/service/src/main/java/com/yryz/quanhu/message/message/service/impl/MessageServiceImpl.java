@@ -1,5 +1,11 @@
 package com.yryz.quanhu.message.message.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageType;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.IdGen;
+import com.yryz.quanhu.message.common.constant.PushConstant;
 import com.yryz.quanhu.message.message.constants.MessageContants;
 import com.yryz.quanhu.message.message.dto.MessageDto;
 import com.yryz.quanhu.message.message.mongo.MessageMongo;
@@ -7,16 +13,16 @@ import com.yryz.quanhu.message.message.redis.MessageRedis;
 import com.yryz.quanhu.message.message.service.MessageService;
 import com.yryz.quanhu.message.message.vo.MessageStatusVo;
 import com.yryz.quanhu.message.message.vo.MessageVo;
+import com.yryz.quanhu.message.push.api.PushAPI;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -36,6 +42,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private MessageMongo messageMongo;
+
+    @Reference(check = false, timeout = 30000, lazy = true)
+    private PushAPI pushAPI;
 
     @Override
     public Map<String, String> getUnread(Long userId) {
@@ -124,5 +133,71 @@ public class MessageServiceImpl implements MessageService {
         if (!CollectionUtils.isEmpty(list)) {
             map.put(messageType, list.get(0));
         }
+    }
+
+    @Override
+    public Boolean sendMessage(MessageVo messageVo) {
+        return sendMessage(messageVo, false);
+    }
+
+    @Override
+    public Boolean sendMessage(MessageVo messageVo, boolean flag) {
+        if (StringUtils.isBlank(messageVo.getMessageId())) {
+            messageVo.setMessageId(IdGen.uuid());
+        }
+
+        messageMongo.save(messageVo);
+
+        int itype = messageVo.getType() == null ? 0 : messageVo.getType().intValue();
+
+        if(itype != MessageType.NOTICE_TYPE){ //非通知公告的未读数需要增加，通知公告类型采用群发机制，不处理
+            messageRedis.addUnread(messageVo.getToCust(), getReadTypeString(messageVo));
+        }
+
+        if(flag){
+            pushMessage(messageVo);
+        }
+        return true;
+    }
+
+    private void pushMessage(MessageVo messageVo) {
+        try {
+            PushReqVo reqVo = new PushReqVo();
+            List<String> custIds = new ArrayList<>();
+            custIds.add(messageVo.getToCust());
+            reqVo.setCustIds(custIds);
+            reqVo.setNotification(messageVo.getTitle());
+            int itype = messageVo.getType() == null ? 0 : messageVo.getType().intValue();
+            if(itype == MessageType.NOTICE_TYPE){
+                reqVo.setPushType(PushReqVo.CommonPushType.BY_ALL);
+            } else {
+                reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
+            }
+            reqVo.setMsg(GsonUtils.parseJson(messageVo));
+            pushAPI.commonSendAlias(reqVo);
+        } catch (Exception e) {
+            LOGGER.warn("[message] push message faild ...",e);
+        }
+    }
+
+    private static String getReadTypeString(MessageVo messageVo) {
+        if(messageVo == null){
+            throw QuanhuException.busiError("message can't be null");
+        }
+        Integer type = messageVo.getType();
+        Integer label = messageVo.getLabel();
+        if(type == null){
+            throw QuanhuException.busiError("message type can't be null");
+        }
+        if(label != null){
+            return type + "|" + label;
+        } else {
+            return type.toString();
+        }
+    }
+
+    @Override
+    public MessageVo get(String messageId) {
+        return messageMongo.get(messageId);
     }
 }
