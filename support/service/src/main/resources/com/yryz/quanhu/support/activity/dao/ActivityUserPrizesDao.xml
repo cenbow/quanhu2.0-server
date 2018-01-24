@@ -186,4 +186,40 @@
         where kid = #{kid,jdbcType=BIGINT}
     </update>
 
+	<!-- 更新用户投票卷的使用数量 -->
+	<update id="updateUserRoll">
+		update qh_activity_user_prizes set
+		can_num = can_num -1
+		where prizes_type = 1
+		and create_user_id = #{createUserId, jdbcType=BIGINT}
+		<![CDATA[
+			and can_num > 0
+			and begin_time <= now()
+			and end_time >= now()
+  		]]>
+		order by end_time asc limit 1
+	</update>
+
+	<!-- 查询用户是否有可用投票卷 -->
+	<select id="selectUserRoll" resultType="int">
+		select count(1)
+		from qh_activity_user_prizes
+		where prizes_type = 1
+		and create_user_id = #{createUserId, jdbcType=BIGINT}
+		<![CDATA[
+			and can_num > 0
+			and begin_time <= now()
+			and end_time >= now()
+  		]]>
+	</select>
+
+	<!-- 将投票卷的状态修改为已使用 -->
+	<update id="updateStatus">
+		update qh_activity_user_prizes set
+		status = 2
+		where prizes_type = 1
+		and create_user_id = #{createUserId, jdbcType=BIGINT}
+		and can_num = 0
+	</update>
+
 </mapper>

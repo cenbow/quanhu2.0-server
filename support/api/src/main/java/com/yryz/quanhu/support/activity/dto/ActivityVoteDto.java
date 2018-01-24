@@ -28,6 +28,8 @@ public class ActivityVoteDto implements Serializable {
     private String videoThumbnailUrl;
     /** 视频url */
     private String videoUrl;
+    /** 创建用户id */
+    private Long createUserId;
 
     public Integer getCurrentPage() {
         return currentPage;
@@ -123,5 +125,13 @@ public class ActivityVoteDto implements Serializable {
 
     public void setVideoUrl(String videoUrl) {
         this.videoUrl = videoUrl;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
     }
 }

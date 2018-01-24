@@ -3,6 +3,7 @@ package com.yryz.quanhu.support.activity.dao;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteRecordVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 
@@ -24,5 +25,10 @@ public interface ActivityVoteRecordDao  {
     void insertByPrimaryKeySelective(ActivityVoteRecord activityVoteRecord);
 
     int update(ActivityVoteRecord activityVoteRecord);
+
+    int voteRecordCount(@Param("activityInfoId") Long activityInfoId,
+                        @Param("createUserId") Long createUserId,
+                        @Param("otherFlag") Integer otherFlag,
+                        @Param("voteType") String voteType);
 
 }
