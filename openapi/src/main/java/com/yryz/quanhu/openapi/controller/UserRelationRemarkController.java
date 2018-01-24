@@ -42,7 +42,7 @@ public class UserRelationRemarkController {
      */
     @ApiOperation("用户备注名-设置/重置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/remark")
+    @RequestMapping("/{version}/user/relation/remark")
     public Response<Boolean> setRemarkName(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
@@ -81,7 +81,7 @@ public class UserRelationRemarkController {
      */
     @ApiOperation("用户备注名-查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/remark/query")
+    @RequestMapping("/{version}/user/relation/remark/query")
     public Response<List<UserRelationRemarkVo>> selectBy(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
