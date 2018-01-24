@@ -16,13 +16,13 @@ public interface CountApi {
 
     /**
      * @param behaviorEnum
-     * @param userId
-     * @param resourceId
+     * @param kid
+     * @param page
      * @param count
      * @return
      */
-    Response<Object> countCommit(BehaviorEnum behaviorEnum, Long userId, Long resourceId, Long count);
+    Response<Object> commitCount(BehaviorEnum behaviorEnum, Long kid, String page, Long count);
 
-    Response<Map<String, Long>> getCount(String countType, Long kid);
+    Response<Map<String, Long>> getCount(String countType, Long kid, String page);
 
 }
