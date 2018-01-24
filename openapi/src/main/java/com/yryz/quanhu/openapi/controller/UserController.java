@@ -137,18 +137,9 @@ public class UserController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/login")
-	public Response<Map<String,Object>> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+	public Response<RegisterLoginVO> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		Response<RegisterLoginVO> response = accountApi.login(loginDTO, header);
-		Map<String,Object> map = new HashMap<>();
-		map.put("needPhone", false);
-		if(StringUtils.equals(response.getCode(),ExceptionEnum.NEED_PHONE.getCode())){
-			map.put("needPhone", true);
-		}else{
-			map.put("authInfo", response.getData().getAuthInfo());
-			map.put("user", response.getData().getUser());
-		}
-		return ResponseUtils.returnObjectSuccess(map);
+		return accountApi.login(loginDTO, header);
 	}
 
 	/**
@@ -186,15 +177,23 @@ public class UserController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginThird")
-	public Response<RegisterLoginVO> loginThird(@RequestBody ThirdLoginDTO loginDTO, HttpServletRequest request) {
+	public Response<Map<String,Object>> loginThird(@RequestBody ThirdLoginDTO loginDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String ip = WebUtil.getClientIP(request);
 		loginDTO.setDeviceId(header.getDevId());
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
-
-		return accountApi.loginThird(loginDTO, header);
+		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
+		Map<String,Object> map = new HashMap<>();
+		map.put("needPhone", false);
+		if(StringUtils.equals(response.getCode(),ExceptionEnum.NEED_PHONE.getCode())){
+			map.put("needPhone", true);
+		}else{
+			map.put("authInfo", response.getData().getAuthInfo());
+			map.put("user", response.getData().getUser());
+		}
+		return ResponseUtils.returnObjectSuccess(map);
 	}
 
 	/**

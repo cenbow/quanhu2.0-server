@@ -1,8 +1,18 @@
 package com.yryz.quanhu.message.notice.service.impl;
 
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
-import com.yryz.common.context.Context;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageActionCode;
 import com.yryz.common.message.MessageLabel;
@@ -33,16 +43,6 @@ import com.yryz.quanhu.message.notice.vo.NoticeVo;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -103,7 +103,7 @@ public class NoticeServiceImpl implements NoticeService {
         upload(notice);
 
         Response<Long> response = idAPI.getKid(QH_NOTICE);
-        Long kid = ResponseUtils.checkResponseNotNull(response);
+        Long kid = ResponseUtils.getResponseData(response);
         notice.setKid(kid);
 
         return noticeDao.add(notice);
