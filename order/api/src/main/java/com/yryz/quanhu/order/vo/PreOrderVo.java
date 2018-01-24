@@ -39,10 +39,7 @@ public class PreOrderVo implements Serializable {
 	 */
 	private List<IntegralOrder> integrals;
 	
-	/**
-	 * 
-	 * @exception 
-	 */
+
 	public PreOrderVo() {
 		super();
 	}

@@ -76,4 +76,17 @@ public class CommonConstants {
      * 删除
      */
     public static final byte DELETE_YES = 11;
+
+
+	/**
+	 * 推荐
+	 */
+	public static final byte recommend_YES = 11;
+
+	/**
+	 * 非推荐
+	 */
+	public static final byte recommend_NO = 10;
+
+
 }

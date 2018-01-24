@@ -1,30 +1,34 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author
- * @date
+ * @author wanght
+ * @date 2018-02-1-22
  */
 @Service
 public class QuestionServiceImpl implements QuestionService {
-    /**
-     * 发布问题
-     *
-     * @param question
-     * @return
-     */
 
     @Autowired
     private QuestionDao questionDao;
+
+    @Reference
+    private UserApi userApi;
 
     /**
      * 发布提问
@@ -89,8 +93,49 @@ public class QuestionServiceImpl implements QuestionService {
         if (questionBySearch.getAnswerdFlag().compareTo(QuestionAnswerConstants.AnswerdFlag.ANSWERED) != 0) {
             throw QuanhuException.busiError("问题已经回答，不能删除");
         }
-        // TODO: 2018/1/22 0022
         return this.questionDao.updateByPrimaryKeySelective(question);
+    }
+
+
+    /**
+     * 查询问题的详情
+     *
+     * @param kid
+     * @return
+     */
+    @Override
+    public QuestionVo getDetail(Long kid, Long userId) {
+        /**
+         * 参数校验
+         */
+        if (null == kid || null == userId) {
+            throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+        }
+
+        Question questionBysearch = this.questionDao.selectByPrimaryKey(kid);
+        if (null == questionBysearch) {
+            throw QuanhuException.busiError("查询的问题不存在");
+        }
+
+        /**
+         * 如果是私密问题，只有提问人和圈主可见
+         */
+        Long createUserId = questionBysearch.getCreateUserId();
+        if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
+            if (createUserId.compareTo(userId) != 0) {
+                throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREAD);
+            }
+        }
+        QuestionVo questionVo = new QuestionVo();
+        BeanUtils.copyProperties(questionVo, questionBysearch);
+        if (null != createUserId) {
+            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+            if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
+                UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
+                questionVo.setUser(userSimpleVO);
+            }
+        }
+        return questionVo;
     }
 
 

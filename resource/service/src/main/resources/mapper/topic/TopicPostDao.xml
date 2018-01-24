@@ -75,6 +75,9 @@
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
+    <if test="pageStartIndex != null and pageSize!=null">
+      limit ${pageStartIndex},${pageSize}
+    </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>

@@ -10,6 +10,7 @@ package com.yryz.quanhu.openapi.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -33,6 +34,7 @@ import io.swagger.annotations.ApiParam;
  */
 @Api(tags = "积分管理")
 @RestController
+@RequestMapping(value="services/app")
 public class ScoreController {
 	
 	@Reference
@@ -44,7 +46,7 @@ public class ScoreController {
 	@NotLogin
     @ApiOperation("积分事件")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/commit")
+    @GetMapping(value = "/{version}/order/score/commit")
 	public void commit(@ApiParam("事件对象")EventInfo event){
 		EventInfo eventInfo = new EventInfo();
 		eventAPI.commit(eventInfo);
@@ -53,10 +55,9 @@ public class ScoreController {
 	@NotLogin
     @ApiOperation("积分流水查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/getScoreFlowList")
+    @GetMapping(value = "/{version}/order/score/getScoreFlowList")
 	public List<EventReportVo> getScoreFlowList(@ApiParam("事件对象")EventInfo event){
-		EventInfo eventInfo = new EventInfo();
-	    return eventAPI.getScoreFlowList(eventInfo);
+	    return eventAPI.getScoreFlowList(event);
 	}
 	
 

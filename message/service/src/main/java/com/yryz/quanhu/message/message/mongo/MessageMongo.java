@@ -36,7 +36,6 @@ public class MessageMongo extends AbsBaseMongoDAO<MessageVo> {
         this.mongoTemplate = mongoTemplate;
     }
 
-
     public List<MessageVo> getList(MessageDto messageDto) {
         try {
             Query query = new Query();
@@ -61,6 +60,17 @@ public class MessageMongo extends AbsBaseMongoDAO<MessageVo> {
             return mongoTemplate.find(query, MessageVo.class, COLLECTION_NAME);
         } catch (Exception e) {
             LOGGER.error("【MessageMongo】 查询列表失败！");
+            throw new QuanhuException(ExceptionEnum.MONGO_EXCEPTION);
+        }
+    }
+
+    public MessageVo get(String messageId) {
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("messageId").is(messageId));
+            return mongoTemplate.findOne(query, MessageVo.class, COLLECTION_NAME);
+        } catch (Exception e) {
+            LOGGER.error("【MessageMongo】 查询单一消息失败！");
             throw new QuanhuException(ExceptionEnum.MONGO_EXCEPTION);
         }
     }
