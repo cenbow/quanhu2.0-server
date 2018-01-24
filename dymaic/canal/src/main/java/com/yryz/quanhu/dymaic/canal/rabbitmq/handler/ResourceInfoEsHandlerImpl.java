@@ -17,7 +17,7 @@ import com.yryz.quanhu.dymaic.canal.entity.TopicInfo;
 import com.yryz.quanhu.dymaic.canal.entity.TopicPostInfo;
 
 @Component
-public class TopicInfoEsHandlerImpl implements SyncHandler{
+public class ResourceInfoEsHandlerImpl implements SyncHandler{
 	@Resource
 	private SyncExecutor syncExecutor;
 	
