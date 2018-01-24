@@ -126,8 +126,6 @@ public class ReleaseInfoVo extends GenericEntity {
     */
     private String extend;
     
-    private UserSimpleVo createUserInfo;
-
     public Long getClassifyId() {
         return classifyId;
     }
@@ -312,12 +310,15 @@ public class ReleaseInfoVo extends GenericEntity {
         this.extend = extend;
     }
 
-	public UserSimpleVo getCreateUserInfo() {
-		return createUserInfo;
-	}
-
-	public void setCreateUserInfo(UserSimpleVo createUserInfo) {
-		this.createUserInfo = createUserInfo;
+	@Override
+	public String toString() {
+		return "ReleaseInfoVo [classifyId=" + classifyId + ", coverPlanUrl=" + coverPlanUrl + ", title=" + title
+				+ ", description=" + description + ", audioUrl=" + audioUrl + ", videoUrl=" + videoUrl
+				+ ", videoThumbnailUrl=" + videoThumbnailUrl + ", contentLabel=" + contentLabel + ", cityCode="
+				+ cityCode + ", gps=" + gps + ", coterieId=" + coterieId + ", contentPrice=" + contentPrice
+				+ ", shelveFlag=" + shelveFlag + ", delFlag=" + delFlag + ", recommend=" + recommend + ", sort=" + sort
+				+ ", moduleEnum=" + moduleEnum + ", appId=" + appId + ", revision=" + revision + ", contentSource="
+				+ contentSource + ", content=" + content + ", imgUrl=" + imgUrl + ", extend=" + extend + "]";
 	}
     
 }

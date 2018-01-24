@@ -42,8 +42,6 @@ public class TopicInfoVo implements Serializable {
 
 	private String gps;
 	
-	private UserSimpleVo user;
-	
 	public Long getKid() {
 		return kid;
 	}
@@ -188,12 +186,14 @@ public class TopicInfoVo implements Serializable {
 		this.gps = gps;
 	}
 
-	public UserSimpleVo getUser() {
-		return user;
-	}
-
-	public void setUser(UserSimpleVo user) {
-		this.user = user;
+	@Override
+	public String toString() {
+		return "TopicInfoVo [kid=" + kid + ", title=" + title + ", imgUrl=" + imgUrl + ", content=" + content
+				+ ", contentSource=" + contentSource + ", recommend=" + recommend + ", shelveFlag=" + shelveFlag
+				+ ", delFlag=" + delFlag + ", sort=" + sort + ", replyCount=" + replyCount + ", createUserId="
+				+ createUserId + ", lastUpdateUserId=" + lastUpdateUserId + ", createDate=" + createDate
+				+ ", lastUpdateDate=" + lastUpdateDate + ", revision=" + revision + ", coterieId=" + coterieId
+				+ ", cityCode=" + cityCode + ", gps=" + gps + "]";
 	}
 
 }

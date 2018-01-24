@@ -1,5 +1,6 @@
 package com.yryz.quanhu.dymaic.canal.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -32,8 +33,9 @@ public class CoterieInfoSearchImpl implements CoterieInfoSearch {
 		QueryBuilder query4 = QueryBuilders.termQuery("shelveFlag", 10);
 		QueryBuilder query5 = QueryBuilders.termQuery("state", 11);
 		
-		List<Order> orders=Lists.newArrayList();
+		List<Order> orders=new ArrayList<>();
 		orders.add(Order.desc("sort"));
+		orders.add(Order.desc("memberNum"));
 		orders.add(Order.desc("createDate"));
 		Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
 		SearchQuery query = new NativeSearchQueryBuilder()

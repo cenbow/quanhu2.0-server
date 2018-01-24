@@ -64,10 +64,6 @@ public class TopicInfo implements Serializable{
 	@Field(type = FieldType.text)
     private String gps;
 	
-	//最终热度
-	@Field(type=FieldType.Long)
-	private Long lastHeat;
-
 	public TopicInfo(){
 		
 	}

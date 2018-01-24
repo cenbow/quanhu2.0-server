@@ -1,8 +1,11 @@
-package com.yryz.quanhu.dymaic.canal.entity;
+package com.yryz.quanhu.dymaic.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TopicPostInfo {
+public class TopicPostInfoVo implements Serializable{
+	private static final long serialVersionUID = 756020625791940599L;
+
 	private Long kid;
 
 	private Long topicId;
@@ -53,12 +56,28 @@ public class TopicPostInfo {
 		this.topicId = topicId;
 	}
 
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getContentSource() {
+		return contentSource;
+	}
+
+	public void setContentSource(String contentSource) {
+		this.contentSource = contentSource;
+	}
+
 	public String getVideoUrl() {
 		return videoUrl;
 	}
 
 	public void setVideoUrl(String videoUrl) {
-		this.videoUrl = videoUrl == null ? null : videoUrl.trim();
+		this.videoUrl = videoUrl;
 	}
 
 	public String getVideoThumbnailUrl() {
@@ -66,7 +85,23 @@ public class TopicPostInfo {
 	}
 
 	public void setVideoThumbnailUrl(String videoThumbnailUrl) {
-		this.videoThumbnailUrl = videoThumbnailUrl == null ? null : videoThumbnailUrl.trim();
+		this.videoThumbnailUrl = videoThumbnailUrl;
+	}
+
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+
+	public String getImgThumbnailUrl() {
+		return imgThumbnailUrl;
+	}
+
+	public void setImgThumbnailUrl(String imgThumbnailUrl) {
+		this.imgThumbnailUrl = imgThumbnailUrl;
 	}
 
 	public String getAudioUrl() {
@@ -74,7 +109,7 @@ public class TopicPostInfo {
 	}
 
 	public void setAudioUrl(String audioUrl) {
-		this.audioUrl = audioUrl == null ? null : audioUrl.trim();
+		this.audioUrl = audioUrl;
 	}
 
 	public Byte getShelveFlag() {
@@ -146,7 +181,7 @@ public class TopicPostInfo {
 	}
 
 	public void setCityCode(String cityCode) {
-		this.cityCode = cityCode == null ? null : cityCode.trim();
+		this.cityCode = cityCode;
 	}
 
 	public String getGps() {
@@ -154,39 +189,7 @@ public class TopicPostInfo {
 	}
 
 	public void setGps(String gps) {
-		this.gps = gps == null ? null : gps.trim();
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getContentSource() {
-		return contentSource;
-	}
-
-	public void setContentSource(String contentSource) {
-		this.contentSource = contentSource;
-	}
-
-	public String getImgUrl() {
-		return imgUrl;
-	}
-
-	public void setImgUrl(String imgUrl) {
-		this.imgUrl = imgUrl;
-	}
-
-	public String getImgThumbnailUrl() {
-		return imgThumbnailUrl;
-	}
-
-	public void setImgThumbnailUrl(String imgThumbnailUrl) {
-		this.imgThumbnailUrl = imgThumbnailUrl;
+		this.gps = gps;
 	}
 
 	public Long getCoterieId() {
@@ -195,6 +198,17 @@ public class TopicPostInfo {
 
 	public void setCoterieId(Long coterieId) {
 		this.coterieId = coterieId;
+	}
+
+	@Override
+	public String toString() {
+		return "TopicPostInfoVo [kid=" + kid + ", topicId=" + topicId + ", content=" + content + ", contentSource="
+				+ contentSource + ", videoUrl=" + videoUrl + ", videoThumbnailUrl=" + videoThumbnailUrl + ", imgUrl="
+				+ imgUrl + ", imgThumbnailUrl=" + imgThumbnailUrl + ", audioUrl=" + audioUrl + ", shelveFlag="
+				+ shelveFlag + ", delFlag=" + delFlag + ", sort=" + sort + ", createUserId=" + createUserId
+				+ ", lastUpdateUserId=" + lastUpdateUserId + ", createDate=" + createDate + ", lastUpdateDate="
+				+ lastUpdateDate + ", revision=" + revision + ", cityCode=" + cityCode + ", gps=" + gps + ", coterieId="
+				+ coterieId + "]";
 	}
 	
 }

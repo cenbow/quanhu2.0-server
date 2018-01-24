@@ -4,8 +4,7 @@ import java.util.List;
 
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.dymaic.vo.CoterieInfoVo;
-import com.yryz.quanhu.dymaic.vo.ReleaseInfoVo;
-import com.yryz.quanhu.dymaic.vo.TopicInfoVo;
+import com.yryz.quanhu.dymaic.vo.ResourceInfoVo;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
 
 public interface ElasticsearchService {
@@ -16,7 +15,16 @@ public interface ElasticsearchService {
 	 * @param size
 	 * @return
 	 */
-	List<UserSimpleVo> searchUser(String keyWord,Integer page,Integer size);
+	PageList<UserSimpleVo> searchUser(String keyWord,Integer page,Integer size);
+	
+	/**
+	 * 搜索话题帖子信息
+	 * @param keyWord
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	PageList<ResourceInfoVo> searchTopicInfo(String keyWord,Integer page,Integer size);
 	
 	/**
 	 * 搜索文章信息
@@ -25,16 +33,7 @@ public interface ElasticsearchService {
 	 * @param size
 	 * @return
 	 */
-	PageList<ReleaseInfoVo> searchReleaseInfo(String keyWord,Integer page,Integer size);
-	
-	/**
-	 * 搜索话题信息
-	 * @param keyWord
-	 * @param page
-	 * @param size
-	 * @return
-	 */
-	PageList<TopicInfoVo> searchTopicInfo(String keyWord,Integer page,Integer size);
+	PageList<ResourceInfoVo> searchReleaseInfo(String keyWord,Integer page,Integer size);
 	
 	/**
 	 * 搜索私圈信息

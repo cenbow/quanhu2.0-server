@@ -1,5 +1,7 @@
 package com.yryz.quanhu.dymaic;
 
+import javax.annotation.Resource;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ public class EsTest {
 //	    @Autowired
 //	    private ElasticsearchService elasticsearchService;
 	    
-	    @Autowired
+	    @Resource
 	    private ElasticsearchTemplate elasticsearchTemplate;
 	    
 	    @Test
@@ -25,6 +27,6 @@ public class EsTest {
 //	    	List<UserSimpleVo> list=elasticsearchService.searchUser("姜昆",0,3);
 //	        System.out.println(list);
 	    	elasticsearchTemplate.deleteIndex("quanhu-v2-resourceinfo");
-	    	elasticsearchTemplate.deleteIndex("quanhu-v2");
+//	    	elasticsearchTemplate.deleteIndex("quanhu-v2");
 	    }
 }

@@ -27,7 +27,7 @@
             <artifactId>quanhu-common</artifactId>
         </dependency>
         
-        <dependency>
+       <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>dymaic-elasticsearch</artifactId>
             <version>${quanhu.version}</version>
@@ -46,10 +46,10 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
