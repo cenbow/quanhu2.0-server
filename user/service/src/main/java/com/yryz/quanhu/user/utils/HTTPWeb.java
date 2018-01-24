@@ -97,7 +97,7 @@ public class HTTPWeb {
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet();
 		try {
-			URIBuilder uriBuilder = new URIBuilder().setPath(url);
+			URIBuilder uriBuilder = new URIBuilder(url);
 			if(data != null){
 				for (String key : data.keySet()) {
 					uriBuilder.setParameter(key, data.get(key).toString());

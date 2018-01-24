@@ -25,4 +25,6 @@ public interface ActivityVoteConfigDao {
 
     int update(ActivityVoteConfig activityVoteConfig);
 
+    ActivityVoteConfig selectByActivityInfoId(Long activityInfoId);
+
 }

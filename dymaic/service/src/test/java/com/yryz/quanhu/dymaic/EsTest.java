@@ -22,7 +22,7 @@ public class EsTest {
 	
 	    @Test
 	    public void exampleTest(){
-	    	 List<UserSimpleVO> list=elasticsearchService.searchUser("姜昆");
+	    	 List<UserSimpleVO> list=elasticsearchService.searchUser("姜昆",0,3);
 	        System.out.println(list);
 	    }
 }

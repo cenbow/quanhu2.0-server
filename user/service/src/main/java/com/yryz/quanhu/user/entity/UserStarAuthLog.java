@@ -25,7 +25,10 @@ public class UserStarAuthLog extends GenericEntity{
      * 用户id
      */
     private Long userId;
-
+    /**
+     * 应用id
+     */
+    private String appId;
     /**
      * 机构名称
      */
@@ -306,5 +309,13 @@ public class UserStarAuthLog extends GenericEntity{
     public void setRecommendCancelTime(Date recommendCancelTime) {
         this.recommendCancelTime = recommendCancelTime;
     }
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
 
 }

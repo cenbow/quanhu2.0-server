@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.resource.release.config.dao.ReleaseConfigDao">
+	<resultMap id="BaseResultMap" type="com.yryz.quanhu.resource.release.config.entity.ReleaseConfig">
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="classify_id" jdbcType="BIGINT" property="classifyId" />
+		<result column="property_key" jdbcType="VARCHAR" property="propertyKey" />
+		<result column="property_alias" jdbcType="VARCHAR" property="propertyAlias" />
+		<result column="enabled" jdbcType="TINYINT" property="enabled" />
+		<result column="required" jdbcType="TINYINT" property="required" />
+		<result column="lower_limit" jdbcType="INTEGER" property="lowerLimit" />
+		<result column="upper_limit" jdbcType="INTEGER" property="upperLimit" />
+		<result column="input_prompt" jdbcType="VARCHAR" property="inputPrompt" />
+		<result column="error_prompt" jdbcType="VARCHAR" property="errorPrompt" />
+		<result column="check_regExp" jdbcType="VARCHAR" property="checkRegexp" />
+		<result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+		<result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+		<result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+		<result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+		<result column="app_id" jdbcType="VARCHAR" property="appId" />
+		<result column="revision" jdbcType="INTEGER" property="revision" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, classify_id, property_key, property_alias, enabled, required, lower_limit, upper_limit,
+		input_prompt,
+		error_prompt, check_regExp, create_date, create_user_id, last_update_date,
+		last_update_user_id, app_id, revision
+	</sql>
+
+
+	<select id="selectByClassifyId" parameterType="java.lang.Long" resultType="com.yryz.quanhu.resource.release.config.entity.ReleaseConfig">
+		select
+		<include refid="Base_Column_List" />
+		from qh_release_config
+		where classify_id = #{classifyId,jdbcType=BIGINT}
+	</select>
+
+
+	<update id="updateByUkSelective" parameterType="com.yryz.quanhu.resource.release.config.entity.ReleaseConfig">
+		update qh_release_config
+		<set>
+			<if test="propertyAlias != null">
+				property_alias = #{propertyAlias,jdbcType=VARCHAR},
+			</if>
+			<if test="enabled != null">
+				enabled = #{enabled,jdbcType=TINYINT},
+			</if>
+			<if test="required != null">
+				required = #{required,jdbcType=TINYINT},
+			</if>
+			<if test="lowerLimit != null">
+				lower_limit = #{lowerLimit,jdbcType=INTEGER},
+			</if>
+			<if test="upperLimit != null">
+				upper_limit = #{upperLimit,jdbcType=INTEGER},
+			</if>
+			<if test="inputPrompt != null">
+				input_prompt = #{inputPrompt,jdbcType=VARCHAR},
+			</if>
+			<if test="errorPrompt != null">
+				error_prompt = #{errorPrompt,jdbcType=VARCHAR},
+			</if>
+			<if test="checkRegexp != null">
+				check_regExp = #{checkRegexp,jdbcType=VARCHAR},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createUserId != null">
+				create_user_id = #{createUserId,jdbcType=BIGINT},
+			</if>
+			<if test="lastUpdateDate != null">
+				last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastUpdateUserId != null">
+				last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+			</if>
+			<if test="appId != null">
+				app_id = #{appId,jdbcType=VARCHAR},
+			</if>
+			<if test="revision != null">
+				revision = #{revision,jdbcType=INTEGER},
+			</if>
+		</set>
+		where
+		  classify_id = #{classifyId,jdbcType=BIGINT},
+		  property_key = #{propertyKey,jdbcType=VARCHAR},
+	</update>
+
+</mapper>

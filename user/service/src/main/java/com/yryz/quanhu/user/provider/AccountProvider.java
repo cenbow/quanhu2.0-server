@@ -15,6 +15,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
+import com.yryz.common.utils.GsonUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.LoginType;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
+import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
@@ -45,6 +48,7 @@ import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
+import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
@@ -81,9 +85,6 @@ import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 @Service(interfaceClass = AccountApi.class)
 public class AccountProvider implements AccountApi {
 	private static final Logger logger = LoggerFactory.getLogger(AccountProvider.class);
-	private static final int CHAR_51 = 3;
-	private static final String CHAR_3F = "%3F";
-	private static final String CHAR_63 = "?";
 
 	@Autowired
 	private DistributedLockManager lockManager;
@@ -156,6 +157,7 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> login(LoginDTO loginDTO, RequestHeader header) {
 		try {
+			logger.info("user login request: {}", GsonUtils.parseJson(loginDTO));
 			checkLoginDTO(loginDTO, LoginType.PHONE);
 			checkHeader(header);
 			loginDTO.setDeviceId(header.getDevId());
@@ -182,12 +184,15 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
-	public Response<RegisterLoginVO> loginByVerifyCode(LoginDTO loginDTO, RequestHeader header) {
+	public Response<RegisterLoginVO> loginByVerifyCode(RegisterDTO registerDTO, RequestHeader header) {
 		try {
-			checkLoginDTO(loginDTO, LoginType.VERIFYCODE);
+			logger.info("loginByVerifyCode request, registerDTO: {}, header: {}", GsonUtils.parseJson(registerDTO),
+			GsonUtils.parseJson(header));
+			checkRegisterDTO(registerDTO, RegType.PHONE);
 			checkHeader(header);
-			loginDTO.setDeviceId(header.getDevId());
-			Long userId = accountService.loginByVerifyCode(loginDTO, header.getAppId());
+			registerDTO.setDeviceId(header.getDevId());
+			
+			Long userId = accountService.loginByVerifyCode(registerDTO, header.getAppId());
 
 			// 判断用户状态
 			if (checkUserDisable(userId.toString()).getData()) {
@@ -211,11 +216,13 @@ public class AccountProvider implements AccountApi {
 	 */
 	public Response<RegisterLoginVO> loginThird(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
+			logger.info("loginDTO request, loginDTO: {}, header: {}", JSON.toJSONString(loginDTO), JSON.toJSONString(header));
 			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
 
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
+			logger.info("thirdLoginService.selectByThirdId result: {}", GsonUtils.parseJson(login));
 			Long userId = null;
 			// 已存在账户直接登录
 			if (login != null) {
@@ -227,12 +234,13 @@ public class AccountProvider implements AccountApi {
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			}
-
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId.toString(), header));
+			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId.toString(), header);
+			logger.info("loginThird result: {}", JSON.toJSONString(registerLoginVO));
+			return ResponseUtils.returnObjectSuccess(registerLoginVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-			logger.error("第三方登录未知异常", e);
+			logger.error("loginThird error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}
@@ -675,7 +683,7 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isEmpty(header.getAppId())) {
 			throw QuanhuException.busiError("应用id为空");
 		}
-		if (StringUtils.isBlank(header.getDevType())) {
+		if (StringUtils.isBlank(header.getDevType()) || DevType.getEnumByType(header.getDevType(), header.getUserAgent()) == null) {
 			throw QuanhuException.busiError("设备类型不能为空");
 		}
 	}
@@ -811,7 +819,7 @@ public class AccountProvider implements AccountApi {
 				thirdUser = OatuhWeibo.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
 			} // qq
 			else if (loginDTO.getType() == RegType.QQ.getType()) {
-				thirdUser = OatuhQq.getUser(UserUtils.getThirdAppKey(appId, RegType.QQ), loginDTO.getOpenId(),
+				thirdUser = OatuhQq.getUser(ThirdConstants.QQ_APP_ID, loginDTO.getOpenId(),
 						loginDTO.getAccessToken());
 			} // 微信
 			else {
@@ -824,6 +832,8 @@ public class AccountProvider implements AccountApi {
 		if (thirdUser == null || StringUtils.isBlank(thirdUser.getThirdId())) {
 			throw QuanhuException.busiError("认证失败，thirdUser or thirdId is null !");
 		}
+		logger.info("getThirdUser result: {}", GsonUtils.parseJson(thirdUser));
+
 		return thirdUser;
 	}
 
@@ -978,6 +988,7 @@ public class AccountProvider implements AccountApi {
 	@Override
 	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
 		try {
+			logger.info("sendVerifyCode request codeDTO: {}", GsonUtils.parseJson(codeDTO));
 			checkCodeDTO(codeDTO);
 			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO));
 		} catch (QuanhuException e) {

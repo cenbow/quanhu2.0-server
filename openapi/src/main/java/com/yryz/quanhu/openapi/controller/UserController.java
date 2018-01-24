@@ -8,6 +8,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +54,8 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value="services/app")
 public class UserController {
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class );
+
 	private static final int CHAR_51 = 3;
 	private static final String CHAR_3F = "%3F";
 	private static final String CHAR_63 = "?";
@@ -89,7 +94,7 @@ public class UserController {
 	
 	@ApiOperation("用户信息编辑")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/user/update")
+	@PostMapping(value = "/{version}/user/update")
 	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		infoDTO.setUserId(header.getUserId());
@@ -147,9 +152,15 @@ public class UserController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginVerifyCode")
-	public Response<RegisterLoginVO> loginByVerifyCode(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+	public Response<RegisterLoginVO> loginByVerifyCode(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.loginByVerifyCode(loginDTO, header);
+		String ip = WebUtil.getClientIP(request);
+		registerDTO.setDeviceId(header.getDevId());
+		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
+		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, registerDTO.getUserLocation(),
+				registerDTO.getActivityChannelCode(), devType, ip);
+		registerDTO.setRegLogDTO(logDTO);
+		return accountApi.loginByVerifyCode(registerDTO,header);
 	}
 
 	/**

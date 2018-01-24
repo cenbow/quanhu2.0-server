@@ -29,7 +29,7 @@
 	</if>
   </select>
  
-  <insert id="insert" parameterType="com.yryz.service.commonsafe.entity.VerifyCodeModel" >
+  <insert id="insert" parameterType="com.yryz.quanhu.message.commonsafe.entity.VerifyCode" >
     insert into qh_verify_code
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

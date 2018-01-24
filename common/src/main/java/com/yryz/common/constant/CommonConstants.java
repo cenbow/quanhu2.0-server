@@ -56,5 +56,37 @@ public class CommonConstants {
 	public static final String DEV_TYPE_ANROID = "2";
 	public static final String DEV_TYPE_IOS = "1";
 	public static final String DEV_TYPE_PC = "3";
-		
+
+    /**
+     * 上架
+     */
+    public static final byte SHELVE_YES = 10;
+
+    /**
+     * 未删除
+     */
+    public static final byte DELETE_NO = 10;
+
+    /**
+     * 下架
+     */
+    public static final byte SHELVE_NO = 11;
+
+    /**
+     * 删除
+     */
+    public static final byte DELETE_YES = 11;
+
+
+	/**
+	 * 推荐
+	 */
+	public static final byte recommend_YES = 11;
+
+	/**
+	 * 非推荐
+	 */
+	public static final byte recommend_NO = 10;
+
+
 }

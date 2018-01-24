@@ -14,7 +14,10 @@ public class StarAuthInfo implements Serializable {
      * 主键
      */
     private Integer id;
-
+    /**
+     * 应用id
+     */
+    private String appId;
     /**
      * 机构名称
      */
@@ -23,7 +26,7 @@ public class StarAuthInfo implements Serializable {
     /**
      * 用户id
      */
-    private String custId;
+    private String userId;
 
     /**
      * 真实姓名或者运营者姓名
@@ -66,22 +69,22 @@ public class StarAuthInfo implements Serializable {
     private String organizationPaper;
 
     /**
-     * 认证类型 0:个人认证 1:企业/机构认证
+     * 认证类型 10:个人认证 11:企业/机构认证
      */
     private Byte authType;
 
     /**
-     * 认证方式 0:用户申请 1:平台设置
+     * 认证方式 10:用户申请 11:平台设置
      */
     private Byte authWay;
 
     /**
-     * 审核状态 0:待审核 1:审核通过 2:审核失败 3:取消认证
+     * 审核状态 10:待审核 11:审核通过 12:审核失败 13:取消认证
      */
     private Byte auditStatus;
 
     /**
-     * 是否被推荐 0:否 1:是
+     * 是否被推荐 10:否 11:是
      */
     private Byte recommendStatus;
 
@@ -137,7 +140,11 @@ public class StarAuthInfo implements Serializable {
     /**
      * 达人推荐权重值
      */
-    private Integer starWeight;
+    private Integer recommendHeight;
+    /**
+     * 达人推荐语
+     */
+    private String recommendDesc;
     public Integer getId() {
         return id;
     }
@@ -154,12 +161,12 @@ public class StarAuthInfo implements Serializable {
         this.organizationName = organizationName == null ? null : organizationName.trim();
     }
 
-    public String getCustId() {
-        return custId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setCustId(String custId) {
-        this.custId = custId == null ? null : custId.trim();
+    public void setUserId(String userId) {
+        this.userId = userId == null ? null : userId.trim();
     }
 
     public String getRealName() {
@@ -226,12 +233,21 @@ public class StarAuthInfo implements Serializable {
         this.organizationPaper = organizationPaper == null ? null : organizationPaper.trim();
     }
 
-    public Integer getStarWeight() {
-		return starWeight;
+
+	public Integer getRecommendHeight() {
+		return recommendHeight;
 	}
 
-	public void setStarWeight(Integer starWeight) {
-		this.starWeight = starWeight;
+	public void setRecommendHeight(Integer recommendHeight) {
+		this.recommendHeight = recommendHeight;
+	}
+
+	public String getRecommendDesc() {
+		return recommendDesc;
+	}
+
+	public void setRecommendDesc(String recommendDesc) {
+		this.recommendDesc = recommendDesc;
 	}
 
 	public Byte getAuthType() {
@@ -345,4 +361,62 @@ public class StarAuthInfo implements Serializable {
 	public void setRecommendCancelTime(Date recommendCancelTime) {
 		this.recommendCancelTime = recommendCancelTime;
 	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+	
+	
+	public StarAuthInfo() {
+		super();
+	}
+
+	/**
+	 * 达人审核
+	 * @param userId
+	 * @param auditStatus
+	 * @param operational
+	 * @param auditFailReason
+	 */
+	public StarAuthInfo(String userId, Byte auditStatus, String operational, String auditFailReason) {
+		super();
+		this.userId = userId;
+		this.auditStatus = auditStatus;
+		this.operational = operational;
+		this.auditFailReason = auditFailReason;
+	}
+
+	/**
+	 * 达人推荐
+	 * @param userId
+	 * @param recommendStatus
+	 * @param operational
+	 * @param recommendOperate
+	 * @param recommendDesc
+	 */
+	public StarAuthInfo(String userId, Byte recommendStatus, String operational, String recommendOperate,
+			String recommendDesc) {
+		super();
+		this.userId = userId;
+		this.recommendStatus = recommendStatus;
+		this.operational = operational;
+		this.recommendOperate = recommendOperate;
+		this.recommendDesc = recommendDesc;
+	}
+
+	/**
+	 * 达人推荐权重更新
+	 * @param userId
+	 * @param recommendHeight
+	 */
+	public StarAuthInfo(String userId, Integer recommendHeight) {
+		super();
+		this.userId = userId;
+		this.recommendHeight = recommendHeight;
+	}
+
 }

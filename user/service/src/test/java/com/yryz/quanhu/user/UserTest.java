@@ -23,6 +23,8 @@ import com.yryz.quanhu.user.dto.ForgotPasswordDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
+import com.yryz.quanhu.user.dto.ThirdLoginDTO;
+import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
@@ -88,6 +90,28 @@ public class UserTest {
 	}
 
 	//@Test
+	public void thirdLogin(){
+		RequestHeader header = new RequestHeader();
+		header.setAppId("vebff12m1762");
+		header.setAppVersion("2.0");
+		header.setDevId("24456241457878");
+		header.setDevName("HUAWEI");
+		header.setDevType("11");
+		header.setDitchCode("APP");
+		ThirdLoginDTO loginDTO = new ThirdLoginDTO();
+		loginDTO.setAccessToken("162C9522156358786DE06E441E9C2A3F");
+		loginDTO.setOpenId("F1E167B92BB7D1B1D093B1D44A9147E3");
+		loginDTO.setUserRegInviterCode("48565247");
+		loginDTO.setType(12);
+		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(),
+				RegType.QQ.getText(), DevType.ANDROID.getLabel(), header.getDevName(), header.getAppId(),
+				"127.0.0.1", "", "", null);
+		loginDTO.setRegLogDTO(logDTO);
+		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	//@Test
 	public void forgotPassword() {
 		Response<Boolean> response = accountApi
 				.forgotPassword(new ForgotPasswordDTO("16612345679", "vebff12m1762", "6884", "a12345"));
@@ -101,6 +125,15 @@ public class UserTest {
 	}
 	
 	//@Test
+	public void updateUser(){
+		UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
+		infoDTO.setUserId("727061873573347328");
+		infoDTO.setUserGenders(10);
+		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	//@Test
 	public void bindPhone(){
 		BindPhoneDTO phoneDTO = new BindPhoneDTO("724011759597371392", "16612345689", "5023", "vebff12m1762");
 		Response<Boolean> response = accountApi.bindPhone(phoneDTO);
@@ -109,10 +142,7 @@ public class UserTest {
 	
 	//@Test
 	public void loginByVerifyCode(){
-		LoginDTO loginDTO = new LoginDTO();
-		loginDTO.setPhone("16612345679");
-		//loginDTO.setPassword("a12345");
-		loginDTO.setVerifyCode("6421");
+		RegisterDTO registerDTO = new RegisterDTO();
 		RequestHeader header = new RequestHeader();
 		header.setAppId("vebff12m1762");
 		header.setAppVersion("2.0");
@@ -120,11 +150,24 @@ public class UserTest {
 		header.setDevName("HUAWEI");
 		header.setDevType("1");
 		header.setDitchCode("APP");
-		Response<RegisterLoginVO> response = accountApi.loginByVerifyCode(loginDTO, header);
+		registerDTO.setActivityChannelCode("quanhu-new");
+		registerDTO.setCityCode("431000");
+		registerDTO.setDeviceId("24456241457878");
+		registerDTO.setUserLocation("湖北 武汉");
+		registerDTO.setUserPhone("16612345679");
+		registerDTO.setUserPwd("");
+		registerDTO.setVeriCode("6700");
+		registerDTO.setUserRegInviterCode("48565247");
+		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(),
+				RegType.PHONE.getText(), DevType.ANDROID.getLabel(), header.getDevName(), header.getAppId(),
+				"127.0.0.1", registerDTO.getUserLocation(), registerDTO.getActivityChannelCode(), null);
+		registerDTO.setRegLogDTO(logDTO);
+
+		Response<RegisterLoginVO> response = accountApi.loginByVerifyCode(registerDTO, header);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void login() {
 		LoginDTO loginDTO = new LoginDTO();
 		loginDTO.setPhone("16612345679");
@@ -170,7 +213,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void getUserLoginSimpleVO(){
 		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO("724011759597371392");
 		System.out.println(JsonUtils.toFastJson(response));

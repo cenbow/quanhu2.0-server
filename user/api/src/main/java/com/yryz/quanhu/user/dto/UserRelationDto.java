@@ -1,5 +1,6 @@
 package com.yryz.quanhu.user.dto;
 
+import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.entity.UserRelationEntity;
 import com.yryz.quanhu.user.service.UserRelationApi;
 
@@ -19,14 +20,106 @@ public class UserRelationDto extends UserRelationEntity{
     /**每页大小*/
     private Integer pageSize = 10;
 
-    private UserRelationApi.STATUS statusBy;
+    private int toFollowStatus;
 
-    public UserRelationApi.STATUS getStatusBy() {
-        return statusBy;
+    private int fromFollowStatus;
+
+    private int toBlackStatus;
+
+    private int fromBlackStatus;
+
+    /**
+     * 用户ID
+     */
+    private String userId;
+    /**
+     * 用户名称
+     */
+    private String userName;
+    /**
+     * 头像
+     */
+    private String userHeadImg;
+    /**
+     * 达人标识
+     */
+    private int userStarFlag;
+    /**
+     * 用户简介
+     */
+    private String userSummary;
+
+
+    public int getToBlackStatus() {
+        return toBlackStatus;
     }
 
-    public void setStatusBy(UserRelationApi.STATUS statusBy) {
-        this.statusBy = statusBy;
+    public void setToBlackStatus(int toBlackStatus) {
+        this.toBlackStatus = toBlackStatus;
+    }
+
+    public int getToFollowStatus() {
+        return toFollowStatus;
+    }
+
+    public void setToFollowStatus(int toFollowStatus) {
+        this.toFollowStatus = toFollowStatus;
+    }
+
+    public int getFromFollowStatus() {
+        return fromFollowStatus;
+    }
+
+    public void setFromFollowStatus(int fromFollowStatus) {
+        this.fromFollowStatus = fromFollowStatus;
+    }
+
+    public int getFromBlackStatus() {
+        return fromBlackStatus;
+    }
+
+    public void setFromBlackStatus(int fromBlackStatus) {
+        this.fromBlackStatus = fromBlackStatus;
+    }
+
+    public String getUserHeadImg() {
+        return userHeadImg;
+    }
+
+    public void setUserHeadImg(String userHeadImg) {
+        this.userHeadImg = userHeadImg;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public int getUserStarFlag() {
+        return userStarFlag;
+    }
+
+    public void setUserStarFlag(int userStarFlag) {
+        this.userStarFlag = userStarFlag;
+    }
+
+    public String getUserSummary() {
+        return userSummary;
+    }
+
+    public void setUserSummary(String userSummary) {
+        this.userSummary = userSummary;
     }
 
     public boolean isNewRecord() {

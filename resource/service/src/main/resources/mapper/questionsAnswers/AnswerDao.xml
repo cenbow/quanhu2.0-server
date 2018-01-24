@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao">
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.resource.questionsAnswers.entity.Answer">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="kid" jdbcType="BIGINT" property="kid" />
+    <result column="question_id" jdbcType="BIGINT" property="questionId" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="shelve_flag" jdbcType="TINYINT" property="shelveFlag" />
+    <result column="del_flag" jdbcType="TINYINT" property="delFlag" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+    <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
+    <result column="revision" jdbcType="INTEGER" property="revision" />
+    <result column="operator_id" jdbcType="VARCHAR" property="operatorId" />
+    <result column="answer_type" jdbcType="TINYINT" property="answerType" />
+    <result column="answer_audio" jdbcType="VARCHAR" property="answerAudio" />
+    <result column="coterie_id" jdbcType="VARCHAR" property="coterieId" />
+    <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
+    <result column="gps" jdbcType="VARCHAR" property="gps" />
+    <result column="audio_length" jdbcType="BIGINT" property="audioLength" />
+    <result column="order_flag" jdbcType="TINYINT" property="orderFlag" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="content_source" jdbcType="LONGVARCHAR" property="contentSource" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, kid, question_id, img_url, shelve_flag, del_flag, create_date, last_update_date, 
+    create_user_id, last_update_user_id, revision, operator_id, answer_type, answer_audio, 
+    coterie_id, city_code, gps, audio_length, order_flag, order_id
+  </sql>
+  <sql id="Blob_Column_List">
+    content, content_source
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from qh_answer
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+    from qh_answer
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from qh_answer
+    where kid = #{kid,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from qh_answer
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample">
+    delete from qh_answer
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into qh_answer (id, kid, question_id, 
+      img_url, shelve_flag, del_flag, 
+      create_date, last_update_date, create_user_id, 
+      last_update_user_id, revision, operator_id, 
+      answer_type, answer_audio, coterie_id, 
+      city_code, gps, audio_length, 
+      order_flag, order_id, content, 
+      content_source)
+    values (#{id,jdbcType=BIGINT}, #{kid,jdbcType=BIGINT}, #{questionId,jdbcType=BIGINT}, 
+      #{imgUrl,jdbcType=VARCHAR}, #{shelveFlag,jdbcType=TINYINT}, #{delFlag,jdbcType=TINYINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=BIGINT}, 
+      #{lastUpdateUserId,jdbcType=BIGINT}, #{revision,jdbcType=INTEGER}, #{operatorId,jdbcType=VARCHAR}, 
+      #{answerType,jdbcType=TINYINT}, #{answerAudio,jdbcType=VARCHAR}, #{coterieId,jdbcType=VARCHAR}, 
+      #{cityCode,jdbcType=VARCHAR}, #{gps,jdbcType=VARCHAR}, #{audioLength,jdbcType=BIGINT}, 
+      #{orderFlag,jdbcType=TINYINT}, #{orderId,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, 
+      #{contentSource,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into qh_answer
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      id,
+      <if test="kid != null">
+        kid,
+      </if>
+      <if test="questionId != null">
+        question_id,
+      </if>
+      <if test="imgUrl != null">
+        img_url,
+      </if>
+      <if test="shelveFlag != null">
+        shelve_flag,
+      </if>
+      <if test="delFlag != null">
+        del_flag,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null">
+        last_update_date,
+      </if>
+      <if test="createUserId != null">
+        create_user_id,
+      </if>
+      <if test="lastUpdateUserId != null">
+        last_update_user_id,
+      </if>
+      <if test="revision != null">
+        revision,
+      </if>
+      <if test="operatorId != null">
+        operator_id,
+      </if>
+      <if test="answerType != null">
+        answer_type,
+      </if>
+      <if test="answerAudio != null">
+        answer_audio,
+      </if>
+      <if test="coterieId != null">
+        coterie_id,
+      </if>
+      <if test="cityCode != null">
+        city_code,
+      </if>
+      <if test="gps != null">
+        gps,
+      </if>
+      <if test="audioLength != null">
+        audio_length,
+      </if>
+      <if test="orderFlag != null">
+        order_flag,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="contentSource != null">
+        content_source,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{id,jdbcType=BIGINT},
+      <if test="kid != null">
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="questionId != null">
+        #{questionId,jdbcType=BIGINT},
+      </if>
+      <if test="imgUrl != null">
+        #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="shelveFlag != null">
+        #{shelveFlag,jdbcType=TINYINT},
+      </if>
+      <if test="delFlag != null">
+        #{delFlag,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null">
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserId != null">
+        #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="lastUpdateUserId != null">
+        #{lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="revision != null">
+        #{revision,jdbcType=INTEGER},
+      </if>
+      <if test="operatorId != null">
+        #{operatorId,jdbcType=VARCHAR},
+      </if>
+      <if test="answerType != null">
+        #{answerType,jdbcType=TINYINT},
+      </if>
+      <if test="answerAudio != null">
+        #{answerAudio,jdbcType=VARCHAR},
+      </if>
+      <if test="coterieId != null">
+        #{coterieId,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="gps != null">
+        #{gps,jdbcType=VARCHAR},
+      </if>
+      <if test="audioLength != null">
+        #{audioLength,jdbcType=BIGINT},
+      </if>
+      <if test="orderFlag != null">
+        #{orderFlag,jdbcType=TINYINT},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="contentSource != null">
+        #{contentSource,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample" resultType="java.lang.Long">
+    select count(*) from qh_answer
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
+    update qh_answer
+    <set>
+      <if test="kid != null">
+        kid = #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="questionId != null">
+        question_id = #{questionId,jdbcType=BIGINT},
+      </if>
+      <if test="imgUrl != null">
+        img_url = #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="shelveFlag != null">
+        shelve_flag = #{shelveFlag,jdbcType=TINYINT},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null">
+        last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserId != null">
+        create_user_id = #{createUserId,jdbcType=BIGINT},
+      </if>
+      <if test="lastUpdateUserId != null">
+        last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="revision != null">
+        revision = #{revision,jdbcType=INTEGER},
+      </if>
+      <if test="operatorId != null">
+        operator_id = #{operatorId,jdbcType=VARCHAR},
+      </if>
+      <if test="answerType != null">
+        answer_type = #{answerType,jdbcType=TINYINT},
+      </if>
+      <if test="answerAudio != null">
+        answer_audio = #{answerAudio,jdbcType=VARCHAR},
+      </if>
+      <if test="coterieId != null">
+        coterie_id = #{coterieId,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="gps != null">
+        gps = #{gps,jdbcType=VARCHAR},
+      </if>
+      <if test="audioLength != null">
+        audio_length = #{audioLength,jdbcType=BIGINT},
+      </if>
+      <if test="orderFlag != null">
+        order_flag = #{orderFlag,jdbcType=TINYINT},
+      </if>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="contentSource != null">
+        content_source = #{contentSource,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
+    update qh_answer
+    set kid = #{kid,jdbcType=BIGINT},
+      question_id = #{questionId,jdbcType=BIGINT},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      shelve_flag = #{shelveFlag,jdbcType=TINYINT},
+      del_flag = #{delFlag,jdbcType=TINYINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      create_user_id = #{createUserId,jdbcType=BIGINT},
+      last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+      revision = #{revision,jdbcType=INTEGER},
+      operator_id = #{operatorId,jdbcType=VARCHAR},
+      answer_type = #{answerType,jdbcType=TINYINT},
+      answer_audio = #{answerAudio,jdbcType=VARCHAR},
+      coterie_id = #{coterieId,jdbcType=VARCHAR},
+      city_code = #{cityCode,jdbcType=VARCHAR},
+      gps = #{gps,jdbcType=VARCHAR},
+      audio_length = #{audioLength,jdbcType=BIGINT},
+      order_flag = #{orderFlag,jdbcType=TINYINT},
+      order_id = #{orderId,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR},
+      content_source = #{contentSource,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.Answer">
+    update qh_answer
+    set
+      question_id = #{questionId,jdbcType=BIGINT},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      shelve_flag = #{shelveFlag,jdbcType=TINYINT},
+      del_flag = #{delFlag,jdbcType=TINYINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      create_user_id = #{createUserId,jdbcType=BIGINT},
+      last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+      revision = #{revision,jdbcType=INTEGER},
+      operator_id = #{operatorId,jdbcType=VARCHAR},
+      answer_type = #{answerType,jdbcType=TINYINT},
+      answer_audio = #{answerAudio,jdbcType=VARCHAR},
+      coterie_id = #{coterieId,jdbcType=VARCHAR},
+      city_code = #{cityCode,jdbcType=VARCHAR},
+      gps = #{gps,jdbcType=VARCHAR},
+      audio_length = #{audioLength,jdbcType=BIGINT},
+      order_flag = #{orderFlag,jdbcType=TINYINT},
+      order_id = #{orderId,jdbcType=VARCHAR}
+    where kid = #{kid,jdbcType=BIGINT}
+  </update>
+</mapper>

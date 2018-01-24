@@ -90,6 +90,7 @@ public class PayService {
 				return null;
 			}
 		} catch (Exception e) {
+			logger.info("调用IDRPC失败",e);
 			throw new RpcOptException("IDRPC，getOrderId调用异常", e.getCause());
 		}
 	}
@@ -138,6 +139,20 @@ public class PayService {
 			return ResponseUtils.returnCommonException(PayMsgConstant.message_account_unenough);
 		}
 		return ResponseUtils.returnSuccess();
+	}
+	
+	/**
+	 * 获取账户消息
+	 * @param custId
+	 * @return
+	 */
+	public UserAccount getUserAccount(String custId) {
+		try {
+			UserAccount userAccount = orderAPI.getUserAccount(custId).getData();
+			return userAccount;
+		} catch (Exception e) {
+			throw new RpcOptException("资金RPC，getUserAccount调用异常", e.getCause());
+		}
 	}
 
 	/**

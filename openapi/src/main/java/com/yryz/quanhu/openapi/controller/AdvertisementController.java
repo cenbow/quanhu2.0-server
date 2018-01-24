@@ -15,10 +15,12 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Api("广告")
 @RestController
+@RequestMapping("services/app")
 public class AdvertisementController {
 
     @Reference(check = false, timeout = 30000)

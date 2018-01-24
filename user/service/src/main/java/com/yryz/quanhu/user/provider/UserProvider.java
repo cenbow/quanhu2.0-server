@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import com.github.pagehelper.Page;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
@@ -200,6 +199,7 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<List<String>> getUserIdByParams(AdminUserInfoDTO custInfoDTO) {
 		try {
+			logger.info("getUserIdByParams custInfoDTO: {}", GsonUtils.parseJson(custInfoDTO));
 			List<String> list = userService.getUserIdByParams(custInfoDTO);
 			return ResponseUtils.returnObjectSuccess(list);
 		} catch (QuanhuException e) {
@@ -245,6 +245,7 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<Boolean> updateUserInfo(UpdateBaseInfoDTO infoDTO) {
 		try {
+			logger.info("updateUserInfo infoDTO: {}", GsonUtils.parseJson(infoDTO));
 			if(infoDTO == null || StringUtils.isBlank(infoDTO.getUserId())){
 				throw QuanhuException.busiError("用户id不能为空");
 			}
@@ -252,15 +253,13 @@ public class UserProvider implements UserApi{
 			if(info == null){
 				throw QuanhuException.busiError("用户不存在");
 			}
-			UserBaseInfo baseInfo = new UserBaseInfo();
-			BeanUtils.copyProperties(baseInfo, infoDTO);
-			baseInfo.setUserId(NumberUtils.toLong(infoDTO.getUserId()));
+			UserBaseInfo baseInfo = GsonUtils.parseObj(infoDTO, UserBaseInfo.class);
 			userService.updateUserInfo(baseInfo);
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-			logger.error("用户信息更新异常", e);
+			logger.error("updateUserInfo error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}
