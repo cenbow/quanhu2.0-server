@@ -31,9 +31,9 @@ public class ActivityInfoController {
     @ApiOperation("我参加/报名的活动列表(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/myList")
-    public  Response<PageList<ActivityInfoAppListVo>>  myList(Integer pageNum, Integer pageSize, @RequestHeader("custId") String custId, HttpServletRequest request) {
-       Assert.notNull(custId, "custId is null");
-       return activityInfoApi.myList(pageNum,pageSize,Long.valueOf(custId));
+    public  Response<PageList<ActivityInfoAppListVo>>  myList(Integer pageNum, Integer pageSize, @RequestHeader("userId") String userId, HttpServletRequest request) {
+       Assert.notNull(userId, "userId is null");
+       return activityInfoApi.myList(pageNum,pageSize,Long.valueOf(userId));
     }
 
     @NotLogin

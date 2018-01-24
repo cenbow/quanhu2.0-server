@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -60,7 +61,7 @@ public class UserRelationController {
         }else if(0 == Integer.parseInt(eventType)){
             rpc = userRelationApi.setRelation(userId,targetUserId,UserRelationConstant.EVENT.CANCEL_FOLLOW);
         }else{
-            return ResponseUtils.returnException(new RuntimeException("eventType value is illegal:"+eventType));
+            return ResponseUtils.returnException(new QuanhuException("","","eventType value is illegal:"+eventType));
         }
 
         //转换vo
@@ -95,7 +96,7 @@ public class UserRelationController {
         }else if(0 == Integer.parseInt(eventType)){
             rpc = userRelationApi.setRelation(userId,targetUserId,UserRelationConstant.EVENT.CANCEL_BLACK);
         }else{
-            return ResponseUtils.returnException(new RuntimeException("eventType value is illegal:"+eventType));
+            return ResponseUtils.returnException(new QuanhuException("","","eventType value is illegal:"+eventType));
         }
 
         //转换vo
