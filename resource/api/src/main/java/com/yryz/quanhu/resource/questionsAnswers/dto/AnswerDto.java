@@ -17,7 +17,7 @@ public class AnswerDto {
 
     private String answerAudio;
 
-    private String coterieId;
+    private Long coterieId;
 
     private Long audioLength;
 
@@ -89,11 +89,11 @@ public class AnswerDto {
         this.answerAudio = answerAudio;
     }
 
-    public String getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 

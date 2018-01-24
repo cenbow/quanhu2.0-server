@@ -35,6 +35,8 @@ public class TopicPost {
 
     private String gps;
 
+    private Integer coterieId;
+
     public Long getId() {
         return id;
     }
@@ -161,5 +163,13 @@ public class TopicPost {
 
     public void setGps(String gps) {
         this.gps = gps == null ? null : gps.trim();
+    }
+
+    public Integer getCoterieId() {
+        return coterieId;
+    }
+
+    public void setCoterieId(Integer coterieId) {
+        this.coterieId = coterieId;
     }
 }

@@ -2,6 +2,7 @@ package com.yryz.quanhu.resource.topic.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.topic.api.TopicApi;
@@ -49,6 +50,32 @@ public class TopicProvider implements TopicApi {
     public Response<TopicVo> queryDetail(Long kid, Long userId) {
         try {
             TopicVo  result=this.topicService.queryDetail(kid,userId);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Integer> deleteTopic(Long kid, Long userId) {
+        try {
+            Integer  result=this.topicService.deleteTopic(kid,userId);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<PageList<TopicVo>> queryTopicList(TopicDto dto) {
+        try {
+            PageList<TopicVo>  result=this.topicService.queryTopicList(dto);
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

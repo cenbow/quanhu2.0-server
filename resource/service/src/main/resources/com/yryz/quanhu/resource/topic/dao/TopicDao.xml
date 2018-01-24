@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yryz.quanhu.resource.topic.dao.TopicPostDao">
-  <resultMap id="BaseResultMap" type="com.yryz.quanhu.resource.topic.entity.TopicPost">
+<mapper namespace="com.yryz.quanhu.resource.topic.dao.TopicDao">
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.resource.topic.entity.Topic">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="kid" jdbcType="BIGINT" property="kid" />
-    <result column="topic_id" jdbcType="BIGINT" property="topicId" />
-    <result column="video_url" jdbcType="VARCHAR" property="videoUrl" />
-    <result column="video_thumbnail_url" jdbcType="VARCHAR" property="videoThumbnailUrl" />
-    <result column="audio_url" jdbcType="VARCHAR" property="audioUrl" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="recommend" jdbcType="TINYINT" property="recommend" />
     <result column="shelve_flag" jdbcType="TINYINT" property="shelveFlag" />
     <result column="del_flag" jdbcType="TINYINT" property="delFlag" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="reply_count" jdbcType="INTEGER" property="replyCount" />
     <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
     <result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
     <result column="revision" jdbcType="INTEGER" property="revision" />
+    <result column="coterie_id" jdbcType="BIGINT" property="coterieId" />
     <result column="city_code" jdbcType="VARCHAR" property="cityCode" />
     <result column="gps" jdbcType="VARCHAR" property="gps" />
   </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
-    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yryz.quanhu.resource.topic.entity.Topic">
     <result column="content_source" jdbcType="LONGVARCHAR" property="contentSource" />
-    <result column="img_url" jdbcType="LONGVARCHAR" property="imgUrl" />
-    <result column="img_thumbnail_url" jdbcType="LONGVARCHAR" property="imgThumbnailUrl" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -55,14 +54,14 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, kid, topic_id, video_url, video_thumbnail_url, audio_url, shelve_flag, del_flag, 
-    sort, create_user_id, last_update_user_id, create_date, last_update_date, revision, 
+    id, kid, title, img_url, content, recommend, shelve_flag, del_flag, sort, reply_count, 
+    create_user_id, last_update_user_id, create_date, last_update_date, revision, coterie_id, 
     city_code, gps
   </sql>
   <sql id="Blob_Column_List">
-    content, content_source, img_url, img_thumbnail_url
+    content_source
   </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostExample" resultMap="ResultMapWithBLOBs">
+  <select id="selectByExampleWithBLOBs" parameterType="com.yryz.quanhu.resource.topic.entity.TopicExample" resultMap="ResultMapWithBLOBs">
     select
     <if test="distinct">
       distinct
@@ -71,25 +70,25 @@
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
-    from qh_topic_post
+    from qh_topic
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
-    </if>
-    <if test="pageStartIndex != null and pageSize!=null">
-      limit ${pageStartIndex},${pageSize}
     </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+    <if test="pageStartIndex != null and pageSize!=null">
+      limit ${pageStartIndex},${pageSize}
+    </if>
   </select>
-  <select id="selectByExample" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.yryz.quanhu.resource.topic.entity.TopicExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'false' as QUERYID,
     <include refid="Base_Column_List" />
-    from qh_topic_post
+    from qh_topic
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -102,59 +101,59 @@
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
-    from qh_topic_post
-    where id = #{id,jdbcType=BIGINT}
+    from qh_topic
+    where kid = #{kid,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from qh_topic_post
+    delete from qh_topic
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <delete id="deleteByExample" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostExample">
-    delete from qh_topic_post
+  <delete id="deleteByExample" parameterType="com.yryz.quanhu.resource.topic.entity.TopicExample">
+    delete from qh_topic
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
+  <insert id="insert" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
     <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into qh_topic_post (id, kid, topic_id, 
-      video_url, video_thumbnail_url, audio_url, 
+    insert into qh_topic (id, kid, title, 
+      img_url, content, recommend, 
       shelve_flag, del_flag, sort, 
-      create_user_id, last_update_user_id, create_date, 
-      last_update_date, revision, city_code, 
-      gps, content, content_source, 
-      img_url, img_thumbnail_url)
-    values (#{id,jdbcType=BIGINT}, #{kid,jdbcType=BIGINT}, #{topicId,jdbcType=BIGINT}, 
-      #{videoUrl,jdbcType=VARCHAR}, #{videoThumbnailUrl,jdbcType=VARCHAR}, #{audioUrl,jdbcType=VARCHAR}, 
+      reply_count, create_user_id, last_update_user_id, 
+      create_date, last_update_date, revision, 
+      coterie_id, city_code, gps, 
+      content_source)
+    values (#{id,jdbcType=BIGINT}, #{kid,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, 
+      #{imgUrl,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{recommend,jdbcType=TINYINT}, 
       #{shelveFlag,jdbcType=TINYINT}, #{delFlag,jdbcType=TINYINT}, #{sort,jdbcType=INTEGER}, 
-      #{createUserId,jdbcType=BIGINT}, #{lastUpdateUserId,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{lastUpdateDate,jdbcType=TIMESTAMP}, #{revision,jdbcType=INTEGER}, #{cityCode,jdbcType=VARCHAR}, 
-      #{gps,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{contentSource,jdbcType=LONGVARCHAR}, 
-      #{imgUrl,jdbcType=LONGVARCHAR}, #{imgThumbnailUrl,jdbcType=LONGVARCHAR})
+      #{replyCount,jdbcType=INTEGER}, #{createUserId,jdbcType=BIGINT}, #{lastUpdateUserId,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{revision,jdbcType=INTEGER}, 
+      #{coterieId,jdbcType=BIGINT}, #{cityCode,jdbcType=VARCHAR}, #{gps,jdbcType=VARCHAR},
+      #{contentSource,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
+  <insert id="insertSelective" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
     <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into qh_topic_post
+    insert into qh_topic
     <trim prefix="(" suffix=")" suffixOverrides=",">
       id,
       <if test="kid != null">
         kid,
       </if>
-      <if test="topicId != null">
-        topic_id,
+      <if test="title != null">
+        title,
       </if>
-      <if test="videoUrl != null">
-        video_url,
+      <if test="imgUrl != null">
+        img_url,
       </if>
-      <if test="videoThumbnailUrl != null">
-        video_thumbnail_url,
+      <if test="content != null">
+        content,
       </if>
-      <if test="audioUrl != null">
-        audio_url,
+      <if test="recommend != null">
+        recommend,
       </if>
       <if test="shelveFlag != null">
         shelve_flag,
@@ -164,6 +163,9 @@
       </if>
       <if test="sort != null">
         sort,
+      </if>
+      <if test="replyCount != null">
+        reply_count,
       </if>
       <if test="createUserId != null">
         create_user_id,
@@ -180,23 +182,17 @@
       <if test="revision != null">
         revision,
       </if>
+      <if test="coterieId != null">
+        coterie_id,
+      </if>
       <if test="cityCode != null">
         city_code,
       </if>
       <if test="gps != null">
         gps,
       </if>
-      <if test="content != null">
-        content,
-      </if>
       <if test="contentSource != null">
         content_source,
-      </if>
-      <if test="imgUrl != null">
-        img_url,
-      </if>
-      <if test="imgThumbnailUrl != null">
-        img_thumbnail_url,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -204,17 +200,17 @@
       <if test="kid != null">
         #{kid,jdbcType=BIGINT},
       </if>
-      <if test="topicId != null">
-        #{topicId,jdbcType=BIGINT},
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
       </if>
-      <if test="videoUrl != null">
-        #{videoUrl,jdbcType=VARCHAR},
+      <if test="imgUrl != null">
+        #{imgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="videoThumbnailUrl != null">
-        #{videoThumbnailUrl,jdbcType=VARCHAR},
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
       </if>
-      <if test="audioUrl != null">
-        #{audioUrl,jdbcType=VARCHAR},
+      <if test="recommend != null">
+        #{recommend,jdbcType=TINYINT},
       </if>
       <if test="shelveFlag != null">
         #{shelveFlag,jdbcType=TINYINT},
@@ -224,6 +220,9 @@
       </if>
       <if test="sort != null">
         #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="replyCount != null">
+        #{replyCount,jdbcType=INTEGER},
       </if>
       <if test="createUserId != null">
         #{createUserId,jdbcType=BIGINT},
@@ -240,49 +239,40 @@
       <if test="revision != null">
         #{revision,jdbcType=INTEGER},
       </if>
+      <if test="coterieId != null">
+        #{coterieId,jdbcType=BIGINT},
+      </if>
       <if test="cityCode != null">
         #{cityCode,jdbcType=VARCHAR},
       </if>
       <if test="gps != null">
         #{gps,jdbcType=VARCHAR},
       </if>
-      <if test="content != null">
-        #{content,jdbcType=LONGVARCHAR},
-      </if>
       <if test="contentSource != null">
         #{contentSource,jdbcType=LONGVARCHAR},
       </if>
-      <if test="imgUrl != null">
-        #{imgUrl,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="imgThumbnailUrl != null">
-        #{imgThumbnailUrl,jdbcType=LONGVARCHAR},
-      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostExample" resultType="java.lang.Long">
-    select count(*) from qh_topic_post
+  <select id="countByExample" parameterType="com.yryz.quanhu.resource.topic.entity.TopicExample" resultType="java.lang.Long">
+    select count(*) from qh_topic
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
-    update qh_topic_post
+  <update id="updateByPrimaryKeySelective" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
+    update qh_topic
     <set>
-      <if test="kid != null">
-        kid = #{kid,jdbcType=BIGINT},
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
       </if>
-      <if test="topicId != null">
-        topic_id = #{topicId,jdbcType=BIGINT},
+      <if test="imgUrl != null">
+        img_url = #{imgUrl,jdbcType=VARCHAR},
       </if>
-      <if test="videoUrl != null">
-        video_url = #{videoUrl,jdbcType=VARCHAR},
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
       </if>
-      <if test="videoThumbnailUrl != null">
-        video_thumbnail_url = #{videoThumbnailUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="audioUrl != null">
-        audio_url = #{audioUrl,jdbcType=VARCHAR},
+      <if test="recommend != null">
+        recommend = #{recommend,jdbcType=TINYINT},
       </if>
       <if test="shelveFlag != null">
         shelve_flag = #{shelveFlag,jdbcType=TINYINT},
@@ -292,6 +282,9 @@
       </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="replyCount != null">
+        reply_count = #{replyCount,jdbcType=INTEGER},
       </if>
       <if test="createUserId != null">
         create_user_id = #{createUserId,jdbcType=BIGINT},
@@ -308,67 +301,62 @@
       <if test="revision != null">
         revision = #{revision,jdbcType=INTEGER},
       </if>
+      <if test="coterieId != null">
+        coterie_id = #{coterieId,jdbcType=BIGINT},
+      </if>
       <if test="cityCode != null">
         city_code = #{cityCode,jdbcType=VARCHAR},
       </if>
       <if test="gps != null">
         gps = #{gps,jdbcType=VARCHAR},
       </if>
-      <if test="content != null">
-        content = #{content,jdbcType=LONGVARCHAR},
-      </if>
       <if test="contentSource != null">
         content_source = #{contentSource,jdbcType=LONGVARCHAR},
       </if>
-      <if test="imgUrl != null">
-        img_url = #{imgUrl,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="imgThumbnailUrl != null">
-        img_thumbnail_url = #{imgThumbnailUrl,jdbcType=LONGVARCHAR},
-      </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
+    where kid = #{kid,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
-    update qh_topic_post
-    set kid = #{kid,jdbcType=BIGINT},
-      topic_id = #{topicId,jdbcType=BIGINT},
-      video_url = #{videoUrl,jdbcType=VARCHAR},
-      video_thumbnail_url = #{videoThumbnailUrl,jdbcType=VARCHAR},
-      audio_url = #{audioUrl,jdbcType=VARCHAR},
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
+    update qh_topic
+    set
+      title = #{title,jdbcType=VARCHAR},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      recommend = #{recommend,jdbcType=TINYINT},
       shelve_flag = #{shelveFlag,jdbcType=TINYINT},
       del_flag = #{delFlag,jdbcType=TINYINT},
       sort = #{sort,jdbcType=INTEGER},
+      reply_count = #{replyCount,jdbcType=INTEGER},
       create_user_id = #{createUserId,jdbcType=BIGINT},
       last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
       create_date = #{createDate,jdbcType=TIMESTAMP},
       last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
       revision = #{revision,jdbcType=INTEGER},
+      coterie_id = #{coterieId,jdbcType=BIGINT},
       city_code = #{cityCode,jdbcType=VARCHAR},
       gps = #{gps,jdbcType=VARCHAR},
-      content = #{content,jdbcType=LONGVARCHAR},
-      content_source = #{contentSource,jdbcType=LONGVARCHAR},
-      img_url = #{imgUrl,jdbcType=LONGVARCHAR},
-      img_thumbnail_url = #{imgThumbnailUrl,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=BIGINT}
+      content_source = #{contentSource,jdbcType=LONGVARCHAR}
+    where kid = #{kid,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPost">
-    update qh_topic_post
-    set kid = #{kid,jdbcType=BIGINT},
-      topic_id = #{topicId,jdbcType=BIGINT},
-      video_url = #{videoUrl,jdbcType=VARCHAR},
-      video_thumbnail_url = #{videoThumbnailUrl,jdbcType=VARCHAR},
-      audio_url = #{audioUrl,jdbcType=VARCHAR},
+  <update id="updateByPrimaryKey" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
+    update qh_topic
+    set
+      title = #{title,jdbcType=VARCHAR},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      recommend = #{recommend,jdbcType=TINYINT},
       shelve_flag = #{shelveFlag,jdbcType=TINYINT},
       del_flag = #{delFlag,jdbcType=TINYINT},
       sort = #{sort,jdbcType=INTEGER},
+      reply_count = #{replyCount,jdbcType=INTEGER},
       create_user_id = #{createUserId,jdbcType=BIGINT},
       last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
       create_date = #{createDate,jdbcType=TIMESTAMP},
       last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
       revision = #{revision,jdbcType=INTEGER},
+      coterie_id = #{coterieId,jdbcType=BIGINT},
       city_code = #{cityCode,jdbcType=VARCHAR},
       gps = #{gps,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=BIGINT}
+    where kid = #{kid,jdbcType=BIGINT}
   </update>
 </mapper>
