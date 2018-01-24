@@ -42,6 +42,7 @@ public class CommonSafeProvider implements CommonSafeApi {
     @Override
     public Response<Integer> checkVerifyCode(VerifyCodeDTO codeDTO) {
         try {
+            logger.info("checkVerifyCode codeDTO request: {}", GsonUtils.parseJson(codeDTO));
             checkSmsDTO(codeDTO);
             if (StringUtils.isBlank(codeDTO.getVerifyCode())) {
                 throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "验证码不能为空");

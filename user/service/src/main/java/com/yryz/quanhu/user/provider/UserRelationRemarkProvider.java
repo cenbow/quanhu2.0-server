@@ -5,7 +5,6 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
-import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.service.UserRelationRemarkApi;
 import com.yryz.quanhu.user.service.UserRelationRemarkService;
 import org.slf4j.Logger;

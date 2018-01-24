@@ -14,48 +14,48 @@ public class ActivityVoteDetail extends GenericEntity{
 	
 	/**
 	 * 活动id
-	 */	 
-    private  Long activityInfoId;
-    
+	 */
+	private  Long activityInfoId;
+
 	/**
 	 * 编号
-	 */	 
-    private  Integer voteNo;
-    
+	 */
+	private  Integer voteNo;
+
 	/**
 	 * 参与获得积分
-	 */	 
-    private  Integer obtainIntegral;
-    
+	 */
+	private  Integer obtainIntegral;
+
 	/**
 	 * 文本
-	 */	 
-    private  String content;
-    
+	 */
+	private  String content;
+
 	/**
 	 * 封面图
-	 */	 
-    private  String coverPlan;
-    
+	 */
+	private  String coverPlan;
+
 	/**
 	 * 图片url
-	 */	 
-    private  String imgUrl;
-    
+	 */
+	private  String imgUrl;
+
 	/**
 	 * 视频url
-	 */	 
-    private  String videoUrl;
-    
+	 */
+	private  String videoUrl;
+
 	/**
 	 * 视频首帧图url
-	 */	 
-    private  String videoThumbnailUrl;
-    
+	 */
+	private  String videoThumbnailUrl;
+
 	/**
 	 * 投票数
-	 */	 
-    private  Integer voteCount;
+	 */
+	private  Integer voteCount;
     
 	/**
 	 * 后台增加的票数

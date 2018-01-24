@@ -1,7 +1,6 @@
 package com.yryz.quanhu.user.service;
 
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;

@@ -20,6 +20,7 @@ public class ActivityInfoServiceImpl implements ActivityInfoService {
 
     @Autowired
     ActivityInfoDao activityInfoDao;
+
     @Override
     public PageList<ActivityInfoAppListVo> getActivityInfoMyAppListVoPageList(Integer pageNum, Integer pageSize, Long custId) {
         Page<ActivityInfoAppListVo> page = PageHelper.startPage(pageNum, pageSize);
@@ -66,7 +67,7 @@ public class ActivityInfoServiceImpl implements ActivityInfoService {
     }
 
     @Override
-    public void updateJoinCount(ActivityInfo activityInfo) {
-        activityInfoDao.updateJoinCount(activityInfo);
+    public void updateJoinCount(Long kid,Integer userNum) {
+        activityInfoDao.updateJoinCount(kid,userNum);
     }
 }
