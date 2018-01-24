@@ -41,6 +41,9 @@ public class CommentProvider implements CommentApi {
         try {
             comment.setKid(idAPI.getKid(CommentConstatns.QH_COMMENT_INFO).getData());
             Map<String,Integer> map=new HashMap<String, Integer>();
+            //根据调用用户拿到用户的对象comment.getCreateUserId();
+            comment.setNickName("");
+            comment.setUserImg("");
             int count=commentService.accretion(comment);
             if(count>0){
                 map.put("result",1);
