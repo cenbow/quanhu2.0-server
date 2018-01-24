@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -25,6 +26,7 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
+* @Description 平台文章
 * @author wangheng
 * @date 2018年1月23日 上午11:11:44
 */
@@ -48,6 +50,16 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
+            record.setClassifyId(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
+            record.setDelFlag(CommonConstants.DELETE_NO);
+            record.setShelveFlag(CommonConstants.SHELVE_YES);
+
+            Assert.isTrue(0L == record.getCoterieId(), "平台文章发布 没有：CoterieId");
+            Assert.isTrue(0L == record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
+
+            // 校验用户是否存在
+            ResponseUtils.getResponseData(userApi.getUserSimple(String.valueOf(record.getCreateUserId())));
+
             ReleaseConfigVo cfgVo = releaseConfigService.getTemplate(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             Assert.notNull(cfgVo, "平台发布文章，发布模板不存在！classifyId：" + ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
 
@@ -60,8 +72,6 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
                 throw QuanhuException.busiError("富文本元素(文字、图片、视频、音频)至少有一个不能为空！");
             }
 
-            // 校验用户是否存在
-            ResponseUtils.getResponseData(userApi.getUserSimple(String.valueOf(record.getCreateUserId())));
             // kid 生成
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
@@ -83,6 +93,8 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
         try {
             ReleaseInfoVo infoVo = releaseInfoService.selectByKid(kid);
             Assert.notNull(infoVo, "文章不存在！kid:" + kid);
+
+            Assert.isTrue(0L == infoVo.getCoterieId(), "非平台文章禁止访问！");
 
             // TODO 创建者用户信息
             UserSimpleVO user = ResponseUtils
@@ -107,7 +119,10 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Override
     public Response<Integer> deleteBykid(ReleaseInfo upInfo) {
-        try { // 校验记录是否存在
+        try {
+            upInfo.setDelFlag(CommonConstants.DELETE_YES);
+
+            // 校验记录是否存在
             ReleaseInfo info = releaseInfoService.selectByKid(upInfo.getKid());
             Assert.notNull(info, "文章资源不存在，kid：" + upInfo.getKid());
 
