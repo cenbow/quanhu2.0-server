@@ -47,13 +47,9 @@ public class CoterieAdmin implements Serializable{
 	/**
      * 私圈id
      */
-    private String coterieId;
+    private Long coterieId;
     
-    /**
-     * 圈子ID
-     */
-    private String circleId;
-    
+
     /**
      * 私圈名称
      */
@@ -133,21 +129,15 @@ public class CoterieAdmin implements Serializable{
 		this.phone = phone;
 	}
 
-	public String getCoterieId() {
+	public Long getCoterieId() {
 		return coterieId;
 	}
 
-	public void setCoterieId(String coterieId) {
+	public void setCoterieId(Long coterieId) {
 		this.coterieId = coterieId;
 	}
 
-	public String getCircleId() {
-		return circleId;
-	}
 
-	public void setCircleId(String circleId) {
-		this.circleId = circleId;
-	}
 
 	public String getName() {
 		return name;
@@ -265,7 +255,7 @@ public class CoterieAdmin implements Serializable{
 	public String toString() {
 		return "CoterieAdmin [nickName=" + nickName + ", custName=" + custName + ", custId=" + custId + ", ownerIntro="
 				+ ownerIntro + ", isExpert=" + isExpert + ", phone=" + phone + ", coterieId=" + coterieId
-				+ ", circleId=" + circleId + ", name=" + name + ", intro=" + intro + ", joinFee=" + joinFee
+				    + ", name=" + name + ", intro=" + intro + ", joinFee=" + joinFee
 				+ ", consultingFee=" + consultingFee + ", joinCheck=" + joinCheck + ", status=" + status
 				+ ", recommend=" + recommend + ", createDate=" + createDate + ", operName=" + operName + ", operDate="
 				+ operDate + ", reason=" + reason + "]";
