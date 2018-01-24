@@ -1,5 +1,7 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
+import com.yryz.quanhu.user.vo.UserSimpleVO;
+
 import java.util.Date;
 
 public class QuestionVo {
@@ -35,6 +37,8 @@ public class QuestionVo {
     private Byte answerdFlag;
 
     private String contentSource;
+
+    private UserSimpleVO user;
 
     public Long getKid() {
         return kid;
@@ -162,5 +166,13 @@ public class QuestionVo {
 
     public void setContentSource(String contentSource) {
         this.contentSource = contentSource;
+    }
+
+    public UserSimpleVO getUser() {
+        return user;
+    }
+
+    public void setUser(UserSimpleVO user) {
+        this.user = user;
     }
 }

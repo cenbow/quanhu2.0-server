@@ -3,8 +3,11 @@ package com.yryz.quanhu.resource.questionsAnswers.dao;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Answer;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs;
+import org.apache.ibatis.annotations.Mapper;
+
 import java.util.List;
 
+@Mapper
 public interface AnswerDao {
     long countByExample(AnswerExample example);
 

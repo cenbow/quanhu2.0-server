@@ -99,7 +99,7 @@
     ,
     <include refid="Blob_Column_List" />
     from qh_topic
-    where id = #{id,jdbcType=BIGINT}
+    where kid = #{kid,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from qh_topic
