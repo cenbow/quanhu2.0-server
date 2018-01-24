@@ -77,7 +77,7 @@ public class CoterieAdmin implements Serializable{
     /**
      * 0不审核，1审核
      */
-    private Byte joinCheck;
+    private Integer joinCheck;
     
     /**
      * 状态：0待审核，2审批未通过，3上架，4下架
@@ -197,11 +197,11 @@ public class CoterieAdmin implements Serializable{
 		this.custId = custId;
 	}
 
-	public Byte getJoinCheck() {
+	public Integer getJoinCheck() {
 		return joinCheck;
 	}
 
-	public void setJoinCheck(Byte joinCheck) {
+	public void setJoinCheck(Integer joinCheck) {
 		this.joinCheck = joinCheck;
 	}
 

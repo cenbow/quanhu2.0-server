@@ -41,7 +41,7 @@ public class CoterieBasicInfo implements Serializable{
     /**
      * 加入私圈 收费需要审核 0不审核，1审核
      */
-    private Byte joinCheck;
+    private Integer joinCheck;
 
 	public String getOwnerId() {
 		return ownerId;
@@ -83,11 +83,11 @@ public class CoterieBasicInfo implements Serializable{
 		this.joinFee = joinFee;
 	}
 
-	public Byte getJoinCheck() {
+	public Integer getJoinCheck() {
 		return joinCheck;
 	}
 
-	public void setJoinCheck(Byte joinCheck) {
+	public void setJoinCheck(Integer joinCheck) {
 		this.joinCheck = joinCheck;
 	}
 
