@@ -45,7 +45,7 @@ public class CoterieController {
 	@Reference
 	private AuthApi authApi;
 	@Reference
-	private CoterieApi coterieApi ;
+	private CoterieApi coterieApi;
 
 
 	@ApiOperation("发布私圈")
@@ -53,15 +53,15 @@ public class CoterieController {
 	@PostMapping(value = "/{version}/coterieInfo/create")
 	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		String useId=header.getUserId();
+		String useId = header.getUserId();
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
-			info.setJoinCheck(  1);
+			info.setJoinCheck(1);
 		} else {
 			//付费加入方式，成员必须不审核
-			info.setJoinCheck(  0);
+			info.setJoinCheck(0);
 		}
-		info.setOwnerId(useId);
+		//info.setOwnerId(useId);
 		return coterieApi.applyCreate(info );
 	}
 	
@@ -132,7 +132,6 @@ public class CoterieController {
 			logger.error(String.format("query Coterie details error, coterieId=[%s]", coterieId), e);
 		}
 		return coterieInfo;
-
 	}
 
 	/**
