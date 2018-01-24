@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
-import com.yryz.quanhu.dymaic.canal.elasticsearch.UserEsRepository;
+import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
 import com.yryz.quanhu.dymaic.canal.entity.CanalChangeInfo;
 import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
@@ -31,7 +31,7 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 	private SyncExecutor syncExecutor;
 
 	@Resource
-	private UserEsRepository userEsRepository;
+	private UserRepository userRepository;
 	
 	@Resource
 	private ElasticsearchTemplate elasticsearchTemplate;
@@ -52,28 +52,28 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
 	@Override
 	public void handler(CanalMsgContent msg) {
-		boolean exists=elasticsearchTemplate.indexExists(UserInfo.class);
-		if(!exists){
-			elasticsearchTemplate.createIndex(UserInfo.class);
-		}
+//		boolean exists=elasticsearchTemplate.indexExists(UserInfo.class);
+//		if(!exists){
+//			elasticsearchTemplate.createIndex(UserInfo.class);
+//		}
 		UserInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),UserInfo.class);
 		UserInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),UserInfo.class);
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
-			Optional<UserInfo> uinfo = userEsRepository.findById(uinfoBefore.getUserId());
+			Optional<UserInfo> uinfo = userRepository.findById(uinfoBefore.getUserId());
 			if (uinfo.isPresent()) {
 				UserInfo userInfo = EntityParser.parse(uinfo.get(), msg.getDataAfter(),UserInfo.class);
-				userEsRepository.save(userInfo);
+				userRepository.save(userInfo);
 			} else {
 				// 先收到了update消息，后收到insert消息
-				userEsRepository.save(uinfoAfter);
+				userRepository.save(uinfoAfter);
 			}
 		} else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
-			userEsRepository.deleteById(uinfoBefore.getUserId());
+			userRepository.deleteById(uinfoBefore.getUserId());
 		} else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
 			// 先执行了update则不执行insert
-			Optional<UserInfo> uinfo = userEsRepository.findById(uinfoAfter.getUserId());
+			Optional<UserInfo> uinfo = userRepository.findById(uinfoAfter.getUserId());
 			if (!uinfo.isPresent()) {
-				userEsRepository.save(uinfoAfter);
+				userRepository.save(uinfoAfter);
 			}
 		}
 	}

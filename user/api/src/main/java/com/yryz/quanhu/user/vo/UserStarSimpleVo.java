@@ -9,10 +9,6 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class UserStarSimpleVo implements Serializable {
 	/**
-	 * 达人主键
-	 */
-	private Long id;
-	/**
 	 * 行业以及领域
 	 */
 	private String tradeField;
@@ -30,12 +26,12 @@ public class UserStarSimpleVo implements Serializable {
 	/**
 	 * 用户id
 	 */
-	private String custId;
+	private Long userId;
 	
 	/**
-	 * 	认证状态 0:审核中 1:成功 2:失败 3:后台取消认证 4:未填写过认证资料
+	 * 	认证状态10:审核中 11:成功 12:失败 13:后台取消认证 14:未填写过认证资料
 	 */
-	private Byte authStatus;
+	private Byte auditStatus;
 	
 	/**
      * 机构名称
@@ -78,14 +74,6 @@ public class UserStarSimpleVo implements Serializable {
     private String organizationPaper;
 
 	
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public String getTradeField() {
 		return tradeField;
 	}
@@ -110,21 +98,14 @@ public class UserStarSimpleVo implements Serializable {
 		this.authWay = authWay;
 	}
 
-	public String getCustId() {
-		return custId;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
-	public Byte getAuthStatus() {
-		return authStatus;
-	}
-
-	public void setAuthStatus(Byte authStatus) {
-		this.authStatus = authStatus;
-	}
 
 	public String getOrganizationName() {
 		return organizationName;
@@ -188,6 +169,14 @@ public class UserStarSimpleVo implements Serializable {
 
 	public void setOrganizationPaper(String organizationPaper) {
 		this.organizationPaper = organizationPaper == null ? "" : organizationPaper;
+	}
+
+	public Byte getAuditStatus() {
+		return auditStatus;
+	}
+
+	public void setAuditStatus(Byte auditStatus) {
+		this.auditStatus = auditStatus;
 	}
 	
 }

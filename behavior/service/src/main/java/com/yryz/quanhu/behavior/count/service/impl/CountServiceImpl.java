@@ -6,6 +6,7 @@ import com.yryz.quanhu.behavior.count.contants.RedisContants;
 import com.yryz.quanhu.behavior.count.dao.CountRedisDao;
 import com.yryz.quanhu.behavior.count.service.CountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sun.misc.GC;
 
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @Desc: 计数服务实现类
  * @Date: 2018/1/23.
  */
+@Service
 public class CountServiceImpl implements CountService {
 
     @Autowired

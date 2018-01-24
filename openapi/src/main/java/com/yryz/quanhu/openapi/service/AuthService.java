@@ -2,6 +2,7 @@ package com.yryz.quanhu.openapi.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,12 +43,12 @@ public class AuthService {
 		Integer checkEnum = TokenCheckEnum.SUCCESS.getStatus();
 		try {
 			if (devType != DevType.ANDROID && devType != DevType.IOS) {
-				AuthTokenDTO tokenDTO = new AuthTokenDTO(userId, devType, header.getAppId(),header.getToken());
+				AuthTokenDTO tokenDTO = new AuthTokenDTO(NumberUtils.toLong(userId), devType, header.getAppId(),header.getToken());
 				checkEnum = authAPi.checkToken(tokenDTO).getData();
 			} else {
 				AuthRefreshDTO refreshDTO = new AuthRefreshDTO(null, false);
 				refreshDTO.setAppId(header.getAppId());
-				refreshDTO.setUserId(userId);
+				refreshDTO.setUserId(NumberUtils.toLong(userId));
 				refreshDTO.setType(devType);
 				refreshDTO.setToken(header.getToken());
 				checkEnum = authAPi.checkToken(refreshDTO).getData();

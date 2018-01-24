@@ -2,12 +2,12 @@ package com.yryz.quanhu.user.provider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.PageModel;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.dto.StarAuthQueryDTO;
@@ -30,13 +31,15 @@ import com.yryz.quanhu.user.entity.UserStarAuth;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthType;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthWay;
-import com.yryz.quanhu.user.entity.UserStarAuth.StarRecommendStatus;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.service.UserStarService;
 import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.vo.StarAuthAuditVo;
 import com.yryz.quanhu.user.vo.StarAuthLogVO;
+import com.yryz.quanhu.user.vo.StarInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
+import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
 @Service(interfaceClass = UserStarApi.class)
 public class UserStarProvider implements UserStarApi {
@@ -61,7 +64,7 @@ public class UserStarProvider implements UserStarApi {
 			UserStarAuth model = (UserStarAuth) GsonUtils.parseObj(info, UserStarAuth.class);
 			UserStarAuth authModel = userStarService.get(info.getUserId(), null);
 			if (authModel != null) {
-				if (authModel.getAuditStatus() == StarAuditStatus.AUDIT_FAIL.getStatus()) {
+				if (authModel.getAuditStatus() == StarAuditStatus.WAIT_AUDIT.getStatus()) {
 					throw QuanhuException.busiError("待审核中，不允许重复申请");
 				}
 				if (authModel.getAuditStatus() == StarAuditStatus.AUDIT_SUCCESS.getStatus()) {
@@ -102,10 +105,15 @@ public class UserStarProvider implements UserStarApi {
 	@Override
 	public Response<StarAuthInfo> get(String userId) {
 		try {
-			if (StringUtils.isEmpty(userId)) {
+			if (StringUtils.isBlank(userId)) {
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			UserStarAuth model = userStarService.get(userId, null);
+			if(model == null){
+				model = new UserStarAuth();
+				model.setUserId(NumberUtils.createLong(userId));
+				model.setAuditStatus((byte)14);
+			}
 			StarAuthInfo authInfo = (StarAuthInfo) GsonUtils.parseObj(model, StarAuthInfo.class);
 			return ResponseUtils.returnObjectSuccess(authInfo);
 		} catch (QuanhuException e) {
@@ -191,10 +199,10 @@ public class UserStarProvider implements UserStarApi {
 			if (auditVo == null || auditVo.getAuditStatus() == null
 					|| auditVo.getAuditStatus() < StarAuditStatus.WAIT_AUDIT.getStatus()
 					|| auditVo.getAuditStatus() > StarAuditStatus.CANCEL_AUTH.getStatus()
-					|| StringUtils.isEmpty(auditVo.getUserId())) {
+					|| auditVo.getUserId() == null) {
 				throw QuanhuException.busiError("auditVo、auditStatus、userId为空");
 			}
-			UserStarAuth authModel = userStarService.get(auditVo.getUserId(), null);
+			UserStarAuth authModel = userStarService.get(auditVo.getUserId().toString(), null);
 			if (authModel == null) {
 				throw QuanhuException.busiError("认证信息不存在");
 			}
@@ -218,7 +226,7 @@ public class UserStarProvider implements UserStarApi {
 			}
 
 			UserStarAuth reAuthModel = new UserStarAuth();
-			reAuthModel.setUserId(NumberUtils.toLong(auditVo.getUserId()));
+			reAuthModel.setUserId(auditVo.getUserId());
 			reAuthModel.setAuditStatus(auditVo.getAuditStatus());
 			reAuthModel.setAuditFailReason(auditVo.getReason());
 			reAuthModel.setOperational(auditVo.getOperational());
@@ -239,6 +247,9 @@ public class UserStarProvider implements UserStarApi {
 			if (authInfo == null || StringUtils.isEmpty(authInfo.getUserId())
 					|| authInfo.getRecommendStatus() == null) {
 				throw QuanhuException.busiError("authModel、recommendStatus、userId为空");
+			}
+			if (StringUtils.isBlank(authInfo.getRecommendDesc()) || authInfo.getRecommendDesc().length() > 200) {
+				throw QuanhuException.busiError("推荐语为空或者超长");
 			}
 			UserStarAuth authModel = userStarService.get(authInfo.getUserId(), null);
 			if (authModel == null) {
@@ -274,7 +285,7 @@ public class UserStarProvider implements UserStarApi {
 				throw QuanhuException.busiError("非达人不能设置排序权重");
 			}
 			UserBaseInfo info = new UserBaseInfo();
-			info.setUserId(NumberUtils.toLong(userId));
+			info.setUserId(NumberUtils.createLong(userId));
 			info.setLastHeat(weight);
 			userService.updateUserInfo(info);
 			return ResponseUtils.returnObjectSuccess(true);
@@ -357,18 +368,10 @@ public class UserStarProvider implements UserStarApi {
 	}
 
 	@Override
-	public Response<List<StarAuthInfo>> starList(Integer isRecommend, int start) {
-		if (isRecommend == null) {
-			isRecommend = (int) StarRecommendStatus.FALSE.getStatus();
-		}
+	public Response<List<StarInfoVO>> starList(StarAuthParamDTO authParamDTO) {
 		try {
-			StarAuthParamDTO authParamDTO = new StarAuthParamDTO();
-			if (isRecommend == (int) StarRecommendStatus.TRUE.getStatus()) {
-				authParamDTO.setStarRecommend(true);
-			}
-			authParamDTO.setStart(start);
 			List<UserStarAuth> list = userStarService.starList(authParamDTO);
-			List<StarAuthInfo> authInfos = (List<StarAuthInfo>) GsonUtils.parseList(list, StarAuthInfo.class);
+			List<StarInfoVO> authInfos = getStarInfoList(authParamDTO.getUserId(), list);	
 			return ResponseUtils.returnObjectSuccess(authInfos);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -377,7 +380,48 @@ public class UserStarProvider implements UserStarApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-
+	/**
+	 * 解析达人信息
+	 * @param userId
+	 * @param authInfos
+	 * @return
+	 */
+	private List<StarInfoVO> getStarInfoList(Long userId,List<UserStarAuth> authInfos){
+		List<StarInfoVO> list = null;
+		
+		Map<String, UserSimpleVO> userVos = null;
+		Set<String> userIds = null;
+		//Map<String,String> levelMap = null;
+		int length = authInfos == null ? 0 : authInfos.size();
+		list = new ArrayList<>(length);
+		userIds = new HashSet<>(length);
+		
+		if(length == 0){
+			return list;
+		}
+		
+		for (int i = 0; i < length; i++) {
+			userIds.add(authInfos.get(i).getUserId().toString());
+		}
+		if (CollectionUtils.isNotEmpty(userIds)){
+			userVos = userService.getUserSimple(userId, userIds);
+			//levelMap = getUserLevels(userIds);
+		}
+		
+		for (int i = 0; i < length; i++) {
+			UserStarAuth authInfo = authInfos.get(i);
+			StarInfoVO infoDTO = new StarInfoVO();
+			UserStarSimpleVo simpleVo = (UserStarSimpleVo) GsonUtils.parseObj(authInfo, UserStarSimpleVo.class);
+			simpleVo.setAuthType(null);
+			simpleVo.setAuthWay(null);
+			simpleVo.setUserId(null);
+			infoDTO.parseUser(authInfo.getUserId().toString(), userVos);
+			//infoDTO.getCustInfo().setCustLevel(levelMap.get(authInfo.getUserId()));
+			infoDTO.setStarInfo(simpleVo);
+			list.add(infoDTO);
+		}
+		return list;
+	}
 	@Override
 	public Response<Integer> countStar() {
 		try {

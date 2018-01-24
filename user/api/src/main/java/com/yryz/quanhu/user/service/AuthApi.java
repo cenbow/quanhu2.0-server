@@ -28,8 +28,8 @@ public interface AuthApi {
 	 * @param devType 客户端设备类型
 	 * @return
 	 */
-	static String cacheKey(String userId, String appId, DevType devType){
-		return String.format("%s.%s.%s.%s", RedisConstants.AUTH_TOKEN,userId,appId,devType.getLabel());
+	static String cacheKey(Long userId, String appId, DevType devType){
+		return String.format("%s.%s.%s.%s", RedisConstants.AUTH_TOKEN,userId.toString(),appId,devType.getLabel());
 	};
 	/**
 	 * 检查web端token
@@ -68,12 +68,4 @@ public interface AuthApi {
 	 * @Description app端刷新token
 	 */
 	Response<AuthTokenVO> refreshToken(AuthRefreshDTO refreshDTO);
-	
-	/**
-	 * 删除当前应用下所有端token 后台踢人下线
-	 * @param userId 用户id
-	 * @param appId 应用id
-	 */
-	Response<Boolean> delToken(String userId,String appId);
-	
 }

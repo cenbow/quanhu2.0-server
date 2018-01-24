@@ -55,6 +55,6 @@ public interface AuthService {
 	 * @param userId 用户id
 	 * @param appId 应用id
 	 */
-	public void delToken(String userId,String appId);
+	public void delToken(Long userId,String appId);
 	
 }

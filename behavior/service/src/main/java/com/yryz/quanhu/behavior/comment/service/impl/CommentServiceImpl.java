@@ -1,11 +1,14 @@
 package com.yryz.quanhu.behavior.comment.service.impl;
 
+import com.yryz.common.mongodb.Page;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.comment.dao.CommentDao;
+import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentService;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,21 +44,21 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
-        List<CommentVO> commentVOS=commentDao.queryComments(commentFrontDTO);
-        PageList pageList=new PageList();
+        List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
+        PageList pageList = new PageList();
         pageList.setCurrentPage(commentFrontDTO.getCurrentPage());
         pageList.setPageSize(commentFrontDTO.getPageSize());
-        List<CommentVO> commentVOS_=new ArrayList<CommentVO>();
-        List<Comment> commentsnew=new ArrayList<Comment>();
-        for(CommentVO commentVO:commentVOS){
-            CommentFrontDTO commentFrontDTOnew=new CommentFrontDTO();
+        List<CommentVO> commentVOS_ = new ArrayList<CommentVO>();
+        List<Comment> commentsnew = new ArrayList<Comment>();
+        for (CommentVO commentVO : commentVOS) {
+            CommentFrontDTO commentFrontDTOnew = new CommentFrontDTO();
             commentFrontDTOnew.setTopId(commentVO.getKid());
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
             commentVOS_ = commentDao.queryComments(commentFrontDTOnew);
-            int i=0;
-            for(CommentVO commentVOsnew:commentVOS_){
+            int i = 0;
+            for (CommentVO commentVOsnew : commentVOS_) {
                 i++;
-                Comment comment=new Comment();
+                Comment comment = new Comment();
                 comment.setId(commentVOsnew.getId());
                 comment.setKid(commentVOsnew.getKid());
                 comment.setTopId(commentVOsnew.getTopId());
@@ -80,19 +83,35 @@ public class CommentServiceImpl implements CommentService {
                 comment.setLikeCount(0);
                 comment.setLikeFlag((byte) 0);
                 commentsnew.add(comment);
-                if(i>=3){
+                if (i >= 3) {
                     break;
                 }
             }
             //需要接统计
             commentVO.setLikeCount(0);
-            commentVO.setLikeFlag((byte)0);
+            commentVO.setLikeFlag((byte) 0);
 
             commentVO.setCommentCount(commentsnew.size());
             commentVO.setChildrenComments(commentsnew);
         }
         pageList.setCount(Long.valueOf(commentVOS.size()));
         pageList.setEntities(commentVOS);
+        return pageList;
+    }
+
+    @Override
+    public int updownBatch(List<Comment> comments) {
+        return commentDao.updownBatch(comments);
+    }
+
+    @Override
+    public PageList<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO) {
+        PageList pageList = new PageList();
+        pageList.setCurrentPage(commentDTO.getCurrentPage());
+        List<CommentVOForAdmin> commentVOForAdmins = commentDao.queryCommentForAdmin(commentDTO);
+        pageList.setPageSize(commentDTO.getPageSize());
+        pageList.setEntities(commentVOForAdmins);
+        pageList.setCount(Long.valueOf(commentVOForAdmins.size()));
         return pageList;
     }
 }

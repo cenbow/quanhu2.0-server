@@ -22,11 +22,12 @@ public class TopicVo {
 
     private Integer replyCount;
 
-    private String coterieId;
+    private Integer coterieId;
 
     private String contentSource;
 
     private UserSimpleVO user;
+
 
     public Long getKid() {
         return kid;
@@ -100,11 +101,11 @@ public class TopicVo {
         this.replyCount = replyCount;
     }
 
-    public String getCoterieId() {
+    public Integer getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
+    public void setCoterieId(Integer coterieId) {
         this.coterieId = coterieId;
     }
 

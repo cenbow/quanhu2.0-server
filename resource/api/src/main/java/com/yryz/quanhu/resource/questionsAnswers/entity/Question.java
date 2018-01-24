@@ -31,7 +31,7 @@ public class Question {
 
     private String operatorId;
 
-    private String coterieId;
+    private Long coterieId;
 
     private Integer validTime;
 
@@ -171,12 +171,12 @@ public class Question {
         this.operatorId = operatorId == null ? null : operatorId.trim();
     }
 
-    public String getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
-        this.coterieId = coterieId == null ? null : coterieId.trim();
+    public void setCoterieId(Long coterieId) {
+        this.coterieId = coterieId;
     }
 
     public Integer getValidTime() {

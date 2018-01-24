@@ -2,10 +2,13 @@ package com.yryz.quanhu.behavior.comment.service;
 
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,4 +40,17 @@ public interface CommentApi {
      */
     Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO);
 
+    /**
+     * 批量上下架
+     * @param comments
+     * @return
+     */
+    Response<Integer> updownBatch(List<Comment> comments);
+
+    /**
+     * 评论列表{管理后台}
+     * @param commentDTO
+     * @return
+     */
+    Response<PageList<CommentVOForAdmin>> queryCommentForAdmin(CommentDTO commentDTO);
 }

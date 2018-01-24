@@ -31,7 +31,7 @@ public class Answer {
 
     private String answerAudio;
 
-    private String coterieId;
+    private Long coterieId;
 
     private String cityCode;
 
@@ -155,12 +155,12 @@ public class Answer {
         this.answerAudio = answerAudio == null ? null : answerAudio.trim();
     }
 
-    public String getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
-        this.coterieId = coterieId == null ? null : coterieId.trim();
+    public void setCoterieId(Long coterieId) {
+        this.coterieId = coterieId;
     }
 
     public String getCityCode() {

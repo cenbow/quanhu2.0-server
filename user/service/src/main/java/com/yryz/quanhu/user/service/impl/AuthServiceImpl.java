@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
 		String token = null;
 		// token解析
 		try {
-			token = TokenUtils.getTokenByDesToken(tokenDTO.getToken(), tokenDTO.getUserId());
+			token = TokenUtils.getTokenByDesToken(tokenDTO.getToken(), tokenDTO.getUserId().toString());
 		} catch (IOException e) {
 			logger.error("[des decrypt token]", e);
 			return TokenCheckEnum.INVALID;
@@ -79,8 +79,8 @@ public class AuthServiceImpl implements AuthService {
 		String refreshToken = null;
 		// token解析
 		try {
-			token = TokenUtils.getTokenByDesToken(tokenDTO.getToken(), tokenDTO.getUserId());
-			refreshToken = TokenUtils.getTokenByDesToken(tokenDTO.getRefreshToken(), tokenDTO.getUserId());
+			token = TokenUtils.getTokenByDesToken(tokenDTO.getToken(), tokenDTO.getUserId().toString());
+			refreshToken = TokenUtils.getTokenByDesToken(tokenDTO.getRefreshToken(), tokenDTO.getUserId().toString());
 		} catch (IOException e) {
 			logger.error("[des decrypt token]", e);
 			return TokenCheckEnum.INVALID;
@@ -127,14 +127,14 @@ public class AuthServiceImpl implements AuthService {
 		// token过期或者设置登录刷新token都重新获取新token
 		if (tokenVO == null || (tokenVO.getExpireAt() != null && tokenVO.getExpireAt() < System.currentTimeMillis())
 				|| (tokenDTO.isRefreshLogin() != null && tokenDTO.isRefreshLogin())) {
-			token = TokenUtils.constructToken(tokenDTO.getUserId());
+			token = TokenUtils.constructToken(tokenDTO.getUserId().toString());
 			tokenDTO.setToken(token);
 			redisDao.setToken(tokenDTO, expireAt);
 		} else {
 			token = tokenVO.getToken();
 		}
 		try {
-			tokenVO = new AuthTokenVO(tokenDTO.getUserId(), TokenUtils.getDesToken(tokenDTO.getUserId(), token),
+			tokenVO = new AuthTokenVO(tokenDTO.getUserId(), TokenUtils.getDesToken(tokenDTO.getUserId().toString(), token),
 					expireAt);
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
@@ -160,8 +160,8 @@ public class AuthServiceImpl implements AuthService {
 		if (tokenVO == null
 				|| (tokenVO.getRefreshExpireAt() != null && tokenVO.getRefreshExpireAt() < System.currentTimeMillis())
 				|| (refreshDTO.isRefreshLogin() != null && refreshDTO.isRefreshLogin())) {
-			token = TokenUtils.constructToken(refreshDTO.getUserId());
-			refreshToken = TokenUtils.constructToken(refreshDTO.getUserId());
+			token = TokenUtils.constructToken(refreshDTO.getUserId().toString());
+			refreshToken = TokenUtils.constructToken(refreshDTO.getUserId().toString());
 			
 			
 			refreshDTO.setToken(token);
@@ -171,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
 			token = tokenVO.getToken();
 			// 刷新短期token
 			if (refreshDTO.isRefreshTokenFlag()) {
-				token = TokenUtils.constructToken(refreshDTO.getUserId());
+				token = TokenUtils.constructToken(refreshDTO.getUserId().toString());
 				refreshDTO.setToken(token);
 				refreshDTO.setRefreshToken(tokenVO.getRefreshToken());
 				refreshExpireAt = tokenVO.getRefreshExpireAt();
@@ -180,8 +180,8 @@ public class AuthServiceImpl implements AuthService {
 			refreshToken = tokenVO.getRefreshToken();
 		}
 		try {
-			tokenVO = new AuthTokenVO(refreshDTO.getUserId(), TokenUtils.getDesToken(refreshDTO.getUserId(), token),
-					expireAt, TokenUtils.getDesToken(refreshDTO.getUserId(),refreshToken), refreshExpireAt);
+			tokenVO = new AuthTokenVO(refreshDTO.getUserId(), TokenUtils.getDesToken(refreshDTO.getUserId().toString(), token),
+					expireAt, TokenUtils.getDesToken(refreshDTO.getUserId().toString(),refreshToken), refreshExpireAt);
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException);
@@ -190,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public void delToken(String userId, String appId) {
+	public void delToken(Long userId, String appId) {
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.ANDROID, appId));
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WAP, appId));
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WEB, appId));

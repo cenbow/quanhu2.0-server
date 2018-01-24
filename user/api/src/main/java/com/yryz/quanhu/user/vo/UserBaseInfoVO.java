@@ -13,7 +13,7 @@ public class UserBaseInfoVO implements Serializable{
     /**
      * 用户账户id
      */
-    private String userId;
+    private Long userId;
     /**
      * 应用id
      */
@@ -133,10 +133,10 @@ public class UserBaseInfoVO implements Serializable{
      */
     private Date createDate;
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
     public String getAppId() {
@@ -283,7 +283,7 @@ public class UserBaseInfoVO implements Serializable{
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
-	public UserBaseInfoVO(String userId, String appId, String userNickName, String userImg, String userSignature,
+	public UserBaseInfoVO(Long userId, String appId, String userNickName, String userImg, String userSignature,
 			String userPhone, Byte userAge, String userQr, Byte userGenders, String userBirthday, String userLocation,
 			String userDeviceId, Byte userStatus, String userCountry, String userProvince, String userCity,
 			String cityCode, Byte userRole, Byte userVest, Byte authStatus, Integer lastHeat, Date banPostTime,

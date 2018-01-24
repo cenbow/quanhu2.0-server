@@ -12,7 +12,7 @@ public class UnBindThirdDTO implements Serializable{
 	/**
 	 * 用户id
 	 */
-	private String userId;
+	private Long userId;
 	/**
 	 * 第三方id
 	 */
@@ -25,10 +25,10 @@ public class UnBindThirdDTO implements Serializable{
 	 * 应用id
 	 */
 	private String appId;
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public String getThirdId() {
@@ -52,7 +52,7 @@ public class UnBindThirdDTO implements Serializable{
 	public UnBindThirdDTO() {
 		super();
 	}
-	public UnBindThirdDTO(String userId, String thirdId, Integer type, String appId) {
+	public UnBindThirdDTO(Long userId, String thirdId, Integer type, String appId) {
 		super();
 		this.userId = userId;
 		this.thirdId = thirdId;

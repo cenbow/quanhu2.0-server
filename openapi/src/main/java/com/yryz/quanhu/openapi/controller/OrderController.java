@@ -7,28 +7,7 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.exception.RpcOptException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -36,37 +15,27 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
-import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
-import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
-import com.yryz.quanhu.openapi.order.dto.BindBankCardDTO;
-import com.yryz.quanhu.openapi.order.dto.ExecuteOrderDTO;
-import com.yryz.quanhu.openapi.order.dto.FindPayPasswordDTO;
-import com.yryz.quanhu.openapi.order.dto.FreePayDTO;
-import com.yryz.quanhu.openapi.order.dto.GetCashDTO;
-import com.yryz.quanhu.openapi.order.dto.OrderListDTO;
-import com.yryz.quanhu.openapi.order.dto.PointsToAccountDTO;
-import com.yryz.quanhu.openapi.order.dto.UnbindBankCardDTO;
-import com.yryz.quanhu.openapi.order.dto.UserBankDTO;
-import com.yryz.quanhu.openapi.order.dto.UserPhyDTO;
+import com.yryz.quanhu.openapi.order.dto.*;
 import com.yryz.quanhu.openapi.order.utils.BankUtil;
 import com.yryz.quanhu.openapi.order.utils.DataEnum;
 import com.yryz.quanhu.openapi.service.PayService;
 import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
-import com.yryz.quanhu.order.vo.AccountOrder;
-import com.yryz.quanhu.order.vo.IntegralOrder;
-import com.yryz.quanhu.order.vo.OrderInfo;
-import com.yryz.quanhu.order.vo.UserAccount;
-import com.yryz.quanhu.order.vo.UserPhy;
-import com.yryz.quanhu.user.contants.SmsType;
+import com.yryz.quanhu.order.vo.*;
 import com.yryz.quanhu.user.service.UserApi;
-import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * @author yehao
@@ -100,14 +69,16 @@ public class OrderController {
 	 */
     @ApiOperation("设置支付密码")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/setPayPassword")
-	public Response<?> setPayPassword(@RequestBody UserPhy userPhy) {
-		if (StringUtils.isEmpty(userPhy.getCustId())) {
+    @PostMapping(value = "/{version}/pay/setPayPassword")
+	public Response<?> setPayPassword(@RequestHeader String userId,@RequestBody UserPhy userPhy) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(userPhy.getPayPassword())) {
 			return ResponseUtils.returnCommonException("新密码必填");
 		}
+		//设置custId为Header里面获取的userId
+		userPhy.setCustId(userId);
 		try {
 			orderApi.checkUserPayPassword(userPhy.getCustId(), userPhy.getPayPassword());
 			Response<?> response = orderApi.dealUserPhy(userPhy);
@@ -124,20 +95,22 @@ public class OrderController {
     
     /**
      * 设置密保问题
+     * @param userId
      * @param userPhy
      * @return
      */
     @ApiOperation("设置密保问题")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/setSecurityProblem")
-	public Response<?> setSecurityProblem(@RequestBody UserPhy userPhy) {
-		if (StringUtils.isEmpty(userPhy.getCustId())) {
+    @PostMapping(value = "/{version}/pay/setSecurityProblem")
+	public Response<?> setSecurityProblem(@RequestHeader String userId, @RequestBody UserPhy userPhy) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(userPhy.getPhyName()) || StringUtils.isEmpty(userPhy.getCustIdcardNo())) {
 			return ResponseUtils.returnCommonException("信息必填");
 		}
 		try {
+			userPhy.setCustId(userId);
 			return orderApi.dealUserPhy(userPhy);
 		} catch (Exception e) {
 			logger.error("设置密保问题失败", e);
@@ -147,18 +120,17 @@ public class OrderController {
     
     /**
      * 找回支付密码
-     * @param request
+     * @param appId
      * @param findPayPasswordDTO
      * @return
      */
     @ApiOperation("找回支付密码")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/findPayPassword")
-	public Response<?> findPayPassword(HttpServletRequest request , @RequestBody FindPayPasswordDTO findPayPasswordDTO) {
-		
-		RequestHeader header = WebUtil.getHeader(request);
+    @PostMapping(value = "/{version}/pay/findPayPassword")
+	public Response<?> findPayPassword(@RequestHeader String appId, @RequestHeader String userId,
+									   @RequestBody FindPayPasswordDTO findPayPasswordDTO) {
 
-		if (StringUtils.isBlank(findPayPasswordDTO.getUserId()) || StringUtils.isBlank(findPayPasswordDTO.getVeriCode())) {
+		if (StringUtils.isBlank(userId) || StringUtils.isBlank(findPayPasswordDTO.getVeriCode())) {
 			return ResponseUtils.returnCommonException("please check paramter: custId | veriCode");
 		}
 //		if (StringUtils.isBlank(findPayPasswordDTO.getPhyName()) || StringUtils.isBlank(findPayPasswordDTO.getCustIdcardNo())) {
@@ -168,7 +140,7 @@ public class OrderController {
 		try {
 			String phone = findPayPasswordDTO.getPhone();
 //			if(StringUtils.isEmpty(phone)){
-//				Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(findPayPasswordDTO.getUserId());
+//				Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(userId);
 //				UserLoginSimpleVO userBase = response.success() ? response.getData() : null;
 //				if(userBase == null || StringUtils.isEmpty(userBase.getUserPhone())){
 //					return ResponseUtils.returnCommonException("当前用户不存在或者没有绑定手机号码");
@@ -178,19 +150,19 @@ public class OrderController {
 //			
 //
 //			Response<Integer> checkCode = this.commonSafeApi.checkVerifyCode(new VerifyCodeDTO(SmsType.CODE_CHANGE_PAYPWD.getType(),
-//					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, header.getAppId(),
+//					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId,
 //					findPayPasswordDTO.getVeriCode(), false));
 //			if (!checkCode.success() || checkCode.getData() != 0 ) {
 //				return ResponseUtils.returnCommonException("短信码错误");
 //			}
 			//重置支付密码
 			UserPhy userPhy = new UserPhy();
-			userPhy.setCustId(findPayPasswordDTO.getUserId());
+			userPhy.setCustId(userId);
 			userPhy.setPayPassword("");
 			orderApi.dealUserPhy(userPhy);
 			//设置新密码
 			userPhy = new UserPhy();
-			userPhy.setCustId(findPayPasswordDTO.getUserId());
+			userPhy.setCustId(userId);
 			userPhy.setPayPassword(findPayPasswordDTO.getPayPassword());
 			orderApi.dealUserPhy(userPhy);
 		} catch (Exception e) {
@@ -203,20 +175,15 @@ public class OrderController {
     
     /**
      * 积分兑换
-     * @param request
-     * @param custId
-     * @param cost
-     * @param password
+     * @param appId
+     * @param pointsToAccountDTO
      * @return
      */
     @ApiOperation("积分兑换")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/pointsToAccount")
-    public Response<?> pointsToAccount(HttpServletRequest request ,@RequestBody PointsToAccountDTO pointsToAccountDTO ) {
-    	
-    	RequestHeader header = WebUtil.getHeader(request);
-    	
-    	String userId = pointsToAccountDTO.getUserId();
+    @PostMapping(value = "/{version}/pay/pointsToAccount")
+    public Response<?> pointsToAccount(@RequestHeader String appId, @RequestHeader String userId,
+									   @RequestBody PointsToAccountDTO pointsToAccountDTO ) {
     	Long cost = pointsToAccountDTO.getCost();
     	String payPassword = pointsToAccountDTO.getPayPassword();
     	
@@ -226,7 +193,6 @@ public class OrderController {
 		if (cost == null || cost.intValue() < 100 || cost % 100 != 0) {
 			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
 		}
-		String appId = header.getAppId();
 		try {
 			String orderId = payService.getOrderId();
 			OrderInfo orderInfo = new OrderInfo();
@@ -266,7 +232,7 @@ public class OrderController {
 			try {
 				Response<?> return1 = orderApi.executeOrder(orderInfo, accounts, integrals, userId, payPassword, null);
 				if (return1.success()) {
-//					pushService.pointToAccount(custId, cost,appId);
+//					pushService.pointToAccount(userId, cost,appId);
 					return ResponseUtils.returnSuccess();
 				} else {
 					return ResponseUtils.returnCommonException("兑换失败，请检查余额后重试");
@@ -282,18 +248,18 @@ public class OrderController {
     
     /**
      * 获取账户信息
-     * @param custId
+     * @param userId
      * @return
      */
     @ApiOperation("获取账户信息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/getUserAccount")
-	public Response<?> getUserAccount(String custId) {
-		if (StringUtils.isEmpty(custId)) {
+    @GetMapping(value = "/{version}/pay/getUserAccount")
+	public Response<?> getUserAccount(@RequestHeader String userId) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		try {
-			Response<UserAccount> response = orderApi.getUserAccount(custId);
+			Response<UserAccount> response = orderApi.getUserAccount(userId);
 			if (!response.success() || response.getData() == null) {
 				return ResponseUtils.returnCommonException("账户不存在");
 			} else {
@@ -307,22 +273,20 @@ public class OrderController {
     
     /**
      * 用户提现
-     * @param request
+     * @param appId
      * @param getCashDTO
      * @return
      */
     @ApiOperation("用户提现")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/getCash")
-	public Response<?> getCash(HttpServletRequest request, @RequestBody GetCashDTO getCashDTO) {
+    @PostMapping(value = "/{version}/pay/getCash")
+	public Response<?> getCash(@RequestHeader String appId, @RequestHeader String userId, @RequestBody GetCashDTO getCashDTO) {
 		// return ReturnCodeUtils.getWarnResult(ActEnums.GET_CASH, "资金系统正在维护中");
-    	String custId = getCashDTO.getCustId();
     	String cost = getCashDTO.getCost();
     	String cust2BankId = getCashDTO.getCust2BankId();
     	String payPassword = getCashDTO.getPayPassword();
-		RequestHeader header = WebUtil.getHeader(request);
-		
-		if (StringUtils.isEmpty(custId)) {
+
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(cost)) {
@@ -345,7 +309,7 @@ public class OrderController {
 		}
 
 		try {
-			return payService.getCash(header.getAppId() , custId, cost, cust2BankId, payPassword);
+			return payService.getCash(appId , userId, cost, cust2BankId, payPassword);
 		} catch (RpcOptException e) {
 			return ResponseUtils.returnCommonException(e.getMessage());
 		} catch (Exception e) {
@@ -360,7 +324,7 @@ public class OrderController {
      */
     @ApiOperation("计算充值手续费")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/getServiceCharge")
+    @GetMapping(value = "/{version}/pay/getServiceCharge")
 	public Response<?> getServiceCharge() {
 		List<Map<String, Object>> list = DataEnum.getPayCharge();
 		return ResponseUtils.returnListSuccess(list);
@@ -368,27 +332,19 @@ public class OrderController {
     
     /**
      * 绑定银行卡
-     * @param custId
-     * @param bankCardNo
-     * @param fastPay
-     * @param phone
-     * @param bankCardType
-     * @param name
-     * @param bankCode
-     * @param no_agree
-     * @param password
+     * @param userId
+     * @param bindBankCardDTO
      * @return
      */
     @ApiOperation("绑定银行卡")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/bindBankCard")
-	public Response<?> bindBankCard( @RequestBody BindBankCardDTO bindBankCardDTO , HttpServletRequest request ) {
-    	String custId = bindBankCardDTO.getCustId();
+    @PostMapping(value = "/{version}/pay/bindBankCard")
+	public Response<?> bindBankCard(@RequestHeader String userId, @RequestBody BindBankCardDTO bindBankCardDTO) {
     	String bankCardNo = bindBankCardDTO.getBankCardNo();
     	String name = bindBankCardDTO.getName();
     	String bankCode = bindBankCardDTO.getBankCode();
     	
-		if (StringUtils.isEmpty(custId)) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(bankCardNo)) {
@@ -403,8 +359,8 @@ public class OrderController {
 		UserBankDTO userBankDTO = new UserBankDTO();
 		userBankDTO.setBankCardNo(bankCardNo.trim());
 		userBankDTO.setBankCode(bankCode.trim());
-		userBankDTO.setCreateBy(custId);
-		userBankDTO.setCustId(custId);
+		userBankDTO.setCreateBy(userId);
+		userBankDTO.setCustId(userId);
 		userBankDTO.setName(name.trim());
 		try {
 			UserBankDTO cust2bank = payService.bindbankcard(userBankDTO);
@@ -421,18 +377,18 @@ public class OrderController {
 
     /**
      * 我的银行卡列表
-     * @param custId
+     * @param userId
      * @return
      */
     @ApiOperation("我的银行卡列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/bankCardList")
-	public Response<?> bankCardList(String custId) {
-		if (StringUtils.isEmpty(custId)) {
+    @GetMapping(value = "/{version}/pay/bankCardList")
+	public Response<?> bankCardList(@RequestHeader String userId) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		try {
-			List<UserBankDTO> list = payService.bankcardlist(custId);
+			List<UserBankDTO> list = payService.bankcardlist(userId);
 			if (list == null) {
 				return ResponseUtils.returnListSuccess(list);
 			} else {
@@ -446,21 +402,22 @@ public class OrderController {
     
     /**
      * 设置默认卡
+     * @param userId
      * @param userBankDTO
      * @return
      */
     @ApiOperation("设置默认卡")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/setDefaultBankCard")
-	public Response<?> setDefaultBankCard(@RequestBody UserBankDTO userBankDTO) {
-		if (StringUtils.isEmpty(userBankDTO.getCustId())) {
+    @PostMapping(value = "/{version}/pay/setDefaultBankCard")
+	public Response<?> setDefaultBankCard(@RequestHeader String userId, @RequestBody UserBankDTO userBankDTO) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(userBankDTO.getCust2BankId())) {
 			return ResponseUtils.returnCommonException("关系ID：cust2BankId必填");
 		}
-
-		userBankDTO.setCreateBy(userBankDTO.getCustId());
+		userBankDTO.setCustId(userId);
+		userBankDTO.setCreateBy(userId);
 		userBankDTO.setDefaultCard(1);
 		try {
 			UserBankDTO userbank = payService.bindbankcard(userBankDTO);
@@ -482,9 +439,9 @@ public class OrderController {
      */
     @ApiOperation("解绑银行卡")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/unbindBankCard")
-	public Response<?> unbindBankCard(@RequestBody UnbindBankCardDTO unbindBankCardDTO) {
-		if (StringUtils.isEmpty(unbindBankCardDTO.getCustId())) {
+    @PostMapping(value = "/{version}/pay/unbindBankCard")
+	public Response<?> unbindBankCard(@RequestHeader String userId, @RequestBody UnbindBankCardDTO unbindBankCardDTO) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(unbindBankCardDTO.getCust2BankId())) {
@@ -494,15 +451,15 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("验证密码：payPassword必填");
 		}
 
-		Response<?> return1 = payService.checkPassword(unbindBankCardDTO.getCustId(), unbindBankCardDTO.getPayPassword());
+		Response<?> return1 = payService.checkPassword(userId, unbindBankCardDTO.getPayPassword());
 		if (return1 == null || !return1.success()) {
 			return ResponseUtils.returnCommonException(return1.getMsg());
 		}
 
 		UserBankDTO userBankDTO = new UserBankDTO();
 		userBankDTO.setCust2BankId(unbindBankCardDTO.getCust2BankId());
-		userBankDTO.setCustId(unbindBankCardDTO.getCustId());
-		userBankDTO.setCreateBy(unbindBankCardDTO.getCustId());
+		userBankDTO.setCustId(userId);
+		userBankDTO.setCreateBy(userId);
 		userBankDTO.setDelFlag("1");
 		try {
 			if (payService.unbindbankcard(userBankDTO)) {
@@ -518,19 +475,17 @@ public class OrderController {
     
     /**
      * 设置小额免密
-     * @param custId
-     * @param type
-     * @param password
+     * @param userId
+     * @param freePayDTO
      * @return
      */
     @ApiOperation("设置小额免密")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/setFreePay")
-	public Response<?> setFreePay(HttpServletRequest request, @RequestBody FreePayDTO freePayDTO) {
-    	String custId = WebUtil.getHeader(request).getUserId();
+    @PostMapping(value = "/{version}/pay/setFreePay")
+	public Response<?> setFreePay(@RequestHeader String userId, @RequestBody FreePayDTO freePayDTO) {
     	Integer type = freePayDTO.getType();
     	String password = freePayDTO.getPayPassword();
-		if (StringUtils.isEmpty(custId)) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (type == null) {
@@ -540,10 +495,10 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("密码必填");
 		}
 		try {
-			if (!payService.checkPassword(custId, password).success()) {
+			if (!payService.checkPassword(userId, password).success()) {
 				return ResponseUtils.returnCommonException("支付密码验证失败");
 			}
-			if (payService.setFreePay(custId, type)) {
+			if (payService.setFreePay(userId, type)) {
 				return ResponseUtils.returnSuccess();
 			} else {
 				return ResponseUtils.returnCommonException("设置失败，请重试");
@@ -559,7 +514,7 @@ public class OrderController {
      */
     @ApiOperation("获取最低充值金额")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/getMinChargeAmount")
+    @GetMapping(value = "/{version}/pay/getMinChargeAmount")
 	public Response<?> getMinChargeAmount() {
 		Map<String, Object> map = DataEnum.getMinChargeAmount();
 		return ResponseUtils.returnObjectSuccess(map);
@@ -567,20 +522,20 @@ public class OrderController {
     
     /**
      * 创建充值订单
-     * @param custId
-     * @param payWay
-     * @param orderSrc
-     * @param orderAmount
-     * @param currency
+     * @param userId
+     * @param payOrderDTO
      * @param request
      * @return
      */
     @ApiOperation("创建充值订单")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/getNewPayFlowId")
-	public Response<?> getNewPayFlowId(String custId, String payWay, String orderSrc, long orderAmount, String currency,
-			HttpServletRequest request) {
-		if (StringUtils.isEmpty(custId)) {
+    @PostMapping(value = "/{version}/pay/getNewPayFlowId")
+	public Response<?> getNewPayFlowId(@RequestHeader String userId, @RequestBody PayOrderDTO payOrderDTO, HttpServletRequest request) {
+		String payWay = payOrderDTO.getPayWay();
+		String orderSrc = payOrderDTO.getOrderSrc();
+		Long orderAmount = payOrderDTO.getOrderAmount();
+		String currency = payOrderDTO.getCurrency();
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (StringUtils.isEmpty(payWay)) {
@@ -592,14 +547,13 @@ public class OrderController {
 		if (StringUtils.isEmpty(currency)) {
 			return ResponseUtils.returnCommonException("币种：currency必填");
 		}
-		if ( orderAmount < 100 || orderAmount % 100 != 0) {
+		if (null == orderAmount || orderAmount < 100 || orderAmount % 100 != 0) {
 			return ResponseUtils.returnCommonException("请输入正常充值金额");
 		}
-		
 
 		String ipAddress = WebUtil.getClientIP(request);
 		long fee = DataEnum.countFee(payWay, orderAmount);
-//		OrderVO orderVO = payServcie.getNewPayFlowId(custId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
+//		OrderVO orderVO = payServcie.getNewPayFlowId(userId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
 //		return ReturnModel.beanToString(orderVO);
 		return ResponseUtils.returnSuccess();
 	}
@@ -699,19 +653,19 @@ public class OrderController {
 	
 	/**
 	 * 获取安全信息
-	 * @param custId
+	 * @param userId
 	 * @return
 	 */
     @ApiOperation("获取安全信息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/getUserPhy")
-	public Response<?> getUserPhy(String custId) {
-		if (StringUtils.isEmpty(custId)) {
+    @GetMapping(value = "/{version}/pay/getUserPhy")
+	public Response<?> getUserPhy(@RequestHeader String userId) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		try {
-			UserPhyDTO userPhy = payService.getUserPhy(custId);
-			UserAccount account = payService.getUserAccount(custId);
+			UserPhyDTO userPhy = payService.getUserPhy(userId);
+			UserAccount account = payService.getUserAccount(userId);
 			if (userPhy == null || account == null) {
 				return ResponseUtils.returnCommonException("当前用户数据不存在，请重试");
 			}
@@ -751,7 +705,7 @@ public class OrderController {
 	
 	/**
 	 * 获取订单列表
-	 * @param custId
+	 * @param userId
 	 * @param date
 	 * @param productType
 	 * @param type
@@ -761,10 +715,10 @@ public class OrderController {
 	 */
     @ApiOperation("获取订单列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/getOrderList")
-	public Response<?> getOrderList(String custId, String date, Integer productType, Integer type, Long start,
-			Long limit) {
-		if (StringUtils.isEmpty(custId)) {
+    @GetMapping(value = "/{version}/pay/getOrderList")
+	public Response<?> getOrderList(@RequestHeader String userId, String date, Integer productType, Integer type,
+									Long start, Long limit) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
 		if (type == null) {
@@ -777,7 +731,7 @@ public class OrderController {
 			limit = 20L;
 		}
 		try {
-			List<OrderListDTO> list = payService.getOrderList(custId, date, productType, type, start, limit);
+			List<OrderListDTO> list = payService.getOrderList(userId, date, productType, type, start, limit);
 			return ResponseUtils.returnListSuccess(list);
 		} catch (Exception e) {
 			logger.error("查询用户账单信息失败", e);
@@ -787,22 +741,23 @@ public class OrderController {
     
     /**
      * 苹果内购
-     * @param orderId
-     * @param orderAmount
-     * @param receipt
-     * @param custId
-     * @return
+     * @param userId
+	 * @param checkIOSPayDTO
+	 * @return
      */
     @ApiOperation("苹果内购支付")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/checkIOSPay")
-    public Response<?> checkIOSPay(String orderId, Long orderAmount, String receipt, String custId) {
+    @PostMapping(value = "/{version}/pay/checkIOSPay")
+    public Response<?> checkIOSPay(@RequestHeader String userId, @RequestBody CheckIOSPayDTO checkIOSPayDTO) {
+		String orderId = checkIOSPayDTO.getOrderId();
+		Long orderAmount = checkIOSPayDTO.getOrderAmount();
+		String receipt = checkIOSPayDTO.getReceipt();
 		if (orderAmount == null || orderAmount.intValue() < 100 || orderAmount.intValue() % 100 != 0) {
 			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
 		}
 		
 //		boolean isSandbox = false;
-//		if ("575155838165196903".equals(custId)) {
+//		if ("575155838165196903".equals(userId)) {
 //			isSandbox = true;
 //		}
 //
@@ -836,16 +791,16 @@ public class OrderController {
     
     /**
      * 获取统计信息
-     * @param custId
+     * @param userId
      * @return
      */
-	public Response<?> getStatistics(String custId) {
-		if (StringUtils.isEmpty(custId)) {
-			return ResponseUtils.returnCommonException("custId为空");
+	public Response<?> getStatistics(@RequestHeader String userId) {
+		if (StringUtils.isEmpty(userId)) {
+			return ResponseUtils.returnCommonException("userId为空");
 		}
 		return ResponseUtils.returnSuccess();
 //		try {
-//			UserStatistics statistics = payServcie.getIntegralStatistics(custId);
+//			UserStatistics statistics = payServcie.getIntegralStatistics(userId);
 //			return ReturnModel.beanToString(statistics);
 //		} catch (Exception e) {
 //			logger.error("查询积分统计失败", e);
@@ -861,7 +816,7 @@ public class OrderController {
 	 */
     @ApiOperation("支付宝网页支付")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-	@GetMapping(value = "/toAlipay")
+	@GetMapping(value = "{version}/pay/toAlipay")
 	public void toAlipay(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String orderId = request.getParameter("orderId");
 		if (StringUtils.isEmpty(orderId)) {
@@ -878,26 +833,24 @@ public class OrderController {
     
     /**
      * 执行异步订单
-     * @param orderId
-     * @param custId
-     * @param password
+     * @param userId
+     * @param executeOrderDTO
      * @return
      */
     @ApiOperation("执行异步订单")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/order/executeOrder")
-    public Response<?> executeOrder(@RequestBody ExecuteOrderDTO executeOrderDTO) {
-    	String orderId = executeOrderDTO.getOrderId();
-    	String custId = executeOrderDTO.getCustId();
-    	String password = executeOrderDTO.getPayPassord();
+    @PostMapping(value = "/{version}/pay/executeOrder")
+    public Response<?> executeOrder(@RequestHeader String userId, @RequestBody ExecuteOrderDTO executeOrderDTO) {
+		String orderId = executeOrderDTO.getOrderId();
+		String password = executeOrderDTO.getPayPassord();
 		if (StringUtils.isEmpty(orderId)) {
 			return ResponseUtils.returnCommonException("orderId必填");
 		}
-		if (StringUtils.isEmpty(custId)) {
+		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("custId必填");
 		}
 		try {
-			return payService.executeOrder(orderId, custId, password);
+			return payService.executeOrder(orderId, userId, password);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnCommonException("未知异常");
@@ -911,7 +864,7 @@ public class OrderController {
      */
     @ApiOperation("查询订单状态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/getOrderInfo")
+    @GetMapping(value = "/{version}/pay/getOrderInfo")
 	public Response<?> getOrderInfo(String orderId) {
 		if (StringUtils.isEmpty(orderId)) {
 			return ResponseUtils.returnCommonException("orderId必填");

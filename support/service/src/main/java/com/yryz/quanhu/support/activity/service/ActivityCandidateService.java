@@ -8,6 +8,12 @@ import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 public interface ActivityCandidateService {
 
     /**
+     * 增加参与者
+     * @param activityVoteDto
+     * */
+    void join(ActivityVoteDto activityVoteDto);
+
+    /**
      * 活动配置信息
      * @param   activityInfoId
      * @return

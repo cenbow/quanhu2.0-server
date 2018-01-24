@@ -11,7 +11,7 @@ public class StarRecommendQueryDTO implements Serializable {
 	/**
 	 * 用户昵称
 	 */
-	private String custNname;
+	private String userNname;
 	/**
 	 * 用户联系方式
 	 */
@@ -25,14 +25,14 @@ public class StarRecommendQueryDTO implements Serializable {
 	/**
 	 * 用户等级
 	 */
-	private Integer custLevel;
+	private Integer userLevel;
 
-	public String getCustNname() {
-		return custNname;
+	public String getUserNname() {
+		return userNname;
 	}
 
-	public void setCustNname(String custNname) {
-		this.custNname = custNname;
+	public void setUserNname(String userNname) {
+		this.userNname = userNname;
 	}
 
 	public String getPhone() {
@@ -51,11 +51,11 @@ public class StarRecommendQueryDTO implements Serializable {
 		this.authWay = authWay;
 	}
 
-	public Integer getCustLevel() {
-		return custLevel;
+	public Integer getUserLevel() {
+		return userLevel;
 	}
 
-	public void setCustLevel(Integer custLevel) {
-		this.custLevel = custLevel;
+	public void setUserLevel(Integer userLevel) {
+		this.userLevel = userLevel;
 	}
 }

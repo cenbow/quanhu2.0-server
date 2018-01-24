@@ -34,7 +34,7 @@ public interface AccountApi {
 	 * @param userId
 	 * @return
 	 */
-	static String userCacheKey(String userId){
+	static String userCacheKey(Long userId){
 		return String.format("%s.%s", RedisConstants.ACCOUNT_USER,userId);
 	}
 	/**
@@ -138,7 +138,7 @@ public interface AccountApi {
 	 * @return
 	 * @Description 根据header信息获取登录方式
 	 */
-	public Response<List<LoginMethodVO>> getLoginMethod(String userId);
+	public Response<List<LoginMethodVO>> getLoginMethod(Long userId);
 	
 	/**
 	 * 查询用户最后登录时间
@@ -191,7 +191,7 @@ public interface AccountApi {
 	 * @return
 	 * @Description 需要在header获取用户id
 	 */
-	public Response<Boolean> editPassword(String userId,String oldPassword,String newPassword);
+	public Response<Boolean> editPassword(Long userId,String oldPassword,String newPassword);
 
 	/**
 	 * 手机短信重置密码
@@ -204,5 +204,5 @@ public interface AccountApi {
 	 * @param userId
 	 * @return
 	 */
-	public Response<Boolean> checkUserDisTalk(String userId);
+	public Response<Boolean> checkUserDisTalk(Long userId);
 }

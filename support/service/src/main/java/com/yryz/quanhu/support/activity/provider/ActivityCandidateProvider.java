@@ -22,6 +22,21 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
     private ActivityCandidateService activityCandidateService;
 
     /**
+     * 增加参与者
+     * @param activityVoteDto
+     * @return
+     * */
+    public Response join(ActivityVoteDto activityVoteDto) {
+        try {
+            activityCandidateService.join(activityVoteDto);
+            return ResponseUtils.returnObjectSuccess(null);
+        } catch (Exception e) {
+            logger.error("增加参与者 失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    /**
      * 参与投票活动
      * @param   activityInfoId
      * @return

@@ -54,7 +54,7 @@ public class ComponentController {
 		codeDTO.setAppId(header.getAppId());
 		if(StringUtils.isBlank(codeDTO.getPhone())){
 			authService.checkToken(request);
-			codeDTO.setUserId(header.getUserId());
+			codeDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		}
 		return accountApi.sendVerifyCode(codeDTO);
 	}

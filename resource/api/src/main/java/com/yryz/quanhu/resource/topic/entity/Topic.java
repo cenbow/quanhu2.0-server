@@ -33,7 +33,7 @@ public class Topic {
 
     private Integer revision;
 
-    private String coterieId;
+    private Integer coterieId;
 
     private String cityCode;
 
@@ -161,12 +161,12 @@ public class Topic {
         this.revision = revision;
     }
 
-    public String getCoterieId() {
+    public Integer getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
-        this.coterieId = coterieId == null ? null : coterieId.trim();
+    public void setCoterieId(Integer coterieId) {
+        this.coterieId = coterieId;
     }
 
     public String getCityCode() {

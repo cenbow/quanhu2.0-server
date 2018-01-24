@@ -138,10 +138,6 @@
         <appender-ref ref="pushLog"/>
     </logger>
     
-    <logger name="third.logger" level="info" additivity="false">
-        <appender-ref ref="thirdLog"/>
-    </logger>
-
     <logger name="org.apache.zookeeper.ClientCnxn" level="ERROR" additivity="false"/>
     
     
