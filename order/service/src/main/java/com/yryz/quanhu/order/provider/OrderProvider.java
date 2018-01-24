@@ -237,27 +237,6 @@ public class OrderProvider implements OrderApi {
 	}
 
 	/**
-	 * 验证密码
-	 * @param userPhy
-	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#checkSecurityProblem(com.yryz.quanhu.order.vo.UserPhy)
-	 */
-	@Override
-	public Response<?> checkSecurityProblem(UserPhy userPhy) {
-		logger.info("收到安全信息密码验证需求，custId：" + userPhy.getCustId());
-		try {
-			RrzOrderUserPhy rrzOrderUserPhy = (RrzOrderUserPhy) GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
-
-			return userPhyService.checkSecurityProblem(rrzOrderUserPhy);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnException(new CommonException("数据提交失败"));
-		} catch (Exception e) {
-			logger.warn("unknown Exception", e);
-			return ResponseUtils.returnException(new CommonException("未知异常"));
-		}
-	}
-
-	/**
 	 * 锁定账户
 	 * @param custId
 	 * @return
@@ -296,6 +275,27 @@ public class OrderProvider implements OrderApi {
 	}
 
 	/**
+	 * 验证安全问题
+	 * @param userPhy
+	 * @return
+	 * @see com.yryz.quanhu.order.api.OrderApi#checkSecurityProblem(com.yryz.quanhu.order.vo.UserPhy)
+	 */
+	@Override
+	public Response<?> checkSecurityProblem(UserPhy userPhy) {
+		logger.info("收到安全信息密码验证需求，custId：" + userPhy.getCustId());
+		try {
+			RrzOrderUserPhy rrzOrderUserPhy = (RrzOrderUserPhy) GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
+
+			return userPhyService.checkSecurityProblem(rrzOrderUserPhy);
+		} catch (MysqlOptException e) {
+			return ResponseUtils.returnException(new CommonException("数据提交失败"));
+		} catch (Exception e) {
+			logger.warn("unknown Exception", e);
+			return ResponseUtils.returnException(new CommonException("未知异常"));
+		}
+	}
+
+	/**
 	 * 检查支付密码
 	 * @param custId
 	 * @param payPassword
@@ -316,7 +316,7 @@ public class OrderProvider implements OrderApi {
 	}
 
 	/**
-	 * 处理安全信息
+	 * 更改安全信息
 	 * @param userPhy
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#dealUserPhy(com.yryz.quanhu.order.vo.UserPhy)
@@ -336,7 +336,7 @@ public class OrderProvider implements OrderApi {
 	}
 
 	/**
-	 * 获取物理信息
+	 * 获取安全信息
 	 * @param custId
 	 * @return
 	 * @see com.yryz.quanhu.order.api.OrderApi#getUserPhy(java.lang.String)
