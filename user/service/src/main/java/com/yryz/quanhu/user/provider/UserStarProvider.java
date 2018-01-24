@@ -53,7 +53,11 @@ public class UserStarProvider implements UserStarApi {
 		if (info != null && info.getAuthWay() == null) {
 			info.setAuthWay(StarAuthWay.ADMIN_SET.getWay());
 		}
+		
 		try {
+			if(StringUtils.isBlank(info.getUserId())){
+				throw QuanhuException.busiError("用户id不能为空");
+			}
 			UserStarAuth model = (UserStarAuth) GsonUtils.parseObj(info, UserStarAuth.class);
 			UserStarAuth authModel = userStarService.get(info.getUserId(), null);
 			if (authModel != null) {
@@ -140,6 +144,9 @@ public class UserStarProvider implements UserStarApi {
 		try {
 			if (info == null) {
 				throw QuanhuException.busiError("达人认证信息不能为空");
+			}
+			if(StringUtils.isBlank(info.getUserId())){
+				throw QuanhuException.busiError("用户id不能为空");
 			}
 			if (info.getAuthWay() == null) {
 				info.setAuthWay(StarAuthWay.ADMIN_SET.getWay());
