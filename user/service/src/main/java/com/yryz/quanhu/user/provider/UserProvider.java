@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.alibaba.fastjson.JSON;
-import com.yryz.common.utils.GsonUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +14,7 @@ import com.github.pagehelper.Page;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
@@ -256,9 +253,7 @@ public class UserProvider implements UserApi{
 			if(info == null){
 				throw QuanhuException.busiError("用户不存在");
 			}
-			UserBaseInfo baseInfo = new UserBaseInfo();
-			BeanUtils.copyProperties(baseInfo, infoDTO);
-			baseInfo.setUserId(NumberUtils.toLong(infoDTO.getUserId()));
+			UserBaseInfo baseInfo = GsonUtils.parseObj(infoDTO, UserBaseInfo.class);
 			userService.updateUserInfo(baseInfo);
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {

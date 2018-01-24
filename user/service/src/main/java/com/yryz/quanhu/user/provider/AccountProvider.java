@@ -237,6 +237,8 @@ public class AccountProvider implements AccountApi {
 			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId.toString(), header);
 			logger.info("loginThird result: {}", JSON.toJSONString(registerLoginVO));
 			return ResponseUtils.returnObjectSuccess(registerLoginVO);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
 			logger.error("loginThird error", e);
 			return ResponseUtils.returnException(e);
