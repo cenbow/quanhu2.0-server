@@ -135,7 +135,7 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
 
         // 将纵向数据记录，转换为 约束的数据格式
         for (ReleaseConfig cfg : cfgList) {
-            if (null == cfg) {
+            if (null == cfg || null == cfg.getPropertyKey()) {
                 continue;
             }
             switch (cfg.getPropertyKey()) {

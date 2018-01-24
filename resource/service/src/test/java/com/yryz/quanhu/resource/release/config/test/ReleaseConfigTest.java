@@ -27,6 +27,7 @@ public class ReleaseConfigTest {
     }
 
     @Test
-    public void test002() {
+    public void test002() throws JsonProcessingException {
+        System.out.println(new ObjectMapper().writeValueAsString(eleaseConfigApi.getTemplate(-2L)));
     }
 }
