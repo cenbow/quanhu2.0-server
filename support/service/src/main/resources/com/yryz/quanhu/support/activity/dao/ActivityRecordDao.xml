@@ -37,8 +37,9 @@
 	
 	<!--按需新增ActivityRecord-->
     <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityRecord">
-	    insert into qh_activity_record 
+	    insert into qh_activity_record
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
+			kid,
         <if test="activityInfoId != null">
 			activity_info_id,
 	    </if>
@@ -62,6 +63,7 @@
 	    </if>
 	    </trim>
 	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{kid,jdbcType=BIGINT},
         <if test="activityInfoId != null">
 			#{activityInfoId,jdbcType=BIGINT},
 	    </if>
