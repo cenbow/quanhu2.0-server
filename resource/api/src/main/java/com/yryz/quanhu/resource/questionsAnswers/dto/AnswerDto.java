@@ -1,11 +1,6 @@
-package com.yryz.quanhu.resource.questionsAnswers.vo;
+package com.yryz.quanhu.resource.questionsAnswers.dto;
 
-import com.yryz.quanhu.user.vo.UserSimpleVO;
-
-import java.util.Date;
-
-public class AnswerVo {
-
+public class AnswerDto {
     private Long kid;
 
     private Long questionId;
@@ -16,15 +11,9 @@ public class AnswerVo {
 
     private Byte delFlag;
 
-    private Date createDate;
-
     private Long createUserId;
 
-    private Integer revision;
-
-    private String operatorId;
-
-    private Byte answerType;
+    private Long lastUpdateUserId;
 
     private String answerAudio;
 
@@ -35,8 +24,6 @@ public class AnswerVo {
     private String content;
 
     private String contentSource;
-
-    private UserSimpleVO user;
 
     public Long getKid() {
         return kid;
@@ -78,14 +65,6 @@ public class AnswerVo {
         this.delFlag = delFlag;
     }
 
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
     public Long getCreateUserId() {
         return createUserId;
     }
@@ -94,28 +73,12 @@ public class AnswerVo {
         this.createUserId = createUserId;
     }
 
-    public Integer getRevision() {
-        return revision;
+    public Long getLastUpdateUserId() {
+        return lastUpdateUserId;
     }
 
-    public void setRevision(Integer revision) {
-        this.revision = revision;
-    }
-
-    public String getOperatorId() {
-        return operatorId;
-    }
-
-    public void setOperatorId(String operatorId) {
-        this.operatorId = operatorId;
-    }
-
-    public Byte getAnswerType() {
-        return answerType;
-    }
-
-    public void setAnswerType(Byte answerType) {
-        this.answerType = answerType;
+    public void setLastUpdateUserId(Long lastUpdateUserId) {
+        this.lastUpdateUserId = lastUpdateUserId;
     }
 
     public String getAnswerAudio() {
@@ -156,13 +119,5 @@ public class AnswerVo {
 
     public void setContentSource(String contentSource) {
         this.contentSource = contentSource;
-    }
-
-    public UserSimpleVO getUser() {
-        return user;
-    }
-
-    public void setUser(UserSimpleVO user) {
-        this.user = user;
     }
 }

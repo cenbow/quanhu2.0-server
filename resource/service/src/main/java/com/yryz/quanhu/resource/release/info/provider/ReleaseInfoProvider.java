@@ -61,9 +61,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             }
 
             // 校验用户是否存在
-            ResponseUtils.getResponseObject(userApi.getUserSimple(String.valueOf(record.getCreateUserId())));
+            ResponseUtils.getResponseData(userApi.getUserSimple(String.valueOf(record.getCreateUserId())));
             // kid 生成
-            record.setKid(ResponseUtils.getResponseObject(idAPI.getSnowflakeId()));
+            record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
             // TODO 资源进动态
@@ -86,7 +86,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             // TODO 创建者用户信息
             UserSimpleVO user = ResponseUtils
-                    .getResponseObject(userApi.getUserSimple(String.valueOf(infoVo.getCreateUserId())));
+                    .getResponseData(userApi.getUserSimple(String.valueOf(infoVo.getCreateUserId())));
 
             // TODO 资源互动信息
 

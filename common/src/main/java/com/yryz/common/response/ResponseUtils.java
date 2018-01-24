@@ -98,7 +98,7 @@ public class ResponseUtils {
     * @return T
     * @throws  
     */
-    public static <T> T getResponseObject(Response<T> res) {
+    public static <T> T getResponseData(Response<T> res) {
         if (null == res) {
             throw QuanhuException.busiError("getResponseObject() , res is null !");
         }
@@ -118,7 +118,7 @@ public class ResponseUtils {
     * @return Collection<?>
     * @throws  
     */
-    public static <T> Collection<?> getResponseList(Response<Collection<?>> res) {
+    public static <T> Collection<?> getResponseDataList(Response<Collection<?>> res) {
         if (null == res) {
             throw QuanhuException.busiError("getResponseObject() , res is null !");
         }

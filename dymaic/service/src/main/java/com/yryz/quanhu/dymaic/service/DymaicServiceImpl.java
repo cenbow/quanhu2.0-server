@@ -25,8 +25,10 @@ import java.util.*;
  * <p>
  *
  * TODO
- * 对接动态写入
- * 对接粉丝、用户、统计系统
+ * 关于转发类型的判断...
+ *
+ * 对接KID, 粉丝, 用户
+ * 对接动态写入、统计系统
  */
 @Service
 public class DymaicServiceImpl implements DymaicService {
@@ -88,9 +90,10 @@ public class DymaicServiceImpl implements DymaicService {
 
             if (dymaic != null) {
                 if (dymaic.getDelFlag() != 10) {
-                    dymaic = new Dymaic();
-                    dymaic.setKid(dymaic.getKid());
-                    dymaic.setDelFlag(dymaic.getDelFlag());
+                    Dymaic tmp = new Dymaic();
+                    tmp.setKid(dymaic.getKid());
+                    tmp.setDelFlag(dymaic.getDelFlag());
+                    dymaic = tmp;
                 }
                 dymaicCache.addDynamic(dymaic);
             } else {
