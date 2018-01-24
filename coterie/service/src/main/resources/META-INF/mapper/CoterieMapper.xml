@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yryz.quanhu.coterie.dao.CoterieMapper" >
-  <resultMap id="BaseResultMap" type="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.coterie.entity.Coterie" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="coterieId" jdbcType="CHAR" />
     <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
@@ -30,7 +30,7 @@
     qr_url, join_fee, consulting_fee, join_check, member_num, state, create_date, last_update_date,
     process_time, deleted,heat,is_expert,recommend,last_info_time
   </sql>
-  <insert id="insert" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <insert id="insert" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     insert into qh_coterie (id, kid, owner_id,
        owner_name, owner_intro,
       icon, coterie_name, intro,
@@ -46,7 +46,7 @@
       #{createDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{processTime,jdbcType=TIMESTAMP}, 
       #{deleted,jdbcType=TINYINT},#{heat},#{isExpert},#{recommend},#{lastInfoTime)
   </insert>
-  <insert id="insertSelective" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <insert id="insertSelective" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     insert into qh_coterie
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -117,6 +117,7 @@
       <if test="lastInfoTime != null" >
         last_info_time,
       </if>
+      tenant_id,revision,
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -186,9 +187,10 @@
       <if test="lastInfoTime != null" >
         #{lastInfoTime},
       </if>
+      '',0,
     </trim>
   </insert>
-  <update id="updateByCoterieIdSelective" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <update id="updateByCoterieIdSelective" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     update qh_coterie
     <set >
       <if test="coterieId != null" >
@@ -259,7 +261,7 @@
     </set>
     where kid = #{coterieId,jdbcType=CHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <update id="updateByPrimaryKey" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     update qh_coterie
     set kid = #{coterieId,jdbcType=CHAR},
       owner_id = #{ownerId,jdbcType=VARCHAR},
@@ -334,7 +336,7 @@
     where state = #{status}
   </select>
   
-  <select id="selectListByCoterie" resultMap="BaseResultMap" parameterType="com.yryz.service.circle.modules.coterie.entity.Coterie" >
+  <select id="selectListByCoterie" resultMap="BaseResultMap" parameterType="com.yryz.quanhu.coterie.entity.Coterie" >
     select 
     <include refid="Base_Column_List" />
     from qh_coterie
@@ -493,7 +495,7 @@
     	and (state=0 or state=3)
   </select>
   
-  <select id="selectBySearchParam" resultType="com.yryz.service.circle.modules.coterie.entity.Coterie" parameterType="com.yryz.service.circle.modules.coterie.entity.CoterieSearch">
+  <select id="selectBySearchParam" resultType="com.yryz.quanhu.coterie.entity.Coterie" parameterType="com.yryz.quanhu.coterie.entity.CoterieSearch">
     SELECT s.owner_name ownerName,
 	  s.owner_intro ownerIntro,
 	  s.coterie_name,
@@ -530,7 +532,7 @@
 	limit #{start},#{pageSize}
   </select>
   
-  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.service.circle.modules.coterie.entity.CoterieSearch">
+  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.coterie.entity.CoterieSearch">
     SELECT count(*)
 	FROM `qh_coterie` s
 	WHERE 1=1
@@ -573,6 +575,8 @@
     order by heat desc
     limit #{start},#{pageSize}
   </select>
+
+
   
   <select id="selectCountByCircleId"  resultType="java.lang.Integer" >
     select 

@@ -59,7 +59,7 @@ public class ComponentController {
 	@ApiOperation("验证码校验（只校验不删除）")
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/component/checkVerifyCode")
+	@PostMapping(value = "/{version}/component/checkVerifyCode")
 	public Response<Integer> checkVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
@@ -71,7 +71,7 @@ public class ComponentController {
 
 	@ApiOperation("发送短信验证码（滑动验证）")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/component/sendVerifyCodeForSlip")
+	@PostMapping(value = "/{version}/component/sendVerifyCodeForSlip")
 	public Response<VerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());

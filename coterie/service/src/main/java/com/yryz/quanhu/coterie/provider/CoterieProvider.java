@@ -212,7 +212,6 @@ public class CoterieProvider implements CoterieApi {
 		if (info == null) {
 			throw ServiceException.paramsError();
 		}
-
 		if (StringUtils.isEmpty(info.getIcon())) {
 			throw ServiceException.paramsError("icon");
 		}
@@ -228,20 +227,17 @@ public class CoterieProvider implements CoterieApi {
 		if (info.getJoinFee()!=null && info.getJoinFee()<100 && info.getJoinFee()>0) {//私圈单位为分，0表示免费，小于100的  单位必定错误
 			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "加入私圈金额设置不正确。");
 		}
-		List<CoterieInfo> coterieList = coterieService.findByName(StringUtils.trim(info.getName()));
-		if (!coterieList.isEmpty()) {
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "私圈名称已存在");
-		}
-		 // 一个人在一个圈子里只能创建一个私圈
-         //		CoterieInfo coterie = coterieService.find(info.getOwnerId(), info.getCircleId());
-         //		if (coterie != null) {
-        //			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "该圈子里您已创建了一个私圈");
-        //		}
+		//todo
+//		List<CoterieInfo> coterieList = coterieService.findByName(StringUtils.trim(info.getName()));
+//		if (!coterieList.isEmpty()) {
+//			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "私圈名称已存在");
+//		}
 
-		Response<UserSimpleVO> cust=userApi.getUserSimple(info.getOwnerId());
-		if(cust==null){
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "用户("+info.getOwnerId()+")不存在");
-		}
+		//todo
+//		Response<UserSimpleVO> cust=userApi.getUserSimple(info.getOwnerId());
+//		if(cust==null){
+//			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "用户("+info.getOwnerId()+")不存在");
+//		}
 		//todo
 		/*
 		if(StringUtils.isEmpty(cust.getCustLevel())){

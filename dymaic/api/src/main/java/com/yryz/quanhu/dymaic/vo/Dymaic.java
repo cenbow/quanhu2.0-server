@@ -33,7 +33,6 @@ public class Dymaic implements Serializable {
      */
     private Integer resourceId;
 
-
     /**
      * 文章分类ID
      */
@@ -161,6 +160,14 @@ public class Dymaic implements Serializable {
 
     public void setTransmitNote(String transmitNote) {
         this.transmitNote = transmitNote;
+    }
+
+    public Integer getTransmitType() {
+        return transmitType;
+    }
+
+    public void setTransmitType(Integer transmitType) {
+        this.transmitType = transmitType;
     }
 
     public String getTitle() {

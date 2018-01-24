@@ -33,6 +33,7 @@ import java.util.List;
  */
 @Api(description = "用户关系接口")
 @RestController
+@RequestMapping(value="services/app")
 public class UserRelationController {
 
     @Reference(check = false)

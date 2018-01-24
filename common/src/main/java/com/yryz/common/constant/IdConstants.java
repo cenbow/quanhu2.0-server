@@ -67,4 +67,9 @@ public class IdConstants {
      * 报名类活动:报名支付记录表
      */
     public static final String QUANHU_ACTIVITY_SIGNUP_PAY = "quanhu_activity_signup_pay";
+
+    /**  
+    * @Fields : 资源-文章
+    */
+    public static final String QUANHU_RELEASE_INFO = "quanhu_release_info";
 }
