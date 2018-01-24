@@ -33,9 +33,9 @@ import java.util.Map;
  */
 @Service
 public class CoterieMemberServiceImpl implements CoterieMemberService {
-    @Resource
+
     private CoterieMemberDao coterieMemberDao;
-    @Resource
+
     private CoterieApplyDao coterieApplyDao;
     @Resource
     private CoterieMapper coterieMapper;
