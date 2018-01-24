@@ -19,6 +19,8 @@
     <result column="auth_way" property="authWay" jdbcType="TINYINT" />
     <result column="audit_status" property="auditStatus" jdbcType="TINYINT" />
     <result column="recommend_status" property="recommendStatus" jdbcType="TINYINT" />
+    <result column="recommend_desc" property="recommendDesc" jdbcType="VARCHAR" />
+    <result column="recommend_height" property="recommendHeight" jdbcType="INTEGER" />
     <result column="operational" property="operational" jdbcType="VARCHAR" />
     <result column="recommend_operate" property="recommendOperate" jdbcType="VARCHAR" />
     <result column="audit_fail_reason" property="auditFailReason" jdbcType="VARCHAR" />
@@ -33,7 +35,7 @@
   <sql id="Base_Column_List" >
      a.user_id, a.organization_name, a.real_name, a.id_card, a.location, a.trade_field, a.owner_app_id, 
     a.resource_desc, a.contact_call, a.organization_paper, a.auth_type, a.auth_way, a.audit_status, 
-    a.recommend_status, a.operational, a.recommend_operate, a.audit_fail_reason, a.auth_time, a.audit_fail_time, 
+    a.recommend_status,a.recommend_desc,a.recommend_height, a.operational, a.recommend_operate, a.audit_fail_reason, a.auth_time, a.audit_fail_time, 
     a.auth_cancel_time, a.recommend_time, a.recommend_cancel_time, a.create_date, a.last_update_date
   </sql>
   
@@ -71,10 +73,10 @@
 		from qh_user_star_auth
 	</select>
 	
+	<!-- 达人后台查询需要依赖积分 -->
 	<select id="listByParams" resultMap="BaseResultMap">
 		select
-		<include refid="Base_Column_List" />,
-		r.star_weight
+		<include refid="Base_Column_List" />		
 		from qh_user_star_auth a
 		left join user_baseinfo r on
 		a.user_id = r.user_id
@@ -128,25 +130,18 @@
 		select
 		a.id as id,
 		a.user_id as userId,
-		a.trade_field as tradeField
+		a.trade_field as tradeField,
+		a.recommend_desc as recommendDesc
 		from
-		qh_user_star_auth a
-		left join qh_user_baseinfo r on a.user_id = r.user_id
+		qh_user_star_auth a		
 		where 1=1
 		<if test="starRecommend != null ">
-			and r.star_recommend_status = 11 and a.audit_status = 11
-		</if>
-		<if test="starRecommend == null ">
-			and a.audit_status = 11
+			and a.star_recommend_status = 11 and a.audit_status = 11
 		</if>
 		order by
 		<if test="starRecommend != null ">
-			r.star_weight desc,a.recommend_time desc,a.auth_time desc
-			limit 15
-		</if>
-		<if test="starRecommend == null ">
-			a.auth_time desc,r.heat_weight desc
-			limit #{start},10
+			a.recommend_height desc,a.recommend_time desc,a.auth_time desc
+			limit #{start},#{limit}
 		</if>
 	</select>
 	
@@ -204,6 +199,12 @@
       <if test="recommendStatus != null" >
         recommend_status,
       </if>
+	  <if test="recommendHeight != null" >
+        recommend_height,
+      </if>   
+	  <if test="recommendDesc != null" >
+        recommend_desc,
+      </if>      
       <if test="operational != null" >
         operational,
       </if>
@@ -287,6 +288,12 @@
       <if test="recommendStatus != null" >
         #{recommendStatus,jdbcType=TINYINT},
       </if>
+	  <if test="recommendHeight != null" >
+        recommend_height = #{recommendHeight},
+      </if>   
+	  <if test="recommendDesc != null" >
+        recommend_desc = #{recommendDesc},
+      </if>        
       <if test="operational != null" >
         #{operational,jdbcType=VARCHAR},
       </if>
@@ -362,6 +369,12 @@
       <if test="recommendStatus != null" >
         recommend_status = #{recommendStatus,jdbcType=TINYINT},
       </if>
+      <if test="recommendHeight != null" >
+        recommend_height = #{recommendHeight},
+      </if>   
+	  <if test="recommendDesc != null" >
+        recommend_desc = #{recommendDesc},
+      </if>      
       <if test="operational != null" >
         operational = #{operational,jdbcType=VARCHAR},
       </if>

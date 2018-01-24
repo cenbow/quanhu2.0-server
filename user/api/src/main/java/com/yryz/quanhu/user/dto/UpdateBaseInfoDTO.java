@@ -77,7 +77,7 @@ public class UpdateBaseInfoDTO implements Serializable{
     public int getUserAge() {
         return userAge;
     }
-    public void setUserAge(int userAge) {
+    public void setUserAge(Integer userAge) {
         this.userAge = userAge;
     }
     public String getUserDesc() {
@@ -95,7 +95,7 @@ public class UpdateBaseInfoDTO implements Serializable{
     public int getUserGenders() {
         return userGenders;
     }
-    public void setUserGenders(int userGenders) {
+    public void setUserGenders(Integer userGenders) {
         this.userGenders = userGenders;
     }
     public String getUserLocation() {
