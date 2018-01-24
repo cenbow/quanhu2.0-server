@@ -9,9 +9,14 @@ package com.yryz.quanhu.order.score.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.aliyun.oss.ServiceException;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
@@ -25,6 +30,8 @@ import com.yryz.quanhu.score.vo.EventReportVo;
  */
 @Service(interfaceClass=EventAPI.class)
 public class EventAPIImpl implements EventAPI {
+	
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     EventService eventService;
@@ -43,7 +50,21 @@ public class EventAPIImpl implements EventAPI {
 
 	    
 	@Override
-	public List<EventReportVo> getScoreFlowList(EventInfo log) {
-		return eventService.getScoreFlowList(log);
+	public   Response<List<EventReportVo>> getScoreFlowList(EventInfo log) {
+		
+		logger.info("Response<List<EventReportVo>> getScoreFlowList: " + log );
+		try {
+		List<EventReportVo> list = eventService.getScoreFlowList(log);
+ 
+		return ResponseUtils.returnListSuccess(list);
+		
+	}  catch (ServiceException e) {
+		return ResponseUtils.returnException(e);
+	} catch (Exception e) {
+		logger.error("unKown Exception", e);
+		return ResponseUtils.returnException(e);
+	}
+		
+ 
 	}
 }

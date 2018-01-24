@@ -237,6 +237,8 @@ public class AccountProvider implements AccountApi {
 			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId.toString(), header);
 			logger.info("loginThird result: {}", JSON.toJSONString(registerLoginVO));
 			return ResponseUtils.returnObjectSuccess(registerLoginVO);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
 			logger.error("loginThird error", e);
 			return ResponseUtils.returnException(e);
@@ -986,6 +988,7 @@ public class AccountProvider implements AccountApi {
 	@Override
 	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
 		try {
+			logger.info("sendVerifyCode request codeDTO: {}", GsonUtils.parseJson(codeDTO));
 			checkCodeDTO(codeDTO);
 			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO));
 		} catch (QuanhuException e) {

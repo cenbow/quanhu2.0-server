@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.behavior.comment.dao.CommentDao">
+
+    <resultMap id="BaseCommentResultMap" type="com.yryz.quanhu.behavior.comment.entity.Comment">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="kid" property="kid" jdbcType="BIGINT"/>
+        <result column="top_id" property="topId" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+        <result column="parent_user_id" property="parentUserId" jdbcType="BIGINT"/>
+        <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
+        <result column="coterie_id" property="coterieId" jdbcType="BIGINT"/>
+        <result column="target_user_id" property="targetUserId" jdbcType="BIGINT"/>
+        <result column="content_comment" property="contentComment" jdbcType="VARCHAR"/>
+        <result column="shelve_flag" property="shelveFlag" jdbcType="TINYINT"/>
+        <result column="del_flag" property="delFlag" jdbcType="TINYINT"/>
+        <result column="recommend" property="recommend" jdbcType="TINYINT"/>
+        <result column="create_user_id" property="createUserId" jdbcType="BIGINT"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="BIGINT"/>
+        <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR"/>
+        <result column="revision" property="revision" jdbcType="INTEGER"/>
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+        <result column="user_img" property="userImg" jdbcType="VARCHAR"/>
+        <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Comment_Column_List">
+        id,kid,top_id,parent_id,parent_user_id,module_enum,coterie_id,target_user_id,content_comment,shelve_flag,del_flag,recommend,create_user_id,
+        create_date,last_update_user_id,last_update_date,tenant_id,revision,nick_name,user_img,resource_id
+    </sql>
+
+    <sql id="Base_Comment_Column_List_trans">
+        id,kid,top_id AS topId,parent_id AS parentId,parent_user_id AS parentUserId,module_enum AS moduleEnum,coterie_id AS coterieId,
+        target_user_id AS targetUserId,content_comment AS contentComment,shelve_flag AS shelveFlag,del_flag AS delFlag,recommend,create_user_id AS createUserId,
+        create_date AS createDate,last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,tenant_id AS tenantId,revision,nick_name AS nickName,user_img AS userImg,resource_id AS resourceId
+    </sql>
+
+    <insert id="accretion" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
+        insert into qh_comment_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="kid != null">
+                kid,
+            </if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+                module_enum,
+            </if>
+            <if test="resourceId != null">
+                resource_id,
+            </if>
+            <if test="topId != null">
+                top_id,
+            </if>
+            <if test=" parentId != null">
+                parent_id,
+            </if>
+            <if test="shelveFlag != null">
+                shelve_flag,
+            </if>
+            <if test="nickName != null and nickName != ''">
+                nick_name,
+            </if>
+            <if test="userImg != null and userImg != ''">
+                user_img,
+            </if>
+            <if test="tenantId != null and tenantId != ''">
+                tenant_id,
+            </if>
+            <if test="delFlag != null">
+                del_flag,
+            </if>
+            <if test="recommend != null">
+                recommend,
+            </if>
+            <if test="createUserId != null">
+                create_user_id,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="parentUserId != null">
+                parent_user_id,
+            </if>
+            <if test="contentComment != null and contentComment != ''">
+                content_comment,
+            </if>
+            <if test="coterieId != null">
+                coterie_id,
+            </if>
+            <if test="targetUserId!= null">
+                target_user_id,
+            </if>
+            <if test="revision != null">
+                revision,
+            </if>
+            <if test="lastUpdateUserId != null">
+                last_update_user_id,
+            </if>
+            <if test="lastUpdateDate != null">
+                last_update_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="kid != null">
+                #{kid,jdbcType=BIGINT},
+            </if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+                #{moduleEnum,jdbcType=VARCHAR} ,
+            </if>
+            <if test="resourceId != null">
+                #{resourceId,jdbcType=BIGINT},
+            </if>
+            <if test="topId != null">
+                #{topId,jdbcType=BIGINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="shelveFlag != null">
+                #{shelveFlag,jdbcType=TINYINT},
+            </if>
+            <if test="nickName != null and nickName != ''">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="userImg != null and userImg != ''">
+                #{userImg,jdbcType=VARCHAR},
+            </if>
+            <if test="tenantId != null and tenantId != ''">
+                #{tenantId,jdbcType=VARCHAR},
+            </if>
+            <if test="delFlag != null">
+                #{delFlag,jdbcType=TINYINT},
+            </if>
+            <if test="recommend != null">
+                #{recommend,jdbcType=TINYINT},
+            </if>
+            <if test="createUserId != null">
+                #{createUserId,jdbcType=BIGINT},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="parentUserId != null">
+                #{parentUserId,jdbcType=BIGINT},
+            </if>
+            <if test="contentComment != null and contentComment != ''">
+                #{contentComment,jdbcType=VARCHAR},
+            </if>
+            <if test="coterieId != null">
+                #{coterieId,jdbcType=BIGINT},
+            </if>
+            <if test="targetUserId!= null">
+                #{targetUserId,jdbcType=BIGINT},
+            </if>
+            <if test="revision != null">
+                #{revision,jdbcType=INTEGER},
+            </if>
+            <if test="lastUpdateUserId != null">
+                #{lastUpdateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="lastUpdateDate != null">
+                #{lastUpdateDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="querySingleComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment"
+            resultMap="BaseCommentResultMap">
+        SELECT
+        <include refid="Base_Comment_Column_List"/>
+        FROM qh_comment_info
+        <where>
+            1=1
+            <if test="kid != null">
+                AND kid = #{kid,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
+
+    <update id="delComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
+        UPDATE qh_comment_info
+        SET del_flag=11
+        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT} AND create_user_id=#{createUserId,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="queryCommentForAdmin" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentDTO"
+            resultMap="BaseCommentResultMap">
+        SELECT
+        <include refid="Base_Comment_Column_List"/>
+        FROM qh_comment_info
+        <where>
+            1=1
+            <if test="shelveFlag != null and shelveFlag != ''">
+                AND shelve_flag=#{shelveFlag,jdbcType=TINYINT}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND create_date >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_date &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="keyWords != null and keyWords != ''">
+                AND CONCAT(`content_comment`) LIKE CONCAT('%',#{keyWords,jdbcType=VARCHAR},'%')
+            </if>
+            ORDER BY
+            create_date DESC
+        </where>
+    </select>
+
+    <select id="queryComments" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO" resultType="com.yryz.quanhu.behavior.comment.vo.CommentVO">
+        SELECT
+        <include refid="Base_Comment_Column_List_trans"/>
+        FROM qh_comment_info
+        <where>
+            1=1 AND del_flag=10
+            <if test="resourceId!=null">
+                AND resource_id=#{resourceId,jdbcType=BIGINT}
+            </if>
+            <if test="topId!=null">
+                AND top_id=#{topId,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>

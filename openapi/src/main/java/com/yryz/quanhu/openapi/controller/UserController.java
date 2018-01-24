@@ -3,12 +3,13 @@ package com.yryz.quanhu.openapi.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.constant.DevType;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -175,15 +177,23 @@ public class UserController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginThird")
-	public Response<RegisterLoginVO> loginThird(@RequestBody ThirdLoginDTO loginDTO, HttpServletRequest request) {
+	public Response<Map<String,Object>> loginThird(@RequestBody ThirdLoginDTO loginDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String ip = WebUtil.getClientIP(request);
 		loginDTO.setDeviceId(header.getDevId());
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
-
-		return accountApi.loginThird(loginDTO, header);
+		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
+		Map<String,Object> map = new HashMap<>();
+		map.put("needPhone", false);
+		if(StringUtils.equals(response.getCode(),ExceptionEnum.NEED_PHONE.getCode())){
+			map.put("needPhone", true);
+		}else{
+			map.put("authInfo", response.getData().getAuthInfo());
+			map.put("user", response.getData().getUser());
+		}
+		return ResponseUtils.returnObjectSuccess(map);
 	}
 
 	/**

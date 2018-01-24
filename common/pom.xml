@@ -15,62 +15,21 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <com.google.zxing.version>3.2.0</com.google.zxing.version>
         <com.aliyun.jaq.version>1.0.0</com.aliyun.jaq.version>
-		<com.aliyun.oss.version>2.2.3</com.aliyun.oss.version>
+        <com.aliyun.oss.version>2.2.3</com.aliyun.oss.version>
         <cn.jpush.api.version>3.2.16</cn.jpush.api.version>
     </properties>
     <dependencies>
-
+        <!-- 公司内部库 -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>com.yryz.framework</groupId>
+            <artifactId>service-starter</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!--  spring  -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!-- commons相关工具类引入 -->
@@ -83,50 +42,12 @@
             <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.yryz.framework</groupId>
-            <artifactId>service-starter</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--dubbo的filter引用以及基本的spring框架引入-->
-        <dependency>
-            <groupId>io.dubbo.springboot</groupId>
-            <artifactId>spring-boot-starter-dubbo</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- mysql和mybatis基类封装依赖 -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -143,19 +64,6 @@
         </dependency>
 
         <!-- 常用工具包依赖  -->
-        <!-- httpclient封装 -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-
-        <!-- servlet引入 -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -167,28 +75,15 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-
         <!-- json相关标准库 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
-
-        <!-- elasticsearch log4j -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-
         <!-- model接口 -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -208,25 +103,25 @@
             <artifactId>javase</artifactId>
             <version>${com.google.zxing.version}</version>
         </dependency>
-        
-        <!-- 阿里云oss -->
-		<dependency>
-				<groupId>com.aliyun.oss</groupId>
-				<artifactId>aliyun-sdk-oss</artifactId>
-				<version>${com.aliyun.oss.version}</version>
-		</dependency>
 
-		<!-- 阿里云滑动验证码 -->	
-		<dependency>
-			<groupId>com.aliyun.jaq</groupId>
-			<artifactId>aliyun-sdk-jaq</artifactId>
-			<version>${com.aliyun.jaq.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.aliyun.jaq</groupId>
-			<artifactId>aliyun-sdk-core</artifactId>
-			<version>${com.aliyun.jaq.version}</version>
-		</dependency>
+        <!-- 阿里云oss -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>${com.aliyun.oss.version}</version>
+        </dependency>
+
+        <!-- 阿里云滑动验证码 -->
+        <dependency>
+            <groupId>com.aliyun.jaq</groupId>
+            <artifactId>aliyun-sdk-jaq</artifactId>
+            <version>${com.aliyun.jaq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.jaq</groupId>
+            <artifactId>aliyun-sdk-core</artifactId>
+            <version>${com.aliyun.jaq.version}</version>
+        </dependency>
         <dependency>
             <groupId>cn.jpush.api</groupId>
             <artifactId>jpush-client</artifactId>
@@ -239,5 +134,10 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

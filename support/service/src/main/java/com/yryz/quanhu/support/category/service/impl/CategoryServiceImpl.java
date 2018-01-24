@@ -1,6 +1,5 @@
 package com.yryz.quanhu.support.category.service.impl;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.category.constants.CategoryConstant;
 import com.yryz.quanhu.support.category.dao.CategoryDao;
@@ -9,7 +8,6 @@ import com.yryz.quanhu.support.category.service.ICategoryService;
 import com.yryz.quanhu.support.category.vo.CategoryCheckedVo;
 import com.yryz.quanhu.support.category.vo.CategoryDiscoverVo;
 import com.yryz.quanhu.support.category.vo.CategoryVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

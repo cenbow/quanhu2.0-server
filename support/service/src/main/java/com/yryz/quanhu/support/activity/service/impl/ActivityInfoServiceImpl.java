@@ -67,7 +67,7 @@ public class ActivityInfoServiceImpl implements ActivityInfoService {
     }
 
     @Override
-    public void updateJoinCount(ActivityInfo activityInfo) {
-//        activityInfoDao.updateJoinCount(activityInfo);
+    public void updateJoinCount(Long kid,Integer userNum) {
+        activityInfoDao.updateJoinCount(kid,userNum);
     }
 }

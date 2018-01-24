@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.PageModel;
 import com.yryz.common.utils.PageUtils;
@@ -24,7 +25,6 @@ import org.apache.commons.collections.ListUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -193,7 +193,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(sourceUserId.equalsIgnoreCase(targetUserId)){
-            throw new RuntimeException("don't allow set relation to self");
+            throw new QuanhuException("","","don't allow set relation to self");
         }
 
         /**
@@ -202,7 +202,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         Long followCount = userRelationDao.selectTotalCount(sourceUserId,UserRelationConstant.STATUS.FOLLOW.getCode());
 
         if(followCount>=maxFollowCount){
-            throw new RuntimeException("user follow number reached the upper limit : "+maxFollowCount);
+            throw new QuanhuException("","","user follow number reached the upper limit : "+maxFollowCount);
         }
 
         /**
@@ -227,11 +227,11 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(UserRelationConstant.YES == targetDto.getBlackStatus()){
-            throw new RuntimeException("target user has set black to source");
+            throw new QuanhuException("","","target user has set black to source");
         }
 
         if(UserRelationConstant.YES == sourceDto.getBlackStatus()&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-            throw new RuntimeException("source user has set black to target,please cancel black first");
+            throw new QuanhuException("","","source user has set black to target,please cancel black first");
         }
 
         return true;
@@ -312,7 +312,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             sourceDto.setFollowStatus(UserRelationConstant.NO);
 
         }else{
-            throw new RuntimeException("type not exist");
+            throw new QuanhuException("","","type not exist");
         }
     }
 

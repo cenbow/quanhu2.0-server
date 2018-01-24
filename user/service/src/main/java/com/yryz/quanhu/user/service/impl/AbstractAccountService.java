@@ -142,7 +142,11 @@ public class AbstractAccountService implements AccountService {
 	 */
 	@Override
 	public Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId) {
-		if (userId != null) {
+		if (userId == null) {
+			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+		}
+		UserAccount account = getUserAccountByUserId(userId.toString());
+		if(StringUtils.isBlank(account.getUserPhone())){
 			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号

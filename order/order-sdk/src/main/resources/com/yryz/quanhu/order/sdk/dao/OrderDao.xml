@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.order.sdk.dao.OrderDao">
+
+    <select id="selectByKid" resultType="com.yryz.quanhu.order.sdk.entity.Order">
+        select * from qh_buy_order T where T.kid = #{kid}
+    </select>
+
+    <insert id="insertOrder" parameterType="com.yryz.quanhu.order.sdk.entity.Order">
+        insert into qh_buy_order(
+        kid,
+        cost,
+        pay_type,
+        order_type,
+        product_id,
+        product_type,
+        product_desc,
+        order_desc,
+        remark,
+        order_state,
+        callback,
+        biz_content,
+        resource_id,
+        module_enum,
+        coterie_id,
+        create_user_id,
+        create_date,
+        last_update_user_id,
+        last_update_date
+        )
+        values(
+        #{kid , jdbcType=NUMERIC},
+        #{cost , jdbcType=NUMERIC},
+        #{payType , jdbcType=NUMERIC},
+        #{orderType , jdbcType=NUMERIC},
+        #{productId , jdbcType=VARCHAR},
+        #{productType , jdbcType=NUMERIC},
+        #{productDesc , jdbcType=VARCHAR},
+        #{orderDesc , jdbcType=VARCHAR},
+        #{remark , jdbcType=VARCHAR},
+        #{orderState , jdbcType=NUMERIC},
+        #{callback , jdbcType=VARCHAR},
+        #{bizContent , jdbcType=VARCHAR},
+        #{resourceId , jdbcType=NUMERIC},
+        #{moduleEnum , jdbcType=VARCHAR},
+        #{coterieId , jdbcType=NUMERIC},
+        #{createUserId, jdbcType=NUMERIC},
+        NOW(),
+        #{createUserId, jdbcType=NUMERIC},
+        NOW()
+        )
+    </insert>
+
+    <update id="updateOrderState">
+		update qh_buy_order set order_state = #{orderState} where kid = #{kid}
+	</update>
+</mapper>

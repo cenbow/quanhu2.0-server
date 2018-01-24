@@ -17,10 +17,16 @@ public enum ExceptionEnum {
     USER_NO_TALK("1007", "用户被禁言", "用户被禁言"),
     USER_FREEZE("1008", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被冻结"),
     USER_DISTORY("1009", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被注销"),
+    USER_NO_RIGHT_TOREAD("1020","您无权去查看。","你无权执行此操作"),
+    USER_NO_RIGHT_TODELETE("1021","您无权执行删除操作。","您无权执行删除操作。"),
     ValidateException("2000", "数据验证失败！", "网络开小差了，请稍候再试！"),
     PARAM_MISSING("2001", "参数缺失", "网络开小差了，请稍候再试！"),
 
-    MONGO_EXCEPTION("3000", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！");
+    RPC_RESPONSE_EXCEPTION("2002","网络开小差了，请稍候再试！","RpcResponse对象为空！"),
+    RPC_RESPONSE_DATA_EXCEPTION("2002","网络开小差了，请稍候再试！","RpcResponse对象返回Data为空！"),
+    MONGO_EXCEPTION("3000", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！"),
+    COTERIE_NON_EXISTENT("1021", "未找到该私圈,访问出错", "私圈不存在！");
+
 
     private String code;
 

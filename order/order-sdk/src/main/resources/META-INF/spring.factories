@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.yryz.quanhu.order.autoconfig.OrderSDKAutoConfig
+  com.yryz.quanhu.order.sdk.autoconfig.OrderSDKAutoConfig

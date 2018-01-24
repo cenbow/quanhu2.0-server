@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +20,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.PageModel;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.dto.StarAuthQueryDTO;
@@ -53,7 +53,11 @@ public class UserStarProvider implements UserStarApi {
 		if (info != null && info.getAuthWay() == null) {
 			info.setAuthWay(StarAuthWay.ADMIN_SET.getWay());
 		}
+		
 		try {
+			if(StringUtils.isBlank(info.getUserId())){
+				throw QuanhuException.busiError("用户id不能为空");
+			}
 			UserStarAuth model = (UserStarAuth) GsonUtils.parseObj(info, UserStarAuth.class);
 			UserStarAuth authModel = userStarService.get(info.getUserId(), null);
 			if (authModel != null) {
@@ -98,10 +102,15 @@ public class UserStarProvider implements UserStarApi {
 	@Override
 	public Response<StarAuthInfo> get(String userId) {
 		try {
-			if (StringUtils.isEmpty(userId)) {
+			if (StringUtils.isBlank(userId)) {
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			UserStarAuth model = userStarService.get(userId, null);
+			if(model == null){
+				model = new UserStarAuth();
+				model.setUserId(NumberUtils.toLong(userId));
+				model.setAuditStatus((byte)14);
+			}
 			StarAuthInfo authInfo = (StarAuthInfo) GsonUtils.parseObj(model, StarAuthInfo.class);
 			return ResponseUtils.returnObjectSuccess(authInfo);
 		} catch (QuanhuException e) {
@@ -140,6 +149,9 @@ public class UserStarProvider implements UserStarApi {
 		try {
 			if (info == null) {
 				throw QuanhuException.busiError("达人认证信息不能为空");
+			}
+			if(StringUtils.isBlank(info.getUserId())){
+				throw QuanhuException.busiError("用户id不能为空");
 			}
 			if (info.getAuthWay() == null) {
 				info.setAuthWay(StarAuthWay.ADMIN_SET.getWay());
@@ -184,10 +196,10 @@ public class UserStarProvider implements UserStarApi {
 			if (auditVo == null || auditVo.getAuditStatus() == null
 					|| auditVo.getAuditStatus() < StarAuditStatus.WAIT_AUDIT.getStatus()
 					|| auditVo.getAuditStatus() > StarAuditStatus.CANCEL_AUTH.getStatus()
-					|| StringUtils.isEmpty(auditVo.getUserId())) {
+					|| auditVo.getUserId() == null) {
 				throw QuanhuException.busiError("auditVo、auditStatus、userId为空");
 			}
-			UserStarAuth authModel = userStarService.get(auditVo.getUserId(), null);
+			UserStarAuth authModel = userStarService.get(auditVo.getUserId().toString(), null);
 			if (authModel == null) {
 				throw QuanhuException.busiError("认证信息不存在");
 			}
@@ -211,7 +223,7 @@ public class UserStarProvider implements UserStarApi {
 			}
 
 			UserStarAuth reAuthModel = new UserStarAuth();
-			reAuthModel.setUserId(NumberUtils.toLong(auditVo.getUserId()));
+			reAuthModel.setUserId(auditVo.getUserId());
 			reAuthModel.setAuditStatus(auditVo.getAuditStatus());
 			reAuthModel.setAuditFailReason(auditVo.getReason());
 			reAuthModel.setOperational(auditVo.getOperational());

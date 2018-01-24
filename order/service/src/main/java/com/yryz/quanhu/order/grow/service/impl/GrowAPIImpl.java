@@ -1,14 +1,12 @@
 package com.yryz.quanhu.order.grow.service.impl;
 
 import java.util.Date;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
@@ -20,8 +18,7 @@ import com.yryz.quanhu.order.grow.service.GrowFlowService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.score.vo.EventAcount;
 
-@Transactional
-@Service
+@Service(interfaceClass=GrowAPI.class)
 public class GrowAPIImpl implements GrowAPI {
 
 	@Autowired

@@ -44,6 +44,7 @@ public class UserStarController {
 	public Response<Boolean> save(@RequestBody StarAuthInfo info, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		info.setAuthWay((byte) 10);
+		info.setUserId(header.getUserId());
 		info.setAppId(header.getAppId());
 		return starApi.save(info);
 	}
@@ -60,6 +61,7 @@ public class UserStarController {
 	public Response<Boolean> update(@RequestBody StarAuthInfo info, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		info.setAuthWay((byte) 10);
+		info.setUserId(header.getUserId());
 		info.setAppId(header.getAppId());
 		return starApi.update(info);
 	}

@@ -3,11 +3,12 @@ package com.yryz.quanhu.openapi.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
-import com.yryz.quanhu.coterie.service.CoterieApi;
-import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
-import com.yryz.quanhu.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
@@ -17,10 +18,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import java.util.List;
  */
 @Api(description = "私圈接口")
 @RestController
+@RequestMapping(value="services/app")
 public class CoterieController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final int CHAR_51 = 3;
@@ -44,20 +44,23 @@ public class CoterieController {
 	@Reference
 	private AuthApi authApi;
 	@Reference
-	private CoterieApi coterieApi ;
+	private CoterieApi coterieApi;
 
 
 	@ApiOperation("发布私圈")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/coterieInfo/create")
+	@PostMapping(value = "/{version}/coterieInfo/create")
 	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		String useId = header.getUserId();
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
-			info.setJoinCheck((byte) 1);
+			info.setJoinCheck(1);
 		} else {
 			//付费加入方式，成员必须不审核
-			info.setJoinCheck((byte) 0);
+			info.setJoinCheck(0);
 		}
+		//info.setOwnerId(useId);
 		return coterieApi.applyCreate(info );
 	}
 	
@@ -102,7 +105,7 @@ public class CoterieController {
 			record.setJoinCheck(config.getJoinCheck());
 		}
 		 coterieApi.modifyCoterieInfo(record);
-         return null;
+		return ResponseUtils.returnObjectSuccess(true);
 	}
 	
 	/**
@@ -128,7 +131,6 @@ public class CoterieController {
 			logger.error(String.format("query Coterie details error, coterieId=[%s]", coterieId), e);
 		}
 		return coterieInfo;
-
 	}
 
 	/**
@@ -180,7 +182,5 @@ public class CoterieController {
 	{
        return coterieApi.queryPageForApp(currentPage,pageSize);
 	}
-
-
 
 }

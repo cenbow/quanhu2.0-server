@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -29,6 +30,7 @@ import java.util.List;
  */
 @Api(description = "用户关系-备注名接口")
 @RestController
+@RequestMapping(value="services/app")
 public class UserRelationRemarkController {
 
     @Reference(check = false,retries = 0)
@@ -41,7 +43,7 @@ public class UserRelationRemarkController {
      */
     @ApiOperation("用户备注名-设置/重置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/remark")
+    @RequestMapping("/{version}/user/relation/remark")
     public Response<Boolean> setRemarkName(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
@@ -69,7 +71,7 @@ public class UserRelationRemarkController {
         }else if(0 == Integer.parseInt(eventType)){
             return userRelationRemarkApi.resetRemarkName(dto);
         }else{
-            return ResponseUtils.returnException(new RuntimeException("eventType is illegal:"+eventType));
+            return ResponseUtils.returnException(new QuanhuException("","","eventType is illegal:"+eventType));
         }
     }
 
@@ -80,7 +82,7 @@ public class UserRelationRemarkController {
      */
     @ApiOperation("用户备注名-查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/remark/query")
+    @RequestMapping("/{version}/user/relation/remark/query")
     public Response<List<UserRelationRemarkVo>> selectBy(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
