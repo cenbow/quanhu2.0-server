@@ -12,7 +12,7 @@ public class StarAuthAuditVo implements Serializable{
 	/**
 	 * 用户id
 	 */
-	private String userId;
+	private Long userId;
 	/**
 	 * 审核状态 0:待审核 1:审核通过 2:审核失败 3:取消认证
 	 */
@@ -34,11 +34,11 @@ public class StarAuthAuditVo implements Serializable{
 		this.operational = operational;
 	}
 
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 

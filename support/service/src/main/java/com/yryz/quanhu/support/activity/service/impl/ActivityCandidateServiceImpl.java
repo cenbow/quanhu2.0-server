@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.support.activity.constants.ActivityCandidateConstants;
 import com.yryz.quanhu.support.activity.constants.ActivityVoteConstants;
@@ -13,19 +14,22 @@ import com.yryz.quanhu.support.activity.dao.ActivityVoteConfigDao;
 import com.yryz.quanhu.support.activity.dao.ActivityVoteDetailDao;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
+import com.yryz.quanhu.support.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.support.activity.service.ActivityCandidateService;
 import com.yryz.quanhu.support.activity.service.ActivityVoteService;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteConfigVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.DefaultTypedTuple;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -35,7 +39,13 @@ import java.util.stream.Collectors;
 public class ActivityCandidateServiceImpl implements ActivityCandidateService {
 
     @Autowired
+    IdAPI idAPI;
+
+    @Autowired
     ActivityInfoDao activityInfoDao;
+
+    @Autowired
+    ActivityVoteDetailDao activityVoteDetailDao;
 
     @Autowired
     ActivityVoteService activityVoteService;
@@ -44,14 +54,16 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     ActivityVoteConfigDao activityVoteConfigDao;
 
     @Autowired
-    ActivityVoteDetailDao activityVoteDetailDao;
-
-    @Autowired
     RedisTemplateBuilder templateBuilder;
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 增加参与者
+     * @param activityVoteDto
+     * */
+    @Transactional(propagation = Propagation.REQUIRED)
     public void join(ActivityVoteDto activityVoteDto) {
         //获取投票信息
         ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
@@ -59,17 +71,65 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         this.validateActivity(activityVoteInfoVo);
         //获取用户是否参与
         int candidateCount = activityVoteDetailDao.selectCandidateCount(activityVoteDto.getActivityInfoId(),
-                activityVoteDto.getCandidateId());
+                activityVoteDto.getCreateUserId());
         if(candidateCount != 0) {
             throw QuanhuException.busiError("用户已参与");
         }
-        //减少参与人数
+        //增加已参与人数
         int flag = activityInfoDao.updateJoinCount(activityVoteDto.getActivityInfoId(), activityVoteInfoVo.getUserNum());
         if(flag == 0) {
             throw QuanhuException.busiError("参加人数已满");
         }
+        ActivityVoteDetail voteDetail = new ActivityVoteDetail();
+        Response<Long> result = idAPI.getKid("qh_activity_vote_detail");
+        if(!result.success()){
+            throw QuanhuException.busiError("调用发号器失败");
+        }
+        voteDetail.setKid(result.getData());
+        voteDetail.setActivityInfoId(activityVoteDto.getActivityInfoId());
+        voteDetail.setVoteNo(this.getMaxVoteNo(activityVoteDto.getActivityInfoId()).intValue());
+        voteDetail.setObtainIntegral(activityVoteInfoVo.getAmount());
+        voteDetail.setContent(activityVoteDto.getContent());
+        voteDetail.setContent1(activityVoteDto.getContent1());
+        voteDetail.setContent2(activityVoteDto.getContent2());
+        voteDetail.setCoverPlan(activityVoteDto.getCoverPlan());
+        voteDetail.setImgUrl(activityVoteDto.getImgUrl());
+        voteDetail.setVideoUrl(activityVoteDto.getVideoUrl());
+        voteDetail.setVideoThumbnailUrl(activityVoteDto.getVideoThumbnailUrl());
+        voteDetail.setVoteCount(1);
+        voteDetail.setAddVote(0);
+        voteDetail.setCreateUserId(activityVoteDto.getCreateUserId());
+        //TODO:功能枚举
+        voteDetail.setShelveFlag(10);
+        //保存参与信息
+        activityVoteDetailDao.insertByPrimaryKeySelective(voteDetail);
+        //TODO:调用平台获得积分
+        if(activityVoteInfoVo.getAmount() != 0) {
 
+        }
+        //递增参与人数
+        stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityVoteDto.getActivityInfoId()),
+                "joinCount",
+                1L);
+        //删除首页列表
+        stringRedisTemplate.delete(ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId()));
+        //删除排行榜
+        stringRedisTemplate.delete(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()));
 
+        //增加首页列表
+//        String keyId = ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId());
+//        if(!stringRedisTemplate.hasKey(keyId)) {
+//            this.setList(activityVoteDto.getActivityInfoId());
+//        }
+//        template.opsForZSet().add(keyId, voteDetail.getKid(), voteDetail.getId());
+        //增加排行榜列表
+//        String keyRank = ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId());
+//        if(!stringRedisTemplate.hasKey(keyRank)) {
+//            this.setRank(activityVoteDto.getActivityInfoId());
+//        }
+//        template.opsForZSet().add(keyRank,
+//                voteDetail.getKid(),
+//                voteDetail.getVoteCount());
     }
 
     /**
@@ -128,6 +188,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             String key = ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId());
             if(!stringRedisTemplate.hasKey(key)) {
                 this.setList(activityVoteDto.getActivityInfoId());
+                this.setRank(activityVoteDto.getActivityInfoId());
             }
             RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
             Set<ZSetOperations.TypedTuple<Long>> list = template.opsForZSet().reverseRangeWithScores(key,
@@ -135,6 +196,13 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     activityVoteDto.getPageSize());
 
             List<ActivityVoteDetailVo> resultList = this.getDetail(activityVoteDto.getActivityInfoId(), list);
+            if(!CollectionUtils.isEmpty(resultList)){
+                resultList.stream().forEach(detailVo -> {
+                    Double score = template.opsForZSet().score(ActivityCandidateConstants.getKeyRank(detailVo.getActivityInfoId()),
+                            detailVo.getKid());
+                    detailVo.setVoteCount(score == null ? 0 : score.intValue());
+                });
+            }
             pageList.setCurrentPage(activityVoteDto.getCurrentPage());
             pageList.setPageSize(activityVoteDto.getPageSize());
             pageList.setEntities(resultList);
@@ -226,45 +294,54 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     }
 
     private void setList(Long activityInfoId) {
-        String key = ActivityCandidateConstants.getKeyId(activityInfoId);
-        this.setCandidateInfo(key, activityInfoId, "kid");
+        List<ActivityVoteDetailVo> activityList = this.getCandidateInfo(activityInfoId);
+        this.setCandidateInfo(ActivityCandidateConstants.getKeyId(activityInfoId), "kid", activityList);
+        this.setCandidateInfo(ActivityCandidateConstants.getKeyRank(activityInfoId),  "voteCount", activityList);
     }
 
     private void setRank(Long activityInfoId) {
-        String key = ActivityCandidateConstants.getKeyRank(activityInfoId);
-        this.setCandidateInfo(key, activityInfoId, "voteCount");
+        List<ActivityVoteDetailVo> activityList = this.getCandidateInfo(activityInfoId);
+        this.setCandidateInfo(ActivityCandidateConstants.getKeyRank(activityInfoId),  "voteCount", activityList);
     }
 
-    private void setCandidateInfo(String key, Long activityInfoId, String sort) {
+    private List<ActivityVoteDetailVo> getCandidateInfo(Long activityInfoId) {
         Page<ActivityVoteDetailVo> page = PageHelper.startPage(ActivityCandidateConstants.CURRENTPAGE, ActivityCandidateConstants.PAGESIZE);
         List<ActivityVoteDetailVo> list = activityVoteDetailDao.selectVoteList(activityInfoId);
         if(!CollectionUtils.isEmpty(list)) {
             BigDecimal total = new BigDecimal(page.getTotal());
             BigDecimal pageSize = new BigDecimal(ActivityCandidateConstants.PAGESIZE);
-            if(total.compareTo(pageSize) == 1) {
+            if (total.compareTo(pageSize) == 1) {
                 int c = total.divide(pageSize).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
-                for(int i = 0; i<c; i++) {
-                    PageHelper.startPage(i+2, ActivityCandidateConstants.PAGESIZE);
+                for (int i = 0; i < c; i++) {
+                    PageHelper.startPage(i + 2, ActivityCandidateConstants.PAGESIZE);
                     list.addAll(activityVoteDetailDao.selectVoteList(activityInfoId));
                 }
             }
-            Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
-            list.stream()
-                    .filter(detail -> detail.getKid() != null)
-                    .forEach(detail -> {
-                        double score = 0;
-                        if("kid".equals(sort)) {
-                            score = detail.getKid().doubleValue();
-                        } else {
-                            score = detail.getVoteCount() == null ? 0 : detail.getVoteCount().doubleValue();
-                        }
-
-                        ZSetOperations.TypedTuple tuple = new DefaultTypedTuple<>(detail.getKid(), score);
-                        set.add(tuple);
-                    });
-            RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
-            template.opsForZSet().add(key, set);
         }
+
+        return list;
+    }
+
+    private void setCandidateInfo(String key, String sort, List<ActivityVoteDetailVo> list) {
+        Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
+        list.stream()
+                .filter(detail -> detail.getKid() != null)
+                .forEach(detail -> {
+                    long value = 0;
+                    double score = 0;
+                    if("kid".equals(sort)) {
+                        value = detail.getKid();
+                        score = detail.getId().doubleValue();
+                    } else {
+                        value = detail.getKid();
+                        score = detail.getVoteCount() == null ? 0 : detail.getVoteCount().doubleValue();
+                    }
+
+                    ZSetOperations.TypedTuple tuple = new DefaultTypedTuple<>(value, score);
+                    set.add(tuple);
+                });
+        RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
+        template.opsForZSet().add(key, set);
     }
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {
@@ -275,7 +352,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         if(now.compareTo(activityVoteInfoVo.getBeginTime()) == -1) {
             throw QuanhuException.busiError("活动未开始");
         }
-        if(now.compareTo(activityVoteInfoVo.getEndTime()) == -1) {
+        if(now.compareTo(activityVoteInfoVo.getEndTime()) == 1) {
             throw QuanhuException.busiError("活动已结束");
         }
         if(!Integer.valueOf(10).equals(activityVoteInfoVo.getShelveFlag()) ) {
@@ -287,6 +364,22 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         if(now.compareTo(activityVoteInfoVo.getActivityJoinEnd()) == 1 ) {
             throw QuanhuException.busiError("该活动参与阶段已结束");
         }
+    }
+
+    private Long getMaxVoteNo(Long activityInfoId) {
+        if(!stringRedisTemplate.opsForHash().hasKey(ActivityVoteConstants.ACTIVITY_VOTE_NO, activityInfoId.toString())) {
+            Integer maxVoteNo = activityVoteDetailDao.selectMaxVoteNo(activityInfoId);
+            stringRedisTemplate.opsForHash().putIfAbsent(ActivityVoteConstants.ACTIVITY_VOTE_NO,
+                    activityInfoId.toString(),
+                    maxVoteNo == null ? "0" : String.valueOf(maxVoteNo));
+        }
+
+        Long voteNo = stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.ACTIVITY_VOTE_NO, activityInfoId.toString(), 1);
+        if(voteNo == null) {
+            throw QuanhuException.busiError("生成参与者编号失败");
+        }
+
+        return voteNo;
     }
 
 }

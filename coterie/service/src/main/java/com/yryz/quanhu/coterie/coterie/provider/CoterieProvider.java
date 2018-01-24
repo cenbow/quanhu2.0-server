@@ -153,7 +153,7 @@ public class CoterieProvider implements CoterieApi {
 	@Override
 	public void modifyCoterieInfo(CoterieInfo info) {
 		logger.info("CoterieApi.modifyCoterieInfo params:" + info);
-		if (info == null || StringUtils.isEmpty(info.getCoterieId())) {
+		if (info == null ||  info.getCoterieId()==null) {
 			throw ServiceException.paramsError();
 		}
 		String name = StringUtils.trim(info.getName());
@@ -190,18 +190,18 @@ public class CoterieProvider implements CoterieApi {
 	 */
 	@Override
 	public Response<CoterieInfo> applyCreate(CoterieBasicInfo info) {
-		logger.info("CoterieApi.applyCreate params:" + info);
-		checkApplyCreateParam(info);
-		try {
-			return ResponseUtils.returnObjectSuccess(coterieService.save(info));
-		} catch (DatasOptException e) {
-			logger.error(e.getMessage(), e);
-			return ResponseUtils.returnException(e);
-		} catch (ServiceException e) {
-			return ResponseUtils.returnException(e);
-		} catch (Exception e) {
-			logger.error("unKown Exception", e);
-			return ResponseUtils.returnException(e);
+				logger.info("CoterieApi.applyCreate params:" + info);
+				checkApplyCreateParam(info);
+				try {
+					return ResponseUtils.returnObjectSuccess(coterieService.save(info));
+				} catch (DatasOptException e) {
+					logger.error(e.getMessage(), e);
+					return ResponseUtils.returnException(e);
+				} catch (ServiceException e) {
+					return ResponseUtils.returnException(e);
+				} catch (Exception e) {
+					logger.error("unKown Exception", e);
+					return ResponseUtils.returnException(e);
 		}
 	}
 

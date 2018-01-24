@@ -49,6 +49,9 @@
     <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityVoteDetail">
 	    insert into qh_activity_vote_detail 
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
+		<if test="kid != null">
+			kid,
+		</if>
         <if test="activityInfoId != null">
 			activity_info_id,
 	    </if>
@@ -102,6 +105,9 @@
 	    </if>
 	    </trim>
 	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="kid != null">
+			#{kid, jdbcType=BIGINT},
+		</if>
         <if test="activityInfoId != null">
 			#{activityInfoId,jdbcType=BIGINT},
 	    </if>
@@ -243,6 +249,21 @@
 		<if test="createUserId != null">
 			and create_user_id = #{createUserId,jdbcType=BIGINT}
 		</if>
+	</select>
+
+	<!-- 更新投票数量 -->
+	<update id="updateVoteCount">
+		update qh_activity_vote_detail set
+		vote_count = vote_count+1
+		where kid = #{kid,jdbcType=BIGINT}
+		and activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+	</update>
+
+	<!-- 获取投票编号 -->
+	<select id="selectMaxVoteNo" resultType="int">
+		select max(vote_no)
+		from qh_activity_vote_detail
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
 	</select>
 
 </mapper>

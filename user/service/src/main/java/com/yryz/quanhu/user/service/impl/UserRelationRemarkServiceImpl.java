@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dao.UserRelationRemarkDao;
@@ -45,7 +46,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
              * 自己不允许对自己设置备注
              */
             if(sourceUserId.equalsIgnoreCase(targetUserId)){
-                throw new RuntimeException("don't allow set remark name to self");
+                throw new QuanhuException("","","don't allow set remark name to self");
             }
 
             /**

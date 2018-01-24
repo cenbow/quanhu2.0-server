@@ -22,6 +22,7 @@ public class ResponseUtils {
 
     /**
      * 返回成功
+     *
      * @return
      */
     public static <T> Response<T> returnSuccess() {
@@ -31,6 +32,7 @@ public class ResponseUtils {
 
     /**
      * 返回对象结果
+     *
      * @param t
      * @return
      */
@@ -45,6 +47,7 @@ public class ResponseUtils {
 
     /**
      * 返回列表结果
+     *
      * @param collection
      * @return
      */
@@ -60,6 +63,7 @@ public class ResponseUtils {
 
     /**
      * 返回异常信息
+     *
      * @param e
      * @return
      */
@@ -83,6 +87,7 @@ public class ResponseUtils {
 
     /**
      * 简化消息提示，客户端得到该错误只会直接显示消息内容
+     *
      * @param msg
      * @return
      */
@@ -90,14 +95,13 @@ public class ResponseUtils {
         return new Response<T>(false, ResponseConstant.SYS_EXCEPTION.getCode(), msg, msg, null);
     }
 
-    /**  
-    * @Description: 获取返回对象中对象
-    * @author wangheng
-    * @param @param res
-    * @param @return
-    * @return T
-    * @throws  
-    */
+    /**
+     * @param  res
+     * @return T
+     * @throws
+     * @Description: 获取返回对象中对象
+     * @author wangheng
+     */
     public static <T> T getResponseData(Response<T> res) {
         if (null == res) {
             throw QuanhuException.busiError("getResponseObject() , res is null !");
@@ -110,14 +114,13 @@ public class ResponseUtils {
         return res.getData();
     }
 
-    /**  
-    * @Description: 获取返回对象中List对象
-    * @author wangheng
-    * @param @param res
-    * @param @return
-    * @return Collection<?>
-    * @throws  
-    */
+    /**
+     * @param  res
+     * @return Collection<?>
+     * @throws
+     * @Description: 获取返回对象中List对象
+     * @author wangheng
+     */
     public static <T> Collection<?> getResponseDataList(Response<Collection<?>> res) {
         if (null == res) {
             throw QuanhuException.busiError("getResponseObject() , res is null !");

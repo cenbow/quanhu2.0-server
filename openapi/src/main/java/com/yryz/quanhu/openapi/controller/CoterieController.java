@@ -18,10 +18,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -33,6 +31,7 @@ import java.util.List;
  */
 @Api(description = "私圈接口")
 @RestController
+@RequestMapping(value="services/app")
 public class CoterieController {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private static final int CHAR_51 = 3;
@@ -45,7 +44,7 @@ public class CoterieController {
 	@Reference
 	private AuthApi authApi;
 	@Reference
-	private CoterieApi coterieApi ;
+	private CoterieApi coterieApi;
 
 
 	@ApiOperation("发布私圈")
@@ -53,15 +52,15 @@ public class CoterieController {
 	@PostMapping(value = "/{version}/coterieInfo/create")
 	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		String useId=header.getUserId();
+		String useId = header.getUserId();
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
-			info.setJoinCheck(  1);
+			info.setJoinCheck(1);
 		} else {
 			//付费加入方式，成员必须不审核
-			info.setJoinCheck(  0);
+			info.setJoinCheck(0);
 		}
-		info.setOwnerId(useId);
+		//info.setOwnerId(useId);
 		return coterieApi.applyCreate(info );
 	}
 	
@@ -132,7 +131,6 @@ public class CoterieController {
 			logger.error(String.format("query Coterie details error, coterieId=[%s]", coterieId), e);
 		}
 		return coterieInfo;
-
 	}
 
 	/**

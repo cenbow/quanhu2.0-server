@@ -69,6 +69,11 @@
 			<artifactId>taobao-sdk-java-auto</artifactId>
 			<version>${taobao.version}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -17,7 +17,7 @@ public class CoterieInfo implements Serializable{
     /**
      * 私圈id
      */
-    private String coterieId;
+    private Long coterieId;
 
     /**
      * 用户ID
@@ -125,11 +125,11 @@ public class CoterieInfo implements Serializable{
 	 */
 	private Date lastInfoTime;
 
-	public String getCoterieId() {
+	public Long getCoterieId() {
 		return coterieId;
 	}
 
-	public void setCoterieId(String coterieId) {
+	public void setCoterieId(Long coterieId) {
 		this.coterieId = coterieId;
 	}
 

@@ -145,6 +145,10 @@ public class AbstractAccountService implements AccountService {
 		if (userId == null) {
 			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
 		}
+		UserAccount account = getUserAccountByUserId(userId.toString());
+		if(StringUtils.isBlank(account.getUserPhone())){
+			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getDeviceId(), null));
