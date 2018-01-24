@@ -1,15 +1,14 @@
 package com.yryz.quanhu.message.message.redis;
 
 import com.yryz.common.exception.RedisOptException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -83,6 +82,34 @@ public class MessageRedis {
         } catch (RedisOptException e) {
             redisTemplate.delete(lockKey);
             LOGGER.error("addUnread exception");
+            throw new RedisOptException(e);
+        }
+    }
+
+    public boolean addUnread(String userId, String readTypeString) {
+        String key = getMessagekey(userId);
+        String lockKey = key + ".lock";
+        try {
+            Boolean lock = redisTemplate.opsForValue().setIfAbsent(lockKey, "LOCK");
+            if (lock) {
+                if (!redisTemplate.expire(lockKey, LOCK_EXPIRE_DEFAULT, TimeUnit.SECONDS)) {
+                    redisTemplate.delete(lockKey);
+                    throw new RedisOptException("++++++++++++++++++++++++addUnread exception++++++++++++++++");
+                }
+                String value = (String) redisTemplate.opsForHash().get(key, readTypeString);
+                int unreadCount = 0;
+                if (StringUtils.isNotBlank(value)) {
+                    unreadCount = Integer.valueOf(value);
+                }
+                redisTemplate.opsForHash().put(key, readTypeString, ++unreadCount);
+                redisTemplate.delete(key);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            redisTemplate.delete(key);
+            LOGGER.error("添加未读失败！", e);
             throw new RedisOptException(e);
         }
     }

@@ -22,7 +22,10 @@ public enum ExceptionEnum {
     ValidateException("2000", "数据验证失败！", "网络开小差了，请稍候再试！"),
     PARAM_MISSING("2001", "参数缺失", "网络开小差了，请稍候再试！"),
 
+    RPC_RESPONSE_EXCEPTION("2002","网络开小差了，请稍候再试！","RpcResponse对象为空！"),
+    RPC_RESPONSE_DATA_EXCEPTION("2002","网络开小差了，请稍候再试！","RpcResponse对象返回Data为空！"),
     MONGO_EXCEPTION("3000", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！");
+
 
     private String code;
 
