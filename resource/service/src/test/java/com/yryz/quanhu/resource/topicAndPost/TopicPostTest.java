@@ -11,8 +11,10 @@ import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
+import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
+import org.aspectj.weaver.ast.And;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -111,8 +113,12 @@ public class TopicPostTest {
         System.out.println("===============" + JSON.toJSONString(data.getData()));
     }
 
-    @Test
-    public void queryPostDetail(){
-       Response<TopicPostVo> data= topicPostApi.quetyDetail(164439L,0L);
+
+    /**
+     * 帖子详情
+     */
+    @Test  public void queryPostDetail(){
+       Response<TopicAndPostVo> data= topicPostApi.quetyDetail(164439L,0L);
+        System.out.println("========"+ JSON.toJSONString(data));
     }
 }
