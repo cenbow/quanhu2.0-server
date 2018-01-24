@@ -8,7 +8,6 @@ import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentApi;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
-import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
