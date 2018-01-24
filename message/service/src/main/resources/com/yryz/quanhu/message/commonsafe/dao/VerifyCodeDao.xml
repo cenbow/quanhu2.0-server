@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.message.commonsafe.dao.VerifyCodeDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.message.commonsafe.entity.VerifyCode" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="verify_key" property="verifyKey" jdbcType="VARCHAR" />
+    <result column="service_type" property="serviceType" jdbcType="VARCHAR" />
+    <result column="qh_verify_code" property="verifyCode" jdbcType="VARCHAR" />
+    <result column="service_code" property="serviceCode" jdbcType="TINYINT" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, verify_key, service_type, qh_verify_code, service_code, create_date
+  </sql>
+  <select id="selectByPrimaryverify_key" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from qh_verify_code
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="checkCode" resultType="java.lang.Integer" >
+	select count(0) from qh_verify_code 
+	where service_code =  #{serviceCode,jdbcType=TINYINT}
+	and service_type = #{serviceType,jdbcType=VARCHAR} 
+	and verify_code = #{verifyCode,jdbcType=VARCHAR}
+	<if test="verifyKey != null">
+		and `verify_key` = #{verifyKey}
+	</if>
+  </select>
+ 
+  <insert id="insert" parameterType="com.yryz.quanhu.message.commonsafe.entity.VerifyCode" >
+    insert into qh_verify_code
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="verifyKey != null" >
+        `verify_key`,
+      </if>
+      <if test="serviceType != null" >
+        service_type,
+      </if>
+      <if test="verifyCode != null" >
+        verify_code,
+      </if>
+      <if test="serviceCode != null" >
+        service_code,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="kid != null" >
+        #{kid},
+      </if>
+      <if test="verifyKey != null" >
+        #{verifyKey,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceType != null" >
+        #{serviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyCode != null" >
+        #{verifyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceCode != null" >
+        #{serviceCode,jdbcType=TINYINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>
