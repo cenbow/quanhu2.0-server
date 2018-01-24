@@ -39,7 +39,7 @@ public class CommentProvider implements CommentApi {
     @Override
     public Response<Map<String, Integer>> accretion(Comment comment) {
         try {
-            idAPI.getKid(CommentConstatns.QH_COMMENT_INFO);
+            comment.setKid(idAPI.getKid(CommentConstatns.QH_COMMENT_INFO).getData());
             Map<String,Integer> map=new HashMap<String, Integer>();
             int count=commentService.accretion(comment);
             if(count>0){
