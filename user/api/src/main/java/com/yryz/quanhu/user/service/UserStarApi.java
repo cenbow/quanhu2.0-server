@@ -12,6 +12,7 @@ import com.yryz.quanhu.user.dto.StarAuthQueryDTO;
 import com.yryz.quanhu.user.dto.StarRecommendQueryDTO;
 import com.yryz.quanhu.user.vo.StarAuthAuditVo;
 import com.yryz.quanhu.user.vo.StarAuthLogVO;
+import com.yryz.quanhu.user.vo.StarInfoVO;
 
 
 public interface UserStarApi {
@@ -95,10 +96,11 @@ public interface UserStarApi {
      * app端达人列表
      * @param isRecommend 是否推荐列表 10:否 11:是
      * @param start 用于分页
-     * @return
+     * @param limit
+	 * @return
      * @throws ServiceException
      */
-    public Response<List<StarAuthInfo>> starList(Integer isRecommend,int start);
+	Response<List<StarInfoVO>> starList(Integer isRecommend, Integer start, Integer limit);
     
     /**
      * 统计达人总数

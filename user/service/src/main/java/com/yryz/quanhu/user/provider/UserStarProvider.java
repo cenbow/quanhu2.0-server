@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.pagehelper.PageHelper;
+import com.yryz.quanhu.user.vo.StarInfoVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -362,19 +364,21 @@ public class UserStarProvider implements UserStarApi {
 	}
 
 	@Override
-	public Response<List<StarAuthInfo>> starList(Integer isRecommend, int start) {
-		if (isRecommend == null) {
+	public Response<List<StarInfoVO>> starList(Integer isRecommend, Integer start, Integer limit) {
+		/*if (isRecommend == null) {
 			isRecommend = (int) StarRecommendStatus.FALSE.getStatus();
-		}
+		}*/
 		try {
 			StarAuthParamDTO authParamDTO = new StarAuthParamDTO();
 			if (isRecommend == (int) StarRecommendStatus.TRUE.getStatus()) {
 				authParamDTO.setStarRecommend(true);
 			}
 			authParamDTO.setStart(start);
-			List<UserStarAuth> list = userStarService.starList(authParamDTO);
-			List<StarAuthInfo> authInfos = (List<StarAuthInfo>) GsonUtils.parseList(list, StarAuthInfo.class);
-			return ResponseUtils.returnObjectSuccess(authInfos);
+
+			List<UserStarAuth> list = userStarService.starList(authParamDTO, start, limit);
+
+//			List<StarAuthInfo> authInfos = (List<StarAuthInfo>) GsonUtils.parseList(list, StarAuthInfo.class);
+			return ResponseUtils.returnObjectSuccess(null);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {

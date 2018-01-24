@@ -66,9 +66,10 @@ public interface UserStarService {
     /**
      * app端达人列表
      * @param paramDTO
-     * @return
+     * @param start
+     *@param limit @return
      */
-    List<UserStarAuth> starList(StarAuthParamDTO paramDTO);
+    List<UserStarAuth> starList(StarAuthParamDTO paramDTO, Integer start, Integer limit);
     
     /**
      * 达人申请以及审核日志查询

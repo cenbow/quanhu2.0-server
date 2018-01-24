@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.yryz.quanhu.user.vo.StarInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -87,25 +88,39 @@ public class UserStarController {
 	}
 
 	/**
-	 * 达人推荐列表
+	 * 达人推荐列表(分页查询)
 	 * 
-	 * @param custId
+	 * @param
 	 * @return
 	 */
 	@ApiOperation("达人推荐列表")
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/star/starCommend")
-	public Response<List<StarAuthInfo>> recommendList() {
-		return starApi.starList(11, 0);
+	@GetMapping(value = "/{version}/star/recommend/list")
+	public Response<List<StarInfoVO>> recommendStarList(Integer start, Integer limit) {
+		return starApi.starList(11, start, limit);
 	}
 
 	/**
+	 * 查询某一分类下的达人列表
+	 * 运营后台推荐+热度排序+去重+去除页面访问者本人；运营推荐的不做数量限制，由运营人员自己把控
+	 */
+	@ApiOperation("查询某一标签下的达人列表")
+	@NotLogin
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/star/label/list")
+	public Response<List<StarAuthInfo>> labelStarList(String labelId, Integer pageNo, Integer pageSize) {
+//		return starApi.starList(11, 0);
+		return null;
+	}
+
+
+	/**
 	 * 更多达人列表
-	 * 
+	 *
 	 * @param custId
 	 * @return
-	 */
+	 *//*
 	@ApiOperation("更多达人列表")
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -113,5 +128,5 @@ public class UserStarController {
 	@RequestMapping(value = "/getAllStar", method = { RequestMethod.POST, RequestMethod.OPTIONS })
 	public Response<List<StarAuthInfo>> starList(String custId, Integer start) {
 		return starApi.starList(10, 0);
-	}
+	}*/
 }

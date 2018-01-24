@@ -120,7 +120,7 @@
 			a.create_date desc
 		</if>
 		<if test="starRecommend != null">
-			r.star_recommend_status desc,r.star_weight
+			r.recommend_status desc,r.star_weight
 			desc,a.recommend_time desc,a.auth_time desc
 		</if>
 	</select>	
@@ -136,12 +136,11 @@
 		qh_user_star_auth a		
 		where 1=1
 		<if test="starRecommend != null ">
-			and a.star_recommend_status = 11 and a.audit_status = 11
+			and a.recommend_status = 11 and a.audit_status = 11
 		</if>
 		order by
 		<if test="starRecommend != null ">
 			a.recommend_height desc,a.recommend_time desc,a.auth_time desc
-			limit #{start},#{limit}
 		</if>
 	</select>
 	
