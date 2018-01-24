@@ -2,6 +2,7 @@ package com.yryz.quanhu.score.service;
 
 import java.util.List;
 
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
 
@@ -30,7 +31,7 @@ public interface EventAPI {
      *查询积分流水表
      * @param list
      */
-    List<EventReportVo> getScoreFlowList(EventInfo log); 
+    Response<List<EventReportVo>> getScoreFlowList(EventInfo log); 
 
 
 }

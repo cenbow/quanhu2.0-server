@@ -261,7 +261,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 record.setLastUpdateUserId(Long.valueOf(custId));
                 record.setKid(idApi.getKid(IdConstants.QUANHU_ACTIVITY_SIGNUP_PAY).getData());
                 //将支付记录插入到报名支付记录表中
-                activityPayRecordDao.insert(record);
+                activityPayRecordDao.insertByPrimaryKeySelective(record);
                 break;
             case 13:
                 break;
@@ -269,7 +269,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "SignUpType:" + activityEnrolConfig.getSignUpType(), "SignUpType:" + activityEnrolConfig.getSignUpType());
         }
 
-        activityRecordDao.insert(activityRecord);
+        activityRecordDao.insertByPrimaryKeySelective(activityRecord);
 
         // 更新主表的当前报名人人数信息
         activityInfo.setJoinCount(activityInfo.getJoinCount() + 1);

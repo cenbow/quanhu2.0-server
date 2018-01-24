@@ -3,6 +3,7 @@ package com.yryz.quanhu.support.activity.dao;
 import com.yryz.quanhu.support.activity.entity.ActivityUserPrizes;
 import com.yryz.quanhu.support.activity.vo.ActivityUserPrizesVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 
@@ -24,5 +25,11 @@ public interface ActivityUserPrizesDao {
     void insertByPrimaryKeySelective(ActivityUserPrizes activityUserPrizes);
 
     int update(ActivityUserPrizes activityUserPrizes);
+
+    int updateUserRoll(@Param("createUserId") Long createUserId);
+
+    int selectUserRoll(@Param("createUserId") Long createUserId);
+
+    int updateStatus(@Param("createUserId") Long createUserId);
 
 }
