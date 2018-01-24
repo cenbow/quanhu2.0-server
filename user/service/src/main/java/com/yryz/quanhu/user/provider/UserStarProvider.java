@@ -111,7 +111,7 @@ public class UserStarProvider implements UserStarApi {
 			UserStarAuth model = userStarService.get(userId, null);
 			if(model == null){
 				model = new UserStarAuth();
-				model.setUserId(NumberUtils.toLong(userId));
+				model.setUserId(NumberUtils.createLong(userId));
 				model.setAuditStatus((byte)14);
 			}
 			StarAuthInfo authInfo = (StarAuthInfo) GsonUtils.parseObj(model, StarAuthInfo.class);
@@ -285,7 +285,7 @@ public class UserStarProvider implements UserStarApi {
 				throw QuanhuException.busiError("非达人不能设置排序权重");
 			}
 			UserBaseInfo info = new UserBaseInfo();
-			info.setUserId(NumberUtils.toLong(userId));
+			info.setUserId(NumberUtils.createLong(userId));
 			info.setLastHeat(weight);
 			userService.updateUserInfo(info);
 			return ResponseUtils.returnObjectSuccess(true);
