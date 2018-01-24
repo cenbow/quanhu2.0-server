@@ -69,7 +69,7 @@ public interface UserStarService {
      * @param start
      *@param limit @return
      */
-    List<UserStarAuth> starList(StarAuthParamDTO paramDTO, Integer start, Integer limit);
+    List<UserStarAuth> starList(StarAuthParamDTO paramDTO);
     
     /**
      * 达人申请以及审核日志查询

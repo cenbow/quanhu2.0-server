@@ -226,9 +226,8 @@ public class UserStarServiceImpl implements UserStarService {
 	}
 
 	@Override
-	public List<UserStarAuth> starList(StarAuthParamDTO paramDTO, Integer start, Integer limit) {
+	public List<UserStarAuth> starList(StarAuthParamDTO paramDTO) {
 		try {
-			Page<UserStarAuth> page = PageHelper.startPage(start, limit);
 			return persistenceDao.starList(paramDTO);
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.starList]", e);
