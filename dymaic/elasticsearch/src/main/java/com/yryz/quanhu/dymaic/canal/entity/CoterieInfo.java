@@ -156,7 +156,7 @@ public class CoterieInfo implements Serializable {
 	private Date lastInfoTime;
 	
 	private Date masterLastViewTime;
-
+	
 	public Long getKid() {
 		return kid;
 	}

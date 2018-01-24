@@ -1,8 +1,8 @@
-package com.yryz.quanhu.dymaic.dao.elasticsearch;
+package com.yryz.quanhu.dymaic.canal.dao;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-import com.yryz.quanhu.dymaic.entity.UserInfo;
+import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 
 /**
  * user Elasticsearch仓库
