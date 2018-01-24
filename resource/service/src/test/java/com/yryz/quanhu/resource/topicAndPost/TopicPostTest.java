@@ -10,6 +10,7 @@ import com.yryz.quanhu.resource.topic.api.TopicApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
+import com.yryz.quanhu.resource.topic.entity.TopicPost;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import org.junit.Assert;
@@ -97,7 +98,9 @@ public class TopicPostTest {
         topicPostApi.savePost(dto);
     }
 
-
+    /**
+     * 查询帖子列表
+     */
     @Test
     public void queryListTopicPost() {
         TopicPostDto dto = new TopicPostDto();
@@ -106,5 +109,10 @@ public class TopicPostTest {
         dto.setPageSize(5);
         Response<PageList<TopicPostVo>> data = topicPostApi.listPost(dto);
         System.out.println("===============" + JSON.toJSONString(data.getData()));
+    }
+
+    @Test
+    public void queryPostDetail(){
+       Response<TopicPostVo> data= topicPostApi.quetyDetail(164439L,0L);
     }
 }

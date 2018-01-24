@@ -8,6 +8,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
+import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,9 @@ public class TopicPostProvider implements TopicPostApi {
     }
 
     @Override
-    public Response<TopicPostVo> quetyDetail(Long kid, Long userId) {
+    public Response<TopicAndPostVo> quetyDetail(Long kid, Long userId) {
         try {
-            TopicPostVo vo = this.topicPostService.getDetail(kid, userId);
+            TopicAndPostVo vo = this.topicPostService.getDetail(kid, userId);
             return ResponseUtils.returnObjectSuccess(vo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

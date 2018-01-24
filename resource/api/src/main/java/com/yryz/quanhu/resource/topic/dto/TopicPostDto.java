@@ -1,7 +1,9 @@
 package com.yryz.quanhu.resource.topic.dto;
 
 
-public class TopicPostDto {
+import java.io.Serializable;
+
+public class TopicPostDto  implements Serializable {
 
     private Long topicId;
 
