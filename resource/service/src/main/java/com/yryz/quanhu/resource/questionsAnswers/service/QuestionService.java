@@ -1,6 +1,9 @@
 package com.yryz.quanhu.resource.questionsAnswers.service;
 
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 
 public interface QuestionService {
@@ -12,17 +15,34 @@ public interface QuestionService {
 
     /**
      * 标记删除
-     * @param question
+     * @param kid
+     * @param userId
      * @return
      */
-    int deleteQuestion(Question question);
+    int deleteQuestion(Long kid, Long userId);
 
 
     /**
-     *
+     *查询问题的详情
      * @param kid
      * @param userId
      * @return
      */
     QuestionVo getDetail(Long kid, Long userId);
+
+    /**
+     * 圈主拒绝回答问题
+     * @param kid
+     * @param userId
+     * @return
+     */
+    Integer rejectAnswer(Long kid, Long userId);
+
+
+    /**
+     * 查询问答列表
+     * @param dto
+     * @return
+     */
+    public PageList<QuestionAnswerVo> queryQuestionAnswerList(QuestionDto dto);
 }

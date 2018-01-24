@@ -9,7 +9,27 @@ public class QuestionExample {
 
     protected boolean distinct;
 
+    protected Integer pageStartIndex;
+
+    protected  Integer pageSize;
+
     protected List<Criteria> oredCriteria;
+
+    public Integer getPageStartIndex() {
+        return pageStartIndex;
+    }
+
+    public void setPageStartIndex(Integer pageStartIndex) {
+        this.pageStartIndex = pageStartIndex;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public QuestionExample() {
         oredCriteria = new ArrayList<Criteria>();
@@ -995,62 +1015,52 @@ public class QuestionExample {
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdEqualTo(String value) {
+        public Criteria andCoterieIdEqualTo(Long value) {
             addCriterion("coterie_id =", value, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdNotEqualTo(String value) {
+        public Criteria andCoterieIdNotEqualTo(Long value) {
             addCriterion("coterie_id <>", value, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdGreaterThan(String value) {
+        public Criteria andCoterieIdGreaterThan(Long value) {
             addCriterion("coterie_id >", value, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdGreaterThanOrEqualTo(String value) {
+        public Criteria andCoterieIdGreaterThanOrEqualTo(Long value) {
             addCriterion("coterie_id >=", value, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdLessThan(String value) {
+        public Criteria andCoterieIdLessThan(Long value) {
             addCriterion("coterie_id <", value, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdLessThanOrEqualTo(String value) {
+        public Criteria andCoterieIdLessThanOrEqualTo(Long value) {
             addCriterion("coterie_id <=", value, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdLike(String value) {
-            addCriterion("coterie_id like", value, "coterieId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCoterieIdNotLike(String value) {
-            addCriterion("coterie_id not like", value, "coterieId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCoterieIdIn(List<String> values) {
+        public Criteria andCoterieIdIn(List<Long> values) {
             addCriterion("coterie_id in", values, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdNotIn(List<String> values) {
+        public Criteria andCoterieIdNotIn(List<Long> values) {
             addCriterion("coterie_id not in", values, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdBetween(String value1, String value2) {
+        public Criteria andCoterieIdBetween(Long value1, Long value2) {
             addCriterion("coterie_id between", value1, value2, "coterieId");
             return (Criteria) this;
         }
 
-        public Criteria andCoterieIdNotBetween(String value1, String value2) {
+        public Criteria andCoterieIdNotBetween(Long value1, Long value2) {
             addCriterion("coterie_id not between", value1, value2, "coterieId");
             return (Criteria) this;
         }
