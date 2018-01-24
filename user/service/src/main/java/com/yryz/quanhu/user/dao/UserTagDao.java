@@ -32,7 +32,7 @@ public interface UserTagDao {
      * 用户标签批量写入
      * @param userTags
      */
-    void batch(@Param("userTags")List<UserTag> userTags);
+    void batchSave(@Param("userTags")List<UserTag> userTags);
     /**
      * 查询用户tag
      * @param userId
