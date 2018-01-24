@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -70,7 +71,7 @@ public class UserRelationRemarkController {
         }else if(0 == Integer.parseInt(eventType)){
             return userRelationRemarkApi.resetRemarkName(dto);
         }else{
-            return ResponseUtils.returnException(new RuntimeException("eventType is illegal:"+eventType));
+            return ResponseUtils.returnException(new QuanhuException("","","eventType is illegal:"+eventType));
         }
     }
 
