@@ -3,11 +3,12 @@ package com.yryz.quanhu.openapi.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
-import com.yryz.quanhu.coterie.service.CoterieApi;
-import com.yryz.quanhu.coterie.vo.CoterieBasicInfo;
-import com.yryz.quanhu.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
@@ -52,7 +53,7 @@ public class CoterieController {
 	@PostMapping(value = "/{version}/coterieInfo/create")
 	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		//userId=header.getUserId();
+		String useId=header.getUserId();
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
 			info.setJoinCheck(  1);
@@ -60,7 +61,7 @@ public class CoterieController {
 			//付费加入方式，成员必须不审核
 			info.setJoinCheck(  0);
 		}
-		info.setOwnerId(userId);
+		info.setOwnerId(useId);
 		return coterieApi.applyCreate(info );
 	}
 	
@@ -105,7 +106,7 @@ public class CoterieController {
 			record.setJoinCheck(config.getJoinCheck());
 		}
 		 coterieApi.modifyCoterieInfo(record);
-         return null;
+		return ResponseUtils.returnObjectSuccess(true);
 	}
 	
 	/**
@@ -183,7 +184,5 @@ public class CoterieController {
 	{
        return coterieApi.queryPageForApp(currentPage,pageSize);
 	}
-
-
 
 }
