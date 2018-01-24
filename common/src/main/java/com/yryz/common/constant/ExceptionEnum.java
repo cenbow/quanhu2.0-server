@@ -24,7 +24,8 @@ public enum ExceptionEnum {
 
     RPC_RESPONSE_EXCEPTION("2002","网络开小差了，请稍候再试！","RpcResponse对象为空！"),
     RPC_RESPONSE_DATA_EXCEPTION("2002","网络开小差了，请稍候再试！","RpcResponse对象返回Data为空！"),
-    MONGO_EXCEPTION("3000", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！");
+    MONGO_EXCEPTION("3000", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！"),
+    COTERIE_NON_EXISTENT("1021", "未找到该私圈,访问出错", "私圈不存在！");
 
 
     private String code;
