@@ -1,6 +1,5 @@
 package com.yryz.quanhu.coterie.member.entity;
 
-import com.sun.tools.javah.Gen;
 import com.yryz.common.entity.GenericEntity;
 
 import java.io.Serializable;
