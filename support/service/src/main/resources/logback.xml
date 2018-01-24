@@ -87,61 +87,13 @@
         </encoder>
     </appender>
 
-     <!-- 短信验证码日志 appender -->
-    <appender name="smsLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 过滤器，只记录DEBUG级别的日志 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <file>${log_dir}/sms.log</file>
-        <!-- 配置日志所生成的目录-->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log_dir}/sms-%d{yyyy-MM-dd-HH}.log.gz</fileNamePattern>
-            <maxHistory>${maxHistory}</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${normal-pattern}</pattern>
-        </encoder>
-    </appender>
-
-         <!-- 消息推送日志 appender -->
-    <appender name="pushLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 过滤器，只记录DEBUG级别的日志 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <file>${log_dir}/push.log</file>
-        <!-- 配置日志所生成的目录-->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log_dir}/push-%d{yyyy-MM-dd-HH}.log.gz</fileNamePattern>
-            <maxHistory>${maxHistory}</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${normal-pattern}</pattern>
-        </encoder>
-    </appender>
 
     
     <logger name="com.alibaba.dubbo" level="info" additivity="false">
         <appender-ref ref="dubbo"/>
     </logger>
     
-    <logger name="sms.Logger" level="info" additivity="false">
-        <appender-ref ref="smsLog"/>
-    </logger>
-
-    <logger name="push.logger" level="info" additivity="false">
-        <appender-ref ref="pushLog"/>
-    </logger>
     
-    <logger name="third.logger" level="info" additivity="false">
-        <appender-ref ref="thirdLog"/>
-    </logger>
-
     <logger name="org.apache.zookeeper.ClientCnxn" level="ERROR" additivity="false"/>
     
     
