@@ -1,8 +1,10 @@
 package com.yryz.quanhu.message.notice.dao;
 
 import com.yryz.common.dao.BaseDao;
+import com.yryz.quanhu.message.notice.dto.NoticeAdminDto;
 import com.yryz.quanhu.message.notice.dto.NoticeDto;
 import com.yryz.quanhu.message.notice.entity.Notice;
+import com.yryz.quanhu.message.notice.vo.NoticeAdminVo;
 import com.yryz.quanhu.message.notice.vo.NoticeDetailVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -40,4 +42,28 @@ public interface NoticeDao extends BaseDao {
      * @return
      */
     NoticeDetailVo detail(NoticeDto noticeDto);
+
+    /**
+     * 添加
+     *
+     * @param notice
+     * @return
+     */
+    Integer add(Notice notice);
+
+    /**
+     * 列表（admin）
+     *
+     * @param noticeAdminDto
+     * @return
+     */
+    List<NoticeAdminVo> listAdmin(NoticeAdminDto noticeAdminDto);
+
+    /**
+     * 详情（admin）
+     *
+     * @param noticeAdminDto
+     * @return
+     */
+    NoticeAdminVo detailAdmin(NoticeAdminDto noticeAdminDto);
 }

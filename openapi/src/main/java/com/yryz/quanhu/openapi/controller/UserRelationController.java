@@ -41,7 +41,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-关注/取消关注")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/follow")
+    @RequestMapping("/{version}/user/relation/follow")
     public Response<UserRelationEventVo> setFollow(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
@@ -76,7 +76,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-拉黑/取消拉黑")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/black")
+    @RequestMapping("/{version}/user/relation/black")
     public Response<UserRelationEventVo> setBlack(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
@@ -112,7 +112,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-查询（一对一）")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/mapper")
+    @RequestMapping("/{version}/user/relation/mapper")
     public Response<UserRelationQueryVo> getRelation(HttpServletRequest request){
         String userId       = request.getHeader("userId");
         String targetUserId = request.getParameter("targetUserId");
@@ -137,7 +137,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-查询（指定条件）")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/query")
+    @RequestMapping("/{version}/user/relation/query")
     public Response<PageList<UserRelationQueryVo>> getRelations(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
@@ -192,7 +192,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-统计查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("{version}/user/relation/count")
+    @RequestMapping("/{version}/user/relation/count")
     public Response<UserRelationCountVo> getRelationCount(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
