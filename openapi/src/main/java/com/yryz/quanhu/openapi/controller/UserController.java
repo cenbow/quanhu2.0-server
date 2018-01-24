@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,7 +77,7 @@ public class UserController {
 		AuthRefreshDTO refreshDTO = new AuthRefreshDTO(refreshToken, true);
 		refreshDTO.setAppId(header.getAppId());
 		refreshDTO.setToken(header.getToken());
-		refreshDTO.setUserId(header.getUserId());
+		refreshDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		refreshDTO.setType(DevType.getEnumByType(header.getDevType(), header.getUserAgent()));
 		return authApi.refreshToken(refreshDTO);
 	}
@@ -85,12 +86,12 @@ public class UserController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/find")
-	public Response<UserLoginSimpleVO> findUser(String userId, HttpServletRequest request) {
+	public Response<UserLoginSimpleVO> findUser(Long userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		if (StringUtils.isBlank(userId)) {
-			return userApi.getUserLoginSimpleVO(header.getUserId());
+		if(userId == null) {
+			return userApi.getUserLoginSimpleVO(NumberUtils.toLong(header.getUserId()));
 		} else {
-			return userApi.getUserLoginSimpleVO(header.getUserId(), userId);
+			return userApi.getUserLoginSimpleVO(NumberUtils.toLong(header.getUserId()), userId);
 		}
 	}
 	
@@ -99,7 +100,7 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/update")
 	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		infoDTO.setUserId(header.getUserId());
+		infoDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		return userApi.updateUserInfo(infoDTO);
 	}
 	
@@ -218,7 +219,7 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
 
-		return accountApi.loginThird(loginDTO, header);
+		return accountApi.loginThirdBindPhone(loginDTO, header);
 	}
 
 	/**
@@ -266,7 +267,7 @@ public class UserController {
 	@GetMapping(value = "/{version}/user/getLoginMethod")
 	public Response<List<LoginMethodVO>> getLoginMethod(HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.getLoginMethod(header.getUserId());
+		return accountApi.getLoginMethod(NumberUtils.toLong(header.getUserId()));
 	}
 
 	/**
@@ -293,7 +294,7 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/bindPhone")
 	public Response<Boolean> bindPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		phoneDTO.setUserId(header.getUserId());
+		phoneDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		return accountApi.bindPhone(phoneDTO);
 	}
 
@@ -308,7 +309,7 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/bindThird")
 	public Response<Boolean> bindThird(@RequestBody BindThirdDTO thirdDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		thirdDTO.setUserId(header.getUserId());
+		thirdDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		return accountApi.bindThird(thirdDTO);
 	}
 
@@ -323,7 +324,7 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/unbindThird")
 	public Response<Boolean> unbindThird(@RequestBody UnBindThirdDTO thirdDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		thirdDTO.setUserId(header.getUserId());
+		thirdDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		return accountApi.unbindThird(thirdDTO);
 	}
 
@@ -344,7 +345,7 @@ public class UserController {
 	public Response<Boolean> editPassword(@RequestBody String oldPassword,
 			@RequestBody String newPassword,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.editPassword(header.getUserId(), oldPassword, newPassword);
+		return accountApi.editPassword(NumberUtils.toLong(header.getUserId()), oldPassword, newPassword);
 	}
 
 	/**

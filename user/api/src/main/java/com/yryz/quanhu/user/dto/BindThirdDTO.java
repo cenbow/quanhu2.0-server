@@ -11,7 +11,7 @@ public class BindThirdDTO implements Serializable {
 	/**
 	 * 用户Id
 	 */
-	private String userId;
+	private Long userId;
 	/**
 	 * 应用id
 	 */
@@ -28,10 +28,10 @@ public class BindThirdDTO implements Serializable {
 	 * 第三方类型
 	 */
 	private Integer thirdType;
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public String getAppId() {
@@ -61,7 +61,7 @@ public class BindThirdDTO implements Serializable {
 	public BindThirdDTO() {
 		super();
 	}
-	public BindThirdDTO(String userId, String appId, String openId, String accessToken, Integer thirdType) {
+	public BindThirdDTO(Long userId, String appId, String openId, String accessToken, Integer thirdType) {
 		super();
 		this.userId = userId;
 		this.appId = appId;
@@ -69,7 +69,7 @@ public class BindThirdDTO implements Serializable {
 		this.accessToken = accessToken;
 		this.thirdType = thirdType;
 	}
-	public BindThirdDTO(String userId, String appId, String openId, Integer thirdType) {
+	public BindThirdDTO(Long userId, String appId, String openId, Integer thirdType) {
 		super();
 		this.userId = userId;
 		this.appId = appId;

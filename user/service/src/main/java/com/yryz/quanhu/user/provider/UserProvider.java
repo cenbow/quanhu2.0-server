@@ -37,9 +37,9 @@ public class UserProvider implements UserApi{
 	private UserService userService;
 	
 	@Override
-	public Response<UserSimpleVO> getUserSimple(String userId) {
+	public Response<UserSimpleVO> getUserSimple(Long userId) {
 		try {
-			if(StringUtils.isBlank(userId)){
+			if(userId == null){
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			return ResponseUtils.returnObjectSuccess(userService.getUserSimple(userId));
@@ -52,14 +52,14 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<UserSimpleVO> getUserSimple(String userId, String friendId) {
+	public Response<UserSimpleVO> getUserSimple(Long userId, Long friendId) {
 		try {
-			if(StringUtils.isBlank(friendId)){
+			if(friendId == null){
 				throw QuanhuException.busiError("friendId不能为空");
 			}
 			UserSimpleVO simpleVO = userService.getUserSimple(friendId);
 			
-			if(StringUtils.isBlank(userId)){
+			if(userId == null){
 				// TODO:聚合关系数据
 			}
 			
@@ -90,13 +90,13 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<Map<String, UserSimpleVO>> getUserSimple(String userId, Set<String> firendIds) {
+	public Response<Map<String, UserSimpleVO>> getUserSimple(Long userId, Set<String> firendIds) {
 		try {
 			if(CollectionUtils.isEmpty(firendIds)){
 				throw QuanhuException.busiError("userIds不能为空");
 			}
 			Map<String, UserSimpleVO> map = userService.getUserSimple(firendIds);
-			if(StringUtils.isBlank(userId)){
+			if(userId == null){
 				// TODO:聚合关系数据
 			}
 			return ResponseUtils.returnObjectSuccess(map);
@@ -109,9 +109,9 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<UserLoginSimpleVO> getUserLoginSimpleVO(String userId) {
+	public Response<UserLoginSimpleVO> getUserLoginSimpleVO(Long userId) {
 		try {
-			if(StringUtils.isEmpty(userId)){
+			if(userId == null){
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId);
@@ -125,13 +125,13 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<UserLoginSimpleVO> getUserLoginSimpleVO(String userId, String friendId) {
+	public Response<UserLoginSimpleVO> getUserLoginSimpleVO(Long userId, Long friendId) {
 		try {
-			if(StringUtils.isEmpty(friendId)){
+			if(friendId == null){
 				throw QuanhuException.busiError("friendId不能为空");
 			}
 			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(friendId);
-			if(StringUtils.isBlank(userId)){
+			if(userId == null){
 				// TODO:聚合关系数据
 			}
 			return ResponseUtils.returnObjectSuccess(loginSimpleVO);
@@ -211,7 +211,7 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<String> getDeviceIdByUserId(String userId) {
+	public Response<String> getDeviceIdByUserId(Long userId) {
 		try {
 			String devId = userService.getDeviceIdByUserId(userId);
 			return ResponseUtils.returnObjectSuccess(devId);
@@ -246,7 +246,7 @@ public class UserProvider implements UserApi{
 	public Response<Boolean> updateUserInfo(UpdateBaseInfoDTO infoDTO) {
 		try {
 			logger.info("updateUserInfo infoDTO: {}", GsonUtils.parseJson(infoDTO));
-			if(infoDTO == null || StringUtils.isBlank(infoDTO.getUserId())){
+			if(infoDTO == null || infoDTO.getUserId() == null){
 				throw QuanhuException.busiError("用户id不能为空");
 			}
 			UserSimpleVO info = userService.getUserSimple(infoDTO.getUserId());

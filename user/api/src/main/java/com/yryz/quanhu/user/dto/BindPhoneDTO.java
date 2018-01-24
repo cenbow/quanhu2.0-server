@@ -12,7 +12,7 @@ public class BindPhoneDTO implements Serializable {
 	/**
 	 * 用户id
 	 */
-	private String userId;
+	private Long userId;
 	/**
 	 * 手机号
 	 */
@@ -25,10 +25,10 @@ public class BindPhoneDTO implements Serializable {
 	 * 应用id
 	 */
 	private String appId;
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public String getPhone() {
@@ -52,7 +52,7 @@ public class BindPhoneDTO implements Serializable {
 	public BindPhoneDTO() {
 		super();
 	}
-	public BindPhoneDTO(String userId, String phone, String verifyCode, String appId) {
+	public BindPhoneDTO(Long userId, String phone, String verifyCode, String appId) {
 		super();
 		this.userId = userId;
 		this.phone = phone;

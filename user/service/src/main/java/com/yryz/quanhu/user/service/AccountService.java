@@ -95,7 +95,7 @@ public interface AccountService {
 	 * @param userId
 	 * @return
 	 */
-	List<LoginMethodVO> getLoginMethod(String userId);
+	List<LoginMethodVO> getLoginMethod(Long userId);
 	/**
 	 * 获取用户最后登录时间
 	 * @param userIds
@@ -162,7 +162,7 @@ public interface AccountService {
 	 * @param newPassword
 	 * @param oldPassword
 	 */
-	void editPassword(String userId, String newPassword, String oldPassword);
+	void editPassword(Long userId, String newPassword, String oldPassword);
 
 	/**
 	 * 手机号重置密码
@@ -197,5 +197,5 @@ public interface AccountService {
 	 * @param userId
 	 * @return
 	 */
-	UserAccount getUserAccountByUserId(String userId);
+	UserAccount getUserAccountByUserId(Long userId);
 }

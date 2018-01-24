@@ -247,14 +247,14 @@ public class UserViolationServiceImpl implements UserViolationService {
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.FREEZE.getStatus(), null, null, null, null, new Date()));
 			// TODO:请求im发送下线消息
-			authService.delToken(violation.getUserId().toString(), appId);
+			authService.delToken(violation.getUserId(), appId);
 		}//注销 
 		else {
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.DISTORY.getStatus(), null, null, null, null, new Date()));
 			// TODO:请求im发送下线消息
-			authService.delToken(violation.getUserId().toString(), appId);
+			authService.delToken(violation.getUserId(), appId);
 		}
 	}
 

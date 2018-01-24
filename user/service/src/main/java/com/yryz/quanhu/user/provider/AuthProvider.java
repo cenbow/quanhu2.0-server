@@ -129,32 +129,11 @@ public class AuthProvider implements AuthApi {
 		}
 	}
 
-	@Override
-	public Response<Boolean> delToken(String userId, String appId) {
-		try {
-			if (StringUtils.isBlank(appId)) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"appId不能为空");
-			}
-			if (StringUtils.isBlank(userId)) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"userId不能为空");
-			}
-			authService.delToken(userId, appId);
-			return ResponseUtils.returnObjectSuccess(true);
-		} catch (RedisOptException e) {
-			return ResponseUtils.returnException(e);
-		} catch (QuanhuException e) {
-			return ResponseUtils.returnException(e);
-		} catch (Exception e) {
-			logger.error("删除全部token未知异常", e);
-			return ResponseUtils.returnException(e);
-		}
-	}
-
 	private void checkParam(AuthTokenDTO tokenDTO) {
 		if (tokenDTO == null || StringUtils.isBlank(tokenDTO.getAppId())) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"appId不能为空");
 		}
-		if (StringUtils.isBlank(tokenDTO.getUserId())) {
+		if (tokenDTO.getUserId() == null) {
 			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"userId不能为空");
 		}
 		if (tokenDTO.getType() == null) {

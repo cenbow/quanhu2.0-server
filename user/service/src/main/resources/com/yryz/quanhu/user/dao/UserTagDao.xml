@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.user.dao.UserTagDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserTag" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="kid" property="kid" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="tag_type" property="tagType" jdbcType="TINYINT" />
+    <result column="tag_id" property="tagId" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="BIGINT" />
+    <result column="del_flag" property="delFlag" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, kid, user_id, tag_type, tag_id, create_date, last_update_date, last_update_user_id, 
+    del_flag
+  </sql>
+  
+  <select id="selectTagByUserId" resultType="java.lang.String">
+  	select 
+  	tag_id 
+  	from qh_user_tag
+  	where user_id = #{userId} and tag_type = #{tagType} and del_flag = 10
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    update qh_user_tag set del_flag = 11 
+    where user_id = #{userId} and tag_type = #{tagType}
+  </delete>
+
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserTag" >
+    insert into qh_user_tag
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="tagType != null" >
+        tag_type,
+      </if>
+      <if test="tagId != null" >
+        tag_id,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date,
+      </if>
+      <if test="lastUpdateUserId != null" >
+        last_update_user_id,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="kid != null" >
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="tagType != null" >
+        #{tagType,jdbcType=TINYINT},
+      </if>
+      <if test="tagId != null" >
+        #{tagId,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateUserId != null" >
+        #{lastUpdateUserId,jdbcType=BIGINT},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  
+  <insert id="batchSave">
+		insert into qh_user_tag (kid,user_id, tag_id,
+		tag_type,
+		create_date,last_update_user_id)
+		values
+		<foreach item="item" index="index" collection="userTags"
+			separator=",">
+			(#{item.kid},#{item.userId},#{item.tagId},
+			#{item.tagType},#{item.createDate},#{item.lastUpdateUserId})
+		</foreach>
+	</insert>
+</mapper>

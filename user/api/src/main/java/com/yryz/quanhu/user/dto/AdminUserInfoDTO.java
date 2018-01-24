@@ -29,7 +29,7 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String endDate;
 	
-	private List<String> custIds;
+	private List<String> userIds;
 	public String getNickName() {
 		return nickName;
 	}
@@ -54,15 +54,15 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-	public List<String> getCustIds() {
-		return custIds;
+	public List<String> getUserIds() {
+		return userIds;
 	}
-	public void setCustIds(List<String> custIds) {
-		this.custIds = custIds;
+	public void setUserIds(List<String> userIds) {
+		this.userIds = userIds;
 	}
 	@Override
 	public String toString() {
-		return "AdminCustInfoDTO [nickName=" + nickName + ", phone=" + phone + ", startDate=" + startDate + ", endDate="
+		return "AdminUserInfoDTO [nickName=" + nickName + ", phone=" + phone + ", startDate=" + startDate + ", endDate="
 				+ endDate + "]";
 	}
 }

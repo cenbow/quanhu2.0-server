@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,9 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
+import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.service.UserStarApi;
+import com.yryz.quanhu.user.vo.StarInfoVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -96,22 +99,13 @@ public class UserStarController {
 	@NotLogin
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/star/starCommend")
-	public Response<List<StarAuthInfo>> recommendList() {
-		return starApi.starList(11, 0);
+	public Response<List<StarInfoVO>> recommendList(Integer start,Integer limit,HttpServletRequest request)  {
+		RequestHeader header = WebUtil.getHeader(request);
+		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+		paramDTO.setUserId(NumberUtils.toLong(header.getUserId()));
+		paramDTO.setStart(start);
+		paramDTO.setLimit(limit);
+		return starApi.starList(paramDTO);
 	}
 
-	/**
-	 * 更多达人列表
-	 * 
-	 * @param custId
-	 * @return
-	 */
-	@ApiOperation("更多达人列表")
-	@NotLogin
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/star/getAllStar")
-	@RequestMapping(value = "/getAllStar", method = { RequestMethod.POST, RequestMethod.OPTIONS })
-	public Response<List<StarAuthInfo>> starList(String custId, Integer start) {
-		return starApi.starList(10, 0);
-	}
 }

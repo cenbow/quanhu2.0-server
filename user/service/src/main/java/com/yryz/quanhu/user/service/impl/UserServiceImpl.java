@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 		// 检查电话、昵称
 		String nickName = baseInfo.getUserNickName();
 		UserBaseInfo existByName = null;
-		UserBaseInfo user = getUser(baseInfo.getUserId().toString());
+		UserBaseInfo user = getUser(baseInfo.getUserId());
 
 		if (!StringUtils.isBlank(nickName)) {
 			if (user != null && nickName.equals(user.getUserNickName())) {
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserLoginSimpleVO getUserLoginSimpleVO(String userId) {
+	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId) {
 		UserBaseInfo baseInfo = getUser(userId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		simpleVO.setUserLevel("1");
@@ -126,11 +126,19 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public UserSimpleVO getUserSimple(String userId) {
+	public UserSimpleVO getUserSimple(Long userId) {
+		return getUserSimple(null,userId);
+	}
+	
+	@Override
+	public UserSimpleVO getUserSimple(Long userId, Long friendId) {
 		// 查询单个用户基础信息
-		List<UserBaseInfo> baseInfos = getUserInfo(Sets.newHashSet(userId));
+		List<UserBaseInfo> baseInfos = getUserInfo(Sets.newHashSet(friendId.toString()));
 		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
+		}
+		if(userId != null && userId != 0l){
+			//TODO:聚合关系数据
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
 		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
@@ -139,6 +147,32 @@ public class UserServiceImpl implements UserService {
 		return simpleVO;
 	}
 
+	@Override
+	public Map<String, UserSimpleVO> getUserSimple(Long userId, Set<String> friendIds) {
+		if (CollectionUtils.isEmpty(friendIds)) {
+			return new HashMap<>();
+		}
+		List<UserBaseInfo> list = getUserInfo(friendIds);
+		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
+		if (list != null) {
+			for (UserBaseInfo vo : list) {
+				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
+				simpleVO.setUserLevel("1");
+				if(userId != null && userId != 0l){
+					//TODO:聚合关系数据
+				}
+				//TODO:获取等级
+				map.put(vo.getUserId().toString(), simpleVO);
+			}
+		}
+		return map;
+	}
+	
+	@Override
+	public Map<String, UserSimpleVO> getUserSimple(Set<String> userIds) {
+		return getUserSimple(null,userIds);
+	}
+	
 	/**
 	 * 根据手机号查询简单用户信息
 	 * 
@@ -178,31 +212,7 @@ public class UserServiceImpl implements UserService {
 		return map;
 	}
 
-	/**
-	 * 查询用户信息
-	 * 
-	 * @param Set<String>
-	 *            userIds
-	 * @return Map<String, UserSimpleVO>
-	 * @Description
-	 */
-	@Override
-	public Map<String, UserSimpleVO> getUserSimple(Set<String> userIds) {
-		if (CollectionUtils.isEmpty(userIds)) {
-			return new HashMap<>();
-		}
-		List<UserBaseInfo> list = getUserInfo(userIds);
-		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
-		if (list != null) {
-			for (UserBaseInfo vo : list) {
-				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
-				simpleVO.setUserLevel("1");
-				//TODO:获取等级
-				map.put(vo.getUserId().toString(), simpleVO);
-			}
-		}
-		return map;
-	}
+
 
 	/**
 	 * 查询用户信息
@@ -212,8 +222,8 @@ public class UserServiceImpl implements UserService {
 	 * @Description
 	 */
 	@Override
-	public UserBaseInfo getUser(String userId) {
-		return custbaseinfoDao.selectByUserId(userId);
+	public UserBaseInfo getUser(Long userId) {
+		return custbaseinfoDao.selectByUserId(userId.toString());
 	}
 
 	/**
@@ -390,8 +400,8 @@ public class UserServiceImpl implements UserService {
 	 * @Description 获取设备信息
 	 */
 	@Override
-	public String getDeviceIdByUserId(String userId) {
-		List<String> deviceIds = getDeviceIdByUserId(Lists.newArrayList(userId));
+	public String getDeviceIdByUserId(Long userId) {
+		List<String> deviceIds = getDeviceIdByUserId(Lists.newArrayList(userId.toString()));
 		if (CollectionUtils.isEmpty(deviceIds)) {
 			return null;
 		}
@@ -430,5 +440,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return nickName;
 	}
+
+
 
 }
