@@ -299,7 +299,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 List<Coterie> coterieList = new ArrayList<>();
                 for (int i = 0; i < coterieList.size(); i++) {
                     Coterie c = coterieList.get(i);
-                    maps.put(c.getCoterieId(), c);
+                    maps.put(c.getCoterieId()+"", c);
                 }
                 for (int j = 0; j < rstList.size(); j++) {
                     CoterieMemberVo info = rstList.get(j);

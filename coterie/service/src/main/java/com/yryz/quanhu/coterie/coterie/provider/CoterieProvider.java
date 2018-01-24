@@ -153,7 +153,7 @@ public class CoterieProvider implements CoterieApi {
 	@Override
 	public void modifyCoterieInfo(CoterieInfo info) {
 		logger.info("CoterieApi.modifyCoterieInfo params:" + info);
-		if (info == null || StringUtils.isEmpty(info.getCoterieId())) {
+		if (info == null ||  info.getCoterieId()==null) {
 			throw ServiceException.paramsError();
 		}
 		String name = StringUtils.trim(info.getName());
