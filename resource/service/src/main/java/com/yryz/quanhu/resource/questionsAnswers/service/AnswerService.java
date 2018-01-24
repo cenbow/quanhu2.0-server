@@ -10,4 +10,6 @@ public interface AnswerService {
     public Integer deleteAnswer(AnswerDto answerdto);
 
     public  AnswerVo getDetail(Long kid,Long userId);
+
+    public AnswerVo queryAnswerVoByquestionId(Long kid);
 }

@@ -85,7 +85,7 @@ public class UserTest {
 
 	// @Test
 	public void getLoginMethod() {
-		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod("724007310011252736");
+		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736l);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
@@ -127,7 +127,7 @@ public class UserTest {
 	//@Test
 	public void updateUser(){
 		UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
-		infoDTO.setUserId("727061873573347328");
+		infoDTO.setUserId(724007310011252736l);
 		infoDTO.setUserGenders(10);
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -135,7 +135,7 @@ public class UserTest {
 	
 	//@Test
 	public void bindPhone(){
-		BindPhoneDTO phoneDTO = new BindPhoneDTO("724011759597371392", "16612345689", "5023", "vebff12m1762");
+		BindPhoneDTO phoneDTO = new BindPhoneDTO(724007310011252736l, "16612345689", "5023", "vebff12m1762");
 		Response<Boolean> response = accountApi.bindPhone(phoneDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
@@ -185,7 +185,7 @@ public class UserTest {
 	
 	//@Test
 	public void eidtPassowrd(){
-		Response<Boolean> response = accountApi.editPassword("724011759597371392", "a123456", "a123456");
+		Response<Boolean> response = accountApi.editPassword(724007310011252736l, "a123456", "a123456");
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
@@ -202,7 +202,7 @@ public class UserTest {
 	
 	//@Test
 	public void checkUserDistory(){
-		Response<Boolean> response = accountApi.checkUserDisTalk("724011759597371392");
+		Response<Boolean> response = accountApi.checkUserDisTalk(724007310011252736l);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
@@ -215,7 +215,7 @@ public class UserTest {
 	
 	//@Test
 	public void getUserLoginSimpleVO(){
-		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO("724011759597371392");
+		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(724007310011252736l);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 }

@@ -26,7 +26,7 @@ public class UserStarSimpleVo implements Serializable {
 	/**
 	 * 用户id
 	 */
-	private String userId;
+	private Long userId;
 	
 	/**
 	 * 	认证状态10:审核中 11:成功 12:失败 13:后台取消认证 14:未填写过认证资料
@@ -98,11 +98,11 @@ public class UserStarSimpleVo implements Serializable {
 		this.authWay = authWay;
 	}
 
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 

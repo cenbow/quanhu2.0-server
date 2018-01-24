@@ -32,7 +32,7 @@ public class StarInfoVO implements Serializable {
 		}
 	}
 	
-	public void parseStar(String userId, Map<String, StarAuthInfo> starMap) {
+	public void parseStar(Long userId, Map<String, StarAuthInfo> starMap) {
 		if (starMap != null) {
 			StarAuthInfo info = starMap.get(userId);
 			if (info != null) {

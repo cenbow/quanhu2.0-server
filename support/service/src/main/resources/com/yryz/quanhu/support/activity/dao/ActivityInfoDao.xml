@@ -326,10 +326,7 @@
 		</if>
 	</select>
 	<update id="updateJoinCount">
-		update qh_activity_info set last_update_date = NOW()
-		<if test="joinCount != null" >
-			,join_count = join_count + 1
-		</if>
+		update qh_activity_info set last_update_date = NOW() ,join_count = join_count + 1
 		where kid = #{kid,jdbcType=BIGINT}
 		and join_count &lt; #{userNum,jdbcType=BIGINT}
 	</update>

@@ -37,7 +37,7 @@ public class SmsServiceImpl implements SmsService{
 		String msg = null;
 		boolean accountFlag = true;
 		
-		if(StringUtils.isBlank(codeDTO.getUserId())){
+		if(codeDTO.getUserId() == null){
 		   accountFlag = accountService.checkUserByPhone(codeDTO.getPhone(),codeDTO.getAppId());
 		}else{
 		   UserAccount account = accountService.getUserAccountByUserId(codeDTO.getUserId());

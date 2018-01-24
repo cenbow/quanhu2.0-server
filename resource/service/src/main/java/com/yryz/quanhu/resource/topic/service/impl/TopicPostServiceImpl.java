@@ -92,7 +92,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         TopicPostVo vo=new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs,vo);
         if(null!=createUserId){
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(String.valueOf(createUserId));
+            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
             if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
                 UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
                 vo.setUser(userSimpleVO);
@@ -118,21 +118,24 @@ public class TopicPostServiceImpl implements TopicPostService {
         PageList<TopicPostVo> data=new PageList<>();
         Integer pageNum=dto.getPageNum()==null?1:dto.getPageNum();
         Integer pageSize=dto.getPageSize()==null?10:dto.getPageSize();
+        Integer pageStartIndex=(pageNum-1)*pageSize;
         TopicPostExample example=new TopicPostExample();
         TopicPostExample.Criteria criteria= example.createCriteria();
         criteria.andTopicIdEqualTo(topicId);
         criteria.andShelveFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        example.setPageStartIndex(pageStartIndex);
+        example.setPageSize(pageSize);
         example.setOrderByClause("create_date desc");
 
-        List<TopicPost>  topicPosts=this.topicPostDao.selectByExample(example);
+        List<TopicPostWithBLOBs>  topicPosts=this.topicPostDao.selectByExampleWithBLOBs(example);
         List<TopicPostVo> list=new ArrayList<>();
-        for(TopicPost topicPost:topicPosts){
+        for(TopicPostWithBLOBs topicPost:topicPosts){
             TopicPostVo vo=new TopicPostVo();
             BeanUtils.copyProperties(topicPost,vo);
             Long crateUserId=topicPost.getCreateUserId();
             if(null!=crateUserId){
-                Response<UserSimpleVO> userSimpleVOResponse=userApi.getUserSimple(String.valueOf(crateUserId));
+                Response<UserSimpleVO> userSimpleVOResponse=userApi.getUserSimple(crateUserId);
                 if(ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())){
                     vo.setUser(userSimpleVOResponse.getData());
                 }
@@ -144,5 +147,24 @@ public class TopicPostServiceImpl implements TopicPostService {
         data.setPageSize(pageSize);
         data.setEntities(list);
         return data;
+    }
+
+    @Override
+    public Integer deleteTopicPost(Long kid, Long userId) {
+        /**
+         * 传入参数校验
+         */
+        if(null==kid || null==userId){
+            throw  new QuanhuException(ExceptionEnum.PARAM_MISSING);
+        }
+        TopicPost topicPost=this.topicPostDao.selectByPrimaryKey(kid);
+        if(null ==topicPost){
+            throw QuanhuException.busiError("删除的帖子不存在");
+        }
+        if(userId.compareTo(topicPost.getCreateUserId())!=0){
+            throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
+        }
+        topicPost.setDelFlag(CommonConstants.DELETE_YES);
+        return this.topicPostDao.updateByPrimaryKey(topicPost);
     }
 }

@@ -8,11 +8,13 @@ import com.aliyun.oss.ServiceException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
+import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.dto.StarAuthQueryDTO;
 import com.yryz.quanhu.user.dto.StarRecommendQueryDTO;
 import com.yryz.quanhu.user.vo.StarAuthAuditVo;
 import com.yryz.quanhu.user.vo.StarAuthLogVO;
 import com.yryz.quanhu.user.vo.StarInfoVO;
+import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
 
 public interface UserStarApi {
@@ -93,14 +95,12 @@ public interface UserStarApi {
     public Response<List<StarAuthLogVO>> listAuthLog(String userId);
     
     /**
-     * app端达人列表
-     * @param isRecommend 是否推荐列表 10:否 11:是
-     * @param start 用于分页
-     * @param limit
-	 * @return
+     * app端达人运营推荐列表
+     * @param authParamDTO
+     * @return
      * @throws ServiceException
      */
-	Response<List<StarInfoVO>> starList(Integer isRecommend, Integer start, Integer limit);
+    public Response<List<StarInfoVO>> starList(StarAuthParamDTO authParamDTO);
     
     /**
      * 统计达人总数

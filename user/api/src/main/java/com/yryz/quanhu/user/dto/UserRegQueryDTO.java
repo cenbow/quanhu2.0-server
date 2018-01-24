@@ -20,7 +20,7 @@ public class UserRegQueryDTO implements Serializable {
 	/**
 	 * 本人用户id
 	 */
-	private String userId;
+	private Long userId;
 	/**
 	 * 邀请人用户id
 	 */
@@ -33,10 +33,10 @@ public class UserRegQueryDTO implements Serializable {
 	 * 注册结束时间
 	 */
 	private String endDate;
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public String getUserRegId() {
@@ -68,7 +68,7 @@ public class UserRegQueryDTO implements Serializable {
 	 * @param userId
 	 * @exception 
 	 */
-	public UserRegQueryDTO(String userId) {
+	public UserRegQueryDTO(Long userId) {
 		super();
 		this.userId = userId;
 	}

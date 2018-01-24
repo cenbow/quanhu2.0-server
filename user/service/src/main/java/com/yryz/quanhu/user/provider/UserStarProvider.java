@@ -2,12 +2,11 @@ package com.yryz.quanhu.user.provider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.pagehelper.PageHelper;
-import com.yryz.quanhu.user.vo.StarInfoVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -32,13 +31,15 @@ import com.yryz.quanhu.user.entity.UserStarAuth;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthType;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthWay;
-import com.yryz.quanhu.user.entity.UserStarAuth.StarRecommendStatus;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.service.UserStarService;
 import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.vo.StarAuthAuditVo;
 import com.yryz.quanhu.user.vo.StarAuthLogVO;
+import com.yryz.quanhu.user.vo.StarInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
+import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
 @Service(interfaceClass = UserStarApi.class)
 public class UserStarProvider implements UserStarApi {
@@ -63,7 +64,7 @@ public class UserStarProvider implements UserStarApi {
 			UserStarAuth model = (UserStarAuth) GsonUtils.parseObj(info, UserStarAuth.class);
 			UserStarAuth authModel = userStarService.get(info.getUserId(), null);
 			if (authModel != null) {
-				if (authModel.getAuditStatus() == StarAuditStatus.AUDIT_FAIL.getStatus()) {
+				if (authModel.getAuditStatus() == StarAuditStatus.WAIT_AUDIT.getStatus()) {
 					throw QuanhuException.busiError("待审核中，不允许重复申请");
 				}
 				if (authModel.getAuditStatus() == StarAuditStatus.AUDIT_SUCCESS.getStatus()) {
@@ -247,6 +248,9 @@ public class UserStarProvider implements UserStarApi {
 					|| authInfo.getRecommendStatus() == null) {
 				throw QuanhuException.busiError("authModel、recommendStatus、userId为空");
 			}
+			if (StringUtils.isBlank(authInfo.getRecommendDesc()) || authInfo.getRecommendDesc().length() > 200) {
+				throw QuanhuException.busiError("推荐语为空或者超长");
+			}
 			UserStarAuth authModel = userStarService.get(authInfo.getUserId(), null);
 			if (authModel == null) {
 				throw QuanhuException.busiError("认证信息不存在");
@@ -364,21 +368,11 @@ public class UserStarProvider implements UserStarApi {
 	}
 
 	@Override
-	public Response<List<StarInfoVO>> starList(Integer isRecommend, Integer start, Integer limit) {
-		/*if (isRecommend == null) {
-			isRecommend = (int) StarRecommendStatus.FALSE.getStatus();
-		}*/
+	public Response<List<StarInfoVO>> starList(StarAuthParamDTO authParamDTO) {
 		try {
-			StarAuthParamDTO authParamDTO = new StarAuthParamDTO();
-			if (isRecommend == (int) StarRecommendStatus.TRUE.getStatus()) {
-				authParamDTO.setStarRecommend(true);
-			}
-			authParamDTO.setStart(start);
-
-			List<UserStarAuth> list = userStarService.starList(authParamDTO, start, limit);
-
-//			List<StarAuthInfo> authInfos = (List<StarAuthInfo>) GsonUtils.parseList(list, StarAuthInfo.class);
-			return ResponseUtils.returnObjectSuccess(null);
+			List<UserStarAuth> list = userStarService.starList(authParamDTO);
+			List<StarInfoVO> authInfos = getStarInfoList(authParamDTO.getUserId(), list);	
+			return ResponseUtils.returnObjectSuccess(authInfos);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -386,7 +380,48 @@ public class UserStarProvider implements UserStarApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-
+	/**
+	 * 解析达人信息
+	 * @param userId
+	 * @param authInfos
+	 * @return
+	 */
+	private List<StarInfoVO> getStarInfoList(Long userId,List<UserStarAuth> authInfos){
+		List<StarInfoVO> list = null;
+		
+		Map<String, UserSimpleVO> userVos = null;
+		Set<String> userIds = null;
+		//Map<String,String> levelMap = null;
+		int length = authInfos == null ? 0 : authInfos.size();
+		list = new ArrayList<>(length);
+		userIds = new HashSet<>(length);
+		
+		if(length == 0){
+			return list;
+		}
+		
+		for (int i = 0; i < length; i++) {
+			userIds.add(authInfos.get(i).getUserId().toString());
+		}
+		if (CollectionUtils.isNotEmpty(userIds)){
+			userVos = userService.getUserSimple(userId, userIds);
+			//levelMap = getUserLevels(userIds);
+		}
+		
+		for (int i = 0; i < length; i++) {
+			UserStarAuth authInfo = authInfos.get(i);
+			StarInfoVO infoDTO = new StarInfoVO();
+			UserStarSimpleVo simpleVo = (UserStarSimpleVo) GsonUtils.parseObj(authInfo, UserStarSimpleVo.class);
+			simpleVo.setAuthType(null);
+			simpleVo.setAuthWay(null);
+			simpleVo.setUserId(null);
+			infoDTO.parseUser(authInfo.getUserId().toString(), userVos);
+			//infoDTO.getCustInfo().setCustLevel(levelMap.get(authInfo.getUserId()));
+			infoDTO.setStarInfo(simpleVo);
+			list.add(infoDTO);
+		}
+		return list;
+	}
 	@Override
 	public Response<Integer> countStar() {
 		try {

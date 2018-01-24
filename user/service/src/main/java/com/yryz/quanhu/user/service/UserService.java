@@ -30,13 +30,32 @@ public interface UserService {
 	 * @param userId
 	 * @return
 	 */
-	UserSimpleVO getUserSimple(String userId);
+	UserSimpleVO getUserSimple(Long userId);
+	
+	/**
+	 * 查询用户简要信息
+	 * @param userId
+	 * @return
+	 */
+	UserSimpleVO getUserSimple(Long userId,Long friendId);
+	/**
+	 * 查询用户简要信息
+	 * @param userIds
+	 * @return
+	 */
+	Map<String,UserSimpleVO> getUserSimple(Long userId,Set<String> friendIds);
+	/**
+	 * 查询用户简要信息
+	 * @param userIds
+	 * @return
+	 */
+	Map<String,UserSimpleVO> getUserSimple(Set<String> userIds);
 	/**
 	 * 用户登录返回的用户信息
 	 * @param userId
 	 * @return
 	 */
-	UserLoginSimpleVO getUserLoginSimpleVO(String userId);
+	UserLoginSimpleVO getUserLoginSimpleVO(Long userId);
 	
 	/**
 	 * 根据电话检索用户
@@ -55,19 +74,16 @@ public interface UserService {
 	 */
 	Map<String, String> getUserByPhone(Set<String> phones,String appId);
 	
-	/**
-	 * 查询用户简要信息
-	 * @param userIds
-	 * @return
-	 */
-	Map<String,UserSimpleVO> getUserSimple(Set<String> userIds);
+
+	
+
 	
 	/**
 	 * 查询用户基本信息
 	 * @param userId
 	 * @return
 	 */
-	UserBaseInfo getUser(String userId);
+	UserBaseInfo getUser(Long userId);
 	/**
 	 * 查询用户基本信息
 	 * @param userIds
@@ -80,14 +96,14 @@ public interface UserService {
 	 * @param custInfoDTO
 	 * @return 昵称需要加特殊字符转义
 	 */
-	List<String> getUserIdByParams(AdminUserInfoDTO custInfoDTO);
+	List<String> getUserIdByParams(AdminUserInfoDTO userInfoDTO);
 
 	/**
 	 * 获取用户推送设备号
 	 * @param userId
 	 * @return
 	 */
-	String getDeviceIdByUserId(String userId);
+	String getDeviceIdByUserId(Long userId);
 	
 	/**
 	 * 获取用户推送设备号

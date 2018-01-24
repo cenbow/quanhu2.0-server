@@ -2,13 +2,17 @@ package com.yryz.quanhu.resource.topicAndPost;
 
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.quanhu.resource.topic.api.TopicApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.topic.vo.TopicVo;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,24 +28,61 @@ public class TopicPostTest {
     @Reference
     private TopicPostApi topicPostApi;
 
+    /**
+     * 发布话题
+     */
     @Test
-    public void saveTopic(){
-        TopicDto dto=new TopicDto();
-        dto.setContent("Ai 的未来，可以主宰人类世界吗？");
+    public void saveTopic() {
+        TopicDto dto = new TopicDto();
+        dto.setContent("斯蒂芬斯蒂芬斯蒂芬");
         dto.setCoterieId("123456");
-        dto.setCreateUserId(10000);
-        dto.setTitle("AIAIAIAI");
+        dto.setCreateUserId(727447149320273920L);
+        dto.setTitle("哈哈哈哈哈哈");
         dto.setCreateUserId(1000L);
-        dto.setDelFlag(Byte.valueOf( "10"));
-        dto.setRecommend(Byte.valueOf( "10"));
         dto.setImgUrl("http://wewew.com/sdsd");
-        dto.setShelveFlag(Byte.valueOf( "10"));
         topicApi.saveTopic(dto);
     }
 
+    /**
+     * 查询话题详情
+     */
     @Test
-    public void saveTopicPost(){
-        TopicPostDto dto=new TopicPostDto();
+    public void queryTopicDetil() {
+        Response<TopicVo> data = topicApi.queryDetail(180504L, 724007310011252736L);
+        if (ResponseConstant.SUCCESS.getCode().equals(data.getCode())) {
+            System.out.println("==========" + JSON.toJSONString(data.getData()));
+        }
+    }
+
+    /**
+     * 查询话题列表
+     */
+    @Test
+    public void queryTopicList() {
+        TopicDto dto = new TopicDto();
+        dto.setPageNum(1);
+        dto.setPageSize(5);
+        Response<PageList<TopicVo>> data = this.topicApi.queryTopicList(dto);
+        Assert.assertTrue(ResponseConstant.SUCCESS.getCode().equals(data.getCode()));
+        System.out.println("=======" + JSON.toJSONString(data.getData()));
+    }
+
+    /**
+     * 标记删除
+     */
+    @Test
+    public void DeleteTopic(){
+        Response<Integer> data=this.topicApi.deleteTopic(180504L,724007L);
+        System.out.println("=========="+JSON.toJSONString(data));
+    }
+
+
+    /**
+     * 发布帖子
+     */
+    @Test
+    public void saveTopicPost() {
+        TopicPostDto dto = new TopicPostDto();
         dto.setAudioUrl("http://ffff.com/ddd");
         dto.setContent("aaaaaaaaaaaa");
         dto.setCreateUserId(1000L);
@@ -58,12 +99,12 @@ public class TopicPostTest {
 
 
     @Test
-    public void queryList(){
-        TopicPostDto dto=new TopicPostDto();
+    public void queryListTopicPost() {
+        TopicPostDto dto = new TopicPostDto();
         dto.setTopicId(180504L);
         dto.setPageNum(1);
         dto.setPageSize(5);
-        Response<PageList<TopicPostVo>> data=topicPostApi.listPost(dto);
-        System.out.print("==============="+data.getData().getEntities().size());
+        Response<PageList<TopicPostVo>> data = topicPostApi.listPost(dto);
+        System.out.println("===============" + JSON.toJSONString(data.getData()));
     }
 }

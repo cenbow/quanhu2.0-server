@@ -28,7 +28,7 @@ public class Coterie implements Serializable {
 	/**
 	 * 私圈id
 	 */
-	private String coterieId;
+	private Long coterieId;
 
 	/**
 	 * 用户ID
@@ -88,7 +88,7 @@ public class Coterie implements Serializable {
 	private Integer memberNum;
 
 	/**
-	 * 状态：0待审核，1审批通过，2审批未通过，3上架，4下架
+	 * 状态：10待审核，11审批通过，12审批未通过，13上架，14下架
 	 */
 	private Byte status;
 
@@ -140,12 +140,12 @@ public class Coterie implements Serializable {
 		this.id = id;
 	}
 
-	public String getCoterieId() {
+	public Long getCoterieId() {
 		return coterieId;
 	}
 
-	public void setCoterieId(String coterieId) {
-		this.coterieId = coterieId == null ? null : coterieId.trim();
+	public void setCoterieId(Long coterieId) {
+		this.coterieId = coterieId == null ? null : coterieId ;
 	}
 
 	public String getOwnerId() {

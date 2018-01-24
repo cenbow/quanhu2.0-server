@@ -42,8 +42,8 @@ public class CoterieServiceImpl implements CoterieService {
 	public CoterieInfo save(CoterieBasicInfo info) {
 		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
 		//todo
-		 coterie.setCoterieId(IdUtils.randomappId());
-		String qrUrl= QrUtils.createQr("",coterie.getCoterieId());
+		 coterie.setCoterieId(Long.parseLong(IdUtils.randomappId()));
+		String qrUrl= QrUtils.createQr("",coterie.getCoterieId()+"");
 		coterie.setQrUrl(qrUrl);
 		coterie.setConsultingFee(0);
 		coterie.setCreateDate(new Date());
@@ -75,7 +75,7 @@ public class CoterieServiceImpl implements CoterieService {
 	public void remove(String coterieId) {
 		try{
 			Coterie coterie=new Coterie();
-			coterie.setCoterieId(coterieId);
+			coterie.setCoterieId(Long.parseLong(coterieId));
 			coterie.setDeleted((byte)1);
 			coterieMapper.updateByCoterieIdSelective(coterie);
 		}catch (Exception e) {

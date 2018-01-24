@@ -27,7 +27,7 @@ public class StarAuthLogVO implements Serializable{
     /**
      * 用户id
      */
-    private String UserId;
+    private Long userId;
 
     /**
      * 真实姓名或者运营者姓名
@@ -147,12 +147,12 @@ public class StarAuthLogVO implements Serializable{
         this.organizationName = organizationName == null ? null : organizationName.trim();
     }
 
-    public String getUserId() {
-        return UserId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUserId(String UserId) {
-        this.UserId = UserId == null ? null : UserId.trim();
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getRealName() {
@@ -342,7 +342,7 @@ public class StarAuthLogVO implements Serializable{
 
 	@Override
 	public String toString() {
-		return "UserStarAuthLogModel [organizationName=" + organizationName + ", UserId=" + UserId
+		return "UserStarAuthLogModel [organizationName=" + organizationName + ", UserId=" + userId
 				+ ", realName=" + realName + ", idCard=" + idCard + ", location=" + location + ", tradeField="
 				+ tradeField + ", ownerAppId=" + ownerAppId + ", resourceDesc=" + resourceDesc + ", contactCall="
 				+ contactCall + ", organizationPaper=" + organizationPaper + ", authType=" + authType + ", authWay="

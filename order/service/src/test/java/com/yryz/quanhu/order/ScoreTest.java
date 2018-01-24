@@ -9,7 +9,6 @@ package com.yryz.quanhu.order;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +17,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
-import com.yryz.quanhu.score.vo.EventReportVo;
+import com.yryz.quanhu.score.vo.EventSign;
 
 /**
  * @author syc
@@ -35,6 +35,9 @@ public class ScoreTest {
 	@Reference
 	private static EventAPI eventAPI;
 	
+	
+	@Reference
+	private static EventAcountApiService eventAcountApiService;
 
 	
 	@Test
@@ -64,9 +67,18 @@ public class ScoreTest {
     public void getScoreFlowList() {
         EventInfo info = new EventInfo();
         info.setUserId("123456789");
-        List<EventReportVo>   list =   eventAPI.getScoreFlowList(info);
+      //  List<EventReportVo>   list =   eventAPI.getScoreFlowList(info);
 
-        System.out.println("ScoreFlow list: "+list.size());
+      //  System.out.println("ScoreFlow list: "+list.size());
+    }
+	
+	@Test
+    public   EventSign getEventSign()  {
+		String custId = "123456789";
+		String eventCode = "1";
+        return eventAcountApiService.getEventSign(custId, eventCode);
+
+      //  System.out.println("ScoreFlow list: "+list.size());
     }
 	
 	

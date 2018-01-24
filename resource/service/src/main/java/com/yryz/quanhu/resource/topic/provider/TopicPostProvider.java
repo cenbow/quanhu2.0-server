@@ -59,5 +59,18 @@ public class TopicPostProvider implements TopicPostApi {
         }
     }
 
+    @Override
+    public Response<Integer> deleteTopicPost(Long kid, Long userId) {
+        try {
+            Integer data = this.topicPostService.deleteTopicPost(kid, userId);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
 
 }

@@ -23,7 +23,7 @@ public interface UserApi {
 	 * @param userId
 	 * @return
 	 */
-	static String userInfoKey(String userId){
+	static String userInfoKey(Long userId){
 		return String.format("%s.%s", RedisConstants.USER_INFO,userId);
 	}
 	/**
@@ -31,7 +31,7 @@ public interface UserApi {
 	 * @param userId
 	 * @return
 	 */
-	Response<UserSimpleVO> getUserSimple(String userId);
+	Response<UserSimpleVO> getUserSimple(Long userId);
 	/**
 	 * 查询用户简要信息并聚合关系信息<br/>
 	 * userId不为空表示会聚合关系信息
@@ -39,7 +39,7 @@ public interface UserApi {
 	 * @param friendId 好友id
 	 * @return
 	 */
-	Response<UserSimpleVO> getUserSimple(String userId,String friendId);
+	Response<UserSimpleVO> getUserSimple(Long userId,Long friendId);
 	/**
 	 * 查询用户简要信息
 	 * @param userIds 用户id
@@ -53,13 +53,13 @@ public interface UserApi {
 	 * @param userId 用户id
 	 * @return
 	 */
-	Response<Map<String,UserSimpleVO>> getUserSimple(String userId,Set<String> firendIds);
+	Response<Map<String,UserSimpleVO>> getUserSimple(Long userId,Set<String> firendIds);
 	/**
 	 * 用户登录返回的用户信息
 	 * @param userId
 	 * @return
 	 */
-	Response<UserLoginSimpleVO> getUserLoginSimpleVO(String userId);
+	Response<UserLoginSimpleVO> getUserLoginSimpleVO(Long userId);
 	/**
 	 * 用户登录返回的用户信息<br/>
 	 * friendId不为空表示会聚合关系信息
@@ -67,7 +67,7 @@ public interface UserApi {
 	 * @param friendId 好友id
 	 * @return
 	 */
-	Response<UserLoginSimpleVO> getUserLoginSimpleVO(String userId,String friendId);
+	Response<UserLoginSimpleVO> getUserLoginSimpleVO(Long userId,Long friendId);
 	
 	/**
 	 * 根据电话检索用户
@@ -107,7 +107,7 @@ public interface UserApi {
 	 * @param userId
 	 * @return
 	 */
-	Response<String> getDeviceIdByUserId(String userId);
+	Response<String> getDeviceIdByUserId(Long userId);
 	
 	/**
 	 * 获取用户推送设备号
