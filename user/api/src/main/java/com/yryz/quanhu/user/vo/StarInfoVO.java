@@ -39,7 +39,7 @@ public class StarInfoVO implements Serializable {
 				this.starInfo = (UserStarSimpleVo) GsonUtils.parseObj(info, UserStarSimpleVo.class);
 				this.starInfo.setAuthType(null);
 				this.starInfo.setAuthWay(null);
-				this.starInfo.setCustId(null);
+				this.starInfo.setUserId(userId);
 			}else{
 				this.starInfo = new UserStarSimpleVo();				
 			}
