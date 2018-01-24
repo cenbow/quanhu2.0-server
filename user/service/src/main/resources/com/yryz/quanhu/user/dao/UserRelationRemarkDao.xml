@@ -33,6 +33,28 @@
         )
     </insert>
 
+
+    <select id="selectByUserIds" parameterType="com.yryz.quanhu.user.dto.UserRelationRemarkDto"
+            resultType="com.yryz.quanhu.user.dto.UserRelationRemarkDto">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM qh_user_relation_remark WHERE
+        del_flag = 10 AND
+        <choose>
+            <when test="targetUserIds != null and targetUserIds.length > 0">
+                source_user_id = #{userId,jdbcType=VARCHAR}
+                AND target_user_id IN
+                <foreach collection="targetUserIds" item="targetUserId" index="index" open="(" separator="," close=")">
+                    #{targetUserId,jdbcType=VARCHAR}
+                </foreach>
+            </when>
+            <otherwise>
+                FALSE
+            </otherwise>
+        </choose>
+    </select>
+
+
     <select id="selectByUser" parameterType="com.yryz.quanhu.user.dto.UserRelationRemarkDto"
             resultType="com.yryz.quanhu.user.dto.UserRelationRemarkDto">
 
