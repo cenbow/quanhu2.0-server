@@ -52,7 +52,7 @@ public class ActivityVoteProvider implements ActivityVoteApi {
             Assert.notNull(record.getVoteNo(), "voteNo不能为空");
             int voteCount = activityVoteService.voteRecord(record);
             Map<String, Object> map = new HashMap<>();
-            map.put("haveFreeVote", voteCount++);
+            map.put("haveFreeVote", ++voteCount);
             map.put("otherFlag", record.getOtherFlag());
             map.put("userRollFlag", activityVoteService.selectUserRoll(record.getCreateUserId()));
             return ResponseUtils.returnObjectSuccess(map);

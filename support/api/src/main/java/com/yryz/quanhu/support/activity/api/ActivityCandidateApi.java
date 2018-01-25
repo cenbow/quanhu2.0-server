@@ -24,12 +24,10 @@ public interface ActivityCandidateApi {
 
     /**
      * 获取参与者详情
-     * @param   activityInfoId
-     * @param   candidateId
-     * @param   userId
+     * @param   activityVoteDto
      * @return
      * */
-    Response<ActivityVoteDetailVo> detail(Long activityInfoId, Long candidateId, Long userId);
+    Response<ActivityVoteDetailVo> detail(ActivityVoteDto activityVoteDto);
 
     /**
      * 参与者列表
