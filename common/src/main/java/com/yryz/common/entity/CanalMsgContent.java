@@ -1,4 +1,4 @@
-package com.yryz.quanhu.dymaic.canal.entity;
+package com.yryz.common.entity;
 
 import java.util.List;
 import java.util.Map;

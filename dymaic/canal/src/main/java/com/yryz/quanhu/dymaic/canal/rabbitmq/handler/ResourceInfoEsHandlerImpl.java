@@ -8,9 +8,10 @@ import javax.annotation.Resource;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
+import com.yryz.common.entity.CanalMsgContent;
+import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.dao.ResourceInfoRepository;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.entity.ReleaseInfo;
 import com.yryz.quanhu.dymaic.canal.entity.ResourceInfo;
 import com.yryz.quanhu.dymaic.canal.entity.TopicInfo;
@@ -64,13 +65,13 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 	 * @param msg
 	 */
 	private void doTopicInfo(CanalMsgContent msg){
-		TopicInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),TopicInfo.class);
-		TopicInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),TopicInfo.class);
+		TopicInfo uinfoBefore = CanalEntityParser.parse(msg.getDataBefore(),TopicInfo.class);
+		TopicInfo uinfoAfter = CanalEntityParser.parse(msg.getDataAfter(),TopicInfo.class);
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
 			Optional<ResourceInfo> uinfo = resourceInfoRepository.findById(uinfoBefore.getKid());
 			if(uinfo.isPresent()){
 				ResourceInfo resource=uinfo.get();
-				TopicInfo topicInfo = EntityParser.parse(resource.getTopicInfo(), msg.getDataAfter(),TopicInfo.class);
+				TopicInfo topicInfo = CanalEntityParser.parse(resource.getTopicInfo(), msg.getDataAfter(),TopicInfo.class);
 				resource.setKid(topicInfo.getKid());
 				resource.setTopicInfo(topicInfo);
 				resource.setResourceType(1);//话题
@@ -109,13 +110,13 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 	 * @param msg
 	 */
 	private void doTopicPostInfo(CanalMsgContent msg){
-		TopicPostInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),TopicPostInfo.class);
-		TopicPostInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),TopicPostInfo.class);
+		TopicPostInfo uinfoBefore = CanalEntityParser.parse(msg.getDataBefore(),TopicPostInfo.class);
+		TopicPostInfo uinfoAfter = CanalEntityParser.parse(msg.getDataAfter(),TopicPostInfo.class);
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
 			Optional<ResourceInfo> uinfo = resourceInfoRepository.findById(uinfoBefore.getKid());
 			if(uinfo.isPresent()){
 				ResourceInfo resource=uinfo.get();
-				TopicPostInfo topicPostInfo = EntityParser.parse(resource.getTopicPostInfo(), msg.getDataAfter(),TopicPostInfo.class);
+				TopicPostInfo topicPostInfo = CanalEntityParser.parse(resource.getTopicPostInfo(), msg.getDataAfter(),TopicPostInfo.class);
 				resource.setKid(topicPostInfo.getKid());
 				resource.setTopicPostInfo(topicPostInfo);
 				resource.setResourceType(2);//帖子
@@ -153,13 +154,13 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 	 * 文章
 	 */
 	private void doReleaseInfo(CanalMsgContent msg){
-		ReleaseInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),ReleaseInfo.class);
-		ReleaseInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),ReleaseInfo.class);
+		ReleaseInfo uinfoBefore = CanalEntityParser.parse(msg.getDataBefore(),ReleaseInfo.class);
+		ReleaseInfo uinfoAfter = CanalEntityParser.parse(msg.getDataAfter(),ReleaseInfo.class);
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
 			Optional<ResourceInfo> uinfo = resourceInfoRepository.findById(uinfoBefore.getKid());
 			if(uinfo.isPresent()){
 				ResourceInfo resource=uinfo.get();
-				ReleaseInfo releaseInfo = EntityParser.parse(resource.getReleaseInfo(), msg.getDataAfter(),ReleaseInfo.class);
+				ReleaseInfo releaseInfo = CanalEntityParser.parse(resource.getReleaseInfo(), msg.getDataAfter(),ReleaseInfo.class);
 				resource.setKid(releaseInfo.getKid());
 				resource.setReleaseInfo(releaseInfo);
 				resource.setResourceType(3);//文章

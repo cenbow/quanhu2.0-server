@@ -1,4 +1,4 @@
-package com.yryz.quanhu.dymaic.canal.rabbitmq.handler;
+package com.yryz.common.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,9 +11,10 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
-import com.yryz.quanhu.dymaic.canal.entity.CanalChangeInfo;
+import com.yryz.common.entity.CanalChangeInfo;
 
-public class EntityParser {
+
+public class CanalEntityParser {
 	public static <T> T parse(List<CanalChangeInfo> changeInfoList, Class<T> classs) {
 		T instance;
 		try {

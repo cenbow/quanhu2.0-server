@@ -8,9 +8,10 @@ import javax.annotation.Resource;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
+import com.yryz.common.entity.CanalMsgContent;
+import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.dao.CoterieInfoRepository;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.entity.CoterieInfo;
 
 @Component
@@ -40,17 +41,13 @@ public class CoterieInfoEsHandlerImpl implements SyncHandler {
 
 	@Override
 	public void handler(CanalMsgContent msg) {
-		boolean exists=elasticsearchTemplate.indexExists(CoterieInfo.class);
-		if(!exists){
-			elasticsearchTemplate.createIndex(CoterieInfo.class);
-		}
-		CoterieInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),CoterieInfo.class);
-		CoterieInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),CoterieInfo.class);
+		CoterieInfo uinfoBefore = CanalEntityParser.parse(msg.getDataBefore(),CoterieInfo.class);
+		CoterieInfo uinfoAfter = CanalEntityParser.parse(msg.getDataAfter(),CoterieInfo.class);
 
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
 			Optional<CoterieInfo> uinfo = coterieInfoRepository.findById(uinfoBefore.getKid());
 			if (uinfo.isPresent()) {
-				CoterieInfo userInfo = EntityParser.parse(uinfo.get(), msg.getDataAfter(),CoterieInfo.class);
+				CoterieInfo userInfo = CanalEntityParser.parse(uinfo.get(), msg.getDataAfter(),CoterieInfo.class);
 				coterieInfoRepository.save(userInfo);
 			} else {
 				// 先收到了update消息，后收到insert消息

@@ -20,9 +20,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yryz.quanhu.dymaic.canal.constant.AmqpConstant;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.rabbitmq.handler.SyncExecutor;
-
+import com.yryz.common.entity.CanalMsgContent;
 /**
  * @author jk
  * @version 2.0
@@ -47,7 +46,6 @@ public class ElasticsearchSyncConsumer {
 			exchange=@Exchange(value=AmqpConstant.CANAL_FANOUT_EXCHANGE,ignoreDeclarationExceptions="true",type=ExchangeTypes.FANOUT))
 	)
 	public void handleMessage(String data){
-		//TODO 测试异常时，数据是否丢失
 		logger.info("canal Message:" + data);
 		try {
 			CanalMsgContent canalMsg=MAPPER.readValue(data, CanalMsgContent.class);

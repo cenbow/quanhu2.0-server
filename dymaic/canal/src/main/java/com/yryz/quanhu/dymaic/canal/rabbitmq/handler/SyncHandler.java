@@ -1,9 +1,6 @@
 package com.yryz.quanhu.dymaic.canal.rabbitmq.handler;
 
-import java.util.List;
-
-import com.alibaba.otter.canal.protocol.CanalEntry;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
+import com.yryz.common.entity.CanalMsgContent;
 
 /**
  * canal消息处理

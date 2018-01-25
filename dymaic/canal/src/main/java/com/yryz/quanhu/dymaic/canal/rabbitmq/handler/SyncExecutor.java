@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
+import com.yryz.common.entity.CanalMsgContent;
 
 @Component
 public class SyncExecutor {
