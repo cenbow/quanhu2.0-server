@@ -20,7 +20,7 @@ public class MyInviterDetailVO implements Serializable {
 	/**
 	 * 	被邀请人id（注册信息表主键）
 	 */
-	private Integer inviterId;
+	private Long inviterId;
 	
 	/**
 	 * 用户昵称
@@ -29,11 +29,11 @@ public class MyInviterDetailVO implements Serializable {
 	
 	private Long userRegTime;
 
-	public Integer getInviterId() {
+	public Long getInviterId() {
 		return inviterId;
 	}
 
-	public void setInviterId(Integer inviterId) {
+	public void setInviterId(Long inviterId) {
 		this.inviterId = inviterId;
 	}
 
@@ -67,7 +67,7 @@ public class MyInviterDetailVO implements Serializable {
 	 * @param userRegTime
 	 * @exception 
 	 */
-	public MyInviterDetailVO(Integer inviterId, String userNname, Long userRegTime) {
+	public MyInviterDetailVO(Long inviterId, String userNname, Long userRegTime) {
 		super();
 		this.inviterId = inviterId;
 		this.userNname = userNname;

@@ -11,13 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.yryz.common.aliyun.jaq.AfsCheckManager;
-import com.yryz.common.context.Context;
-import com.yryz.common.entity.AfsCheckRequest;
-import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseUtils;
-import com.yryz.quanhu.message.push.enums.CheckVerifyCodeReturnCode;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -27,9 +20,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.aliyun.jaq.AfsCheckManager;
 import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.constant.IdConstants;
+import com.yryz.common.context.Context;
+import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.constants.RedisConstants;
@@ -43,6 +40,7 @@ import com.yryz.quanhu.message.commonsafe.utils.CommonUtils;
 import com.yryz.quanhu.message.commonsafe.utils.DateUtils;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO.VerifyStatus;
+import com.yryz.quanhu.message.push.enums.CheckVerifyCodeReturnCode;
 import com.yryz.quanhu.message.sms.dto.SmsDTO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO.SmsType;
 import com.yryz.quanhu.message.sms.service.SmsService;
@@ -124,7 +122,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		if (codeDTO.isNeedDelete()) {
 			redisDao.clearVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), codeDTO.getServiceCode());
 		}
-		if (StringUtils.isBlank(verifyCode)) {
+		if (StringUtils.isBlank(verifyCode) || StringUtils.equals(verifyCode, codeDTO.getVerifyCode())) {
 			return CheckVerifyCodeReturnCode.EXPIRE.getCode();
 		}
 		return CheckVerifyCodeReturnCode.SUCCESS.getCode();

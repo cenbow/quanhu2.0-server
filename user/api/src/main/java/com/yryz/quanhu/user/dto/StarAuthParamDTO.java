@@ -63,10 +63,10 @@ public class StarAuthParamDTO implements Serializable {
 	private Boolean starRecommend;
 
 
-	public int getStart() {
+	public Integer getStart() {
 		return start;
 	}
-	public void setStart(int start) {
+	public void setStart(Integer start) {
 		this.start = start;
 	}
 	public String getUserNname() {
@@ -140,8 +140,5 @@ public class StarAuthParamDTO implements Serializable {
 	}
 	public void setUserId(Long userId) {
 		this.userId = userId;
-	}
-	public void setStart(Integer start) {
-		this.start = start;
 	}
 }

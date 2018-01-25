@@ -31,7 +31,7 @@ public interface UserOperateInfoDao {
 	 * @param userId
 	 * @return
 	 */
-	String selectInviterByUserId(String userId);
+	String selectInviterByUserId(Long userId);
 
 	/**
 	 * 根据本人邀请码获取用户id
@@ -51,7 +51,7 @@ public interface UserOperateInfoDao {
 	 *            主键
 	 * @return
 	 */
-	List<UserOperateInfo> listByUserId(@Param("userId") String userId, @Param("limit") Integer limit,
+	List<UserOperateInfo> listByUserId(@Param("userId") Long userId, @Param("limit") Integer limit,
 			@Param("inviterId") Integer inviterId);
 
 	/**
@@ -73,5 +73,5 @@ public interface UserOperateInfoDao {
 	 * @return
 	 * @Description 查询用户邀请人数
 	 */
-	int getInviterNum(@Param("userId") String userId);
+	int getInviterNum(@Param("userId") Long userId);
 }
