@@ -122,7 +122,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		if (codeDTO.isNeedDelete()) {
 			redisDao.clearVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), codeDTO.getServiceCode());
 		}
-		if (StringUtils.isBlank(verifyCode) || StringUtils.equals(verifyCode, codeDTO.getVerifyCode())) {
+		if (StringUtils.isBlank(verifyCode) || !StringUtils.equals(verifyCode, codeDTO.getVerifyCode())) {
 			return CheckVerifyCodeReturnCode.EXPIRE.getCode();
 		}
 		return CheckVerifyCodeReturnCode.SUCCESS.getCode();
