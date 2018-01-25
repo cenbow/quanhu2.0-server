@@ -15,13 +15,13 @@ public class StarAuthParamDTO implements Serializable {
 	private Long categoryId;
 
 	/**
-	 * 起始位置
+	 * 页数
 	 */
-	private Integer start;
+	private Integer currentPage;
 	/**
 	 * 页长度
 	 */
-	private Integer limit;
+	private Integer pageSize;
 	/**
 	 * 当前用户id
 	 */
@@ -75,12 +75,6 @@ public class StarAuthParamDTO implements Serializable {
 		this.categoryId = categoryId;
 	}
 
-	public Integer getStart() {
-		return start;
-	}
-	public void setStart(Integer start) {
-		this.start = start;
-	}
 	public String getUserNname() {
 		return userNname;
 	}
@@ -141,16 +135,26 @@ public class StarAuthParamDTO implements Serializable {
 	public void setStarRecommend(Boolean starRecommend) {
 		this.starRecommend = starRecommend;
 	}
-	public Integer getLimit() {
-		return limit;
-	}
-	public void setLimit(Integer limit) {
-		this.limit = limit;
-	}
 	public Long getUserId() {
 		return userId;
 	}
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public Integer getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(Integer currentPage) {
+		this.currentPage = currentPage;
+	}
+
+	public Integer getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(Integer pageSize) {
+		this.pageSize = pageSize;
 	}
 }

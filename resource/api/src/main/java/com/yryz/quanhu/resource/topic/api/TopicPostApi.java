@@ -9,7 +9,7 @@ import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 
 public interface TopicPostApi {
 
-    public Response<TopicPostVo> savePost(TopicPostDto dto);
+    public Response<Integer> savePost(TopicPostDto dto);
 
     public Response<TopicAndPostVo> quetyDetail(Long kid, Long userId);
 

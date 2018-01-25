@@ -135,11 +135,6 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Boolean sendMessage(MessageVo messageVo) {
-        return sendMessage(messageVo, false);
-    }
-
-    @Override
     public Boolean sendMessage(MessageVo messageVo, boolean flag) {
         if (StringUtils.isBlank(messageVo.getMessageId())) {
             messageVo.setMessageId(IdGen.uuid());
@@ -175,7 +170,7 @@ public class MessageServiceImpl implements MessageService {
             reqVo.setMsg(GsonUtils.parseJson(messageVo));
             pushAPI.commonSendAlias(reqVo);
         } catch (Exception e) {
-            LOGGER.warn("[message] push message faild ...", e);
+            LOGGER.error("[message] push message faild ...", e);
         }
     }
 

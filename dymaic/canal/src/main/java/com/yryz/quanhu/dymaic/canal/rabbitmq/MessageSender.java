@@ -2,8 +2,8 @@ package com.yryz.quanhu.dymaic.canal.rabbitmq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.constant.AmqpConstant;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

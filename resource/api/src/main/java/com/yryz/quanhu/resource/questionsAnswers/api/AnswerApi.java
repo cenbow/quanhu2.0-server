@@ -10,5 +10,4 @@ public interface AnswerApi {
 
     public Response<Integer> deletetAnswer(AnswerDto answerDto);
 
-    public Response<AnswerVo> queryAnswer(Long kid,Long userId);
 }

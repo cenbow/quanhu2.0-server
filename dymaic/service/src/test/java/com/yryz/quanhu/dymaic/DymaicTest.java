@@ -25,7 +25,7 @@ import java.util.Map;
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class DymaicTest {
 
-    private final static Long USER_DEMO = 100L;
+    private final static Long USER_DEMO = 724007310011252736L;
     private final Long USER_DEBAR = 200L;
 
 
@@ -34,35 +34,36 @@ public class DymaicTest {
 
     @Test
     public void add() {
-        Long[] kids = new Long[]{101L, 102L, 103L};
+        Dymaic tmp = new Dymaic();
+        tmp.setKid(1L);
+        tmp.setUserId(100L);
 
-        for (Long kid : kids) {
-            Dymaic dymaic = new Dymaic();
-            dymaic.setUserId(USER_DEBAR);
-            dymaic.setKid(kid);
-            dymaic.setContent("content test " + kid);
-            dymaic.setModuleEnum(1000);
+        Dymaic dymaic = new Dymaic();
+        dymaic.setUserId(USER_DEMO);
+        dymaic.setTransmitNote("transmit");
+        dymaic.setTransmitType(1001);
+        dymaic.setExtJson(GsonUtils.parseJson(tmp));
+        dymaic.setModuleEnum(1000);
 
-            Response<Boolean> response = dymaicService.send(dymaic);
-            print(response);
-        }
+        Response<Boolean> response = dymaicService.send(dymaic);
+        print(response);
     }
 
     @Test
     public void delete() {
-        Response<Boolean> response = dymaicService.delete(USER_DEMO, 1L);
+        Response<Boolean> response = dymaicService.delete(USER_DEMO, 107226L);
         print(response);
     }
 
     @Test
     public void get() {
-        Response<Dymaic> response = dymaicService.get(1L);
+        Response<Dymaic> response = dymaicService.get(107233L);
         print(response);
     }
 
     @Test
     public void getBatch() {
-        List<Long> kids = Arrays.asList(new Long[]{1L, 2L, 101L});
+        List<Long> kids = Arrays.asList(new Long[]{107226L,107227L,107230L,107232L});
         Response<Map<Long, Dymaic>> response = dymaicService.get(kids);
         print(response);
     }
@@ -71,14 +72,13 @@ public class DymaicTest {
 
     @Test
     public void getSendList() {
-        Response<List<DymaicVo>> response = dymaicService
-                .getSendList(USER_DEMO, 100L, 5L);
+        Response<List<DymaicVo>> response = dymaicService.getSendList(USER_DEMO, USER_DEMO, 0L, 5L);
         print(response);
     }
 
     @Test
     public void rebuildSendList() {
-        Response<Boolean> response = dymaicService.rebuildSendList(USER_DEMO);
+        Response<Boolean> response = dymaicService.rebuildSendList(USER_DEBAR);
         print(response);
     }
 
@@ -86,14 +86,18 @@ public class DymaicTest {
     //============  TimeLine ==============
     @Test
     public void getTimeLine() {
-        Response<List<DymaicVo>> response =
-                dymaicService.getTimeLine(USER_DEBAR, 1000L, 10L);
+        Response<List<DymaicVo>> response = dymaicService.getTimeLine(USER_DEMO, 0L, 2L);
         print(response);
     }
 
     @Test
     public void pushTimeLine() {
-        Response<Boolean> response = dymaicService.pushTimeLine(null);
+        Dymaic dymaic = new Dymaic();
+        dymaic.setUserId(USER_DEMO);
+        dymaic.setKid(107233L);
+        dymaic.setModuleEnum(1000);
+
+        Response<Boolean> response = dymaicService.pushTimeLine(dymaic);
         print(response);
     }
 

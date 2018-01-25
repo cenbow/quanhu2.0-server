@@ -97,5 +97,18 @@ public class QuestionProvider implements QuestionApi {
             return ResponseUtils.returnException(e);
         }
     }
+
+    @Override
+    public Response<QuestionAnswerVo> queryQuestionAnswerDetail(Long kid, Long userId) {
+        try {
+            QuestionAnswerVo result = this.questionService.getDetail(kid,userId);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
 }
 

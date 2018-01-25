@@ -13,10 +13,10 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
+import com.yryz.common.entity.CanalMsgContent;
+import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
-import com.yryz.quanhu.dymaic.canal.entity.CanalChangeInfo;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 
 /**
@@ -56,12 +56,12 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 //		if(!exists){
 //			elasticsearchTemplate.createIndex(UserInfo.class);
 //		}
-		UserInfo uinfoBefore = EntityParser.parse(msg.getDataBefore(),UserInfo.class);
-		UserInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),UserInfo.class);
+		UserInfo uinfoBefore = CanalEntityParser.parse(msg.getDataBefore(),UserInfo.class);
+		UserInfo uinfoAfter = CanalEntityParser.parse(msg.getDataAfter(),UserInfo.class);
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
 			Optional<UserInfo> uinfo = userRepository.findById(uinfoBefore.getUserId());
 			if (uinfo.isPresent()) {
-				UserInfo userInfo = EntityParser.parse(uinfo.get(), msg.getDataAfter(),UserInfo.class);
+				UserInfo userInfo = CanalEntityParser.parse(uinfo.get(), msg.getDataAfter(),UserInfo.class);
 				userRepository.save(userInfo);
 			} else {
 				// 先收到了update消息，后收到insert消息

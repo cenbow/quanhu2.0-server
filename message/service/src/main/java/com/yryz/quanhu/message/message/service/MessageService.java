@@ -25,8 +25,6 @@ public interface MessageService {
 
     Map<Integer, MessageVo> getMessageCommon(Long userId);
 
-    Boolean sendMessage(MessageVo messageVo);
-
     Boolean sendMessage(MessageVo messageVo, boolean flag);
 
     MessageVo get(String messageId);

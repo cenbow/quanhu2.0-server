@@ -3,7 +3,9 @@ package com.yryz.quanhu.behavior.comment.service;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
+import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
+import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 
@@ -29,4 +31,8 @@ public interface CommentService {
     int updownBatch(List<Comment> comments);
 
     PageList<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO);
+
+    CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO);
+
+    PageList<CommentVO> querySubCommentsInfo(CommentSubDTO commentSubDTO);
 }

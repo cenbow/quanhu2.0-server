@@ -227,6 +227,9 @@
 		<include refid="Base_Column_List"/>
 		from qh_activity_vote_detail
 		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+		<if test="voteNo != null">
+			and vote_no = #{voteNo, jdbcType=INTEGER}
+		</if>
 		and shelve_flag = 10
 	</select>
 

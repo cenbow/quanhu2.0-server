@@ -226,9 +226,11 @@ public class UserStarServiceImpl implements UserStarService {
 	}
 
 	@Override
-	public List<UserStarAuth> starList(StarAuthParamDTO paramDTO) {
+	public Page<UserStarAuth> starList(StarAuthParamDTO paramDTO) {
+		Page<UserStarAuth> page = PageHelper.startPage(paramDTO.getCurrentPage(), paramDTO.getPageSize(),false);
 		try {
-			return persistenceDao.starList(paramDTO);
+			persistenceDao.starList(paramDTO);
+			return page;
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.starList]", e);
 			throw new MysqlOptException(e);
@@ -236,9 +238,11 @@ public class UserStarServiceImpl implements UserStarService {
 	}
 
 	@Override
-	public List<UserStarAuth> labelStarList(StarAuthParamDTO paramDTO) {
+	public Page<UserStarAuth> labelStarList(StarAuthParamDTO paramDTO) {
+		Page<UserStarAuth> page = PageHelper.startPage(paramDTO.getCurrentPage(), paramDTO.getPageSize(),false);
 		try {
-			return persistenceDao.labelStarList(paramDTO);
+			persistenceDao.labelStarList(paramDTO);
+			return page;
 		} catch (Exception e) {
 			logger.error("labelStarList error", e);
 			throw new MysqlOptException(e);

@@ -4,7 +4,9 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
+import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
+import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 
@@ -53,4 +55,11 @@ public interface CommentApi {
      * @return
      */
     Response<PageList<CommentVOForAdmin>> queryCommentForAdmin(CommentDTO commentDTO);
+
+    /**
+     * 评论详情
+     * @param commentSubDTO
+     * @return
+     */
+    Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO);
 }

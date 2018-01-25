@@ -24,4 +24,15 @@ public interface OrderSDK {
      * @return
      */
     Long createOrder(InputOrder inputOrder);
+
+    /**
+     * 查询用户是否已经购买成功
+     *
+     * @param moduleEnum
+     * @param userId
+     * @param resourceId
+     * @return
+     */
+    boolean isBuyOrderSuccess(String moduleEnum, long userId, long resourceId);
+
 }

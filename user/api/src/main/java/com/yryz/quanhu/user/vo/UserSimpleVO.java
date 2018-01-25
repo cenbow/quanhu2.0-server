@@ -38,10 +38,6 @@ public class UserSimpleVO implements Serializable {
      */
     private String userDesc;
     /**
-     * 用户等级（这里的等级要从积分中心获取，不能以此为准）
-     */
-    private String userLevel;
-    /**
      * 用户角色 10:普通用户 11:实名用户
      */
     private Byte userRole;
@@ -51,7 +47,7 @@ public class UserSimpleVO implements Serializable {
      */
     private String nameNotes;
     /**
-     * 关系状态 0-陌生人 1-关注 2-粉丝 3-黑名单
+     * 关系状态 0-陌生人 1-关注 2-粉丝 3-相互关注 4-拉黑 5-被拉黑 6-相互拉黑 7-自己
      */
     private Integer relationStatus;
 	public String getNameNotes() {
@@ -95,12 +91,6 @@ public class UserSimpleVO implements Serializable {
 	}
 	public void setUserRole(Byte userRole) {
 		this.userRole = userRole;
-	}
-	public String getUserLevel() {
-		return userLevel;
-	}
-	public void setUserLevel(String userLevel) {
-		this.userLevel = userLevel == null ? "1" : userLevel;
 	}
 	public Integer getRelationStatus() {
 		return relationStatus;

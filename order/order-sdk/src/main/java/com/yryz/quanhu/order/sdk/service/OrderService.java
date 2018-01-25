@@ -13,6 +13,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.order.api.OrderAsynApi;
 import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.OrderConstants;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dao.OrderDao;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
@@ -27,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * @author liupan
@@ -37,7 +41,7 @@ public class OrderService implements OrderSDK {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-    @Value("order.notify.queue")
+    @Value("${order.notify.queue}")
     private String notifyQueue;
 
     @Autowired
@@ -70,7 +74,7 @@ public class OrderService implements OrderSDK {
         // 封装预订单PreOrderVo
         OrderEnum orderEnum = inputOrder.getOrderEnum();
         PreOrderVo orderVo = orderEnum.getOrder(orderId, inputOrder.getFromId(), inputOrder.getToId(), inputOrder.getCost());
-        orderVo.getOrderInfo().setBizContent(inputOrder.getBizContent());
+//        orderVo.getOrderInfo().setBizContent(inputOrder.getBizContent());
         orderVo.getOrderInfo().setCallback(notifyQueue);
         logger.info("createOrder getOrderVo orderVo[orderinfo]:" + orderVo.getOrderInfo().toString());
         logger.info("createOrder getOrderVo orderVo[accounts]:" + orderVo.getAccounts().toString());
@@ -101,14 +105,16 @@ public class OrderService implements OrderSDK {
             order.setProductDesc(orderInfo.getProductDesc());
             order.setProductType(orderInfo.getProductType());
             order.setOrderDesc(orderInfo.getOrderDesc());
-            order.setRemark(orderInfo.getRemark());
+            order.setRemark(orderVo.getOrderInfo().getRemark());
             //新标准枚举字段统一从10开始
             order.setOrderState(orderInfo.getOrderState() + 10);
             order.setCallback(orderInfo.getCallback());
             order.setBizContent(inputOrder.getBizContent());
             order.setModuleEnum(inputOrder.getModuleEnum());
-            order.setCoterieId(inputOrder.getCoterieId());
+            order.setCoterieId(inputOrder.getCoterieId() == null ? 0 : inputOrder.getCoterieId());
             order.setResourceId(inputOrder.getResourceId());
+            order.setCreateUserId(inputOrder.getCreateUserId());
+            order.setLastUpdateUserId(inputOrder.getCreateUserId());
             logger.info("insert order:" + order.toString());
             orderDao.insertOrder(order);
         } catch (Exception e) {
@@ -137,6 +143,38 @@ public class OrderService implements OrderSDK {
         if (null == inputOrder.getCreateUserId())
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "createUserId is null");
+    }
+
+    /**
+     * 检测是否已经购买成功
+     *
+     * @param moduleEnum
+     * @param userId
+     * @param resourceId
+     * @return
+     */
+    @Override
+    public boolean isBuyOrderSuccess(String moduleEnum, long userId, long resourceId) {
+        List<Order> orderList = orderDao.selectLatestOrder(moduleEnum, userId, resourceId);
+        if (CollectionUtils.isEmpty(orderList)) {
+            return false;
+        }
+        boolean success = false;
+        for (Order order : orderList) {
+            if (OrderConstants.OrderState.SUCCESS.equals(order.getOrderState())) {
+                success = true;
+                break;
+            } else {
+                Response<OrderInfo> orderInfoResponse = orderAsynApi.getOrderInfo(String.valueOf(order.getKid()));
+                if (orderInfoResponse.success() && null != orderInfoResponse.getData()) {
+                    if (OrderConstants.RpcOrderState.SUCCESS.equals(orderInfoResponse.getData().getOrderState())) {
+                        success = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return success;
     }
 
 }

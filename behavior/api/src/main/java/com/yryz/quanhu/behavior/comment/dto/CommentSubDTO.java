@@ -12,4 +12,15 @@ import java.io.Serializable;
  */
 public class CommentSubDTO extends PageList implements Serializable {
     private static final long serialVersionUID = 5278107300199813679L;
+
+    private Long kid;
+
+    public Long getKid() {
+        return kid;
+    }
+
+    public CommentSubDTO setKid(Long kid) {
+        this.kid = kid;
+        return this;
+    }
 }

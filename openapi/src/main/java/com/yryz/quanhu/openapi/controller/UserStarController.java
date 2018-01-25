@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
@@ -99,12 +100,12 @@ public class UserStarController {
     @NotLogin
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/starCommend")
-    public Response<List<StarInfoVO>> recommendList(Integer start, Integer limit, HttpServletRequest request) {
+    public Response<PageList<StarInfoVO>> recommendList(Integer pageSize, Integer currentPage, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-        paramDTO.setStart(start);
-        paramDTO.setLimit(limit);
+        paramDTO.setCurrentPage(currentPage);
+        paramDTO.setPageSize(pageSize);
         return starApi.starList(paramDTO);
     }
 
@@ -118,14 +119,14 @@ public class UserStarController {
     @NotLogin
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/label/list")
-    public Response<List<StarInfoVO>> labelStarList(Long categoryId, Integer start, Integer limit, HttpServletRequest request) {
+    public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage,  HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 
         paramDTO.setCategoryId(categoryId);
-        paramDTO.setStart(start);
-        paramDTO.setLimit(limit);
+        paramDTO.setCurrentPage(currentPage);
+        paramDTO.setPageSize(pageSize);
         return starApi.labelStarList(paramDTO);
     }
 

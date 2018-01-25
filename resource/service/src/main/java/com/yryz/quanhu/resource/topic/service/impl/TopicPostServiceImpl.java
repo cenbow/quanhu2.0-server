@@ -5,10 +5,8 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
+import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
@@ -35,11 +33,9 @@ public class TopicPostServiceImpl implements TopicPostService {
     @Autowired
     private TopicPostDao topicPostDao;
 
-    @Reference
-    private UserApi userApi;
+    @Autowired
+    private APIservice apIservice;
 
-    @Reference
-    private IdAPI idAPI;
 
     @Autowired
     private TopicService topicService;
@@ -52,7 +48,7 @@ public class TopicPostServiceImpl implements TopicPostService {
      * @return
      */
     @Override
-    public TopicPostVo saveTopicPost(TopicPostDto topicPostDto) {
+    public Integer saveTopicPost(TopicPostDto topicPostDto) {
         /**
          * 校验参数
          */
@@ -63,16 +59,13 @@ public class TopicPostServiceImpl implements TopicPostService {
         }
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         BeanUtils.copyProperties(topicPostDto, topicPost);
-        topicPost.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+        topicPost.setKid(apIservice.getKid());
         topicPost.setCreateDate(new Date());
         topicPost.setCityCode("");
         topicPost.setGps("");
         topicPost.setDelFlag(CommonConstants.DELETE_NO);
         topicPost.setShelveFlag(CommonConstants.SHELVE_YES);
-        this.topicPostDao.insertSelective(topicPost);
-        TopicPostVo vo = new TopicPostVo();
-        BeanUtils.copyProperties(topicPost, vo);
-        return vo;
+        return this.topicPostDao.insertSelective(topicPost);
     }
 
 
@@ -92,16 +85,23 @@ public class TopicPostServiceImpl implements TopicPostService {
         if (null == kid) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        TopicPostWithBLOBs topicPostWithBLOBs = this.topicPostDao.selectByPrimaryKey(kid);
-        if (null == topicPostWithBLOBs) {
-            throw QuanhuException.busiError("查询的帖子不存在");
-        }
 
+        TopicPostExample example=new TopicPostExample();
+        TopicPostExample.Criteria criteria=example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andKidEqualTo(kid);
+        List<TopicPostWithBLOBs> topicPostWithBLOBsList = this.topicPostDao.selectByExampleWithBLOBs(example);
+        if (null == topicPostWithBLOBsList || topicPostWithBLOBsList.isEmpty()) {
+            //throw QuanhuException.busiError("查询的帖子不存在");
+            return null;
+        }
+        TopicPostWithBLOBs topicPostWithBLOBs=topicPostWithBLOBsList.get(0);
         Long createUserId = topicPostWithBLOBs.getCreateUserId();
         TopicPostVo vo = new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs, vo);
         if (null != createUserId) {
-            vo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+            vo.setUser(apIservice.getUser(createUserId));
         }
 
         topicAndPostVo.setPost(vo);
@@ -148,7 +148,7 @@ public class TopicPostServiceImpl implements TopicPostService {
             BeanUtils.copyProperties(topicPost, vo);
             Long createUserId = topicPost.getCreateUserId();
             if (null != createUserId) {
-                vo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+                vo.setUser(apIservice.getUser(createUserId));
             }
             list.add(vo);
         }

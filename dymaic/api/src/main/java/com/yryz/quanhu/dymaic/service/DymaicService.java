@@ -17,7 +17,7 @@ import java.util.Map;
 public interface DymaicService {
 
     /**
-     * 发布动态
+     * 发布动态信息
      *
      * @param dymaic
      * @return
@@ -25,7 +25,7 @@ public interface DymaicService {
     Response<Boolean> send(Dymaic dymaic);
 
     /**
-     * 删除动态
+     * 删除动态信息
      *
      * @param kid
      * @return
@@ -33,7 +33,7 @@ public interface DymaicService {
     Response<Boolean> delete(Long userId, Long kid);
 
     /**
-     * 查询动态
+     * 查询动态信息
      *
      * @param kid
      * @return
@@ -41,25 +41,26 @@ public interface DymaicService {
     Response<Dymaic> get(Long kid);
 
     /**
-     * 批量查询动态
+     * 批量查询动态信息
      *
-     * @param ids
+     * @param kids
      * @return
      */
-    Response<Map<Long, Dymaic>> get(List<Long> ids);
+    Response<Map<Long, Dymaic>> get(List<Long> kids);
 
     /**
-     * 查询个人动态
+     * 查询个人动态列表
      *
-     * @param userId
+     * @param sourceUserId
+     * @param targetUserId
      * @param kid
      * @param limit
      * @return
      */
-    Response<List<DymaicVo>> getSendList(Long userId, Long kid, Long limit);
+    Response<List<DymaicVo>> getSendList(Long sourceUserId, Long targetUserId, Long kid, Long limit);
 
     /**
-     * 从数据库重建SendList到cache
+     * 重建个人动态列表Cache
      *
      * @param userId
      * @return
@@ -67,7 +68,7 @@ public interface DymaicService {
     Response<Boolean> rebuildSendList(Long userId);
 
     /**
-     * 查询好友动态
+     * 查询好友动态列表
      *
      * @param userId
      * @param kid
@@ -79,10 +80,10 @@ public interface DymaicService {
     /**
      * push动态到好友的TimeLine
      *
-     * @param dynamic
+     * @param dymaic
      * @return
      */
-    Response<Boolean> pushTimeLine(Dymaic dynamic);
+    Response<Boolean> pushTimeLine(Dymaic dymaic);
 
     /**
      * 移除TimeLine中指定用户的动态
