@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.topic.vo;
 
-public class BehaviorVo {
+import java.io.Serializable;
+
+public class BehaviorVo implements Serializable {
     private  Long likeCount;
 
     private  Long commentCount;
