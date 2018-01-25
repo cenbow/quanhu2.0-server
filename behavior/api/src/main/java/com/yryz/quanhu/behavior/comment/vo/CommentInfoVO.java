@@ -17,8 +17,7 @@ public class CommentInfoVO extends Comment{
         return commentEnties;
     }
 
-    public CommentInfoVO setCommentEnties(PageList<CommentVO> commentEnties) {
+    public void setCommentEnties(PageList<CommentVO> commentEnties) {
         this.commentEnties = commentEnties;
-        return this;
     }
 }
