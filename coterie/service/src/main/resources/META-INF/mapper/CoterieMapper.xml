@@ -407,7 +407,7 @@
   <select id="findPage" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
-    from qh_coterie where state=3
+    from qh_coterie where state=11 and shelve_flag=10
     ORDER BY `create_date` DESC,heat desc 
    	limit #{start},#{pageSize} 
   </select>
@@ -465,7 +465,7 @@
     SELECT count(*) 
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=3
+    AND c.state=11 and c.recommend=11 and c.shelve_flag=10
     AND m.user_id=#{custId}
   </select>
   
@@ -553,7 +553,7 @@
     select 
     <include refid="Base_Column_List" /> 
     from qh_coterie
-    where state=3 and recommend=1
+    where state=11 and recommend=11 and shelve_flag=10
     order by heat desc
     limit #{start},#{pageSize}
   </select>
