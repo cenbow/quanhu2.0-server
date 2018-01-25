@@ -29,7 +29,7 @@ public interface ActivityVoteDetailDao {
 
     int update(ActivityVoteDetail activityVoteDetail);
 
-    List<ActivityVoteDetailVo> selectVoteList(@Param("activityInfoId") Long activityInfoId);
+    List<ActivityVoteDetailVo> selectVoteList(@Param("activityInfoId") Long activityInfoId, @Param("voteNo") Integer voteNo);
 
     List<ActivityVoteDetailVo> batchVote(List<Long> set);
 

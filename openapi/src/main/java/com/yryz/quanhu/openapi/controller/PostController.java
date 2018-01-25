@@ -56,7 +56,7 @@ public class PostController {
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
     @PostMapping(value = "/{version}/post/add")
-    public Response<TopicPostVo> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
+    public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         String userId = header.getUserId();
         if (StringUtils.isNotBlank(userId)) {

@@ -46,14 +46,17 @@
 	</select>
 
 	<select id="getPage" resultType="com.yryz.quanhu.score.entity.ScoreFlow">
-		select  a.id as id,
-   		a.user_id as userId,
-		a.event_code as eventCode,
-		a.new_score as newScore,
-		a.all_score as allScore,
-		a.consume_flag as consumeFlag,
-		a.create_time as createTime,
-		a.update_time as updateTime , b.event_name as  eventName  from (
+		select   
+			a.id  ,
+			a.userId  ,
+			a.eventCode  ,
+			a.newScore  ,
+			a.allScore  ,
+			a.consumeFlag  ,
+			a.createTime  ,
+			a.updateTime  ,
+			b.event_name  as eventName 
+  	  from (
 		select <include refid="columns" /> from score_flow where user_id = #{sfq.userId}
 		<if test="consumeFlag != -1">
 			and consume_flag = #{consumeFlag}
@@ -67,7 +70,7 @@
 		<if test="sfq.endTime != null">
 			and create_time &lt;= #{sfq.endTime}
 		</if>
-		) a left join event_sys b on a.event_code = b.event_code
+		) a left join event_sys b on a.eventCode = b.event_code
 		order by id desc limit #{limit} offset #{start}
 	</select>
 

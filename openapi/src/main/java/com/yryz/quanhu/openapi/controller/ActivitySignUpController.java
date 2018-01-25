@@ -3,6 +3,8 @@ package com.yryz.quanhu.openapi.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.support.activity.api.ActivitySignUpApi;
 import com.yryz.quanhu.support.activity.entity.ActivityEnrolConfig;
@@ -25,7 +27,13 @@ import java.util.Map;
 public class ActivitySignUpController {
     @Reference(check = false, timeout = 30000)
     private ActivitySignUpApi activitySignUpApi;
+    @Reference(check = false, timeout = 30000)
+    private CountApi countApi;
 
+    public static final String SIGNUP_ACTIVITY_DETAIL = "SIGNUP-ACTIVITY-DETAIL";
+    public static final Long COUNT = 1L;
+    public static final String ACTIVITY_RECORD_COUNT = "ACTIVITY-RECORD-COUNT";
+    public static final Long ACTIVITY_COUNT = 1L;
     @NotLogin
     @ApiOperation("报名活动详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -33,7 +41,9 @@ public class ActivitySignUpController {
     public Response<ActivitySignUpHomeAppVo> getActivityInfoVo(Long activityInfoId, @RequestHeader("userId") String userId, HttpServletRequest request) {
         Assert.notNull(activityInfoId, "activityInfoId is null");
         Assert.notNull(userId, "userId is null");
-        return activitySignUpApi.getActivitySignUpHome(activityInfoId, userId);
+        Response<ActivitySignUpHomeAppVo> activitySignUpHomeAppVo = activitySignUpApi.getActivitySignUpHome(activityInfoId, userId);
+        countApi.commitCount(BehaviorEnum.RealRead,activityInfoId,SIGNUP_ACTIVITY_DETAIL,COUNT);
+        return activitySignUpHomeAppVo;
     }
 
     @ApiOperation("确认报名-提交报名信息(token)")
@@ -42,7 +52,9 @@ public class ActivitySignUpController {
     public Response<ActivityRecord> activitySignUpSubmit(@RequestBody ActivityRecord activityRecord,@RequestHeader("userId") String userId, HttpServletRequest request) {
         Assert.notNull(activityRecord, "activityRecord is null");
         Assert.notNull(userId, "userId is null");
-        return activitySignUpApi.activitySignUpSubmit(activityRecord, userId);
+        Response<ActivityRecord> activityRecordResponse = activitySignUpApi.activitySignUpSubmit(activityRecord, userId);
+        countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId),ACTIVITY_RECORD_COUNT,ACTIVITY_COUNT);
+        return activityRecordResponse;
     }
 
     @ApiOperation("参与报名-获取活动配置")

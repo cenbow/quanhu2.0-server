@@ -13,7 +13,7 @@ public class ActivityVoteDto implements Serializable {
     /** 参与者id */
     private Long candidateId;
     /** 查询条件（编号） */
-    private String queryCondition;
+    private Integer queryCondition;
     /** 文本 */
     private String content;
     /** 文本1 */
@@ -65,11 +65,11 @@ public class ActivityVoteDto implements Serializable {
         this.candidateId = candidateId;
     }
 
-    public String getQueryCondition() {
+    public Integer getQueryCondition() {
         return queryCondition;
     }
 
-    public void setQueryCondition(String queryCondition) {
+    public void setQueryCondition(Integer queryCondition) {
         this.queryCondition = queryCondition;
     }
 

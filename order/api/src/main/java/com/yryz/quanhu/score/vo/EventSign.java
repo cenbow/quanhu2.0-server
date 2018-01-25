@@ -3,9 +3,11 @@ package com.yryz.quanhu.score.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 签到状态记录实体类
- * @author lsn
+ * @author syc
  *
  */
 public class EventSign implements Serializable{
@@ -15,20 +17,36 @@ public class EventSign implements Serializable{
 	 */
 	private static final long serialVersionUID = -5784041224148862394L;
 
+	/** id */
+    @ApiModelProperty(value = "id")
 	private Long id;
 	
+	/** 用户ID */
+    @ApiModelProperty(value = "用户ID")
 	private String userId;
 	
+	/** 事件编码 */
+    @ApiModelProperty(value = "事件编码")
 	private String eventCode;
 	
+	/** 连续签到天数 */
+    @ApiModelProperty(value = "连续签到天数")
 	private int signCount;
 	
+	/** 最近一次签到时间 */
+    @ApiModelProperty(value = "最近一次签到时间")
 	private Date lastSignTime;
 	
+	/** 记录创建时间 */
+    @ApiModelProperty(value = "记录创建时间")
 	private Date createTime;
 	
+	/** 记录更新时间 */
+    @ApiModelProperty(value = "记录更新时间")
 	private Date updateTime;
 	
+	/** 签到状态 */
+    @ApiModelProperty(value = "签到状态")
 	private boolean signFlag;
 	
 	public EventSign(){

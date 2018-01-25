@@ -36,8 +36,8 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	GrowAPI growAPI;
 	
 	@Override
-	public EventAcount getEventAcount(String custId) {
-		return eventAcountAPI.getEventAcount(custId);
+	public EventAcount getEventAcount(String userId) {
+		return eventAcountAPI.getEventAcount(userId);
 	}
 
 	@Override

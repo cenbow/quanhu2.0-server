@@ -22,9 +22,9 @@ public class TopicPostProvider implements TopicPostApi {
     private TopicPostService topicPostService;
 
     @Override
-    public Response<TopicPostVo> savePost(TopicPostDto dto) {
+    public Response<Integer> savePost(TopicPostDto dto) {
         try {
-            TopicPostVo result = this.topicPostService.saveTopicPost(dto);
+            Integer result = this.topicPostService.saveTopicPost(dto);
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

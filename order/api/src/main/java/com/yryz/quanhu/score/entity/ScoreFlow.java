@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author lsn on 2017/8/28.
+ * @author syc on 2018/1/22.
  */
 public class ScoreFlow implements Serializable{
 
