@@ -2,10 +2,13 @@ package com.yryz.quanhu.behavior.like.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.mongodb.Page;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import com.yryz.quanhu.behavior.like.contants.LikeContants;
+import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeService;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
@@ -70,15 +73,15 @@ public class LikeProvider implements LikeApi {
     }
 
     @Override
-    public Response<List<LikeVO>> queryLikers(Like like) {
+    public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO) {
         try {
-            List<LikeVO> likeVOS=likeService.queryLikers(like);
-            for(LikeVO likeVO:likeVOS){
+            PageList<LikeVO> likeVOS=likeService.queryLikers(likeFrontDTO);
+            for(LikeVO likeVO:likeVOS.getEntities()){
                 //预留根据用户ID取用户昵称头像的问题
                 likeVO.setUserNickName("天凉好个冻");
                 likeVO.setUserImg("https://cdn-qa.yryz.com/pic/hwq/6932776fa931fa462bb85727d35fe5e7.png");
             }
-            return ResponseUtils.returnListSuccess(likeVOS);
+            return ResponseUtils.returnObjectSuccess(likeVOS);
         }catch (Exception e){
             logger.error("", e);
             return ResponseUtils.returnException(e);
