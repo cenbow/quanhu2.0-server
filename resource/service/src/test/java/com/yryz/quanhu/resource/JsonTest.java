@@ -43,7 +43,7 @@ public class JsonTest {
 			e1.printStackTrace();
 		}
 		ResourceVo resource = new ResourceVo();
-		resource.setResourceId("resoureId");
+		resource.setResourceId(10002120);
 		try {
 			String val = objectMapper.writeValueAsString(resource);
 			System.out.println(val);

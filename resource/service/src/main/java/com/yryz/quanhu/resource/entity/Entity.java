@@ -14,5 +14,24 @@ package com.yryz.quanhu.resource.entity;
  * @Description 实体类扩展类
  */
 public abstract class Entity {
+	
+	/**
+	 * 资源分类搜索
+	 */
+	private String resourceType;
 
+	/**
+	 * @return the resourceType
+	 */
+	public String getResourceType() {
+		return resourceType;
+	}
+
+	/**
+	 * @param resourceType the resourceType to set
+	 */
+	public void setResourceType(String resourceType) {
+		this.resourceType = resourceType;
+	}
+	
 }

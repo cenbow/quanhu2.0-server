@@ -59,14 +59,8 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 		if(resourceModel.getTalentType() == null){
 			resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_FALSE);
 		}
-		if(resourceModel.getReadNum() == null){
-			resourceModel.setReadNum(0L);
-		}
 		if(resourceModel.getHeat() == null){
 			resourceModel.setHeat(0L);
-		}
-		if(resourceModel.getPartNum() == null){
-			resourceModel.setPartNum(0L);
 		}
 		if(resourceModel.getCreateTime() == null){
 			resourceModel.setCreateTime(System.currentTimeMillis());
@@ -74,14 +68,11 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 		if(resourceModel.getUpdateTime() == null){
 			resourceModel.setUpdateTime(System.currentTimeMillis());
 		}
-		if(resourceModel.getOrderby() == null){
-			resourceModel.setOrderby(0L);
-		}
 		if(resourceModel.getPublicState() == null){
-			resourceModel.setPublicState(0);
+			resourceModel.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
 		}
-		if(resourceModel.getRecommendType() == null){
-			resourceModel.setRecommendType(ResourceEnum.RECOMMEND_TYPE_FALSE);
+		if(resourceModel.getRecommend() == null){
+			resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_FALSE);
 		}
 		if(resourceModel.getDelFlag() == null){
 			resourceModel.setDelFlag(ResourceEnum.DEL_FLAG_FALSE);
@@ -142,7 +133,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 	 * 删除资源库，通过ID
 	 * @param resourceId
 	 */
-	public void delete(String resourceId){
+	public void delete(Integer resourceId){
 		Query query = new Query();
 		query.addCriteria(Criteria.where("resourceId").is(resourceId));
 		Update update = new Update();
@@ -169,11 +160,11 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			criteria = Criteria.where("delFlag").is("0");
 			
 			//资源ID，用户ID，是否达人，私圈ID
-			if(StringUtils.isNotEmpty(resourceModel.getResourceId())){
+			if(resourceModel.getResourceId() != null){
 				criteria = Criteria.where("resourceId").is(resourceModel.getResourceId()).andOperator(criteria);
 			}
-			if(StringUtils.isNotEmpty(resourceModel.getCustId())){
-				criteria = Criteria.where("custId").is(resourceModel.getCustId()).andOperator(criteria);
+			if(resourceModel.getUserId() != null){
+				criteria = Criteria.where("custId").is(resourceModel.getUserId()).andOperator(criteria);
 			}
 			if(StringUtils.isNotEmpty(resourceModel.getTalentType())){
 				criteria = Criteria.where("talentType").is(resourceModel.getTalentType()).andOperator(criteria);
@@ -200,7 +191,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			
 			//资源类型,多条件查询，resourceType支持多类型的枚举值，以,分隔
 			if(StringUtils.isNotEmpty(resourceModel.getResourceType())){
-				Criteria resouceTypeCriteria = Criteria.where("resourceType");
+				Criteria resouceTypeCriteria = Criteria.where("moduleEnum");
 				String[] resourceTypes = resourceModel.getResourceType().split(",");
 				if(resourceTypes != null && resourceTypes.length == 1){
 					resouceTypeCriteria = resouceTypeCriteria.is(resourceTypes[0]);
@@ -214,8 +205,8 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				}
 				criteria = resouceTypeCriteria.andOperator(criteria);
 			}
-			if(StringUtils.isNotEmpty(resourceModel.getRecommendType())){
-				criteria = Criteria.where("recommendType").is(resourceModel.getRecommendType()).andOperator(criteria);
+			if(StringUtils.isNotEmpty(resourceModel.getRecommend())){
+				criteria = Criteria.where("recommend").is(resourceModel.getRecommend()).andOperator(criteria);
 			}
 			
 			if(StringUtils.isNotEmpty(startTime) || StringUtils.isNotEmpty(endTime)){
