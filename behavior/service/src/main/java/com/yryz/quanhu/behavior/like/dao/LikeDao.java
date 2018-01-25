@@ -1,5 +1,6 @@
 package com.yryz.quanhu.behavior.like.dao;
 
+import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,7 +22,7 @@ public interface LikeDao {
 
     int cleanLike(Like like);
 
-    List<LikeVO> queryLikers(Like like);
+    List<LikeVO> queryLikers(LikeFrontDTO likeFrontDTO);
 
     LikeVO querySingleLiker(Like like);
 }

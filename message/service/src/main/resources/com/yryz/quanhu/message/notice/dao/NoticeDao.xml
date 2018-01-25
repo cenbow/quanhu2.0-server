@@ -267,10 +267,10 @@
         <include refid="Base_Column_List"/>
         from qh_notice
         <where>
-            <if test="notice_status != null">
+            <if test="noticeStatus != null">
                 notice_status = #{noticeStatus}
             </if>
-            <if test="notice_status == null">
+            <if test="noticeStatus == null">
                 notice_status in (0,1)
             </if>
             <if test="keyword != null and keyword != ''">

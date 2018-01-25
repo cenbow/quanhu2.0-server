@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.yryz.common.constant.ExceptionEnum;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
 import com.yryz.common.exception.QuanhuException;
@@ -132,4 +133,23 @@ public class ResponseUtils {
 
         return res.getData();
     }
+
+    /**
+     * 检查Response对象且检查data数据对象
+     *
+     * @param response
+     * @param <T>
+     * @return
+     */
+    public static <T> T getResponseNotNull(Response<T> response) {
+        if (response != null && response.success()) {
+            T t = response.getData();
+            if (t == null) {
+                throw new QuanhuException(ExceptionEnum.RPC_RESPONSE_DATA_EXCEPTION);
+            }
+            return t;
+        }
+        throw new QuanhuException(response.getCode(), response.getMsg(), response.getErrorMsg());
+    }
+
 }

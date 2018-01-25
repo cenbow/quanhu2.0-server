@@ -95,7 +95,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 	}
 
 	@Override
-	public String selectInviterByUserId(String userId) {
+	public String selectInviterByUserId(Long userId) {
 		try {
 			return mysqlDao.selectInviterByUserId(userId);
 		} catch (Exception e) {
@@ -122,7 +122,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 	 * @param inviterId
 	 * @return
 	 */
-	private List<UserOperateInfo> listByuserId(String userId, Integer limit, Integer inviterId) {
+	private List<UserOperateInfo> listByUserId(Long userId, Integer limit, Integer inviterId) {
 		try {
 			return mysqlDao.listByUserId(userId, limit, inviterId);
 		} catch (Exception e) {
@@ -160,7 +160,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 	 * @param userId
 	 * @return
 	 */
-	private int getInviterNum(String userId) {
+	private int getInviterNum(Long userId) {
 		try {
 			return mysqlDao.getInviterNum(userId);
 		} catch (Exception e) {
@@ -170,8 +170,8 @@ public class UserOperateServiceImpl implements UserOperateService {
 	}
 
 	@Override
-	public MyInviterVO getMyInviter(String userId, Integer limit, Integer inviterId) {
-		List<UserOperateInfo> list = this.listByuserId(userId, limit, inviterId);
+	public MyInviterVO getMyInviter(Long userId, Integer limit, Integer inviterId) {
+		List<UserOperateInfo> list = this.listByUserId(userId, limit, inviterId);
 		int regLength = list == null ? 0 : list.size();
 		if (regLength == 0) {
 			return null;
@@ -180,21 +180,21 @@ public class UserOperateServiceImpl implements UserOperateService {
 		int total = this.getInviterNum(userId);
 
 		Set<String> userIds = new HashSet<>(regLength);
-		Map<String, UserSimpleVO> custMap = new HashMap<>(regLength);
+		Map<String, UserSimpleVO> userMap = new HashMap<>(regLength);
 
 		for (int i = 0; i < regLength; i++) {
 			userIds.add(list.get(i).getUserId().toString());
 		}
 		if (CollectionUtils.isNotEmpty(userIds)) {
-			custMap = userService.getUserSimple(userIds);
+			userMap = userService.getUserSimple(userId,userIds);
 		}
 
 		List<MyInviterDetailVO> detailVOs = new ArrayList<>(regLength);
 		for (int i = 0; i < regLength; i++) {
 			UserOperateInfo model = list.get(i);
-			UserSimpleVO simpleVo = custMap.get(model.getUserId());
+			UserSimpleVO simpleVo = userMap.get(model.getUserId());
 			if (simpleVo != null) {
-				detailVOs.add(new MyInviterDetailVO(model.getKid().intValue(), simpleVo.getUserNickName(),
+				detailVOs.add(new MyInviterDetailVO(model.getKid(), simpleVo.getUserNickName(),
 						model.getCreateDate().getTime()));
 			}
 		}

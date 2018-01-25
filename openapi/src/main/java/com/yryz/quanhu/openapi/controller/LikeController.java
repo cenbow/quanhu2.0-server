@@ -2,9 +2,10 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
+import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -42,10 +43,8 @@ public class LikeController {
     @ApiOperation("点赞列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/like/frontlist")
-    public Response<List<LikeVO>> queryLikers(Integer resourceId){
-        Like like=new Like();
-        like.setResourceId(resourceId);
-        return likeApi.queryLikers(like);
+    public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO){
+        return likeApi.queryLikers(likeFrontDTO);
     }
 
 }

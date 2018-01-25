@@ -166,6 +166,7 @@ public class AbstractAccountService implements AccountService {
 		registerDTO.setUserLocation(thirdUser.getLocation());
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
 		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
+		registerDTO.setUserPhone(loginDTO.getPhone());
 		Long userId = createUser(registerDTO);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
@@ -455,13 +456,11 @@ public class AbstractAccountService implements AccountService {
 		userService
 				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
 						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode()));
-
 		// 异步处理
 		// 创建运营信息
-		if (StringUtils.isNotBlank(registerDTO.getUserRegInviterCode())) {
-			operateService.save(
-					new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
-		}
+		operateService.save(
+				new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
+		
 		if (registerDTO.getRegLogDTO() != null) {
 			registerDTO.getRegLogDTO().setUserId(userId);
 			operateService.saveRegLog(registerDTO.getRegLogDTO());

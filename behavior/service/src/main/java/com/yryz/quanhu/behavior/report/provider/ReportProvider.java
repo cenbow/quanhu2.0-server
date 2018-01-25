@@ -39,7 +39,7 @@ public class ReportProvider implements ReportApi {
     @Override
     public Response<Map<String, Integer>> accretion(Report report) {
         try {
-            report.setKid(idAPI.getKid(ReportConstatns.QH_INFORM).getData());
+            report.setKid(idAPI.getSnowflakeId().getData());
             Map<String,Integer> map=new HashMap<String,Integer>();
             int count = reportService.accretion(report);
             if(count>0){

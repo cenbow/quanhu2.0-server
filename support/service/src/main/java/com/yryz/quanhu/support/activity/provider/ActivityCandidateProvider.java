@@ -12,6 +12,7 @@ import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 @Service(interfaceClass=ActivityCandidateApi.class)
 public class ActivityCandidateProvider implements ActivityCandidateApi {
@@ -28,6 +29,7 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
      * */
     public Response join(ActivityVoteDto activityVoteDto) {
         try {
+            Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
             activityCandidateService.join(activityVoteDto);
             return ResponseUtils.returnObjectSuccess(null);
         } catch (Exception e) {
@@ -43,6 +45,7 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
      * */
     public Response<ActivityVoteConfigVo> config(Long activityInfoId) {
         try {
+            Assert.notNull(activityInfoId, "activityInfoId不能为空");
             return ResponseUtils.returnObjectSuccess(activityCandidateService.config(activityInfoId));
         } catch (Exception e) {
             logger.error("参与投票活动 失败", e);
@@ -52,14 +55,15 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
 
     /**
      * 获取参与者详情
-     * @param   activityInfoId
-     * @param   candidateId
-     * @param   userId
+     * @param   activityVoteDto
      * @return
      * */
-    public Response<ActivityVoteDetailVo> detail(Long activityInfoId, Long candidateId, Long userId) {
+    public Response<ActivityVoteDetailVo> detail(ActivityVoteDto activityVoteDto) {
         try {
-            return ResponseUtils.returnObjectSuccess(activityCandidateService.detail(activityInfoId, candidateId, userId));
+            Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
+            Assert.notNull(activityVoteDto.getCandidateId(), "candidateId不能为空");
+            Assert.notNull(activityVoteDto.getOtherFlag(), "otherFlag不能为空");
+            return ResponseUtils.returnObjectSuccess(activityCandidateService.detail(activityVoteDto));
         } catch (Exception e) {
             logger.error("获取参与者详情 失败", e);
             return ResponseUtils.returnException(e);
@@ -73,6 +77,8 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
      * */
     public Response<PageList<ActivityVoteDetailVo>> list(ActivityVoteDto activityVoteDto) {
         try {
+            Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
+            Assert.notNull(activityVoteDto.getOtherFlag(), "otherFlag不能为空");
             return ResponseUtils.returnObjectSuccess(activityCandidateService.list(activityVoteDto));
         } catch (Exception e) {
             logger.error("参与投票活动 失败", e);
@@ -87,6 +93,8 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
      * */
     public Response<PageList<ActivityVoteDetailVo>> rank(ActivityVoteDto activityVoteDto) {
         try {
+            Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
+            Assert.notNull(activityVoteDto.getOtherFlag(), "otherFlag不能为空");
             return ResponseUtils.returnObjectSuccess(activityCandidateService.rank(activityVoteDto));
         } catch (Exception e) {
             logger.error("排行榜 失败", e);
