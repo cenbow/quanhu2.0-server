@@ -8,6 +8,15 @@
         select * from qh_buy_order T where T.kid = #{kid}
     </select>
 
+    <select id="selectLatestOrder" resultType="com.yryz.quanhu.order.sdk.entity.Order">
+        select * from qh_buy_order T
+        where T.module_enum = #{moduleEnum}
+          AND T.resource_id = #{resourceId}
+          AND T.create_user_id = #{userId}
+          ORDER BY create_date DESC
+          limit 3
+    </select>
+
     <insert id="insertOrder" parameterType="com.yryz.quanhu.order.sdk.entity.Order">
         insert into qh_buy_order(
         kid,
