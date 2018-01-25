@@ -43,29 +43,29 @@ public class ResourceTest {
 		List<ResourceVo> list = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			ResourceVo resource = new ResourceVo();
-			resource.setAudio("yehao-audio" + i);
-			resource.setCityCode("100101");
-			resource.setCompleteTime(System.currentTimeMillis());
-			resource.setContent("yehao-content" + i);
-			resource.setCoterieId("coterieId");
-			resource.setCreateTime(System.currentTimeMillis());
-			resource.setCustId("yehao-test-id");
-			resource.setExtjson("{}");
-			resource.setGps("113.11,34.22");
-			resource.setHeat(0L);
-			resource.setModuleEnum("1000-1120");
-			resource.setPics("yehao-pics" + i);
-			resource.setPrice(0l);
-			resource.setResourceId(IdGen.uuid());
-			resource.setResourceTag("yehao-resourceTag");
-			resource.setResourceType(ResourceTypeEnum.RELEASE);
-			resource.setSummary("yehao-summary");
-			resource.setTalentType(ResourceEnum.TALENT_TYPE_FALSE);
-			resource.setThumbnail("yehao-thumbnail");
-			resource.setTitle("yehao-title");
-			resource.setUpdateTime(System.currentTimeMillis());
-			resource.setVideo("yehao-video" + i);
-			resource.setVideoPic("yehao-videoPic" + i);
+//			resource.setAudio("yehao-audio" + i);
+//			resource.setCityCode("100101");
+//			resource.setCompleteTime(System.currentTimeMillis());
+//			resource.setContent("yehao-content" + i);
+//			resource.setCoterieId("coterieId");
+//			resource.setCreateTime(System.currentTimeMillis());
+//			resource.setCustId("yehao-test-id");
+//			resource.setExtjson("{}");
+//			resource.setGps("113.11,34.22");
+//			resource.setHeat(0L);
+//			resource.setModuleEnum("1000-1120");
+//			resource.setPics("yehao-pics" + i);
+//			resource.setPrice(0l);
+//			resource.setResourceId(IdGen.uuid());
+//			resource.setResourceTag("yehao-resourceTag");
+//			resource.setResourceType(ResourceTypeEnum.RELEASE);
+//			resource.setSummary("yehao-summary");
+//			resource.setTalentType(ResourceEnum.TALENT_TYPE_FALSE);
+//			resource.setThumbnail("yehao-thumbnail");
+//			resource.setTitle("yehao-title");
+//			resource.setUpdateTime(System.currentTimeMillis());
+//			resource.setVideo("yehao-video" + i);
+//			resource.setVideoPic("yehao-videoPic" + i);
 			System.out.println("resourceId:" + resource.getResourceId());
 			list.add(resource);
 		}
@@ -76,10 +76,10 @@ public class ResourceTest {
 	public void updateResource(){
 		List<ResourceVo> list = new ArrayList<>();
 			ResourceVo resource = new ResourceVo();
-			resource.setResourceId("02d5cf323c3641779eeb2fff65b291b0");
-			resource.setAudio("yehao-audio" + "-update");
-			resource.setCityCode("100101");
-			resource.setCompleteTime(System.currentTimeMillis());
+//			resource.setResourceId("02d5cf323c3641779eeb2fff65b291b0");
+//			resource.setAudio("yehao-audio" + "-update");
+//			resource.setCityCode("100101");
+//			resource.setCompleteTime(System.currentTimeMillis());
 			resource.setContent("yehao-content" + "-update");
 			resource.setCoterieId("coterieId");
 			list.add(resource);
@@ -89,7 +89,7 @@ public class ResourceTest {
 	@Test
 	public void getReources(){
 		ResourceVo resource = new ResourceVo();
-		resource.setCustId("yehao-test-id");
+//		resource.setCustId("yehao-test-id");
 		resource.setTitle("title");
 		resource.setResourceType(ResourceTypeEnum.RELEASE + "," + ResourceTypeEnum.TOPIC );
 		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "orderby", 0, 2, "2018-1-17 1:1:1", "2018-1-17 14:1:1");

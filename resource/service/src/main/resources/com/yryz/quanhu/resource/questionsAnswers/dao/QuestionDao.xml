@@ -121,10 +121,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.Question">
-    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.Question">
     insert into qh_question (id, kid, title, 
       content, target_id, question_type, 
       shelve_flag, del_flag, create_date, 
@@ -146,10 +143,7 @@
       #{orderId,jdbcType=VARCHAR}, #{refundOrderId,jdbcType=VARCHAR}, #{answerdFlag,jdbcType=TINYINT}, 
       #{contentSource,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.Question">
-    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.Question">
     insert into qh_question
     <trim prefix="(" suffix=")" suffixOverrides=",">
       id,

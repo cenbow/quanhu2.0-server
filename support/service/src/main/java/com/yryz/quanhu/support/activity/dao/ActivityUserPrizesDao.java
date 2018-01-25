@@ -5,6 +5,8 @@ import com.yryz.quanhu.support.activity.vo.ActivityUserPrizesVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 
   * @ClassName: ActivityUserPrizesDao
@@ -31,5 +33,7 @@ public interface ActivityUserPrizesDao {
     int selectUserRoll(@Param("createUserId") Long createUserId);
 
     int updateStatus(@Param("createUserId") Long createUserId);
+
+    List<ActivityUserPrizes> selectUserPrizesList();
 
 }

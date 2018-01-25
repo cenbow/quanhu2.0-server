@@ -11,6 +11,8 @@ import com.yryz.quanhu.order.sdk.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author liupan
  * @ClassName IOrderDao
@@ -21,6 +23,9 @@ import org.apache.ibatis.annotations.Param;
 public interface OrderDao {
 
     Order selectByKid(Long kid);
+
+    List<Order> selectLatestOrder(@Param("moduleEnum") String moduleEnum, @Param("userId") long userId,
+                           @Param("resourceId") long resourceId);
 
     void insertOrder(Order order);
 

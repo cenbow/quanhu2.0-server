@@ -9,166 +9,105 @@ package com.yryz.quanhu.resource.entity;
 
 import java.io.Serializable;
 
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
-
 /**
  * @author yehao
  * @version 2.0
  * @date 2018年1月16日 下午2:01:43
  * @Description 资源实体管理类
  */
-public class ResourceModel implements Serializable {
+public class ResourceModel extends Entity implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3185737813541083029L;
-	
-	/** 
-	 * 数据id
-	 */
-	private String resourceId;
+    /**
+     * 动态ID
+     */
+    private Long kid;
 
-	/** 
-	 * 发布人ID
-	 */
-	private String custId;
-	
-	/** 
-	 * 是否达人:否(0)，是(1)
-	 */
-	private String talentType;
-	
-	/**
-	 * 私圈ID，如果有私圈ID，则表示此资源是私圈资源
-	 */
-	private String coterieId;
+    /**
+     * 用户ID
+     */
+    private Long userId;
 
-	/**
-	 * 功能ID 前端跳转专用 
-	 */
-	private String moduleEnum;
-	
-	/** 
-	 * 资源类型,枚举：文章(1000)、话题(1001)、帖子(1002)、问题(1003)、答案(1004)、活动(1005)
-	 * @see ResourceTypeEnum
-	 */
-	private String resourceType;
-	
-	/** 
-	 * 资源标签
-	 */
-	private String resourceTag;
-	
-	/** 
-	 * 地区城市，二级城市，地区编码 
-	 */
-	private String cityCode;
+    /**
+     * 资源类型模块ID
+     * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
+     */
+    private Integer moduleEnum;
 
-	/** 
-	 * 信息标题 
-	 */
-	private String title;
-	
-	/** 
-	 * 简介 
-	 */ 
-	private String summary;
+    /**
+     * 资源ID
+     */
+    private Integer resourceId;
 
-	/** 
-	 * 信息简介 150字以内
-	 */
-	private String content;
+    /**
+     * 文章分类ID
+     */
+    private Integer classifyId;
 
-	/** 
-	 * 信息缩略图
-	 */
-	private String thumbnail;
+    /**
+     * 私圈ID
+     */
+    private String coterieId;
 
-	/** 
-	 * 图片相册数据 
-	 */
-	private String pics;
+    /**
+     * 动态标题
+     */
+    private String title;
 
-	/** 
-	 * 视频地址
-	 */
-	private String video;
+    /**
+     * 动态正文
+     */
+    private String content;
+    
+    /**
+     * 删除标记
+     * 10正常，11已删除
+     */
+    private Integer delFlag;
 
-	/** 
-	 * 视频预览图 
-	 */
-	private String videoPic;
-
-	/** 
-	 * 音频地址
-	 */
-	private String audio;
-	
-	/** 
-	 * 热度值 
-	 */
-	private Long heat;
-	
-	/** 
-	 * 阅读数 
-	 */
-	private Long readNum;
-	
-	/** 
-	 * 参与数
-	 */
-	private Long partNum;
-
-	/** 
-	 * 创建时间
-	 */
-	private Long createTime;
-	
-	/** 
-	 * 结束时间 
-	 */
-	private Long completeTime;
-	
-	/** 
-	 * 更新时间
-	 */
-	private Long updateTime;
-	
-	/** 
-	 * 排序字段 
-	 */
-	private Long orderby;
-	
-	/** 
-	 * 用户GPS信息 
-	 */
-	private String gps;
-	
-	/** 
-	 * 资源扩展展示信息
-	 */
-	private String extjson;
-	
-	/**
-	 * 资源价格
-	 */
-	private Long price;
-	
-	/**
-	 * 公开状态
-	 */
-	private Integer publicState;
-	
-	/**
-	 * 推荐类型，0不推荐，1推荐
-	 */
-	private String recommendType;
-	
-	/**
-	 * 删除状态，0未删除，1已删除
-	 */
-	private String delFlag;
+    /**
+     * 发布时间
+     */
+    private String createDate;
+    
+    /**
+     * 热度值
+     */
+    private Long heat;
+    
+    /**
+     * 达人状态：11，是；10，否
+     */
+    private String talentType;
+    
+    /**
+     * 创建时间
+     */
+    private Long createTime;
+    
+    /**
+     * 更新时间
+     */
+    private Long updateTime;
+    
+    /**
+     * 公开状态：10不公开，11公开
+     */
+    private String publicState;
+    
+    /**
+     * 推荐状态：10不推荐，11推荐
+     */
+    private String recommend;
+    
+    /**
+     * 资源简介
+     */
+    private String summary;
+    
+    /**
+     * 扩展字段，仅供展示使用，由前端的发布方和列表解析方解决
+     */
+    private String extJson;
 
 	/**
 	 * 
@@ -179,114 +118,73 @@ public class ResourceModel implements Serializable {
 	}
 
 	/**
-	 * @param resourceId
-	 * @param custId
-	 * @param talentType
-	 * @param coterieId
-	 * @param moduleEnum
-	 * @param resourceType
-	 * @param resourceTag
-	 * @param cityCode
-	 * @param title
-	 * @param summary
-	 * @param content
-	 * @param thumbnail
-	 * @param pics
-	 * @param video
-	 * @param videoPic
-	 * @param audio
-	 * @param heat
-	 * @param readNum
-	 * @param partNum
-	 * @param createTime
-	 * @param completeTime
-	 * @param updateTime
-	 * @param orderby
-	 * @param gps
-	 * @param extjson
-	 * @param price
-	 * @param publicState
-	 * @param recommendType
-	 * @param delFlag
-	 * @exception 
+	 * @return the kid
 	 */
-	public ResourceModel(String resourceId, String custId, String talentType, String coterieId, String moduleEnum,
-			String resourceType, String resourceTag, String cityCode, String title, String summary, String content,
-			String thumbnail, String pics, String video, String videoPic, String audio, Long heat, Long readNum,
-			Long partNum, Long createTime, Long completeTime, Long updateTime, Long orderby, String gps, String extjson,
-			Long price, Integer publicState, String recommendType, String delFlag) {
-		super();
-		this.resourceId = resourceId;
-		this.custId = custId;
-		this.talentType = talentType;
-		this.coterieId = coterieId;
+	public Long getKid() {
+		return kid;
+	}
+
+	/**
+	 * @param kid the kid to set
+	 */
+	public void setKid(Long kid) {
+		this.kid = kid;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public Long getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the moduleEnum
+	 */
+	public Integer getModuleEnum() {
+		return moduleEnum;
+	}
+
+	/**
+	 * @param moduleEnum the moduleEnum to set
+	 */
+	public void setModuleEnum(Integer moduleEnum) {
 		this.moduleEnum = moduleEnum;
-		this.resourceType = resourceType;
-		this.resourceTag = resourceTag;
-		this.cityCode = cityCode;
-		this.title = title;
-		this.summary = summary;
-		this.content = content;
-		this.thumbnail = thumbnail;
-		this.pics = pics;
-		this.video = video;
-		this.videoPic = videoPic;
-		this.audio = audio;
-		this.heat = heat;
-		this.readNum = readNum;
-		this.partNum = partNum;
-		this.createTime = createTime;
-		this.completeTime = completeTime;
-		this.updateTime = updateTime;
-		this.orderby = orderby;
-		this.gps = gps;
-		this.extjson = extjson;
-		this.price = price;
-		this.publicState = publicState;
-		this.recommendType = recommendType;
-		this.delFlag = delFlag;
 	}
 
 	/**
 	 * @return the resourceId
 	 */
-	public String getResourceId() {
+	public Integer getResourceId() {
 		return resourceId;
 	}
 
 	/**
 	 * @param resourceId the resourceId to set
 	 */
-	public void setResourceId(String resourceId) {
+	public void setResourceId(Integer resourceId) {
 		this.resourceId = resourceId;
 	}
 
 	/**
-	 * @return the custId
+	 * @return the classifyId
 	 */
-	public String getCustId() {
-		return custId;
+	public Integer getClassifyId() {
+		return classifyId;
 	}
 
 	/**
-	 * @param custId the custId to set
+	 * @param classifyId the classifyId to set
 	 */
-	public void setCustId(String custId) {
-		this.custId = custId;
-	}
-
-	/**
-	 * @return the talentType
-	 */
-	public String getTalentType() {
-		return talentType;
-	}
-
-	/**
-	 * @param talentType the talentType to set
-	 */
-	public void setTalentType(String talentType) {
-		this.talentType = talentType;
+	public void setClassifyId(Integer classifyId) {
+		this.classifyId = classifyId;
 	}
 
 	/**
@@ -304,62 +202,6 @@ public class ResourceModel implements Serializable {
 	}
 
 	/**
-	 * @return the moduleEnum
-	 */
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	/**
-	 * @param moduleEnum the moduleEnum to set
-	 */
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
-	}
-
-	/**
-	 * @return the resourceType
-	 */
-	public String getResourceType() {
-		return resourceType;
-	}
-
-	/**
-	 * @param resourceType the resourceType to set
-	 */
-	public void setResourceType(String resourceType) {
-		this.resourceType = resourceType;
-	}
-
-	/**
-	 * @return the resourceTag
-	 */
-	public String getResourceTag() {
-		return resourceTag;
-	}
-
-	/**
-	 * @param resourceTag the resourceTag to set
-	 */
-	public void setResourceTag(String resourceTag) {
-		this.resourceTag = resourceTag;
-	}
-
-	/**
-	 * @return the cityCode
-	 */
-	public String getCityCode() {
-		return cityCode;
-	}
-
-	/**
-	 * @param cityCode the cityCode to set
-	 */
-	public void setCityCode(String cityCode) {
-		this.cityCode = cityCode;
-	}
-
-	/**
 	 * @return the title
 	 */
 	public String getTitle() {
@@ -371,20 +213,6 @@ public class ResourceModel implements Serializable {
 	 */
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	/**
-	 * @return the summary
-	 */
-	public String getSummary() {
-		return summary;
-	}
-
-	/**
-	 * @param summary the summary to set
-	 */
-	public void setSummary(String summary) {
-		this.summary = summary;
 	}
 
 	/**
@@ -402,73 +230,31 @@ public class ResourceModel implements Serializable {
 	}
 
 	/**
-	 * @return the thumbnail
+	 * @return the delFlag
 	 */
-	public String getThumbnail() {
-		return thumbnail;
+	public Integer getDelFlag() {
+		return delFlag;
 	}
 
 	/**
-	 * @param thumbnail the thumbnail to set
+	 * @param delFlag the delFlag to set
 	 */
-	public void setThumbnail(String thumbnail) {
-		this.thumbnail = thumbnail;
+	public void setDelFlag(Integer delFlag) {
+		this.delFlag = delFlag;
 	}
 
 	/**
-	 * @return the pics
+	 * @return the createDate
 	 */
-	public String getPics() {
-		return pics;
+	public String getCreateDate() {
+		return createDate;
 	}
 
 	/**
-	 * @param pics the pics to set
+	 * @param createDate the createDate to set
 	 */
-	public void setPics(String pics) {
-		this.pics = pics;
-	}
-
-	/**
-	 * @return the video
-	 */
-	public String getVideo() {
-		return video;
-	}
-
-	/**
-	 * @param video the video to set
-	 */
-	public void setVideo(String video) {
-		this.video = video;
-	}
-
-	/**
-	 * @return the videoPic
-	 */
-	public String getVideoPic() {
-		return videoPic;
-	}
-
-	/**
-	 * @param videoPic the videoPic to set
-	 */
-	public void setVideoPic(String videoPic) {
-		this.videoPic = videoPic;
-	}
-
-	/**
-	 * @return the audio
-	 */
-	public String getAudio() {
-		return audio;
-	}
-
-	/**
-	 * @param audio the audio to set
-	 */
-	public void setAudio(String audio) {
-		this.audio = audio;
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
 	}
 
 	/**
@@ -486,31 +272,17 @@ public class ResourceModel implements Serializable {
 	}
 
 	/**
-	 * @return the readNum
+	 * @return the talentType
 	 */
-	public Long getReadNum() {
-		return readNum;
+	public String getTalentType() {
+		return talentType;
 	}
 
 	/**
-	 * @param readNum the readNum to set
+	 * @param talentType the talentType to set
 	 */
-	public void setReadNum(Long readNum) {
-		this.readNum = readNum;
-	}
-
-	/**
-	 * @return the partNum
-	 */
-	public Long getPartNum() {
-		return partNum;
-	}
-
-	/**
-	 * @param partNum the partNum to set
-	 */
-	public void setPartNum(Long partNum) {
-		this.partNum = partNum;
+	public void setTalentType(String talentType) {
+		this.talentType = talentType;
 	}
 
 	/**
@@ -528,20 +300,6 @@ public class ResourceModel implements Serializable {
 	}
 
 	/**
-	 * @return the completeTime
-	 */
-	public Long getCompleteTime() {
-		return completeTime;
-	}
-
-	/**
-	 * @param completeTime the completeTime to set
-	 */
-	public void setCompleteTime(Long completeTime) {
-		this.completeTime = completeTime;
-	}
-
-	/**
 	 * @return the updateTime
 	 */
 	public Long getUpdateTime() {
@@ -556,101 +314,59 @@ public class ResourceModel implements Serializable {
 	}
 
 	/**
-	 * @return the orderby
-	 */
-	public Long getOrderby() {
-		return orderby;
-	}
-
-	/**
-	 * @param orderby the orderby to set
-	 */
-	public void setOrderby(Long orderby) {
-		this.orderby = orderby;
-	}
-
-	/**
-	 * @return the gps
-	 */
-	public String getGps() {
-		return gps;
-	}
-
-	/**
-	 * @param gps the gps to set
-	 */
-	public void setGps(String gps) {
-		this.gps = gps;
-	}
-
-	/**
-	 * @return the extjson
-	 */
-	public String getExtjson() {
-		return extjson;
-	}
-
-	/**
-	 * @param extjson the extjson to set
-	 */
-	public void setExtjson(String extjson) {
-		this.extjson = extjson;
-	}
-
-	/**
-	 * @return the price
-	 */
-	public Long getPrice() {
-		return price;
-	}
-
-	/**
-	 * @param price the price to set
-	 */
-	public void setPrice(Long price) {
-		this.price = price;
-	}
-
-	/**
 	 * @return the publicState
 	 */
-	public Integer getPublicState() {
+	public String getPublicState() {
 		return publicState;
 	}
 
 	/**
 	 * @param publicState the publicState to set
 	 */
-	public void setPublicState(Integer publicState) {
+	public void setPublicState(String publicState) {
 		this.publicState = publicState;
 	}
 
 	/**
-	 * @return the recommendType
+	 * @return the recommend
 	 */
-	public String getRecommendType() {
-		return recommendType;
+	public String getRecommend() {
+		return recommend;
 	}
 
 	/**
-	 * @param recommendType the recommendType to set
+	 * @param recommend the recommend to set
 	 */
-	public void setRecommendType(String recommendType) {
-		this.recommendType = recommendType;
+	public void setRecommend(String recommend) {
+		this.recommend = recommend;
 	}
 
 	/**
-	 * @return the delFlag
+	 * @return the summary
 	 */
-	public String getDelFlag() {
-		return delFlag;
+	public String getSummary() {
+		return summary;
 	}
 
 	/**
-	 * @param delFlag the delFlag to set
+	 * @param summary the summary to set
 	 */
-	public void setDelFlag(String delFlag) {
-		this.delFlag = delFlag;
+	public void setSummary(String summary) {
+		this.summary = summary;
 	}
-	
+
+	/**
+	 * @return the extJson
+	 */
+	public String getExtJson() {
+		return extJson;
+	}
+
+	/**
+	 * @param extJson the extJson to set
+	 */
+	public void setExtJson(String extJson) {
+		this.extJson = extJson;
+	}
+    
 }

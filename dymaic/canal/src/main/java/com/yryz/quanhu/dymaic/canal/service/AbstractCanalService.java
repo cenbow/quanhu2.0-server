@@ -24,9 +24,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.yryz.common.entity.CanalChangeInfo;
+import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
-import com.yryz.quanhu.dymaic.canal.entity.CanalChangeInfo;
-import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.rabbitmq.MessageSender;
 
 @Component

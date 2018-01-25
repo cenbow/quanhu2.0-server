@@ -42,6 +42,11 @@ public class ReleaseInfoDto extends ReleaseInfo {
 
     private Long[] kids;
     
+    /**  
+    * @Fields : 所有私圈：true,false
+    */
+    private Boolean allCoterie;
+    
     public String getBeginDate() {
         return beginDate;
     }
@@ -104,5 +109,13 @@ public class ReleaseInfoDto extends ReleaseInfo {
 
     public void setKids(Long[] kids) {
         this.kids = kids;
+    }
+
+    public Boolean getAllCoterie() {
+        return allCoterie;
+    }
+
+    public void setAllCoterie(Boolean allCoterie) {
+        this.allCoterie = allCoterie;
     }
 }

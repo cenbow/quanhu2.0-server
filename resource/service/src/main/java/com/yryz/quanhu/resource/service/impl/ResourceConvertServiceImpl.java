@@ -46,13 +46,13 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 		if(CollectionUtils.isNotEmpty(list)){
 			Set<String> userIds = new HashSet<>();
 			for (ResourceVo resourceVo : list) {
-				userIds.add(resourceVo.getCustId());
+				userIds.add(resourceVo.getUserId().toString());
 			}
 			Response<Map<String,UserBaseInfoVO>> response = userApi.getUser(userIds);
 			if(response.success()){
 				Map<String,UserBaseInfoVO> map = response.getData();
 				for (ResourceVo resourceVo : list) {
-					resourceVo.setUser(map.get(resourceVo.getCustId()));
+					resourceVo.setUser(map.get(resourceVo.getUserId().toString()));
 				}
 			}
 		}

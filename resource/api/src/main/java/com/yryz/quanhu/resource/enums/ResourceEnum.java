@@ -18,31 +18,42 @@ public class ResourceEnum {
 	/**
 	 * 达人状态：是
 	 */
-	public static String TALENT_TYPE_TRUE = "1";
+	public static String TALENT_TYPE_TRUE = "11";
 	
 	/**
 	 * 达人状态：否
 	 */
-	public static String TALENT_TYPE_FALSE = "0";
+	public static String TALENT_TYPE_FALSE = "10";
 	
 	/**
 	 * 推荐状态：是
 	 */
-	public static String RECOMMEND_TYPE_TRUE = "1";
+	public static String RECOMMEND_TYPE_TRUE = "11";
 	
 	/**
 	 * 推荐状态：否
 	 */
-	public static String RECOMMEND_TYPE_FALSE = "0";
+	public static String RECOMMEND_TYPE_FALSE = "10";
 	
 	/**
 	 * 删除状态：是
 	 */
-	public static String DEL_FLAG_TRUE = "1";
+	public static Integer DEL_FLAG_TRUE = 11;
 	
 	/**
 	 * 删除状态：否
 	 */
-	public static String DEL_FLAG_FALSE = "0";
+	public static Integer DEL_FLAG_FALSE = 10;
+	
+	/**
+	 * 公开状态：是
+	 */
+	public static String PUBLIC_STATE_TRUE = "11";
+	
+	/**
+	 * 公开状态：否
+	 */
+	public static String PUBLIC_STATE_FALSE = "10";
+	
 
 }

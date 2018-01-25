@@ -23,7 +23,8 @@ import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -39,6 +40,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ActivityCandidateServiceImpl implements ActivityCandidateService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateServiceImpl.class);
 
     @Autowired
     IdAPI idAPI;
@@ -272,6 +275,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10;
             //活动主信息相关
             ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
+            logger.info("activityVoteInfoVo =======================>>" + activityVoteInfoVo);
+            logger.info("activityVoteInfoVo.getInAppVoteType =======================>>" + activityVoteInfoVo.getInAppVoteType());
+
             Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : 0;
             Integer inAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteConfigCount() : 0;
             Integer otherAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteType() : 0;
