@@ -17,6 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -30,8 +35,8 @@ public class NotifyService {
 
     private static final Logger logger = LoggerFactory.getLogger(NotifyService.class);
 
-    @Autowired
-    private IOrderNotifyService orderNotifyService;
+    @Autowired(required = false)
+    private List<IOrderNotifyService> notifyServiceList = new ArrayList<>();
 
     @Reference
     private OrderAsynApi orderAsynApi;
@@ -73,13 +78,26 @@ public class NotifyService {
         logger.info("notify method , updateCount :" + updateCount);
         // 本地订单修改完成，提交与订单绑定的业务数据至业务方
         if (updateCount > 0) {
-            //回调业务
-            OutputOrder outputOrder = new OutputOrder();
-            outputOrder.setModuleEnum(localOrder.getModuleEnum());
-            outputOrder.setCoterieId(localOrder.getCoterieId());
-            outputOrder.setResourceId(localOrder.getResourceId());
-            outputOrder.setBizContent(localOrder.getBizContent());
-            orderNotifyService.notify(outputOrder);
+            if (CollectionUtils.isEmpty(notifyServiceList)) {
+                return;
+            }
+            IOrderNotifyService orderNotifyService = null;
+            for (IOrderNotifyService notifyService : notifyServiceList) {
+                String moduleEnum = notifyService.getModuleEnum();
+                if (!StringUtils.isEmpty(moduleEnum) && moduleEnum.equals(localOrder.getModuleEnum())) {
+                    orderNotifyService = notifyService;
+                    break;
+                }
+            }
+            if (null != orderNotifyService) {
+                //回调业务
+                OutputOrder outputOrder = new OutputOrder();
+                outputOrder.setModuleEnum(localOrder.getModuleEnum());
+                outputOrder.setCoterieId(localOrder.getCoterieId());
+                outputOrder.setResourceId(localOrder.getResourceId());
+                outputOrder.setBizContent(localOrder.getBizContent());
+                orderNotifyService.notify(outputOrder);
+            }
         }
     }
 
