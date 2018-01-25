@@ -52,7 +52,7 @@ public class TopicPostServiceImpl implements TopicPostService {
      * @return
      */
     @Override
-    public TopicPostVo saveTopicPost(TopicPostDto topicPostDto) {
+    public Integer saveTopicPost(TopicPostDto topicPostDto) {
         /**
          * 校验参数
          */
@@ -69,10 +69,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         topicPost.setGps("");
         topicPost.setDelFlag(CommonConstants.DELETE_NO);
         topicPost.setShelveFlag(CommonConstants.SHELVE_YES);
-        this.topicPostDao.insertSelective(topicPost);
-        TopicPostVo vo = new TopicPostVo();
-        BeanUtils.copyProperties(topicPost, vo);
-        return vo;
+        return this.topicPostDao.insertSelective(topicPost);
     }
 
 
