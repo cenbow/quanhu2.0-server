@@ -30,13 +30,13 @@ public class PostController {
 	@GetMapping(value = "/{version}/post/single")
 	public Response<TopicAndPostVo> queryTopicDetail(Long kid, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return topicPostApi.quetyDetail(kid,Long.valueOf(header.getUserId()));
+		return topicPostApi.quetyDetail(kid,null);
 	}
 
 	@ApiOperation("查询帖子列表")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/post/single")
-	public Response<PageList<TopicPostVo>> queryTopicList(Integer pageNum,Integer 	pageSize,Long topicId,
+	@GetMapping(value = "/{version}/post/list")
+	public Response<PageList<TopicPostVo>> queryTopicPostList(Integer pageNum,Integer 	pageSize,Long topicId,
 														  String orderBy,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		TopicPostDto dto=new TopicPostDto();
