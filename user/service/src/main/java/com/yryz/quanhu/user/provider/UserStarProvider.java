@@ -371,6 +371,13 @@ public class UserStarProvider implements UserStarApi {
 	@Override
 	public Response<List<StarInfoVO>> starList(StarAuthParamDTO authParamDTO) {
 		try {
+			if(authParamDTO.getStart() == null ||authParamDTO.getStart() < 0){
+				authParamDTO.setStart(0);
+			}
+			authParamDTO.setStart(0);
+			if(authParamDTO.getLimit() == null ||authParamDTO.getLimit() > 100 || authParamDTO.getLimit() < 0 ){
+				authParamDTO.setLimit(10);
+			}
 			List<UserStarAuth> list = userStarService.starList(authParamDTO);
 			List<StarInfoVO> authInfos = getStarInfoList(authParamDTO.getUserId(), list);	
 			return ResponseUtils.returnObjectSuccess(authInfos);
@@ -428,8 +435,8 @@ public class UserStarProvider implements UserStarApi {
 			//levelMap = getUserLevels(userIds);
 		}
 		
-		for (int i = 0; i < length; i++) {
-			UserStarAuth authInfo = authInfos.get(i);
+		for (int i = 0; i < 10; i++) {
+			UserStarAuth authInfo = authInfos.get(0);
 			StarInfoVO infoDTO = new StarInfoVO();
 			UserStarSimpleVo simpleVo = (UserStarSimpleVo) GsonUtils.parseObj(authInfo, UserStarSimpleVo.class);
 			simpleVo.setAuthType(null);

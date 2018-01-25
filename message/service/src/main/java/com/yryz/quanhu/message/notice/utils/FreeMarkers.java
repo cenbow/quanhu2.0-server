@@ -49,6 +49,9 @@ public class FreeMarkers {
 		Configuration cfg = new Configuration();
 		//Resource path = new DefaultResourceLoader().getResource(directory);
 		File file = new File(directory);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
 		cfg.setDirectoryForTemplateLoading(file);
 		return cfg;
 	}

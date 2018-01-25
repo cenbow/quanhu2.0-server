@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -43,29 +44,33 @@ public class ActivityCandidateController {
         return activityCandidateApi.config(activityInfoId);
     }
 
-
+    @NotLogin
     @ApiOperation("参与者详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/detail")
     public Response<ActivityVoteDetailVo> detail(ActivityVoteDto activityVoteDto, HttpServletRequest request) {
         String userId = request.getHeader("userId");
-        Assert.hasText(userId, "userId不能为空");
         activityVoteDto.setCreateUserId(Long.valueOf(userId));
         return activityCandidateApi.detail(activityVoteDto);
     }
 
+    @NotLogin
     @ApiOperation("参与者列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/list")
     public Response<PageList<ActivityVoteDetailVo>> list(ActivityVoteDto activityVoteDto, HttpServletRequest request) {
         String userId = request.getHeader("userId");
+        activityVoteDto.setCreateUserId(Long.valueOf(userId));
         return activityCandidateApi.list(activityVoteDto);
     }
 
+    @NotLogin
     @ApiOperation("排行榜")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/rank")
-    public Response<PageList<ActivityVoteDetailVo>> rank(ActivityVoteDto activityVoteDto) {
+    public Response<PageList<ActivityVoteDetailVo>> rank(ActivityVoteDto activityVoteDto, HttpServletRequest request) {
+        String userId = request.getHeader("userId");
+        activityVoteDto.setCreateUserId(Long.valueOf(userId));
         return activityCandidateApi.rank(activityVoteDto);
     }
 

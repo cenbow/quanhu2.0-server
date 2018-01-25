@@ -5,7 +5,6 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageType;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.IdGen;
-import com.yryz.quanhu.message.common.constant.PushConstant;
 import com.yryz.quanhu.message.message.constants.MessageContants;
 import com.yryz.quanhu.message.message.dto.MessageDto;
 import com.yryz.quanhu.message.message.mongo.MessageMongo;
@@ -150,11 +149,11 @@ public class MessageServiceImpl implements MessageService {
 
         int itype = messageVo.getType() == null ? 0 : messageVo.getType().intValue();
 
-        if(itype != MessageType.NOTICE_TYPE){ //非通知公告的未读数需要增加，通知公告类型采用群发机制，不处理
+        if (itype != MessageType.NOTICE_TYPE) { //非通知公告的未读数需要增加，通知公告类型采用群发机制，不处理
             messageRedis.addUnread(messageVo.getToCust(), getReadTypeString(messageVo));
         }
 
-        if(flag){
+        if (flag) {
             pushMessage(messageVo);
         }
         return true;
@@ -168,7 +167,7 @@ public class MessageServiceImpl implements MessageService {
             reqVo.setCustIds(custIds);
             reqVo.setNotification(messageVo.getTitle());
             int itype = messageVo.getType() == null ? 0 : messageVo.getType().intValue();
-            if(itype == MessageType.NOTICE_TYPE){
+            if (itype == MessageType.NOTICE_TYPE) {
                 reqVo.setPushType(PushReqVo.CommonPushType.BY_ALL);
             } else {
                 reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
@@ -176,20 +175,20 @@ public class MessageServiceImpl implements MessageService {
             reqVo.setMsg(GsonUtils.parseJson(messageVo));
             pushAPI.commonSendAlias(reqVo);
         } catch (Exception e) {
-            LOGGER.warn("[message] push message faild ...",e);
+            LOGGER.warn("[message] push message faild ...", e);
         }
     }
 
     private static String getReadTypeString(MessageVo messageVo) {
-        if(messageVo == null){
+        if (messageVo == null) {
             throw QuanhuException.busiError("message can't be null");
         }
         Integer type = messageVo.getType();
         Integer label = messageVo.getLabel();
-        if(type == null){
+        if (type == null) {
             throw QuanhuException.busiError("message type can't be null");
         }
-        if(label != null){
+        if (label != null) {
             return type + "|" + label;
         } else {
             return type.toString();

@@ -42,7 +42,7 @@ public class CommentProvider implements CommentApi {
     @Override
     public Response<Map<String, Integer>> accretion(Comment comment) {
         try {
-            comment.setKid(idAPI.getKid(CommentConstatns.QH_COMMENT_INFO).getData());
+            comment.setKid(idAPI.getSnowflakeId().getData());
             Map<String,Integer> map=new HashMap<String, Integer>();
             //根据调用用户拿到用户的对象comment.getCreateUserId();
             comment.setNickName("");

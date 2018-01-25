@@ -63,9 +63,12 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
     public ActivityVoteInfoVo detail(Long kid, Long userId) {
         ActivityVoteInfoVo activityInfoVo = this.getVoteInfo(kid);
         if(activityInfoVo != null) {
-            //更新参与者的票数
-            int votoDetailCount = activityVoteDetailDao.updateVoteCount(userId, kid);
-            activityInfoVo.setJoinFlag(votoDetailCount == 0 ? 10 : 11);
+            if(userId != null) {
+                //获取当前用户是否参与此活动
+                activityInfoVo.setJoinFlag(activityVoteDetailDao.selectCandidateCount(kid, userId) == 0 ? 10 : 11);
+            } else {
+                activityInfoVo.setJoinFlag(10);
+            }
             //TODO:判断用户是否禁言
             //设置已参与人数
             Object joinCount = stringRedisTemplate.opsForHash().get(ActivityVoteConstants.getKeyConfig(activityInfoVo.getKid()), "joinCount");

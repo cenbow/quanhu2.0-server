@@ -48,15 +48,15 @@
 		where user_inviter_code = #{userInviterCode}
 	</select>
 
-	<select id="listByUserId" resultMap="BaseResultMap">
+	<select id="listByUserId" resultType="com.yryz.quanhu.user.entity.UserOperateInfo">
 		select
 		kid as kid,
 		user_id as userId,
 		create_date as createDate
 		from qh_user_operate_info
 		where user_inviter_id = #{userInviterId}
-		<if test="kid != null">
-			and kid &lt; #{kid}
+		<if test="inviterId != null">
+			and kid &lt; #{inviterId}
 		</if>
 		order by create_date desc
 		limit #{limit}
