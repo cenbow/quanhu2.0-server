@@ -1,8 +1,9 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.constant.DevType;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
@@ -10,14 +11,8 @@ import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.questionsAnswers.api.QuestionApi;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
-import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
-import com.yryz.quanhu.user.contants.RegType;
-import com.yryz.quanhu.user.dto.*;
-import com.yryz.quanhu.user.service.AccountApi;
-import com.yryz.quanhu.user.service.AuthApi;
-import com.yryz.quanhu.user.service.UserApi;
-import com.yryz.quanhu.user.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -26,14 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.List;
-
 @Api(description = "圈粉提问接口")
 @RestController
 public class QuestionController {
@@ -47,10 +35,13 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 			@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 	})
-	@PostMapping(value = "/{version}/coterie/question/add")
+	@PostMapping(value = "/services/app/{version}/coterie/question/add")
 	public Response<QuestionVo> saveQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		questionDto.setCreateUserId(Long.valueOf(header.getUserId()));
+		String userId=header.getUserId();
+		if(StringUtils.isBlank(userId)){
+			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
+		}
 		return questionApi.saveQuestion(questionDto);
 	}
 
@@ -59,14 +50,46 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
-	@PostMapping(value = "/{version}/coterie/question/delete")
-	public Response<Integer> findUser(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
+	@PostMapping(value = "/services/app/{version}/coterie/question/delete")
+	public Response<Integer> deleteQueston(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId=header.getUserId();
 		if(StringUtils.isBlank(userId)){
-			userId="0";
+			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
 		}
 		return questionApi.deleteQuestion(questionDto.getKid(),Long.valueOf(userId));
 	}
+
+	@ApiOperation("圈主拒接回答问题")
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			})
+	@PostMapping(value = "/services/app/{version}/coterie/question/reject")
+	public Response<Integer> rejectQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		String userId=header.getUserId();
+		if(StringUtils.isBlank(userId)){
+			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
+		}
+		return questionApi.rejectAnswerQuestion(questionDto.getKid(),Long.valueOf(userId));
+	}
+
+
+	@ApiOperation("查询问答的详情")
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			})
+	@GetMapping(value = "/services/app/{version}/coterie/questionAnswer/single")
+	public Response<QuestionAnswerVo> queryQuestionAnswer(Long kid, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		String userId=header.getUserId();
+		if(StringUtils.isBlank(userId)){
+			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
+		}
+		return questionApi.queryQuestionAnswerDetail(kid,Long.valueOf(userId));
+	}
+
 
 }

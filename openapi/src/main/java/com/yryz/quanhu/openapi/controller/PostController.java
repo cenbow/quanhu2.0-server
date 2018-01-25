@@ -29,7 +29,7 @@ public class PostController {
 
     @ApiOperation("查询帖子详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/post/single")
+    @GetMapping(value = "/services/app/{version}/post/single")
     public Response<TopicAndPostVo> queryTopicDetail(Long kid, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         return topicPostApi.quetyDetail(kid, null);
@@ -37,7 +37,7 @@ public class PostController {
 
     @ApiOperation("查询帖子列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/post/list")
+    @GetMapping(value = "/services/app/{version}/post/list")
     public Response<PageList<TopicPostVo>> queryTopicPostList(Integer pageNum, Integer pageSize, Long topicId,
                                                               String orderBy, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
@@ -55,7 +55,7 @@ public class PostController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @PostMapping(value = "/{version}/post/add")
+    @PostMapping(value = "/services/app/{version}/post/add")
     public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         String userId = header.getUserId();
