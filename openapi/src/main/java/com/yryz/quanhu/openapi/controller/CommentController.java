@@ -5,8 +5,10 @@ import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
+import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentApi;
+import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import io.swagger.annotations.Api;
@@ -54,6 +56,14 @@ public class CommentController {
     public Response<Map<String, Integer>> delComment(@RequestBody Comment comment,@RequestHeader Long userId){
         comment.setCreateUserId(userId);
         return commentApi.delComment(comment);
+    }
+
+    @NotLogin
+    @ApiOperation("用户评论详情")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO){
+        return commentApi.querySingleCommentInfo(commentSubDTO);
     }
 
 }

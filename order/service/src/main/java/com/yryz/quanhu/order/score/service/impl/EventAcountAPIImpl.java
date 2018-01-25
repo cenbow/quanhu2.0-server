@@ -43,8 +43,8 @@ public class EventAcountAPIImpl implements EventAcountAPI {
 //	private CoterieStatisticsService coterieStatisticsService;
 
 	@Override
-	public EventAcount getEventAcount(String custId) {
-		return eventAcountService.getLastAcount(custId);
+	public EventAcount getEventAcount(String userId) {
+		return eventAcountService.getLastAcount(userId);
 	}
 
 	@Override

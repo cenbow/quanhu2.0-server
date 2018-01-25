@@ -2,7 +2,9 @@ package com.yryz.quanhu.behavior.comment.dao;
 
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
+import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
+import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import org.apache.ibatis.annotations.Mapper;
@@ -29,5 +31,7 @@ public interface CommentDao {
     int updownBatch(List<Comment> comments);
 
     List<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO);
+
+    CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO);
 
 }

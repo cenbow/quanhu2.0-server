@@ -7,6 +7,9 @@
  */
 package com.yryz.quanhu.order.sdk.autoconfig;
 
+import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +21,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan(basePackages = "com.yryz.quanhu.order.sdk")
+@DubboComponentScan(basePackages = "com.yryz.quanhu.order.sdk")
+@MapperScan(basePackages = "com.yryz.quanhu.order.sdk.dao")
+@EnableRabbit
 public class OrderSDKAutoConfig {
 
 }

@@ -46,55 +46,6 @@
 			jdbcType="TIMESTAMP" />
 	</resultMap>
 
-	<resultMap id="LabelStarModelResultMap" type="com.yryz.quanhu.user.entity.LabelStarModel">
-		<id column="id" property="id" jdbcType="BIGINT" />
-		<result column="kid" property="kid" jdbcType="BIGINT" />
-		<result column="user_id" property="userId" jdbcType="BIGINT" />
-		<result column="app_id" property="appId" jdbcType="VARCHAR" />
-		<result column="organization_name" property="organizationName"
-				jdbcType="VARCHAR" />
-		<result column="real_name" property="realName" jdbcType="VARCHAR" />
-		<result column="id_card" property="idCard" jdbcType="VARCHAR" />
-		<result column="location" property="location" jdbcType="VARCHAR" />
-		<result column="trade_field" property="tradeField" jdbcType="VARCHAR" />
-		<result column="owner_app_id" property="ownerAppId" jdbcType="VARCHAR" />
-		<result column="resource_desc" property="resourceDesc"
-				jdbcType="VARCHAR" />
-		<result column="contact_call" property="contactCall" jdbcType="VARCHAR" />
-		<result column="organization_paper" property="organizationPaper"
-				jdbcType="VARCHAR" />
-		<result column="auth_type" property="authType" jdbcType="TINYINT" />
-		<result column="auth_way" property="authWay" jdbcType="TINYINT" />
-		<result column="audit_status" property="auditStatus" jdbcType="TINYINT" />
-		<result column="recommend_status" property="recommendStatus"
-				jdbcType="TINYINT" />
-
-		<!--star最终热度-->
-		<result column="last_heat" property="lastHeat" jdbcType="INTEGER" />
-
-		<result column="recommend_desc" property="recommendDesc"
-				jdbcType="VARCHAR" />
-		<result column="recommend_height" property="recommendHeight"
-				jdbcType="INTEGER" />
-		<result column="operational" property="operational" jdbcType="VARCHAR" />
-		<result column="recommend_operate" property="recommendOperate"
-				jdbcType="VARCHAR" />
-		<result column="audit_fail_reason" property="auditFailReason"
-				jdbcType="VARCHAR" />
-		<result column="auth_time" property="authTime" jdbcType="TIMESTAMP" />
-		<result column="audit_fail_time" property="auditFailTime"
-				jdbcType="TIMESTAMP" />
-		<result column="auth_cancel_time" property="authCancelTime"
-				jdbcType="TIMESTAMP" />
-		<result column="recommend_time" property="recommendTime"
-				jdbcType="TIMESTAMP" />
-		<result column="recommend_cancel_time" property="recommendCancelTime"
-				jdbcType="TIMESTAMP" />
-		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
-		<result column="last_update_date" property="lastUpdateDate"
-				jdbcType="TIMESTAMP" />
-	</resultMap>
-
 	<sql id="Base_Column_List">
 		a.user_id, a.organization_name, a.real_name, a.id_card, a.location,
 		a.trade_field, a.owner_app_id,
@@ -219,20 +170,21 @@
 		a.user_id as
 		userId,
 		a.trade_field as tradeField,
-		a.recommend_desc as recommendDesc
+		a.recommend_desc as recommendDesc,
+		a.recommend_status as recommendStatus
 		from qh_user_star_auth a
 		left join qh_user_tag t on
 		a.user_id = t.user_id
 		left join qh_user_heat h on
 		a.user_id = h.user_id
 		where
-		t.tag_id = #{categoryId} AND
-		a.recommend_status = 11 and a.audit_status = 11
+		t.tag_id = #{categoryId}
+		and a.audit_status = 11
 		<if test="userId != null">
 			and a.user_id != #{userId}
 		</if>
-		order by a.recommend_height desc,a.recommend_time desc,a.auth_time desc, h.last_heat DESC
-		limit #{start},#{limit}
+		order by a.recommend_height desc,a.recommend_time desc,a.auth_time desc, h.last_heat desc
+		limit #{start}, #{limit}
 	</select>
 
 

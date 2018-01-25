@@ -54,7 +54,7 @@ public class UserStarTest {
 		paramDTO.setCategoryId(5881248773L);
 		paramDTO.setStart(0);
 		paramDTO.setLimit(10);
-		paramDTO.setUserId(null);
+		paramDTO.setUserId(727061873573347328L);
 		Response<List<StarInfoVO>> response = starApi.labelStarList(paramDTO);
 		System.out.println("labelStarListTest: " + JsonUtils.toFastJson(response));
 	}

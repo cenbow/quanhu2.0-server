@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * 积分事件类型维护接口
- * @author lsn on 2017/8/28.
+ * @author syc on 2018/1/22.
  */
 public class ScoreEventInfo implements Serializable{
 
