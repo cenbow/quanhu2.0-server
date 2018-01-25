@@ -21,14 +21,22 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DymaicCache {
 
-    //动态信息
-    private final static String KEY_DYNAMIC_INFO = "dy.i.";
-    //发布列表
-    private final static String KEY_DYNAMIC_SENDLIST = "dy.s.";
-    //timeLine列表
-    private final static String KEY_DYNAMIC_TIMELINE = "dy.t.";
+    /**
+     * 动态信息
+     */
+    private final static String KEY_DYNAMIC_INFO = "dymaic:i:";
+    /**
+     * 发布列表
+     */
+    private final static String KEY_DYNAMIC_SENDLIST = "dymaic:s:";
+    /**
+     * timeLine列表
+     */
+    private final static String KEY_DYNAMIC_TIMELINE = "dymaic:t:";
 
-    //动态信息过期时间
+    /**
+     * 动态信息过期时间
+     */
     private final static int EXPIRE_DAY = 30;
 
     @Autowired
@@ -153,7 +161,13 @@ public class DymaicCache {
     public Set<Long> rangeSendList(Long userId, Long kid, Long limit) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
-        Set<Long> sendList = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid, 0, limit);
+        Set<Long> sendList = null;
+        if (kid <= 0) {
+            sendList = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
+        } else {
+            sendList = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid - 1, 0, limit);
+        }
+
         return sendList;
     }
 
@@ -235,7 +249,12 @@ public class DymaicCache {
     public Set<Long> rangeTimeLine(Long userId, Long kid, Long limit) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
-        Set<Long> timeLine = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid, 0, limit);
+        Set<Long> timeLine = null;
+        if (kid <= 0) {
+            timeLine = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
+        } else {
+            timeLine = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid - 1, 0, limit);
+        }
         return timeLine;
     }
 

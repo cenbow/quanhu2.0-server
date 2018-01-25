@@ -9,6 +9,7 @@ package com.yryz.quanhu.dymaic.mq;
 
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.service.DymaicServiceImpl;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class DymaicConsumer {
 	Logger logger = LoggerFactory.getLogger(DymaicConsumer.class);
 
 	@Autowired
-	private DymaicService dymaicService;
+	private DymaicServiceImpl dymaicServiceImpl;
 	
 	/**
 	 * QueueBinding: exchange和queue的绑定
@@ -51,8 +52,11 @@ public class DymaicConsumer {
 			key=AmqpConstant.DYMAIC_QUEUE)
 	)
 	public void handleMessage(String data) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("mqConsumer recive " + data);
+		}
 		Dymaic dymaic = GsonUtils.json2Obj(data, Dymaic.class);
-		dymaicService.pushTimeLine(dymaic);
+		dymaicServiceImpl.pushTimeLine(dymaic);
 	}
 
 }
