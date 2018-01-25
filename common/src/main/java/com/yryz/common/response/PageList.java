@@ -26,7 +26,7 @@ public class PageList<T> implements Serializable {
     /**实体数据集合*/
     private List<T> entities;
     /**总页码*/
-    private Long count;
+    private Long count = 1l;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -64,7 +64,26 @@ public class PageList<T> implements Serializable {
         this.count = count;
     }
 
-    @Override
+    public PageList() {
+		super();
+	}
+
+	public PageList(Integer currentPage, Integer pageSize, List<T> entities) {
+		super();
+		this.currentPage = currentPage;
+		this.pageSize = pageSize;
+		this.entities = entities;
+	}
+
+	public PageList(Integer currentPage, Integer pageSize, List<T> entities, Long count) {
+		super();
+		this.currentPage = currentPage;
+		this.pageSize = pageSize;
+		this.entities = entities;
+		this.count = count;
+	}
+
+	@Override
     public String toString() {
         return "PageList{" +
                 "currentPage=" + currentPage +

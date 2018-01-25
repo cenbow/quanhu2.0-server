@@ -28,6 +28,7 @@ public class DubboConfig {
     	ConsumerConfig consumerConfig = new ConsumerConfig();
     	consumerConfig.setCheck(false);
     	consumerConfig.setLazy(true);
+		consumerConfig.setTimeout(30000);
     	return consumerConfig;
 	}
 

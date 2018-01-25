@@ -69,14 +69,14 @@ public interface UserStarService {
      * @param start
      *@param limit @return
      */
-    List<UserStarAuth> starList(StarAuthParamDTO paramDTO);
+    Page<UserStarAuth> starList(StarAuthParamDTO paramDTO);
 
     /**
      * 标签达人列表
      * @param paramDTO
      * @return
      */
-    List<UserStarAuth> labelStarList(StarAuthParamDTO paramDTO);
+    Page<UserStarAuth> labelStarList(StarAuthParamDTO paramDTO);
     
     /**
      * 达人申请以及审核日志查询

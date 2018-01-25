@@ -50,6 +50,10 @@ public class UpdateBaseInfoDTO implements Serializable{
      */
     private String cityCode;
     
+	/**
+	 * 最终热度值
+	 */
+	private Integer lastHeat;
     public Long getUserId() {
         return userId;
     }
@@ -110,6 +114,12 @@ public class UpdateBaseInfoDTO implements Serializable{
     public void setCityCode(String cityCode) {
         this.cityCode = cityCode;
     }
+	public Integer getLastHeat() {
+		return lastHeat;
+	}
+	public void setLastHeat(Integer lastHeat) {
+		this.lastHeat = lastHeat;
+	}
 	public UpdateBaseInfoDTO() {
 		super();
 	}
