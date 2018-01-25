@@ -12,4 +12,14 @@ public class AdvertisementConstants {
 
     public static final String QH_ADVERTISEMENT_LIST = "qh_advertisement_list";
 
+    /**
+     * 引导页
+     */
+    public static final Integer TYPE_GUIDE = 10;
+
+
+    /**
+     * 首页
+     */
+    public static final Integer TYPE_BANNER = 20;
 }

@@ -43,7 +43,7 @@ public class LikeProvider implements LikeApi {
     public Response<Map<String, Object>> dian(Like like) {
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            like.setKid(idAPI.getKid(LikeContants.QH_LIKE).getData());
+            like.setKid(idAPI.getSnowflakeId().getData());
             int isLikeCount = likeService.isLike(like);
             if (isLikeCount <= 0) {
                 int dianCount = likeService.accretion(like);

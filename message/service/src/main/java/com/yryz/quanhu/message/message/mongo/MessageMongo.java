@@ -29,7 +29,7 @@ public class MessageMongo extends AbsBaseMongoDAO<MessageVo> {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MessageMongo.class);
 
-    public static final String COLLECTION_NAME = "message";
+    public static final String COLLECTION_NAME = "messageVo";
 
     @Override
     protected void setMongoTemplate(MongoTemplate mongoTemplate) {
