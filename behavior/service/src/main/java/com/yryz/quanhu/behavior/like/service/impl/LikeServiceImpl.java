@@ -44,7 +44,7 @@ public class LikeServiceImpl implements LikeService {
         pageList.setCurrentPage(likeFrontDTO.getCurrentPage());
         pageList.setPageSize(likeFrontDTO.getPageSize());
         List<LikeVO> likeVOS=likeDao.queryLikers(likeFrontDTO);
-        pageList.setCount(Long.valueOf(likeVOS.size()));
+        //pageList.setCount(Long.valueOf(likeVOS.size()));
         pageList.setEntities(likeVOS);
         return pageList;
     }
