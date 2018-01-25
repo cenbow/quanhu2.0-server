@@ -7,7 +7,7 @@ import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 
 public interface TopicPostService {
 
-    public TopicPostVo saveTopicPost(TopicPostDto topicPostDto);
+    public Integer saveTopicPost(TopicPostDto topicPostDto);
 
     public TopicAndPostVo getDetail(Long kid, Long userId);
 
