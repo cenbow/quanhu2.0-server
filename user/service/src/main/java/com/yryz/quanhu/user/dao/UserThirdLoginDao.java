@@ -21,7 +21,7 @@ public interface UserThirdLoginDao {
 	 * @param thirdId
 	 * @return
 	 */
-    int delete(@Param("userId")String userId,@Param("thirdId")String thirdId);
+    int delete(@Param("userId")Long userId,@Param("thirdId")String thirdId);
     
     /**
      * 新增第三方账户信息
@@ -35,7 +35,7 @@ public interface UserThirdLoginDao {
      * @param userId
      * @return
      */
-    List<UserThirdLogin> selectByUserId(String userId);
+    List<UserThirdLogin> selectByUserId(Long userId);
     
     /**
      * 根据第三方id查询第三方账户信息

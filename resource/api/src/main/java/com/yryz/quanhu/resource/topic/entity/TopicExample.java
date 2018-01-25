@@ -9,7 +9,27 @@ public class TopicExample {
 
     protected boolean distinct;
 
+    protected  Integer pageStartIndex;
+
+    protected  Integer pageSize;
+
     protected List<Criteria> oredCriteria;
+
+    public Integer getPageStartIndex() {
+        return pageStartIndex;
+    }
+
+    public void setPageStartIndex(Integer pageStartIndex) {
+        this.pageStartIndex = pageStartIndex;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public TopicExample() {
         oredCriteria = new ArrayList<Criteria>();

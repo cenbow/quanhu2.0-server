@@ -165,6 +165,33 @@ public class ActivityVoteInfoVo implements Serializable {
      * */
     private Long amountOfAccess;
 
+    /**
+     * 是否可评论(10否 11是)
+     */
+    private  Integer commentFlag;
+
+    /**
+     * app内投票规则   11,整个活动时间内的总投票数  12,活动期间每天可投
+     */
+    private  Integer inAppVoteType;
+
+    /**
+     * app内配置票数
+     */
+    private  Integer inAppVoteConfigCount;
+
+    /**
+     * app外投票规则   11,整个活动时间内的总投票数  12,活动期间每天可投
+     */
+    private  Integer otherAppVoteType;
+
+    /**
+     * app外配置票数
+     */
+    private  Integer otherAppVoteConfigCount;
+
+
+
     public Long getKid() {
         return kid;
     }
@@ -419,5 +446,45 @@ public class ActivityVoteInfoVo implements Serializable {
 
     public void setAmountOfAccess(Long amountOfAccess) {
         this.amountOfAccess = amountOfAccess;
+    }
+
+    public Integer getCommentFlag() {
+        return commentFlag;
+    }
+
+    public void setCommentFlag(Integer commentFlag) {
+        this.commentFlag = commentFlag;
+    }
+
+    public Integer getInAppVoteType() {
+        return inAppVoteType;
+    }
+
+    public void setInAppVoteType(Integer inAppVoteType) {
+        this.inAppVoteType = inAppVoteType;
+    }
+
+    public Integer getInAppVoteConfigCount() {
+        return inAppVoteConfigCount;
+    }
+
+    public void setInAppVoteConfigCount(Integer inAppVoteConfigCount) {
+        this.inAppVoteConfigCount = inAppVoteConfigCount;
+    }
+
+    public Integer getOtherAppVoteType() {
+        return otherAppVoteType;
+    }
+
+    public void setOtherAppVoteType(Integer otherAppVoteType) {
+        this.otherAppVoteType = otherAppVoteType;
+    }
+
+    public Integer getOtherAppVoteConfigCount() {
+        return otherAppVoteConfigCount;
+    }
+
+    public void setOtherAppVoteConfigCount(Integer otherAppVoteConfigCount) {
+        this.otherAppVoteConfigCount = otherAppVoteConfigCount;
     }
 }

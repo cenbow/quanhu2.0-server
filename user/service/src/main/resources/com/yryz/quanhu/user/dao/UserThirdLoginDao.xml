@@ -61,6 +61,9 @@
 			<if test="kid != null">
 				kid,
 			</if>
+			<if test="appId != null">
+				app_id,
+			</if>
 			<if test="userId != null">
 				user_id,
 			</if>
@@ -89,6 +92,9 @@
 			</if>
 			<if test="kid != null">
 				#{kid,jdbcType=BIGINT},
+			</if>
+			<if test="appId != null">
+				#{appId},
 			</if>
 			<if test="userId != null">
 				#{userId,jdbcType=BIGINT},

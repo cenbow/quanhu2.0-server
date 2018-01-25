@@ -2,9 +2,10 @@ package com.yryz.quanhu.resource.topic.vo;
 
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TopicPostVo {
+public class TopicPostVo  implements Serializable {
 
     private Long kid;
 
@@ -31,6 +32,8 @@ public class TopicPostVo {
     private Date createDate;
 
     private UserSimpleVO user;
+
+    private Integer coterieId;
 
     public Long getKid() {
         return kid;
@@ -134,5 +137,13 @@ public class TopicPostVo {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Integer getCoterieId() {
+        return coterieId;
+    }
+
+    public void setCoterieId(Integer coterieId) {
+        this.coterieId = coterieId;
     }
 }

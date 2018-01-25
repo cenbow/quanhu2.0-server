@@ -18,7 +18,7 @@ public class QuestionDto implements Serializable {
 
     private Byte delFlag;
 
-    private String coterieId;
+    private Long  coterieId;
 
     private Long chargeAmount;
 
@@ -30,6 +30,9 @@ public class QuestionDto implements Serializable {
 
     private Long createUserId;
 
+    private Integer pageNum;
+
+    private  Integer pageSize;
 
     public Long getKid() {
         return kid;
@@ -79,11 +82,11 @@ public class QuestionDto implements Serializable {
         this.delFlag = delFlag;
     }
 
-    public String getCoterieId() {
+    public Long  getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 
@@ -125,5 +128,21 @@ public class QuestionDto implements Serializable {
 
     public void setCreateUserId(Long createUserId) {
         this.createUserId = createUserId;
+    }
+
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }

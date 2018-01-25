@@ -10,13 +10,26 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class StarAuthParamDTO implements Serializable {
 	/**
+	 * 达人标签(二级分类)
+	 */
+	private Long categoryId;
+
+	/**
 	 * 起始位置
 	 */
-	private int  start;
+	private Integer start;
+	/**
+	 * 页长度
+	 */
+	private Integer limit;
+	/**
+	 * 当前用户id
+	 */
+	private Long userId;
 	/**
 	 * 用户昵称
 	 */
-	private String custNname;
+	private String userNname;
 	/**
 	 * 联系方式
 	 */
@@ -30,13 +43,13 @@ public class StarAuthParamDTO implements Serializable {
 	 */
 	private Byte authType;
 	/**
-	 * 认证方式 0:用户申请 1:平台设置
+	 * 认证方式 10:用户申请 11:平台设置
 	 */
 	private Byte authWay;
 	/**
 	 * 用户等级
 	 */
-	private Integer custLevel;
+	private Integer userLevel;
 	/**
 	 * 申请起始时间
 	 */
@@ -54,18 +67,25 @@ public class StarAuthParamDTO implements Serializable {
 	 */
 	private Boolean starRecommend;
 
+	public Long getCategoryId() {
+		return categoryId;
+	}
 
-	public int getStart() {
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public Integer getStart() {
 		return start;
 	}
-	public void setStart(int start) {
+	public void setStart(Integer start) {
 		this.start = start;
 	}
-	public String getCustNname() {
-		return custNname;
+	public String getUserNname() {
+		return userNname;
 	}
-	public void setCustNname(String custNname) {
-		this.custNname = custNname;
+	public void setUserNname(String userNname) {
+		this.userNname = userNname;
 	}
 	public String getPhone() {
 		return phone;
@@ -91,11 +111,11 @@ public class StarAuthParamDTO implements Serializable {
 	public void setAuthWay(Byte authWay) {
 		this.authWay = authWay;
 	}
-	public Integer getCustLevel() {
-		return custLevel;
+	public Integer getUserLevel() {
+		return userLevel;
 	}
-	public void setCustLevel(Integer custLevel) {
-		this.custLevel = custLevel;
+	public void setUserLevel(Integer userLevel) {
+		this.userLevel = userLevel;
 	}
 	public String getStartTime() {
 		return startTime;
@@ -120,5 +140,17 @@ public class StarAuthParamDTO implements Serializable {
 	}
 	public void setStarRecommend(Boolean starRecommend) {
 		this.starRecommend = starRecommend;
+	}
+	public Integer getLimit() {
+		return limit;
+	}
+	public void setLimit(Integer limit) {
+		this.limit = limit;
+	}
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 }

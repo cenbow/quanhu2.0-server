@@ -61,6 +61,19 @@ public class Notice extends GenericEntity {
      */
     private String appName;
 
+    /**
+     * 枚举id
+     */
+    private String moduleEnum;
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
+    }
+
     public String getTitle() {
         return this.title;
     }

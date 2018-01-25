@@ -8,6 +8,12 @@ import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 public interface ActivityCandidateService {
 
     /**
+     * 增加参与者
+     * @param activityVoteDto
+     * */
+    void join(ActivityVoteDto activityVoteDto);
+
+    /**
      * 活动配置信息
      * @param   activityInfoId
      * @return
@@ -16,12 +22,10 @@ public interface ActivityCandidateService {
 
     /**
      * 获取参与者详情
-     * @param   activityInfoId
-     * @param   candidateId
-     * @param   userId
+     * @param   activityVoteDto
      * @return
      * */
-    ActivityVoteDetailVo detail(Long activityInfoId, Long candidateId, Long userId);
+    ActivityVoteDetailVo detail(ActivityVoteDto activityVoteDto);
 
     /**
      * 获取参与者列表

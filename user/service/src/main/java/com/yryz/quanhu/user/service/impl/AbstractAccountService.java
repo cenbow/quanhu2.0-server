@@ -145,7 +145,8 @@ public class AbstractAccountService implements AccountService {
 		if (userId == null) {
 			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
 		}
-		UserAccount account = getUserAccountByUserId(userId.toString());
+		//兼容未绑定手机号的老用户
+		UserAccount account = getUserAccountByUserId(userId);
 		if(StringUtils.isBlank(account.getUserPhone())){
 			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
 		}
@@ -164,15 +165,17 @@ public class AbstractAccountService implements AccountService {
 		registerDTO.setUserNickName(thirdUser.getNickName());
 		registerDTO.setUserLocation(thirdUser.getLocation());
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
+		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
+		registerDTO.setUserPhone(loginDTO.getPhone());
 		Long userId = createUser(registerDTO);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
-				thirdUser.getNickName()));
+				thirdUser.getNickName(),loginDTO.getRegLogDTO().getAppId()));
 		return userId;
 	}
 
 	@Override
-	public List<LoginMethodVO> getLoginMethod(String userId) {
+	public List<LoginMethodVO> getLoginMethod(Long userId) {
 		List<UserThirdLogin> logins = thirdLoginService.selectByUserId(userId);
 		if (CollectionUtils.isEmpty(logins)) {
 			logins = new ArrayList<>();
@@ -187,7 +190,7 @@ public class AbstractAccountService implements AccountService {
 
 		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
-			LoginMethodVO methodVO = new LoginMethodVO(account.getKid().toString(), account.getUserPhone(),
+			LoginMethodVO methodVO = new LoginMethodVO(account.getKid(), account.getUserPhone(),
 					RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
@@ -235,7 +238,7 @@ public class AbstractAccountService implements AccountService {
 		Long userId = createUser(registerDTO);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(),
-				(byte) RegType.getEnumByText(loginType).getType(), thirdUser.getNickName()));
+				(byte) RegType.getEnumByText(loginType).getType(), thirdUser.getNickName(),"appId"));
 
 		return userId;
 	}
@@ -273,15 +276,15 @@ public class AbstractAccountService implements AccountService {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "不是本人不能操作");
 		}
 		// 判断用户手机号是否都为空？
-		UserAccount account = selectOne(thirdLogin.getUserId().toString(), null, null, null);
+		UserAccount account = selectOne(thirdLogin.getUserId(), null, null, null);
 		if (StringUtils.isBlank(account.getUserEmail()) && StringUtils.isBlank(account.getUserPhone())) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "主账号没有其他登录方式，不能解绑第三方");
 		}
-		thirdLoginService.delete(userId.toString(), thirdId);
+		thirdLoginService.delete(userId, thirdId);
 	}
 
 	@Override
-	public void editPassword(String userId, String newPassword, String oldPassword) {
+	public void editPassword(Long userId, String newPassword, String oldPassword) {
 		UserAccount account = selectOne(userId, null, null, oldPassword);
 		if (account == null) {
 			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "旧密码不正确",
@@ -331,7 +334,7 @@ public class AbstractAccountService implements AccountService {
 	 * @return
 	 */
 	@Transactional(rollbackFor = RuntimeException.class)
-	public int delete(String userId) {
+	public int delete(Long userId) {
 		try {
 			// 删除用户信息
 			// 删除第三方账户
@@ -391,7 +394,7 @@ public class AbstractAccountService implements AccountService {
 	 * @param appId
 	 * @return
 	 */
-	private UserAccount selectOne(String userId, String custPhone, String appId, String custPwd) {
+	private UserAccount selectOne(Long userId, String custPhone, String appId, String custPwd) {
 		try {
 			return mysqlDao.selectOne(userId, custPhone, appId, custPwd);
 		} catch (Exception e) {
@@ -453,13 +456,11 @@ public class AbstractAccountService implements AccountService {
 		userService
 				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
 						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode()));
-
 		// 异步处理
 		// 创建运营信息
-		if (StringUtils.isNotBlank(registerDTO.getUserRegInviterCode())) {
-			operateService.save(
-					new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
-		}
+		operateService.save(
+				new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
+		
 		if (registerDTO.getRegLogDTO() != null) {
 			registerDTO.getRegLogDTO().setUserId(userId);
 			operateService.saveRegLog(registerDTO.getRegLogDTO());
@@ -469,7 +470,7 @@ public class AbstractAccountService implements AccountService {
 	}
 
 	@Override
-	public UserAccount getUserAccountByUserId(String userId) {
+	public UserAccount getUserAccountByUserId(Long userId) {
 		return selectOne(userId, null, null, null);
 	}
 

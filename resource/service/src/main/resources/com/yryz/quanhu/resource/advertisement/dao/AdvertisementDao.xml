@@ -31,13 +31,12 @@
     </sql>
 
     <!-- 查询Advertisement详情 -->
-    <select id="selectByKid" parameterType="java.lang.Long"
+    <select id="detail" parameterType="java.lang.Long"
             resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo">
         select
         <include refid="Base_Column_List"/>
         from qh_adv
-        where adv_status = 20
-        and kid = #{kid,jdbcType=BIGINT}
+        where kid = #{kid,jdbcType=BIGINT}
     </select>
 
     <!-- 删除Advertisement-->
@@ -73,7 +72,7 @@
 	</insert>
 
     <!--按需新增Advertisement-->
-    <insert id="insertByPrimaryKeySelective" parameterType="com.yryz.quanhu.resource.advertisement.entity.Advertisement">
+    <insert id="add" parameterType="com.yryz.quanhu.resource.advertisement.entity.Advertisement">
         insert into qh_adv
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="kid != null">
@@ -271,6 +270,22 @@
         <![CDATA[  AND end_date > #{nowDate} ]]>
         <![CDATA[  AND start_time <= #{nowTime} ]]>
         <![CDATA[  AND end_time > #{nowTime} ]]>
+        order by adv_sort desc, create_date desc
+    </select>
+
+    <select id="selectListAdmin" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        <where>
+            <if test="advStatus != null">
+                adv_status = #{advStatus}
+            </if>
+            <if test="advType != null">
+                and adv_type = #{advType}
+            </if>
+        </where>
         order by adv_sort desc, create_date desc
     </select>
 

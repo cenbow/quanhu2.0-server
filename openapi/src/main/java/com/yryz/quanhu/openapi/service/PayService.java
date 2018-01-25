@@ -23,6 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.rongzhong.component.pay.alipay.AlipayConfig;
+import com.rongzhong.component.pay.api.YryzPaySDK;
+import com.rongzhong.component.pay.chinapay.ChinapayCash;
+import com.rongzhong.component.pay.entity.PayResponse;
+import com.rongzhong.component.pay.wxpay.WxpayConfig;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.RpcOptException;
 import com.yryz.common.response.PageList;
@@ -32,10 +37,13 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.openapi.constants.PayMsgConstant;
+import com.yryz.quanhu.openapi.order.dto.IOSPayConfig;
 import com.yryz.quanhu.openapi.order.dto.OrderListDTO;
 import com.yryz.quanhu.openapi.order.dto.PayInfoDTO;
+import com.yryz.quanhu.openapi.order.dto.PayVO;
 import com.yryz.quanhu.openapi.order.dto.UserBankDTO;
 import com.yryz.quanhu.openapi.order.dto.UserPhyDTO;
+import com.yryz.quanhu.openapi.order.utils.DataEnum;
 import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.api.OrderAsynApi;
 import com.yryz.quanhu.order.enums.AccountEnum;
@@ -195,6 +203,12 @@ public class PayService {
 		}
 	}
 
+	/**
+	 * 设置免密支付
+	 * @param custId
+	 * @param type
+	 * @return
+	 */
 	public boolean setFreePay(String custId, Integer type) {
 		UserAccount account = new UserAccount();
 		account.setCustId(custId);
@@ -212,86 +226,97 @@ public class PayService {
 		}
 	}
 
-//	public OrderVO getNewPayFlowId(String custId, String payWay, String orderSrc, long orderAmount, long feeAmount,
-//			String currency, String ipAddress) {
-//		String orderId = getOrderId();
-//
-//		PayInfo payInfo = new PayInfo();
-//		payInfo.setCost(orderAmount);
-//		if (payWay != null && payWay.equals(Constant.PAY_WAY_IOS_IAP)) {
-//			IOSPayConfig config = DataEnum.getIosProductConfig(orderAmount/100);
-//			if (config != null) {
-//				payInfo.setCostTrue(config.getCostTrue() * 100);
-//				payInfo.setCostFee(config.getCostFee() * 100);
-//			} else {
-//				payInfo.setCostTrue(orderAmount);
-//				payInfo.setCostFee(feeAmount);
-//			}
-//		} else {
-//			payInfo.setCostTrue(orderAmount);
-//			payInfo.setCostFee(feeAmount);
-//		}
-//		payInfo.setCreateTime(new Date());
-//		payInfo.setCurrency(currency);
-//		payInfo.setCustId(custId);
-//		payInfo.setOrderChannel(payWay);
-//		payInfo.setOrderDesc("用户充值");
-//		payInfo.setOrderId(orderId);
-//		payInfo.setOrderState(0);
-//		payInfo.setOrderType(1);
-//		payInfo.setProductId(ProductEnum.RECHARGE_TYPE.getType() + "");
-//		payInfo.setProductType(ProductEnum.RECHARGE_TYPE.getType() + "");
-//
-//		OrderVO orderVO = new OrderVO();
-//		orderVO.setOrderAmount(orderAmount);
-//		orderVO.setOrderCurrency(currency);
-//		orderVO.setOrderDatetime(DateUtils.getDate("yyyyMMddHHmmss"));
-//		orderVO.setOrderId(orderId);
-//		orderVO.setProductName("充值支付");
-//
-//		if (payWay != null && payWay.equals(OrderConstant.PAY_WAY_ALIPAY) && (OrderConstant.ORDER_SRC_ANDROID.equals(orderSrc)
-//				|| OrderConstant.ORDER_SRC_IOS.equals(orderSrc) || OrderConstant.ORDER_SRC_WAP.equals(orderSrc))) {
-//			try {
-//				String orderStr = YryzPaySDK.buildAppAliPayOrder(fromOrder(orderVO));
-//				Map<String, String> map = new HashMap<String, String>(1);
-//				map.put("orderStr", orderStr);
-//				orderVO.setExt(map);
-//				payInfo.setStartDesc(GsonUtils.parseJson(map));
-//				orderVO.setProductName("支付宝充值");
-//				payInfo.setProductDesc("支付宝移动充值");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		// 手机端的微信支付，设置扩展参数
-//		if (payWay != null && payWay.equals(OrderConstant.PAY_WAY_WXPAY) && (OrderConstant.ORDER_SRC_ANDROID.equals(orderSrc)
-//				|| OrderConstant.ORDER_SRC_IOS.equals(orderSrc) || OrderConstant.ORDER_SRC_WAP.equals(orderSrc))) {
-//			SortedMap<String, String> wxReqMap;
-//			try {
-//				wxReqMap = YryzPaySDK.buildAppWxPayOrder(fromOrder(orderVO), ipAddress);
-//				orderVO.setExt(wxReqMap);
-//				payInfo.setStartDesc(GsonUtils.parseJson(wxReqMap));
-//				orderVO.setProductName("微信充值");
-//				payInfo.setProductDesc("微信移动充值");
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		orderAPI.executePay(payInfo, custId, null, null);
-//		return orderVO;
-//	}
-//
-//	public com.rongzhong.component.pay.entity.OrderInfo fromOrder(OrderVO orderVO) {
-//		com.rongzhong.component.pay.entity.OrderInfo orderInfo = new com.rongzhong.component.pay.entity.OrderInfo();
-//		orderInfo.setSn(orderVO.getOrderId());
-//		orderInfo.setOrderAmount(orderVO.getOrderAmount());
-//		orderInfo.setOrderCurrency(orderVO.getOrderCurrency());
-//		orderInfo.setOrderDatetime(DateUtils.getDate("yyyyMMddHHmmss"));
-//		orderInfo.setProductName(orderVO.getProductName());
-//		return orderInfo;
-//	}
+	/**
+	 * 生成充值订单
+	 * @param custId
+	 * @param payWay
+	 * @param orderSrc
+	 * @param orderAmount
+	 * @param feeAmount
+	 * @param currency
+	 * @param ipAddress
+	 * @return
+	 */
+	public PayVO getNewPayFlowId(String custId, String payWay, String orderSrc, long orderAmount, long feeAmount,
+			String currency, String ipAddress) {
+		String orderId = getOrderId();
+
+		PayInfo payInfo = new PayInfo();
+		payInfo.setCost(orderAmount);
+		if (payWay != null && payWay.equals(OrderConstant.PAY_WAY_IOS_IAP)) {
+			IOSPayConfig config = DataEnum.getIosProductConfig(orderAmount/100);
+			if (config != null) {
+				payInfo.setCostTrue(config.getCostTrue() * 100);
+				payInfo.setCostFee(config.getCostFee() * 100);
+			} else {
+				payInfo.setCostTrue(orderAmount);
+				payInfo.setCostFee(feeAmount);
+			}
+		} else {
+			payInfo.setCostTrue(orderAmount);
+			payInfo.setCostFee(feeAmount);
+		}
+		payInfo.setCreateTime(new Date());
+		payInfo.setCurrency(currency);
+		payInfo.setCustId(custId);
+		payInfo.setOrderChannel(payWay);
+		payInfo.setOrderDesc("用户充值");
+		payInfo.setOrderId(orderId);
+		payInfo.setOrderState(0);
+		payInfo.setOrderType(1);
+		payInfo.setProductId(ProductEnum.RECHARGE_TYPE.getType() + "");
+		payInfo.setProductType(ProductEnum.RECHARGE_TYPE.getType() + "");
+
+		PayVO payVO = new PayVO();
+		payVO.setOrderAmount(orderAmount);
+		payVO.setOrderCurrency(currency);
+		payVO.setOrderDatetime(DateUtils.getDate("yyyyMMddHHmmss"));
+		payVO.setOrderId(orderId);
+		payVO.setProductName("充值支付");
+
+		if (payWay != null && payWay.equals(OrderConstant.PAY_WAY_ALIPAY) && (OrderConstant.ORDER_SRC_ANDROID.equals(orderSrc)
+				|| OrderConstant.ORDER_SRC_IOS.equals(orderSrc) || OrderConstant.ORDER_SRC_WAP.equals(orderSrc))) {
+			try {
+				String orderStr = YryzPaySDK.buildAppAliPayOrder(fromOrder(payVO));
+				Map<String, String> map = new HashMap<String, String>(1);
+				map.put("orderStr", orderStr);
+				payVO.setExt(map);
+				payInfo.setStartDesc(GsonUtils.parseJson(map));
+				payVO.setProductName("支付宝充值");
+				payInfo.setProductDesc("支付宝移动充值");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 手机端的微信支付，设置扩展参数
+		if (payWay != null && payWay.equals(OrderConstant.PAY_WAY_WXPAY) && (OrderConstant.ORDER_SRC_ANDROID.equals(orderSrc)
+				|| OrderConstant.ORDER_SRC_IOS.equals(orderSrc) || OrderConstant.ORDER_SRC_WAP.equals(orderSrc))) {
+			SortedMap<String, String> wxReqMap;
+			try {
+				wxReqMap = YryzPaySDK.buildAppWxPayOrder(fromOrder(payVO), ipAddress);
+				payVO.setExt(wxReqMap);
+				payInfo.setStartDesc(GsonUtils.parseJson(wxReqMap));
+				payVO.setProductName("微信充值");
+				payInfo.setProductDesc("微信移动充值");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		orderAPI.executePay(payInfo, custId, null, null);
+		return payVO;
+	}
+
+	public com.rongzhong.component.pay.entity.OrderInfo fromOrder(PayVO payVO) {
+		com.rongzhong.component.pay.entity.OrderInfo orderInfo = new com.rongzhong.component.pay.entity.OrderInfo();
+		orderInfo.setSn(payVO.getOrderId());
+		orderInfo.setOrderAmount(payVO.getOrderAmount());
+		orderInfo.setOrderCurrency(payVO.getOrderCurrency());
+		orderInfo.setOrderDatetime(DateUtils.getDate("yyyyMMddHHmmss"));
+		orderInfo.setProductName(payVO.getProductName());
+		return orderInfo;
+	}
 //
 //	public String buildAppPayOrderStr(OrderVO orderInfo) throws IOException {
 //		Map<String, String> sParaTemp = new HashMap<String, String>(11);
@@ -315,53 +340,57 @@ public class PayService {
 //		return linkStr;
 //	}
 //
-//	@Override
-//	public boolean completePayInfo(PayResponse payResp, String sysAccountType, int orderState) throws Exception {
-//		switch (sysAccountType) {
-//		case OrderConstant.PAY_WAY_ALIPAY:
-//			// 支付宝回调中，商户号可能为空
-//			if (payResp.getMchId() != null && 
-//					!AlipayConfig.partner.equals(payResp.getMchId())) {
-//				logger.error("支付宝回调中商户号不一致，回调信息：" + payResp.toString());
-//				throw new Exception("支付宝回调中商户号不一致，回调信息：" + payResp.toString());
-//			}
-//			break;
-//		case OrderConstant.PAY_WAY_WXPAY:
-//			if (!WxpayConfig.MCH_ID.equals(payResp.getMchId()) && !WxpayConfig.GZH_MCH_ID.equals(payResp.getMchId())) {
-//				logger.error("微信回调中商户号不一致，回调信息：" + payResp.toString());
-//				throw new Exception("微信回调中商户号不一致，回调信息：" + payResp.toString());
-//			}
-//			break;
-//		default:;	
-//		}
-//
-//		// 回写数据库结果
-//		PayInfo info = fromPayInfo(payResp);
-//		info.setOrderState(orderState);
-//		try {
-//			info = orderAPI.executePay(info, null, null, null).getData();
-//			if (info != null) {
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		} catch (Exception e) {
-//			logger.warn("资金RPC调用异常，设置资金结果失败", e);
-//			return false;
-//		}
-//	}
-//
-//	private PayInfo fromPayInfo(PayResponse payResp) {
-//		PayInfo payInfo = new PayInfo();
-//		payInfo.setOrderId(payResp.getSn());
-//		payInfo.setCompleteTime(new Date());
-//		payInfo.setEndDesc(GsonUtils.parseJson(payResp));
-//		// 如果金额不为空，则传入金额
-//		if (StringUtils.isNotEmpty(payResp.getPayAmount())) { 
-//			payInfo.setCost(Long.parseLong(payResp.getPayAmount()));
-//		}
-//		return payInfo;
-//	}
+	public boolean completePayInfo(PayResponse payResp, String sysAccountType, int orderState) throws Exception {
+		switch (sysAccountType) {
+		case OrderConstant.PAY_WAY_ALIPAY:
+			// 支付宝回调中，商户号可能为空
+			if (payResp.getMchId() != null && 
+					!AlipayConfig.partner.equals(payResp.getMchId())) {
+				logger.error("支付宝回调中商户号不一致，回调信息：" + payResp.toString());
+				throw new Exception("支付宝回调中商户号不一致，回调信息：" + payResp.toString());
+			}
+			break;
+		case OrderConstant.PAY_WAY_WXPAY:
+			if (!WxpayConfig.MCH_ID.equals(payResp.getMchId()) && !WxpayConfig.GZH_MCH_ID.equals(payResp.getMchId())) {
+				logger.error("微信回调中商户号不一致，回调信息：" + payResp.toString());
+				throw new Exception("微信回调中商户号不一致，回调信息：" + payResp.toString());
+			}
+			break;
+		default:;	
+		}
+
+		// 回写数据库结果
+		PayInfo info = fromPayInfo(payResp);
+		info.setOrderState(orderState);
+		try {
+			info = orderAPI.executePay(info, null, null, null).getData();
+			if (info != null) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			logger.warn("资金RPC调用异常，设置资金结果失败", e);
+			return false;
+		}
+	}
+
+	/**
+	 * 生成资金订单
+	 * @param payResp
+	 * @return
+	 */
+	private PayInfo fromPayInfo(PayResponse payResp) {
+		PayInfo payInfo = new PayInfo();
+		payInfo.setOrderId(payResp.getSn());
+		payInfo.setCompleteTime(new Date());
+		payInfo.setEndDesc(GsonUtils.parseJson(payResp));
+		// 如果金额不为空，则传入金额
+		if (StringUtils.isNotEmpty(payResp.getPayAmount())) { 
+			payInfo.setCost(Long.parseLong(payResp.getPayAmount()));
+		}
+		return payInfo;
+	}
 
 	public Response<?> checkPassword(String custId, String password) {
 		return orderAPI.checkUserPayPassword(custId, password);
@@ -375,72 +404,81 @@ public class PayService {
 		return orderAPI.unlockUserAccount(custId);
 	}
 
+	/**
+	 * 用户提现
+	 * @param appId
+	 * @param custId
+	 * @param cost
+	 * @param cust2BankId
+	 * @param password
+	 * @return
+	 */
 	public Response<?> getCash(String appId ,String custId, String cost, String cust2BankId, String password) {
 				
-//		CustBank custBank = orderAPI.getCustBankById(cust2BankId).getData();
-//		if (custBank == null) {
-//			return ResponseUtils.returnCommonException("银行卡信息不存在");
-//		}
-//		String orderId = getOrderId();
-//		
-//		Response<?> return1 = checkPassword(custId, password);
-//		if (return1 == null  || !return1.success()) {
-//			return return1;
-//		}
-//
-//		PayInfo payInfo = new PayInfo();
-//		payInfo.setCost(Long.parseLong(cost));
-//		payInfo.setCostTrue(Long.parseLong(cost));
-//		// 手续费 固定2块
-//		payInfo.setCostFee(200L); 
-//		payInfo.setCreateTime(new Date());
-//		payInfo.setCurrency("156");
-//		payInfo.setCustId(custId);
-//		payInfo.setOrderChannel(OrderConstant.PAY_WAY_UNIONPAY);
-//		payInfo.setOrderDesc(OrderDescEnum.INTEGRAL_CASH);
-//		payInfo.setOrderId(orderId);
-//		payInfo.setOrderState(1);
-//		payInfo.setOrderType(0);
-//		payInfo.setProductId(ProductEnum.CASH_TYPE.getType() + "");
-//		payInfo.setProductType(ProductEnum.CASH_TYPE.getType() + "");
-//		payInfo.setRemark("custBankNo:" + custBank.getBankCardNo());
-//
-//		OrderVO orderVO = new OrderVO();
-//		orderVO.setOrderAmount(Long.parseLong(cost));
-//		orderVO.setOrderCurrency("156");
-//		orderVO.setOrderDatetime(DateUtils.getDate("yyyyMMddHHmmss"));
-//		orderVO.setOrderId(orderId);
-//		orderVO.setProductName("银联提现");
-//
-//		PayInfo info = orderAPI.executePay(payInfo, custId, null, null);
-//		if (info == null) {
-//			return ResponseUtils.returnCommonException("积分余额不足");
-//		}
-//		// 银联商务提现接口取消
-//		// boolean flag = UnionpayCash.payCash(cost, orderId,
-//		// custBank.getName(), custBank.getBankCardNo().replace(" ", ""),
-//		// txnTime);
-//		try {
-//			boolean flag = ChinapayCash.payCash(cost, orderId, custBank.getName(),
-//					custBank.getBankCardNo().replace(" ", ""), custBank.getBankCode());
-//			if (!flag) {
-//				// 只会退交易费，手续费照扣
-//				executeCashRefundOrder(custId, (Long.parseLong(cost)));
-//				logger.warn("china pay is wrong ...提现失败 , custId: " + custId + "-bankCardNo:" + custBank.getBankCardNo()
-//						+ "-cost:" + (Long.parseLong(cost)));
-//				return ResponseUtils.returnCommonException("提现申请银行处理失败，系统已自动退回此笔申请，如还有问题请联系客服解决");
-//			}
-////			pushService.cash(custId, Long.parseLong(cost),appId);
-//		} catch (RpcOptException e) {
-//			// 此异常说明是退款RPC执行失败，直接跑到页面端处理
-//			throw e;
-//		} catch (Exception e) {
-//			// 只会退交易费，手续费照扣
-//			executeCashRefundOrder(custId, (Long.parseLong(cost)));
-//			logger.warn("china pay is wrong unknown exception ...提现失败 ,未知异常。 custId: " + custId + "-bankCardNo:"
-//					+ custBank.getBankCardNo() + "-cost:" + (Long.parseLong(cost)), e);
-//			return ResponseUtils.returnCommonException("提现申请银行处理失败，系统已自动退回此笔申请，如还有问题请联系客服解决");
-//		}
+		CustBank custBank = orderAPI.getCustBankById(cust2BankId).getData();
+		if (custBank == null) {
+			return ResponseUtils.returnCommonException("银行卡信息不存在");
+		}
+		String orderId = getOrderId();
+		
+		Response<?> return1 = checkPassword(custId, password);
+		if (return1 == null  || !return1.success()) {
+			return return1;
+		}
+
+		PayInfo payInfo = new PayInfo();
+		payInfo.setCost(Long.parseLong(cost));
+		payInfo.setCostTrue(Long.parseLong(cost));
+		// 手续费 固定2块
+		payInfo.setCostFee(200L); 
+		payInfo.setCreateTime(new Date());
+		payInfo.setCurrency("156");
+		payInfo.setCustId(custId);
+		payInfo.setOrderChannel(OrderConstant.PAY_WAY_UNIONPAY);
+		payInfo.setOrderDesc(OrderDescEnum.INTEGRAL_CASH);
+		payInfo.setOrderId(orderId);
+		payInfo.setOrderState(1);
+		payInfo.setOrderType(0);
+		payInfo.setProductId(ProductEnum.CASH_TYPE.getType() + "");
+		payInfo.setProductType(ProductEnum.CASH_TYPE.getType() + "");
+		payInfo.setRemark("custBankNo:" + custBank.getBankCardNo());
+
+		PayVO payVO = new PayVO();
+		payVO.setOrderAmount(Long.parseLong(cost));
+		payVO.setOrderCurrency("156");
+		payVO.setOrderDatetime(DateUtils.getDate("yyyyMMddHHmmss"));
+		payVO.setOrderId(orderId);
+		payVO.setProductName("银联提现");
+
+		PayInfo info = orderAPI.executePay(payInfo, custId, null, null).getData();
+		if (info == null) {
+			return ResponseUtils.returnCommonException("积分余额不足");
+		}
+		// 银联商务提现接口取消
+		// boolean flag = UnionpayCash.payCash(cost, orderId,
+		// custBank.getName(), custBank.getBankCardNo().replace(" ", ""),
+		// txnTime);
+		try {
+			boolean flag = ChinapayCash.payCash(cost, orderId, custBank.getName(),
+					custBank.getBankCardNo().replace(" ", ""), custBank.getBankCode());
+			if (!flag) {
+				// 只会退交易费，手续费照扣
+				executeCashRefundOrder(custId, (Long.parseLong(cost)));
+				logger.warn("china pay is wrong ...提现失败 , custId: " + custId + "-bankCardNo:" + custBank.getBankCardNo()
+						+ "-cost:" + (Long.parseLong(cost)));
+				return ResponseUtils.returnCommonException("提现申请银行处理失败，系统已自动退回此笔申请，如还有问题请联系客服解决");
+			}
+//			pushService.cash(custId, Long.parseLong(cost),appId);
+		} catch (RpcOptException e) {
+			// 此异常说明是退款RPC执行失败，直接跑到页面端处理
+			throw e;
+		} catch (Exception e) {
+			// 只会退交易费，手续费照扣
+			executeCashRefundOrder(custId, (Long.parseLong(cost)));
+			logger.warn("china pay is wrong unknown exception ...提现失败 ,未知异常。 custId: " + custId + "-bankCardNo:"
+					+ custBank.getBankCardNo() + "-cost:" + (Long.parseLong(cost)), e);
+			return ResponseUtils.returnCommonException("提现申请银行处理失败，系统已自动退回此笔申请，如还有问题请联系客服解决");
+		}
 		return ResponseUtils.returnSuccess();
 	}
 

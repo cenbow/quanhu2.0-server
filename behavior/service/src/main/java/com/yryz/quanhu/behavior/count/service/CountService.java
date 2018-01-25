@@ -10,7 +10,9 @@ import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
  */
 public interface CountService {
 
-    void countCommit(BehaviorEnum behaviorEnum, String kid, Long count);
+    void commitCount(BehaviorEnum behaviorEnum, String kid, String page, Long count);
 
-    Long getCount(String kid, String code);
+    Long getCount(String kid, String code, String page);
+
+    void excuteCountSyncMongoJob();
 }

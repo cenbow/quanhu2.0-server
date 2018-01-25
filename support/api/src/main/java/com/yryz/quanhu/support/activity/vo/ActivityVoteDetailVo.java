@@ -8,6 +8,11 @@ import java.io.Serializable;
 public class ActivityVoteDetailVo implements Serializable {
 
     /**
+     * 主键
+     * */
+    private Long id;
+
+    /**
      * 唯一id
      * */
     private Long kid;
@@ -140,6 +145,14 @@ public class ActivityVoteDetailVo implements Serializable {
      * 用户是否有可用投票卷 10否 11是
      */
     private Integer userRollFlag;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getKid() {
         return kid;

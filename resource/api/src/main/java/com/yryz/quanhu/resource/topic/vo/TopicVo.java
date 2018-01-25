@@ -2,7 +2,10 @@ package com.yryz.quanhu.resource.topic.vo;
 
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
-public class TopicVo {
+import java.io.Serializable;
+import java.util.Date;
+
+public class TopicVo implements Serializable {
 
     private Long kid;
 
@@ -20,13 +23,15 @@ public class TopicVo {
 
     private Integer sort;
 
-    private Integer replyCount;
+    private Long replyCount;
 
-    private String coterieId;
+    private Integer coterieId;
 
     private String contentSource;
 
     private UserSimpleVO user;
+
+    private Date createDate;
 
     public Long getKid() {
         return kid;
@@ -92,19 +97,19 @@ public class TopicVo {
         this.sort = sort;
     }
 
-    public Integer getReplyCount() {
+    public Long getReplyCount() {
         return replyCount;
     }
 
-    public void setReplyCount(Integer replyCount) {
+    public void setReplyCount(Long replyCount) {
         this.replyCount = replyCount;
     }
 
-    public String getCoterieId() {
+    public Integer getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
+    public void setCoterieId(Integer coterieId) {
         this.coterieId = coterieId;
     }
 
@@ -122,5 +127,13 @@ public class TopicVo {
 
     public void setUser(UserSimpleVO user) {
         this.user = user;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

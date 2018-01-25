@@ -21,7 +21,7 @@ public class LoginMethodVO implements Serializable {
     /**
      * 用户账户id
      */
-    private String userId;
+    private Long userId;
     /**
      * 第三方id 或者手机号、邮箱
      */
@@ -35,10 +35,10 @@ public class LoginMethodVO implements Serializable {
      */
     private Boolean havePwd;
     
-    public String getuserId() {
+    public Long getuserId() {
         return userId;
     }
-    public void setuserId(String userId) {
+    public void setuserId(Long userId) {
         this.userId = userId;
     }
     public Integer getLoginType() {
@@ -69,7 +69,7 @@ public class LoginMethodVO implements Serializable {
 	 * @param createDate
 	 * @exception 
 	 */
-	public LoginMethodVO(String userId,String thirdId, Integer loginType, boolean havePwd) {
+	public LoginMethodVO(Long userId,String thirdId, Integer loginType, boolean havePwd) {
 		super();
 		this.userId = userId;
 		this.thirdId = thirdId;

@@ -9,6 +9,7 @@ package com.yryz.quanhu.coterie.member.dao;
 
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.entity.CoterieMember;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -18,14 +19,21 @@ import java.util.List;
  * @author chengyunfei
  *
  */
+@Mapper
 public interface CoterieMemberDao {
-    int deleteByPrimaryKey(Long kid);
-    
-    int deleteByCustIdAndCoterieId(@Param("userId") Long userId, @Param("coterieId") Long coterieId);
 
     int insert(CoterieMember record);
 
-    int insertSelective(CoterieMember record);
+    int updateByCoterieMember(CoterieMember record);
+
+
+
+
+    int deleteByPrimaryKey(Long kid);
+    
+    int deleteByUserIdAndCoterieId(@Param("userId") Long userId, @Param("coterieId") Long coterieId, @Param("reason") String reason);
+
+//    int insertSelective(CoterieMember record);
 
     CoterieMember selectByPrimaryKey(Long kid);
 
@@ -33,11 +41,9 @@ public interface CoterieMemberDao {
 
     int updateByPrimaryKey(CoterieMember record);
 
-    int updateByCustIdAndCoterieId(CoterieMember record);
-
     List<CoterieMember> selectPageByCoterieId(@Param("coterieId") Long coterieId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
-    CoterieMember selectByCoterieIdAndCustId(@Param("coterieId") Long coterieId, @Param("custId") Long userId);
+    CoterieMember selectByCoterieIdAndCustId(@Param("coterieId") Long coterieId, @Param("userId") Long userId);
     
     int selectCountByCoterieId(Long coterieId);
     

@@ -9,10 +9,9 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
-import com.yryz.quanhu.dymaic.canal.elasticsearch.CoterieInfoEsRepository;
+import com.yryz.quanhu.dymaic.canal.dao.CoterieInfoRepository;
 import com.yryz.quanhu.dymaic.canal.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.entity.CoterieInfo;
-import com.yryz.quanhu.dymaic.canal.entity.ReleaseInfo;
 
 @Component
 public class CoterieInfoEsHandlerImpl implements SyncHandler {
@@ -23,7 +22,7 @@ public class CoterieInfoEsHandlerImpl implements SyncHandler {
 	private ElasticsearchTemplate elasticsearchTemplate;
 	
 	@Resource
-	private CoterieInfoEsRepository coterieInfoEsRepository;
+	private CoterieInfoRepository coterieInfoRepository;
 	
 	@PostConstruct
 	private void register() {
@@ -49,21 +48,21 @@ public class CoterieInfoEsHandlerImpl implements SyncHandler {
 		CoterieInfo uinfoAfter = EntityParser.parse(msg.getDataAfter(),CoterieInfo.class);
 
 		if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
-			Optional<CoterieInfo> uinfo = coterieInfoEsRepository.findById(uinfoBefore.getKid());
+			Optional<CoterieInfo> uinfo = coterieInfoRepository.findById(uinfoBefore.getKid());
 			if (uinfo.isPresent()) {
 				CoterieInfo userInfo = EntityParser.parse(uinfo.get(), msg.getDataAfter(),CoterieInfo.class);
-				coterieInfoEsRepository.save(userInfo);
+				coterieInfoRepository.save(userInfo);
 			} else {
 				// 先收到了update消息，后收到insert消息
-				coterieInfoEsRepository.save(uinfoAfter);
+				coterieInfoRepository.save(uinfoAfter);
 			}
 		} else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
-			coterieInfoEsRepository.deleteById(uinfoBefore.getKid());
+			coterieInfoRepository.deleteById(uinfoBefore.getKid());
 		} else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
 			// 先执行了update则不执行insert
-			Optional<CoterieInfo> uinfo = coterieInfoEsRepository.findById(uinfoAfter.getKid());
+			Optional<CoterieInfo> uinfo = coterieInfoRepository.findById(uinfoAfter.getKid());
 			if (!uinfo.isPresent()) {
-				coterieInfoEsRepository.save(uinfoAfter);
+				coterieInfoRepository.save(uinfoAfter);
 			}
 		}
 	}

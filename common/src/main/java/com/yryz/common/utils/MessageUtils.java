@@ -51,7 +51,7 @@ public class MessageUtils {
      */
     public static MessageVo buildMessage(MessageConstant mc, String userId, String msg, Object body) {
         MessageVo messageVo = new MessageVo();
-        messageVo.setMessageId(UUID.randomUUID().toString());
+        messageVo.setMessageId(IdGen.uuid());
         messageVo.setActionCode(mc.getMessageActionCode());
         String content = mc.getContent();
         if (StringUtils.isNotEmpty(msg)) {

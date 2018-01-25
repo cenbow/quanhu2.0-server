@@ -34,7 +34,7 @@ import io.swagger.annotations.ApiParam;
 @RestController
 public class ResourceController {
 	
-	@Reference
+	@Reference(check = false)
 	private ResourceApi resourceApi;
 	
 	

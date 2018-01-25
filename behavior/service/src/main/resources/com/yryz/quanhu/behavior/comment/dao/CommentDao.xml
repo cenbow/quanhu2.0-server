@@ -26,11 +26,6 @@
         <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
     </resultMap>
 
-    <sql id="Base_Comment_Column_List">
-        id,kid,top_id,parent_id,parent_user_id,module_enum,coterie_id,target_user_id,content_comment,shelve_flag,del_flag,recommend,create_user_id,
-        create_date,last_update_user_id,last_update_date,tenant_id,revision,nick_name,user_img,resource_id
-    </sql>
-
     <sql id="Base_Comment_Column_List_trans">
         id,kid,top_id AS topId,parent_id AS parentId,parent_user_id AS parentUserId,module_enum AS moduleEnum,coterie_id AS coterieId,
         target_user_id AS targetUserId,content_comment AS contentComment,shelve_flag AS shelveFlag,del_flag AS delFlag,recommend,create_user_id AS createUserId,
@@ -168,7 +163,7 @@
     <select id="querySingleComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment"
             resultMap="BaseCommentResultMap">
         SELECT
-        <include refid="Base_Comment_Column_List"/>
+        <include refid="Base_Comment_Column_List_trans"/>
         FROM qh_comment_info
         <where>
             1=1
@@ -186,9 +181,9 @@
 
 
     <select id="queryCommentForAdmin" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentDTO"
-            resultMap="BaseCommentResultMap">
+            resultType="com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin">
         SELECT
-        <include refid="Base_Comment_Column_List"/>
+        <include refid="Base_Comment_Column_List_trans"/>
         FROM qh_comment_info
         <where>
             1=1
@@ -209,12 +204,13 @@
         </where>
     </select>
 
-    <select id="queryComments" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO" resultType="com.yryz.quanhu.behavior.comment.vo.CommentVO">
+    <select id="queryComments" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO"
+            resultType="com.yryz.quanhu.behavior.comment.vo.CommentVO">
         SELECT
         <include refid="Base_Comment_Column_List_trans"/>
         FROM qh_comment_info
         <where>
-            1=1 AND del_flag=10
+            1=1 AND del_flag=10 AND shelve_flag=10
             <if test="resourceId!=null">
                 AND resource_id=#{resourceId,jdbcType=BIGINT}
             </if>
@@ -224,6 +220,11 @@
         </where>
     </select>
 
-
+    <update id="updownBatch" parameterType="java.util.List">
+        <foreach close="" collection="list" index="index" item="item" open="" separator=";">
+            UPDATE qh_comment_info SET shelve_flag=#{item.shelve_flag,jdbcType=TINYINT}
+            where kid=#{item.kid,jdbcType=BIGINT}
+        </foreach>
+    </update>
 
 </mapper>

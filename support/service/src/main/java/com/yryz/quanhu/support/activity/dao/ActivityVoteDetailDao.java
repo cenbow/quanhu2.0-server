@@ -35,4 +35,8 @@ public interface ActivityVoteDetailDao {
 
     int selectCandidateCount(@Param("activityInfoId") Long activityInfoId, @Param("createUserId") Long createUserId);
 
+    Integer selectMaxVoteNo(@Param("activityInfoId") Long activityInfoId);
+
+    int updateVoteCount(@Param("kid") Long kid, @Param("activityInfoId") Long activityInfoId);
+
 }

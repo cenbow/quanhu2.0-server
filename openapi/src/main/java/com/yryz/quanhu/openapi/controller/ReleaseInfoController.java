@@ -20,7 +20,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
-
 /**
  * @author wangheng
  * @Description: 平台文章发布
@@ -38,12 +37,12 @@ public class ReleaseInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "record", paramType = "body", required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @PostMapping(value = "{version}/release/info/single")
     public Response<ReleaseInfo> release(@RequestBody ReleaseInfo record, @RequestHeader("userId") Long headerUserId) {
 
         record.setCreateUserId(headerUserId);
-        
+
         return releaseInfoApi.release(record);
     }
 
@@ -51,7 +50,7 @@ public class ReleaseInfoController {
     @ApiOperation("文章详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @GetMapping(value = "{version}/release/info/detail")
     public Response<ReleaseInfoVo> infoByKid(Long kid, @RequestHeader("userId") Long headerUserId) {
         return releaseInfoApi.infoByKid(kid, headerUserId);
@@ -60,13 +59,13 @@ public class ReleaseInfoController {
     @ApiOperation("文章删除")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @PostMapping(value = "{version}/release/info/delete")
     public Response<Integer> deleteBykid(Long kid, @RequestHeader("userId") Long headerUserId) {
         ReleaseInfo upInfo = new ReleaseInfo();
         upInfo.setKid(kid);
         upInfo.setLastUpdateUserId(headerUserId);
-        
+
         return releaseInfoApi.deleteBykid(upInfo);
     }
 }

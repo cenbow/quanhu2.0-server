@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +11,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
+import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.service.UserStarApi;
+import com.yryz.quanhu.user.vo.StarInfoVO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -17,7 +21,7 @@ public class UserStarTest {
 	@Reference
 	UserStarApi starApi;
 	
-	@Test
+	//@Test
 	public void save(){
 		StarAuthInfo info = new StarAuthInfo();
 		info.setAuthWay((byte)10);
@@ -31,6 +35,27 @@ public class UserStarTest {
 		info.setResourceDesc("哒呵呵哒呵呵哒呵呵哒");
 		info.setContactCall("15088052677");
 		Response<Boolean> response = starApi.save(info);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	@Test
+	public void starRecommonedList(){
+		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+		paramDTO.setStart(0);
+		paramDTO.setLimit(10);
+		paramDTO.setUserId(null);
+		Response<List<StarInfoVO>> response = starApi.starList(paramDTO);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+
+	@Test
+	public void labelStarListTest(){
+		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+		paramDTO.setCategoryId(5881248773L);
+		paramDTO.setStart(0);
+		paramDTO.setLimit(10);
+		paramDTO.setUserId(null);
+		Response<List<StarInfoVO>> response = starApi.labelStarList(paramDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 }

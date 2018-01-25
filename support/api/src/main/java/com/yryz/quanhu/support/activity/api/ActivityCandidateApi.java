@@ -9,6 +9,13 @@ import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 public interface ActivityCandidateApi {
 
     /**
+     * 增加参与者
+     * @param activityVoteDto
+     * @return
+     * */
+    Response join(ActivityVoteDto activityVoteDto);
+
+    /**
      * 参与投票活动
      * @param   activityInfoId
      * @return
@@ -17,12 +24,10 @@ public interface ActivityCandidateApi {
 
     /**
      * 获取参与者详情
-     * @param   activityInfoId
-     * @param   candidateId
-     * @param   userId
+     * @param   activityVoteDto
      * @return
      * */
-    Response<ActivityVoteDetailVo> detail(Long activityInfoId, Long candidateId, Long userId);
+    Response<ActivityVoteDetailVo> detail(ActivityVoteDto activityVoteDto);
 
     /**
      * 参与者列表

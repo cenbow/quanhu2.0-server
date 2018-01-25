@@ -23,7 +23,7 @@ public class SmsVerifyCodeDTO implements Serializable{
 	/**
 	 * 用户id
 	 */
-	private String userId;
+	private Long userId;
 	public String getPhone() {
 		return phone;
 	}
@@ -48,10 +48,10 @@ public class SmsVerifyCodeDTO implements Serializable{
 	public void setVeriCode(String veriCode) {
 		this.veriCode = veriCode;
 	}
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 }

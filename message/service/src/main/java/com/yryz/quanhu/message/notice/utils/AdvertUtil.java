@@ -74,7 +74,7 @@ public class AdvertUtil {
 		model.put("title", notice.getTitle());
 		model.put("content", notice.getContent());
 		model.put("timestamp", String.valueOf(System.currentTimeMillis()));
-		model.put("createTime", DateUtils.formatDate(notice.getCreateDate(), "yyyy-MM-dd"));
+		model.put("createTime", DateUtils.formatDate(new Date(), "yyyy-MM-dd"));
 		File file = null;
 		try {
 			String fileName = FreeMarkers.createFile(NoticeConstants.NOTICETHTML, model);

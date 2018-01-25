@@ -18,7 +18,6 @@ import com.yryz.quanhu.support.activity.entity.ActivityRecord;
 import com.yryz.quanhu.support.activity.service.ActivityInfoService;
 import com.yryz.quanhu.support.activity.service.ActivitySignUpService;
 import com.yryz.quanhu.support.activity.util.DateUtils;
-import com.yryz.quanhu.support.activity.util.JsonUtils;
 import com.yryz.quanhu.support.activity.vo.ActivitySignUpHomeAppVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -220,7 +219,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         activityRecord.setCreateUserId(Long.valueOf(custId));
         activityRecord.setLastUpdateUserId(Long.valueOf(custId));
         activityRecord.setEnrolSources(this.replaceIllagelWordsEnrolSources(activityRecord.getEnrolSources()));
-        activityRecord.setKid(idApi.getKid(IdConstants.QUANHU_ACTIVITY_SIGNUP).getData());
+        activityRecord.setKid(idApi.getSnowflakeId().getData());
         // 报名类型（1报名需支付货币 2报名需支付积分 3免费报名）
         switch (activityEnrolConfig.getSignUpType()) {
             case 11:
@@ -259,9 +258,9 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 record.setSignUpType(activityEnrolConfig.getSignUpType());
                 record.setCreateUserId(Long.valueOf(custId));
                 record.setLastUpdateUserId(Long.valueOf(custId));
-                record.setKid(idApi.getKid(IdConstants.QUANHU_ACTIVITY_SIGNUP_PAY).getData());
+                record.setKid(idApi.getSnowflakeId().getData());
                 //将支付记录插入到报名支付记录表中
-                activityPayRecordDao.insert(record);
+                activityPayRecordDao.insertByPrimaryKeySelective(record);
                 break;
             case 13:
                 break;
@@ -269,7 +268,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "SignUpType:" + activityEnrolConfig.getSignUpType(), "SignUpType:" + activityEnrolConfig.getSignUpType());
         }
 
-        activityRecordDao.insert(activityRecord);
+        activityRecordDao.insertByPrimaryKeySelective(activityRecord);
 
         // 更新主表的当前报名人人数信息
         activityInfo.setJoinCount(activityInfo.getJoinCount() + 1);

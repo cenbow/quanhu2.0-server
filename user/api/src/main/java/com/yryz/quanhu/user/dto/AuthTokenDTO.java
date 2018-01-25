@@ -22,7 +22,7 @@ public class AuthTokenDTO implements Serializable {
 	/**
 	 * 用户账户Id
 	 */
-	private String userId;
+	private Long userId;
 	/**
 	 * 用户访问类型
 	 */
@@ -39,10 +39,10 @@ public class AuthTokenDTO implements Serializable {
 	 * 登录是否刷新token
 	 */
 	private Boolean refreshLogin;
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 	public DevType getType() {
@@ -84,7 +84,7 @@ public class AuthTokenDTO implements Serializable {
 	 * @param appId
 	 * @exception 
 	 */
-	public AuthTokenDTO(String userId, DevType type, String appId) {
+	public AuthTokenDTO(Long userId, DevType type, String appId) {
 		super();
 		this.userId = userId;
 		this.type = type;
@@ -97,7 +97,7 @@ public class AuthTokenDTO implements Serializable {
 	 * @param refreshLogin
 	 * @exception 
 	 */
-	public AuthTokenDTO(String userId, DevType type, String appId, Boolean refreshLogin) {
+	public AuthTokenDTO(Long userId, DevType type, String appId, Boolean refreshLogin) {
 		super();
 		this.userId = userId;
 		this.type = type;
@@ -112,7 +112,7 @@ public class AuthTokenDTO implements Serializable {
 	 * @param token
 	 * @exception 
 	 */
-	public AuthTokenDTO(String userId, DevType type, String appId, String token) {
+	public AuthTokenDTO(Long userId, DevType type, String appId, String token) {
 		super();
 		this.userId = userId;
 		this.type = type;

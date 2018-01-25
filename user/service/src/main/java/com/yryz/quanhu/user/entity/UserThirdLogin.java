@@ -61,12 +61,13 @@ public class UserThirdLogin extends GenericEntity{
 	 * @param nickName
 	 * @exception 
 	 */
-	public UserThirdLogin(Long userId, String thirdId, Byte loginType, String nickName) {
+	public UserThirdLogin(Long userId, String thirdId, Byte loginType, String nickName,String appId) {
 		super();
 		this.userId = userId;
 		this.thirdId = thirdId;
 		this.loginType = loginType;
 		this.nickName = nickName;
+		this.appId = appId;
 	}
 
 	/**

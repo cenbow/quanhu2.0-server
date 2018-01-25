@@ -8,6 +8,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
+import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,9 @@ public class TopicPostProvider implements TopicPostApi {
     }
 
     @Override
-    public Response<TopicPostVo> quetyDetail(Long kid, Long userId) {
+    public Response<TopicAndPostVo> quetyDetail(Long kid, Long userId) {
         try {
-            TopicPostVo vo = this.topicPostService.getDetail(kid, userId);
+            TopicAndPostVo vo = this.topicPostService.getDetail(kid, userId);
             return ResponseUtils.returnObjectSuccess(vo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
@@ -50,6 +51,19 @@ public class TopicPostProvider implements TopicPostApi {
     public Response<PageList<TopicPostVo>> listPost(TopicPostDto dto) {
         try {
             PageList<TopicPostVo> data = this.topicPostService.queryList(dto);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Integer> deleteTopicPost(Long kid, Long userId) {
+        try {
+            Integer data = this.topicPostService.deleteTopicPost(kid, userId);
             return ResponseUtils.returnObjectSuccess(data);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

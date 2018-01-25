@@ -28,6 +28,10 @@ public class ActivityVoteDto implements Serializable {
     private String videoThumbnailUrl;
     /** 视频url */
     private String videoUrl;
+    /** 创建用户id */
+    private Long createUserId;
+    /** 是否第三方 */
+    private Integer otherFlag;
 
     public Integer getCurrentPage() {
         return currentPage;
@@ -123,5 +127,21 @@ public class ActivityVoteDto implements Serializable {
 
     public void setVideoUrl(String videoUrl) {
         this.videoUrl = videoUrl;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public Integer getOtherFlag() {
+        return otherFlag;
+    }
+
+    public void setOtherFlag(Integer otherFlag) {
+        this.otherFlag = otherFlag;
     }
 }
