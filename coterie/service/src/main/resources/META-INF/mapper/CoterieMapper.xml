@@ -288,7 +288,7 @@
   </update>
   
   <update id="updateMemberNum">
-    update coterie
+    update qh_coterie
     set member_num = #{newMemberNum,jdbcType=INTEGER},
       last_update_date = now()
     where kid = #{coterieId,jdbcType=CHAR} and member_num=#{oldMemberNum}
@@ -407,7 +407,7 @@
   <select id="findPage" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
-    from qh_coterie where state=11 and shelve_flag=10
+    from qh_coterie where state=11 and shelve_flag=10  and deleted=10
     ORDER BY `create_date` DESC,heat desc 
    	limit #{start},#{pageSize} 
   </select>
@@ -416,8 +416,8 @@
     select 
     <include refid="Base_Column_List" />
     from qh_coterie
-    WHERE owner_id=#{custId}
-  	ORDER BY create_date DESC
+    WHERE owner_id=#{custId} and shelve_flag=10
+  	ORDER BY state, create_date DESC
   </select>
   
   <select id="selectMyCreateCoteriePage" resultMap="BaseResultMap" >
