@@ -6,17 +6,21 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dao.CoterieApplyDao;
 import com.yryz.quanhu.coterie.member.dao.CoterieMemberDao;
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.entity.CoterieMember;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
+import com.yryz.quanhu.coterie.member.entity.CoterieMemberNotify;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,13 +48,53 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void join(Long userId, Long coterieId, String reason) {
-//        Coterie info = coterieMapper.selectByCoterieId(coterieId);
-//        if (info == null) {
-//            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-//        }
+    public CoterieMemberVoForJoin join(Long userId, Long coterieId, String reason) {
 
-//        if (info.getJoinCheck().intValue() == 10 || info.getJoinFee().intValue() > 0) {//不审核 或付费支付的直接加入
+        CoterieMemberVoForJoin result = new CoterieMemberVoForJoin();
+
+//        Coterie coterie = coterieMapper.selectByCoterieId(coterieId.toString());
+        Coterie coterie = new Coterie();
+        coterie.setMemberNum(2000);
+
+
+        //私圈人数已满
+        if (coterie.getMemberNum().intValue() >= 2000) {
+            result.setStatus(40);
+            return result;
+        }
+
+        //收费时,直接加入,返回orderId
+        if (coterie.getJoinFee() > 0) {
+            CoterieMemberNotify coterieMemberNotify = new CoterieMemberNotify();
+
+            coterieMemberNotify.setUserId(userId);
+            coterieMemberNotify.setCoterieId(coterieId);
+            coterieMemberNotify.setReason(reason);
+            coterieMemberNotify.setCoterieName(coterie.getName());
+            coterieMemberNotify.setOwner(coterie.getOwnerId());
+            coterieMemberNotify.setAmount(coterie.getJoinFee().longValue());
+            coterieMemberNotify.setIcon(coterie.getIcon());
+
+            String extJson = JsonUtils.toFastJson(coterieMemberNotify);
+
+//            Order order = new Order(custId, coterieInfo.getJoinFee() * 1L, extJson, CommonConstants.JOIN_COTERIE_MODULE_ENUM, coterieId,
+//                    CommonConstants.JOIN_COTERIE_RESOURCE_ID, custId, circleId);
+//            Long orderId = orderService.createOrder(OrderConstant.JOIN_COTERIE_ORDER, custId, coterieInfo.getOwnerId(), order);
+            Long orderId = 1111111111L;
+
+            result.setStatus(10);
+            result.setOrderId(orderId);
+            return result;
+        }
+
+        //免费不审核,直接加入
+        if (coterie.getJoinFee() == 0 && coterie.getJoinCheck() == 10) {
+
+            //先入审请表
+            CoterieMemberApply apply = makeApplyInfo(userId, coterieId, reason, MemberConstant.Status.PASS.getStatus());
+            coterieApplyDao.insert(apply);
+
+            //再入成员表
             CoterieMember record = new CoterieMember();
             record.setUserId(userId);
             record.setCoterieId(coterieId);
@@ -60,47 +104,123 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             record.setLastUpdateDate(new Date());
             record.setMemberStatus(MemberConstant.Status.PASS.getStatus());
             record.setProcessTime(new Date());
-//            record.setJoinType(info.getJoinFee().intValue() > 0 ? MemberConstant.JoinType.NOTFREE.getStatus() : MemberConstant.JoinType.FREE.getStatus());
-//            record.setAmount(Long.valueOf(info.getJoinFee()));
+            record.setJoinType(MemberConstant.JoinType.NOTFREE.getStatus());
+            record.setAmount(Long.valueOf(coterie.getJoinFee()));
             saveMember(record);
-//        } else {
-            CoterieMemberApply apply = new CoterieMemberApply();
-            apply.setCoterieId(coterieId);
-            apply.setCreateDate(new Date());
-            apply.setUserId(userId);
-            apply.setLastUpdateDate(new Date());
-            apply.setReason(reason);
-            apply.setMemberStatus(MemberConstant.Status.WAIT.getStatus());
+
+            result.setStatus(20);
+            return result;
+        }
+
+        //免费要审核
+        if (coterie.getJoinFee() == 0 && coterie.getJoinCheck() == 11) {
             try {
+                //不能有通过或是不通过的审请
                 List<CoterieMemberApply> list = coterieApplyDao.selectByCoterieIdAndCustId(coterieId, userId);
                 if (list.isEmpty()) {
-                    coterieApplyDao.insertSelective(apply);
-//                    coterieMemberMessageManager.joinMessage(custId, coterieId, reason);
+                    CoterieMemberApply apply = makeApplyInfo(userId, coterieId, reason, null);
+                    coterieApplyDao.insert(apply);
+                    //coterieMemberMessageManager.joinMessage(custId, coterieId, reason);
                 }
             } catch (Exception e) {
-                throw new MysqlOptException("param coterieApply:" + apply, e);
+                throw new QuanhuException(ExceptionEnum.SysException);
             }
-//        }
+        }
+
+        result.setStatus(30);
+        return result;
     }
 
-    private void saveMember(CoterieMember record) {
+    @Override
+    @Transactional
+    public void kick(Long userId, Long coterieId, String reason) {
         try {
-            CoterieMember member = coterieMemberDao.selectByCoterieIdAndCustId(record.getCoterieId(), record.getUserId());
-            if (member == null) {
-//                Coterie coterie = coterieMapper.selectByCoterieId(record.getCoterieId());
-//                if (coterie != null) {
-//                    int count = coterieMapper.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
-//                    if (count > 0) {
-                        coterieMemberDao.insert(record);
-//                    } else {
-//                        throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
-//                    }
-//                }
-            }
+//            Coterie coterie = coterieMapper.selectByCoterieId(coterieId.toString());
+//            if (coterie != null) {
+                //update kickStatus
+                CoterieMember coterieMember = new CoterieMember();
+                coterieMember.setUserId(userId);
+                coterieMember.setCoterieId(coterieId);
+                coterieMember.setReason(reason);
+                int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
+
+                //update delFlag
+                CoterieMemberApply apply = new CoterieMemberApply();
+                apply.setUserId(userId);
+                apply.setCoterieId(coterieId);
+                apply.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+                int resultApply = coterieApplyDao.updateByCoterieApply(apply);
+
+                if (resultMember > 0 && resultApply > 0) {
+                    //更新私圈成员数
+//                    coterieMapper.updateMemberNum(coterie.getCoterieId().toString(), coterie.getMemberNum() - 1, coterie.getMemberNum());
+                }
+//            }
+//            coterieMemberMessageManager.kickMessage(custId, coterieId, reason);
         } catch (Exception e) {
-            throw new MysqlOptException("param coterieMember:" + record, e);
+            e.printStackTrace();
+            throw new MysqlOptException("param custId:" + userId + "coterieId:" + coterieId, e);
         }
     }
+
+    @Override
+    @Transactional
+    public void quit(Long userId, Long coterieId) {
+        try {
+//            Coterie coterie = coterieMapper.selectByCoterieId(coterieId.toString());
+//            if (coterie != null) {
+                //update delFlag
+                CoterieMember coterieMember = new CoterieMember();
+                coterieMember.setUserId(userId);
+                coterieMember.setCoterieId(coterieId);
+                coterieMember.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+                int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
+                //update delFlag
+                CoterieMemberApply apply = new CoterieMemberApply();
+                apply.setUserId(userId);
+                apply.setCoterieId(coterieId);
+                apply.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+                int resultApply = coterieApplyDao.updateByCoterieApply(apply);
+                if (resultMember > 0 && resultApply > 0) {
+                    //更新私圈成员数
+//                    coterieMapper.updateMemberNum(coterie.getCoterieId().toString(), coterie.getMemberNum() - 1, coterie.getMemberNum());
+                }
+//            }
+        } catch (Exception e) {
+            throw new QuanhuException(ExceptionEnum.SysException);
+        }
+    }
+
+    @Override
+    public void banSpeak(Long userId, Long coterieId, Integer type) {
+        CoterieMember record = new CoterieMember();
+        record.setUserId(userId);
+        record.setCoterieId(coterieId);
+        record.setLastUpdateDate(new Date());
+        if (type == 1) {
+            record.setBanSpeak(MemberConstant.BanSpeak.BANSPEAK.getStatus());
+        } else {
+            record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
+        }
+
+        try {
+         Integer result = coterieMemberDao.updateByCoterieMember(record);
+
+         if (result > 0) {
+
+         } else {
+             System.out.println("#######################################"+ result);
+         }
+//            coterieMemberMessageManager.banSpeakMessage(custId, coterieId);
+        } catch (Exception e) {
+            e.printStackTrace();
+//            throw new QuanhuException(ExceptionEnum.SysException);
+        }
+    }
+
+
+    /************** 0124 ***********************************************************************/
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -112,7 +232,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         apply.setProcessTime(new Date());
         apply.setMemberStatus(MemberConstant.Status.PASS.getStatus());
         try {
-            coterieApplyDao.updateByCoterieIdAndCustIdSelective(apply);
+            coterieApplyDao.updateByCoterieApply(apply);
         } catch (Exception e) {
             throw new MysqlOptException("param coterieApply:" + apply, e);
         }
@@ -147,71 +267,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         apply.setProcessTime(new Date());
         apply.setMemberStatus(MemberConstant.Status.NOTPASS.getStatus());
         try {
-            coterieApplyDao.updateByCoterieIdAndCustIdSelective(apply);
+            coterieApplyDao.updateByCoterieApply(apply);
         } catch (Exception e) {
             throw new MysqlOptException("param coterieApply:" + apply, e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void kick(Long userId, Long coterieId, String reason) {
-        try {
-//            Coterie coterie = coterieMapper.selectByCoterieId(coterieId);
-//            if (coterie != null) {
-                int count = coterieMemberDao.deleteByCustIdAndCoterieId(userId, coterieId);
-                if (count > 0) {
-//                    coterieMapper.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
-                }
-//            }
-//            coterieMemberMessageManager.kickMessage(custId, coterieId, reason);
-        } catch (Exception e) {
-            throw new MysqlOptException("param custId:" + userId + "coterieId:" + coterieId, e);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void quit(Long userId, Long coterieId) {
-        try {
-//            Coterie coterie = coterieMapper.selectByCoterieId(coterieId);
-//            if (coterie != null) {
-//                int count = coterieMemberDao.deleteByCustIdAndCoterieId(custId, coterieId);
-//                if (count > 0) {
-//                    coterieMapper.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
-//                }
-//            }
-        } catch (Exception e) {
-//            throw new MysqlOptException("param custId:" + custId + "coterieId:" + coterieId, e);
-        }
-    }
-
-    @Override
-    public void banSpeak(Long userId, Long coterieId) {
-        CoterieMember record = new CoterieMember();
-        record.setUserId(userId);
-        record.setCoterieId(coterieId);
-        record.setLastUpdateDate(new Date());
-        record.setBanSpeak(MemberConstant.BanSpeak.BANSPEAK.getStatus());
-        try {
-            coterieMemberDao.updateByCustIdAndCoterieId(record);
-//            coterieMemberMessageManager.banSpeakMessage(custId, coterieId);
-        } catch (Exception e) {
-            throw new MysqlOptException("param coterie:" + record, e);
-        }
-    }
-
-    @Override
-    public void unBanSpeak(Long userId, Long coterieId) {
-        CoterieMember record = new CoterieMember();
-        record.setUserId(userId);
-        record.setCoterieId(coterieId);
-        record.setLastUpdateDate(new Date());
-        record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
-        try {
-            coterieMemberDao.updateByCustIdAndCoterieId(record);
-        } catch (Exception e) {
-            throw new MysqlOptException("param coterie:" + record, e);
         }
     }
 
@@ -299,7 +357,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 List<Coterie> coterieList = new ArrayList<>();
                 for (int i = 0; i < coterieList.size(); i++) {
                     Coterie c = coterieList.get(i);
-                    maps.put(c.getCoterieId()+"", c);
+                    maps.put(c.getCoterieId() + "", c);
                 }
                 for (int j = 0; j < rstList.size(); j++) {
                     CoterieMemberVo info = rstList.get(j);
@@ -337,5 +395,41 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             throw new MysqlOptException("param coterieId:" + coterieId + ",custId" + userId, e);
         }
     }
+
+    private CoterieMemberApply makeApplyInfo(Long userId, Long coterieId, String reason, Integer status){
+        CoterieMemberApply apply = new CoterieMemberApply();
+        apply.setCoterieId(coterieId);
+        apply.setCreateDate(new Date());
+        apply.setUserId(userId);
+        apply.setLastUpdateDate(new Date());
+        apply.setReason(reason);
+        if (null != status) {
+            apply.setMemberStatus(status);
+        } else {
+            apply.setMemberStatus(MemberConstant.Status.WAIT.getStatus());
+        }
+
+        return apply;
+    }
+
+    private void saveMember(CoterieMember record) {
+        try {
+            CoterieMember member = coterieMemberDao.selectByCoterieIdAndCustId(record.getCoterieId(), record.getUserId());
+            if (member == null) {
+                Coterie coterie = coterieMapper.selectByCoterieId(record.getCoterieId().toString());
+                if (coterie != null) {
+                    int count = coterieMapper.updateMemberNum(coterie.getCoterieId().toString(), coterie.getMemberNum() + 1, coterie.getMemberNum());
+                    if (count > 0) {
+                        coterieMemberDao.insert(record);
+                    } else {
+                        throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new MysqlOptException("param coterieMember:" + record, e);
+        }
+    }
+
 
 }
