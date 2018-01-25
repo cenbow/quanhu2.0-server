@@ -130,7 +130,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             //同步单向关系至redis
             userRelationCacheDao.refreshCacheRelation(sourceDto);
 
-            return sourceDto;
+            return mergeRelation(sourceDto,targetDto);
         }catch (Exception e){
             throw e;
         }
@@ -190,7 +190,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(sourceUserId.equalsIgnoreCase(targetUserId)){
-            throw new QuanhuException("","","don't allow set relation to self");
+            throw new QuanhuException("","","您不能对着自己设置关系");
         }
 
         /**
@@ -199,7 +199,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         Long followCount = userRelationDao.selectTotalCount(sourceUserId,UserRelationConstant.STATUS.FOLLOW.getCode());
 
         if(followCount>=maxFollowCount){
-            throw new QuanhuException("","","user follow number reached the upper limit : "+maxFollowCount);
+            throw new QuanhuException("","","您已添加最大关注人数: "+maxFollowCount);
         }
 
         /**
@@ -224,11 +224,11 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(UserRelationConstant.YES == targetDto.getBlackStatus()){
-            throw new QuanhuException("","","target user has set black to source");
+            throw new QuanhuException("","","目标用户已将您拉入黑名单");
         }
 
         if(UserRelationConstant.YES == sourceDto.getBlackStatus()&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-            throw new QuanhuException("","","source user has set black to target,please cancel black first");
+            throw new QuanhuException("","","您已将目标用户拉入黑名单");
         }
 
         return true;
@@ -309,7 +309,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             sourceDto.setFollowStatus(UserRelationConstant.NO);
 
         }else{
-            throw new QuanhuException("","","type not exist");
+            throw new QuanhuException("","","系统参数异常");
         }
     }
 
@@ -323,6 +323,8 @@ public class UserRelationServiceImpl implements UserRelationService{
 
         UserRelationDto newDto = new UserRelationDto();
 
+        int finalStatus = UserRelationConstant.STATUS.NONE.getCode();
+
         if(null==sourceDto){
             //用户未与目标用户建立关系，则设置所以状态为no,
 
@@ -331,6 +333,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             newDto.setBlackStatus(UserRelationConstant.NO);
             newDto.setFollowStatus(UserRelationConstant.NO);
             newDto.setFriendStatus(UserRelationConstant.NO);
+
         }else{
             //用户已与目标用户建立关系，则复制数据至新对象
             BeanUtils.copyProperties(sourceDto,newDto);
@@ -350,8 +353,14 @@ public class UserRelationServiceImpl implements UserRelationService{
             newDto.setFromFollowStatus(targetDto.getFollowStatus());
             newDto.setFromBlackStatus(targetDto.getBlackStatus());
         }
+        /**
+         * 转换为统一状态
+         */
+
         return newDto;
     }
+
+
 
 
     @Override
@@ -458,6 +467,13 @@ public class UserRelationServiceImpl implements UserRelationService{
     }
 
     @Override
+    public List<UserRelationDto> selectByAll(UserRelationDto dto, UserRelationConstant.STATUS status) {
+        dto.setCurrentPage(1);
+        dto.setPageSize(Integer.parseInt(String.valueOf(maxFollowCount)));
+        return selectByPage(dto,status).getEntities();
+    }
+
+    @Override
     public List<UserRelationDto> selectBy(String sourceUserId, Set<String> targetUserIds) {
         return userRelationDao.selectUserToTarget(UserRelationDto.class,sourceUserId,targetUserIds);
     }
@@ -502,4 +518,8 @@ public class UserRelationServiceImpl implements UserRelationService{
         }
         return targetUserIds;
     }
+
+
+
+
 }

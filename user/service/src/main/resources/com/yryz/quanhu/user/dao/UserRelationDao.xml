@@ -74,7 +74,7 @@
         FROM qh_user_relation WHERE
         del_flag = 10 AND
         <choose>
-            <when test="targetUserIds != null and targetUserIds.length > 0">
+            <when test="targetUserIds != null and targetUserIds.size > 0">
 
                 (source_user_id = #{sourceUserId,jdbcType=VARCHAR}
 
@@ -147,7 +147,7 @@
         FROM qh_user_relation WHERE
         del_flag = 10 AND
         <choose>
-            <when test="targetUserIds != null and targetUserIds.length > 0">
+            <when test="targetUserIds != null and targetUserIds.size > 0">
                 source_user_id = #{userId,jdbcType=VARCHAR}
                 AND target_user_id IN
                 <foreach collection="targetUserIds" item="targetUserId" index="index" open="(" separator="," close=")">
@@ -167,7 +167,7 @@
         FROM qh_user_relation WHERE
         del_flag = 10 AND
         <choose>
-            <when test="targetUserIds != null and targetUserIds.length > 0">
+            <when test="targetUserIds != null and targetUserIds.size > 0">
                 target_user_id = #{userId,jdbcType=VARCHAR}
                 AND source_user_id IN
                 <foreach collection="targetUserIds" item="targetUserId" index="index" open="(" separator="," close=")">
