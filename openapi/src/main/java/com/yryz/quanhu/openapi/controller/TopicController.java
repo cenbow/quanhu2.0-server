@@ -34,7 +34,7 @@ public class TopicController {
 	@GetMapping(value = "/{version}/topic/single")
 	public Response<TopicVo> queryTopicDetail(Long kid, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return topicApi.queryDetail(kid,Long.valueOf(header.getUserId()));
+		return topicApi.queryDetail(kid,null);
 	}
 
 }
