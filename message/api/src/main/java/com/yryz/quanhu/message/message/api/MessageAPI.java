@@ -19,13 +19,6 @@ import java.util.Map;
 public interface MessageAPI {
 
     /**
-     * 发布消息，默认不同步推送消息
-     *
-     * @param messageVo
-     */
-     Response<Boolean> sendMessage(MessageVo messageVo);
-
-    /**
      * 发布消息
      *
      * @param messageVo

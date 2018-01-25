@@ -85,19 +85,6 @@ public class MessageProvider implements MessageAPI {
     }
 
     @Override
-    public Response<Boolean> sendMessage(MessageVo messageVo) {
-        try {
-            return ResponseUtils.returnObjectSuccess(messageService.sendMessage(messageVo));
-        } catch (QuanhuException e) {
-            LOGGER.error("推送消息异常", e);
-            return ResponseUtils.returnException(e);
-        } catch (Exception e) {
-            LOGGER.error("推送消息异常", e);
-            return ResponseUtils.returnException(e);
-        }
-    }
-
-    @Override
     public Response<Boolean> sendMessage(MessageVo messageVo, boolean flag) {
         try {
             return ResponseUtils.returnObjectSuccess(messageService.sendMessage(messageVo, flag));
