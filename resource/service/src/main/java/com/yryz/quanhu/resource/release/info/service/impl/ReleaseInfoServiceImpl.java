@@ -244,4 +244,17 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
         return true;
 
     }
+
+    @Override
+    public void resourcePropertiesEmpty(ReleaseInfo record) {
+        record.setAudioUrl(null);
+        record.setContent(null);
+        record.setContentSource(null);
+        record.setCoverPlanUrl(null);
+        record.setDescription(null);
+        record.setExtend(null);
+        record.setImgUrl(null);
+        record.setVideoThumbnailUrl(null);
+        record.setVideoUrl(null);
+    }
 }

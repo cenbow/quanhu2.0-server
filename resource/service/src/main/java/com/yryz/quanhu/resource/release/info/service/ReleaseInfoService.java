@@ -95,4 +95,13 @@ public interface ReleaseInfoService {
     * @throws  
     */
     public boolean releaseInfoCheck(ReleaseInfo record, ReleaseConfigVo cfgVo);
+    
+    /**  
+    * @Description: 资源属性 置为：空
+    * @author wangheng
+    * @param @param record
+    * @return void
+    * @throws  
+    */
+    public void resourcePropertiesEmpty(ReleaseInfo record);
 }

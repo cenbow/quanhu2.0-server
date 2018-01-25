@@ -25,7 +25,7 @@ import java.util.Map;
  * @Desc: 计数系统count服务
  * @Date: 2018/1/23.
  */
-@Service(interfaceClass = CountApi.class)
+@Service(interfaceClass = CountApi.class, timeout = 1000 * 60)
 public class CountProvider implements CountApi {
 
     private static final Logger logger = LoggerFactory.getLogger(CountProvider.class);
@@ -34,36 +34,34 @@ public class CountProvider implements CountApi {
     private CountService countService;
 
     @Override
-    public Response<Object> countCommit(BehaviorEnum behaviorEnum, Long userId, Long resourceId, Long count) {
+    public Response<Object> commitCount(BehaviorEnum behaviorEnum, Long kid, String page, Long count) {
         try {
-            if (userId != null) {
-                countService.countCommit(behaviorEnum, userId.toString(), count);
+            if (StringUtils.isEmpty(page)) {
+                page = "-1";
+            }
+            if (kid != null) {
+                countService.commitCount(behaviorEnum, kid.toString(), page, count);
             }
         } catch (Exception e) {
-            logger.error("countCommit userId falid! userId:" + userId, e);
-            return ResponseUtils.returnException(e);
-        }
-        try {
-            if (resourceId != null) {
-                countService.countCommit(behaviorEnum, resourceId.toString(), count);
-            }
-        } catch (Exception e) {
-            logger.error("countCommit resourceId falid! resourceId:" + userId, e);
+            logger.error("commitCount kid falid! kid:" + kid, e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnSuccess();
     }
 
     @Override
-    public Response<Map<String, Long>> getCount(String countType, Long kid) {
+    public Response<Map<String, Long>> getCount(String countType, Long kid, String page) {
         try {
+            if (StringUtils.isEmpty(page)) {
+                page = "-1";
+            }
             if (kid == null) {
                 throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
             }
             List<BehaviorEnum> list = getBehaviorEnumList(countType);
             Map<String, Long> map = Maps.newConcurrentMap();
             for (BehaviorEnum behaviorEnum : list) {
-                Long count = countService.getCount(kid.toString(), behaviorEnum.getCode());
+                Long count = countService.getCount(kid.toString(), behaviorEnum.getCode(), page);
                 map.put(behaviorEnum.getKey(), count);
             }
             return ResponseUtils.returnObjectSuccess(map);

@@ -54,9 +54,13 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             record.setDelFlag(CommonConstants.DELETE_NO);
             record.setShelveFlag(CommonConstants.SHELVE_YES);
 
-            Assert.isTrue(0L == record.getCoterieId(), "平台文章发布 没有：CoterieId");
-            Assert.isTrue(0L == record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
+            Assert.isNull(record.getCoterieId(), "平台文章发布 没有：CoterieId");
+            Assert.isNull(record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
 
+            if (StringUtils.isBlank(record.getModuleEnum())) {
+                record.setModuleEnum("1003");
+            }
+            
             // 校验用户是否存在
             ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
 
@@ -77,7 +81,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             releaseInfoService.insertSelective(record);
 
             // TODO 资源进动态
-
+            // TODO 接入统计计数
             return ResponseUtils.returnObjectSuccess(record);
 
         } catch (QuanhuException e) {
@@ -97,8 +101,15 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isTrue(0L == infoVo.getCoterieId(), "非平台文章禁止访问！");
 
             // TODO 创建者用户信息
-            UserSimpleVO user = ResponseUtils
-                    .getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
+            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
+
+            // 若资源已删除、或者 已经下线 直接返回
+            if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
+                    || CommonConstants.SHELVE_NO.equals(infoVo.getShelveFlag())) {
+                releaseInfoService.resourcePropertiesEmpty(infoVo);
+
+                return ResponseUtils.returnObjectSuccess(infoVo);
+            }
 
             // TODO 资源互动信息
 
