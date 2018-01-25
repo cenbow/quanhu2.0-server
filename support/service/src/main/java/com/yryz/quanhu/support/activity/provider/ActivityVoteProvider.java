@@ -32,6 +32,7 @@ public class ActivityVoteProvider implements ActivityVoteApi {
      * */
     public Response<ActivityVoteInfoVo> detail(Long kid, Long userId) {
         try {
+            Assert.notNull(kid, "activityInfoId不能为空");
             return ResponseUtils.returnObjectSuccess(activityVoteService.detail(kid, userId));
         } catch (Exception e) {
             logger.error("获取活动详情 失败", e);

@@ -173,7 +173,8 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         ActivityVoteDetailVo detail = !CollectionUtils.isEmpty(list) ? list.get(0) : null;
         if(detail != null) {
             //用户是否有可用投票卷
-            detail.setUserRollFlag(activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()));
+            detail.setUserRollFlag(activityVoteDto.getCreateUserId() != null ?
+                    activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10);
             //获取前后排名
             Long rank = template.opsForZSet().reverseRank(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()),
                     activityVoteDto.getCandidateId());
@@ -218,15 +219,17 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                 Integer voteType = ActivityVoteConstants.IN_APP.equals(activityVoteDto.getOtherFlag())
                         ? detail.getInAppVoteType() : detail.getOtherAppVoteType();
                 if(voteType != null) {
-                    //用户的投票数
-                    int count = activityVoteRecordDao.voteRecordCount(activityVoteDto.getActivityInfoId(),
-                            activityVoteDto.getCreateUserId(),
-                            activityVoteDto.getOtherFlag(),
-                            ActivityVoteConstants.FIXED_VOTE_TYPE.equals(voteType) ? "fixed" : "event");
-                    if(ActivityVoteConstants.IN_APP.equals(activityVoteDto.getOtherFlag())) {
-                        detail.setInAppVoteCount(count);
-                    } else {
-                        detail.setOtherAppVoteCount(count);
+                    if(activityVoteDto.getCreateUserId() != null) {
+                        //用户的投票数
+                        int count = activityVoteRecordDao.voteRecordCount(activityVoteDto.getActivityInfoId(),
+                                activityVoteDto.getCreateUserId(),
+                                activityVoteDto.getOtherFlag(),
+                                ActivityVoteConstants.FIXED_VOTE_TYPE.equals(voteType) ? "fixed" : "event");
+                        if(ActivityVoteConstants.IN_APP.equals(activityVoteDto.getOtherFlag())) {
+                            detail.setInAppVoteCount(count);
+                        } else {
+                            detail.setOtherAppVoteCount(count);
+                        }
                     }
                 }
             }
@@ -257,7 +260,8 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             List<ActivityVoteDetailVo> resultList = this.getDetail(activityVoteDto.getActivityInfoId(), list);
             if(!CollectionUtils.isEmpty(resultList)) {
                 //用户是否有可用投票卷
-                int userRoll = activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId());
+                int userRoll = activityVoteDto.getCreateUserId() != null ?
+                        activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10;
                 //活动主信息相关
                 ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
                 Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : 0;
@@ -266,7 +270,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                 Integer otherAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteConfigCount() : 0;
                 Integer inAppVoteCount = null;
                 Integer otherAppVoteCount = null;
-                if(activityVoteInfoVo != null){
+                if(activityVoteInfoVo != null && activityVoteDto.getCreateUserId() != null){
                     //获取投票类型
                     Integer voteType = ActivityVoteConstants.IN_APP.equals(activityVoteDto.getOtherFlag())
                             ? activityVoteInfoVo.getInAppVoteType() : activityVoteInfoVo.getOtherAppVoteType();
@@ -320,6 +324,49 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         long pageSize = ActivityPageConstants.getPageSize(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());
         Set<ZSetOperations.TypedTuple<Long>> list = template.opsForZSet().reverseRangeWithScores(key, pageNo, pageSize);
         List<ActivityVoteDetailVo> rankList = this.getDetail(activityVoteDto.getActivityInfoId(), list);
+        if(!CollectionUtils.isEmpty(rankList)) {
+            //用户是否有可用投票卷
+            int userRoll = activityVoteDto.getCreateUserId() != null ?
+                    activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10;
+            //活动主信息相关
+            ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
+            Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : 0;
+            Integer inAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteConfigCount() : 0;
+            Integer otherAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteType() : 0;
+            Integer otherAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteConfigCount() : 0;
+            Integer inAppVoteCount = null;
+            Integer otherAppVoteCount = null;
+            if(activityVoteInfoVo != null && activityVoteDto.getCreateUserId() != null){
+                //获取投票类型
+                Integer voteType = ActivityVoteConstants.IN_APP.equals(activityVoteDto.getOtherFlag())
+                        ? activityVoteInfoVo.getInAppVoteType() : activityVoteInfoVo.getOtherAppVoteType();
+                if(voteType != null) {
+                    //用户的投票数
+                    int count = activityVoteRecordDao.voteRecordCount(activityVoteDto.getActivityInfoId(),
+                            activityVoteDto.getCreateUserId(),
+                            activityVoteDto.getOtherFlag(),
+                            ActivityVoteConstants.FIXED_VOTE_TYPE.equals(voteType) ? "fixed" : "event");
+                    if(ActivityVoteConstants.IN_APP.equals(activityVoteDto.getOtherFlag())) {
+                        inAppVoteCount = count;
+                    } else {
+                        otherAppVoteCount = count;
+                    }
+                }
+            }
+            //组装参数
+            for (ActivityVoteDetailVo detailVo : rankList) {
+                Double score = template.opsForZSet().score(ActivityCandidateConstants.getKeyRank(detailVo.getActivityInfoId()),
+                        detailVo.getKid());
+                detailVo.setVoteCount(score == null ? 0 : score.intValue());
+                detailVo.setUserRollFlag(userRoll);
+                detailVo.setInAppVoteType(inAppVoteType);
+                detailVo.setInAppVoteConfigCount(inAppVoteConfigCount);
+                detailVo.setOtherAppVoteType(otherAppVoteType);
+                detailVo.setOtherAppVoteConfigCount(otherAppVoteConfigCount);
+                detailVo.setInAppVoteCount(inAppVoteCount);
+                detailVo.setOtherAppVoteCount(otherAppVoteCount);
+            }
+        }
         PageList<ActivityVoteDetailVo> pageList = new PageList<>();
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
