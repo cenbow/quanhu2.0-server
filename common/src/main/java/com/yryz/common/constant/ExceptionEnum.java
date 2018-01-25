@@ -19,6 +19,7 @@ public enum ExceptionEnum {
     USER_DISTORY("1009", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被注销"),
     USER_NO_RIGHT_TOREAD("1020", "您无权去查看。", "你无权执行此操作"),
     USER_NO_RIGHT_TODELETE("1021", "您无权执行删除操作。", "您无权执行删除操作。"),
+    USER_NO_RIGHT_TOREJECT("1022", "您无权执行拒接回答操作。", "您无权执行拒接回答操作。"),
     ValidateException("2000", "数据验证失败！", "网络开小差了，请稍候再试！"),
     PARAM_MISSING("2001", "参数缺失", "网络开小差了，请稍候再试！"),
 
