@@ -5,7 +5,11 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
@@ -14,6 +18,7 @@ import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.service.TopicService;
+import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
@@ -23,9 +28,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TopicPostServiceImpl implements TopicPostService {
@@ -39,6 +46,9 @@ public class TopicPostServiceImpl implements TopicPostService {
 
     @Autowired
     private TopicService topicService;
+
+    @Reference
+    private CountApi countApi;
 
 
     /**
@@ -103,6 +113,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         if (null != createUserId) {
             vo.setUser(apIservice.getUser(createUserId));
         }
+        vo.setModuleEnum(ResourceTypeEnum.POSTS);
 
         topicAndPostVo.setPost(vo);
 
@@ -149,6 +160,21 @@ public class TopicPostServiceImpl implements TopicPostService {
             Long createUserId = topicPost.getCreateUserId();
             if (null != createUserId) {
                 vo.setUser(apIservice.getUser(createUserId));
+            }
+            vo.setModuleEnum(ResourceTypeEnum.POSTS);
+            Response<Map<String,Long>> countData=countApi.getCount("10,11",vo.getKid(),null);
+            if(ResponseConstant.SUCCESS.getCode().equals(countData.getCode())){
+                Map<String,Long> count=countData.getData();
+                if(count!=null){
+                    BehaviorVo behaviorVo=new BehaviorVo();
+                    if(count.containsKey("likeCount")){
+                        behaviorVo.setLikeCount(count.get("likeCount"));
+                    }
+                    if(count.containsKey("commentCount")){
+                        behaviorVo.setCommentCount(count.get("commentCount"));
+                    }
+                    vo.setBehaviorVo(behaviorVo);
+                }
             }
             list.add(vo);
         }
