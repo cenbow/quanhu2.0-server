@@ -1,6 +1,8 @@
 package com.yryz.quanhu.behavior.like.Service;
 
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 
@@ -24,10 +26,9 @@ public interface LikeApi {
 
     /**
      * desc:点赞列表
-     * @param like
+     * @paraml:ike
      * @return
      */
-    Response<List<LikeVO>> queryLikers(Like like);
-
+    Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO);
 
 }

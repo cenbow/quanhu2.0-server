@@ -1,6 +1,8 @@
 package com.yryz.quanhu.behavior.like.service.impl;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.like.dao.LikeDao;
+import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeService;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
@@ -37,8 +39,14 @@ public class LikeServiceImpl implements LikeService {
     }
 
     @Override
-    public List<LikeVO> queryLikers(Like like) {
-        return likeDao.queryLikers(like);
+    public PageList<LikeVO> queryLikers(LikeFrontDTO likeFrontDTO) {
+        PageList pageList=new PageList();
+        pageList.setCurrentPage(likeFrontDTO.getCurrentPage());
+        pageList.setPageSize(likeFrontDTO.getPageSize());
+        List<LikeVO> likeVOS=likeDao.queryLikers(likeFrontDTO);
+        pageList.setCount(Long.valueOf(likeVOS.size()));
+        pageList.setEntities(likeVOS);
+        return pageList;
     }
 
     @Override
