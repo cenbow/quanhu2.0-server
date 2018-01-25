@@ -5,15 +5,20 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
+import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.AnswerDto;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Answer;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs;
+import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
+import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +35,9 @@ public class AnswerServiceImpl implements AnswerService {
     private AnswerDao answerDao;
 
     @Autowired
+    private QuestionService questionService;
+
+    @Autowired
     private APIservice apIservice;
 
     @Override
@@ -41,6 +49,15 @@ public class AnswerServiceImpl implements AnswerService {
         Long coterieId = answerdto.getCoterieId();
         if (null == questionId || null == coterieId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+        }
+
+        Question questionCheck=this.questionService.queryAvailableQuestionByKid(questionId);
+        if(null==questionCheck){
+            throw  QuanhuException.busiError("提问不存在");
+        }
+
+        if(null !=questionCheck.getAnswerdFlag() && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionCheck.getAnswerdFlag())==-1){
+            throw  QuanhuException.busiError("圈主已处理过该问题，不能再回答");
         }
         AnswerWithBLOBs answerWithBLOBs = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answerWithBLOBs);
@@ -59,6 +76,12 @@ public class AnswerServiceImpl implements AnswerService {
          *校验圈主是否禁言，圈粉是否删除
          */
         this.answerDao.insertSelective(answerWithBLOBs);
+
+        //更新问题的回答状态
+        Question question=new Question();
+        question.setKid(questionId);
+        question.setAnswerdFlag(QuestionAnswerConstants.AnswerdFlag.ANSWERED);
+        this.questionService.updateByPrimaryKeySelective(question);
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
         return answerVo;
@@ -110,6 +133,7 @@ public class AnswerServiceImpl implements AnswerService {
         if (null != createUserId) {
             answerVo.setUser(apIservice.getUser(createUserId));
         }
+        answerVo.setModuleEnum(ResourceTypeEnum.ANSWER);
         return answerVo;
     }
 

@@ -33,6 +33,8 @@ public class TopicVo implements Serializable {
 
     private Date createDate;
 
+    private String moduleEnum;
+
     public Long getKid() {
         return kid;
     }
@@ -135,5 +137,13 @@ public class TopicVo implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
     }
 }
