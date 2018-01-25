@@ -73,7 +73,32 @@ public class UserStarSimpleVo implements Serializable {
      */
     private String organizationPaper;
 
-	
+	/**
+	 * 推荐状态
+	 */
+    private Byte recommendStatus;
+
+	/**
+	 * 推荐语
+	 */
+	private String recommendDesc;
+
+	public Byte getRecommendStatus() {
+		return recommendStatus;
+	}
+
+	public void setRecommendStatus(Byte recommendStatus) {
+		this.recommendStatus = recommendStatus;
+	}
+
+	public String getRecommendDesc() {
+		return recommendDesc;
+	}
+
+	public void setRecommendDesc(String recommendDesc) {
+		this.recommendDesc = recommendDesc;
+	}
+
 	public String getTradeField() {
 		return tradeField;
 	}

@@ -37,7 +37,7 @@ public class OrderService implements OrderSDK {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
-    @Value("order.notify.queue")
+    @Value("${order.notify.queue}")
     private String notifyQueue;
 
     @Autowired
@@ -70,7 +70,7 @@ public class OrderService implements OrderSDK {
         // 封装预订单PreOrderVo
         OrderEnum orderEnum = inputOrder.getOrderEnum();
         PreOrderVo orderVo = orderEnum.getOrder(orderId, inputOrder.getFromId(), inputOrder.getToId(), inputOrder.getCost());
-        orderVo.getOrderInfo().setBizContent(inputOrder.getBizContent());
+//        orderVo.getOrderInfo().setBizContent(inputOrder.getBizContent());
         orderVo.getOrderInfo().setCallback(notifyQueue);
         logger.info("createOrder getOrderVo orderVo[orderinfo]:" + orderVo.getOrderInfo().toString());
         logger.info("createOrder getOrderVo orderVo[accounts]:" + orderVo.getAccounts().toString());
@@ -101,7 +101,7 @@ public class OrderService implements OrderSDK {
             order.setProductDesc(orderInfo.getProductDesc());
             order.setProductType(orderInfo.getProductType());
             order.setOrderDesc(orderInfo.getOrderDesc());
-            order.setRemark(orderInfo.getRemark());
+            order.setRemark(orderVo.getOrderInfo().getRemark());
             //新标准枚举字段统一从10开始
             order.setOrderState(orderInfo.getOrderState() + 10);
             order.setCallback(orderInfo.getCallback());
@@ -109,6 +109,8 @@ public class OrderService implements OrderSDK {
             order.setModuleEnum(inputOrder.getModuleEnum());
             order.setCoterieId(inputOrder.getCoterieId());
             order.setResourceId(inputOrder.getResourceId());
+            order.setCreateUserId(inputOrder.getCreateUserId());
+            order.setLastUpdateUserId(inputOrder.getCreateUserId());
             logger.info("insert order:" + order.toString());
             orderDao.insertOrder(order);
         } catch (Exception e) {

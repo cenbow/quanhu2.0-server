@@ -1,14 +1,5 @@
 package com.yryz.quanhu.resource.coterie.release.info.provider;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
@@ -16,6 +7,10 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoApi;
 import com.yryz.quanhu.resource.coterie.release.info.vo.CoterieReleaseInfoVo;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
@@ -27,12 +22,20 @@ import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
-* @Description: 私圈文章 - 特有
-* @author wangheng
-* @date 2018年1月24日 下午1:24:40
-*/
+ * @author wangheng
+ * @Description: 私圈文章 - 特有
+ * @date 2018年1月24日 下午1:24:40
+ */
 @Service(interfaceClass = CoterieReleaseInfoApi.class)
 public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
 
@@ -50,9 +53,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
 
-//    @Autowired
-//    OrderSDK orderSDK;
-    
+    @Autowired
+    private OrderSDK orderSDK;
+
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
@@ -165,19 +168,18 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             // 创建订单者 不能是作者
             Assert.isTrue(!headerUserId.equals(info.getCreateUserId()), "阅读资源文章，创建订单者 不能是作者");
 
-//            InputOrder inputOrder = new InputOrder();
-//            inputOrder.setBizContent(JsonUtils.toFastJson(info));
-//            inputOrder.setCost(info.getContentPrice());
-//            inputOrder.setCoterieId(info.getCoterieId());
-//            inputOrder.setCreateUserId(headerUserId);
-//            inputOrder.setFromId(headerUserId);
-//            inputOrder.setModuleEnum(info.getModuleEnum());
-//            inputOrder.setOrderEnum(OrderEnum.READ_ORDER);
-//            inputOrder.setResourceId(info.getKid());
-//            inputOrder.setToId(info.getCreateUserId());
-//
+            InputOrder inputOrder = new InputOrder();
+            inputOrder.setBizContent(JsonUtils.toFastJson(info));
+            inputOrder.setCost(info.getContentPrice());
+            inputOrder.setCoterieId(info.getCoterieId());
+            inputOrder.setCreateUserId(headerUserId);
+            inputOrder.setFromId(headerUserId);
+            inputOrder.setModuleEnum(info.getModuleEnum());
+            inputOrder.setOrderEnum(OrderEnum.READ_ORDER);
+            inputOrder.setResourceId(info.getKid());
+            inputOrder.setToId(info.getCreateUserId());
             Map<String, Object> result = new HashMap<>();
-//            result.put("orderId", orderSDK.createOrder(inputOrder));
+            result.put("orderId", orderSDK.createOrder(inputOrder));
 
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {

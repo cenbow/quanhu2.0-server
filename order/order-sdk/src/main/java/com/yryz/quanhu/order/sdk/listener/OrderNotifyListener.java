@@ -17,7 +17,6 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,9 +34,6 @@ import org.springframework.stereotype.Service;
 public class OrderNotifyListener {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderNotifyListener.class);
-
-    @Value("order.notify.queue")
-    private String notifyQueue;
 
     @Autowired
     private NotifyService notifyService;

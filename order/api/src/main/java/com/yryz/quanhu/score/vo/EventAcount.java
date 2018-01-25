@@ -3,9 +3,11 @@ package com.yryz.quanhu.score.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 用户事件账户表，描述用户总积分值，成长值/等级 数据结构
- * @author lsn
+ * @author syc
  *
  */
 public class EventAcount implements Serializable{
@@ -15,18 +17,32 @@ public class EventAcount implements Serializable{
 	 */
 	private static final long serialVersionUID = 3825623201525351620L;
 	
+	/** id */
+    @ApiModelProperty(value = "id")
 	private Long id;
 	
+    /** 用户id */
+    @ApiModelProperty(value = "用户id")
 	private String userId;
 	
+    /** 总积分 */
+    @ApiModelProperty(value = "总积分")
 	private Long score;
 	
+    /** 成长值 */
+    @ApiModelProperty(value = "成长值")
 	private Long grow = 0L;
 	
+    /** 成长级别 */
+    @ApiModelProperty(value = "成长级别")
 	private String growLevel;
 	
+    /** 创建时间 */
+    @ApiModelProperty(value = "创建时间")
 	private Date createTime;
 	
+    /** 更新时间 */
+    @ApiModelProperty(value = "更新时间")
 	private Date updateTime;
 
 	public EventAcount(){}

@@ -9,7 +9,6 @@ package com.yryz.quanhu.score.vo;
  */
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,7 +18,6 @@ import io.swagger.annotations.ApiModelProperty;
  * @date 2017年8月25日
  */
 public class EventInfo implements Serializable {
-	
 
 	/**
 	 * 
@@ -28,17 +26,7 @@ public class EventInfo implements Serializable {
 	
 	/** 事件用户ID */
     @ApiModelProperty(value = "事件用户ID")
-//    private String custId;
     private String  userId;
-
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
 
 	/**
      * 圈子ID
@@ -88,6 +76,13 @@ public class EventInfo implements Serializable {
     private Double amount;
 
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
     public String getCircleId() {
         return circleId;

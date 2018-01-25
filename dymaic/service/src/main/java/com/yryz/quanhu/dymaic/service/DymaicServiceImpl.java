@@ -1,20 +1,24 @@
 package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import com.yryz.quanhu.dymaic.dao.redis.DymaicCache;
 import com.yryz.quanhu.dymaic.mq.DymaicSender;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.dymaic.vo.DymaicVo;
+import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -23,15 +27,12 @@ import java.util.*;
  * @version 1.0
  * @data 2018/1/19 0019 04
  * <p>
- *
+ * <p>
  * TODO
- * 关于转发类型的判断...
- *
- * 对接KID, 粉丝, 用户
- * 对接动态写入、统计系统
+ * 对接动态写入、对接统计查询
  */
 @Service
-public class DymaicServiceImpl implements DymaicService {
+public class DymaicServiceImpl {
 
     Logger logger = LoggerFactory.getLogger(DymaicServiceImpl.class);
 
@@ -47,8 +48,22 @@ public class DymaicServiceImpl implements DymaicService {
     @Reference
     UserApi userApi;
 
-    @Override
-    public Response<Boolean> send(Dymaic dymaic) {
+    @Reference
+    UserRelationApi userRelationApi;
+
+    @Reference
+    IdAPI idAPI;
+
+    /**
+     * 发布动态
+     *
+     * @param dymaic
+     * @return
+     */
+    public Boolean send(Dymaic dymaic) {
+        Response<Long> idRsp = idAPI.getKid("dymaic");
+        dymaic.setKid(idRsp.getData());
+
         //write db
         dymaicDao.insert(dymaic);
 
@@ -61,11 +76,17 @@ public class DymaicServiceImpl implements DymaicService {
         //mq
         dymaicSender.directSend(dymaic);
 
-        return ResponseUtils.returnObjectSuccess(true);
+        return true;
     }
 
-    @Override
-    public Response<Boolean> delete(Long userId, Long kid) {
+    /**
+     * 删除动态
+     *
+     * @param userId
+     * @param kid
+     * @return
+     */
+    public Boolean delete(Long userId, Long kid) {
         //write db
         Dymaic dymaic = new Dymaic();
         dymaic.setKid(kid);
@@ -78,11 +99,16 @@ public class DymaicServiceImpl implements DymaicService {
         //update sendList
         dymaicCache.removeSendList(userId, kid);
 
-        return ResponseUtils.returnObjectSuccess(true);
+        return true;
     }
 
-    @Override
-    public Response<Dymaic> get(Long kid) {
+    /**
+     * 查询动态
+     *
+     * @param kid
+     * @return
+     */
+    public Dymaic get(Long kid) {
         Dymaic dymaic = dymaicCache.getDynamic(kid);
 
         if (dymaic == null) {
@@ -101,13 +127,7 @@ public class DymaicServiceImpl implements DymaicService {
             }
         }
 
-        return ResponseUtils.returnObjectSuccess(dymaic);
-    }
-
-    @Override
-    public Response<Map<Long, Dymaic>> get(List<Long> kids) {
-        Map<Long, Dymaic> result = this.getBatch(kids);
-        return ResponseUtils.returnObjectSuccess(result);
+        return dymaic;
     }
 
     /**
@@ -116,7 +136,7 @@ public class DymaicServiceImpl implements DymaicService {
      * @param kids
      * @return
      */
-    private Map<Long, Dymaic> getBatch(List<Long> kids) {
+    public Map<Long, Dymaic> get(List<Long> kids) {
         if (kids == null || kids.isEmpty()) {
             return null;
         }
@@ -162,32 +182,52 @@ public class DymaicServiceImpl implements DymaicService {
         return result;
     }
 
-    @Override
-    public Response<List<DymaicVo>> getSendList(Long userId, Long kid, Long limit) {
-        Set<Long> kids = dymaicCache.rangeSendList(userId, kid, limit);
+    /**
+     * 查询个人动态列表
+     *
+     * @param sourceUserId
+     * @param targetUserId
+     * @param kid
+     * @param limit
+     * @return
+     */
+    public List<DymaicVo> getSendList(Long sourceUserId, Long targetUserId, Long kid, Long limit) {
+        Set<Long> kids = dymaicCache.rangeSendList(targetUserId, kid, limit);
 
         List<DymaicVo> result;
         if (kids == null || kids.isEmpty()) {
             result = new ArrayList<>();
         } else {
-            result = this.mergeDymaicVo(kids);
+            result = this.mergeDymaicVo(sourceUserId, kids);
         }
 
-        return ResponseUtils.returnListSuccess(result);
+        return result;
     }
 
-    @Override
-    public Response<Boolean> rebuildSendList(Long userId) {
+    /**
+     * 重构个人动态列表Cache
+     *
+     * @param userId
+     * @return
+     */
+    public Boolean rebuildSendList(Long userId) {
         List<Long> kids = dymaicDao.getSendListIds(userId);
         if (kids != null && !kids.isEmpty()) {
             dymaicCache.addSendList(userId, new HashSet<>(kids));
         }
 
-        return ResponseUtils.returnObjectSuccess(true);
+        return true;
     }
 
-    @Override
-    public Response<List<DymaicVo>> getTimeLine(Long userId, Long kid, Long limit) {
+    /**
+     * 查询好友动态列表
+     *
+     * @param userId
+     * @param kid
+     * @param limit
+     * @return
+     */
+    public List<DymaicVo> getTimeLine(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
         logger.info("dymaicIds size " + kids.size());
 
@@ -195,51 +235,68 @@ public class DymaicServiceImpl implements DymaicService {
         if (kids == null || kids.isEmpty()) {
             result = new ArrayList<>();
         } else {
-            result = this.mergeDymaicVo(kids);
+            result = this.mergeDymaicVo(userId, kids);
         }
 
-        return ResponseUtils.returnListSuccess(result);
+        return result;
     }
 
-    @Override
-    public Response<Boolean> pushTimeLine(Dymaic dynamic) {
-        if (dynamic == null) {
-            return ResponseUtils.returnObjectSuccess(true);
+    /**
+     * 好友动态Push计算
+     *
+     * @param dymaic
+     * @return
+     */
+    public Boolean pushTimeLine(Dymaic dymaic) {
+        if (dymaic == null || StringUtils.isEmpty(dymaic.getUserId()) || dymaic.getKid() == null) {
+            return true;
         }
 
         Long startTime = System.currentTimeMillis();
-        Long userId = dynamic.getUserId();
-        Long kid = dynamic.getKid();
+        Long userId = dymaic.getUserId();
+        Long kid = dymaic.getKid();
 
         //获取粉丝列表
-        List<Long> followers = getFollowers(userId);
+        List<Long> followers = getFans(userId);
 
         //push
         for (Long followerId : followers) {
             dymaicCache.addTimeLine(followerId, kid);
         }
 
-        logger.info("[dymaic] push dymaicId " + dynamic.getKid() + ", followers " + followers.size() + ", take timeMillis " + (System.currentTimeMillis() - startTime));
+        logger.info("[dymaic] push dymaicId " + dymaic.getKid() + ", followers " + followers.size() + ", take timeMillis " + (System.currentTimeMillis() - startTime));
 
-        return ResponseUtils.returnObjectSuccess(true);
+        return true;
     }
 
-    @Override
-    public Response<Boolean> shuffleTimeLine(Long userId, Long debarUserId) {
+    /**
+     * 删除好友动态中指定用户的动态
+     *
+     * @param userId
+     * @param debarUserId
+     * @return
+     */
+    public Boolean shuffleTimeLine(Long userId, Long debarUserId) {
         Set<Long> kids = dymaicCache.rangeAllSendList(debarUserId);
 
         if (kids != null && !kids.isEmpty()) {
             dymaicCache.removeTimeLine(userId, kids);
         }
 
-        return ResponseUtils.returnObjectSuccess(true);
+        return true;
     }
 
-    @Override
-    public Response<Boolean> rebuildTimeLine(Long userId, Long limit) {
+    /**
+     * 重构好友动态列表Cache
+     *
+     * @param userId
+     * @param limit
+     * @return
+     */
+    public Boolean rebuildTimeLine(Long userId, Long limit) {
         Long startTime = System.currentTimeMillis();
         //获取粉丝列表
-        List<Long> followers = getFollowers(userId);
+        List<Long> followers = getFans(userId);
 
         //从mysql中取limit条好友动态
         int idsSize = 0;
@@ -253,7 +310,7 @@ public class DymaicServiceImpl implements DymaicService {
 
         logger.info("[dymaic] rebuildTimeLine userId " + userId + ", followers " + followers.size() + ", find dymaic " + idsSize + ", take timeMillis " + (System.currentTimeMillis() - startTime));
 
-        return ResponseUtils.returnObjectSuccess(true);
+        return true;
     }
 
     /**
@@ -262,34 +319,45 @@ public class DymaicServiceImpl implements DymaicService {
      * @param kids
      * @return
      */
-    private List<DymaicVo> mergeDymaicVo(Set<Long> kids) {
+    private List<DymaicVo> mergeDymaicVo(Long userId, Set<Long> kids) {
         List<DymaicVo> result = new ArrayList<>();
 
-        //1 动态摘要
+        //1 查询动态摘要
         List<Long> kidList = new ArrayList<>(kids);
-        Map<Long, Dymaic> dymaicMap = this.getBatch(kidList);
+        Map<Long, Dymaic> dymaicMap = this.get(kidList);
 
-        //2 用户信息
+        //2 查询用户信息
         Map<String, UserSimpleVO> users = null;
         if (dymaicMap != null) {
-            Set<Long> userIds = new HashSet<>();
+            Set<String> userIds = new HashSet<>();
             for (Dymaic dymaic : dymaicMap.values()) {
-                userIds.add(dymaic.getUserId());
+                if (dymaic.getUserId() != null) {
+                    userIds.add(dymaic.getUserId().toString());
+                }
             }
             if (!userIds.isEmpty()) {
-                //todo rpcInvoke
-                users = new HashMap<>();
+                Response<Map<String, UserSimpleVO>> rsp = userApi.getUserSimple(userId, userIds);
+                users = rsp.getData();
             }
         }
 
-        //3 统计数据
+        //3 查询统计数据
         Map<String, Dymaic> statistics = null;
         if (!kids.isEmpty()) {
-            //todo rpcInvoke
+            try {
+                //todo rpcInvoke
+            } catch (Exception e) {
+                // ignore
+            }
             statistics = new HashMap<>();
         }
 
-        //4, 聚合信息
+        if (logger.isDebugEnabled()) {
+            logger.debug("debug findusers hit " + (users == null ? 0 : users.size()));
+            logger.debug("debug findstatics hit " + (statistics == null ? 0 : statistics.size()));
+        }
+
+        //4, 聚合动态、用户、统计信息
         if (dymaicMap != null) {
             for (Long kid : kids) {
                 Dymaic dymaic = dymaicMap.get(kid);
@@ -298,8 +366,8 @@ public class DymaicServiceImpl implements DymaicService {
                     DymaicVo vo = new DymaicVo();
                     BeanUtils.copyProperties(dymaic, vo);
 
-                    if (users != null && users.containsKey(dymaic.getUserId())) {
-                        vo.setUser(users.get(dymaic.getUserId()));
+                    if (users != null && users.containsKey(dymaic.getUserId().toString())) {
+                        vo.setUser(users.get(dymaic.getUserId().toString()));
                     } else {
                         vo.setUser(new UserSimpleVO());
                     }
@@ -323,9 +391,22 @@ public class DymaicServiceImpl implements DymaicService {
      * @param userId
      * @return
      */
-    private List<Long> getFollowers(Long userId) {
-        //todo rpcInvoke
-        return Arrays.asList(new Long[]{100L, 200L, userId});
+    private List<Long> getFans(Long userId) {
+        List<Long> result = new ArrayList<>();
+
+        Response<Set<String>> fansRsp = userRelationApi.selectBy(userId.toString(), UserRelationConstant.STATUS.FANS);
+
+        if (fansRsp.getData() != null) {
+            for (String fansId : fansRsp.getData()) {
+                result.add(Long.parseLong(fansId));
+            }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("debug findFans " + userId + ", hit " + result.size());
+        }
+
+        return result;
     }
 
     public static class TimeLineMonitor {
