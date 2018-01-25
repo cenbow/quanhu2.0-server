@@ -236,6 +236,16 @@ public class UserStarServiceImpl implements UserStarService {
 	}
 
 	@Override
+	public List<UserStarAuth> labelStarList(StarAuthParamDTO paramDTO) {
+		try {
+			return persistenceDao.labelStarList(paramDTO);
+		} catch (Exception e) {
+			logger.error("labelStarList error", e);
+			throw new MysqlOptException(e);
+		}
+	}
+
+	@Override
 	public Integer countStar() {
 		try {
 			return persistenceDao.countStar();

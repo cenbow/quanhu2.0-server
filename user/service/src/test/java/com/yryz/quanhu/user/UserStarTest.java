@@ -47,4 +47,15 @@ public class UserStarTest {
 		Response<List<StarInfoVO>> response = starApi.starList(paramDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
+
+	@Test
+	public void labelStarListTest(){
+		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+		paramDTO.setCategoryId(5881248773L);
+		paramDTO.setStart(0);
+		paramDTO.setLimit(10);
+		paramDTO.setUserId(null);
+		Response<List<StarInfoVO>> response = starApi.labelStarList(paramDTO);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
 }

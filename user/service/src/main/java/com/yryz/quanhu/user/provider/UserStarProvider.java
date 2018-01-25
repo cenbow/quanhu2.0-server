@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -380,6 +381,25 @@ public class UserStarProvider implements UserStarApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
+
+	@Override
+	public Response<List<StarInfoVO>> labelStarList(StarAuthParamDTO paramDTO) {
+		try {
+			logger.info("labelStarList request: {}", GsonUtils.parseJson(paramDTO));
+			List<UserStarAuth> list = userStarService.labelStarList(paramDTO);
+			logger.info("userStarService.labelStarList result: {}", GsonUtils.parseJson(list));
+
+			List<StarInfoVO> starInfoVOList = getStarInfoList(paramDTO.getUserId(), list);
+			logger.info("labelStarList result: {}", GsonUtils.parseJson(starInfoVOList));
+			return ResponseUtils.returnObjectSuccess(starInfoVOList);
+		} catch (Exception e) {
+			logger.error("labelStarList error", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+
+
 	/**
 	 * 解析达人信息
 	 * @param userId

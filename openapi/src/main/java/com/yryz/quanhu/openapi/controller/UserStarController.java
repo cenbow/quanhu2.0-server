@@ -29,83 +29,104 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value = "services/app")
 public class UserStarController {
-	private static final Logger logger = LoggerFactory.getLogger(UserStarController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserStarController.class);
 
-	@Reference
-	private UserStarApi starApi;
+    @Reference
+    private UserStarApi starApi;
 
-	/**
-	 * 达人申请
-	 * 
-	 * @param info
-	 * @return
-	 */
-	@ResponseBody
-	@ApiOperation("达人申请")
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/star/starApply")
-	public Response<Boolean> save(@RequestBody StarAuthInfo info, HttpServletRequest request) {
-		RequestHeader header = WebUtil.getHeader(request);
-		info.setAuthWay((byte) 10);
-		info.setUserId(header.getUserId());
-		info.setAppId(header.getAppId());
-		return starApi.save(info);
-	}
+    /**
+     * 达人申请
+     *
+     * @param info
+     * @return
+     */
+    @ResponseBody
+    @ApiOperation("达人申请")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @PostMapping(value = "/{version}/star/starApply")
+    public Response<Boolean> save(@RequestBody StarAuthInfo info, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        info.setAuthWay((byte) 10);
+        info.setUserId(header.getUserId());
+        info.setAppId(header.getAppId());
+        return starApi.save(info);
+    }
 
-	/**
-	 * 达人信息编辑
-	 * 
-	 * @param info
-	 * @return
-	 */
-	@ApiOperation(" 达人信息编辑")
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/star/editStarAuth")
-	public Response<Boolean> update(@RequestBody StarAuthInfo info, HttpServletRequest request) {
-		RequestHeader header = WebUtil.getHeader(request);
-		info.setAuthWay((byte) 10);
-		info.setUserId(header.getUserId());
-		info.setAppId(header.getAppId());
-		return starApi.update(info);
-	}
+    /**
+     * 达人信息编辑
+     *
+     * @param info
+     * @return
+     */
+    @ApiOperation(" 达人信息编辑")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @PostMapping(value = "/{version}/star/editStarAuth")
+    public Response<Boolean> update(@RequestBody StarAuthInfo info, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        info.setAuthWay((byte) 10);
+        info.setUserId(header.getUserId());
+        info.setAppId(header.getAppId());
+        return starApi.update(info);
+    }
 
-	/**
-	 * 达人信息获取
-	 * 
-	 * @param custId
-	 * @return
-	 */
-	@ApiOperation("达人信息获取")
-	@NotLogin
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/star/getStarAuth")
-	public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
-		RequestHeader header = WebUtil.getHeader(request);
-		if (StringUtils.isNotBlank(userId)) {
-			return starApi.get(userId);
-		} else {
-			return starApi.get(header.getUserId());
-		}
+    /**
+     * 达人信息获取
+     *
+     * @param custId
+     * @return
+     */
+    @ApiOperation("达人信息获取")
+    @NotLogin
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/{version}/star/getStarAuth")
+    public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        if (StringUtils.isNotBlank(userId)) {
+            return starApi.get(userId);
+        } else {
+            return starApi.get(header.getUserId());
+        }
 
-	}
+    }
 
-	/**
-	 * 达人推荐列表
-	 * 
-	 * @param custId
-	 * @return
-	 */
-	@ApiOperation("达人推荐列表")
-	@NotLogin
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@GetMapping(value = "/{version}/star/starCommend")
-	public Response<List<StarInfoVO>> recommendList(Integer start,Integer limit,HttpServletRequest request)  {
-		RequestHeader header = WebUtil.getHeader(request);
-		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
-		paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		paramDTO.setStart(start);
-		paramDTO.setLimit(limit);
-		return starApi.starList(paramDTO);
-	}
+    /**
+     * 达人推荐列表
+     *
+     * @param custId
+     * @return
+     */
+    @ApiOperation("达人推荐列表")
+    @NotLogin
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/{version}/star/starCommend")
+    public Response<List<StarInfoVO>> recommendList(Integer start, Integer limit, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+        paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+        paramDTO.setStart(start);
+        paramDTO.setLimit(limit);
+        return starApi.starList(paramDTO);
+    }
+
+    /**
+     * @param start
+     * @param limit
+     * @param request
+     * @return
+     */
+    @ApiOperation("某一标签下的达人列表")
+    @NotLogin
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/{version}/star/label/list")
+    public Response<List<StarInfoVO>> labelStarList(Long categoryId, Integer start, Integer limit, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+        paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+
+        paramDTO.setCategoryId(categoryId);
+        paramDTO.setStart(start);
+        paramDTO.setLimit(limit);
+        return starApi.labelStarList(paramDTO);
+    }
 
 }
