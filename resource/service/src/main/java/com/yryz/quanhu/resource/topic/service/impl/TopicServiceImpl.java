@@ -90,11 +90,19 @@ public class TopicServiceImpl implements TopicService {
         if (null == kid) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        Topic topic = this.topicDao.selectByPrimaryKey(kid);
-        if (null == topic) {
-            throw QuanhuException.busiError("查询的话题不存在");
-        }
 
+        TopicExample example=new TopicExample();
+        TopicExample.Criteria criteria=example.createCriteria();
+        criteria.andKidEqualTo(kid);
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+
+        List<Topic> topics = this.topicDao.selectByExample(example);
+        if (null == topics || topics.isEmpty()) {
+            //throw QuanhuException.busiError("查询的话题不存在");
+            return null;
+        }
+        Topic topic=topics.get(0);
         TopicVo topicVo = new TopicVo();
         BeanUtils.copyProperties(topic, topicVo);
         Long createUserId = topic.getCreateUserId();

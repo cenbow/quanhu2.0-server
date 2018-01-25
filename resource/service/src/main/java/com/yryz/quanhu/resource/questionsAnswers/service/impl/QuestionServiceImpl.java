@@ -151,15 +151,21 @@ public class QuestionServiceImpl implements QuestionService {
         if (null == kid || null == userId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-
-        Question questionBysearch = this.questionDao.selectByPrimaryKey(kid);
-        if (null == questionBysearch) {
-            throw QuanhuException.busiError("查询的问题不存在");
+        QuestionExample example=new QuestionExample();
+        QuestionExample.Criteria criteria=example.createCriteria();
+        criteria.andKidEqualTo(kid);
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        List<Question> questions = this.questionDao.selectByExample(example);
+        if (null == questions || questions.isEmpty()) {
+            //throw QuanhuException.busiError("查询的问题不存在");
+            return null;
         }
 
         /**
          * 如果是私密问题，只有提问人和圈主可见
          */
+        Question questionBysearch=questions.get(0);
         Long createUserId = questionBysearch.getCreateUserId();
         if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
             if (createUserId.compareTo(userId) != 0) {

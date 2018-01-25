@@ -92,11 +92,18 @@ public class TopicPostServiceImpl implements TopicPostService {
         if (null == kid) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        TopicPostWithBLOBs topicPostWithBLOBs = this.topicPostDao.selectByPrimaryKey(kid);
-        if (null == topicPostWithBLOBs) {
-            throw QuanhuException.busiError("查询的帖子不存在");
-        }
 
+        TopicPostExample example=new TopicPostExample();
+        TopicPostExample.Criteria criteria=example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andKidEqualTo(kid);
+        List<TopicPostWithBLOBs> topicPostWithBLOBsList = this.topicPostDao.selectByExampleWithBLOBs(example);
+        if (null == topicPostWithBLOBsList || topicPostWithBLOBsList.isEmpty()) {
+            //throw QuanhuException.busiError("查询的帖子不存在");
+            return null;
+        }
+        TopicPostWithBLOBs topicPostWithBLOBs=topicPostWithBLOBsList.get(0);
         Long createUserId = topicPostWithBLOBs.getCreateUserId();
         TopicPostVo vo = new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs, vo);

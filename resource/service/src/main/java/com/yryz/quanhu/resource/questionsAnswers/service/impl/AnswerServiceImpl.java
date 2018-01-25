@@ -89,10 +89,17 @@ public class AnswerServiceImpl implements AnswerService {
         if (null == kid || null == userId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        AnswerWithBLOBs answerWithBLOBs = this.answerDao.selectByPrimaryKey(kid);
-        if (null == answerWithBLOBs) {
-            throw QuanhuException.busiError("查询的回答不存在");
+        AnswerExample example=new AnswerExample();
+        AnswerExample.Criteria criteria=example.createCriteria();
+        criteria.andKidEqualTo(kid);
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
+        if (null==answerWithBLOBsList || answerWithBLOBsList.isEmpty()) {
+            //throw QuanhuException.busiError("查询的回答不存在");
+            return null;
         }
+        AnswerWithBLOBs answerWithBLOBs=answerWithBLOBsList.get(0);
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
         Long createUserId = answerWithBLOBs.getCreateUserId();
