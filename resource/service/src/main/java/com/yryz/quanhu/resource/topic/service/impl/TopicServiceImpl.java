@@ -89,7 +89,7 @@ public class TopicServiceImpl implements TopicService {
         /**
          * 校验参数
          */
-        if (null == kid || null == userId) {
+        if (null == kid ) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
         Topic topic = this.topicDao.selectByPrimaryKey(kid);
