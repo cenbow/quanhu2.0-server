@@ -159,7 +159,6 @@
 		a.recommend_status = 11 and a.audit_status = 11
 		order by a.recommend_height
 		desc,a.recommend_time desc,a.auth_time desc
-		limit #{start},#{limit}
 	</select>
 
 
@@ -175,7 +174,7 @@
 		from qh_user_star_auth a
 		left join qh_user_tag t on
 		a.user_id = t.user_id
-		left join qh_user_heat h on
+		left join qh_user_baseinfo h on
 		a.user_id = h.user_id
 		where
 		t.tag_id = #{categoryId}
@@ -184,7 +183,6 @@
 			and a.user_id != #{userId}
 		</if>
 		order by a.recommend_height desc,a.recommend_time desc,a.auth_time desc, h.last_heat desc
-		limit #{start}, #{limit}
 	</select>
 
 

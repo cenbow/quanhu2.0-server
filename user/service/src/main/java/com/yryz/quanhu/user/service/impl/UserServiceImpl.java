@@ -142,8 +142,6 @@ public class UserServiceImpl implements UserService {
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
 		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
-		simpleVO.setUserLevel("1");
-		//TODO:获取等级
 		return simpleVO;
 	}
 
@@ -157,11 +155,9 @@ public class UserServiceImpl implements UserService {
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
 				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
-				simpleVO.setUserLevel("1");
 				if(userId != null && userId != 0l){
 					//TODO:聚合关系数据
 				}
-				//TODO:获取等级
 				map.put(vo.getUserId().toString(), simpleVO);
 			}
 		}
@@ -244,7 +240,6 @@ public class UserServiceImpl implements UserService {
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
 				UserBaseInfoVO infoVO = UserBaseInfo.getUserBaseInfoVO(vo);
-				//TODO:获取等级
 				map.put(vo.getUserId().toString(), infoVO);
 			}
 		}
