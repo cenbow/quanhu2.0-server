@@ -13,6 +13,9 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -46,6 +49,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
+    
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private CountApi countApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -58,9 +64,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isNull(record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
 
             if (StringUtils.isBlank(record.getModuleEnum())) {
-                record.setModuleEnum("1003");
+                record.setModuleEnum(ResourceTypeEnum.RELEASE);
             }
-            
+
             // 校验用户是否存在
             ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
 
@@ -80,8 +86,15 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
-            // TODO 资源进动态
-            // TODO 接入统计计数
+            try {
+                // TODO 资源进聚合
+
+                // 接入统计计数
+                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
+
             return ResponseUtils.returnObjectSuccess(record);
 
         } catch (QuanhuException e) {
@@ -111,9 +124,13 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
                 return ResponseUtils.returnObjectSuccess(infoVo);
             }
 
-            // TODO 资源互动信息
+            try {
+                // 接入统计计数
+                countApi.commitCount(BehaviorEnum.Read, infoVo.getKid(), null, 1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
 
-            // TODO 对接资源浏览数
             return ResponseUtils.returnObjectSuccess(infoVo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
@@ -152,9 +169,14 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             int result = releaseInfoService.updateByUkSelective(upInfo);
             Assert.isTrue(result > 0, "作者删除文章失败！");
 
-            // TODO 动态资源下线
+            try {
+                // TODO 动态资源下线
 
-            // TODO 对接计数
+                // 接入统计计数
+                countApi.commitCount(BehaviorEnum.Release, upInfo.getKid(), null, -1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
 
             return ResponseUtils.returnObjectSuccess(result);
 

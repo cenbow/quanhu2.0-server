@@ -1,5 +1,14 @@
 package com.yryz.quanhu.resource.coterie.release.info.provider;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
@@ -8,11 +17,15 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoApi;
 import com.yryz.quanhu.resource.coterie.release.info.vo.CoterieReleaseInfoVo;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -22,14 +35,6 @@ import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author wangheng
@@ -56,6 +61,12 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     @Autowired
     private OrderSDK orderSDK;
 
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private CountApi countApi;
+    
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private CoterieMemberAPI coterieMemberAPI;
+
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
@@ -63,6 +74,10 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             Assert.isTrue(record.getContentPrice() >= 0L, "release() ContentPrice is not unsigned !");
             // 校验用户是否存在
             ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+
+            if (StringUtils.isBlank(record.getModuleEnum())) {
+                record.setModuleEnum(ResourceTypeEnum.RELEASE + "-");
+            }
 
             // TODO 校验是否为圈主
 
@@ -86,8 +101,14 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
-            // TODO 资源聚合
-            // TODO 资源计数接入
+            try {
+                // TODO 资源聚合
+
+                // 资源计数接入
+                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
 
             return ResponseUtils.returnObjectSuccess(record);
 
@@ -143,9 +164,15 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
                 releaseInfoService.resourcePropertiesEmpty(infoVo);
             }
 
-            // TODO 资源互动信息
+            try {
+                // TODO 资源聚合
 
-            // TODO 对接资源浏览数
+                // 资源计数接入
+                countApi.commitCount(BehaviorEnum.Read, infoVo.getKid(), null, 1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
+
             return ResponseUtils.returnObjectSuccess(infoVo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
