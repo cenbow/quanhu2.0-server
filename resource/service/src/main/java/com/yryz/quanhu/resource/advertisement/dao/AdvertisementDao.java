@@ -1,7 +1,10 @@
 package com.yryz.quanhu.resource.advertisement.dao;
 
 import com.yryz.common.dao.BaseDao;
+import com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto;
 import com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto;
+import com.yryz.quanhu.resource.advertisement.entity.Advertisement;
+import com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,4 +24,10 @@ public interface AdvertisementDao extends BaseDao {
     List<AdvertisementVo> selectList(AdvertisementDto advertisementDto);
 
     List<AdvertisementVo> selectDefaultAdvertisement();
+
+    List<AdvertisementAdminVo> selectListAdmin(AdvertisementAdminDto advertisementAdminDto);
+
+    Integer add(Advertisement advertisement);
+
+    AdvertisementVo detail(Long kid);
 }
