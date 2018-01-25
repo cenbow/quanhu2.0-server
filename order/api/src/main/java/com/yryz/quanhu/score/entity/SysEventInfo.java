@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * 平台总体事件类型信息维护实体
- * @author lsn
+ * @author syc
  *
  */
 public class SysEventInfo implements Serializable{
