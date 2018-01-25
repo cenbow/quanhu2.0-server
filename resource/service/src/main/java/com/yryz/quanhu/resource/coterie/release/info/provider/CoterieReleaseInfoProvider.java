@@ -16,10 +16,6 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.BeanUtils;
-import com.yryz.common.utils.JsonUtils;
-import com.yryz.quanhu.order.sdk.OrderSDK;
-import com.yryz.quanhu.order.sdk.constant.OrderEnum;
-import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoApi;
 import com.yryz.quanhu.resource.coterie.release.info.vo.CoterieReleaseInfoVo;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
@@ -54,8 +50,8 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
 
-    // @Autowired
-    OrderSDK orderSDK;
+//    @Autowired
+//    OrderSDK orderSDK;
     
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -169,19 +165,19 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             // 创建订单者 不能是作者
             Assert.isTrue(!headerUserId.equals(info.getCreateUserId()), "阅读资源文章，创建订单者 不能是作者");
 
-            InputOrder inputOrder = new InputOrder();
-            inputOrder.setBizContent(JsonUtils.toFastJson(info));
-            inputOrder.setCost(info.getContentPrice());
-            inputOrder.setCoterieId(info.getCoterieId());
-            inputOrder.setCreateUserId(headerUserId);
-            inputOrder.setFromId(headerUserId);
-            inputOrder.setModuleEnum(info.getModuleEnum());
-            inputOrder.setOrderEnum(OrderEnum.READ_ORDER);
-            inputOrder.setResourceId(info.getKid());
-            inputOrder.setToId(info.getCreateUserId());
-
+//            InputOrder inputOrder = new InputOrder();
+//            inputOrder.setBizContent(JsonUtils.toFastJson(info));
+//            inputOrder.setCost(info.getContentPrice());
+//            inputOrder.setCoterieId(info.getCoterieId());
+//            inputOrder.setCreateUserId(headerUserId);
+//            inputOrder.setFromId(headerUserId);
+//            inputOrder.setModuleEnum(info.getModuleEnum());
+//            inputOrder.setOrderEnum(OrderEnum.READ_ORDER);
+//            inputOrder.setResourceId(info.getKid());
+//            inputOrder.setToId(info.getCreateUserId());
+//
             Map<String, Object> result = new HashMap<>();
-            result.put("orderId", orderSDK.createOrder(inputOrder));
+//            result.put("orderId", orderSDK.createOrder(inputOrder));
 
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
