@@ -7,6 +7,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
@@ -110,6 +111,7 @@ public class TopicServiceImpl implements TopicService {
         }
         Long replyCount=this.topicPostService.countPostByTopicId(topicVo.getKid());
         topicVo.setReplyCount(replyCount);
+        topicVo.setModuleEnum(ResourceTypeEnum.TOPIC);
         return topicVo;
     }
 

@@ -45,4 +45,15 @@ public interface QuestionService {
      * @return
      */
     public PageList<QuestionAnswerVo> queryQuestionAnswerList(QuestionDto dto);
+
+
+    /**
+     * 查询有用的提问
+     * @param kid
+     * @return
+     */
+    public Question queryAvailableQuestionByKid(Long kid);
+
+
+    public Integer updateByPrimaryKeySelective(Question question);
 }

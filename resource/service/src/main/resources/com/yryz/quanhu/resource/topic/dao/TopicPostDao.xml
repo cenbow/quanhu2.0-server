@@ -120,10 +120,7 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
-        <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
+    <insert id="insert"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
         insert into qh_topic_post (id, kid, topic_id,
         video_url, video_thumbnail_url, audio_url,
         shelve_flag, del_flag, sort,
@@ -139,10 +136,7 @@
         #{gps,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{contentSource,jdbcType=LONGVARCHAR},
         #{imgUrl,jdbcType=LONGVARCHAR}, #{imgThumbnailUrl,jdbcType=LONGVARCHAR}, #{coterieId,jdbcType=BIGINT})
     </insert>
-    <insert id="insertSelective" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
-        <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
         insert into qh_topic_post
         <trim prefix="(" suffix=")" suffixOverrides=",">
             id,

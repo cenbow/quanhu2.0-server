@@ -114,10 +114,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
-    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
     insert into qh_topic (id, kid, title, 
       img_url, content, recommend, 
       shelve_flag, del_flag, sort, 
@@ -133,10 +130,7 @@
       #{coterieId,jdbcType=BIGINT}, #{cityCode,jdbcType=VARCHAR}, #{gps,jdbcType=VARCHAR},
       #{contentSource,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
-    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Long">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.topic.entity.Topic">
     insert into qh_topic
     <trim prefix="(" suffix=")" suffixOverrides=",">
       id,

@@ -3,6 +3,9 @@ package com.yryz.quanhu.support.activity.dao;
 import com.yryz.quanhu.support.activity.entity.ActivityPrizes;
 import com.yryz.quanhu.support.activity.vo.ActivityPrizesVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 
@@ -24,5 +27,7 @@ public interface ActivityPrizesDao {
     void insertByPrimaryKeySelective(ActivityPrizes activityPrizes);
 
     int update(ActivityPrizes activityPrizes);
+
+    List<ActivityPrizesVo> selectListCondition(@Param("activityInfoId") Long activityInfoId);
 
 }

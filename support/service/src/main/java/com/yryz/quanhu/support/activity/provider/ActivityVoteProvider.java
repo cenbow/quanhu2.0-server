@@ -1,12 +1,15 @@
 package com.yryz.quanhu.support.activity.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.activity.api.ActivityVoteApi;
+import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.support.activity.service.ActivityVoteService;
 import com.yryz.quanhu.support.activity.vo.ActivityInfoVo;
+import com.yryz.quanhu.support.activity.vo.ActivityPrizesVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +62,21 @@ public class ActivityVoteProvider implements ActivityVoteApi {
             return ResponseUtils.returnObjectSuccess(map);
         } catch (Exception e) {
             logger.error("确认投票 失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    /**
+     * 奖品列表
+     * @param   activityVoteDto
+     * @return
+     * */
+    public Response<PageList<ActivityPrizesVo>> prizeslist(ActivityVoteDto activityVoteDto) {
+        try {
+            Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
+            return ResponseUtils.returnObjectSuccess(activityVoteService.prizesList(activityVoteDto));
+        } catch (Exception e) {
+            logger.error("奖品列表 失败", e);
             return ResponseUtils.returnException(e);
         }
     }
