@@ -43,12 +43,12 @@ public class HotMongoConstant {
 	/**
 	 * 资源计算中间数据表名
 	 */
-	public static final String RESOURCE_HOT_CALCULATION_MODEL = "ResourceHotCalculation";
+	public static final String RESOURCE_HOT_CALCULATION_MODEL = "resourceHotCalculation";
 	
 	/**
 	 * 用户计算中间数据表名
 	 */
-	public static final String USER_HOT_CALCULATION_MODEL = "UserHotCalculation";
+	public static final String USER_HOT_CALCULATION_MODEL = "userHotCalculation";
 	
 	/**
 	 * 资源参与计算中间数据表名

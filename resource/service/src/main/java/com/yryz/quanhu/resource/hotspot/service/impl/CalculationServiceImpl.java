@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +19,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapreduce.MapReduceResults;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.Block;
-import com.mongodb.client.MapReduceIterable;
-import com.mongodb.client.MongoCollection;
-import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.entity.ResourceModel;
@@ -32,7 +27,6 @@ import com.yryz.quanhu.resource.hotspot.dao.HotMongoConstant;
 import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.enums.HeatInfoEnum;
 import com.yryz.quanhu.resource.hotspot.service.CalculationService;
-import com.yryz.quanhu.resource.hotspot.utils.ReplicaSetMongo;
 
 /**
  * @author yehao
@@ -51,9 +45,6 @@ public class CalculationServiceImpl implements CalculationService {
 	@Autowired
 	private ResourceMongo resourceMongo;
 	
-//	@Autowired
-	ReplicaSetMongo mongo;
-	
 	@Autowired
 	MongoTemplate mongoTemplate;
 
@@ -65,7 +56,7 @@ public class CalculationServiceImpl implements CalculationService {
 	public void calculation() {
 		logger.info("execute CalculateDataTask start...");
 		calculUserHotTotalValue("start", "end");
-//		calculResourceHotTotalValue("start", "end");
+		calculResourceHotTotalValue("start", "end");
 		logger.info("execute CalculDataTask end...");
 	}
 
@@ -97,12 +88,20 @@ public class CalculationServiceImpl implements CalculationService {
 			String reduce = "function(key,values){   " + " var reducedVal = { count: 0, heat: 0 };  "
 					+ " for (var i = 0; i < values.length; i++) {  " + "reducedVal.count += values[i].count;  "
 					+ " reducedVal.heat += values[i].heat;  " + " }" + "  return reducedVal;  }  ";
-			MapReduceResults<HashMap> results = mongoTemplate.mapReduce(HotMongoConstant.RESOURCE_HOT_CALCULATION_MODEL, map, reduce, HashMap.class);
+			MapReduceResults<HashMap> results = mongoTemplate.mapReduce(HotMongoConstant.USER_HOT_CALCULATION_MODEL, map, reduce, HashMap.class);
 			results.forEach(new Consumer<HashMap>(){
-
 				@Override
-				public void accept(HashMap t) {
-					System.out.println(GsonUtils.parseJson(t));
+				public void accept(HashMap m) {
+					String resourceId = m.get("_id").toString();
+					String eventHotValue = ((Map) m.get("value")).get("heat").toString();
+					if(StringUtils.isNotEmpty(eventHotValue)){
+						//更新热度对象表
+						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_USER, resourceId, Long.valueOf(eventHotValue));
+						if(heatInfo != null){
+							//通知用户热度更新
+							
+						}
+					}
 				}
 				
 			});
@@ -120,19 +119,15 @@ public class CalculationServiceImpl implements CalculationService {
 	public void calculResourceHotTotalValue(String startTime,String endTime){
 		logger.info("start calculResourceHotTotalValue...");
 		try {
-			MongoCollection<Document> conn = mongo.getCollection(HotMongoConstant.DB_EVENT,
-					HotMongoConstant.RESOURCE_HOT_CALCULATION_MODEL);
-
 			String map = "function() {	var value={count:1, heat:this.heat};  " + "emit(this.resourceId,value);  }";
 
 			String reduce = "function(key,values){   " + " var reducedVal = { count: 0, heat: 0 };  "
 					+ " for (var i = 0; i < values.length; i++) {  " + "reducedVal.count += values[i].count;  "
 					+ " reducedVal.heat += values[i].heat;  " + " }" + "  return reducedVal;  }  ";
-			MapReduceIterable<Document> results = conn.mapReduce(map, reduce);
-			results.forEach(new Block<Document>() {
+			MapReduceResults<HashMap> results = mongoTemplate.mapReduce(HotMongoConstant.USER_HOT_CALCULATION_MODEL, map, reduce, HashMap.class);
+			results.forEach(new Consumer<HashMap>(){
 				@Override
-				public void apply(Document t) {
-					Map m = GsonUtils.json2Obj(t.toJson(), Map.class);
+				public void accept(HashMap m) {
 					String resourceId = m.get("_id").toString();
 					String eventHotValue = ((Map) m.get("value")).get("heat").toString();
 					if(StringUtils.isNotEmpty(eventHotValue)){
@@ -146,6 +141,7 @@ public class CalculationServiceImpl implements CalculationService {
 						}
 					}
 				}
+				
 			});
 			logger.info("end calculResourceHotTotalValue...");
 		} catch (Exception e) {
