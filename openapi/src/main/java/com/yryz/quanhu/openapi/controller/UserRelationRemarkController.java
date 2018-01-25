@@ -14,12 +14,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -44,13 +46,14 @@ public class UserRelationRemarkController {
     @ApiOperation("用户备注名-设置/重置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @RequestMapping("/{version}/user/relation/remark")
-    public Response<Boolean> setRemarkName(HttpServletRequest request){
+    public Response<Boolean> setRemarkName(HttpServletRequest request,
+                                           @RequestBody Map<String,String> jsonBody){
 
         String userId       = request.getHeader("userId");
-        String remarkType   = request.getParameter("remarkType");
-        String remarkValue  = request.getParameter("remarkValue");
-        String targetUserId = request.getParameter("targetUserId");
-        String eventType    = request.getParameter("eventType");
+        String remarkType   = jsonBody.get("remarkType");
+        String remarkValue  = jsonBody.get("remarkValue");
+        String targetUserId = jsonBody.get("targetUserId");
+        String eventType    = jsonBody.get("eventType");
 
         //check
         Assert.notNull(userId,"userId不能为空");

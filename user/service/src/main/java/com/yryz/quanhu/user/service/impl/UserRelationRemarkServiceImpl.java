@@ -5,14 +5,13 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dao.UserRelationRemarkDao;
-import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
-import com.yryz.quanhu.user.service.UserRelationRemarkApi;
 import com.yryz.quanhu.user.service.UserRelationRemarkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -120,5 +119,10 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
         }catch (Exception e){
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<UserRelationRemarkDto> selectBy(String sourceUserId,UserRelationConstant.TYPE type,Set<String> targetUserIds) {
+        return userRelationRemarkDao.selectByUserIds(UserRelationRemarkDto.class,type.getCode(),sourceUserId,targetUserIds);
     }
 }

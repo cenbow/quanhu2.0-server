@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.topic.dto;
 
-public class TopicDto {
+import java.io.Serializable;
+
+public class TopicDto implements Serializable {
 
     private String title;
 

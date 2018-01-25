@@ -5,16 +5,11 @@ import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
-import com.yryz.quanhu.behavior.count.dto.CountDto;
-import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -34,10 +29,16 @@ public class BehaviorController {
     @NotLogin
     @ApiOperation("查询计数")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/behavior/getCount")
-    public Response<Map<String, Long>> accretion(@RequestBody CountDto countDto, HttpServletRequest request) {
-        countApi.countCommit(BehaviorEnum.Comment, countDto.getKid(), null, 1L);
-        countApi.countCommit(BehaviorEnum.Like, countDto.getKid(), null, 1L);
-        return countApi.getCount(countDto.getCountType(), countDto.getKid());
+    @GetMapping(value = "/services/app/{version}/behavior/getCount")
+    public Response<Map<String, Long>> getCount(@RequestParam String countType, @RequestParam Long kid, HttpServletRequest request) {
+        return countApi.getCount(countType, kid, null);
+    }
+
+    @NotLogin
+    @ApiOperation("提交事件")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @PostMapping(value = "/services/app/{version}/behavior/commitCount")
+    public Response<Object> countCommit(@RequestBody Map<String, Object> map) {
+        return countApi.commitCount(BehaviorEnum.Read, new Long(map.get("kid").toString()), "", 20L);
     }
 }

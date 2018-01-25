@@ -66,7 +66,8 @@ public interface UserStarService {
     /**
      * app端达人列表
      * @param paramDTO
-     * @return
+     * @param start
+     *@param limit @return
      */
     List<UserStarAuth> starList(StarAuthParamDTO paramDTO);
     

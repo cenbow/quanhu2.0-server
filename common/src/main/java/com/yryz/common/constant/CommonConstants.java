@@ -60,33 +60,33 @@ public class CommonConstants {
     /**
      * 上架
      */
-    public static final byte SHELVE_YES = 10;
+    public static final Byte SHELVE_YES = 10;
 
     /**
      * 未删除
      */
-    public static final byte DELETE_NO = 10;
+    public static final Byte DELETE_NO = 10;
 
     /**
      * 下架
      */
-    public static final byte SHELVE_NO = 11;
+    public static final Byte SHELVE_NO = 11;
 
     /**
      * 删除
      */
-    public static final byte DELETE_YES = 11;
+    public static final Byte DELETE_YES = 11;
 
 
 	/**
 	 * 推荐
 	 */
-	public static final byte recommend_YES = 11;
+	public static final Byte recommend_YES = 11;
 
 	/**
 	 * 非推荐
 	 */
-	public static final byte recommend_NO = 10;
+	public static final Byte recommend_NO = 10;
 
 
 }

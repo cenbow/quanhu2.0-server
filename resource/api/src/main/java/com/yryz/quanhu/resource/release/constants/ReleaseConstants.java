@@ -79,30 +79,30 @@ public final class ReleaseConstants {
      * @date 2017年6月1日 下午6:28:11  
      *    
      */
-     public static final class PropertyVerifyType {
+    public static final class PropertyVerifyType {
 
-         /**  
-         * @Fields length : 长度
-         */
-         public static final byte length = 1;
+        /**  
+        * @Fields length : 长度
+        */
+        public static final byte length = 1;
 
-         /**  
-         * @Fields number : 个数
-         */
-         public static final byte number = 2;
+        /**  
+        * @Fields number : 个数
+        */
+        public static final byte number = 2;
 
-         /**  
-         * @Fields scope : 范围
-         */
-         public static final byte scope = 3;
+        /**  
+        * @Fields scope : 范围
+        */
+        public static final byte scope = 3;
 
-         /**  
-         * @Fields other : 其他
-         */
-         public static final byte other = -1;
+        /**  
+        * @Fields other : 其他
+        */
+        public static final byte other = -1;
 
-     }
-    
+    }
+
     /**  
     * @ClassName: EnabledType  
     * @Description: 属性存在类型
@@ -159,4 +159,22 @@ public final class ReleaseConstants {
         public static final byte time_old = 2;
     }
 
+    /**  
+    * @Description: 可读标识
+    * @author wangheng
+    * @date 2018年1月24日 下午5:27:26  
+    *    
+    */
+    public static final class CanReadType {
+        /**  
+        * @Fields : 不可读
+        */
+        public static final Byte NO = 10;
+
+        /**  
+        * @Fields : 可读
+        */
+        public static final Byte YES = 11;
+
+    }
 }

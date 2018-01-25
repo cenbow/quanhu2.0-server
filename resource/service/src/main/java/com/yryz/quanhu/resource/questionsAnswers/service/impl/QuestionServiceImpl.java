@@ -1,5 +1,14 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
@@ -20,15 +29,6 @@ import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.apache.commons.lang.StringUtils;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author wanght

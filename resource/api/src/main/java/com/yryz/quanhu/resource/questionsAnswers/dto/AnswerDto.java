@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.questionsAnswers.dto;
 
-public class AnswerDto {
+import java.io.Serializable;
+
+public class AnswerDto implements Serializable {
     private Long kid;
 
     private Long questionId;
