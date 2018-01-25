@@ -8,6 +8,10 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.rongzhong.component.pay.api.YryzPaySDK;
+import com.rongzhong.component.pay.entity.PayResponse;
+import com.rongzhong.component.pay.iospay.IosVerify;
+import com.rongzhong.component.pay.wxpay.Wxpay;
 import com.yryz.common.exception.RpcOptException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -21,6 +25,7 @@ import com.yryz.quanhu.openapi.order.utils.BankUtil;
 import com.yryz.quanhu.openapi.order.utils.DataEnum;
 import com.yryz.quanhu.openapi.service.PayService;
 import com.yryz.quanhu.order.api.OrderApi;
+import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.*;
@@ -28,6 +33,8 @@ import com.yryz.quanhu.user.service.UserApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -553,9 +560,8 @@ public class OrderController {
 
 		String ipAddress = WebUtil.getClientIP(request);
 		long fee = DataEnum.countFee(payWay, orderAmount);
-//		OrderVO orderVO = payServcie.getNewPayFlowId(userId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
-//		return ReturnModel.beanToString(orderVO);
-		return ResponseUtils.returnSuccess();
+		PayVO payVO = payService.getNewPayFlowId(userId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
+		return ResponseUtils.returnObjectSuccess(payVO);
 	}
 	
     /**
@@ -565,31 +571,31 @@ public class OrderController {
      * @throws Exception
      */
     @ApiOperation("支付宝支付回调")
-    @RequestMapping(value = "/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/pay/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
 	public void alipayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//		logger.info("receive alipayNotify");
-//		PayResponse payResp = null;
-//		try {
-//			// payResp = Alipay.parsePayResult(request);
-//			payResp = YryzPaySDK.parseAliPayResult(request);
-//		} catch (Exception e) {
-//			logger.error("alipayNotify faild ", e);
-//			response.getWriter().write("alipayNotify faild ");
-//			response.getWriter().flush();
-//			return;
-//		}
-//		logger.info("收到支付宝回调并解析成功，结果为：" + payResp);
-//		if (payResp.getResult() == Response.SUCCESS || payResp.getResult() == Response.FAILURE) {
-//			System.out.println("支付宝回调成功");
-//
-//			int orderState = 2;
-//			if (payResp.getResult() == Response.SUCCESS) {
-//				orderState = 1;
-//			}
-//			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_ALIPAY, orderState);
-//
-//			response.getWriter().write("success");
-//		}
+    	logger.info("receive alipayNotify");
+		PayResponse payResp = null;
+		try {
+			// payResp = Alipay.parsePayResult(request);
+			payResp = YryzPaySDK.parseAliPayResult(request);
+		} catch (Exception e) {
+			logger.error("alipayNotify faild ", e);
+			response.getWriter().write("alipayNotify faild ");
+			response.getWriter().flush();
+			return;
+		}
+		logger.info("收到支付宝回调并解析成功，结果为：" + payResp);
+		if (payResp.getResult() == PayResponse.SUCCESS || payResp.getResult() == PayResponse.FAILURE) {
+			System.out.println("支付宝回调成功");
+
+			int orderState = 2;
+			if (payResp.getResult() == PayResponse.SUCCESS) {
+				orderState = 1;
+			}
+			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_ALIPAY, orderState);
+
+			response.getWriter().write("success");
+		}
 		// logger.info("支付宝回调结束");
 	}
     
@@ -600,30 +606,29 @@ public class OrderController {
      * @throws Exception
      */
     @ApiOperation("微信支付回调")
-    @RequestMapping(value = "/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/pay/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
 	public void wxpayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("receive wxpayNotify...");
-//		PayResponse payResp = null;
-//		try {
-//			// payResp = Wxpay.parsePayResult(request);
-//			payResp = YryzPaySDK.parseWxPayResult(request);
-//		} catch (Exception e) {
-//			logger.error("wxpayNotify faild ", e);
-//			response.getWriter().write("wxpayNotify faild ");
-//			response.getWriter().flush();
-//			return;
-//		}
-//		logger.info("收到微信回调并解析成功，结果为：" + payResp);
-//		if (payResp.getResult() == Response.SUCCESS || payResp.getResult() == Response.FAILURE) {
-//			int orderState = 2;
-//			if (payResp.getResult() == Response.SUCCESS) {
-//				orderState = 1;
-//			}
-//			payServcie.completePayInfo(payResp, Constant.PAY_WAY_WXPAY, orderState);
-//
-//			response.getWriter().write(Wxpay.buildReturnXML("SUCCESS", "OK"));
-//			response.getWriter().flush();
-//		}
+		PayResponse payResp = null;
+		try {
+			// payResp = Wxpay.parsePayResult(request);
+			payResp = YryzPaySDK.parseWxPayResult(request);
+		} catch (Exception e) {
+			logger.error("wxpayNotify faild ", e);
+			response.getWriter().write("wxpayNotify faild ");
+			response.getWriter().flush();
+			return;
+		}
+		logger.info("收到微信回调并解析成功，结果为：" + payResp);
+		if (payResp.getResult() == PayResponse.SUCCESS || payResp.getResult() == PayResponse.FAILURE) {
+			int orderState = 2;
+			if (payResp.getResult() == PayResponse.SUCCESS) {
+				orderState = 1;
+			}
+			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_WXPAY, orderState);
+			response.getWriter().write(Wxpay.buildReturnXML("SUCCESS", "OK"));
+			response.getWriter().flush();
+		}
     }
     
     /**
@@ -756,36 +761,36 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
 		}
 		
-//		boolean isSandbox = false;
-//		if ("575155838165196903".equals(userId)) {
-//			isSandbox = true;
-//		}
-//
-//		String result = IosVerify.verifyReceipt(receipt, isSandbox);
-//		logger.info("ios check receipt : " + result);
-//		logger.info("ios check receive result : " + result);
-//		try {
-//			JSONObject json = new JSONObject(result);
-//			if (json.getInt("status") != 0) {
-//				if (json.getInt("status") == 21005) { // 苹果服务不可用，需要再次测试
-//					return ReturnModel.returnException(ReturnCode.WARN, "验证苹果服务超时");
-//				} else {
-//					return ReturnModel.returnException(ReturnCode.WARN, "验证苹果服务失败");
-//				}
-//			}
-//			String productId = json.getJSONObject("receipt").getJSONArray("in_app").getJSONObject(0)
-//					.getString("product_id");
-//			PayResponse payResp = new PayResponse();
-//			payResp.setSn(orderId);
-//			String payAmount = DataEnum.getIosProductConfig(productId).getCost() + "";
-//			payResp.setPayAmount(payAmount);
-//			int orderState = 1;
-//			payResp.setEndDesc(receipt);
-//			payServcie.completePayInfo(payResp, Constant.PAY_WAY_IOS_IAP, orderState);
-//		} catch (Exception e) {
-//			logger.error("苹果内购验证失败", e);
-//			return ReturnModel.returnException(ReturnCode.WARN, "验证苹果服务失败");
-//		}
+		boolean isSandbox = false;
+		if ("575155838165196903".equals(userId)) {
+			isSandbox = true;
+		}
+
+		String result = IosVerify.verifyReceipt(receipt, isSandbox);
+		logger.info("ios check receipt : " + result);
+		logger.info("ios check receive result : " + result);
+		try {
+			JSONObject json = new JSONObject(result);
+			if (json.getInt("status") != 0) {
+				if (json.getInt("status") == 21005) { // 苹果服务不可用，需要再次测试
+					return ResponseUtils.returnCommonException("验证苹果服务超时");
+				} else {
+					return ResponseUtils.returnCommonException("验证苹果服务失败");
+				}
+			}
+			String productId = json.getJSONObject("receipt").getJSONArray("in_app").getJSONObject(0)
+					.getString("product_id");
+			PayResponse payResp = new PayResponse();
+			payResp.setSn(orderId);
+			String payAmount = DataEnum.getIosProductConfig(productId).getCost() + "";
+			payResp.setPayAmount(payAmount);
+			int orderState = 1;
+			payResp.setEndDesc(receipt);
+			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_IOS_IAP, orderState);
+		} catch (Exception e) {
+			logger.error("苹果内购验证失败", e);
+			return ResponseUtils.returnCommonException("验证苹果服务失败");
+		}
 		return ResponseUtils.returnSuccess();
 	}
     
