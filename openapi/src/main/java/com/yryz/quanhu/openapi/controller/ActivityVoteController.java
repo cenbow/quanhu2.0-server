@@ -2,10 +2,13 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.support.activity.api.ActivityVoteApi;
+import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteRecord;
+import com.yryz.quanhu.support.activity.vo.ActivityPrizesVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,11 +35,11 @@ public class ActivityVoteController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/detail")
     public Response<ActivityVoteInfoVo> detail(Long activityInfoId, HttpServletRequest request) {
-        String userId = null;
+        Long userId = null;
         if(!StringUtils.isEmpty(request.getHeader("userId"))){
-            userId = request.getHeader("userId");
+            userId = Long.valueOf(request.getHeader("userId"));
         }
-        return activityVoteApi.detail(activityInfoId, Long.valueOf(userId));
+        return activityVoteApi.detail(activityInfoId, userId);
     }
 
     @ApiOperation("确认投票")
@@ -47,6 +50,13 @@ public class ActivityVoteController {
         Assert.hasText(userId, "userId不能为空");
         record.setCreateUserId(Long.valueOf(userId));
         return activityVoteApi.single(record);
+    }
+
+    @ApiOperation("奖品列表")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "services/app/{version}/activity/vote/prizeslist")
+    public Response<PageList<ActivityPrizesVo>> prizeslist(ActivityVoteDto activityVoteDto) {
+        return activityVoteApi.prizeslist(activityVoteDto);
     }
 
 }

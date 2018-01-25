@@ -100,7 +100,7 @@ public interface UserStarApi {
      * @return
      * @throws ServiceException
      */
-    public Response<List<StarInfoVO>> starList(StarAuthParamDTO authParamDTO);
+    public Response<PageList<StarInfoVO>> starList(StarAuthParamDTO authParamDTO);
     
     /**
      * 统计达人总数
@@ -114,5 +114,5 @@ public interface UserStarApi {
 	 * @param paramDTO
 	 * @return
 	 */
-    Response<List<StarInfoVO>> labelStarList(StarAuthParamDTO paramDTO);
+    Response<PageList<StarInfoVO>> labelStarList(StarAuthParamDTO paramDTO);
 }

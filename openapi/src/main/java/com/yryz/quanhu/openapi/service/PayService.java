@@ -714,7 +714,7 @@ public class PayService {
 
 	/**
 	 * 更新系统账户缓存
-	 * @see com.yryz.app.openapi.modules.pay.service.IPayServcie#updateSysIDCache()
+	 * @see com.yryz
 	 */
 	public void updateSysIDCache() {
 		try {

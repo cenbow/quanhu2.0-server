@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -369,18 +368,20 @@ public class UserStarProvider implements UserStarApi {
 	}
 
 	@Override
-	public Response<List<StarInfoVO>> starList(StarAuthParamDTO authParamDTO) {
+	public Response<PageList<StarInfoVO>> starList(StarAuthParamDTO authParamDTO) {
 		try {
-			if(authParamDTO.getStart() == null ||authParamDTO.getStart() < 0){
-				authParamDTO.setStart(0);
+			if (authParamDTO.getCurrentPage() == null || authParamDTO.getCurrentPage() < 0) {
+				authParamDTO.setCurrentPage(1);
 			}
-			authParamDTO.setStart(0);
-			if(authParamDTO.getLimit() == null ||authParamDTO.getLimit() > 100 || authParamDTO.getLimit() < 0 ){
-				authParamDTO.setLimit(10);
+			if (authParamDTO.getPageSize() == null || authParamDTO.getPageSize() > 100
+					|| authParamDTO.getPageSize() < 0) {
+				authParamDTO.setPageSize(10);
 			}
-			List<UserStarAuth> list = userStarService.starList(authParamDTO);
-			List<StarInfoVO> authInfos = getStarInfoList(authParamDTO.getUserId(), list);	
-			return ResponseUtils.returnObjectSuccess(authInfos);
+			Page<UserStarAuth> list = userStarService.starList(authParamDTO);
+			List<StarInfoVO> authInfos = getStarInfoList(authParamDTO.getUserId(), list.getResult());
+			PageList<StarInfoVO> pageList = new PageList<>(authParamDTO.getCurrentPage(), authParamDTO.getPageSize(),
+					authInfos);
+			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -390,15 +391,18 @@ public class UserStarProvider implements UserStarApi {
 	}
 
 	@Override
-	public Response<List<StarInfoVO>> labelStarList(StarAuthParamDTO paramDTO) {
+	public Response<PageList<StarInfoVO>> labelStarList(StarAuthParamDTO paramDTO) {
 		try {
 			logger.info("labelStarList request: {}", GsonUtils.parseJson(paramDTO));
-			List<UserStarAuth> list = userStarService.labelStarList(paramDTO);
+			Page<UserStarAuth> list = userStarService.labelStarList(paramDTO);
 			logger.info("userStarService.labelStarList result: {}", GsonUtils.parseJson(list));
 
-			List<StarInfoVO> starInfoVOList = getStarInfoList(paramDTO.getUserId(), list);
+			List<StarInfoVO> starInfoVOList = getStarInfoList(paramDTO.getUserId(), list.getResult());
+
 			logger.info("labelStarList result: {}", GsonUtils.parseJson(starInfoVOList));
-			return ResponseUtils.returnObjectSuccess(starInfoVOList);
+			PageList<StarInfoVO> pageList = new PageList<>(paramDTO.getCurrentPage(), paramDTO.getPageSize(),
+					starInfoVOList);
+			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (Exception e) {
 			logger.error("labelStarList error", e);
 			return ResponseUtils.returnException(e);
@@ -418,7 +422,6 @@ public class UserStarProvider implements UserStarApi {
 		
 		Map<String, UserSimpleVO> userVos = null;
 		Set<String> userIds = null;
-		//Map<String,String> levelMap = null;
 		int length = authInfos == null ? 0 : authInfos.size();
 		list = new ArrayList<>(length);
 		userIds = new HashSet<>(length);
@@ -432,7 +435,6 @@ public class UserStarProvider implements UserStarApi {
 		}
 		if (CollectionUtils.isNotEmpty(userIds)){
 			userVos = userService.getUserSimple(userId, userIds);
-			//levelMap = getUserLevels(userIds);
 		}
 		
 		for (int i = 0; i < length; i++) {
@@ -443,7 +445,6 @@ public class UserStarProvider implements UserStarApi {
 			simpleVo.setAuthWay(null);
 			simpleVo.setUserId(null);
 			infoDTO.parseUser(authInfo.getUserId().toString(), userVos);
-			//infoDTO.getCustInfo().setCustLevel(levelMap.get(authInfo.getUserId()));
 			infoDTO.setStarInfo(simpleVo);
 			list.add(infoDTO);
 		}

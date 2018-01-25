@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
@@ -41,10 +42,10 @@ public class UserStarTest {
 	@Test
 	public void starRecommonedList(){
 		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
-		paramDTO.setStart(0);
-		paramDTO.setLimit(10);
+		paramDTO.setCurrentPage(1);
+		paramDTO.setPageSize(10);
 		paramDTO.setUserId(null);
-		Response<List<StarInfoVO>> response = starApi.starList(paramDTO);
+		Response<PageList<StarInfoVO>> response = starApi.starList(paramDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
@@ -52,10 +53,10 @@ public class UserStarTest {
 	public void labelStarListTest(){
 		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
 		paramDTO.setCategoryId(5881248773L);
-		paramDTO.setStart(0);
-		paramDTO.setLimit(10);
+		paramDTO.setCurrentPage(1);
+		paramDTO.setPageSize(10);
 		paramDTO.setUserId(727061873573347328L);
-		Response<List<StarInfoVO>> response = starApi.labelStarList(paramDTO);
+		Response<PageList<StarInfoVO>> response = starApi.labelStarList(paramDTO);
 		System.out.println("labelStarListTest: " + JsonUtils.toFastJson(response));
 	}
 }

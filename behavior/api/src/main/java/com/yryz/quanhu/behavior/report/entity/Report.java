@@ -31,71 +31,63 @@ public class Report extends GenericEntity {
         return moduleEnum;
     }
 
-    public Report setModuleEnum(String moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
-        return this;
     }
 
     public long getResourceId() {
         return resourceId;
     }
 
-    public Report setResourceId(long resourceId) {
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-        return this;
     }
 
     public byte getInformType() {
         return informType;
     }
 
-    public Report setInformType(byte informType) {
+    public void setInformType(byte informType) {
         this.informType = informType;
-        return this;
     }
 
     public String getInformDesc() {
         return informDesc;
     }
 
-    public Report setInformDesc(String informDesc) {
+    public void setInformDesc(String informDesc) {
         this.informDesc = informDesc;
-        return this;
     }
 
     public byte getInformStatus() {
         return informStatus;
     }
 
-    public Report setInformStatus(byte informStatus) {
+    public void setInformStatus(byte informStatus) {
         this.informStatus = informStatus;
-        return this;
     }
 
     public long getReportUserId() {
         return reportUserId;
     }
 
-    public Report setReportUserId(long reportUserId) {
+    public void setReportUserId(long reportUserId) {
         this.reportUserId = reportUserId;
-        return this;
     }
 
     public long getBeReportUserId() {
         return beReportUserId;
     }
 
-    public Report setBeReportUserId(long beReportUserId) {
+    public void setBeReportUserId(long beReportUserId) {
         this.beReportUserId = beReportUserId;
-        return this;
     }
 
     public String getDisposeTime() {
         return disposeTime;
     }
 
-    public Report setDisposeTime(String disposeTime) {
+    public void setDisposeTime(String disposeTime) {
         this.disposeTime = disposeTime;
-        return this;
     }
 }

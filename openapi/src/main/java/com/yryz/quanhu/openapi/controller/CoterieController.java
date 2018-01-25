@@ -2,6 +2,7 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
@@ -50,9 +51,11 @@ public class CoterieController {
 	@ApiOperation("发布私圈")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/coterieInfo/create")
-	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info, String userId, HttpServletRequest request) {
+	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info ,String uid, HttpServletRequest request) {
+		info.setOwnerId(uid);
 		RequestHeader header = WebUtil.getHeader(request);
 		String useId = header.getUserId();
+		//info.setOwnerId(useId);
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
 			info.setJoinCheck(1);
@@ -120,12 +123,13 @@ public class CoterieController {
 	public Response<CoterieInfo> details(String coterieId, HttpServletRequest request) {
 		//Assert.notNull(coterieId, "私圈id不能为null！");
 		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
-		CoterieInfo rpcCoterieInfo = coterieInfo.getData();
+		CoterieInfo rpcCoterieInfo = (CoterieInfo)coterieInfo.getData();
 		try {
-			if (rpcCoterieInfo != null) {
-				String regroupQrUrl = coterieApi.regroupQr(rpcCoterieInfo).getData();
-				coterieInfo.getData().setQrUrl(regroupQrUrl);
-			}
+			//todo
+			// if (rpcCoterieInfo != null) {
+				//String regroupQrUrl = coterieApi.regroupQr(rpcCoterieInfo).getData();
+				//coterieInfo.getData().setQrUrl(regroupQrUrl);
+			//}
 		} catch (Exception e) {
 
 			logger.error(String.format("query Coterie details error, coterieId=[%s]", coterieId), e);
@@ -167,8 +171,15 @@ public class CoterieController {
  @ApiOperation("分页获取私圈列表")
  @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
  @GetMapping(value = "/{version}/coterieInfo/list/")
-  public Response<List<CoterieInfo>> queryPage(Integer currentPage, Integer pageSize, HttpServletRequest request){
-			return coterieApi.queryPage(  currentPage,   pageSize);
+  public Response<PageList<CoterieInfo>> queryPage(Integer currentPage, Integer pageSize, HttpServletRequest request){
+	        PageList<CoterieInfo> page = new PageList<>();
+	       page.setCurrentPage(currentPage);
+	       page.setPageSize(pageSize);
+	        List<CoterieInfo> list=coterieApi.queryPage(  currentPage,   pageSize).getData();
+	         page.setCount((long)list.size());
+	         page.setEntities(list);
+	      return ResponseUtils.returnObjectSuccess(page);
+
   }
 	/**
 	 *  首页 热门 私圈
@@ -178,9 +189,16 @@ public class CoterieController {
 	@ApiOperation("获取热门私圈 ")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/coterieInfo/list/recommend")
-	public Response<List<CoterieInfo>> getRecommendCoterie(Integer currentPage, Integer pageSize, HttpServletRequest request)
+	public Response<PageList<CoterieInfo>> getRecommendCoterie(Integer currentPage, Integer pageSize, HttpServletRequest request)
 	{
-       return coterieApi.queryPageForApp(currentPage,pageSize);
+		PageList<CoterieInfo> page = new PageList<>();
+		page.setCurrentPage(currentPage);
+		page.setPageSize(pageSize);
+		List<CoterieInfo> list=coterieApi.queryPageForApp(  currentPage,   pageSize).getData();
+		page.setCount((long)list.size());
+		page.setEntities(list);
+		return ResponseUtils.returnObjectSuccess(page);
+
 	}
 
 }

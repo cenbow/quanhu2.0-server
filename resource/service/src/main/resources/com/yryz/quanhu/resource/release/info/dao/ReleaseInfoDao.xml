@@ -71,6 +71,9 @@
 			<if test="coterieId != null">
 				and coterie_id = #{coterieId,jdbcType=BIGINT}
 			</if>
+			<if test="allCoterie != null and allCoterie == true">
+				and coterie_id != 0
+			</if>
 			<if test="createUserId != null">
 				and create_user_id = #{createUserId,jdbcType=BIGINT}
 			</if>
@@ -87,9 +90,9 @@
 				<when test="payFlag != null and payFlag == 0">
 					and content_price = 0
 				</when>
-				<otherwise>
+				<when test="payFlag != null and payFlag == 1">
 					and content_price > 0
-				</otherwise>
+				</when>
 			</choose>
 			<if test="classifyId != null">
 				and classify_id = #{classifyId,jdbcType=BIGINT}

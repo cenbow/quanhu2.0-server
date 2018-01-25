@@ -124,8 +124,18 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     }
 
     @Override
-    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId) {
-        return null;
+    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean haveCount) {
+        try {
+            dto.setCoterieId(0L);
+            PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, haveCount);
+
+            return ResponseUtils.returnObjectSuccess(voList);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("获取平台文章列表异常！", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     @Override

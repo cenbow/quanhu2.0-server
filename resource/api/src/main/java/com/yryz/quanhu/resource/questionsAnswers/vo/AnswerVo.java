@@ -39,6 +39,8 @@ public class AnswerVo  implements Serializable {
 
     private UserSimpleVO user;
 
+    private String moduleEnum;
+
     public Long getKid() {
         return kid;
     }
@@ -165,5 +167,13 @@ public class AnswerVo  implements Serializable {
 
     public void setUser(UserSimpleVO user) {
         this.user = user;
+    }
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
     }
 }

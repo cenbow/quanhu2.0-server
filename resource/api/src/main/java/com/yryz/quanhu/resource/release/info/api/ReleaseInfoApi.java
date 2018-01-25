@@ -16,8 +16,7 @@ public interface ReleaseInfoApi {
     /**  
     * @Description: 发布
     * @author wangheng
-    * @param @param record
-    * @param @return
+    * @param record
     * @return ReleaseInfo
     * @throws  
     */
@@ -26,9 +25,8 @@ public interface ReleaseInfoApi {
     /**  
     * @Description: 详情
     * @author wangheng
-    * @param @param kid
-    * @param @param headerUserId
-    * @param @return
+    * @param kid
+    * @param headerUserId
     * @return ReleaseInfoVo
     * @throws  
     */
@@ -37,19 +35,18 @@ public interface ReleaseInfoApi {
     /**  
     * @Description: 分页查询
     * @author wangheng
-    * @param @param dto
-    * @param @param headerUserId
-    * @param @return
+    * @param dto
+    * @param headerUserId
+    * @param haveCount
     * @return PageList<ReleaseInfoVo>
     * @throws  
     */
-    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId);
+    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean haveCount);
 
     /**  
     * @Description: 作者删除
     * @author wangheng
-    * @param @param record
-    * @param @return
+    * @param record
     * @return int
     * @throws  
     */
@@ -58,9 +55,8 @@ public interface ReleaseInfoApi {
     /**  
     * @Description: 批量下架
     * @author wangheng
-    * @param @param record
-    * @param @param dto
-    * @param @return
+    * @param record
+    * @param dto
     * @return int
     * @throws  
     */

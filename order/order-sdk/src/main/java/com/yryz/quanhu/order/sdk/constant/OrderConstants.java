@@ -29,4 +29,12 @@ public class OrderConstants {
         //成功
         public static final Integer SUCCESS = 11;
     }
+
+    //资金系统订单状态
+    public static class RpcOrderState {
+        //创建
+        public static final Integer CREATE = 0;
+        //成功
+        public static final Integer SUCCESS = 1;
+    }
 }

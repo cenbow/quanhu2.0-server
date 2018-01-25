@@ -18,48 +18,43 @@ public class ReportDTO extends PageList implements Serializable {
     private String startTime;
     private String endTime;
 
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public ReportDTO setStartTime(String startTime) {
-        this.startTime = startTime;
-        return this;
-    }
-
     public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public ReportDTO setModuleEnum(String moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
-        return this;
     }
 
     public byte getInformType() {
         return informType;
     }
 
-    public ReportDTO setInformType(byte informType) {
+    public void setInformType(byte informType) {
         this.informType = informType;
-        return this;
     }
 
     public byte getInformStatus() {
         return informStatus;
     }
 
-    public ReportDTO setInformStatus(byte informStatus) {
+    public void setInformStatus(byte informStatus) {
         this.informStatus = informStatus;
-        return this;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     public String getEndTime() {
         return endTime;
     }
 
-    public ReportDTO setEndTime(String endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
-        return this;
     }
 }
