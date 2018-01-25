@@ -5,10 +5,8 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
+import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
@@ -35,11 +33,9 @@ public class TopicPostServiceImpl implements TopicPostService {
     @Autowired
     private TopicPostDao topicPostDao;
 
-    @Reference
-    private UserApi userApi;
+    @Autowired
+    private APIservice apIservice;
 
-    @Reference
-    private IdAPI idAPI;
 
     @Autowired
     private TopicService topicService;
@@ -63,7 +59,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         }
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         BeanUtils.copyProperties(topicPostDto, topicPost);
-        topicPost.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+        topicPost.setKid(apIservice.getKid());
         topicPost.setCreateDate(new Date());
         topicPost.setCityCode("");
         topicPost.setGps("");
@@ -105,7 +101,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         TopicPostVo vo = new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs, vo);
         if (null != createUserId) {
-            vo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+            vo.setUser(apIservice.getUser(createUserId));
         }
 
         topicAndPostVo.setPost(vo);
@@ -152,7 +148,7 @@ public class TopicPostServiceImpl implements TopicPostService {
             BeanUtils.copyProperties(topicPost, vo);
             Long createUserId = topicPost.getCreateUserId();
             if (null != createUserId) {
-                vo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+                vo.setUser(apIservice.getUser(createUserId));
             }
             list.add(vo);
         }

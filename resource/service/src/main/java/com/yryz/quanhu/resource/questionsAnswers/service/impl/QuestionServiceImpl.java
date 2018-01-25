@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +41,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private QuestionDao questionDao;
 
-    @Reference
-    private UserApi userApi;
-
-
-    @Reference
-    private IdAPI idAPI;
+   @Autowired
+   private APIservice apIservice;
 
     @Autowired
     private AnswerService answerService;
@@ -71,7 +68,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        question.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+        question.setKid(apIservice.getKid());
         question.setCreateDate(new Date());
         question.setQuestionType(QuestionAnswerConstants.questionType.ONE_TO_ONE);
         question.setRevision(0);
@@ -144,7 +141,9 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
-    public QuestionVo getDetail(Long kid, Long userId) {
+    public QuestionAnswerVo getDetail(Long kid, Long userId) {
+
+        QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
         /**
          * 参数校验
          */
@@ -173,11 +172,14 @@ public class QuestionServiceImpl implements QuestionService {
             }
         }
         QuestionVo questionVo = new QuestionVo();
-        BeanUtils.copyProperties(questionVo, questionBysearch);
+        BeanUtils.copyProperties(questionBysearch,questionVo);
         if (null != createUserId) {
-            questionVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+            questionVo.setUser(apIservice.getUser(createUserId));
         }
-        return questionVo;
+
+        questionAnswerVo.setQuestion(questionVo);
+        questionAnswerVo.setAnswer(this.answerService.queryAnswerVoByquestionId(questionVo.getKid()));
+        return questionAnswerVo;
     }
 
 
@@ -200,6 +202,10 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = this.questionDao.selectByPrimaryKey(kid);
         if (null == question) {
             throw QuanhuException.busiError("圈主拒接回答的问题不存在");
+        }
+        String targetId=question.getTargetId();
+        if(!String.valueOf(userId).equals(targetId)){
+            throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREJECT);
         }
         question.setAnswerdFlag(QuestionAnswerConstants.AnswerdFlag.REJECT_ANSWERED);
 
@@ -257,7 +263,7 @@ public class QuestionServiceImpl implements QuestionService {
             BeanUtils.copyProperties(question, questionVo);
             Long questionCreateUserId = question.getCreateUserId();
             if (null == questionCreateUserId) {
-                questionVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+                questionVo.setUser(apIservice.getUser(coteriaId));
             }
 
             /**

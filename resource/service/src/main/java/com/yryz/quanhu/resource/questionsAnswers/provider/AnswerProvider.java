@@ -45,16 +45,5 @@ public class AnswerProvider implements AnswerApi {
         }
     }
 
-    @Override
-    public Response<AnswerVo> queryAnswer(Long kid, Long userId) {
-        try {
-            AnswerVo vo = this.answerService.getDetail(kid, userId);
-            return ResponseUtils.returnObjectSuccess(vo);
-        } catch (QuanhuException e) {
-            return ResponseUtils.returnException(e);
-        } catch (Exception e) {
-            logger.error("注册未知异常", e);
-            return ResponseUtils.returnException(e);
-        }
-    }
+
 }

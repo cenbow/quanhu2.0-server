@@ -7,6 +7,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.entity.Topic;
@@ -31,11 +32,9 @@ public class TopicServiceImpl implements TopicService {
     @Autowired
     private TopicDao topicDao;
 
-    @Reference
-    private UserApi userApi;
+    @Autowired
+    private APIservice apIservice;
 
-    @Reference
-    private IdAPI idAPI;
 
     @Autowired
     private TopicPostService topicPostService;
@@ -58,7 +57,7 @@ public class TopicServiceImpl implements TopicService {
         }
         Topic topic = new Topic();
         BeanUtils.copyProperties(topicDto, topic);
-        topic.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+        topic.setKid(apIservice.getKid());
         topic.setDelFlag(CommonConstants.DELETE_NO);
         topic.setShelveFlag(CommonConstants.SHELVE_YES);
         topic.setRecommend(CommonConstants.recommend_NO);
@@ -107,7 +106,7 @@ public class TopicServiceImpl implements TopicService {
         BeanUtils.copyProperties(topic, topicVo);
         Long createUserId = topic.getCreateUserId();
         if (null != createUserId) {
-            topicVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+            topicVo.setUser(apIservice.getUser(createUserId));
         }
         Long replyCount=this.topicPostService.countPostByTopicId(topicVo.getKid());
         topicVo.setReplyCount(replyCount);
@@ -139,7 +138,7 @@ public class TopicServiceImpl implements TopicService {
             BeanUtils.copyProperties(topic, vo);
             Long createUserId = topic.getCreateUserId();
             if (createUserId != null) {
-                vo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+                vo.setUser(apIservice.getUser(createUserId));
             }
             topicVos.add(vo);
         }

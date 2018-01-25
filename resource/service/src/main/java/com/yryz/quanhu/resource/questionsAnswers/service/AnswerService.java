@@ -9,7 +9,7 @@ public interface AnswerService {
 
     public Integer deleteAnswer(AnswerDto answerdto);
 
-    public  AnswerVo getDetail(Long kid,Long userId);
+    public  AnswerVo getDetailByQuestionId(Long kid);
 
     public AnswerVo queryAnswerVoByquestionId(Long kid);
 }

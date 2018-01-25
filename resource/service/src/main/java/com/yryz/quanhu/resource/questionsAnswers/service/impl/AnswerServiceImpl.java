@@ -11,6 +11,7 @@ import com.yryz.quanhu.resource.questionsAnswers.dto.AnswerDto;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Answer;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs;
+import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -28,11 +29,8 @@ public class AnswerServiceImpl implements AnswerService {
     @Autowired
     private AnswerDao answerDao;
 
-    @Reference
-    private IdAPI idAPI;
-
-    @Reference
-    private UserApi userApi;
+    @Autowired
+    private APIservice apIservice;
 
     @Override
     public AnswerVo saveAnswer(AnswerDto answerdto) {
@@ -46,9 +44,15 @@ public class AnswerServiceImpl implements AnswerService {
         }
         AnswerWithBLOBs answerWithBLOBs = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answerWithBLOBs);
-        answerWithBLOBs.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+        answerWithBLOBs.setKid(apIservice.getKid());
         answerWithBLOBs.setCreateDate(new Date());
         answerWithBLOBs.setDelFlag(CommonConstants.DELETE_NO);
+        answerWithBLOBs.setRevision(0);
+        answerWithBLOBs.setCityCode("");
+        answerWithBLOBs.setGps("");
+        answerWithBLOBs.setOperatorId("");
+        answerWithBLOBs.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
+        answerWithBLOBs.setOrderId("");
         answerWithBLOBs.setShelveFlag(CommonConstants.SHELVE_YES);
         answerWithBLOBs.setAnswerType(QuestionAnswerConstants.questionType.ONE_TO_ONE);
         /**
@@ -82,16 +86,16 @@ public class AnswerServiceImpl implements AnswerService {
      * @return
      */
     @Override
-    public AnswerVo getDetail(Long kid, Long userId) {
+    public AnswerVo getDetailByQuestionId(Long kid) {
         /**
          *校验传入的参数
          */
-        if (null == kid || null == userId) {
+        if (null == kid) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
         AnswerExample example=new AnswerExample();
         AnswerExample.Criteria criteria=example.createCriteria();
-        criteria.andKidEqualTo(kid);
+        criteria.andQuestionIdEqualTo(kid);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
@@ -104,7 +108,7 @@ public class AnswerServiceImpl implements AnswerService {
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
         Long createUserId = answerWithBLOBs.getCreateUserId();
         if (null != createUserId) {
-            answerVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+            answerVo.setUser(apIservice.getUser(createUserId));
         }
         return answerVo;
     }
@@ -121,7 +125,7 @@ public class AnswerServiceImpl implements AnswerService {
             BeanUtils.copyProperties(answerWithBLOBs, answerVo);
             Long createUserId = answerWithBLOBs.getCreateUserId();
             if (null != createUserId) {
-                answerVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
+                answerVo.setUser(apIservice.getUser(createUserId));
             }
             return answerVo;
         }

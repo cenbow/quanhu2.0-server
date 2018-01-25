@@ -4,6 +4,7 @@ package com.yryz.quanhu.resource.questionsAnswers.api;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
+import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 
@@ -16,4 +17,6 @@ public interface QuestionApi {
     Response<Integer> rejectAnswerQuestion(Long kid,Long userId);
 
     Response<PageList<QuestionAnswerVo>> queryQuestionAnswerVoList(QuestionDto questionDto);
+
+    Response<QuestionAnswerVo> queryQuestionAnswerDetail(Long kid,Long userId);
 }
