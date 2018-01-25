@@ -96,160 +96,139 @@ public class Comment extends GenericEntity {
      */
     private byte likeFlag;
 
-    public byte getLikeFlag() {
-        return likeFlag;
-    }
-
-    public Comment setLikeFlag(byte likeFlag) {
-        this.likeFlag = likeFlag;
-        return this;
-    }
-
-    public int getLikeCount() {
-        return likeCount;
-    }
-
-    public Comment setLikeCount(int likeCount) {
-        this.likeCount = likeCount;
-        return this;
-    }
-
-
-
-    public String getUserImg() {
-        return userImg;
-    }
-
-    public Comment setUserImg(String userImg) {
-        this.userImg = userImg;
-        return this;
-    }
-
     public long getTopId() {
         return topId;
     }
 
-    public Comment setTopId(long topId) {
+    public void setTopId(long topId) {
         this.topId = topId;
-        return this;
     }
 
     public long getParentId() {
         return parentId;
     }
 
-    public Comment setParentId(long parentId) {
+    public void setParentId(long parentId) {
         this.parentId = parentId;
-        return this;
     }
 
     public long getParentUserId() {
         return parentUserId;
     }
 
-    public Comment setParentUserId(long parentUserId) {
+    public void setParentUserId(long parentUserId) {
         this.parentUserId = parentUserId;
-        return this;
     }
 
     public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public Comment setModuleEnum(String moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
-        return this;
     }
 
     public long getCoterieId() {
         return coterieId;
     }
 
-    public Comment setCoterieId(long coterieId) {
+    public void setCoterieId(long coterieId) {
         this.coterieId = coterieId;
-        return this;
     }
 
     public long getResourceId() {
         return resourceId;
     }
 
-    public Comment setResourceId(long resourceId) {
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-        return this;
     }
 
     public long getTargetUserId() {
         return targetUserId;
     }
 
-    public Comment setTargetUserId(long targetUserId) {
+    public void setTargetUserId(long targetUserId) {
         this.targetUserId = targetUserId;
-        return this;
     }
 
     public String getContentComment() {
         return contentComment;
     }
 
-    public Comment setContentComment(String contentComment) {
+    public void setContentComment(String contentComment) {
         this.contentComment = contentComment;
-        return this;
     }
 
     public byte getShelveFlag() {
         return shelveFlag;
     }
 
-    public Comment setShelveFlag(byte shelveFlag) {
+    public void setShelveFlag(byte shelveFlag) {
         this.shelveFlag = shelveFlag;
-        return this;
     }
 
     public byte getDelFlag() {
         return delFlag;
     }
 
-    public Comment setDelFlag(byte delFlag) {
+    public void setDelFlag(byte delFlag) {
         this.delFlag = delFlag;
-        return this;
     }
 
     public byte getRecommend() {
         return recommend;
     }
 
-    public Comment setRecommend(byte recommend) {
+    public void setRecommend(byte recommend) {
         this.recommend = recommend;
-        return this;
     }
 
     public String getTenantId() {
         return tenantId;
     }
 
-    public Comment setTenantId(String tenantId) {
+    public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
-        return this;
     }
 
     public int getRevision() {
         return revision;
     }
 
-    public Comment setRevision(int revision) {
+    public void setRevision(int revision) {
         this.revision = revision;
-        return this;
     }
 
     public String getNickName() {
         return nickName;
     }
 
-    public Comment setNickName(String nickName) {
+    public void setNickName(String nickName) {
         this.nickName = nickName;
-        return this;
     }
 
+    public String getUserImg() {
+        return userImg;
+    }
 
+    public void setUserImg(String userImg) {
+        this.userImg = userImg;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public byte getLikeFlag() {
+        return likeFlag;
+    }
+
+    public void setLikeFlag(byte likeFlag) {
+        this.likeFlag = likeFlag;
+    }
 }

@@ -37,35 +37,31 @@ public class CommentDTO extends PageList implements Serializable {
         return keyWords;
     }
 
-    public CommentDTO setKeyWords(String keyWords) {
+    public void setKeyWords(String keyWords) {
         this.keyWords = keyWords;
-        return this;
     }
 
     public String getStartTime() {
         return startTime;
     }
 
-    public CommentDTO setStartTime(String startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
-        return this;
     }
 
     public String getEndTime() {
         return endTime;
     }
 
-    public CommentDTO setEndTime(String endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
-        return this;
     }
 
     public byte getShelveFlag() {
         return shelveFlag;
     }
 
-    public CommentDTO setShelveFlag(byte shelveFlag) {
+    public void setShelveFlag(byte shelveFlag) {
         this.shelveFlag = shelveFlag;
-        return this;
     }
 }

@@ -20,58 +20,52 @@ public class CommentFrontDTO extends PageList implements Serializable {
     private byte shelveFlag;
     private long createUserId;
 
-    public String getModuleEnum() {
-        return moduleEnum;
-    }
-
-    public CommentFrontDTO setModuleEnum(String moduleEnum) {
-        this.moduleEnum = moduleEnum;
-        return this;
-    }
-
-    public long getKid() {
-        return kid;
-    }
-
-    public CommentFrontDTO setKid(long kid) {
-        this.kid = kid;
-        return this;
-    }
-
-    public byte getShelveFlag() {
-        return shelveFlag;
-    }
-
-    public CommentFrontDTO setShelveFlag(byte shelveFlag) {
-        this.shelveFlag = shelveFlag;
-        return this;
-    }
-
-    public long getCreateUserId() {
-        return createUserId;
-    }
-
-    public CommentFrontDTO setCreateUserId(long createUserId) {
-        this.createUserId = createUserId;
-        return this;
-    }
-
     public long getTopId() {
         return topId;
     }
 
-    public CommentFrontDTO setTopId(long topId) {
+    public void setTopId(long topId) {
         this.topId = topId;
-        return this;
     }
 
     public long getResourceId() {
         return resourceId;
     }
 
-    public CommentFrontDTO setResourceId(long resourceId) {
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-        return this;
+    }
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
+    }
+
+    public long getKid() {
+        return kid;
+    }
+
+    public void setKid(long kid) {
+        this.kid = kid;
+    }
+
+    public byte getShelveFlag() {
+        return shelveFlag;
+    }
+
+    public void setShelveFlag(byte shelveFlag) {
+        this.shelveFlag = shelveFlag;
+    }
+
+    public long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(long createUserId) {
+        this.createUserId = createUserId;
     }
 }
 
