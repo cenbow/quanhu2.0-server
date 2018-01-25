@@ -5,19 +5,17 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicExample;
+import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.service.TopicService;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
-import net.sf.jsqlparser.statement.select.Top;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +37,9 @@ public class TopicServiceImpl implements TopicService {
     @Reference
     private IdAPI idAPI;
 
+    @Autowired
+    private TopicPostService topicPostService;
+
     /**
      * 发布话题
      *
@@ -57,10 +58,7 @@ public class TopicServiceImpl implements TopicService {
         }
         Topic topic = new Topic();
         BeanUtils.copyProperties(topicDto, topic);
-        Response<Long> longResponse = idAPI.getKid("qh_topic");
-        if (ResponseConstant.SUCCESS.getCode().equals(longResponse.getCode())) {
-            topic.setKid(longResponse.getData());
-        }
+        topic.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
         topic.setDelFlag(CommonConstants.DELETE_NO);
         topic.setShelveFlag(CommonConstants.SHELVE_YES);
         topic.setRecommend(CommonConstants.recommend_NO);
@@ -89,7 +87,7 @@ public class TopicServiceImpl implements TopicService {
         /**
          * 校验参数
          */
-        if (null == kid ) {
+        if (null == kid) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
         Topic topic = this.topicDao.selectByPrimaryKey(kid);
@@ -101,17 +99,16 @@ public class TopicServiceImpl implements TopicService {
         BeanUtils.copyProperties(topic, topicVo);
         Long createUserId = topic.getCreateUserId();
         if (null != createUserId) {
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
-            if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
-                UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
-                topicVo.setUser(userSimpleVO);
-            }
+            topicVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
         }
+        Long replyCount=this.topicPostService.countPostByTopicId(topicVo.getKid());
+        topicVo.setReplyCount(replyCount);
         return topicVo;
     }
 
     /**
      * 查询话题的列表
+     *
      * @param dto
      * @return
      */
@@ -134,10 +131,7 @@ public class TopicServiceImpl implements TopicService {
             BeanUtils.copyProperties(topic, vo);
             Long createUserId = topic.getCreateUserId();
             if (createUserId != null) {
-                Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
-                if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
-                    vo.setUser(userSimpleVOResponse.getData());
-                }
+                vo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
             }
             topicVos.add(vo);
         }
@@ -152,6 +146,7 @@ public class TopicServiceImpl implements TopicService {
 
     /**
      * 话题标记删除
+     *
      * @param kid
      * @param userId
      * @return
@@ -161,18 +156,18 @@ public class TopicServiceImpl implements TopicService {
         /**
          * 校验参数
          */
-        if(null==kid || null==userId){
+        if (null == kid || null == userId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        Topic topic=this.topicDao.selectByPrimaryKey(kid);
-        if(null==topic){
+        Topic topic = this.topicDao.selectByPrimaryKey(kid);
+        if (null == topic) {
             throw QuanhuException.busiError("删除的话题不存在");
         }
-        if(topic.getCreateUserId().compareTo(userId)!=0){
-            throw  new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
+        if (topic.getCreateUserId().compareTo(userId) != 0) {
+            throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
         }
-        Topic topicParam=new Topic();
+        Topic topicParam = new Topic();
         topicParam.setKid(kid);
         topicParam.setDelFlag(CommonConstants.DELETE_YES);
         return this.topicDao.updateByPrimaryKeySelective(topicParam);

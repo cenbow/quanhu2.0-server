@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.yryz.common.response.ResponseUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
  * @author wanght
@@ -66,15 +66,12 @@ public class QuestionServiceImpl implements QuestionService {
         String conttent = question.getContent();
         Byte isAnonymity = question.getIsAnonymity();
         Byte isOnlyShowMe = question.getIsOnlyShowMe();
-        if (null==citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(conttent)
+        if (null == citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(conttent)
                 || isAnonymity == null || null == isOnlyShowMe) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        Response<Long> longResponse = idAPI.getKid("qh_question");
-        if (ResponseConstant.SUCCESS.getCode().equals(longResponse.getCode())) {
-            question.setKid(longResponse.getData());
-        }
+        question.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
         question.setCreateDate(new Date());
         question.setQuestionType(QuestionAnswerConstants.questionType.ONE_TO_ONE);
         question.setRevision(0);
@@ -109,24 +106,25 @@ public class QuestionServiceImpl implements QuestionService {
 
     /**
      * 删除提问，使用标记删除
+     *
      * @param kid
      * @param userId
      * @return
      */
     @Override
-    public int deleteQuestion(Long kid,Long userId) {
+    public int deleteQuestion(Long kid, Long userId) {
         /**
          * 检查参数是否缺失
          */
-        if (null == kid || null==userId) {
+        if (null == kid || null == userId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
         /**
          * 检验操作人是否有权限执行删除操作，问题是否已经回答，是否是提问者本人
          */
         Question questionBySearch = this.questionDao.selectByPrimaryKey(kid);
-        if(null==questionBySearch){
-            throw  QuanhuException.busiError("删除的问题不存在");
+        if (null == questionBySearch) {
+            throw QuanhuException.busiError("删除的问题不存在");
         }
         if (userId.compareTo(questionBySearch.getCreateUserId()) != 0) {
             throw QuanhuException.busiError("非本人不能删除问题");
@@ -171,11 +169,7 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionVo questionVo = new QuestionVo();
         BeanUtils.copyProperties(questionVo, questionBysearch);
         if (null != createUserId) {
-            Response<UserSimpleVO> userSimpleVOResponse = userApi.getUserSimple(createUserId);
-            if (ResponseConstant.SUCCESS.getCode().equals(userSimpleVOResponse.getCode())) {
-                UserSimpleVO userSimpleVO = userSimpleVOResponse.getData();
-                questionVo.setUser(userSimpleVO);
-            }
+            questionVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
         }
         return questionVo;
     }
@@ -214,7 +208,7 @@ public class QuestionServiceImpl implements QuestionService {
      */
     @Override
     public PageList<QuestionAnswerVo> queryQuestionAnswerList(QuestionDto dto) {
-        PageList<QuestionAnswerVo> questionAnswerVoPageList=new PageList<>();
+        PageList<QuestionAnswerVo> questionAnswerVoPageList = new PageList<>();
         Long coteriaId = dto.getCoterieId();
         Long createUserId = dto.getCreateUserId();
         /**
@@ -250,24 +244,21 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         List<Question> list = this.questionDao.selectByExampleWithBLOBs(example);
-        List<QuestionAnswerVo> questionAnswerVos=new ArrayList<>();
-        for(Question question:list){
-            QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
-            QuestionVo questionVo=new QuestionVo();
-            BeanUtils.copyProperties(question,questionVo);
-            Long questionCreateUserId=question.getCreateUserId();
-            if(null==questionCreateUserId){
-               Response<UserSimpleVO> simpleVOResponse= userApi.getUserSimple(questionCreateUserId);
-                if(ResponseConstant.SUCCESS.getCode().equals(simpleVOResponse.getCode())){
-                    questionVo.setUser(simpleVOResponse.getData());
-                }
+        List<QuestionAnswerVo> questionAnswerVos = new ArrayList<>();
+        for (Question question : list) {
+            QuestionAnswerVo questionAnswerVo = new QuestionAnswerVo();
+            QuestionVo questionVo = new QuestionVo();
+            BeanUtils.copyProperties(question, questionVo);
+            Long questionCreateUserId = question.getCreateUserId();
+            if (null == questionCreateUserId) {
+                questionVo.setUser(ResponseUtils.getResponseData(userApi.getUserSimple(createUserId)));
             }
 
             /**
              * 根据questionId 查询回答
              */
-            if(QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag())==0){
-                AnswerVo answerVo=
+            if (QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag()) == 0) {
+                AnswerVo answerVo =
                         this.answerService.queryAnswerVoByquestionId(question.getKid());
                 questionAnswerVo.setAnswer(answerVo);
             }

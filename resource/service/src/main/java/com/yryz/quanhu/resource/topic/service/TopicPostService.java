@@ -14,4 +14,6 @@ public interface TopicPostService {
     public PageList<TopicPostVo> queryList(TopicPostDto dto);
 
     public Integer deleteTopicPost(Long kid,Long userId);
+
+    public Long countPostByTopicId(Long kid);
 }
