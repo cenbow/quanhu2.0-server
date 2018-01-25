@@ -52,14 +52,12 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
 
     /**
      * 获取参与者详情
-     * @param   activityInfoId
-     * @param   candidateId
-     * @param   userId
+     * @param   activityVoteDto
      * @return
      * */
-    public Response<ActivityVoteDetailVo> detail(Long activityInfoId, Long candidateId, Long userId) {
+    public Response<ActivityVoteDetailVo> detail(ActivityVoteDto activityVoteDto) {
         try {
-            return ResponseUtils.returnObjectSuccess(activityCandidateService.detail(activityInfoId, candidateId, userId));
+            return ResponseUtils.returnObjectSuccess(activityCandidateService.detail(activityVoteDto));
         } catch (Exception e) {
             logger.error("获取参与者详情 失败", e);
             return ResponseUtils.returnException(e);

@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class ActivityVoteServiceImpl implements ActivityVoteService {
@@ -65,7 +63,9 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
     public ActivityVoteInfoVo detail(Long kid, Long userId) {
         ActivityVoteInfoVo activityInfoVo = this.getVoteInfo(kid);
         if(activityInfoVo != null) {
-            //TODO:用户是否参与此活动
+            //更新参与者的票数
+            int votoDetailCount = activityVoteDetailDao.updateVoteCount(userId, kid);
+            activityInfoVo.setJoinFlag(votoDetailCount == 0 ? 10 : 11);
             //TODO:判断用户是否禁言
             //设置已参与人数
             Object joinCount = stringRedisTemplate.opsForHash().get(ActivityVoteConstants.getKeyConfig(activityInfoVo.getKid()), "joinCount");
@@ -84,6 +84,8 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
             else if(now.compareTo(activityInfoVo.getBeginTime()) == 1 && now.compareTo(activityInfoVo.getEndTime()) == -1){
                 activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_PROCESSING);
             }
+            //TODO:设置浏览数
+            activityInfoVo.setAmountOfAccess(0L);
         }
 
         return activityInfoVo;
@@ -146,8 +148,13 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
                 activityVoteInfoVo.setAmount(activityVoteConfig.getAmount());
                 activityVoteInfoVo.setUserFlag(activityVoteConfig.getUserFlag() == null ? 10 : activityVoteConfig.getUserFlag());//用户是否可参与(收禁言规则影响)
                 activityVoteInfoVo.setUserNum(activityVoteConfig.getUserNum() == null ? 0 : activityVoteConfig.getUserNum());//参与人数上限
-                template.opsForValue().set(ActivityVoteConstants.getKeyInfo(activityVoteInfoVo.getKid()), activityVoteInfoVo);
+                activityVoteInfoVo.setInAppVoteType(activityVoteConfig.getInAppVoteType());
+                activityVoteInfoVo.setInAppVoteConfigCount(activityVoteConfig.getInAppVoteConfigCount());
+                activityVoteInfoVo.setOtherAppVoteType(activityVoteConfig.getOtherAppVoteType());
+                activityVoteInfoVo.setOtherAppVoteConfigCount(activityVoteConfig.getOtherAppVoteConfigCount());
+                activityVoteInfoVo.setCommentFlag(activityVoteConfig.getCommentFlag());
 
+                template.opsForValue().set(ActivityVoteConstants.getKeyInfo(activityVoteInfoVo.getKid()), activityVoteInfoVo);
                 this.setVoteConfig(activityVoteInfoVo.getJoinCount() == null ? 0 : activityVoteInfoVo.getJoinCount(), activityVoteConfig);
             }
         }
@@ -190,7 +197,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
                 ActivityVoteConstants.FIXED_VOTE_TYPE.equals(voteType) ? "fixed" : "event");
         if(voteConfig <= count) {
             int flag = activityUserPrizesDao.updateUserRoll(record.getCreateUserId());
-            if(flag == 0){
+            if(flag == 0) {
                 throw QuanhuException.busiError("无可用的投票券");
             }
             record.setFreeVoteFlag(ActivityVoteConstants.NO_FREE_VOTE);
@@ -201,15 +208,15 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         if(votoDetailCount == 0){
             throw QuanhuException.busiError("参与者不存在");
         }
-
-        Response<Long> result = idAPI.getKid("qh_activity_vote_record");
+        //生成投票编号
+        Response<Long> result = idAPI.getSnowflakeId();
         if(!result.success()){
             throw QuanhuException.busiError("调用发号器失败");
         }
         record.setKid(result.getData());
         //插入投票记录
         activityVoteRecordDao.insertByPrimaryKeySelective(record);
-
+        //累计排行榜中的票数
         RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
         template.opsForZSet().incrementScore(ActivityCandidateConstants.getKeyRank(record.getActivityInfoId()),
                 record.getCandidateId(),
@@ -224,7 +231,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
      * @return
      * */
     public int selectUserRoll(Long createUserId) {
-        return activityUserPrizesDao.selectUserRoll(createUserId) > 0 ? 1 : 0;
+        return activityUserPrizesDao.selectUserRoll(createUserId) > 0 ? 11 : 10;
     }
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {

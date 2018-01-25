@@ -8,6 +8,7 @@
 package com.yryz.quanhu.coterie.member.dao;
 
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,16 +18,20 @@ import java.util.List;
  * @author chengyunfei
  *
  */
+@Mapper
 public interface CoterieApplyDao {
-    int deleteByPrimaryKey(Long kid);
-
     int insert(CoterieMemberApply record);
+    int updateByCoterieApply(CoterieMemberApply record);
 
-    int insertSelective(CoterieMemberApply record);
+
+
+
+
+    int deleteByUserIdAndCoterieId(Long userId, Long coterieId);
+
+//    int insertSelective(CoterieMemberApply record);
 
     CoterieMemberApply selectByPrimaryKey(Long kid);
-
-    int updateByCoterieIdAndCustIdSelective(CoterieMemberApply record);
 
     int updateByPrimaryKey(CoterieMemberApply record);
     

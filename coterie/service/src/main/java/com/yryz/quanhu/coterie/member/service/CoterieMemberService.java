@@ -3,6 +3,7 @@ package com.yryz.quanhu.coterie.member.service;
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
 
 import java.util.List;
 
@@ -17,7 +18,8 @@ public interface CoterieMemberService {
 	 * @param coterieId 私圈ID
 	 * @param reason 申请理由
 	 */
-	public void join(Long userId, Long coterieId, String reason);
+	public CoterieMemberVoForJoin join(Long userId, Long coterieId, String reason);
+//	public void joinCoteriePay(Long userId, Long coterieId, String reason);
 
 	/**
 	 * 申请加入私圈  审批通过
@@ -46,18 +48,12 @@ public interface CoterieMemberService {
 	public void quit(Long userId, Long coterieId);
 
 	/**
-	 * 禁言
+	 * 设置禁言/取消禁言
 	 * @param userId
 	 * @param coterieId
 	 */
-	public void banSpeak(Long userId, Long coterieId);
+	public void banSpeak(Long userId, Long coterieId, Integer type);
 
-	/**
-	 * 取消禁言
-	 * @param userId
-	 * @param coterieId
-	 */
-	public void unBanSpeak(Long userId, Long coterieId);
 
 	/**
 	 * 私圈成员列表

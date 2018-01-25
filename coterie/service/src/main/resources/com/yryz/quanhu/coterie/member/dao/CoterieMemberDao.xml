@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.coterie.member.dao.CoterieMemberDao">
+	<!--
+
+	/* 私圈成员表 */
+    CREATE TABLE `service-circle`.`coterie_member`(
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+    `coterie_id` CHAR(12) NOT NULL COMMENT '私圈ID',
+    `cust_id` VARCHAR(64) COMMENT '用户ID',
+    `status` tinyint(3) unsigned DEFAULT 0 COMMENT '0通过，1未通过',
+    `reason` VARCHAR(512) COMMENT '加入理由',
+    `ban_speak` tinyint(3) unsigned DEFAULT 0 COMMENT '0未禁言，1禁言',
+    `create_date` DATETIME not null DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
+    `process_time` DATETIME COMMENT '审批时间',
+    `last_update_date` timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+    )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='私圈成员表';
+
+    -->
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+			parameterType="com.yryz.quanhu.coterie.member.entity.CoterieMember" >
+    	insert into qh_coterie_member(
+            coterie_id
+            ,user_id
+            ,member_status
+            ,reason
+            ,ban_speak
+            ,process_time
+            ,join_type
+            ,amount
+            ,kick_status
+            ,del_flag
+            ,create_userId
+            ,create_date
+            ,last_update_date
+    	) values(
+			#{coterieId,jdbcType=BIGINT}
+			,#{userId,jdbcType=BIGINT}
+			,#{memberStatus,jdbcType=TINYINT}
+			,#{reason,jdbcType=VARCHAR}
+			,#{banSpeak,jdbcType=TINYINT}
+			,#{processTime,jdbcType=TINYINT}
+			,#{joinType,jdbcType=TINYINT}
+			,#{amount,jdbcType=BIGINT}
+			,#{kickStatus,jdbcType=TINYINT}
+			,#{delFlag,jdbcType=TINYINT}
+			,NOW()
+			,NOW()
+    	)
+    </insert>
+
+	<!--<select id="selectAll" resultType="com.yryz.activeii.coterie.member.model.CoterieMember">-->
+		<!--select * from coterie_member T;-->
+	<!--</select>-->
+
+	<!--<select id="select" resultType="com.yryz.activeii.coterie.member.model.CoterieMember">-->
+		<!--select * from coterie_member T where kick_status = 0 and del_flag = 0 limit #{page.firstRecord},#{page.maxRecord};-->
+	<!--</select>-->
+
+	<update id="updateByCoterieMember" parameterType="com.yryz.quanhu.coterie.member.entity.CoterieMember" >
+		update qh_coterie_member set
+		last_update_date = NOW()
+		<if test="kickStatus != null">
+			,kick_status = #{kickStatus}
+		</if>
+		<if test="banSpeak!= null">
+			,ban_speak = #{banSpeak}
+		</if>
+		<if test="delFlag!= null">
+			,del_flag= #{delFlag}
+		</if>
+		<if test="reason!= null">
+			,reason= #{reason}
+		</if>
+		<if test="processTime!= null">
+			,process_time= #{processTime}
+		</if>
+		<if test="createDate!= null">
+			,create_date= #{createDate}
+		</if>
+		where coterie_id = #{coterieId} and user_id = #{userId}
+	</update>
+
+	<!--<select id="selectOne" resultType="com.yryz.activeii.coterie.member.model.CoterieMember">-->
+		<!--select * from coterie_member t-->
+		<!--<where>-->
+			<!--<if test="coterieId != null">-->
+				<!--coterie_id = #{coterieId}-->
+			<!--</if>-->
+			<!--<if test="custId != null">-->
+				<!--and cust_id = #{custId}-->
+			<!--</if>-->
+		<!--</where>-->
+	<!--</select>-->
+
+</mapper>

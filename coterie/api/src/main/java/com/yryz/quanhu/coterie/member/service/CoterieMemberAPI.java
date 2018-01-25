@@ -1,8 +1,10 @@
 package com.yryz.quanhu.coterie.member.service;
 
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForPermission;
 
 import java.util.List;
 
@@ -18,7 +20,7 @@ public interface CoterieMemberAPI {
 	 * @param coterieId 私圈ID
 	 * @param reason 申请理由
 	 */
-	public CoterieMemberVoForJoin join(Long userId, Long coterieId, String reason);
+	public Response<CoterieMemberVoForJoin> join(Long userId, Long coterieId, String reason);
 
 	/**
 	 * 圈主踢出私圈成员
@@ -26,21 +28,37 @@ public interface CoterieMemberAPI {
 	 * @param coterieId
 	 * @param reason
 	 */
-	public Integer kick(Long userId, Long coterieId, String reason);
+	public Response<String> kick(Long userId, Long coterieId, String reason);
 
 	/**
 	 * 圈粉退出私圈
 	 * @param userId
 	 * @param coterieId
 	 */
-	public Integer quit(Long userId, Long coterieId);
+	public Response<String> quit(Long userId, Long coterieId);
 
 	/**
 	 * 设置禁言/取消禁言
 	 * @param userId
 	 * @param coterieId
 	 */
-	public Integer banSpeak(Long userId, Long coterieId, Integer type);
+	public Response<String> banSpeak(Long userId, Long coterieId, Integer type);
+
+
+	/**
+	 * 获取私圈成员权限信息
+	 * @param userId
+	 * @param coterieId
+	 */
+	public Response<CoterieMemberVoForPermission> permission(Long userId, Long coterieId);
+
+
+
+
+
+
+
+
 
 
 /******** 0124 ********************************/
