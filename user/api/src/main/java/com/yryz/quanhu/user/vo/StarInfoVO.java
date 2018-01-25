@@ -46,10 +46,10 @@ public class StarInfoVO implements Serializable {
 		}
 	}
 	
-	public UserSimpleVO getCustInfo() {
+	public UserSimpleVO getUserInfo() {
 		return userInfo;
 	}
-	public void setCustInfo(UserSimpleVO userInfo) {
+	public void setUserInfo(UserSimpleVO userInfo) {
 		this.userInfo = userInfo;
 	}
 	public UserStarSimpleVo getStarInfo() {

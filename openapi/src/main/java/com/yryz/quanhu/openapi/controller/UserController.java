@@ -45,11 +45,14 @@ import com.yryz.quanhu.user.dto.UserTagDTO.UserTagType;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserTagApi;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
+import com.yryz.quanhu.user.vo.MyInviterVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserRegInviterLinkVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import io.swagger.annotations.Api;
@@ -73,7 +76,8 @@ public class UserController {
 	private AuthApi authApi;
 	@Reference
 	private UserTagApi tagApi;
-	
+	@Reference
+	private UserOperateApi operateApi;
 	
 	@ApiOperation("用户token刷新")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -348,10 +352,9 @@ public class UserController {
 	@ApiOperation("修改密码")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/editPassword")
-	public Response<Boolean> editPassword(@RequestBody String oldPassword,
-			@RequestBody String newPassword,HttpServletRequest request) {
+	public Response<Boolean> editPassword(@RequestBody Map<String,String> params,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.editPassword(NumberUtils.createLong(header.getUserId()), oldPassword, newPassword);
+		return accountApi.editPassword(NumberUtils.createLong(header.getUserId()), params.get("oldPassword"), params.get("newPassword"));
 	}
 
 	/**
@@ -372,7 +375,7 @@ public class UserController {
 	/**
 	 * 用户选择标签
 	 * 
-	 * @param passwordDTO
+	 * @param tagDTO
 	 */
 	@ApiOperation("用户选择标签")
 	@NotLogin
@@ -383,6 +386,33 @@ public class UserController {
 		tagDTO.setTagType(UserTagType.US_SELECT.getType());
 		tagDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		return tagApi.batchSaveUserTag(tagDTO);
+	}
+	
+	/**
+	 * 用户获取邀请链接
+	 * 
+	 */
+	@ApiOperation("用户获取邀请链接")
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/user/getInviterLink")
+	public Response<UserRegInviterLinkVO> getInviterLink(HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		return operateApi.getInviterLinkByUserId(NumberUtils.createLong(header.getUserId()));
+	}
+	
+	/**
+	 *  查看自己邀请的好友信息
+	 * @param request
+	 * @param inviterId 分页游标
+	 * @param limit
+	 * @return
+	 */
+	@ApiOperation("查看自己邀请的好友信息")
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/user/getInviterUser")
+	public Response<MyInviterVO> getInviterUser(HttpServletRequest request,Integer inviterId, Integer limit) {
+		RequestHeader header = WebUtil.getHeader(request);
+		return operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId);
 	}
 	
 	/**

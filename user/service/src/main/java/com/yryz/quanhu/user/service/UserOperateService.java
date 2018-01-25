@@ -41,7 +41,7 @@ public interface UserOperateService {
 	 * @param userId
 	 * @return
 	 */
-	String selectInviterByUserId(String userId);
+	String selectInviterByUserId(Long userId);
 	/**
 	 * 根据邀请码获取用户id
 	 * @param inviterCode
@@ -57,7 +57,7 @@ public interface UserOperateService {
 	 *            主键
 	 * @return
 	 */
-	MyInviterVO getMyInviter(String userId, Integer limit,
+	MyInviterVO getMyInviter(Long userId, Integer limit,
 			Integer inviterId);
 
 	/**
