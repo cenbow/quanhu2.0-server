@@ -12,6 +12,7 @@ import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,10 @@ public class PostController {
 
 
     @ApiOperation("发布帖子")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @ApiImplicitParams(
+            {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+                    @ApiImplicitParam(name = "userId", paramType = "header", required = true)
+            })
     @PostMapping(value = "/{version}/post/add")
     public Response<TopicPostVo> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
