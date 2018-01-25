@@ -1,5 +1,6 @@
 package com.yryz.quanhu.behavior.comment.vo;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 
 /**
@@ -10,4 +11,14 @@ import com.yryz.quanhu.behavior.comment.entity.Comment;
  */
 public class CommentInfoVO extends Comment{
 
+    PageList<CommentVO> commentEnties;
+
+    public PageList<CommentVO> getCommentEnties() {
+        return commentEnties;
+    }
+
+    public CommentInfoVO setCommentEnties(PageList<CommentVO> commentEnties) {
+        this.commentEnties = commentEnties;
+        return this;
+    }
 }

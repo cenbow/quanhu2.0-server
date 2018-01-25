@@ -1,12 +1,15 @@
 package com.yryz.quanhu.behavior.comment.service.impl;
 
-import com.yryz.common.mongodb.Page;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.comment.dao.CommentDao;
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
+import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentService;
+import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
+        Page<Comment> page=PageHelper.startPage(commentFrontDTO.getCurrentPage().intValue(),commentFrontDTO.getPageSize().intValue());
         List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
         PageList pageList = new PageList();
         pageList.setCurrentPage(commentFrontDTO.getCurrentPage());
@@ -106,12 +110,34 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageList<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO) {
+        Page<CommentVOForAdmin> page=PageHelper.startPage(commentDTO.getCurrentPage().intValue(),commentDTO.getPageSize().intValue());
         PageList pageList = new PageList();
         pageList.setCurrentPage(commentDTO.getCurrentPage());
-        List<CommentVOForAdmin> commentVOForAdmins = commentDao.queryCommentForAdmin(commentDTO);
         pageList.setPageSize(commentDTO.getPageSize());
+        List<CommentVOForAdmin> commentVOForAdmins = commentDao.queryCommentForAdmin(commentDTO);
         pageList.setEntities(commentVOForAdmins);
         pageList.setCount(Long.valueOf(commentVOForAdmins.size()));
+        return pageList;
+    }
+
+    @Override
+    public CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO) {
+        return commentDao.querySingleCommentInfo(commentSubDTO);
+    }
+
+    @Override
+    public PageList<CommentVO> querySubCommentsInfo(CommentSubDTO commentSubDTO) {
+        Page<Comment> page=PageHelper.startPage(commentSubDTO.getCurrentPage().intValue(),commentSubDTO.getPageSize().intValue());
+        CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
+        commentFrontDTO.setCurrentPage(commentSubDTO.getCurrentPage());
+        commentFrontDTO.setPageSize(commentSubDTO.getPageSize());
+        commentFrontDTO.setTopId(commentSubDTO.getKid());
+        PageList pageList=new PageList();
+        pageList.setCurrentPage(commentSubDTO.getCurrentPage());
+        pageList.setPageSize(commentSubDTO.getPageSize());
+        List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
+        pageList.setEntities(commentVOS);
+        pageList.setCount(Long.valueOf(commentVOS.size()));
         return pageList;
     }
 }

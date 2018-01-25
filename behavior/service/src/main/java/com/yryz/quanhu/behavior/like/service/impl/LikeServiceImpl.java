@@ -1,5 +1,7 @@
 package com.yryz.quanhu.behavior.like.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.like.dao.LikeDao;
 import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
@@ -40,6 +42,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public PageList<LikeVO> queryLikers(LikeFrontDTO likeFrontDTO) {
+        Page<Like> page= PageHelper.startPage(likeFrontDTO.getCurrentPage(),likeFrontDTO.getPageSize());
         PageList pageList=new PageList();
         pageList.setCurrentPage(likeFrontDTO.getCurrentPage());
         pageList.setPageSize(likeFrontDTO.getPageSize());
