@@ -58,7 +58,12 @@ public interface UserStarAuthDao {
      * @return
      */
     List<UserStarAuth> starList(StarAuthParamDTO paramDTO);
-    
+
+    /**
+     * 标签达人列表
+     */
+    List<UserStarAuth> labelStarList(StarAuthParamDTO paramDTO);
+
     /**
      * 获取达人推荐最大权重
      * @param userId

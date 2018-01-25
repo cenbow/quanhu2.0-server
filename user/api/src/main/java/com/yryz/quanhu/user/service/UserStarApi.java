@@ -108,4 +108,11 @@ public interface UserStarApi {
      * @throws ServiceException
      */
     Response<Integer> countStar();
+
+	/**
+	 * 标签达人列表
+	 * @param paramDTO
+	 * @return
+	 */
+    Response<List<StarInfoVO>> labelStarList(StarAuthParamDTO paramDTO);
 }

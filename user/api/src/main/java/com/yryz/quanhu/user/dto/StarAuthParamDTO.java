@@ -10,6 +10,11 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class StarAuthParamDTO implements Serializable {
 	/**
+	 * 达人标签(二级分类)
+	 */
+	private Long categoryId;
+
+	/**
 	 * 起始位置
 	 */
 	private Integer start;
@@ -62,6 +67,13 @@ public class StarAuthParamDTO implements Serializable {
 	 */
 	private Boolean starRecommend;
 
+	public Long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
 
 	public Integer getStart() {
 		return start;

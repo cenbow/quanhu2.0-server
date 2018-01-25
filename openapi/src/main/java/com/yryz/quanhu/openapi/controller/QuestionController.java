@@ -20,6 +20,7 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +43,10 @@ public class QuestionController {
 
 
 	@ApiOperation("圈粉发布问题")
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+			@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+	})
 	@PostMapping(value = "/{version}/coterie/question/add")
 	public Response<QuestionVo> saveQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
@@ -51,12 +55,18 @@ public class QuestionController {
 	}
 
 	@ApiOperation("圈粉删除未回答的问题")
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			})
 	@PostMapping(value = "/{version}/coterie/question/delete")
 	public Response<Integer> findUser(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-
-		return questionApi.deleteQuestion(questionDto.getKid(),Long.valueOf(header.getUserId()));
+		String userId=header.getUserId();
+		if(StringUtils.isBlank(userId)){
+			userId="0";
+		}
+		return questionApi.deleteQuestion(questionDto.getKid(),Long.valueOf(userId));
 	}
 
 }
