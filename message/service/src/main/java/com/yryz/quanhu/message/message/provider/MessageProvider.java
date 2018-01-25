@@ -4,8 +4,6 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.IdGen;
-import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.message.message.dto.MessageDto;
 import com.yryz.quanhu.message.message.service.MessageService;
@@ -102,7 +100,7 @@ public class MessageProvider implements MessageAPI {
     @Override
     public Response<Boolean> sendMessage(MessageVo messageVo, boolean flag) {
         try {
-            return ResponseUtils.returnObjectSuccess(messageService.sendMessage(messageVo,flag));
+            return ResponseUtils.returnObjectSuccess(messageService.sendMessage(messageVo, flag));
         } catch (QuanhuException e) {
             LOGGER.error("推送消息异常", e);
             return ResponseUtils.returnException(e);

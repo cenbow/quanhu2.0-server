@@ -84,7 +84,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
-    public static final String QH_NOTICE = "qh_notice";
+    //public static final String QH_NOTICE = "qh_notice";
 
     //redis key
     public static final String QH_NOTICE_ = "qh:notice:";
@@ -163,7 +163,7 @@ public class NoticeServiceImpl implements NoticeService {
 
             upload(notice);
 
-            Response<Long> response = idAPI.getKid(QH_NOTICE);
+            Response<Long> response = idAPI.getSnowflakeId();
             Long kid = ResponseUtils.getResponseData(response);
             notice.setKid(kid);
 

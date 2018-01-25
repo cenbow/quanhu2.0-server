@@ -54,7 +54,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
-    public static final String QH_ADV = "qh_adv";
+    //public static final String QH_ADV = "qh_adv";
 
     //redis key
     public static final String QH_ADVERTISEMENT_ = "qh:advertisement:";
@@ -109,7 +109,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Transactional
     public Integer add(Advertisement advertisement) {
         try {
-            Response<Long> response = idAPI.getKid(QH_ADV);
+            Response<Long> response = idAPI.getSnowflakeId();
             Long kid = ResponseUtils.getResponseNotNull(response);
             advertisement.setKid(kid);
             Integer integer = advertisementDao.add(advertisement);
