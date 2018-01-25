@@ -56,6 +56,6 @@ public class UserStarTest {
 		paramDTO.setLimit(10);
 		paramDTO.setUserId(null);
 		Response<List<StarInfoVO>> response = starApi.labelStarList(paramDTO);
-		System.out.println(JsonUtils.toFastJson(response));
+		System.out.println("labelStarListTest: " + JsonUtils.toFastJson(response));
 	}
 }

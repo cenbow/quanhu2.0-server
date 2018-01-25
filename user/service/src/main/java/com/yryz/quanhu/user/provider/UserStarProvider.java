@@ -435,8 +435,8 @@ public class UserStarProvider implements UserStarApi {
 			//levelMap = getUserLevels(userIds);
 		}
 		
-		for (int i = 0; i < 10; i++) {
-			UserStarAuth authInfo = authInfos.get(0);
+		for (int i = 0; i < length; i++) {
+			UserStarAuth authInfo = authInfos.get(i);
 			StarInfoVO infoDTO = new StarInfoVO();
 			UserStarSimpleVo simpleVo = (UserStarSimpleVo) GsonUtils.parseObj(authInfo, UserStarSimpleVo.class);
 			simpleVo.setAuthType(null);
