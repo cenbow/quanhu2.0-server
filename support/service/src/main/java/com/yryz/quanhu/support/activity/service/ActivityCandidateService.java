@@ -22,12 +22,10 @@ public interface ActivityCandidateService {
 
     /**
      * 获取参与者详情
-     * @param   activityInfoId
-     * @param   candidateId
-     * @param   userId
+     * @param   activityVoteDto
      * @return
      * */
-    ActivityVoteDetailVo detail(Long activityInfoId, Long candidateId, Long userId);
+    ActivityVoteDetailVo detail(ActivityVoteDto activityVoteDto);
 
     /**
      * 获取参与者列表
