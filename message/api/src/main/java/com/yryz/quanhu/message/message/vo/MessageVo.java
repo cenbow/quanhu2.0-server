@@ -1,5 +1,7 @@
 package com.yryz.quanhu.message.message.vo;
 
+import com.yryz.common.message.*;
+
 import java.io.Serializable;
 
 /**
