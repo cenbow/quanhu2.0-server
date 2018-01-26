@@ -1,19 +1,15 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.activity.constant.ActivityConstant;
 import com.yryz.quanhu.support.activity.dao.ActivityEnrolConfigDao;
-import com.yryz.quanhu.support.activity.dao.ActivityPayRecordDao;
 import com.yryz.quanhu.support.activity.dao.ActivityRecordDao;
 import com.yryz.quanhu.support.activity.entity.ActivityEnrolConfig;
 import com.yryz.quanhu.support.activity.entity.ActivityInfo;
-import com.yryz.quanhu.support.activity.entity.ActivityPayRecord;
 import com.yryz.quanhu.support.activity.entity.ActivityRecord;
 import com.yryz.quanhu.support.activity.service.ActivityInfoService;
 import com.yryz.quanhu.support.activity.service.ActivitySignUpService;
@@ -46,8 +42,6 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     ActivityEnrolConfigDao activityEnrolConfigDao;
     @Autowired
     ActivityRecordDao activityRecordDao;
-    @Autowired
-    ActivityPayRecordDao activityPayRecordDao;
     @Reference(check=false)
     private IdAPI idApi;
     /*@Reference(check=false)
@@ -251,16 +245,6 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 if (flag == 0) {
                     throw new CommonException("积分不足!");
                 }*/
-                //支付成功
-                ActivityPayRecord record = new ActivityPayRecord();
-                record.setActivityInfoId(activityRecord.getActivityInfoId());
-                record.setAmount(activityEnrolConfig.getAmount());
-                record.setSignUpType(activityEnrolConfig.getSignUpType());
-                record.setCreateUserId(Long.valueOf(custId));
-                record.setLastUpdateUserId(Long.valueOf(custId));
-                record.setKid(idApi.getSnowflakeId().getData());
-                //将支付记录插入到报名支付记录表中
-                activityPayRecordDao.insertByPrimaryKeySelective(record);
                 break;
             case 13:
                 break;

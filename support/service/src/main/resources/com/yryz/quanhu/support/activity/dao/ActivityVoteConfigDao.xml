@@ -247,4 +247,26 @@
 		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
 	</select>
 
+
+
+	<select id="selectByPrimaryKey" resultType="com.yryz.quanhu.support.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_vote_config
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<select id="selectByInfoId" resultType="com.yryz.quanhu.support.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_vote_config
+		where activity_info_id = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<select id="selectVoteByActivityInfoId" resultType="com.yryz.quanhu.support.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_vote_config
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+	</select>
 </mapper>

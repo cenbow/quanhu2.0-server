@@ -330,4 +330,253 @@
 		where kid = #{kid,jdbcType=BIGINT}
 		and join_count &lt; #{userNum,jdbcType=BIGINT}
 	</update>
+
+
+
+
+	<insert id="addActivity" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo" >
+		insert into qh_activity_info (
+		id,kid, title, cover_plan,
+		activity_type, online_time, begin_time,
+		end_time,remark,
+		create_user_id, last_update_user_id, content, content_sources
+		)
+		values (
+		#{id,jdbcType=BIGINT},#{kid,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{coverPlan,jdbcType=VARCHAR},
+		#{activityType,jdbcType=TINYINT}, #{onlineTime,jdbcType=TIMESTAMP}, #{beginTime,jdbcType=TIMESTAMP},
+		#{endTime,jdbcType=TIMESTAMP},#{remark,jdbcType=VARCHAR},
+		#{createUserId,jdbcType=VARCHAR}, #{lastUpdateUserId,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{contentSources,jdbcType=LONGVARCHAR}
+		)
+	</insert>
+
+	<select id="selectByPrimaryKey" resultType="com.yryz.quanhu.support.activity.vo.AdminActivityInfoVo1" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_info
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<select id="selectSignAdminlist"
+			resultType="com.yryz.quanhu.support.activity.vo.AdminActivityInfoSignUpVo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_info
+		<where>
+			and activity_type = 11
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==11">
+				<![CDATA[
+	    	AND begin_time > NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==12">
+				<![CDATA[
+	    	AND end_time >= NOW() AND begin_time <= NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==13">
+				<![CDATA[
+	    	AND end_time < NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.title != null and ''!= activityInfoSignUpDto.title and 'null' != activityInfoSignUpDto.title ">
+				<![CDATA[
+	    	and title like CONCAT('%',#{activityInfoSignUpDto.title},'%')
+	    	 ]]>
+			</if>
+			<if test="activityInfoSignUpDto.shelveFlag != null">
+				<![CDATA[
+	    	AND shelve_flag = #{activityInfoSignUpDto.shelveFlag}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.remark != null and ''!= activityInfoSignUpDto.remark and 'null' != activityInfoSignUpDto.remark ">
+				<![CDATA[
+	    	and remark like CONCAT('%',#{activityInfoSignUpDto.remark},'%')
+	    	 ]]>
+			</if>
+			<if test="activityInfoSignUpDto.onlineTimeStart != null">
+				<![CDATA[
+	    	AND online_time >= #{activityInfoSignUpDto.onlineTimeStart}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.onlineTimeEnd != null">
+				<![CDATA[
+	    	AND online_time <= #{activityInfoSignUpDto.onlineTimeEnd}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.beginTimeStart != null">
+				<![CDATA[
+	    	AND begin_time >= #{activityInfoSignUpDto.beginTimeStart}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.beginTimeEnd != null">
+				<![CDATA[
+	    	AND begin_time <= #{activityInfoSignUpDto.beginTimeEnd}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.endTimeStart != null">
+				<![CDATA[
+	    	AND end_time >= #{activityInfoSignUpDto.endTimeStart}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.endTimeEnd != null">
+				<![CDATA[
+	    	AND end_time <= #{activityInfoSignUpDto.endTimeEnd}
+	       ]]>
+			</if>
+		</where>
+		order by online_time desc
+	</select>
+	<select id="selectSignAdminlistCount" parameterType="com.yryz.quanhu.support.activity.dto.AdminActivityInfoSignUpDto"
+			resultType="java.lang.Long">
+		select
+		count(1)
+		from qh_activity_info
+		<where>
+			and activity_type = 11
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==11">
+				<![CDATA[
+	    	AND begin_time > NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==12">
+				<![CDATA[
+	    	AND end_time >= NOW() AND begin_time <= NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==13">
+				<![CDATA[
+	    	AND end_time < NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.title != null and ''!= activityInfoSignUpDto.title and 'null' != activityInfoSignUpDto.title ">
+				<![CDATA[
+	    	and title like CONCAT('%',#{activityInfoSignUpDto.title},'%')
+	    	 ]]>
+			</if>
+			<if test="activityInfoSignUpDto.remark != null and ''!= activityInfoSignUpDto.remark and 'null' != activityInfoSignUpDto.remark ">
+				<![CDATA[
+	    	and title like CONCAT('%',#{activityInfoSignUpDto.remark},'%')
+	    	 ]]>
+			</if>
+			<if test="activityInfoSignUpDto.onlineTimeStart != null">
+				<![CDATA[
+	    	AND online_time >= #{activityInfoSignUpDto.onlineTimeStart}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.shelveFlag != null">
+				<![CDATA[
+	    	AND shelve_flag = #{activityInfoSignUpDto.shelveFlag}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.onlineTimeEnd != null">
+				<![CDATA[
+	    	AND online_time <= #{activityInfoSignUpDto.onlineTimeEnd}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.beginTimeStart != null">
+				<![CDATA[
+	    	AND begin_time >= #{activityInfoSignUpDto.beginTimeStart}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.beginTimeEnd != null">
+				<![CDATA[
+	    	AND begin_time <= #{activityInfoSignUpDto.beginTimeEnd}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.endTimeStart != null">
+				<![CDATA[
+	    	AND end_time >= #{activityInfoSignUpDto.endTimeStart}
+	       ]]>
+			</if>
+			<if test="activityInfoSignUpDto.endTimeEnd != null">
+				<![CDATA[
+	    	AND end_time <= #{activityInfoSignUpDto.endTimeEnd}
+	       ]]>
+			</if>
+		</where>
+	</select>
+
+	<!--后台查询活动序号 -->
+	<select id="selectMaxId" resultType="java.lang.Integer">
+		select ifnull(max(id),0) from qh_activity_info T
+	</select>
+
+	<!-- (后台)所有上架的活动 -->
+	<select id="adminAllSharelist" resultType="com.yryz.quanhu.support.activity.vo.AdminActivityInfoVo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_info where shelve_flag=10 and NOW()>=online_time
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==11">
+			<![CDATA[
+	    	AND begin_time > NOW()
+	       ]]>
+		</if>
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==12">
+			<![CDATA[
+	    	AND end_time >= NOW()
+	    	AND begin_time <= NOW()
+	       ]]>
+		</if>
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==13">
+			<![CDATA[
+	    	AND end_time < NOW()
+	       ]]>
+		</if>
+		<if test="activityInfoDto.title != null and ''!= activityInfoDto.title and 'null' != activityInfoDto.title ">
+			<![CDATA[
+	    	and title like CONCAT('%',#{activityInfoDto.title},'%')
+	    	 ]]>
+		</if>
+		<if test="activityInfoDto.remark != null and ''!= activityInfoDto.remark and 'null' != activityInfoDto.remark ">
+			<![CDATA[
+	    	and remark like CONCAT('%',#{activityInfoDto.remark},'%')
+	    	 ]]>
+		</if>
+
+		<if test="activityInfoDto.orderType	=='sort'">
+			order by sort desc
+		</if>
+		<if test="activityInfoDto.orderType	!=null	and	activityInfoDto.orderType!=''	and	activityInfoDto.orderType=='endTime'">
+			order by end_time desc
+		</if>
+	</select>
+	<select id="adminAllSharelistCount" resultType="java.lang.Long">
+		select
+		count(1)
+		from qh_activity_info where shelve_flag=10 and NOW()>=online_time
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==11">
+			<![CDATA[
+	    	AND begin_time > NOW()
+	       ]]>
+		</if>
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==12">
+			<![CDATA[
+	    	AND end_time >= NOW()
+	    	AND begin_time <= NOW()
+	       ]]>
+		</if>
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==13">
+			<![CDATA[
+	    	AND end_time < NOW()
+	       ]]>
+		</if>
+		<if test="activityInfoDto.title != null and ''!= activityInfoDto.title and 'null' != activityInfoDto.title ">
+			<![CDATA[
+	    	and title like CONCAT('%',#{activityInfoDto.title},'%')
+	    	 ]]>
+		</if>
+		<if test="activityInfoDto.remark != null and ''!= activityInfoDto.remark and 'null' != activityInfoDto.remark ">
+			<![CDATA[
+	    	and remark like CONCAT('%',#{activityInfoDto.remark},'%')
+	    	 ]]>
+		</if>
+	</select>
+
+
+	<!-- (后台)所有上架的活动+不分页 -->
+	<select id="adminAllSharelistNoPage"	resultType="com.yryz.quanhu.support.activity.vo.AdminActivityInfoVo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_info where shelve_flag=10 and NOW()>=online_time
+	</select>
 </mapper>
