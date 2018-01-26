@@ -70,7 +70,7 @@ public interface AppConstants {
     /**
      * 默认前缀昵称
      */
-    public static final String NICK_NAME_PREFIX = "quanhu";
+    public static final String NICK_NAME_PREFIX = "qh";
     /**
      * 邀请码错误
      */

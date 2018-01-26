@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
@@ -80,6 +82,7 @@ public class UserController {
 	private UserOperateApi operateApi;
 	
 	@ApiOperation("用户token刷新")
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/refreshToken")
 	public Response<AuthTokenVO> refreshToken(@RequestBody String refreshToken, HttpServletRequest request) {
@@ -89,29 +92,34 @@ public class UserController {
 		refreshDTO.setToken(header.getToken());
 		refreshDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		refreshDTO.setType(DevType.getEnumByType(header.getDevType(), header.getUserAgent()));
-		return authApi.refreshToken(refreshDTO);
+		AuthTokenVO tokenVO = ResponseUtils.getResponseData(authApi.refreshToken(refreshDTO));
+		return ResponseUtils.returnObjectSuccess(tokenVO);
 	}
 
 	@ApiOperation("用户信息查询")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/find")
 	public Response<UserLoginSimpleVO> findUser(Long userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
+		UserLoginSimpleVO simpleVO = null;
 		if(userId == null) {
-			return userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()));
+			simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
 		} else {
-			return userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId);
+			simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
 		}
+		return ResponseUtils.returnObjectSuccess(simpleVO);
 	}
 	
 	@ApiOperation("用户信息编辑")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/update")
 	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		infoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		return userApi.updateUserInfo(infoDTO);
+		Boolean result = ResponseUtils.getResponseData(userApi.updateUserInfo(infoDTO));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 	
 	/**
@@ -122,7 +130,7 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("手机号注册")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/register")
 	public Response<RegisterLoginVO> register(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
@@ -133,7 +141,8 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, registerDTO.getUserLocation(),
 				registerDTO.getActivityChannelCode(), devType, ip);
 		registerDTO.setRegLogDTO(logDTO);
-		return accountApi.register(registerDTO, header);
+		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.register(registerDTO, header));
+		return ResponseUtils.returnObjectSuccess(loginVO);
 	}
 
 	/**
@@ -145,12 +154,13 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("手机号密码登录")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/login")
 	public Response<RegisterLoginVO> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.login(loginDTO, header);
+		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.login(loginDTO, header));
+		return ResponseUtils.returnObjectSuccess(loginVO);
 	}
 
 	/**
@@ -162,7 +172,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("手机号验证码登录")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginVerifyCode")
 	public Response<RegisterLoginVO> loginByVerifyCode(@RequestBody RegisterDTO registerDTO, HttpServletRequest request) {
@@ -173,7 +183,8 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, registerDTO.getUserLocation(),
 				registerDTO.getActivityChannelCode(), devType, ip);
 		registerDTO.setRegLogDTO(logDTO);
-		return accountApi.loginByVerifyCode(registerDTO,header);
+		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.loginByVerifyCode(registerDTO,header));
+		return ResponseUtils.returnObjectSuccess(loginVO);
 	}
 
 	/**
@@ -185,7 +196,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("app第三方登录")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginThird")
 	public Response<Map<String,Object>> loginThird(@RequestBody ThirdLoginDTO loginDTO, HttpServletRequest request) {
@@ -196,6 +207,9 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
 		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
+		if(StringUtils.equals(response.getCode(),ResponseConstant.SUCCESS.getCode())){
+			throw QuanhuException.busiError("第三方登录失败");
+		}
 		Map<String,Object> map = new HashMap<>();
 		map.put("needPhone", false);
 		if(StringUtils.equals(response.getCode(),ExceptionEnum.NEED_PHONE.getCode())){
@@ -216,7 +230,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("app第三方登录绑定手机号")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginThirdBindPhone")
 	public Response<RegisterLoginVO> loginThirdBindPhone(@RequestBody ThirdLoginDTO loginDTO,
@@ -228,8 +242,8 @@ public class UserController {
 		loginDTO.setDeviceId(header.getDevId());
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
-
-		return accountApi.loginThirdBindPhone(loginDTO, header);
+		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.loginThirdBindPhone(loginDTO, header));
+		return ResponseUtils.returnObjectSuccess(loginVO);
 	}
 
 	/**
@@ -243,7 +257,7 @@ public class UserController {
 	 * @Description
 	 */
 	@ApiOperation("web第三方登录")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/webLoginThird")
 	public Response<String> webLoginThird(String loginType, String returnUrl) {
@@ -258,7 +272,7 @@ public class UserController {
 	 * @Description 第三方回调成功后跳转到web端登录时传的地址
 	 */
 	@ApiOperation("web第三方登录回调")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/thirdLoginNotify")
 	public void webThirdLoginNotify(HttpServletRequest request, HttpServletResponse response) {
@@ -273,6 +287,7 @@ public class UserController {
 	 * @Description 根据header信息获取登录方式
 	 */
 	@ApiOperation("获取登录方式")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/getLoginMethod")
 	public Response<List<LoginMethodVO>> getLoginMethod(HttpServletRequest request) {
@@ -300,12 +315,14 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("绑定手机号")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/bindPhone")
 	public Response<Boolean> bindPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		phoneDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		return accountApi.bindPhone(phoneDTO);
+		Boolean result = ResponseUtils.getResponseData(accountApi.bindPhone(phoneDTO));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 
 	/**
@@ -315,12 +332,14 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("绑定 第三方账户")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/bindThird")
 	public Response<Boolean> bindThird(@RequestBody BindThirdDTO thirdDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		thirdDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		return accountApi.bindThird(thirdDTO);
+		Boolean result = ResponseUtils.getResponseData(accountApi.bindThird(thirdDTO));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 
 	/**
@@ -330,12 +349,14 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("绑定 第三方账户")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/unbindThird")
 	public Response<Boolean> unbindThird(@RequestBody UnBindThirdDTO thirdDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		thirdDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		return accountApi.unbindThird(thirdDTO);
+		Boolean result = ResponseUtils.getResponseData(accountApi.unbindThird(thirdDTO));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 
 	/**
@@ -350,11 +371,13 @@ public class UserController {
 	 * @Description 需要在header获取用户id
 	 */
 	@ApiOperation("修改密码")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/editPassword")
 	public Response<Boolean> editPassword(@RequestBody Map<String,String> params,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.editPassword(NumberUtils.createLong(header.getUserId()), params.get("oldPassword"), params.get("newPassword"));
+		Boolean result = ResponseUtils.getResponseData(accountApi.editPassword(NumberUtils.createLong(header.getUserId()), params.get("oldPassword"), params.get("newPassword")));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 
 	/**
@@ -363,13 +386,14 @@ public class UserController {
 	 * @param passwordDTO
 	 */
 	@ApiOperation("手机短信重置密码")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/forgotPassword")
 	public Response<Boolean> forgotPassword(@RequestBody ForgotPasswordDTO passwordDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		passwordDTO.setAppId(header.getAppId());
-		return accountApi.forgotPassword(passwordDTO);
+		Boolean result = ResponseUtils.getResponseData(accountApi.forgotPassword(passwordDTO));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 	
 	/**
@@ -378,14 +402,15 @@ public class UserController {
 	 * @param tagDTO
 	 */
 	@ApiOperation("用户选择标签")
-	@NotLogin
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/selectTag")
 	public Response<Boolean> selectTag(@RequestBody UserTagDTO tagDTO,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		tagDTO.setTagType(UserTagType.US_SELECT.getType());
 		tagDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		return tagApi.batchSaveUserTag(tagDTO);
+		Boolean result = ResponseUtils.getResponseData(tagApi.batchSaveUserTag(tagDTO));
+		return ResponseUtils.returnObjectSuccess(result);
 	}
 	
 	/**
@@ -393,11 +418,13 @@ public class UserController {
 	 * 
 	 */
 	@ApiOperation("用户获取邀请链接")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/getInviterLink")
 	public Response<UserRegInviterLinkVO> getInviterLink(HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return operateApi.getInviterLinkByUserId(NumberUtils.createLong(header.getUserId()));
+		UserRegInviterLinkVO linkVO = ResponseUtils.getResponseData(operateApi.getInviterLinkByUserId(NumberUtils.createLong(header.getUserId())));
+		return ResponseUtils.returnObjectSuccess(linkVO);
 	}
 	
 	/**
@@ -408,11 +435,13 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("查看自己邀请的好友信息")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/getInviterUser")
 	public Response<MyInviterVO> getInviterUser(HttpServletRequest request,Integer inviterId, Integer limit) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId);
+		MyInviterVO inviterVO = ResponseUtils.getResponseData(operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId));
+		return ResponseUtils.returnObjectSuccess(inviterVO);
 	}
 	
 	/**

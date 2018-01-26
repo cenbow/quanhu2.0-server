@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.AppConstants;
+import com.yryz.common.context.Context;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
@@ -25,6 +27,7 @@ import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.service.UserOperateService;
+import com.yryz.quanhu.user.utils.ThreadPoolUtil;
 
 /**
  * @author danshiyu
@@ -68,7 +71,7 @@ public class EventManager {
 				eventInfo.setEventCode(EventEnum.REGISTER.getCode());
 				eventInfo.setUserId(userId);
 				eventInfo.setEventNum(1);
-				evenApi.commit(eventInfo);
+				commit(eventInfo);
 			}
 			// 邀请注册事件
 			if (StringUtils.isNotBlank(inviter)) {
@@ -99,7 +102,7 @@ public class EventManager {
 			eventInfo.setEventCode(EventEnum.INVITER_REGISTER.getCode());
 			eventInfo.setUserId(userId);
 			eventInfo.setEventNum(1);
-			evenApi.commit(eventInfo);
+			commit(eventInfo);
 			logger.info("[event_inviter_register]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), "");
 		} catch (Exception e) {
 			logger.info("[event_inviter_register]:params:{},result:{}", JsonUtils.toFastJson(eventInfo),
@@ -125,7 +128,8 @@ public class EventManager {
 		}
 		// 表示已经完善过的老用户
 		if (oldUserInfo != null && StringUtils.isNotBlank(oldUserInfo.getUserDesc())
-				&& StringUtils.isNotBlank(oldUserInfo.getUserImg()) && StringUtils.isNotBlank(oldUserInfo.getUserLocation())
+				&& StringUtils.isNotBlank(oldUserInfo.getUserImg())
+				&& StringUtils.isNotBlank(oldUserInfo.getUserLocation())
 				&& StringUtils.isNotBlank(oldUserInfo.getUserNickName()) && oldUserInfo.getUserGenders() == null) {
 			return;
 		}
@@ -144,7 +148,7 @@ public class EventManager {
 		info.setCreateTime(DateUtils.getDateTime());
 		info.setEventNum(1);
 		try {
-			evenApi.commit(info);
+			commit(info,newUserInfo.getAppId());
 			logger.info("[event userDataImprove]:params:{},result:{}", JsonUtils.toFastJson(info), "");
 		} catch (Exception e) {
 			logger.error("[event userDataImprove]", e);
@@ -193,6 +197,40 @@ public class EventManager {
 			logger.error("[event_getLevel]", e);
 			return null;
 		}
+	}
+
+	/**
+	 * 圈乎用户提交事件
+	 * @param info
+	 * @param appId
+	 */
+	public void commit(EventInfo info) {
+		commit(info, Context.getProperty(AppConstants.APP_ID));
+	}
+	
+	/**
+	 * 提交事件，圈乎用户才提交
+	 * @param info
+	 * @param appId
+	 */
+	public void commit(EventInfo info, String appId) {
+		if (info == null || StringUtils.isBlank(appId)
+				|| !StringUtils.equals(appId, Context.getProperty(AppConstants.APP_ID))) {
+			return;
+		}
+		ThreadPoolUtil.execue(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					evenApi.commit(info);
+					logger.info("[event commit]:params:{},result:success", JsonUtils.toFastJson(info));
+				} catch (Exception e) {
+					logger.error("[event commit]", e);
+					logger.info("[event commit]:params:{},result:{}", JsonUtils.toFastJson(info), e.getMessage());
+				}
+			}
+		});
+
 	}
 
 	/**

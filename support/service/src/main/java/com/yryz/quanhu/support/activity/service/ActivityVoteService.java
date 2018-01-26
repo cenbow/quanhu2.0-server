@@ -38,9 +38,10 @@ public interface ActivityVoteService {
     /**
      *  确认投票
      *  @param  record
+     *  @param  activityVoteInfoVo
      *  @return
      * */
-    int voteRecord(ActivityVoteRecord record);
+    int voteRecord(ActivityVoteRecord record, ActivityVoteInfoVo activityVoteInfoVo);
 
     /**
      * 查看用户是否有可用的投票卷

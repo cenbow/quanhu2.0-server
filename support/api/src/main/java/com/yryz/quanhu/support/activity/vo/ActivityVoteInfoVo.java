@@ -195,13 +195,11 @@ public class ActivityVoteInfoVo implements Serializable {
     /**
      * 无奖励配置文案
      * */
-    @JsonIgnore
     private String noRewardContent;
 
     /**
      * 配置元数据
      * */
-    @JsonIgnore
     private String configSources;
 
     public Long getKid() {

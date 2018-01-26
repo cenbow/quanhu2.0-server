@@ -87,12 +87,7 @@ public class StarAuthInfo implements Serializable {
     /**
      * 申请时间
      */
-    private Date createTime;
-
-    /**
-     * 操作时间
-     */
-    private Date updateTime;
+    private Date createDate;
 
     /**
      * 操作人名称
@@ -271,23 +266,15 @@ public class StarAuthInfo implements Serializable {
         this.recommendStatus = recommendStatus;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+    public Date getCreateDate() {
+		return createDate;
+	}
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getOperational() {
+	public String getOperational() {
         return operational;
     }
 

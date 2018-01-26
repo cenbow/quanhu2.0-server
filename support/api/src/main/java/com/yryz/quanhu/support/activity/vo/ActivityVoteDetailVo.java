@@ -146,6 +146,10 @@ public class ActivityVoteDetailVo implements Serializable {
      */
     private Integer userRollFlag;
 
+    private Long createUserId;
+
+    private UserActivityVo user;
+
     public Long getId() {
         return id;
     }
@@ -368,5 +372,21 @@ public class ActivityVoteDetailVo implements Serializable {
 
     public void setUserRollFlag(Integer userRollFlag) {
         this.userRollFlag = userRollFlag;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public UserActivityVo getUser() {
+        return user;
+    }
+
+    public void setUser(UserActivityVo user) {
+        this.user = user;
     }
 }

@@ -19,11 +19,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
+import com.yryz.quanhu.user.manager.MessageManager;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserService;
 
@@ -37,13 +39,15 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 
 	@Autowired
 	private UserImgAuditDao imgAuditDao;
-	@Reference(check=false)
+	@Reference(check = false)
 	private IdAPI idApi;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private MessageManager messageManager;
 
 	@Override
-	@Transactional(rollbackFor=RuntimeException.class)
+	@Transactional(rollbackFor = RuntimeException.class)
 	public int auditImg(UserImgAudit record, Integer aduitActionStatus) {
 		Byte auditStatus = record.getAuditStatus();
 		record.setAuditStatus(aduitActionStatus.byteValue());
@@ -52,7 +56,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 			if (auditStatus.intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
 				delete(record.getUserId());
 				record.setCreateDate(new Date());
-				record.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT).getData());
+				record.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT)));
 				result = imgAuditDao.save(record);
 			} else {
 				result = imgAuditDao.update(record);
@@ -61,7 +65,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 			if (aduitActionStatus.intValue() == ImgAuditStatus.FAIL.getStatus()) {
 				userService.updateUserInfo(new UserBaseInfo(record.getUserId(), ""));
 				// 消息
-				
+				messageManager.userImgAudit(record.getUserId().toString());
 			}
 		} catch (Exception e) {
 			logger.error("[UserImgAuditDao.save or update]", e);
@@ -71,7 +75,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 	}
 
 	@Override
-	@Transactional(rollbackFor=RuntimeException.class)
+	@Transactional(rollbackFor = RuntimeException.class)
 	public int batchAuditImg(List<UserImgAudit> record, Integer aduitActionStatus) {
 		int auditLength = record == null ? 0 : record.size();
 		List<UserImgAudit> saveLists = new ArrayList<>(auditLength);
@@ -88,7 +92,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 				// 待审核图片表示不存在
 				if (auditModel.getAuditStatus().intValue() == ImgAuditStatus.NO_AUDIT.getStatus()) {
 					imgAuditModel.setCreateDate(new Date());
-					imgAuditModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT).getData());
+					imgAuditModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_IMG_AUDIT)));
 					saveLists.add(imgAuditModel);
 					delete(imgAuditModel.getUserId());
 				} else {
@@ -106,9 +110,10 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 			if (aduitActionStatus.intValue() == ImgAuditStatus.FAIL.getStatus()) {
 				for (int i = 0; i < auditLength; i++) {
 					UserImgAudit auditModel = record.get(i);
-					userService.updateUserInfo(new UserBaseInfo(auditModel.getUserId(),""));
+					userService.updateUserInfo(new UserBaseInfo(auditModel.getUserId(), ""));
+					messageManager.userImgAudit(auditModel.getUserId().toString());
 				}
-				// TODO:消息
+
 			}
 
 		} catch (Exception e) {

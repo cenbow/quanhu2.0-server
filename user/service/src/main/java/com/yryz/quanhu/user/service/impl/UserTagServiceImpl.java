@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserTagDao;
@@ -66,7 +67,7 @@ public class UserTagServiceImpl implements UserTagService {
 			tag.setTagId(tagId);
 			tag.setUserId(tagDTO.getUserId());
 			tag.setTagType(tagDTO.getTagType());
-			tag.setKid(idApi.getKid(IdConstants.QUANUH_USER_TAG).getData());
+			tag.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANUH_USER_TAG)));
 			
 			if(CollectionUtils.isNotEmpty(tags)){
 				boolean tagFlag = false;

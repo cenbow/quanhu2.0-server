@@ -48,6 +48,7 @@ import com.yryz.quanhu.order.enums.OrderMsgEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.exception.CommonException;
 import com.yryz.quanhu.order.exception.SourceNotEnoughException;
+import com.yryz.quanhu.order.notify.MQCallBack;
 import com.yryz.quanhu.order.notify.NotifyQueue;
 import com.yryz.quanhu.order.service.OrderAccountHistoryService;
 import com.yryz.quanhu.order.service.OrderIntegralHistoryService;
@@ -804,7 +805,9 @@ public class OrderServiceImpl implements OrderService {
 		}
 		Response<?> return1 = executeOrder(orderVO.getOrderInfo(), orderVO.getAccounts(), orderVO.getIntegrals(), custId, password, null);
 		if(return1 != null && return1.success()){
-			notifyQueue.addOrderInfoNotify(orderVO.getOrderInfo());
+//			notifyQueue.addOrderInfoNotify(orderVO.getOrderInfo());
+			//使用MQ后，这里可以直接发送MQ队列即可
+			MQCallBack.doSend(orderVO.getOrderInfo().getCallback(), GsonUtils.parseJson(orderVO.getOrderInfo()));
 		} else {
 			logger.warn("订单处理失败...orderId: " + orderId + "-custId:" + custId + "-password" + password);
 		}
