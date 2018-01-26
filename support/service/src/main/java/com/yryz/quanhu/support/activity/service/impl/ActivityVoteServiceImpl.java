@@ -271,7 +271,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         result.setPrizes(resultList);
         result.setUserId(userId);
         //获取可领取的奖品
-        List<ActivityPrizesVo> activityPrizes = activityPrizesDao.selectAvailablePrizes(activityInfoId);
+        List<ActivityPrizesVo> activityPrizes = activityPrizesDao.selectAvailablePrizesVo(activityInfoId);
         if (!CollectionUtils.isEmpty(activityPrizes)) {
             for (ActivityPrizesVo activity : activityPrizes) {
                 if (activity != null) {
