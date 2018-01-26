@@ -434,6 +434,16 @@ public class UserServiceImpl implements UserService {
 		return nickName;
 	}
 
+	@Override
+	public List<Long> getUserIdByCreateDate(String startDate, String endDate) {
+		return custbaseinfoDao.getUserIdByCreateDate(startDate, endDate);
+	}
+
+	@Override
+	public List<UserBaseInfo> getAllByUserIds(List<Long> userIds) {
+		return custbaseinfoDao.getAllByUserIds(userIds);
+	}
+
 
 
 }

@@ -7,7 +7,6 @@ import com.yryz.quanhu.support.activity.entity.ActivityPrizes;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.support.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.support.activity.util.DateUtils;
-import com.yryz.quanhu.support.activity.constants.Constant;
 import com.yryz.quanhu.support.activity.dto.AdminActivityInfoVoteDto;
 import com.yryz.quanhu.support.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.support.activity.vo.AdminActivityInfoVo1;
@@ -22,6 +21,8 @@ import org.springframework.util.Assert;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.yryz.common.constant.ModuleEnum.ACTIVITY_ENUM;
 
 //import com.github.pagehelper.PageHelper;
 
@@ -117,7 +118,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 		Assert.notNull(activity, "activity 不能为空");
 		/*TODO activity.setCreateUserId(UserUtils.getUser().getId());*/
 		activity.setActivityChannelCode("");
-		activity.setModuleEnum(Constant.ACTIVITY_ENUM);
+		activity.setModuleEnum(ACTIVITY_ENUM);
 		activityInfoDao.insert(activity);		
 		Long activityInfoId = 0L;
 		if(null==activity.getId() || activity.getId().intValue()==0){

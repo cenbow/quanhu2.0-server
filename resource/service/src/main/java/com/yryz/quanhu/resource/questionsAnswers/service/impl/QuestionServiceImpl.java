@@ -3,9 +3,11 @@ package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
@@ -17,6 +19,7 @@ import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
+import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private OrderSDK orderSDK;
 
+    @Reference
+    private CountApi countApi;
 
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
@@ -326,6 +331,21 @@ public class QuestionServiceImpl implements QuestionService {
             Long questionCreateUserId = question.getCreateUserId();
             if (null != questionCreateUserId) {
                 questionVo.setUser(apIservice.getUser(questionCreateUserId));
+            }
+            questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+            Response<Map<String,Long>> countData=countApi.getCount("10,11",questionVo.getKid(),null);
+            if(ResponseConstant.SUCCESS.getCode().equals(countData.getCode())){
+                Map<String,Long> count=countData.getData();
+                if(count!=null){
+                    BehaviorVo behaviorVo=new BehaviorVo();
+                    if(count.containsKey("likeCount")){
+                        behaviorVo.setLikeCount(count.get("likeCount"));
+                    }
+                    if(count.containsKey("commentCount")){
+                        behaviorVo.setCommentCount(count.get("commentCount"));
+                    }
+                    questionVo.setBehaviorVo(behaviorVo);
+                }
             }
 
             /**

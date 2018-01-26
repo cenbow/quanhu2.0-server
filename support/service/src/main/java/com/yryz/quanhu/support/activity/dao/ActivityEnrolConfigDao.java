@@ -21,7 +21,7 @@ public interface ActivityEnrolConfigDao {
 
     int insert(ActivityEnrolConfig activityEnrolConfig);
 
-    void insertByPrimaryKeySelective(ActivityEnrolConfig activityEnrolConfig);
+    int insertByPrimaryKeySelective(ActivityEnrolConfig activityEnrolConfig);
 
     int update(ActivityEnrolConfig activityEnrolConfig);
 
