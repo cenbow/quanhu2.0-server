@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
@@ -58,9 +59,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Resource
     private CoterieApplyDao coterieApplyDao;
-
-//    @Resource
-//    private CoterieMapper coterieMapper;
 
     @Resource
     private CoterieService coterieService;
@@ -305,9 +303,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         try {
             return coterieApplyDao.selectNewMemberNum(coterieId);
         } catch (Exception e) {
-//            throw new MysqlOptException("param coterieId:" + coterieId, e);
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
-        return null;
     }
 
     @Override
@@ -388,6 +385,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             vo.setJoinType(member.getJoinType());
             vo.setLastUpdateDate(member.getLastUpdateDate());
 
+//            Response<UserSimpleVO>
             UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(member.getUserId()));
             vo.setUser(user);
             memberVos.add(vo);
