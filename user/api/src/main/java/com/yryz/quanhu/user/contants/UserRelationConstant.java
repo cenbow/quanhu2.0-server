@@ -70,7 +70,8 @@ public final class UserRelationConstant {
         TO_BLACK    (3),                              //拉黑
         FROM_BLACK  (4),                              //被拉黑
         FRIEND      (5),                              //好友
-        OWNER       (6)                               //本人
+        BOTH_BLACK  (6),                              //相互拉黑
+        OWNER       (7)                               //本人
         ;
 
         private int code;
@@ -84,6 +85,9 @@ public final class UserRelationConstant {
         }
 
         public static STATUS get(int code){
+            if(0 == code){
+                return NONE;
+            }
             if(1 == code){
                 return FANS;
             }
@@ -98,6 +102,12 @@ public final class UserRelationConstant {
             }
             if(5 == code){
                 return FRIEND;
+            }
+            if(6 == code){
+                return BOTH_BLACK;
+            }
+            if(7 == code){
+                return OWNER;
             }
             return null;
         }
