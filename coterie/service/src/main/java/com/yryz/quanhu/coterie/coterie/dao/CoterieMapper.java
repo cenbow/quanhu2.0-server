@@ -43,7 +43,7 @@ public interface CoterieMapper {
 
     int updateExpert(@Param("custId") String custId, @Param("isExpert") Byte isExpert);
 
-    int updateMemberNum(@Param("coterieId") String coterieId, @Param("newMemberNum") Integer newMemberNum, @Param("oldMemberNum") Integer oldMemberNum);
+    int updateMemberNum(@Param("coterieId") Long coterieId, @Param("newMemberNum") Integer newMemberNum, @Param("oldMemberNum") Integer oldMemberNum);
 
     List<Coterie> selectMyCreateCoterie(@Param("custId") String custId);
 

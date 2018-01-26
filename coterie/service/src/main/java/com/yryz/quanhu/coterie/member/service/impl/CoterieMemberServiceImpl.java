@@ -5,10 +5,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
+import com.yryz.quanhu.coterie.coterie.service.CoterieService;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dao.CoterieApplyDao;
 import com.yryz.quanhu.coterie.member.dao.CoterieMemberDao;
@@ -21,13 +25,19 @@ import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.collections.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.Long.getLong;
 
 /**
  * 私圈成员服务实现
@@ -36,15 +46,24 @@ import java.util.Map;
  */
 @Service
 public class CoterieMemberServiceImpl implements CoterieMemberService {
-    @Resource
-    private CoterieMemberDao coterieMemberDao;
-    @Resource
-    private CoterieApplyDao coterieApplyDao;
-    @Resource
-    private CoterieMapper coterieMapper;
 
     @Reference
     private IdAPI idApi;
+
+    @Reference
+    private UserApi userApi;
+
+    @Resource
+    private CoterieMemberDao coterieMemberDao;
+
+    @Resource
+    private CoterieApplyDao coterieApplyDao;
+
+//    @Resource
+//    private CoterieMapper coterieMapper;
+
+    @Resource
+    private CoterieService coterieService;
 
 //	@Resource
 //	private CoterieMemberMessageManager coterieMemberMessageManager;
@@ -55,11 +74,11 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         CoterieMemberVoForJoin result = new CoterieMemberVoForJoin();
 
-        Coterie coterie = coterieMapper.selectByCoterieId(coterieId.toString());
+        CoterieInfo coterie = coterieService.find(coterieId);
 
         //私圈人数已满
         if (coterie.getMemberNum().intValue() >= 2000) {
-            result.setStatus(40);
+            result.setStatus((byte) 40);
             return result;
         }
 
@@ -83,7 +102,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 //            Long orderId = orderService.createOrder(OrderConstant.JOIN_COTERIE_ORDER, custId, coterieInfo.getOwnerId(), order);
             Long orderId = 1111111111L;
 
-            result.setStatus(10);
+            result.setStatus((byte) 10);
             result.setOrderId(orderId);
             return result;
         }
@@ -113,7 +132,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             record.setCreateUserId(userId);
             saveMember(record);
 
-            result.setStatus(20);
+            result.setStatus((byte) 20);
             return result;
         }
 
@@ -130,7 +149,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             } catch (Exception e) {
                 throw new QuanhuException(ExceptionEnum.SysException);
             }
-            result.setStatus(30);
+            result.setStatus((byte) 30);
         }
 
         return result;
@@ -216,7 +235,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             if (result > 0) {
 
             } else {
-                System.out.println("#######################################"+ result);
+                System.out.println("#######################################" + result);
             }
 //            coterieMemberMessageManager.banSpeakMessage(custId, coterieId);
         } catch (Exception e) {
@@ -229,32 +248,45 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     /************** 0124 ***********************************************************************/
 
     @Override
-    public Integer permission(Long userId, Long coterieId) {
+    public Byte permission(Long userId, Long coterieId) {
 
         //是否为圈主
-        Coterie coterie = coterieMapper.selectByCustIdAndCircleId(userId.toString(), coterieId.toString());
+        CoterieInfo coterie = null;
+        try {
+            coterie = coterieService.find(coterieId);
 
-        if (null != coterie && userId.longValue() == Long.getLong(coterie.getOwnerId()).longValue()) {
-            return MemberConstant.Permission.OWNER.getStatus();
+            Long userIdL = userId.longValue();
+
+            String ownerId = coterie.getOwnerId();
+
+           Long oIdL = Long.parseLong(ownerId);
+
+            if (null != coterie && userId.longValue() == oIdL.longValue()) {
+                return MemberConstant.Permission.OWNER.getStatus();
+            }
+
+            //是否为成员
+
+            CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
+
+            if (null != member) {
+                return MemberConstant.Permission.MEMBER.getStatus();
+            }
+
+            //路人
+
+            CoterieMemberApply apply = coterieApplyDao.selectWaitingByCoterieIdAndUserId(coterieId, userId);
+
+            if (null != apply) {
+                return MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus();
+            } else {
+                return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        //是否为成员
-
-        CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
-
-        if (null != member) {
-            return MemberConstant.Permission.MEMBER.getStatus();
-        }
-
-        //路人
-
-        CoterieMemberApply apply = coterieApplyDao.selectWaitingByCoterieIdAndUserId(coterieId, userId);
-
-        if (null != apply) {
-            return MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus();
-        } else {
-            return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
-        }
+        return 0;
     }
 
     @Override
@@ -280,7 +312,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void audit(Long userId, Long coterieId, Integer type) {
+    public void audit(Long userId, Long coterieId, Byte type) {
         CoterieMemberApply apply = new CoterieMemberApply();
         apply.setCoterieId(coterieId);
         apply.setUserId(userId);
@@ -333,32 +365,87 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     }
 
     @Override
-    public List<CoterieMemberVo> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize) {
+    public PageList<CoterieMemberVo> queryMemberList(Long coterieId, Integer pageNo, Integer pageSize) {
         List<CoterieMember> list = Lists.newArrayList();
+
         try {
-            int start = (pageNum.intValue() - 1) * pageSize.intValue();
+            int start = (pageNo.intValue() - 1) * pageSize.intValue();
             list = coterieMemberDao.selectPageByCoterieId(coterieId, start, pageSize);
         } catch (Exception e) {
 //            throw new MysqlOptException("param coterieId:" + coterieId, e);
         }
-        return (List<CoterieMemberVo>) GsonUtils.parseList(list, CoterieMemberVo.class);
+
+
+        List<CoterieMemberVo> memberVos = Lists.newArrayList();
+
+        for (CoterieMember member : list) {
+
+            CoterieMemberVo vo = new CoterieMemberVo();
+            vo.setAmount(member.getAmount());
+            vo.setBanSpeak(member.getBanSpeak());
+            vo.setCoterieId(member.getCoterieId());
+            vo.setCreateDate(member.getCreateDate());
+            vo.setJoinType(member.getJoinType());
+            vo.setLastUpdateDate(member.getLastUpdateDate());
+
+            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(member.getUserId()));
+            vo.setUser(user);
+            memberVos.add(vo);
+        }
+
+        if (pageNo == 1) {
+            CoterieMemberVo qz = new CoterieMemberVo();
+            qz.setCoterieId(coterieId);
+
+            CoterieInfo coterie = coterieService.find(coterieId);
+
+            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(getLong(coterie.getOwnerId())));
+            qz.setUser(user);
+
+
+            memberVos.add(0, qz);//添加圈主
+        }
+
+
+        PageList<CoterieMemberVo> pageList = new PageList<>(pageNo, pageSize, memberVos);
+
+        return pageList;
 
     }
 
     @Override
-    public List<CoterieMemberApplyVo> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize) {
+    public PageList<CoterieMemberApplyVo> queryMemberApplyList(Long coterieId, Integer pageNo, Integer pageSize) {
         List<CoterieMemberApply> list = Lists.newArrayList();
         try {
-            int start = (pageNum - 1) * pageSize;
+            int start = (pageNo - 1) * pageSize;
             list = coterieApplyDao.selectPageByCoterieId(coterieId, start, pageSize);
         } catch (Exception e) {
             e.printStackTrace();
-//            throw new MysqlOptException("param coterieId:" + coterieId, e);
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
-        return (List<CoterieMemberApplyVo>) GsonUtils.parseList(list, CoterieMemberApplyVo.class);
+
+        List<CoterieMemberApplyVo> applyVos = Lists.newArrayList();
+
+        for (CoterieMemberApply apply : list) {
+
+            CoterieMemberApplyVo vo = new CoterieMemberApplyVo();
+            vo.setCoterieId(apply.getCoterieId());
+            vo.setCreateDate(apply.getCreateDate());
+            vo.setReason(apply.getReason());
+            vo.setMemberStatus(apply.getMemberStatus());
+
+            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(apply.getUserId()));
+            vo.setUser(user);
+            applyVos.add(vo);
+
+        }
+
+        PageList<CoterieMemberApplyVo> pageList = new PageList<>(pageNo, pageSize, applyVos);
+
+        return pageList;
     }
 
-    private CoterieMemberApply makeApplyInfo(Long userId, Long coterieId, String reason, Integer status){
+    private CoterieMemberApply makeApplyInfo(Long userId, Long coterieId, String reason, Byte status) {
         CoterieMemberApply apply = new CoterieMemberApply();
         apply.setCoterieId(coterieId);
         apply.setCreateDate(new Date());
@@ -382,7 +469,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         try {
             CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(record.getCoterieId(), record.getUserId());
             if (member == null) {
-                Coterie coterie = coterieMapper.selectByCoterieId(record.getCoterieId().toString());
+                CoterieInfo coterie = coterieService.find(record.getCoterieId());
                 if (coterie != null) {
 //                    int count = coterieMapper.updateMemberNum(coterie.getCoterieId().toString(), coterie.getMemberNum() + 1, coterie.getMemberNum());
 //                    if (count > 0) {

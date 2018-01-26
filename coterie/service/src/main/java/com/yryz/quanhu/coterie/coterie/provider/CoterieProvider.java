@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -70,7 +71,6 @@ public class CoterieProvider implements CoterieApi {
 			return ResponseUtils.returnListSuccess(Lists.newArrayList());
 		}
 		try {
-
 			List<CoterieInfo> list=coterieService.findList(coterieIdList);
 			fillCircleInfo(list);
 			fillCustInfo(list);
@@ -121,7 +121,7 @@ public class CoterieProvider implements CoterieApi {
 	 * @throws ServiceException
 	 */
 	@Override
-	public Response<CoterieInfo> queryCoterieInfo(String coterieId) {
+	public Response<CoterieInfo> queryCoterieInfo(Long coterieId) {
 
 		logger.info("CoterieApi.queryCoterieInfo params: " + coterieId);
 		if (coterieId == null) {
@@ -211,6 +211,7 @@ public class CoterieProvider implements CoterieApi {
 	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
 			throw ServiceException.paramsError();
+			//throw new QuanhuException
 		}
 		if (StringUtils.isEmpty(info.getIcon())) {
 			throw ServiceException.paramsError("icon");
@@ -238,7 +239,7 @@ public class CoterieProvider implements CoterieApi {
 		if(responseCoterieInfo.getData().size()>10)
 		{
 
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "当前用户创建私圈胡个数不得超过10个！");
+
 		}
 		//todo
 //		Response<UserSimpleVO> cust=userApi.getUserSimple(info.getOwnerId());

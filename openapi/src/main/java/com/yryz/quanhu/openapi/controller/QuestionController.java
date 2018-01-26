@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
@@ -29,7 +30,6 @@ public class QuestionController {
 	@Reference
 	private QuestionApi questionApi;
 
-
 	@ApiOperation("圈粉发布问题")
 	@ApiImplicitParams(
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
@@ -42,6 +42,7 @@ public class QuestionController {
 		if(StringUtils.isBlank(userId)){
 			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
 		}
+		questionDto.setCreateUserId(Long.valueOf(userId));
 		return questionApi.saveQuestion(questionDto);
 	}
 
@@ -89,6 +90,27 @@ public class QuestionController {
 			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
 		}
 		return questionApi.queryQuestionAnswerDetail(kid,Long.valueOf(userId));
+	}
+
+
+	@ApiOperation("查询问答列表")
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			})
+	@GetMapping(value = "/services/app/{version}/coterie/question/list")
+	public Response<PageList<QuestionAnswerVo>> queryQuestionAnswerList(Long coterieId, Integer pageNum, Integer pageSize, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		String userId=header.getUserId();
+		if(StringUtils.isBlank(userId)){
+			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
+		}
+		QuestionDto dto=new QuestionDto();
+		dto.setCreateUserId(Long.valueOf(userId));
+		dto.setCoterieId(coterieId);
+		dto.setPageNum(pageNum);
+		dto.setPageSize(pageSize);
+		return questionApi.queryQuestionAnswerVoList(dto);
 	}
 
 

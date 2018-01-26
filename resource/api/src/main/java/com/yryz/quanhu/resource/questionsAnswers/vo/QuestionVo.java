@@ -43,6 +43,8 @@ public class QuestionVo  implements Serializable {
 
     private String moduleEnum;
 
+    private String orderId;
+
     public Long getKid() {
         return kid;
     }
@@ -185,5 +187,13 @@ public class QuestionVo  implements Serializable {
 
     public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

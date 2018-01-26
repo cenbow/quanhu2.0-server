@@ -6,6 +6,7 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -221,4 +222,10 @@ public interface CoterieService {
 	 * @return
 	 */
 	public List<String> getCircleIdListByOwnerId(String ownerId);
+	/**
+	 *  修改私圈成员数目
+	 * @param coterieId
+	 * @return
+	 */
+	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum);
 }

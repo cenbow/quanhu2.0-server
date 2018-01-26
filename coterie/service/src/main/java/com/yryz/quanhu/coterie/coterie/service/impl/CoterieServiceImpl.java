@@ -407,5 +407,14 @@ public class CoterieServiceImpl implements CoterieService {
 			throw new MysqlOptException("param ownerId:"+ownerId,e);
 		}
 	}
+	@Override
+	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum)
+	{
+		try{
+			return  coterieMapper.updateMemberNum( coterieId,    newMemberNum,  oldMemberNum);
 
+		}catch (Exception e) {
+			throw new MysqlOptException("param ownerId:"+coterieId,e);
+		}
+	}
 }
