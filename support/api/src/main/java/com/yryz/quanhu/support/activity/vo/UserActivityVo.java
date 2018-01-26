@@ -1,9 +1,13 @@
 package com.yryz.quanhu.support.activity.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.io.Serializable;
 
 public class UserActivityVo implements Serializable {
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     private String nickName;
