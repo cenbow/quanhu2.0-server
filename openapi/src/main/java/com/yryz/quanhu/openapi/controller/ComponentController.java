@@ -77,14 +77,17 @@ public class ComponentController {
 
 	@ApiOperation("发送短信验证码（滑动验证）")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@NotLogin
 	@PostMapping(value = "/{version}/component/sendVerifyCodeForSlip")
-	public Response<VerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
+	public Response<SmsVerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
 		AfsCheckRequest afsCheckRequest = WebUtil.getAfsCheckRequest(request);
 
-		return commonSafeApi.sendVerifyCodeForSlip(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
+		VerifyCodeDTO verifyCodeDTO = new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
-				codeDTO.getVeriCode(), false), afsCheckRequest);
+				codeDTO.getVeriCode(), false);
+		VerifyCodeVO verifyCodeVO = commonSafeApi.sendVerifyCodeForSlip(verifyCodeDTO, afsCheckRequest).getData();
+		return ResponseUtils.returnObjectSuccess(new SmsVerifyCodeVO(String.valueOf(verifyCodeDTO.getCommonServiceType()), verifyCodeDTO.getVerifyKey(), String.valueOf(verifyCodeVO.getExpireAt())));
 	}
 }
