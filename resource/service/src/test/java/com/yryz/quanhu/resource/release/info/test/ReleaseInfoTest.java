@@ -87,7 +87,7 @@ public class ReleaseInfoTest {
     public void test004() throws JsonProcessingException {
         ReleaseInfoDto dto = new ReleaseInfoDto();
         // dto.setCoterieId(5259149661L);
-        System.out.println(
-                new ObjectMapper().writeValueAsString(releaseInfoApi.pageByCondition(dto, 727909974996672512L, false)));
+        System.out.println(new ObjectMapper()
+                .writeValueAsString(releaseInfoApi.pageByCondition(dto, 727909974996672512L, false, true)));
     }
 }

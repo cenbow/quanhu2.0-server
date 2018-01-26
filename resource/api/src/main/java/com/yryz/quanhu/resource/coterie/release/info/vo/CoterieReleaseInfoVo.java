@@ -1,6 +1,7 @@
 package com.yryz.quanhu.resource.coterie.release.info.vo;
 
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
 * @Description: 私圈文章
@@ -16,11 +17,24 @@ public class CoterieReleaseInfoVo extends ReleaseInfo {
     */
     private Byte canReadFlag;
 
+    /**  
+     * @Fields : 创建者用户信息
+     */
+    UserSimpleVO user;
+
     public Byte getCanReadFlag() {
         return canReadFlag;
     }
 
     public void setCanReadFlag(Byte canReadFlag) {
         this.canReadFlag = canReadFlag;
+    }
+
+    public UserSimpleVO getUser() {
+        return user;
+    }
+
+    public void setUser(UserSimpleVO user) {
+        this.user = user;
     }
 }

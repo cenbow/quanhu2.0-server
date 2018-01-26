@@ -37,11 +37,13 @@ public interface ReleaseInfoApi {
     * @author wangheng
     * @param dto
     * @param headerUserId
-    * @param haveCount
+    * @param isCount 是否count 总数
+    * @param isGetCreateUser 是否获取创建者用户信息
     * @return PageList<ReleaseInfoVo>
     * @throws  
     */
-    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean haveCount);
+    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
+            boolean isGetCreateUser);
 
     /**  
     * @Description: 作者删除

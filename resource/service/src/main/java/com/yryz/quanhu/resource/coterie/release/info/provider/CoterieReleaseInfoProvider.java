@@ -129,8 +129,10 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             CoterieReleaseInfoVo infoVo = new CoterieReleaseInfoVo();
             BeanUtils.copyProperties(infoVo, vo);
 
-            // TODO 创建者用户信息
-            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(vo.getCreateUserId()));
+            // 创建者用户信息
+            UserSimpleVO userVo = ResponseUtils.getResponseData(userApi.getUserSimple(vo.getCreateUserId()));
+            Assert.notNull(userVo, "文章创建者用户不存在！userId:" + vo.getCreateUserId());
+            infoVo.setUser(userVo);
 
             // 若资源已删除、或者 已经下线 直接返回
             if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
