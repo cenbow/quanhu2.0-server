@@ -160,11 +160,11 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
     /**
      *  确认投票
      *  @param  record
+     *  @param  activityVoteInfoVo
      *  @return
      * */
     @Transactional(propagation = Propagation.REQUIRED)
-    public int voteRecord(ActivityVoteRecord record) {
-        ActivityVoteInfoVo activityVoteInfoVo = this.getVoteInfo(record.getActivityInfoId());
+    public int voteRecord(ActivityVoteRecord record, ActivityVoteInfoVo activityVoteInfoVo) {
         //相关验证规则
         this.validateActivity(activityVoteInfoVo);
         //获取活动配置信息

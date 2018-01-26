@@ -190,7 +190,7 @@
 		where kid = #{kid,jdbcType=BIGINT}
 	</select>
 
-	<select id="selectAvailablePrizesVo" resultType="com.yryz.quanhu.support.activity.entity.ActivityPrizes" parameterType="java.lang.Long">
+	<select id="selectAvailablePrizes" resultType="com.yryz.quanhu.support.activity.entity.ActivityPrizes" parameterType="java.lang.Long">
 		select
 		<include refid="Base_Column_List"/>
 		from qh_activity_prizes where issue_num >= 0
@@ -208,7 +208,7 @@
 	</select>
 
 	<!-- 查看可发放的奖品 -->
-	<select id="selectAvailablePrizes" resultType="com.yryz.quanhu.support.activity.vo.ActivityPrizesVo" parameterType="java.lang.Long">
+	<select id="selectAvailablePrizesVo" resultType="com.yryz.quanhu.support.activity.vo.ActivityPrizesVo" parameterType="java.lang.Long">
 		select
 		<include refid="Base_Column_List"/>
 		from qh_activity_prizes where issue_num >= 1
