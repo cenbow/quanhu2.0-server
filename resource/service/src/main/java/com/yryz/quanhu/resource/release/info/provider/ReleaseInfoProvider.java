@@ -1,5 +1,10 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,9 +118,11 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             Assert.isTrue(0L == infoVo.getCoterieId(), "非平台文章禁止访问！");
 
-            // TODO 创建者用户信息
-            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
-
+            // 创建者用户信息
+            UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
+            Assert.notNull(createUser, "文章创建者用户不存在！userId:" + infoVo.getCreateUserId());
+            infoVo.setUser(createUser);
+            
             // 若资源已删除、或者 已经下线 直接返回
             if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
                     || CommonConstants.SHELVE_NO.equals(infoVo.getShelveFlag())) {
@@ -141,11 +148,38 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     }
 
     @Override
-    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean haveCount) {
+    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
+            boolean isGetCreateUser) {
         try {
             dto.setCoterieId(0L);
-            PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, haveCount);
+            PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, isCount);
 
+            // 设置创建者用户信息
+            if (isGetCreateUser && null != voList && CollectionUtils.isNotEmpty(voList.getEntities())) {
+                // 获取所有创建者用户ID
+                Set<Long> userIds = new HashSet<>();
+                for (ReleaseInfoVo info : voList.getEntities()) {
+                    if (null == info || null == info.getCreateUserId()) {
+                        continue;
+                    }
+                    userIds.add(info.getCreateUserId());
+                }
+
+                // TODO 获取用户信息集合
+                Map<String, UserSimpleVO> userMap = ResponseUtils
+                        .getResponseData(userApi.getUserSimple(new HashSet<>()));
+                if (null != userMap) {
+                    for (ReleaseInfoVo info : voList.getEntities()) {
+                        if (null == info || null == info.getCreateUserId()
+                                || null == userMap.get(info.getCreateUserId())) {
+                            continue;
+                        }
+                        UserSimpleVO userVo = userMap.get(info.getCreateUserId());
+                        info.setUser(userVo);
+                    }
+                }
+            }
+            
             return ResponseUtils.returnObjectSuccess(voList);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

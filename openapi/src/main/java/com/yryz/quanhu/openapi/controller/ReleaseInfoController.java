@@ -76,8 +76,7 @@ public class ReleaseInfoController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @GetMapping(value = "{version}/release/info/list")
-    public Response<PageList<ReleaseInfoVo>> list(ReleaseInfoDto dto,
-            @RequestHeader("userId") Long headerUserId) {
-        return releaseInfoApi.pageByCondition(dto, headerUserId, false);
+    public Response<PageList<ReleaseInfoVo>> list(ReleaseInfoDto dto, @RequestHeader("userId") Long headerUserId) {
+        return releaseInfoApi.pageByCondition(dto, headerUserId, false, true);
     }
 }

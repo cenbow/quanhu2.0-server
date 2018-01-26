@@ -58,12 +58,12 @@ public interface ReleaseInfoService {
     * @Description: 条件分页查询Page 对象
     * @author wangheng
     * @param  dto
-    * @param haveCount 是否有 总数
+    * @param isCount 是否有 总数
     * @param @return
     * @return PageList<ReleaseInfoVo>
     * @throws  
     */
-    public PageList<ReleaseInfoVo> pageByCondition(ReleaseInfoDto dto, boolean haveCount);
+    public PageList<ReleaseInfoVo> pageByCondition(ReleaseInfoDto dto, boolean isCount);
 
     /**  
     * @Description: 唯一ID 选择性更新

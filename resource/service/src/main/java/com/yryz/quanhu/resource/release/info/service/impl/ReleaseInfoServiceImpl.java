@@ -59,7 +59,7 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
     }
 
     @Override
-    public PageList<ReleaseInfoVo> pageByCondition(ReleaseInfoDto dto, boolean haveCount) {
+    public PageList<ReleaseInfoVo> pageByCondition(ReleaseInfoDto dto, boolean isCount) {
         PageList<ReleaseInfoVo> pageList = new PageList<>();
         pageList.setCurrentPage(dto.getPageNo());
         pageList.setPageSize(dto.getPageSize());
@@ -67,7 +67,7 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
         List<ReleaseInfoVo> list = this.selectByCondition(dto);
         pageList.setEntities(list);
 
-        if (!haveCount || CollectionUtils.isEmpty(list)) {
+        if (!isCount || CollectionUtils.isEmpty(list)) {
             pageList.setCount(0L);
         } else {
             pageList.setCount(this.countByCondition(dto));
