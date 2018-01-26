@@ -32,7 +32,7 @@ public interface OrderSDK {
      * @param orderEnum 订单枚举
      * @param toId      收款人ID
      * @param cost      金额
-     * @return 订单ID 成功返回，否则null
+     * @return 成功返回订单ID，否则抛出QuanhuException
      */
     Long executeOrder(OrderEnum orderEnum, Long toId, Long cost);
 
