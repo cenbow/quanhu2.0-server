@@ -64,12 +64,13 @@ public class CoterieProvider implements CoterieApi {
 	 * @throws ServiceException
 	 */
 	@Override
-	public Response<List<CoterieInfo>> queryListByCoterieIdList(List<String> coterieIdList) {
+	public Response<List<CoterieInfo>> queryListByCoterieIdList(List<Long> coterieIdList) {
 		logger.info("queryListByCoterieIdList params:" + coterieIdList);
 		if (CollectionUtils.isEmpty(coterieIdList)) {
 			return ResponseUtils.returnListSuccess(Lists.newArrayList());
 		}
 		try {
+
 			List<CoterieInfo> list=coterieService.findList(coterieIdList);
 			fillCircleInfo(list);
 			fillCustInfo(list);

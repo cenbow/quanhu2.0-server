@@ -20,7 +20,7 @@ public interface CoterieApi {
 	 * @return
 	 * @throws ServiceException
 	 */
-	public Response<List<CoterieInfo>> queryListByCoterieIdList(List<String> coterieIdList) throws ServiceException;
+	public Response<List<CoterieInfo>> queryListByCoterieIdList(List<Long> coterieIdList) throws ServiceException;
 	/**
 	 * 查询已上架的私圈列表
 	 * @param circleId
