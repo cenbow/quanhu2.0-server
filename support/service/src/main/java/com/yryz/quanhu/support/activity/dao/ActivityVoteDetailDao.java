@@ -33,7 +33,7 @@ public interface ActivityVoteDetailDao {
 
     List<ActivityVoteDetailVo> selectVoteList(@Param("activityInfoId") Long activityInfoId, @Param("voteNo") Integer voteNo);
 
-    List<ActivityVoteDetailVo> batchVote(List<Long> set);
+    List<ActivityVoteDetailVo> batchVote(@Param("activityInfoId") Long activityInfoId, @Param("list") List<Long> list);
 
     int selectCandidateCount(@Param("activityInfoId") Long activityInfoId, @Param("createUserId") Long createUserId);
 

@@ -141,74 +141,58 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     }
 
     /**
-     * 活动配置信息
-     * @param   activityInfoId
-     * @return
-     * */
-    public ActivityVoteConfigVo config(Long activityInfoId) {
-        ActivityVoteConfigVo activityVoteConfigVo = new ActivityVoteConfigVo();
-        Object configSources = stringRedisTemplate.opsForHash().get(ActivityVoteConstants.getKeyConfig(activityInfoId), "configSources");
-        if(configSources == null) {
-            //获取活动配置
-            ActivityVoteConfig activityVoteConfig = activityVoteConfigDao.selectByActivityInfoId(activityInfoId);
-            if(activityVoteConfig != null) {
-                activityVoteService.setVoteConfig(null, activityVoteConfig);
-                configSources = activityVoteConfig.getConfigSources();
-            }
-        }
-
-        activityVoteConfigVo.setActivityInfoId(activityInfoId);
-        activityVoteConfigVo.setConfigSources(configSources != null ? configSources.toString() : "");
-        return activityVoteConfigVo;
-    }
-
-    /**
      * 获取参与者详情
      * @param   activityVoteDto
      * @return
      * */
     public ActivityVoteDetailVo detail(ActivityVoteDto activityVoteDto) {
-        RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
-        Double score = template.opsForZSet().score(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()), activityVoteDto.getCandidateId());
         Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
-        set.add(new DefaultTypedTuple<>(activityVoteDto.getCandidateId(), score == null ? 0d : score));
+        set.add(new DefaultTypedTuple<>(activityVoteDto.getCandidateId(), 0d));
         List<ActivityVoteDetailVo> list = this.getDetail(activityVoteDto.getActivityInfoId(), set);
         ActivityVoteDetailVo detail = !CollectionUtils.isEmpty(list) ? list.get(0) : null;
         if(detail != null) {
-            //用户是否有可用投票卷
-            detail.setUserRollFlag(activityVoteDto.getCreateUserId() != null ?
-                    activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10);
+            RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
+            if(!template.hasKey(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()))) {
+                this.setRank(activityVoteDto.getActivityInfoId());
+            }
+            Double score = template.opsForZSet().score(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()), activityVoteDto.getCandidateId());
+            detail.setVoteCount(score == null ? 0 : score.intValue());
             //获取前后排名
             Long rank = template.opsForZSet().reverseRank(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()),
                     activityVoteDto.getCandidateId());
-            Set<ZSetOperations.TypedTuple<Long>> rankList = template.opsForZSet().reverseRangeWithScores(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()),
-                    rank == 0 ? 0 : rank -1,
-                    rank+1);
-            if(!CollectionUtils.isEmpty(rankList)) {
-                //前一名
-                Integer frontVoteDiffer = 0;
-                //后一名
-                Integer afterVoteDiffer = 0;
-                List<ZSetOperations.TypedTuple<Long>> differ = new ArrayList<>();
-                differ.addAll(rankList);
-                if(differ.size() == 2) {
-                    int zero = differ.get(0).getScore() == null ? 0 : differ.get(0).getScore().intValue();
-                    int one = differ.get(1).getScore() == null ? 0 : differ.get(1).getScore().intValue();
-                    if(activityVoteDto.getCandidateId().equals(differ.get(0).getValue())) {
-                        afterVoteDiffer = (zero - one) + 1;
-                    } else {
-                        frontVoteDiffer = (one - zero) + 1;
+            if(rank != null) {
+                Set<ZSetOperations.TypedTuple<Long>> rankList = template.opsForZSet().reverseRangeWithScores(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()),
+                        rank == 0 ? 0 : rank -1,
+                        rank+1);
+                if(!CollectionUtils.isEmpty(rankList)) {
+                    //前一名
+                    Integer frontVoteDiffer = 0;
+                    //后一名
+                    Integer afterVoteDiffer = 0;
+                    List<ZSetOperations.TypedTuple<Long>> differ = new ArrayList<>();
+                    differ.addAll(rankList);
+                    if(differ.size() == 2) {
+                        int zero = differ.get(0).getScore() == null ? 0 : differ.get(0).getScore().intValue();
+                        int one = differ.get(1).getScore() == null ? 0 : differ.get(1).getScore().intValue();
+                        if(activityVoteDto.getCandidateId().equals(differ.get(0).getValue())) {
+                            afterVoteDiffer = (zero - one) + 1;
+                        } else {
+                            frontVoteDiffer = (one - zero) + 1;
+                        }
+                    } else if(differ.size() == 3) {
+                        int zero = differ.get(0).getScore() == null ? 0 : differ.get(0).getScore().intValue();
+                        int one = differ.get(1).getScore() == null ? 0 : differ.get(1).getScore().intValue();
+                        int two = differ.get(2).getScore() == null ? 0 : differ.get(2).getScore().intValue();
+                        frontVoteDiffer = (zero - one) + 1;
+                        afterVoteDiffer = (one - two) + 1;
                     }
-                } else if(differ.size() == 3) {
-                    int zero = differ.get(0).getScore() == null ? 0 : differ.get(0).getScore().intValue();
-                    int one = differ.get(1).getScore() == null ? 0 : differ.get(1).getScore().intValue();
-                    int two = differ.get(2).getScore() == null ? 0 : differ.get(2).getScore().intValue();
-                    frontVoteDiffer = (zero - one) + 1;
-                    afterVoteDiffer = (one - two) + 1;
+                    detail.setFrontVoteDiffer(frontVoteDiffer > 0 ? frontVoteDiffer : 0);
+                    detail.setAfterVoteDiffer(afterVoteDiffer > 0 ? afterVoteDiffer : 0);
                 }
-                detail.setFrontVoteDiffer(frontVoteDiffer > 0 ? frontVoteDiffer : 0);
-                detail.setAfterVoteDiffer(afterVoteDiffer > 0 ? afterVoteDiffer : 0);
             }
+            //用户是否有可用投票卷
+            detail.setUserRollFlag(activityVoteDto.getCreateUserId() != null ?
+                    activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10);
             //活动主信息相关
             ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
             if(activityVoteInfoVo != null){
@@ -255,7 +239,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     activityVoteDto.getQueryCondition());
             if(!CollectionUtils.isEmpty(list)) {
                 Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
-                set.add(new DefaultTypedTuple<>(list.get(0).getKid(), 0d));
+                set.add(new DefaultTypedTuple<>(list.get(0).getKid(), new Double(0)));
                 resultList = this.getDetail(activityVoteDto.getActivityInfoId(), set);
             }
         } else {
@@ -275,13 +259,11 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10;
             //活动主信息相关
             ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
-            logger.info("activityVoteInfoVo =======================>>" + activityVoteInfoVo);
-            logger.info("activityVoteInfoVo.getInAppVoteType =======================>>" + activityVoteInfoVo.getInAppVoteType());
 
-            Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : 0;
-            Integer inAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteConfigCount() : 0;
-            Integer otherAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteType() : 0;
-            Integer otherAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteConfigCount() : 0;
+            Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : new Integer(0);
+            Integer inAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteConfigCount() : new Integer(0);
+            Integer otherAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteType() : new Integer(0);
+            Integer otherAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteConfigCount() : new Integer(0);
             Integer inAppVoteCount = null;
             Integer otherAppVoteCount = null;
             if(activityVoteInfoVo != null && activityVoteDto.getCreateUserId() != null){
@@ -318,6 +300,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
         pageList.setEntities(resultList);
+        pageList.setCount(0L);
 
         return pageList;
     }
@@ -343,10 +326,10 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     activityVoteService.selectUserRoll(activityVoteDto.getCreateUserId()) : 10;
             //活动主信息相关
             ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityVoteDto.getActivityInfoId());
-            Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : 0;
-            Integer inAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteConfigCount() : 0;
-            Integer otherAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteType() : 0;
-            Integer otherAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteConfigCount() : 0;
+            Integer inAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteType() : new Integer(0);
+            Integer inAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getInAppVoteConfigCount() : new Integer(0);
+            Integer otherAppVoteType = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteType() : new Integer(0);
+            Integer otherAppVoteConfigCount = activityVoteInfoVo != null ? activityVoteInfoVo.getOtherAppVoteConfigCount() : new Integer(0);
             Integer inAppVoteCount = null;
             Integer otherAppVoteCount = null;
             if(activityVoteInfoVo != null && activityVoteDto.getCreateUserId() != null){
@@ -384,6 +367,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
         pageList.setEntities(rankList);
+        pageList.setCount(0L);
 
         return pageList;
     }
@@ -429,7 +413,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
 
     private List<ActivityVoteDetailVo> setDetail(Long activityInfoId, List<Long> ids) {
         if(!ids.isEmpty()) {
-            List<ActivityVoteDetailVo> list = activityVoteDetailDao.batchVote(ids);
+            List<ActivityVoteDetailVo> list = activityVoteDetailDao.batchVote(activityInfoId, ids);
             if(!CollectionUtils.isEmpty(list)) {
                 RedisTemplate<String, ActivityVoteDetailVo> template = templateBuilder.buildRedisTemplate(ActivityVoteDetailVo.class);
                 Map<String, ActivityVoteDetailVo> map = new HashMap<>();
@@ -476,25 +460,27 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     }
 
     private void setCandidateInfo(String key, String sort, List<ActivityVoteDetailVo> list) {
-        Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
-        list.stream()
-                .filter(detail -> detail.getKid() != null)
-                .forEach(detail -> {
-                    long value = 0;
-                    double score = 0;
-                    if("kid".equals(sort)) {
-                        value = detail.getKid();
-                        score = detail.getId().doubleValue();
-                    } else {
-                        value = detail.getKid();
-                        score = detail.getVoteCount() == null ? 0 : detail.getVoteCount().doubleValue();
-                    }
+        if(!CollectionUtils.isEmpty(list)) {
+            Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
+            list.stream()
+                    .filter(detail -> detail.getKid() != null)
+                    .forEach(detail -> {
+                        long value = 0;
+                        double score = 0;
+                        if("kid".equals(sort)) {
+                            value = detail.getKid();
+                            score = detail.getId().doubleValue();
+                        } else {
+                            value = detail.getKid();
+                            score = detail.getVoteCount() == null ? 0 : detail.getVoteCount().doubleValue();
+                        }
 
-                    ZSetOperations.TypedTuple tuple = new DefaultTypedTuple<>(value, score);
-                    set.add(tuple);
-                });
-        RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
-        template.opsForZSet().add(key, set);
+                        ZSetOperations.TypedTuple tuple = new DefaultTypedTuple<>(value, score);
+                        set.add(tuple);
+                    });
+            RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
+            template.opsForZSet().add(key, set);
+        }
     }
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {

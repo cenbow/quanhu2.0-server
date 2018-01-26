@@ -4,73 +4,79 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CoterieMemberTest {
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
 
-    private static Long coterieId = 233665981858L;
     private static Long memberId = 730941139577331712L;
-    private static Long userId = 730941139577331712L;
+    private static Long userId = 727061873573347328L;
+    private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
+    private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
+
+    private static Long coterieId = 233665981858L;
 
     @Test
-    public void join() {
+    public void test010_Join() {
 //        Response response = coterieMemberAPI.join(730941139577331712L,5536534415L,"我要加入,不审核的");
-        Response response = coterieMemberAPI.join(111111111111111L,233665981858L,"我要加入,要审核的");
+        Response response = coterieMemberAPI.join(userId,coterieId,"我要加入,要审核的");
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void audit() {
-        Response response = coterieMemberAPI.audit(1L,730941139577331712L,233665981858L,null);
+    public void test020_audit() {
+        Response response = coterieMemberAPI.audit(1L,memberId,coterieId,null);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void banSpeak() {
-        Response response = coterieMemberAPI.banSpeak(1L,730941139577331712L,233665981858L, 1);
+    public void test030_banSpeak() {
+        Response response = coterieMemberAPI.banSpeak(1L,memberId,coterieId, 1);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void kick() {
-        Response response = coterieMemberAPI.kick(1L,730941139577331712L,233665981858L,"就要踢你");
+    public void test040_permission() {
+        Response response = coterieMemberAPI.permission(userId,coterieId);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void quit() {
-        Response response = coterieMemberAPI.quit(730941139577331712L,233665981858L);
+    public void test050_newMemberNum() {
+        Response response = coterieMemberAPI.queryNewMemberNum(coterieId);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void permission() {
-        Response response = coterieMemberAPI.permission(730941139577331712L,233665981858L);
+    public void test060_memberApplyList() {
+        Response response = coterieMemberAPI.queryMemberApplyList(coterieId,1,10);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void newMemberNum() {
-        Response response = coterieMemberAPI.queryNewMemberNum(233665981858L);
+    public void test070_memberList() {
+        Response response = coterieMemberAPI.queryMemberList(coterieId,1,10);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void memberApplyList() {
-        Response response = coterieMemberAPI.queryMemberApplyList(233665981858L,1,10);
+    public void test080_kick() {
+        Response response = coterieMemberAPI.kick(1L,memberId,coterieId,"就要踢你");
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
-    public void memberList() {
-        Response response = coterieMemberAPI.queryMemberList(233665981858L,1,10);
+    public void test090_quit() {
+        Response response = coterieMemberAPI.quit(memberId,coterieId);
         System.out.println(JsonUtils.toFastJson(response));
     }
 }

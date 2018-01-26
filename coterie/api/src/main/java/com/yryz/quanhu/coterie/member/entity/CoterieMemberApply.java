@@ -25,7 +25,7 @@ public class CoterieMemberApply extends GenericEntity implements Serializable {
     /**
      * 通过10，未通过20,待审批30
      */
-    private Integer memberStatus;
+    private Byte memberStatus;
 
     /**
      * 加入理由
@@ -40,7 +40,7 @@ public class CoterieMemberApply extends GenericEntity implements Serializable {
 	/**
 	 * 删除状态(正常10，已删除20)
 	 */
-	private Integer delFlag;
+	private Byte delFlag;
 
 	public static long getSerialVersionUID() {
 		return serialVersionUID;
@@ -62,14 +62,6 @@ public class CoterieMemberApply extends GenericEntity implements Serializable {
 		this.userId = userId;
 	}
 
-	public Integer getMemberStatus() {
-		return memberStatus;
-	}
-
-	public void setMemberStatus(Integer memberStatus) {
-		this.memberStatus = memberStatus;
-	}
-
 	public String getReason() {
 		return reason;
 	}
@@ -86,11 +78,19 @@ public class CoterieMemberApply extends GenericEntity implements Serializable {
 		this.processTime = processTime;
 	}
 
-	public Integer getDelFlag() {
+	public Byte getMemberStatus() {
+		return memberStatus;
+	}
+
+	public void setMemberStatus(Byte memberStatus) {
+		this.memberStatus = memberStatus;
+	}
+
+	public Byte getDelFlag() {
 		return delFlag;
 	}
 
-	public void setDelFlag(Integer delFlag) {
+	public void setDelFlag(Byte delFlag) {
 		this.delFlag = delFlag;
 	}
 }
