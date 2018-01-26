@@ -70,10 +70,13 @@ public class UserRelationRemarkProvider implements UserRelationRemarkApi{
     @Override
     public Response<List<UserRelationRemarkDto>> selectBy(String sourceUserId, UserRelationConstant.TYPE type) {
         try {
+            logger.info("getRemarkDto={} > {} start",sourceUserId,type);
             return ResponseUtils.returnObjectSuccess(userRelationRemarkService.selectBy(sourceUserId,type));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("getRemarkDto={} > {} finish",sourceUserId,type);
         }
     }
 

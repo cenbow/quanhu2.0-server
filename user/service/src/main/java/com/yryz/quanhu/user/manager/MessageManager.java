@@ -25,6 +25,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.message.message.vo.MessageVo;
 import com.yryz.quanhu.message.push.api.PushAPI;
@@ -245,7 +246,7 @@ public class MessageManager {
 	 * @param messageVo
 	 */
 	private void pushMessage(MessageVo messageVo) {
-		ThreadPoolUtil.insertApiLog(new Runnable() {
+		ThreadPoolUtil.execue(new Runnable() {
 			@Override
 			public void run() {
 				PushReqVo reqVo = new PushReqVo();
@@ -266,6 +267,11 @@ public class MessageManager {
 
 	}
 	
+	/**
+	 * 圈乎消息发消息
+	 * @param messageVo
+	 * @param cache
+	 */
 	private void sendMessage(MessageVo messageVo, Boolean cache){
 		sendMessage(messageVo, cache,Context.getProperty(AppConstants.APP_ID));
 	}
@@ -276,7 +282,12 @@ public class MessageManager {
 	 * @param messageVo
 	 */
 	private void sendMessage(MessageVo messageVo, Boolean cache,String appId) {
-		ThreadPoolUtil.insertApiLog(new Runnable() {
+		//非圈乎业务不发消息
+		if (messageVo == null || StringUtils.isBlank(appId)
+				|| !StringUtils.equals(appId, Context.getProperty(AppConstants.APP_ID))) {
+			return;
+		}
+		ThreadPoolUtil.execue(new Runnable() {
 			@Override
 			public void run() {
 				try {

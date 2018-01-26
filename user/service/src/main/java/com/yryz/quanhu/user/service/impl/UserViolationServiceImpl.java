@@ -29,6 +29,7 @@ import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.RedisOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -68,7 +69,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 	private MessageManager messageManager;
 	@Autowired
 	private ImManager imManager;
-	
+
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public void saveViolation(UserViolation violation, String appId) {
@@ -155,7 +156,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 */
 	private void saveViolationDao(UserViolation violation) {
 		try {
-			violation.setKid(idApi.getKid(IdConstants.QUANHU_USER_VIOLATION).getData());
+			violation.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_VIOLATION)));
 			violation.setCreateDate(new Date());
 			mysqlDao.saveViolation(violation);
 		} catch (Exception e) {
@@ -232,15 +233,15 @@ public class UserViolationServiceImpl implements UserViolationService {
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.FREEZE.getStatus(), null, null, null, null, new Date()));
-			//请求im发送下线消息
+			// 请求im发送下线消息
 			imManager.block(violation.getUserId(), appId);
 			authService.delToken(violation.getUserId(), appId);
-		}//注销 
+		} // 注销
 		else {
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.DISTORY.getStatus(), null, null, null, null, new Date()));
-			//请求im发送下线消息
+			// 请求im发送下线消息
 			imManager.block(violation.getUserId(), appId);
 			authService.delToken(violation.getUserId(), appId);
 		}

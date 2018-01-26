@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,9 @@ import com.google.common.collect.Sets;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserBaseInfoDao;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
@@ -112,7 +115,7 @@ public class UserServiceImpl implements UserService {
 		//提交资料完善事件
 		eventManager.userDataImprove(baseInfo, user);
 		
-		return 1;
+		return custbaseinfoDao.update(baseInfo);
 
 	}
 
@@ -120,9 +123,13 @@ public class UserServiceImpl implements UserService {
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId) {
 		UserBaseInfo baseInfo = getUser(userId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
-		simpleVO.setUserLevel("1");
-		// TODO: 依赖积分系统，获取用户积分等级
-		
+		//依赖积分系统，获取用户等级
+		EventAcount acount = eventManager.getGrow(userId.toString());
+		if(NumberUtils.toLong(acount.getGrowLevel()) < 1){
+			simpleVO.setUserLevel("1");
+		}else{
+			simpleVO.setUserLevel(acount.getGrowLevel());
+		}
 		return simpleVO;
 	}
 
@@ -359,7 +366,7 @@ public class UserServiceImpl implements UserService {
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
-		baseInfo.setKid(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO).getData());
+		baseInfo.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO)));
 		baseInfo.setCreateDate(new Date());
 		baseInfo.setBanPostTime(new Date());
 		baseInfo.setUserAge((byte)18);

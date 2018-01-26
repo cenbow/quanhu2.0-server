@@ -52,7 +52,7 @@ public class CommentController {
     @NotLogin
     @ApiOperation("用户删除评论")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @DeleteMapping(value = "/services/app/{version}/comment/clean")
+    @PostMapping(value = "/services/app/{version}/comment/clean")
     public Response<Map<String, Integer>> delComment(@RequestBody Comment comment,@RequestHeader Long userId){
         comment.setCreateUserId(userId);
         return commentApi.delComment(comment);

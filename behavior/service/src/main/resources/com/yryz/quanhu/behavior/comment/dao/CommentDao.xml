@@ -214,7 +214,7 @@
             <if test="resourceId!=null and resourceId!=0">
                 AND resource_id=#{resourceId,jdbcType=BIGINT}
             </if>
-            <if test="topId!=null and topId!=0">
+            <if test="topId!=null">
                 AND top_id=#{topId,jdbcType=BIGINT}
             </if>
         </where>

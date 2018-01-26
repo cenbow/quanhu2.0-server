@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserThirdLoginDao;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
@@ -50,7 +51,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	@Override
 	public int insert(UserThirdLogin record) {
 		record.setCreateDate(new Date());
-		record.setKid(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN).getData());
+		record.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN)));
 		record.setLastUpdateDate(record.getCreateDate());
 		try {
 			return mysqlDao.insert(record);

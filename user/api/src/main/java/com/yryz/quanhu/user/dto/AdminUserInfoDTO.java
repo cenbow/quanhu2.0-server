@@ -29,7 +29,7 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String endDate;
 	
-	private List<String> userIds;
+	private List<Long> userIds;
 	public String getNickName() {
 		return nickName;
 	}
@@ -54,10 +54,10 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-	public List<String> getUserIds() {
+	public List<Long> getUserIds() {
 		return userIds;
 	}
-	public void setUserIds(List<String> userIds) {
+	public void setUserIds(List<Long> userIds) {
 		this.userIds = userIds;
 	}
 	@Override
