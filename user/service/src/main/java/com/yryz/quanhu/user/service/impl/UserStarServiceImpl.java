@@ -26,6 +26,8 @@ import com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthWay;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarRecommendStatus;
 import com.yryz.quanhu.user.entity.UserStarAuthLog;
+import com.yryz.quanhu.user.manager.EventManager;
+import com.yryz.quanhu.user.manager.MessageManager;
 import com.yryz.quanhu.user.entity.UserBaseInfo.UserAuthStatus;
 import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
 import com.yryz.quanhu.user.service.UserService;
@@ -47,10 +49,10 @@ public class UserStarServiceImpl implements UserStarService {
 	private IdAPI idApi;
 	@Autowired
 	private UserStarAuthLogDao starAuthLogDao;
-	// @Autowired
-	// private EventManager eventService;
-	// @Autowired
-	// MessageManager messageManager;
+	@Autowired
+	private EventManager eventService;
+	@Autowired
+	MessageManager messageManager;
 	// @Autowired
 	// private CircleRemote circleService;
 	@Autowired
@@ -80,7 +82,7 @@ public class UserStarServiceImpl implements UserStarService {
 				updateUserStar(record.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
 				// circleService.updateExpert(record.getCustId(),(byte)1);
 				// 消息
-				// messageManager.starSuccess(record.getCustId());
+				messageManager.starSuccess(record.getUserId().toString());
 			}
 			saveStarAuthLog(record);
 			int result = persistenceDao.save(record);
@@ -129,7 +131,7 @@ public class UserStarServiceImpl implements UserStarService {
 				updateUserStar(record.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
 				// circleService.updateExpert(record.getCustId(),(byte)1);
 				// 消息
-				// messageManager.starSuccess(record.getCustId());
+				messageManager.starSuccess(record.getUserId().toString());
 			} else {
 				updateUserStar(record.getUserId(), UserRole.NORMAL, UserAuthStatus.TRUE);
 				/* circleService.updateExpert(record.getCustId(),(byte)0); */
@@ -169,18 +171,18 @@ public class UserStarServiceImpl implements UserStarService {
 				updateUserStar(reAuthModel.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
 				// circleService.updateExpert(reAuthModel.getCustId(),(byte)1);
 				// 消息
-				// messageManager.starSuccess(reAuthModel.getCustId());
+				messageManager.starSuccess(reAuthModel.getUserId().toString());
 			}
 			if (reAuthModel.getAuditFailTime() != null) {
-				// messageManager.starFail(reAuthModel.getCustId(),
-				// reAuthModel.getAuditFailReason());
+				 messageManager.starFail(reAuthModel.getUserId().toString(),
+				 reAuthModel.getAuditFailReason());
 			}
 
 			if (reAuthModel.getAuthCancelTime() != null) {
 				updateUserStar(reAuthModel.getUserId(), UserRole.NORMAL, UserAuthStatus.TRUE);
 				// circleService.updateExpert(reAuthModel.getCustId(),(byte)0);
 				// 消息
-				// messageManager.starCancel(reAuthModel.getCustId());*/
+				messageManager.starCancel(reAuthModel.getUserId().toString());
 			}
 			return result;
 		} catch (Exception e) {
@@ -268,7 +270,7 @@ public class UserStarServiceImpl implements UserStarService {
 		userService.updateUserInfo(
 				new UserBaseInfo(userId, null, role.getRole(), null, authStatus.getStatus(), null, null));
 		// 设置达人等级
-		// eventService.starAuth(record.getCustId());*/
+		eventService.starAuth(userId.toString());
 	}
 
 	/**

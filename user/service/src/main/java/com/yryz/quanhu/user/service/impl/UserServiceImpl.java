@@ -26,7 +26,6 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.AppConstants;
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
@@ -37,10 +36,10 @@ import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
-import com.yryz.quanhu.user.manager.QrManager;
+import com.yryz.quanhu.user.manager.EventManager;
+import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserService;
-import com.yryz.quanhu.user.utils.ThreadPoolUtil;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
@@ -63,10 +62,13 @@ public class UserServiceImpl implements UserService {
 	IdAPI idApi;
 	@Autowired
 	UserImgAuditDao custImgAuditDao;
-
 	@Autowired
 	UserImgAuditService userImgAuditService;
-
+	@Autowired
+	private UserSender mqSender;
+	@Autowired
+	private EventManager eventManager;
+	
 	/**
 	 * 更新用户信息，
 	 * 
@@ -87,9 +89,9 @@ public class UserServiceImpl implements UserService {
 			} else {
 				existByName = this.getUserByNickName(baseInfo.getAppId(), nickName);
 			}
-			// 昵称已纯在
+			// 昵称已存在
 			if (existByName != null) {
-				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "nickName is already ");
+				throw QuanhuException.busiError("nickName is already ");
 			}
 		}
 
@@ -103,8 +105,14 @@ public class UserServiceImpl implements UserService {
 				userImgAuditService.auditImg(auditModel, ImgAuditStatus.NO_AUDIT.getStatus());
 			}
 		}
-
-		return custbaseinfoDao.update(baseInfo);
+		custbaseinfoDao.update(baseInfo);
+		
+		//同步im
+		mqSender.userUpdate(baseInfo);
+		//提交资料完善事件
+		eventManager.userDataImprove(baseInfo, user);
+		
+		return 1;
 
 	}
 
@@ -348,10 +356,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void createUser(UserBaseInfo baseInfo) {
-		
-		// 获取二维码预存地址
-		String qrUrl = QrManager.getQrUrl(baseInfo.getUserId().toString());
-		baseInfo.setUserQr(qrUrl);
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
@@ -363,27 +367,14 @@ public class UserServiceImpl implements UserService {
 		baseInfo.setUserGenders((byte)10);
 		baseInfo.setUserDesc("");
 		custbaseinfoDao.insert(baseInfo);
-		// 异步上传二维码
-
-		ThreadPoolUtil.insertApiLog(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					QrManager.getInstance().createQr(baseInfo.getUserId().toString());
-				} catch (RuntimeException e) {
-				} catch (Exception e) {
-				}
-			}
-		});
 
 		// 初始化用户头像审核信息
 		if (StringUtils.isNotBlank(baseInfo.getUserImg())) {
 			UserImgAudit record = new UserImgAudit();
 			record.setUserId(baseInfo.getUserId());
-			record.setAuditStatus((byte) 0);
+			record.setAuditStatus((byte)ImgAuditStatus.NO_AUDIT.getStatus());
 			record.setUserImg(baseInfo.getUserImg());
-			userImgAuditService.auditImg(record, 0);
+			userImgAuditService.auditImg(record, ImgAuditStatus.NO_AUDIT.getStatus());
 		}
 	}
 

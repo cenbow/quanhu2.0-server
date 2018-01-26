@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -28,6 +29,7 @@ import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import com.yryz.quanhu.user.dto.UserTagDTO.UserTagType;
+import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.service.UserTagApi;
@@ -51,6 +53,13 @@ public class UserTest {
 	private UserApi userApi;
 	@Reference
 	private UserTagApi tagApi;
+	@Autowired
+	private UserSender sender;
+	
+/*	@Test
+	public void sendMq(){
+		sender.userCreate("dsdsfdfdfdf");
+	}*/
 	//
 	// @Test
 	// public void exampleTest(){
@@ -194,7 +203,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void sendVerifyCode() {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
@@ -213,9 +222,10 @@ public class UserTest {
 	
 	//@Test
 	public void getUserSimple(){
-		//Response<UserSimpleVO> response = userApi.getUserSimple("724011759597371392");
-		Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
-		System.out.println(JsonUtils.toFastJson(response));
+		Response<UserSimpleVO> response = userApi.getUserSimple(0l);
+		UserSimpleVO simpleVO = response.getData();
+		//Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
+		System.out.println(JsonUtils.toFastJson(simpleVO));
 	}
 	
 	//@Test

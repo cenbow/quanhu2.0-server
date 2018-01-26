@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.ExceptionEnum;
@@ -34,13 +36,12 @@ import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
-import com.yryz.quanhu.user.entity.UserOperateInfo;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
 import com.yryz.quanhu.user.manager.SmsManager;
+import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.AccountService;
 import com.yryz.quanhu.user.service.OatuhWeibo;
 import com.yryz.quanhu.user.service.OatuhWeixin;
-import com.yryz.quanhu.user.service.UserOperateService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserThirdLoginService;
 import com.yryz.quanhu.user.utils.UserUtils;
@@ -67,10 +68,10 @@ public class AbstractAccountService implements AccountService {
 	@Autowired
 	private SmsManager smsService;
 	@Autowired
-	private UserOperateService operateService;
-	@Autowired
 	protected UserService userService;
-
+	@Autowired
+	private UserSender mqSender;
+	
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public Long register(RegisterDTO registerDTO) {
@@ -456,16 +457,13 @@ public class AbstractAccountService implements AccountService {
 		userService
 				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
 						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode()));
-		// 异步处理
-		// 创建运营信息
-		operateService.save(
-				new UserOperateInfo(userId, registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
+		registerDTO.getRegLogDTO().setUserId(userId);
 		
-		if (registerDTO.getRegLogDTO() != null) {
-			registerDTO.getRegLogDTO().setUserId(userId);
-			operateService.saveRegLog(registerDTO.getRegLogDTO());
-		}
-		// TODO:发送注册消息 加积分
+		//异步处理
+		//创建运营信息
+		//发送注册消息 加积分
+		mqSender.userCreate(registerDTO);
+		
 		return userId;
 	}
 
