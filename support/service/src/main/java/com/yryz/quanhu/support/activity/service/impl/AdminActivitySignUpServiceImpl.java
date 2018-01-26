@@ -3,6 +3,7 @@ package com.yryz.quanhu.support.activity.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.support.activity.dao.ActivityEnrolConfigDao;
 import com.yryz.quanhu.support.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.support.activity.dao.ActivityRecordDao;
@@ -17,6 +18,9 @@ import com.yryz.quanhu.support.activity.vo.*;
 import com.yryz.quanhu.support.activity.dto.AdminActivityInfoDto;
 import com.yryz.quanhu.support.activity.dto.AdminActivityInfoSignUpDto;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
@@ -28,9 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.yryz.common.constant.ModuleContants.*;
 
@@ -47,6 +49,8 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	ActivityEnrolConfigDao activityEnrolConfigDao;
 	@Reference(check=false)
 	private IdAPI idApi;
+	@Reference(check=false)
+	UserApi userApi;
 	/*@Autowired
 	EventReportDao eventReportDao;*/
 	/*@Autowired
@@ -223,35 +227,22 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	@Override
 	public PageList<AdminActivityRecordVo> attendlist(Integer pageNo, Integer pageSize,
 													  AdminActivityRecordVo adminActivityRecordVo) {
-		//PageHelper.startPage(pageNo, pageSize);
-		/*if(pageNo==null||pageNo<=0){
-			pageNo=0;
-		}else{
-			pageNo=(pageNo-1)*pageSize;
-		}
-		if(pageSize==null||pageSize<=0){
-			pageSize=10;
-		}*/
-		pageNo=0;
-		pageSize=99999;
+		PageHelper.startPage(pageNo, pageSize);
 		List<AdminActivityRecordVo> list = activityRecordDao.attendlist(pageNo, pageSize, adminActivityRecordVo);
 		if(CollectionUtils.isEmpty(list)){
 			return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,0L);
 		}
+		Set<String> userIds = new HashSet<>();
 		for(AdminActivityRecordVo vo:list){
-			//TODO 根据用户id获取用户昵称、账号绑定的手机号
-			/*CustInfo custInfo = custAPI.getCustInfo(vo.getCreateUserId());
-			if(custInfo==null){
-				vo.setNickName("");
-				vo.setCustPhone("");
-			}else{
-				vo.setNickName(custInfo.getCustNname());
-				vo.setCustPhone(custInfo.getCustPhone());
-			}*/
-			@SuppressWarnings("unchecked")
 			List<Map<String,String>> voMap = JsonUtils.fromJson(vo.getEnrolSources(), List.class);
 			//Map<Object,Object> map=JSON.parseObject(JSON.toJSONString(vo.getEnrolSources()), Map.class);
 			vo.setMap(voMap);
+			userIds.add(String.valueOf(vo.getCreateUserId()));
+		}
+		Response<Map<String,UserBaseInfoVO>> users = userApi.getUser(userIds);
+		for(AdminActivityRecordVo vo:list){
+			vo.setNickName(users.getData().get(vo.getCreateUserId().toString()).getUserNickName());
+			vo.setCustPhone(users.getData().get(vo.getCreateUserId().toString()).getUserPhone());
 		}
 		return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,activityRecordDao.attendlistCount(adminActivityRecordVo));
 	}

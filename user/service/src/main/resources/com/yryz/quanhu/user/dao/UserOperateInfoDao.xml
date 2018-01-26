@@ -28,7 +28,7 @@
 	</sql>
 	
 	<!-- 查询本人邀请码 -->
-	<select id="selectInviterCodeByUserId" resultType="java.lang.String">
+	<select id="selectInviterByUserId" resultType="java.lang.String">
 		select user_inviter_code
 		from qh_user_operate_info
 		where user_id = #{userId}
