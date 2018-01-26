@@ -72,11 +72,6 @@ public class ResourceTotal {
     private String publicState;
     
     /**
-     * 资源简介
-     */
-    private String summary;
-    
-    /**
      * 扩展字段，仅供展示使用，由前端的发布方和列表解析方解决
      */
     private String extJson;

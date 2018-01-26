@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.resource.provider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,15 @@ public class ResourceProvider implements ResourceApi {
 	 */
 	public Response<?> deleteResource(List<ResourceVo> resources){
 		resourceService.deleteResource(GsonUtils.parseList(resources, ResourceModel.class));
+		return ResponseUtils.returnSuccess();
+	}
+	
+	public Response<?> deleteResourceById(Long resourceId){
+		ResourceModel model = new ResourceModel();
+		model.setResourceId(resourceId);
+		List<ResourceModel> list = new ArrayList<>();
+		list.add(model);
+		resourceService.deleteResource(list);
 		return ResponseUtils.returnSuccess();
 	}
 	

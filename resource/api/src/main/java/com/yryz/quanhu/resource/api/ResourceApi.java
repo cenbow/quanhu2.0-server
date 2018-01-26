@@ -41,6 +41,13 @@ public interface ResourceApi {
 	public Response<?> deleteResource(List<ResourceVo> resources);
 	
 	/**
+	 * 删除资源
+	 * @param resourceId
+	 * @return
+	 */
+	public Response<?> deleteResourceById(Long resourceId);
+	
+	/**
 	 * 资源列表获取,如果有排序字段，默认按字段倒序排序
 	 * @param resource 资源查询条件
 	 * @param orderColumn 排序字段，resource的columnName，如果有多个值，以逗号分隔。默认倒序排序
