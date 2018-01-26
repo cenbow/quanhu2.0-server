@@ -31,6 +31,11 @@
             <artifactId>dymaic-elasticsearch</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>user-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
         
     	<dependency>
             <groupId>org.springframework.boot</groupId>
@@ -57,6 +62,14 @@
             <groupId>io.dubbo.springboot</groupId>
             <artifactId>spring-boot-starter-dubbo</artifactId>
         </dependency>
+        <dependency>
+	        <groupId>com.dangdang</groupId>
+	        <artifactId>elastic-job-lite-core</artifactId>
+	    </dependency>
+	    <dependency>
+	        <groupId>com.dangdang</groupId>
+	        <artifactId>elastic-job-lite-spring</artifactId>
+	    </dependency>
         
         <!-- 第三方依赖 解决Springboot2.0的冲突-->
         <dependency>

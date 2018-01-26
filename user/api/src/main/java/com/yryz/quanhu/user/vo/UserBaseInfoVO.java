@@ -9,7 +9,7 @@ import java.util.Date;
  */
 @SuppressWarnings("serial")
 public class UserBaseInfoVO implements Serializable{
-
+	private Long kid;
     /**
      * 用户账户id
      */
@@ -133,7 +133,13 @@ public class UserBaseInfoVO implements Serializable{
      */
     private Date createDate;
 
-    public Long getUserId() {
+    public Long getKid() {
+		return kid;
+	}
+	public void setKid(Long kid) {
+		this.kid = kid;
+	}
+	public Long getUserId() {
         return userId;
     }
     public void setUserId(Long userId) {
