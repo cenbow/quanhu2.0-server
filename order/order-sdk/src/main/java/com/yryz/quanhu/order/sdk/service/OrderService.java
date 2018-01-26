@@ -135,10 +135,10 @@ public class OrderService implements OrderSDK {
      * @param orderEnum 订单枚举
      * @param toId      收款人ID
      * @param cost      金额
-     * @return 成功标识
+     * @return 订单ID 成功返回，否则null
      */
     @Override
-    public boolean executeOrder(OrderEnum orderEnum, Long toId, Long cost) {
+    public Long executeOrder(OrderEnum orderEnum, Long toId, Long cost) {
         if (null == orderEnum)
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "orderEnum is null");
@@ -158,9 +158,9 @@ public class OrderService implements OrderSDK {
         PreOrderVo orderVo = orderEnum.getOrder(orderId, Long.valueOf(AccountEnum.SYSID), toId, cost);
         Response<?> response = orderApi.executeOrder(orderVo.getOrderInfo(), orderVo.getAccounts(), orderVo.getIntegrals(), null, null, null);
         if (null != response && response.success()) {
-            return true;
+            return orderId;
         }
-        return false;
+        return null;
     }
 
     private void check(InputOrder inputOrder) {

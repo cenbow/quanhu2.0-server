@@ -5,7 +5,7 @@
  * Created on 2018年1月26日
  * Id: ResourceTotal.java, 2018年1月26日 上午10:03:00 yehao
  */
-package com.yryz.quanhu.resource.vo;
+package com.yryz.quanhu.demo;
 
 /**
  * @author yehao
@@ -93,7 +93,6 @@ public class ResourceTotal {
 	 */
 	public ResourceTotal() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

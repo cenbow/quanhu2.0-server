@@ -1,6 +1,6 @@
 package com.yryz.quanhu.support.activity.vo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -195,13 +195,13 @@ public class ActivityVoteInfoVo implements Serializable {
     /**
      * 无奖励配置文案
      * */
-    @Ignore
+    @JsonIgnore
     private String noRewardContent;
 
     /**
      * 配置元数据
      * */
-    @Ignore
+    @JsonIgnore
     private String configSources;
 
     public Long getKid() {

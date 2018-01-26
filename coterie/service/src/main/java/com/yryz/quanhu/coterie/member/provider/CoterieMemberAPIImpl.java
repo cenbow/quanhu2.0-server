@@ -115,10 +115,10 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public Response<Byte> permission(Long userId, Long coterieId) {
-        Byte permission = coterieMemberService.permission(userId, coterieId);
+    public Response<Integer> permission(Long userId, Long coterieId) {
+        Integer permission = coterieMemberService.permission(userId, coterieId);
 
-        return new Response<>(permission);
+        return new Response<Integer>(permission);
     }
 
 

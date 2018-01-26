@@ -171,6 +171,17 @@ public class DymaicCache {
         return sendList;
     }
 
+    public Long rangeLastSend(Long userId) {
+        Long lastKid = null;
+        RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+        final String key = cacheSendListKey(userId);
+        Set<Long> sendList = redisTemplate.opsForZSet().reverseRange(key, 0, 0);
+        if (sendList != null && !sendList.isEmpty() ) {
+            lastKid = (Long) (sendList.toArray())[0];
+        }
+        return lastKid;
+    }
+
     /**
      * 全量查询SendList
      *

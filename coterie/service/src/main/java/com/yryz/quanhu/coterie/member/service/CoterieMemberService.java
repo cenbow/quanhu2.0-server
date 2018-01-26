@@ -76,7 +76,7 @@ public interface CoterieMemberService {
 	 * @param userId
 	 * @param coterieId
 	 */
-	public Byte permission(Long userId, Long coterieId);
+	public Integer permission(Long userId, Long coterieId);
 
 	/**
 	 * 私圈成员权限
