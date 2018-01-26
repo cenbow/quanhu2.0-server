@@ -18,12 +18,24 @@ public class UserStarSimpleVo implements Serializable {
 	 * 用户id
 	 */
 	private Long userId;
+
+	/**
+	 * 是否被推荐 10:否 11:是
+	 */
+	private Byte recommendStatus;
 	
 	/**
 	 * 推荐语
 	 */
 	private String recommendDesc;
 
+	public Byte getRecommendStatus() {
+		return recommendStatus;
+	}
+
+	public void setRecommendStatus(Byte recommendStatus) {
+		this.recommendStatus = recommendStatus;
+	}
 
 	public String getRecommendDesc() {
 		return recommendDesc;
