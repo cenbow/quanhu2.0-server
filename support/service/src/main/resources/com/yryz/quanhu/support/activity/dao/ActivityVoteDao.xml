@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.support.activity.dao.ActivityVoteDao">
+	
+	<sql id="conditions">
+			<if test="activityStatus != null and activityStatus==11">
+				<![CDATA[    AND begin_time > NOW()    ]]> AND shelve_flag = 10
+			</if>
+			<if test="activityStatus != null and activityStatus==12">
+	       		<![CDATA[   AND end_time >= NOW() AND begin_time <= NOW()  ]]> AND shelve_flag = 10
+			</if>
+			<if test="activityStatus != null and activityStatus==13">
+	       		<![CDATA[  AND end_time < NOW() ]]>   AND shelve_flag =10
+			</if>
+			<if test="activityStatus != null and activityStatus==14">
+				and shelve_flag = 11
+			</if>
+			<if test="title != null and title != '' ">
+		    	 <![CDATA[  
+		    		and title like CONCAT('%',#{title},'%') 
+		    	 ]]>
+			</if>
+			<if test="shelveFlag != null">                                   
+		       <![CDATA[                                 
+		    	AND shelve_flag = #{shelveFlag}
+		       ]]>
+			</if>
+			<if test="remark != null and remark != '' ">
+		    	 <![CDATA[  
+		    	  and remark like CONCAT('%',#{remark},'%') 
+		    	 ]]>
+			</if>
+			<if test="userFlag != null ">  
+				AND user_flag = #{userFlag}   
+			</if>
+			<if test="prizesFlag != null ">  
+				AND prizes_flag = #{prizesFlag}   
+			</if>
+			<if test="onlineTimeStart != null">                                   
+		       <![CDATA[                                 
+		    	AND online_time >= #{onlineTimeStart}
+		       ]]>
+			</if>
+			<if test="onlineTimeEnd != null">                                   
+		       <![CDATA[                                 
+		    	AND online_time <= #{onlineTimeEnd}
+		       ]]>
+			</if>
+			<if test="beginTimeStart != null">                                   
+		       <![CDATA[                                 
+		    	AND begin_time >= #{beginTimeStart}
+		       ]]>
+			</if>
+			<if test="beginTimeEnd != null">                                   
+		       <![CDATA[                                 
+		    	AND begin_time <= #{beginTimeEnd}
+		       ]]>
+			</if>
+			<if test="endTimeStart != null">                                   
+		       <![CDATA[                                 
+		    	AND end_time >= #{endTimeStart}
+		       ]]>
+			</if>
+			<if test="endTimeEnd != null">                                   
+		       <![CDATA[                                 
+		    	AND end_time <= #{endTimeEnd}
+		       ]]>
+			</if>
+	</sql>
+	
+	<select id="adminlist" parameterType="com.yryz.quanhu.support.activity.dto.AdminActivityInfoVoteDto" resultType="com.yryz.quanhu.support.activity.vo.AdminActivityVoteVo">
+		select  info.*,
+				ifnull(vote.join_count,0) join_count,
+				ifnull(vote.vote_count,0) vote_count
+		from qh_activity_info info
+		left join ( select  activity_info_id , count(ifnull(vote_no,0))  join_count,  count(ifnull(vote_count,0))  vote_count from qh_activity_vote_detail  group by activity_info_id) vote
+				on info.id = vote.activity_info_id
+		<where>
+			activity_type = 12
+			<include refid="conditions"></include>
+		</where>		
+		order by online_time desc
+	</select>
+
+	<select id="adminlistCount" parameterType="com.yryz.quanhu.support.activity.dto.AdminActivityInfoVoteDto" resultType="java.lang.Long">
+		select  count(1)  from   qh_activity_info
+		<where>
+			activity_type = 12
+			<include refid="conditions"></include>
+		</where>
+	</select>
+
+	<sql id="Base_Column_List">
+		id,kid, title, cover_plan, activity_type, online_time, begin_time, end_time,
+		activity_link,
+		recommend, recommend_date, remark, sort, user_flag, user_num, amount,
+		prizes_flag,
+		shelve_flag, prizes_announcement_flag, create_date, create_user_id,
+		last_update_date,enrol_count,
+		last_update_user_id, content, content_sources, prizes_sources,introduce_sources
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo">
+		insert into qh_activity_info (id,kid, title, cover_plan,
+		activity_type, online_time, begin_time,
+		end_time, activity_link, recommend,
+		recommend_date, remark, sort,
+		user_flag, user_num, amount,
+		prizes_flag, shelve_flag, prizes_announcement_flag,
+		create_user_id, last_update_user_id, content, content_sources,
+		prizes_sources,introduce_sources)
+		values (#{id,jdbcType=BIGINT},#{kid,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR},
+		#{coverPlan,jdbcType=VARCHAR},
+		#{activityType,jdbcType=TINYINT}, #{onlineTime,jdbcType=TIMESTAMP}, #{beginTime,jdbcType=TIMESTAMP},
+		#{endTime,jdbcType=TIMESTAMP}, #{activityLink,jdbcType=VARCHAR},
+		#{recommend,jdbcType=TINYINT},
+		#{recommendDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER},
+		#{userFlag,jdbcType=TINYINT}, #{userNum,jdbcType=INTEGER},
+		#{amount,jdbcType=BIGINT},
+		#{prizesFlag,jdbcType=TINYINT}, #{shelveFlag,jdbcType=TINYINT},
+		#{prizesAnnouncementFlag,jdbcType=TINYINT},
+		#{createUserId,jdbcType=VARCHAR},
+		#{lastUpdateUserId,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR},
+		#{contentSources,jdbcType=LONGVARCHAR},
+		#{prizesSources,jdbcType=LONGVARCHAR},#{introduceSources,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="update" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo">
+		update qh_activity_info set last_update_user_id =
+		#{lastUpdateUserId,jdbcType=VARCHAR}
+		<if test="title != null">
+			,title = #{title,jdbcType=VARCHAR}
+		</if>
+		<if test="coverPlan != null">
+			,cover_plan = #{coverPlan,jdbcType=VARCHAR}
+		</if>
+		<if test="activityType != null">
+			,activity_type = #{activityType,jdbcType=TINYINT}
+		</if>
+		<if test="onlineTime != null">
+			,online_time = #{onlineTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="beginTime != null">
+			,begin_time = #{beginTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="endTime != null">
+			,end_time = #{endTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="activityLink != null">
+			,activity_link = #{activityLink,jdbcType=VARCHAR}
+		</if>
+		<if test="recommend != null">
+			,recommend = #{recommend,jdbcType=TINYINT}
+			<if test="recommend ==1">
+				,recommend_date = NOW()
+			</if>
+		</if>
+		<if test="remark != null">
+			,remark = #{remark,jdbcType=VARCHAR}
+		</if>
+		<if test="sort != null">
+			,sort = #{sort,jdbcType=INTEGER}
+		</if>
+		<if test="userFlag != null">
+			,user_flag = #{userFlag,jdbcType=TINYINT}
+		</if>
+		<if test="userNum != null">
+			,user_num = #{userNum,jdbcType=INTEGER}
+		</if>
+		<if test="amount != null">
+			,amount = #{amount,jdbcType=BIGINT}
+		</if>
+		<if test="prizesFlag != null">
+			,prizes_flag = #{prizesFlag,jdbcType=TINYINT}
+		</if>
+		<if test="shelveFlag != null">
+			,shelve_flag = #{shelveFlag,jdbcType=TINYINT}
+		</if>
+		<if test="prizesAnnouncementFlag != null">
+			,prizes_announcement_flag =
+			#{prizesAnnouncementFlag,jdbcType=TINYINT}
+		</if>
+		<if test="createDate != null">
+			,create_date = #{createDate,jdbcType=TIMESTAMP}
+		</if>
+		<if test="createUserId != null">
+			,create_user_id = #{createUserId,jdbcType=VARCHAR}
+		</if>
+		<!-- <if test="lastUpdateDate != null" > ,last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP} 
+			</if> <if test="lastUpdateUserId != null" > ,last_update_user_id = #{lastUpdateUserId,jdbcType=VARCHAR} 
+			</if> -->
+		<if test="content != null">
+			,content = #{content,jdbcType=LONGVARCHAR}
+		</if>
+		<if test="contentSources != null">
+			,content_sources = #{contentSources,jdbcType=LONGVARCHAR}
+		</if>
+		<if test="prizesSources != null">
+			,prizes_sources = #{prizesSources,jdbcType=LONGVARCHAR}
+		</if>
+		<if test="introduceSources != null">
+			,introduce_sources = #{introduceSources,jdbcType=LONGVARCHAR}
+		</if>
+		,last_update_date = NOW()
+		where kid = #{kid,jdbcType=BIGINT}
+	</update>
+
+  <select id="getVoteTotalCount" resultType="java.lang.Integer">
+		select SUM(vote_count)+SUM(add_vote) from qh_activity_vote_detail where activity_info_id=#{id}
+		
+	</select>
+
+</mapper>

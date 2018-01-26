@@ -140,4 +140,56 @@
 		</if>
 	</select>
 
+
+
+	<!-- 查询全部列表 -->
+	<select id="select" parameterType="com.yryz.quanhu.support.activity.dto.AdminActivityVoteRecordDto"
+			resultType="com.yryz.quanhu.support.activity.vo.AdminActivityVoteRecordVo">
+		select create_user_id , count(*) as vote_count from qh_activity_vote_record
+		<where>
+			activity_info_id = #{record.activityInfoId}
+			<if test="record.custIds != null">
+				and create_user_id in
+				<foreach item="item" index="index" collection="record.custIds" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="record.voteNo!= null">
+				and vote_no = #{record.voteNo}
+			</if>
+		</where>
+		group by create_user_id  order by vote_count
+	</select>
+
+	<!-- 查询全部分页列表 -->
+	<select id="selectPage" parameterType="com.yryz.quanhu.support.activity.dto.AdminActivityVoteRecordDto"
+			resultType="com.yryz.quanhu.support.activity.vo.AdminActivityVoteRecordVo">
+		select create_user_id , count(*) as vote_count from qh_activity_vote_record
+		<where>
+			activity_info_id = #{record.activityInfoId}
+			<if test="record.custIds != null">
+				and create_user_id in
+				<foreach item="item" index="index" collection="record.custIds" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="record.voteNo!= null">
+				and vote_no = #{record.voteNo}
+			</if>
+		</where>
+		group by create_user_id order by vote_count
+	</select>
+
+
+	<!-- 某一活动的总票数 -->
+	<select id="selectCountByActivityInfoId" resultType="java.lang.Integer">
+		select count(*) as vote_count from qh_activity_vote_record
+		<where>
+			activity_info_id = #{id}
+			<if test="voteNo!= null">
+				and vote_no = #{voteNo}
+			</if>
+		</where>
+	</select>
+
 </mapper>

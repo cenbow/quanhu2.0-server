@@ -1,5 +1,10 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +18,9 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -46,6 +54,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
+    
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private CountApi countApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -58,9 +69,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isNull(record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
 
             if (StringUtils.isBlank(record.getModuleEnum())) {
-                record.setModuleEnum("1003");
+                record.setModuleEnum(ResourceTypeEnum.RELEASE);
             }
-            
+
             // 校验用户是否存在
             ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
 
@@ -80,8 +91,15 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
-            // TODO 资源进动态
-            // TODO 接入统计计数
+            try {
+                // TODO 资源进聚合
+
+                // 接入统计计数
+                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
+
             return ResponseUtils.returnObjectSuccess(record);
 
         } catch (QuanhuException e) {
@@ -100,9 +118,11 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             Assert.isTrue(0L == infoVo.getCoterieId(), "非平台文章禁止访问！");
 
-            // TODO 创建者用户信息
-            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
-
+            // 创建者用户信息
+            UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
+            Assert.notNull(createUser, "文章创建者用户不存在！userId:" + infoVo.getCreateUserId());
+            infoVo.setUser(createUser);
+            
             // 若资源已删除、或者 已经下线 直接返回
             if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
                     || CommonConstants.SHELVE_NO.equals(infoVo.getShelveFlag())) {
@@ -111,9 +131,13 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
                 return ResponseUtils.returnObjectSuccess(infoVo);
             }
 
-            // TODO 资源互动信息
+            try {
+                // 接入统计计数
+                countApi.commitCount(BehaviorEnum.Read, infoVo.getKid(), null, 1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
 
-            // TODO 对接资源浏览数
             return ResponseUtils.returnObjectSuccess(infoVo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
@@ -124,8 +148,45 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     }
 
     @Override
-    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId) {
-        return null;
+    public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
+            boolean isGetCreateUser) {
+        try {
+            dto.setCoterieId(0L);
+            PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, isCount);
+
+            // 设置创建者用户信息
+            if (isGetCreateUser && null != voList && CollectionUtils.isNotEmpty(voList.getEntities())) {
+                // 获取所有创建者用户ID
+                Set<Long> userIds = new HashSet<>();
+                for (ReleaseInfoVo info : voList.getEntities()) {
+                    if (null == info || null == info.getCreateUserId()) {
+                        continue;
+                    }
+                    userIds.add(info.getCreateUserId());
+                }
+
+                // TODO 获取用户信息集合
+                Map<String, UserSimpleVO> userMap = ResponseUtils
+                        .getResponseData(userApi.getUserSimple(new HashSet<>()));
+                if (null != userMap) {
+                    for (ReleaseInfoVo info : voList.getEntities()) {
+                        if (null == info || null == info.getCreateUserId()
+                                || null == userMap.get(info.getCreateUserId())) {
+                            continue;
+                        }
+                        UserSimpleVO userVo = userMap.get(info.getCreateUserId());
+                        info.setUser(userVo);
+                    }
+                }
+            }
+            
+            return ResponseUtils.returnObjectSuccess(voList);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("获取平台文章列表异常！", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     @Override
@@ -142,9 +203,14 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             int result = releaseInfoService.updateByUkSelective(upInfo);
             Assert.isTrue(result > 0, "作者删除文章失败！");
 
-            // TODO 动态资源下线
+            try {
+                // TODO 动态资源下线
 
-            // TODO 对接计数
+                // 接入统计计数
+                countApi.commitCount(BehaviorEnum.Release, upInfo.getKid(), null, -1L);
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
 
             return ResponseUtils.returnObjectSuccess(result);
 

@@ -11,6 +11,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
+import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 
 /**
@@ -73,5 +74,20 @@ public class ReleaseInfoTest {
         upInfo.setKid(730182871691157504L);
         upInfo.setLastUpdateUserId(724007310011252736L);
         System.out.println(new ObjectMapper().writeValueAsString(releaseInfoApi.deleteBykid(upInfo)));
+    }
+
+    /**  
+    * @Description: 平台文章 列表
+    * @author wangheng
+    * @param @throws JsonProcessingException
+    * @return void
+    * @throws  
+    */
+    @Test
+    public void test004() throws JsonProcessingException {
+        ReleaseInfoDto dto = new ReleaseInfoDto();
+        // dto.setCoterieId(5259149661L);
+        System.out.println(new ObjectMapper()
+                .writeValueAsString(releaseInfoApi.pageByCondition(dto, 727909974996672512L, false, true)));
     }
 }

@@ -71,6 +71,19 @@ public class UserRelationProvider implements UserRelationApi{
     }
 
     @Override
+    public Response<List<UserRelationDto>> selectByAll(UserRelationDto dto, UserRelationConstant.STATUS status) {
+        try {
+            logger.info("selectByAll={}/{},status={} start",dto.getSourceUserId(),dto.getTargetUserId(),status);
+            return ResponseUtils.returnObjectSuccess(userRelationService.selectByAll(dto,status));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("selectByAll={}/{},status={} finish",dto.getSourceUserId(),dto.getTargetUserId(),status);
+        }
+    }
+
+    @Override
     public Response<Set<String>> selectBy(String sourceUserId, UserRelationConstant.STATUS status) {
         try {
             logger.info("selectBy={},status={} start",sourceUserId,status);

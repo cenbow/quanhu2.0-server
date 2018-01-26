@@ -182,6 +182,22 @@
         where kid = #{kid,jdbcType=BIGINT}
     </update>
 
+
+	<select id="selectByPrimaryKey" resultType="com.yryz.quanhu.support.activity.entity.ActivityPrizes" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_prizes
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<select id="selectAvailablePrizes" resultType="com.yryz.quanhu.support.activity.entity.ActivityPrizes" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_prizes where issue_num >= 0
+		<if test="activityInfoId != null" >
+			AND activity_info_id = #{activityInfoId,jdbcType=BIGINT}
+		</if>
+	</select>
 	<!-- 获取奖品列表 -->
 	<select id="selectListCondition" resultType="com.yryz.quanhu.support.activity.vo.ActivityPrizesVo">
 		select

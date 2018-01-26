@@ -7,26 +7,32 @@
  */
 package com.yryz.quanhu.resource.mq;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.resource.entity.ResourceModel;
+import com.yryz.quanhu.resource.service.ResourceService;
 
 /**
  * @author yehao
  * @version 2.0
  * @date 2018年1月17日 下午3:03:07
- * @Description 广播队列示例
- * POM文件声明配置：
- * <dependency>  
- *	<groupId>org.springframework.boot</groupId>  
- *	<artifactId>spring-boot-starter-amqp</artifactId>  
- * </dependency> 
+ * @Description 资源提交队列消费
  */
 @Service
-public class FanoutExchangeConsumer {
+public class ResourceConsumer {
+	
+	@Autowired
+	private ResourceService resourceService;
 	
 	/**
 	 * QueueBinding: exchange和queue的绑定
@@ -35,11 +41,14 @@ public class FanoutExchangeConsumer {
 	 * @param data
 	 */
 	@RabbitListener(bindings = @QueueBinding(
-			value= @Queue(value=AmqpConstant.DEMO_FANOUT_QUEUE,durable="true"),
-			exchange=@Exchange(value=AmqpConstant.DEMO_FANOUT_EXCHANGE,ignoreDeclarationExceptions="true",type=ExchangeTypes.FANOUT))
+			value= @Queue(value=AmqpConstant.RESOURCE_COMMIT_QUEUE,durable="true"),
+			exchange=@Exchange(value=AmqpConstant.RESOURCE_DYNAMIC_FANOUT_EXCHANGE,ignoreDeclarationExceptions="true",type=ExchangeTypes.FANOUT))
 	)
 	public void handleMessage(String data){
-		System.out.println("hello Fanout Message:" + data);
+		ResourceModel resourceModel = GsonUtils.json2Obj(data, ResourceModel.class);
+		List<ResourceModel> list = new ArrayList<>();
+		list.add(resourceModel);
+		resourceService.commitResource(list);
 	}
 
 

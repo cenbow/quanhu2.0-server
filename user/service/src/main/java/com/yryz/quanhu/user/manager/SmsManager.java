@@ -31,7 +31,7 @@ public class SmsManager {
 	private static final Logger logger = LoggerFactory.getLogger(SmsManager.class);
 	private static final Logger smsLogger = LoggerFactory.getLogger("sms.Logger");
 
-	@Reference(lazy=true,check=false)
+	@Reference
 	private CommonSafeApi commonSafeApi;
 
 	/**

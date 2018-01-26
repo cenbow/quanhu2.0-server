@@ -34,4 +34,13 @@ public interface ActivityPrizesDao {
 
     int updateIssueNum(@Param("kid") Long kid);
 
+
+
+
+
+
+    ActivityPrizes selectByPrimaryKey(Long kid);
+
+    List<ActivityPrizes> selectAvailablePrizes(@Param("activityInfoId") Long activityInfoId);
+
 }

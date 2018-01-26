@@ -26,6 +26,8 @@ public interface CoterieMemberDao {
 
     int updateByCoterieMember(CoterieMember record);
 
+    CoterieMember selectByCoterieIdAndUserId(@Param("coterieId") Long coterieId, @Param("userId") Long userId);
+
 
 
 
@@ -43,8 +45,7 @@ public interface CoterieMemberDao {
 
     List<CoterieMember> selectPageByCoterieId(@Param("coterieId") Long coterieId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
-    CoterieMember selectByCoterieIdAndCustId(@Param("coterieId") Long coterieId, @Param("userId") Long userId);
-    
+
     int selectCountByCoterieId(Long coterieId);
     
     List<CoterieMember> selectBySearchParam(CoterieMemberSearchDto param);

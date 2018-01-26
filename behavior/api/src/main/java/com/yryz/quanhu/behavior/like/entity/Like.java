@@ -29,26 +29,23 @@ public class Like extends GenericEntity {
         return resourceId;
     }
 
-    public Like setResourceId(long resourceId) {
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-        return this;
     }
 
     public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public Like setModuleEnum(String moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
-        return this;
     }
 
     public long getUserId() {
         return userId;
     }
 
-    public Like setUserId(long userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
-        return this;
     }
 }

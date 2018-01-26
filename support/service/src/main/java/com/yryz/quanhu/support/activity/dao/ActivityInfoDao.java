@@ -1,9 +1,9 @@
 package com.yryz.quanhu.support.activity.dao;
 
+import com.yryz.quanhu.support.activity.dto.AdminActivityInfoDto;
+import com.yryz.quanhu.support.activity.dto.AdminActivityInfoSignUpDto;
 import com.yryz.quanhu.support.activity.entity.ActivityInfo;
-import com.yryz.quanhu.support.activity.vo.ActivityInfoAppListVo;
-import com.yryz.quanhu.support.activity.vo.ActivityInfoVo;
-import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
+import com.yryz.quanhu.support.activity.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,4 +39,25 @@ public interface ActivityInfoDao {
     List<ActivityInfoAppListVo> selectAppList(@Param("type") Integer type);
 
     int updateJoinCount(@Param("kid") Long kid, @Param("userNum") Integer userNum);
+
+
+
+
+
+    int	addActivity(ActivityInfo activityInfo);
+
+    AdminActivityInfoVo1 selectByPrimaryKey(Long kid);
+
+    List<AdminActivityInfoSignUpVo> selectSignAdminlist(Integer pageNo, Integer pageSize,
+                                                        @Param("activityInfoSignUpDto") AdminActivityInfoSignUpDto adminActivityInfoSignUpDto);
+
+    Integer selectMaxId();
+
+    long selectSignAdminlistCount(@Param("activityInfoSignUpDto") AdminActivityInfoSignUpDto adminActivityInfoSignUpDto);
+
+    List<AdminActivityInfoVo> adminAllSharelist(Integer pageNo, Integer pageSize, @Param("activityInfoDto") AdminActivityInfoDto adminActivityInfoDto);
+
+    long adminAllSharelistCount(@Param("activityInfoDto") AdminActivityInfoDto adminActivityInfoDto);
+
+    List<AdminActivityInfoVo> adminAllSharelistNoPage();
 }

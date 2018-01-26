@@ -18,7 +18,7 @@ import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.message.commonsafe.service.CommonSafeService;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 
-@Service(interfaceClass = CommonSafeApi.class,cluster="failfast")
+@Service(interfaceClass = CommonSafeApi.class)
 public class CommonSafeProvider implements CommonSafeApi {
     private Logger logger = LoggerFactory.getLogger(CommonSafeProvider.class);
 
@@ -28,7 +28,6 @@ public class CommonSafeProvider implements CommonSafeApi {
     @Override
     public Response<VerifyCodeVO> getVerifyCode(VerifyCodeDTO codeDTO) {
         try {
-        	Thread.sleep(300000);
             checkSmsDTO(codeDTO);
             return ResponseUtils.returnObjectSuccess(commonService.getVerifyCode(codeDTO));
         } catch (QuanhuException e) {

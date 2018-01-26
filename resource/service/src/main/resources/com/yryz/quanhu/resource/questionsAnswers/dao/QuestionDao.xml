@@ -87,6 +87,9 @@
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+    <if test="pageStartIndex != null and pageSize!=null">
+      limit ${pageStartIndex},${pageSize}
+    </if>
   </select>
   <select id="selectByExample" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample" resultMap="BaseResultMap">
     select
@@ -101,6 +104,9 @@
     </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
+    </if>
+    <if test="pageStartIndex != null and pageSize!=null">
+      limit ${pageStartIndex},${pageSize}
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">

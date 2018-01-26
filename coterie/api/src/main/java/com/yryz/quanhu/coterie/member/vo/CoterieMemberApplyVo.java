@@ -1,5 +1,7 @@
 package com.yryz.quanhu.coterie.member.vo;
 
+import com.yryz.quanhu.user.vo.UserSimpleVO;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -7,47 +9,46 @@ import java.util.Date;
  * @author chengyunfei
  */
 public class CoterieMemberApplyVo implements Serializable{
-	private static final long serialVersionUID = -2210849405370472836L;
 
 	/**
      * 私圈ID
      */
-    private String coterieId;
+    private Long coterieId;
+
+	/**
+	 * 加入时间
+	 */
+	private Date createDate;
+
+	/**
+	 * 加入理由
+	 */
+	private String reason;
+
+	/**
+	 * 0通过，1未通过,2待审批
+	 */
+	private Byte memberStatus;
 
     /**
      * 用户信息
      */
-//    private User user;
-    
-    /**
-     * 0通过，1未通过,2待审批
-     */
-    private Byte status;
+    private UserSimpleVO user;
 
-    /**
-     * 加入理由
-     */
-    private String reason;
-
-    /**
-     * 加入时间
-     */
-    private Date createDate;
-
-	public String getCoterieId() {
+	public Long getCoterieId() {
 		return coterieId;
 	}
 
-	public void setCoterieId(String coterieId) {
+	public void setCoterieId(Long coterieId) {
 		this.coterieId = coterieId;
 	}
 
-	public Byte getStatus() {
-		return status;
+	public Date getCreateDate() {
+		return createDate;
 	}
 
-	public void setStatus(Byte status) {
-		this.status = status;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public String getReason() {
@@ -58,11 +59,19 @@ public class CoterieMemberApplyVo implements Serializable{
 		this.reason = reason;
 	}
 
-	public Date getCreateDate() {
-		return createDate;
+	public UserSimpleVO getUser() {
+		return user;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setUser(UserSimpleVO user) {
+		this.user = user;
+	}
+
+	public Byte getMemberStatus() {
+		return memberStatus;
+	}
+
+	public void setMemberStatus(Byte memberStatus) {
+		this.memberStatus = memberStatus;
 	}
 }

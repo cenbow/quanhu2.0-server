@@ -228,6 +228,108 @@
 		and can_num = 0
 	</update>
 
+
+
+
+	<select id="selectByPrimaryKey" resultType="com.yryz.quanhu.support.activity.entity.ActivityUserPrizes" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_user_prizes
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<!-- admin奖品列表分页 -->
+	<select id="listPrizesByConditionAndPage" resultType="com.yryz.quanhu.support.activity.vo.AdminOutActivityUsrePrizes">
+		select P.*	from
+		(select
+		<include refid="Base_Column_List"/>
+		from qh_activity_user_prizes
+		<where>
+			prizes_type=12
+			<if test="dto.prizesName != null	and	dto.prizesName!=''" >
+				and prizes_name = #{dto.prizesName,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.createUserId != null	and	dto.createUserId !=''" >
+				and create_user_id =#{dto.createUserId}
+			</if>
+			<if test="dto.status != null" >
+				and status = #{dto.status,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.onlyCode != null	and	dto.onlyCode!=''" >
+				and only_code = #{dto.onlyCode,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.beginDate != null and dto.beginDate != ''">
+				<![CDATA[
+		    	AND #{dto.beginDate} <= begin_time
+		       ]]>
+			</if>
+			<if test="dto.endDate != null and dto.endDate != ''">
+				<![CDATA[
+		    	AND #{dto.endDate} >= end_time
+		       ]]>
+			</if>
+		</where>)P	inner join
+		(select kid,title from qh_activity_info
+		<where>
+			<if test="dto.activetyTitle != null	and	dto.activetyTitle!=''" >
+				and	title LIKE  CONCAT('%',#{dto.activetyTitle,jdbcType=VARCHAR},'%')
+			</if>
+		</where>
+		)A	on	P.activity_info_id=A.kid
+
+		order	by	P.begin_time	desc
+
+	</select>
+
+	<select id="listPrizesByConditionAndPageCount" resultType="Integer">
+		select count(*)	from
+		(select
+		<include refid="Base_Column_List"/>
+		from qh_activity_user_prizes
+		<where>
+			prizes_type=12
+			<if test="dto.prizesName != null	and	dto.prizesName!=''" >
+				and prizes_name = #{dto.prizesName,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.createUserId != null	and	dto.createUserId !=''" >
+				and create_user_id =#{dto.createUserId}
+			</if>
+			<if test="dto.status != null" >
+				and status = #{dto.status,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.onlyCode != null	and	dto.onlyCode!=''" >
+				and only_code = #{dto.onlyCode,jdbcType=VARCHAR}
+			</if>
+			<if test="dto.beginDate != null and dto.beginDate != ''">
+				<![CDATA[
+		    	AND #{dto.beginDate} <= begin_time
+		       ]]>
+			</if>
+			<if test="dto.endDate != null and dto.endDate != ''">
+				<![CDATA[
+		    	AND #{dto.endDate} >= end_time
+		       ]]>
+			</if>
+		</where>)P	inner join
+		(select kid,title from qh_activity_info
+		<where>
+			<if test="dto.activetyTitle != null	and	dto.activetyTitle!=''" >
+				and	title LIKE  CONCAT('%',#{dto.activetyTitle,jdbcType=VARCHAR},'%')
+			</if>
+		</where>
+		)A	on	P.activity_info_id=A.kid
+
+	</select>
+
+	<!-- 批量修改已使用 -->
+	<update id="updateBatchUsed"  >
+		update qh_activity_user_prizes
+		set	status=#{status}	 where kid in
+		<foreach collection="ids"	open="("	separator=","	close=")" item="kid">
+			#{kid}
+		</foreach>
+	</update>
+
 	<!-- 用户领取的奖品 -->
 	<select id="selectUserPrizesList" parameterType="com.yryz.quanhu.support.activity.dto.ActivityVoteDto"
 			resultType="com.yryz.quanhu.support.activity.entity.ActivityUserPrizes">

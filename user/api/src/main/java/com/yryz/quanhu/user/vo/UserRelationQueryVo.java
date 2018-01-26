@@ -19,9 +19,18 @@ public class UserRelationQueryVo implements Serializable{
 
     private String userId;
     private String userName;
+    private String userRemarkName;
     private int userStarFlag;
     private String userHeadImg;
     private String userSummary;
+
+    public String getUserRemarkName() {
+        return userRemarkName;
+    }
+
+    public void setUserRemarkName(String userRemarkName) {
+        this.userRemarkName = userRemarkName;
+    }
 
     public int getToFollowStatus() {
         return toFollowStatus;

@@ -43,6 +43,15 @@ public interface UserRelationApi {
      */
     Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status);
 
+
+    /**
+     * 查询用户关系（全量）
+     * @param dto
+     * @param status
+     * @return
+     */
+    Response<List<UserRelationDto>> selectByAll(UserRelationDto dto,UserRelationConstant.STATUS status);
+
     /**
      * 查询用户指定关系
      * @param sourceUserId

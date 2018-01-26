@@ -29,6 +29,11 @@ public class UserRelationDto extends UserRelationEntity{
     private int fromBlackStatus;
 
     /**
+     * 统一状态位标识
+     */
+    private int relationStatus;
+
+    /**
      * 用户ID
      */
     private String userId;
@@ -36,6 +41,10 @@ public class UserRelationDto extends UserRelationEntity{
      * 用户名称
      */
     private String userName;
+    /**
+     * 备注名
+     */
+    private String userRemarkName;
     /**
      * 头像
      */
@@ -49,6 +58,21 @@ public class UserRelationDto extends UserRelationEntity{
      */
     private String userSummary;
 
+    public int getRelationStatus() {
+        return relationStatus;
+    }
+
+    public void setRelationStatus(int relationStatus) {
+        this.relationStatus = relationStatus;
+    }
+
+    public String getUserRemarkName() {
+        return userRemarkName;
+    }
+
+    public void setUserRemarkName(String userRemarkName) {
+        this.userRemarkName = userRemarkName;
+    }
 
     public int getToBlackStatus() {
         return toBlackStatus;
