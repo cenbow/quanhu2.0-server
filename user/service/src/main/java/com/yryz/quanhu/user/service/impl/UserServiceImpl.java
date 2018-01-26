@@ -371,7 +371,6 @@ public class UserServiceImpl implements UserService {
 		baseInfo.setBanPostTime(new Date());
 		baseInfo.setUserAge((byte)18);
 		baseInfo.setUserBirthday("");
-		baseInfo.setUserGenders((byte)10);
 		baseInfo.setUserDesc("");
 		custbaseinfoDao.insert(baseInfo);
 

@@ -47,6 +47,21 @@ public class ResponseUtils {
     }
 
     /**
+     * 返回对象结果
+     *
+     * @param t
+     * @return
+     */
+    public static <T> Response<T> returnApiObjectSuccess(T t) {
+        if (t == null) {
+            return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "",
+                    new HashMap<>());
+        } else {
+            return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
+        }
+    }
+    
+    /**
      * 返回列表结果
      *
      * @param collection

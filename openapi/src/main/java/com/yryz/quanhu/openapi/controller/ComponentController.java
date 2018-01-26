@@ -58,7 +58,7 @@ public class ComponentController {
 			codeDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		}
 		SmsVerifyCodeVO codeVO = ResponseUtils.getResponseData(accountApi.sendVerifyCode(codeDTO));
-		return ResponseUtils.returnObjectSuccess(codeVO);
+		return ResponseUtils.returnApiObjectSuccess(codeVO);
 	}
 
 	@ApiOperation("验证码校验（只校验不删除）")
@@ -73,7 +73,7 @@ public class ComponentController {
 				codeDTO.getVeriCode(), false)));
 		Map<String,Integer> map = new HashMap<>();
 		map.put("check", result);
-		return ResponseUtils.returnObjectSuccess(map);
+		return ResponseUtils.returnApiObjectSuccess(map);
 	}
 
 
@@ -90,6 +90,6 @@ public class ComponentController {
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
 				codeDTO.getVeriCode(), false);
 		VerifyCodeVO verifyCodeVO = commonSafeApi.sendVerifyCodeForSlip(verifyCodeDTO, afsCheckRequest).getData();
-		return ResponseUtils.returnObjectSuccess(new SmsVerifyCodeVO(String.valueOf(verifyCodeDTO.getCommonServiceType()), verifyCodeDTO.getVerifyKey(), String.valueOf(verifyCodeVO.getExpireAt())));
+		return ResponseUtils.returnApiObjectSuccess(new SmsVerifyCodeVO(String.valueOf(verifyCodeDTO.getCommonServiceType()), verifyCodeDTO.getVerifyKey(), String.valueOf(verifyCodeVO.getExpireAt())));
 	}
 }
