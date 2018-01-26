@@ -58,8 +58,8 @@
 			b.event_name  as eventName 
   	  from (
 		select <include refid="columns" /> from score_flow where user_id = #{sfq.userId}
-		<if test="consumeFlag != -1">
-			and consume_flag = #{consumeFlag}
+		<if test="sfq.consumeFlag != -1">
+			and consume_flag = #{sfq.consumeFlag}
 		</if>
 		<if test="sfq.eventCode != null">
 			and event_code = #{sfq.eventCode}
@@ -71,7 +71,7 @@
 			and create_time &lt;= #{sfq.endTime}
 		</if>
 		) a left join event_sys b on a.eventCode = b.event_code
-		order by id desc limit #{limit} offset #{start}
+		order by id desc  
 	</select>
 
 	<!-- 更新积分流水记录 -->

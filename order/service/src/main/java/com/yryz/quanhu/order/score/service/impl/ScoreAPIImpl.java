@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.yryz.quanhu.grow.service.GrowAPI;
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.order.score.manage.service.ScoreEventManageService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
@@ -44,13 +44,23 @@ public class ScoreAPIImpl implements ScoreAPI {
 	}
 
 	@Override
-	public List<ScoreEventInfo> getScoreEventPage(int start, int limit) {
-		return scoreEventManageService.getPage(start, limit);
+	public PageList<ScoreEventInfo> getScoreEventPage() {
+		return scoreEventManageService.getPage();
 	}
 
 	@Override
-	public List<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq, int flowType, int start, int limit) {
-		return scoreFlowService.getPage(sfq, flowType, start, limit);
+	public PageList<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq) {
+		
+		   PageList<ScoreFlow> pageList = new PageList<>();
+	        pageList.setCurrentPage(sfq.getCurrentPage());
+	        pageList.setPageSize(sfq.getPageSize());
+
+	        List<ScoreFlow> list = scoreFlowService.getPage(sfq);
+	        pageList.setEntities(list);
+
+	        return pageList;
+		
+		//return scoreFlowService.getPage(sfq, flowType, start, limit);
 	}
 
 	@Override
@@ -111,7 +121,7 @@ public class ScoreAPIImpl implements ScoreAPI {
 	}
 
 	@Override
-	public List<ScoreEventInfo> getScoreEvent() {
+	public PageList<ScoreEventInfo> getScoreEvent() {
 		return scoreEventManageService.getAll();
 	}
 

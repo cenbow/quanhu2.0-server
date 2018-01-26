@@ -1,7 +1,6 @@
 package com.yryz.quanhu.order.score.manage.service;
 
-import java.util.List;
-
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.score.entity.ScoreEventInfo;
 
 /**
@@ -17,8 +16,8 @@ public interface ScoreEventManageService {
 
     ScoreEventInfo getByCode(String code);
 
-    List<ScoreEventInfo> getAll();
+    PageList<ScoreEventInfo> getAll();
     
-    List<ScoreEventInfo> getPage(int start , int limit);
+    PageList<ScoreEventInfo> getPage();
 
 }

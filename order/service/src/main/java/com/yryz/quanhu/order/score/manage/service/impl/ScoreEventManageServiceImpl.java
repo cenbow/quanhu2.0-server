@@ -1,11 +1,10 @@
 package com.yryz.quanhu.order.score.manage.service.impl;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.order.score.manage.dao.persistence.ScoreEventManageDao;
 import com.yryz.quanhu.order.score.manage.service.ScoreEventManageService;
 import com.yryz.quanhu.score.entity.ScoreEventInfo;
@@ -42,13 +41,13 @@ public class ScoreEventManageServiceImpl implements ScoreEventManageService{
 	}
 
 	@Override
-	public List<ScoreEventInfo> getAll() {
+	public PageList<ScoreEventInfo> getAll() {
 		return scoreEventDao.getAll();
 	}
 
 	@Override
-	public List<ScoreEventInfo> getPage(int start, int limit) {
-		return scoreEventDao.getPage(start, limit);
+	public PageList<ScoreEventInfo> getPage() {
+		return scoreEventDao.getPage();
 	}
 		
 }
