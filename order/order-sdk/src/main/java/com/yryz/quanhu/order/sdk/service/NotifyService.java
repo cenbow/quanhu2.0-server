@@ -96,6 +96,8 @@ public class NotifyService {
                 outputOrder.setCoterieId(localOrder.getCoterieId());
                 outputOrder.setResourceId(localOrder.getResourceId());
                 outputOrder.setBizContent(localOrder.getBizContent());
+                outputOrder.setCreateUserId(localOrder.getCreateUserId());
+                outputOrder.setCreateDate(localOrder.getCreateDate());
                 orderNotifyService.notify(outputOrder);
             }
         }

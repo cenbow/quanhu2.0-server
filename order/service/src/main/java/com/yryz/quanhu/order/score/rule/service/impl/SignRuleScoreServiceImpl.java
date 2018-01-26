@@ -3,6 +3,7 @@ package com.yryz.quanhu.order.score.rule.service.impl;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 	@Autowired
 	EventAcountService eventAcountService;
 
+	@Value("${sing.values}")
+	private int[] singValues;
 	@Override
 	public boolean processStatus(String userId, String eventCode, ScoreEventInfo sei, 
 			double amount) {

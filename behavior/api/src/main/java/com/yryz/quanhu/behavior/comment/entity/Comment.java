@@ -96,6 +96,19 @@ public class Comment extends GenericEntity {
      */
     private byte likeFlag;
 
+    /**
+     * 被评论人昵称
+     */
+    private String targetUserNickName;
+
+    public String getTargetUserNickName() {
+        return targetUserNickName;
+    }
+
+    public void setTargetUserNickName(String targetUserNickName) {
+        this.targetUserNickName = targetUserNickName;
+    }
+
     public long getTopId() {
         return topId;
     }

@@ -12,8 +12,8 @@
         <result column="transmit_note" property="transmitNote" jdbcType="VARCHAR"/>
         <result column="transmit_type" property="transmitType" jdbcType="TINYINT"/>
         <result column="ext_json" property="extJson" jdbcType="LONGVARCHAR"/>
-        <result column="release_note" property="releaseNote" jdbcType="VARCHAR"/>
 
+        <result column="shelve_flag" property="shelveFlag" jdbcType="TINYINT"/>
         <result column="del_flag" property="delFlag" jdbcType="TINYINT"/>
         <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -22,7 +22,7 @@
     <sql id="Base_Column_List">
         kid, create_user_id, module_enum, target_id,
         transmit_note, transmit_type, ext_json,
-        release_note, del_flag, create_date
+        shelve_flag, del_flag, create_date
     </sql>
 
     <!-- 查询动态信息 -->
@@ -49,6 +49,9 @@
         <set>
             <if test="delFlag != null">
                 del_flag = #{delFlag,jdbcType=TINYINT},
+            </if>
+            <if test="shelveFlag != null">
+                shelve_flag = #{shelveFlag,jdbcType=TINYINT},
             </if>
         </set>
         where kid = #{kid,jdbcType=BIGINT}
@@ -82,11 +85,11 @@
 
     <insert id="insert" parameterType="com.yryz.quanhu.dymaic.vo.Dymaic">
         insert into qh_dymaic (kid, create_user_id, module_enum, target_id,
-          transmit_note, transmit_type,  ext_json, release_note)
+          transmit_note, transmit_type, ext_json, create_date)
         values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},
             #{moduleEnum,jdbcType=TINYINT},#{resourceId,jdbcType=VARCHAR},
             #{transmitNote,jdbcType=VARCHAR},#{transmitType,jdbcType=VARCHAR},
-            #{extJson,jdbcType=LONGVARCHAR}, #{releaseNote,jdbcType=VARCHAR})
+            #{extJson,jdbcType=LONGVARCHAR}, #{createDate,jdbcType=TIMESTAMP})
     </insert>
 
 </mapper>

@@ -61,7 +61,6 @@ public class CommentProvider implements CommentApi {
             int count=commentService.accretion(comment);
             if(count>0){
                 map.put("result",1);
-//                redisTemplate.opsForValue().
             }else{
                 map.put("result",0);
             }

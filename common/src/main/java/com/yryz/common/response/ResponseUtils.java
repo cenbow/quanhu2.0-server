@@ -28,7 +28,7 @@ public class ResponseUtils {
      */
     public static <T> Response<T> returnSuccess() {
         return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "",
-                new HashMap());
+                null);
     }
 
     /**
@@ -40,7 +40,7 @@ public class ResponseUtils {
     public static <T> Response<T> returnObjectSuccess(T t) {
         if (t == null) {
             return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "",
-                    new HashMap());
+                    null);
         } else {
             return new Response(true, ResponseConstant.SUCCESS.getCode(), ResponseConstant.SUCCESS.getShowMsg(), "", t);
         }

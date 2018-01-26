@@ -46,7 +46,7 @@ public class ResourceVo implements Serializable {
     /**
      * 资源ID
      */
-    private Integer resourceId;
+    private Long resourceId;
 
     /**
      * 文章分类ID
@@ -108,11 +108,6 @@ public class ResourceVo implements Serializable {
      * 推荐状态：10不推荐，11推荐
      */
     private String recommend;
-    
-    /**
-     * 资源简介
-     */
-    private String summary;
     
     /**
      * 资源分类搜索,搜索字段，仅供搜索使用，其他时间不要填。1003文章,1004话题,1005帖子,1006问题,1007答案
@@ -187,14 +182,14 @@ public class ResourceVo implements Serializable {
 	/**
 	 * @return the resourceId
 	 */
-	public Integer getResourceId() {
+	public Long getResourceId() {
 		return resourceId;
 	}
 
 	/**
 	 * @param resourceId the resourceId to set
 	 */
-	public void setResourceId(Integer resourceId) {
+	public void setResourceId(Long resourceId) {
 		this.resourceId = resourceId;
 	}
 
@@ -366,19 +361,6 @@ public class ResourceVo implements Serializable {
 		this.recommend = recommend;
 	}
 
-	/**
-	 * @return the summary
-	 */
-	public String getSummary() {
-		return summary;
-	}
-
-	/**
-	 * @param summary the summary to set
-	 */
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
 
 	/**
 	 * @return the resourceType

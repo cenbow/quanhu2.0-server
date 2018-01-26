@@ -15,14 +15,14 @@ package com.yryz.quanhu.resource.mq;
  */
 public class AmqpConstant {
 	
-	public static final String DEMO_QUEUE = "DEMO_QUEUE";
+	/**
+	 * 资源提交队列
+	 */
+	public static final String RESOURCE_COMMIT_QUEUE = "RESOURCE_COMMIT_QUEUE";
 	
-	public static final String DEMO_RECEIVE_QUEUE = "DEMO_RECEIVE_QUEUE";
-	
-	public static final String DEMO_FANOUT_QUEUE = "DEMO_FANOUT_QUEUE";
-	
-	public static final String DEMO_DIRECT_EXCHANGE = "DEMO_DIRECT_EXCHANGE";
-	
-	public static final String DEMO_FANOUT_EXCHANGE = "DEMO_FANOUT_EXCHANGE";
+	/**
+	 * 资源-动态提交EXCHANGE
+	 */
+	public static final String RESOURCE_DYNAMIC_FANOUT_EXCHANGE = "RESOURCE_DYNAMIC_FANOUT_EXCHANGE";
 
 }

@@ -72,4 +72,21 @@ public class IdConstants {
     * @Fields : 资源-文章
     */
     public static final String QUANHU_RELEASE_INFO = "quanhu_release_info";
+    
+    /**
+     * 短信日志
+     */
+    public static final String QUANHU_SMS_LOG = "quanhu_sms_log";
+    /**
+     * 短信渠道
+     */
+    public static final String QUANHU_SMS_CHANNEL = "quanhu_sms_channel";
+    /**
+     * 短信签名
+     */
+    public static final String QUANHU_SMS_SIGN = "quanhu_sms_sign";
+    /**
+     * 短信模板
+     */
+    public static final String QUANHU_SMS_TEMPLATE = "quanhu_sms_template";
 }

@@ -96,4 +96,18 @@ public class SmsLog extends GenericEntity{
         this.smsTemplateCode = smsTemplateCode == null ? null : smsTemplateCode.trim();
     }
 
+	public SmsLog() {
+		super();
+	}
+
+	public SmsLog(String phone, Byte type, String appKey, String smsChannel, String smsSign, String smsTemplateCode) {
+		super();
+		this.phone = phone;
+		this.type = type;
+		this.appKey = appKey;
+		this.smsChannel = smsChannel;
+		this.smsSign = smsSign;
+		this.smsTemplateCode = smsTemplateCode;
+	}
+
 }

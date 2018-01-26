@@ -72,10 +72,10 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public void remove(String coterieId) {
+	public void remove(Long coterieId) {
 		try{
 			Coterie coterie=new Coterie();
-			coterie.setCoterieId(Long.parseLong(coterieId));
+			coterie.setCoterieId( coterieId );
 			coterie.setDeleted((byte)1);
 			coterieMapper.updateByCoterieIdSelective(coterie);
 		}catch (Exception e) {
@@ -84,7 +84,7 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public CoterieInfo find(String coterieId) {
+	public CoterieInfo find(Long coterieId) {
 		Coterie info=null;
 		try{
 			info=coterieMapper.selectByCoterieId(coterieId);
@@ -142,7 +142,7 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public List<CoterieInfo> findList(List<String> coterieIdList) {
+	public List<CoterieInfo> findList(List<Long> coterieIdList) {
 		List<Coterie> list=Lists.newArrayList();
 		try{
 			list=coterieMapper.selectListByCoterieIdList(coterieIdList);
@@ -309,7 +309,7 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public void recommendCoterie(List<String> coterieIdList) {
+	public void recommendCoterie(List<Long> coterieIdList) {
 		try{
 			coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.YES.getStatus());
 		}catch (Exception e) {
@@ -318,7 +318,7 @@ public class CoterieServiceImpl implements CoterieService {
 	}
 
 	@Override
-	public void cancelRecommendCoterie(List<String> coterieIdList) {
+	public void cancelRecommendCoterie(List<Long> coterieIdList) {
 		try{
 			coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.NO.getStatus());
 		}catch (Exception e) {
@@ -407,5 +407,14 @@ public class CoterieServiceImpl implements CoterieService {
 			throw new MysqlOptException("param ownerId:"+ownerId,e);
 		}
 	}
+	@Override
+	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum)
+	{
+		try{
+			return  coterieMapper.updateMemberNum( coterieId,    newMemberNum,  oldMemberNum);
 
+		}catch (Exception e) {
+			throw new MysqlOptException("param ownerId:"+coterieId,e);
+		}
+	}
 }

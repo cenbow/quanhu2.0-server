@@ -32,7 +32,7 @@ public interface CommentService {
 
     PageList<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO);
 
-    CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO);
+    CommentInfoVO  querySingleCommentInfo(CommentSubDTO commentSubDTO);
 
     PageList<CommentVO> querySubCommentsInfo(CommentSubDTO commentSubDTO);
 }

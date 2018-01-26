@@ -39,8 +39,8 @@ public class ImManager {
 			imUser.setIconUrl(simpleVO.getUserImg());
 			imUser.setNick(simpleVO.getUserNickName());
 			imUser.setUserId(userId.toString());
-			Response<Boolean> response = imApi.addUser(imUser);
 			RpcContext.getContext().set(AppConstants.APP_ID, appId);
+			Response<Boolean> response = imApi.addUser(imUser);
 			LOGGER.info("[user_im_add]:params:{},result:{}",JsonUtils.toFastJson(imUser),JsonUtils.toFastJson(response));
 		}catch(Exception e){
 			LOGGER.info("[user_im_add]:params:{},result:{}",JsonUtils.toFastJson(imUser),JsonUtils.toFastJson(e.getMessage()));

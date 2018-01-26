@@ -2,7 +2,6 @@ package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
-import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import com.yryz.quanhu.dymaic.dao.redis.DymaicCache;
 import com.yryz.quanhu.dymaic.mq.DymaicSender;
@@ -29,10 +28,13 @@ import java.util.*;
  * <p>
  * <p>
  * TODO
- * 对接动态写入、对接统计查询
+ * 对接统计查询、点赞
  */
 @Service
 public class DymaicServiceImpl {
+
+    public static final Integer STATUS_ON = 10;
+    public static final Integer STATUS_OFF = 11;
 
     Logger logger = LoggerFactory.getLogger(DymaicServiceImpl.class);
 
@@ -69,9 +71,8 @@ public class DymaicServiceImpl {
 
         //write cache
         dymaicCache.addDynamic(dymaic);
-
-        //write sendList
         dymaicCache.addSendList(dymaic.getUserId(), dymaic.getKid());
+        dymaicCache.addTimeLine(dymaic.getUserId(), dymaic.getKid());
 
         //mq
         dymaicSender.directSend(dymaic);
@@ -87,18 +88,41 @@ public class DymaicServiceImpl {
      * @return
      */
     public Boolean delete(Long userId, Long kid) {
+        Dymaic dymaic = this.get(kid);
+        if (dymaic == null) {
+            return true;
+        }
+        dymaic.setDelFlag(STATUS_OFF);
+
         //write db
-        Dymaic dymaic = new Dymaic();
-        dymaic.setKid(kid);
-        dymaic.setDelFlag(11);
         dymaicDao.update(dymaic);
 
         //update cache
         dymaicCache.addDynamic(dymaic);
-
-        //update sendList
         dymaicCache.removeSendList(userId, kid);
+        dymaicCache.removeTimeLine(userId, kid);
 
+        return true;
+    }
+
+    /**
+     * 上下架动态
+     * @param userId
+     * @param kid
+     * @param shelve
+     * @return
+     */
+    public Boolean shelve(Long userId, Long kid, Boolean shelve) {
+        Dymaic dymaic = this.get(kid);
+        if (dymaic == null) {
+            return true;
+        }
+        dymaic.setShelveFlag(shelve ? STATUS_ON : STATUS_OFF);
+
+        dymaicDao.update(dymaic);
+
+        //update cache
+        dymaicCache.addDynamic(dymaic);
         return true;
     }
 
@@ -115,12 +139,6 @@ public class DymaicServiceImpl {
             dymaic = dymaicDao.get(kid);
 
             if (dymaic != null) {
-                if (dymaic.getDelFlag() != 10) {
-                    Dymaic tmp = new Dymaic();
-                    tmp.setKid(dymaic.getKid());
-                    tmp.setDelFlag(dymaic.getDelFlag());
-                    dymaic = tmp;
-                }
                 dymaicCache.addDynamic(dymaic);
             } else {
                 dymaic = new Dymaic();
@@ -158,24 +176,33 @@ public class DymaicServiceImpl {
 
         //从数据库查询
         if (!nullIdList.isEmpty()) {
-            List<Dymaic> dbList = dymaicDao.getByids(nullIdList);
-            List<Dymaic> writeCacheList = new ArrayList<>();
-            for (Dymaic dymaic : dbList) {
-                if (dymaic.getDelFlag() == 10) {
-                    writeCacheList.add(dymaic);
+            List<Dymaic> dymaics = dymaicDao.getByids(nullIdList);
+
+            if (dymaics != null) {
+                //写入redis
+                dymaicCache.addDynamic(dymaics);
+
+                for (Dymaic dymaic : dymaics) {
                     result.put(dymaic.getKid(), dymaic);
-                } else {
-                    Dymaic tmp = new Dymaic();
-                    tmp.setKid(dymaic.getKid());
-                    tmp.setDelFlag(dymaic.getDelFlag());
-                    writeCacheList.add(tmp);
-                    result.put(dymaic.getKid(), tmp);
                 }
             }
+        }
 
-            if (writeCacheList != null) {
-                //写入redis
-                dymaicCache.addDynamic(writeCacheList);
+        return result;
+    }
+
+    /**
+     * 批量查询个人最后一条动态
+     * @param userIds
+     * @return
+     */
+    public Map<Long, Dymaic> getLastSend(Set<Long> userIds) {
+        Map<Long, Dymaic> result = new HashMap<>();
+
+        for (Long userId : userIds) {
+            Long last = dymaicCache.rangeLastSend(userId);
+            if (last != null) {
+                result.put(userId, get(last));
             }
         }
 
@@ -297,6 +324,7 @@ public class DymaicServiceImpl {
         Long startTime = System.currentTimeMillis();
         //获取粉丝列表
         List<Long> followers = getFans(userId);
+        followers.add(userId);
 
         //从mysql中取limit条好友动态
         int idsSize = 0;
@@ -364,7 +392,7 @@ public class DymaicServiceImpl {
 
                 if (dymaic != null) {
                     DymaicVo vo = new DymaicVo();
-                    BeanUtils.copyProperties(dymaic, vo);
+                    BeanUtils.copyProperties(trimDymaic(dymaic), vo);
 
                     if (users != null && users.containsKey(dymaic.getUserId().toString())) {
                         vo.setUser(users.get(dymaic.getUserId().toString()));
@@ -372,10 +400,11 @@ public class DymaicServiceImpl {
                         vo.setUser(new UserSimpleVO());
                     }
 
+                    //todo
                     if (statistics != null && statistics.containsKey(kid)) {
-                        vo.setStatistics(statistics.get(kid));
+                        vo.setStatistics(null);
                     } else {
-                        vo.setStatistics(new Dymaic());
+                        vo.setStatistics(null);
                     }
                     result.add(vo);
                 }
@@ -407,6 +436,23 @@ public class DymaicServiceImpl {
         }
 
         return result;
+    }
+
+    /**
+     * 裁剪删除或下架状态的Dymaic
+     * @param dymaic
+     * @return
+     */
+    private Dymaic trimDymaic(Dymaic dymaic) {
+        Dymaic trimDymaic = dymaic;
+        if (STATUS_OFF.equals(dymaic.getShelveFlag()) || STATUS_OFF.equals(dymaic.getDelFlag())) {
+            trimDymaic = new Dymaic();
+            trimDymaic.setKid(dymaic.getKid());
+            trimDymaic.setShelveFlag(dymaic.getShelveFlag());
+            trimDymaic.setDelFlag(dymaic.getDelFlag());
+            return trimDymaic;
+        }
+        return trimDymaic;
     }
 
     public static class TimeLineMonitor {

@@ -1,5 +1,9 @@
 package com.yryz.quanhu.support.activity.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -8,6 +12,7 @@ public class ActivityVoteInfoVo implements Serializable {
     /**
      * 唯一id
      * */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     /**
@@ -190,7 +195,15 @@ public class ActivityVoteInfoVo implements Serializable {
      */
     private  Integer otherAppVoteConfigCount;
 
+    /**
+     * 无奖励配置文案
+     * */
+    private String noRewardContent;
 
+    /**
+     * 配置元数据
+     * */
+    private String configSources;
 
     public Long getKid() {
         return kid;
@@ -486,5 +499,21 @@ public class ActivityVoteInfoVo implements Serializable {
 
     public void setOtherAppVoteConfigCount(Integer otherAppVoteConfigCount) {
         this.otherAppVoteConfigCount = otherAppVoteConfigCount;
+    }
+
+    public String getNoRewardContent() {
+        return noRewardContent;
+    }
+
+    public void setNoRewardContent(String noRewardContent) {
+        this.noRewardContent = noRewardContent;
+    }
+
+    public String getConfigSources() {
+        return configSources;
+    }
+
+    public void setConfigSources(String configSources) {
+        this.configSources = configSources;
     }
 }

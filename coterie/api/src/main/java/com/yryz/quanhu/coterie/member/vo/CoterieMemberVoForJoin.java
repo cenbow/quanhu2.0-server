@@ -16,7 +16,7 @@ public class CoterieMemberVoForJoin implements Serializable{
     /**
      * 审请加入时返回的状态(收费:10 免费不审核：20， 免费要审核时：30，私圈人数已满 40)
      */
-    private Integer status;
+    private Byte status;
 
     public Long getOrderId() {
         return orderId;
@@ -26,11 +26,11 @@ public class CoterieMemberVoForJoin implements Serializable{
         this.orderId = orderId;
     }
 
-    public Integer getStatus() {
+    public Byte getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Byte status) {
         this.status = status;
     }
 }
