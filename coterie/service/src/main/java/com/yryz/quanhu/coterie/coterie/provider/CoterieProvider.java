@@ -70,7 +70,6 @@ public class CoterieProvider implements CoterieApi {
 			return ResponseUtils.returnListSuccess(Lists.newArrayList());
 		}
 		try {
-
 			List<CoterieInfo> list=coterieService.findList(coterieIdList);
 			fillCircleInfo(list);
 			fillCustInfo(list);
@@ -121,7 +120,7 @@ public class CoterieProvider implements CoterieApi {
 	 * @throws ServiceException
 	 */
 	@Override
-	public Response<CoterieInfo> queryCoterieInfo(String coterieId) {
+	public Response<CoterieInfo> queryCoterieInfo(Long coterieId) {
 
 		logger.info("CoterieApi.queryCoterieInfo params: " + coterieId);
 		if (coterieId == null) {
@@ -238,7 +237,7 @@ public class CoterieProvider implements CoterieApi {
 		if(responseCoterieInfo.getData().size()>10)
 		{
 
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "当前用户创建私圈胡个数不得超过10个！");
+
 		}
 		//todo
 //		Response<UserSimpleVO> cust=userApi.getUserSimple(info.getOwnerId());

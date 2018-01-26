@@ -71,7 +71,7 @@ public class CoterieController {
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping (value = "/{version}/coterieInfo/config")
 	public Response<Boolean> config(String coterieId, @RequestBody CoterieInfo config, HttpServletRequest request) {
-		Response<CoterieInfo> rpcRecord = coterieApi.queryCoterieInfo(coterieId);
+		Response<CoterieInfo> rpcRecord = coterieApi.queryCoterieInfo(Long.parseLong(coterieId) );
 		CoterieInfo  record=rpcRecord.getData();
 
 		String tempStr;
@@ -122,7 +122,7 @@ public class CoterieController {
 	@GetMapping(value = "/{version}/coterieInfo/single")
 	public Response<CoterieInfo> details(String coterieId, HttpServletRequest request) {
 		//Assert.notNull(coterieId, "私圈id不能为null！");
-		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
+		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(coterieId));
 		CoterieInfo rpcCoterieInfo = (CoterieInfo)coterieInfo.getData();
 		try {
 			//todo

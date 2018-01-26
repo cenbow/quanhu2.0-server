@@ -46,7 +46,7 @@ public interface CoterieApi {
 	 * @return
 	 * @throws ServiceException
 	 */
-	public Response<CoterieInfo> queryCoterieInfo(String coterieId) throws ServiceException;
+	public Response<CoterieInfo> queryCoterieInfo(Long coterieId) throws ServiceException;
 	
 	/**
 	 * 设置私圈信息
