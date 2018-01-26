@@ -41,62 +41,51 @@ public class LikeVO implements Serializable{
      */
     private String userImg;
 
-    public String getUserNickName() {
-        return userNickName;
-    }
-
-    public LikeVO setUserNickName(String userNickName) {
-        this.userNickName = userNickName;
-        return this;
-    }
-
-    public String getUserImg() {
-        return userImg;
-    }
-
-    public LikeVO setUserImg(String userImg) {
-        this.userImg = userImg;
-        return this;
-    }
-
     public long getKid() {
         return kid;
     }
 
-    public LikeVO setKid(long kid) {
+    public void setKid(long kid) {
         this.kid = kid;
-        return this;
     }
 
     public long getResourceId() {
         return resourceId;
     }
 
-    public LikeVO setResourceId(long resourceId) {
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-        return this;
     }
 
     public String getCreateDate() {
         return createDate;
     }
 
-    public LikeVO setCreateDate(String createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
-        return this;
     }
 
     public long getUserId() {
         return userId;
     }
 
-    public LikeVO setUserId(long userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
-        return this;
     }
 
+    public String getUserNickName() {
+        return userNickName;
+    }
 
+    public void setUserNickName(String userNickName) {
+        this.userNickName = userNickName;
+    }
 
+    public String getUserImg() {
+        return userImg;
+    }
 
-
+    public void setUserImg(String userImg) {
+        this.userImg = userImg;
+    }
 }

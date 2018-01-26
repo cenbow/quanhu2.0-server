@@ -32,6 +32,10 @@ public class ActivityVoteDto implements Serializable {
     private Long createUserId;
     /** 是否第三方 */
     private Integer otherFlag;
+    /** 奖品类型 */
+    private Integer prizesType;
+    /** 是否过期  */
+    private Integer isOverdue;
 
     public Integer getCurrentPage() {
         return currentPage;
@@ -143,5 +147,21 @@ public class ActivityVoteDto implements Serializable {
 
     public void setOtherFlag(Integer otherFlag) {
         this.otherFlag = otherFlag;
+    }
+
+    public Integer getPrizesType() {
+        return prizesType;
+    }
+
+    public void setPrizesType(Integer prizesType) {
+        this.prizesType = prizesType;
+    }
+
+    public Integer getIsOverdue() {
+        return isOverdue;
+    }
+
+    public void setIsOverdue(Integer isOverdue) {
+        this.isOverdue = isOverdue;
     }
 }

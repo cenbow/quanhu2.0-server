@@ -21,6 +21,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,9 @@ public class CommentProvider implements CommentApi {
     @Reference(check = false)
     private UserApi userApi;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Override
     public Response<Map<String, Integer>> accretion(Comment comment) {
         try {
@@ -57,6 +61,7 @@ public class CommentProvider implements CommentApi {
             int count=commentService.accretion(comment);
             if(count>0){
                 map.put("result",1);
+//                redisTemplate.opsForValue().
             }else{
                 map.put("result",0);
             }

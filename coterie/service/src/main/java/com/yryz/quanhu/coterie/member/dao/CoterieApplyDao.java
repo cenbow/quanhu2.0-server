@@ -20,11 +20,16 @@ import java.util.List;
  */
 @Mapper
 public interface CoterieApplyDao {
+
     int insert(CoterieMemberApply record);
+
     int updateByCoterieApply(CoterieMemberApply record);
 
+    CoterieMemberApply selectByCoterieIdAndUserId(@Param("coterieId") Long coterieId, @Param("userId") Long userId);
 
+    CoterieMemberApply selectWaitingByCoterieIdAndUserId(@Param("coterieId") Long coterieId, @Param("userId") Long userId);
 
+    Integer selectNewMemberNum(@Param("coterieId") Long coterieId);
 
 
     int deleteByUserIdAndCoterieId(Long userId, Long coterieId);
@@ -37,9 +42,6 @@ public interface CoterieApplyDao {
     
     List<CoterieMemberApply> selectPageByCoterieId(@Param("coterieId") Long coterieId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
-    List<CoterieMemberApply> selectByCoterieIdAndCustId(@Param("coterieId") Long coterieId, @Param("custId") Long userId);
 
-    CoterieMemberApply selectWaitingByCoterieIdAndCustId(@Param("coterieId") Long coterieId, @Param("custId") Long userId);
-    
-    Integer selectNewMemberNum(Long coterieId);
+
 }

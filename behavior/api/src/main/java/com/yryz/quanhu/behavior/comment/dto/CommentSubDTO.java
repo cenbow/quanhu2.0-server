@@ -19,8 +19,7 @@ public class CommentSubDTO extends PageList implements Serializable {
         return kid;
     }
 
-    public CommentSubDTO setKid(Long kid) {
+    public void setKid(Long kid) {
         this.kid = kid;
-        return this;
     }
 }

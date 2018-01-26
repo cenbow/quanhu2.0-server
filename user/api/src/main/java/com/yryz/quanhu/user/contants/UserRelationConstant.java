@@ -63,11 +63,14 @@ public final class UserRelationConstant {
      * 关系状态
      */
     public static enum STATUS{
+
+        NONE        (0),                              //无关系
         FANS        (1),                              //粉丝
         FOLLOW      (2),                              //关注
         TO_BLACK    (3),                              //拉黑
         FROM_BLACK  (4),                              //被拉黑
-        FRIEND      (5)                               //好友
+        FRIEND      (5),                              //好友
+        OWNER       (6)                               //本人
         ;
 
         private int code;

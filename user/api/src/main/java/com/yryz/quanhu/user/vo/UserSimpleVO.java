@@ -38,7 +38,7 @@ public class UserSimpleVO implements Serializable {
      */
     private String userDesc;
     /**
-     * 用户角色 10:普通用户 11:实名用户
+     * 用户角色 10:普通用户 11:达人
      */
     private Byte userRole;
     
