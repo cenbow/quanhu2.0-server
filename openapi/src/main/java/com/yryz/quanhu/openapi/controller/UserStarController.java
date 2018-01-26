@@ -1,22 +1,27 @@
 package com.yryz.quanhu.openapi.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.utils.CommonUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.service.UserStarApi;
@@ -42,6 +47,7 @@ public class UserStarController {
      * @return
      */
     @ResponseBody
+    @UserBehaviorValidation(login=true)
     @ApiOperation("达人申请")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/{version}/star/starApply")
@@ -50,7 +56,8 @@ public class UserStarController {
         info.setAuthWay((byte) 10);
         info.setUserId(header.getUserId());
         info.setAppId(header.getAppId());
-        return starApi.save(info);
+        Boolean result = ResponseUtils.getResponseData(starApi.save(info));
+        return ResponseUtils.returnObjectSuccess(result);
     }
 
     /**
@@ -60,6 +67,7 @@ public class UserStarController {
      * @return
      */
     @ApiOperation(" 达人信息编辑")
+    @UserBehaviorValidation(login=true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/{version}/star/editStarAuth")
     public Response<Boolean> update(@RequestBody StarAuthInfo info, HttpServletRequest request) {
@@ -67,7 +75,8 @@ public class UserStarController {
         info.setAuthWay((byte) 10);
         info.setUserId(header.getUserId());
         info.setAppId(header.getAppId());
-        return starApi.update(info);
+        Boolean result = ResponseUtils.getResponseData(starApi.update(info));
+        return ResponseUtils.returnObjectSuccess(result);
     }
 
     /**
@@ -77,17 +86,23 @@ public class UserStarController {
      * @return
      */
     @ApiOperation("达人信息获取")
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/getStarAuth")
     public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
+        StarAuthInfo authInfo = null;
         if (StringUtils.isNotBlank(userId)) {
-            return starApi.get(userId);
+        	authInfo = ResponseUtils.getResponseData(starApi.get(userId));
+        	if(authInfo != null){
+        		authInfo.setContactCall(CommonUtils.getPhone(authInfo.getContactCall()));
+        		authInfo.setIdCard(CommonUtils.getIdCardNo(authInfo.getIdCard()));
+        		authInfo.setRealName(CommonUtils.getRealName(authInfo.getRealName()));
+        	}
         } else {
-            return starApi.get(header.getUserId());
+        	authInfo = ResponseUtils.getResponseData(starApi.get(header.getUserId()));
         }
-
+        return ResponseUtils.returnObjectSuccess(authInfo);
     }
 
     /**
@@ -97,7 +112,7 @@ public class UserStarController {
      * @return
      */
     @ApiOperation("达人推荐列表")
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/starCommend")
     public Response<PageList<StarInfoVO>> recommendList(Integer pageSize, Integer currentPage, HttpServletRequest request) {
@@ -106,7 +121,8 @@ public class UserStarController {
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
         paramDTO.setCurrentPage(currentPage);
         paramDTO.setPageSize(pageSize);
-        return starApi.starList(paramDTO);
+        PageList<StarInfoVO> list = ResponseUtils.getResponseData(starApi.starList(paramDTO));
+        return ResponseUtils.returnObjectSuccess(list);
     }
 
     /**
@@ -116,18 +132,18 @@ public class UserStarController {
      * @return
      */
     @ApiOperation("某一标签下的达人列表")
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/label/list")
     public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage,  HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-
         paramDTO.setCategoryId(categoryId);
         paramDTO.setCurrentPage(currentPage);
         paramDTO.setPageSize(pageSize);
-        return starApi.labelStarList(paramDTO);
+        PageList<StarInfoVO> list = ResponseUtils.getResponseData(starApi.labelStarList(paramDTO));
+        return ResponseUtils.returnObjectSuccess(list);
     }
 
 }

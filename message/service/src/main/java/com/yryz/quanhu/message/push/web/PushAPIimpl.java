@@ -24,7 +24,7 @@ import java.util.List;
  * @date 2017年8月10日 下午3:16:59
  * @Description 推送
  */
-@Service
+@Service(filter = {"appInfoFilter"})
 public class PushAPIimpl implements PushAPI {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

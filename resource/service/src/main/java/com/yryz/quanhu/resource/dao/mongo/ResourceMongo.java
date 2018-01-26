@@ -133,7 +133,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 	 * 删除资源库，通过ID
 	 * @param resourceId
 	 */
-	public void delete(Integer resourceId){
+	public void delete(Long resourceId){
 		Query query = new Query();
 		query.addCriteria(Criteria.where("resourceId").is(resourceId));
 		Update update = new Update();
@@ -176,9 +176,6 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			//标题，正文，简介模糊匹配
 			if(StringUtils.isNotEmpty(resourceModel.getTitle())){
 				criteria = Criteria.where("title").regex(resourceModel.getTitle()).andOperator(criteria);
-			}
-			if(StringUtils.isNotEmpty(resourceModel.getSummary())){
-				criteria = Criteria.where("summary").regex(resourceModel.getSummary()).andOperator(criteria);
 			}
 			if(StringUtils.isNotEmpty(resourceModel.getContent())){
 				criteria = Criteria.where("content").regex(resourceModel.getContent()).andOperator(criteria);

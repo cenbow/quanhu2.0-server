@@ -10,11 +10,13 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.context.Context;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.resource.hotspot.api.HotSpotApi;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.entity.UserOperateInfo;
 import com.yryz.quanhu.user.manager.EventManager;
@@ -38,6 +40,8 @@ public class UserCreateConsumer {
 	private UserOperateService operateService;
 	@Autowired
 	private MessageManager messageManager;
+	@Reference
+	private HotSpotApi hotApi;
 	/**
 	 * QueueBinding: exchange和queue的绑定
 	 * Queue:队列声明
@@ -71,6 +75,8 @@ public class UserCreateConsumer {
 			eventManager.register(registerDTO.getRegLogDTO().getUserId().toString(), registerDTO.getUserPhone(), registerDTO.getRegLogDTO().getRegType(), registerDTO.getUserRegInviterCode());
 			//注册消息发送
 			messageManager.register(registerDTO.getRegLogDTO().getUserId().toString(),registerDTO.getRegLogDTO().getAppId());
+			//初始化用户热度
+			initHot(registerDTO.getRegLogDTO().getUserId());
 		}
 		
 	}
@@ -94,5 +100,16 @@ public class UserCreateConsumer {
 		}
 	}
 	
-	
+	/**
+	 * 用户热度初始化
+	 * @param userId
+	 */
+	public void initHot(Long userId){
+		try {
+			hotApi.saveHeat("2", userId.toString());
+		}catch (Exception e) {
+			logger.error("[user_hot_init]",e);
+			logger.info("[user_hot_init]:params:{userId:{},type:2},result:{}",userId,e.getMessage());
+		}
+	}
 }

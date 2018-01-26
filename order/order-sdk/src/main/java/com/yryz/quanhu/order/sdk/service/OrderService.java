@@ -11,7 +11,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.api.OrderAsynApi;
+import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderConstants;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
@@ -53,8 +55,11 @@ public class OrderService implements OrderSDK {
     @Reference
     private OrderAsynApi orderAsynApi;
 
+    @Reference
+    private OrderApi orderApi;
+
     /**
-     * 创建订单
+     * 用户创建待支付订单接口(用于客户端创建订单)
      *
      * @param inputOrder
      * @return 订单ID
@@ -66,9 +71,10 @@ public class OrderService implements OrderSDK {
         check(inputOrder);
         // 调用idAPI生成订单号
         Response<String> orderIdResponse = idAPI.getOrderId();
-        if (!orderIdResponse.success()) {
+        if (null == orderIdResponse || !orderIdResponse.success()) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
-                    ExceptionEnum.BusiException.getShowMsg(), orderIdResponse.getErrorMsg());
+                    ExceptionEnum.BusiException.getShowMsg(),
+                    orderIdResponse == null ? "获取订单ID失败" : orderIdResponse.getErrorMsg());
         }
         Long orderId = Long.valueOf(orderIdResponse.getData());
         // 封装预订单PreOrderVo
@@ -81,9 +87,10 @@ public class OrderService implements OrderSDK {
         logger.info("createOrder getOrderVo orderVo[integrals]:" + orderVo.getIntegrals().toString());
         // 提交OrderVo对象
         Response<PreOrderVo> response = orderAsynApi.createOrder(orderVo);
-        if (!response.success()) {
+        if (null == response || !response.success()) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
-                    ExceptionEnum.BusiException.getShowMsg(), response.getErrorMsg());
+                    ExceptionEnum.BusiException.getShowMsg(),
+                    response == null ? "创建订单失败" : response.getErrorMsg());
         }
         PreOrderVo returnOrder = response.getData();
         logger.info("createOrder createOrder returnOrder[orderinfo]:" + returnOrder.getOrderInfo().toString());
@@ -124,11 +131,47 @@ public class OrderService implements OrderSDK {
         return orderId;
     }
 
+    /**
+     * 系统触发执行订单接口(用于业务端调用，如圈主回答问题后需要将钱支付给圈主，到期未回答退款给用户)
+     *
+     * @param orderEnum 订单枚举
+     * @param toId      收款人ID
+     * @param cost      金额
+     * @return 成功返回订单ID，否则抛出QuanhuException
+     */
+    @Override
+    public Long executeOrder(OrderEnum orderEnum, Long toId, Long cost) {
+        if (null == orderEnum)
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "orderEnum is null");
+        if (null == toId)
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "toId is null");
+        if (null == cost || cost < 0)
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "cost is null or less 0");
+        // 调用idAPI生成订单号
+        Response<String> orderIdResponse = idAPI.getOrderId();
+        if (null == orderIdResponse || !orderIdResponse.success()) {
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+                    ExceptionEnum.BusiException.getShowMsg(),
+                    orderIdResponse == null ? "获取订单ID失败" : orderIdResponse.getErrorMsg());
+        }
+        Long orderId = Long.valueOf(orderIdResponse.getData());
+        PreOrderVo orderVo = orderEnum.getOrder(orderId, Long.valueOf(AccountEnum.SYSID), toId, cost);
+        Response<?> response = orderApi.executeOrder(orderVo.getOrderInfo(), orderVo.getAccounts(), orderVo.getIntegrals(), null, null, null);
+        if (null != response && response.success()) {
+            return orderId;
+        }
+        throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+                ExceptionEnum.BusiException.getShowMsg(), response == null ? "execute order error" : response.getErrorMsg());
+    }
+
     private void check(InputOrder inputOrder) {
         if (inputOrder == null)
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "inputOrder is null");
-        if (StringUtils.isEmpty(inputOrder.getModuleEnum()))
+        if (StringUtils.isBlank(inputOrder.getModuleEnum()))
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "moduleEnum is null");
         if (null == inputOrder.getCoterieId())

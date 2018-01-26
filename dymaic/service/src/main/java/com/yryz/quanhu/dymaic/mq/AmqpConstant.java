@@ -21,9 +21,18 @@ public class AmqpConstant {
 	public static final String DYMAIC_QUEUE = "DYMAIC_QUEUE";
 
 	/**
+	 * 动态推送队列
+	 */
+	public static final String DYMAIC_TIMELINE_QUEUE = "DYMAIC_TIMELINE_QUEUE";
+
+	/**
 	 * 直连交换机
 	 */
 	public static final String DYMAIC_DIRECT_EXCHANGE = "DYMAIC_DIRECT_EXCHANGE";
-	
+
+	/**
+	 * fanout交换机
+	 */
+	public static final String DYMAIC_FANOUT_EXCHANGE = "RESOURCE_DYNAMIC_FANOUT_EXCHANGE";
 
 }

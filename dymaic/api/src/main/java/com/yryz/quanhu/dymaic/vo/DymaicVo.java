@@ -3,6 +3,7 @@ package com.yryz.quanhu.dymaic.vo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author xiepeng
@@ -19,7 +20,7 @@ public class DymaicVo extends Dymaic implements Serializable {
     /**
      * 统计信息（评论、转发、点赞）
      */
-    private Dymaic statistics;
+    private Map<String, Long> statistics;
 
     public UserSimpleVO getUser() {
         return user;
@@ -29,11 +30,11 @@ public class DymaicVo extends Dymaic implements Serializable {
         this.user = user;
     }
 
-    public Dymaic getStatistics() {
+    public Map<String, Long> getStatistics() {
         return statistics;
     }
 
-    public void setStatistics(Dymaic statistics) {
+    public void setStatistics(Map<String, Long> statistics) {
         this.statistics = statistics;
     }
 }

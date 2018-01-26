@@ -441,8 +441,6 @@ public class UserStarProvider implements UserStarApi {
 			UserStarAuth authInfo = authInfos.get(i);
 			StarInfoVO infoDTO = new StarInfoVO();
 			UserStarSimpleVo simpleVo = (UserStarSimpleVo) GsonUtils.parseObj(authInfo, UserStarSimpleVo.class);
-			simpleVo.setAuthType(null);
-			simpleVo.setAuthWay(null);
 			simpleVo.setUserId(null);
 			infoDTO.parseUser(authInfo.getUserId().toString(), userVos);
 			infoDTO.setStarInfo(simpleVo);
