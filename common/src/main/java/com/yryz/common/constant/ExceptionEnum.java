@@ -27,6 +27,8 @@ public enum ExceptionEnum {
     RPC_RESPONSE_DATA_EXCEPTION("2003", "网络开小差了，请稍候再试！", "RpcResponse对象返回Data为空！"),
     MONGO_EXCEPTION("2004", "网络开小差了，请稍候再试！", "mongoDB查询列表异常！"),
     PUSH_MESSAGE_EXCEPTION("2005", "推送消息出错！", "推送消息出错！"),
+    COTERIE_NOT_HAVE_COTERIE("1026", "您不是圈主,禁止操作！", "您不是私圈圈主！"),
+    PAGE_PARAM_ERROR("2002", "您的分页查询参数不正确，请更正！", "分页参数不正确！"),
     COTERIE_NON_EXISTENT("1021", "未找到该私圈,访问出错", "私圈不存在！");
 
     private String code;

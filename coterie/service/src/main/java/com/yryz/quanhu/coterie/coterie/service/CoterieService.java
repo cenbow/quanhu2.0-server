@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * 私圈service
- * @author jk
+ * @author chengyunfei
  *
  */
 public interface CoterieService {
