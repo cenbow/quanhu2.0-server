@@ -44,11 +44,11 @@ public class UserBlacklistValidFilter implements IBehaviorValidFilter{
             UserRelationDto dto = rpc.getData();
             if(dto!=null){
                 //登录用户把作者拉黑了
-                if(dto.getToBlackStatus()== UserRelationConstant.YES){
+                if(dto.getRelationStatus()== UserRelationConstant.STATUS.TO_BLACK.getCode()){
                     throw new QuanhuException("","","您已把该资源作者拉黑，不允许操作");
                 }
                 //作者把登录用户拉黑了
-                if(dto.getFromBlackStatus()==UserRelationConstant.YES){
+                if(dto.getRelationStatus()==UserRelationConstant.STATUS.FROM_BLACK.getCode()){
                     throw new QuanhuException("","","该资源作者已将您拉黑，不允许操作");
                 }
             }

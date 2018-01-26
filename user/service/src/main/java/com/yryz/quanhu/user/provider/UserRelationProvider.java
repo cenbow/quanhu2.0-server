@@ -48,13 +48,27 @@ public class UserRelationProvider implements UserRelationApi{
     public Response<UserRelationDto> getRelation(String sourceUserId, String targetUserId) {
         try {
             logger.info("getRelation={}/{} start",sourceUserId,targetUserId);
-            return ResponseUtils.returnObjectSuccess(userRelationService.getForceRelation(sourceUserId,targetUserId));
+            return ResponseUtils.returnObjectSuccess(userRelationService.getRelation(sourceUserId,targetUserId));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
             logger.info("getRelation={}/{} finish",sourceUserId,targetUserId);
         }
+    }
+
+    @Override
+    public Response<UserRelationDto> getRelationByTargetPhone(String sourceUserId, String targetPhoneNo) {
+        try {
+            logger.info("getRelationByTargetPhone={}/{} start",sourceUserId,targetPhoneNo);
+            return ResponseUtils.returnObjectSuccess(userRelationService.getRelationByTargetPhone(sourceUserId,targetPhoneNo));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("getRelationByTargetPhone={}/{} finish",sourceUserId,targetPhoneNo);
+        }
+
     }
 
     @Override

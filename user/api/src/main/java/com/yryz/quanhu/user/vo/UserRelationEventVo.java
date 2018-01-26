@@ -11,34 +11,16 @@ import java.io.Serializable;
  */
 public class UserRelationEventVo implements Serializable{
 
-    private int blackStatus;
-    private int followStatus;
-    private int friendStatus;
+    private int relationStatus;
     private String sourceUserId;
     private String targetUserId;
 
-    public int getBlackStatus() {
-        return blackStatus;
+    public int getRelationStatus() {
+        return relationStatus;
     }
 
-    public void setBlackStatus(int blackStatus) {
-        this.blackStatus = blackStatus;
-    }
-
-    public int getFollowStatus() {
-        return followStatus;
-    }
-
-    public void setFollowStatus(int followStatus) {
-        this.followStatus = followStatus;
-    }
-
-    public int getFriendStatus() {
-        return friendStatus;
-    }
-
-    public void setFriendStatus(int friendStatus) {
-        this.friendStatus = friendStatus;
+    public void setRelationStatus(int relationStatus) {
+        this.relationStatus = relationStatus;
     }
 
     public String getSourceUserId() {
