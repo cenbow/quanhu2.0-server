@@ -51,11 +51,11 @@ public class CoterieController {
 	@ApiOperation("发布私圈")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/coterieInfo/create")
-	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info ,String uid, HttpServletRequest request) {
-		info.setOwnerId(uid);
+	public Response<CoterieInfo> publish(@RequestBody CoterieBasicInfo info , HttpServletRequest request) {
+		//info.setOwnerId(uid);
 		RequestHeader header = WebUtil.getHeader(request);
 		String useId = header.getUserId();
-		//info.setOwnerId(useId);
+		info.setOwnerId(useId);
 		if (info.getJoinFee().equals(0)) {
 			//免费加入方式，成员必须审核
 			info.setJoinCheck(1);

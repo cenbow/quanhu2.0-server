@@ -25,11 +25,11 @@ public interface CoterieMapper {
 
     int insertSelective(Coterie record);
 
-    Coterie selectByCoterieId(String coterieId);
+    Coterie selectByCoterieId(Long coterieId);
     
     List<Coterie> selectListByStatus(Integer status);
     
-    List<Coterie> selectListByCoterieIdList(@Param("coterieIdList") List<String> coterieIdList);
+    List<Coterie> selectListByCoterieIdList(@Param("coterieIdList") List<Long> coterieIdList);
     
     List<Coterie> selectListByCoterie(Coterie record);
     
@@ -67,7 +67,7 @@ public interface CoterieMapper {
     
     Integer selectCountByCircleId(@Param("circleId") String circleId, @Param("status") Byte status);
     
-    int updateRecommend(@Param("coterieIdList") List<String> coterieIdList, @Param("recommend") Byte recommend);
+    int updateRecommend(@Param("coterieIdList") List<Long> coterieIdList, @Param("recommend") Byte recommend);
     
     List<Coterie> selectRecommendList(@Param("circleId") String circleId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
     
