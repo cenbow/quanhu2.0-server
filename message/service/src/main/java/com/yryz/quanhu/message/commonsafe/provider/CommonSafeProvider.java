@@ -28,7 +28,6 @@ public class CommonSafeProvider implements CommonSafeApi {
     @Override
     public Response<VerifyCodeVO> getVerifyCode(VerifyCodeDTO codeDTO) {
         try {
-        	Thread.sleep(300000);
             checkSmsDTO(codeDTO);
             return ResponseUtils.returnObjectSuccess(commonService.getVerifyCode(codeDTO));
         } catch (QuanhuException e) {
