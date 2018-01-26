@@ -70,11 +70,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     private Boolean checkIdentity(Long userId,Long citeriaId,MemberConstant.Permission permission){
         //圈主10 成员20 路人未审请30 路人待审核40
-        Response<Byte> data=coterieMemberAPI.permission(userId,citeriaId);
+        Response<Integer> data=coterieMemberAPI.permission(userId,citeriaId);
         if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
-            Byte coterieMemberVoForPermission=data.getData();
-            if(null!=coterieMemberVoForPermission){
-                if(MemberConstant.Permission.MEMBER.getStatus().compareTo(coterieMemberVoForPermission)==0){
+            if(null!=data.getData()){
+                if(permission.getStatus().compareTo(data.getData())==0){
                     return true;
                 }
             }
