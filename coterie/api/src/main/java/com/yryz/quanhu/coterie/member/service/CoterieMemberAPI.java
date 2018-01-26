@@ -1,10 +1,7 @@
 package com.yryz.quanhu.coterie.member.service;
 
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForPermission;
+import com.yryz.quanhu.coterie.member.vo.*;
 
 import java.util.List;
 
@@ -24,11 +21,11 @@ public interface CoterieMemberAPI {
 
 	/**
 	 * 圈主踢出私圈成员
-	 * @param userId
+	 * @param memberId
 	 * @param coterieId
 	 * @param reason
 	 */
-	public Response<String> kick(Long userId, Long coterieId, String reason);
+	public Response<String> kick(Long userId, Long memberId, Long coterieId, String reason);
 
 	/**
 	 * 圈粉退出私圈
@@ -39,10 +36,10 @@ public interface CoterieMemberAPI {
 
 	/**
 	 * 设置禁言/取消禁言
-	 * @param userId
+	 * @param memberId
 	 * @param coterieId
 	 */
-	public Response<String> banSpeak(Long userId, Long coterieId, Integer type);
+	public Response<String> banSpeak(Long userId, Long memberId, Long coterieId, Integer type);
 
 
 	/**
@@ -52,29 +49,19 @@ public interface CoterieMemberAPI {
 	 */
 	public Response<CoterieMemberVoForPermission> permission(Long userId, Long coterieId);
 
-
-
-
-
-
-
-
-
-
-/******** 0124 ********************************/
-
 	/**
-	 * 申请加入私圈  审批通过
+	 * 申请加入私圈审批通过
 	 * @param userId
 	 * @param coterieId
 	 */
-	public void agree(Long userId, Long coterieId);
+	public Response audit(Long userId, Long memberId, Long coterieId, Integer type);
+
 	/**
-	 * 申请加入私圈  审批不通过
-	 * @param userId
+	 * 私圈新申请的成员数量
 	 * @param coterieId
+	 * @return
 	 */
-	public void disagree(Long userId, Long coterieId);
+	public Response<CoterieMemberVoForNewMemberCount> queryNewMemberNum(Long coterieId);
 
 	/**
 	 * 私圈成员列表
@@ -83,7 +70,8 @@ public interface CoterieMemberAPI {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<CoterieMemberVo> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize);
+	public Response<List<CoterieMemberVo>> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize);
+
 	/**
 	 *  申请加入私圈记录列表
 	 * @param coterieId
@@ -91,21 +79,22 @@ public interface CoterieMemberAPI {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<CoterieMemberApplyVo> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize);
+	public Response<List<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize);
 
 	/**
-	 * 私圈新申请的成员数量
+	 * 是否被禁言
 	 * @param coterieId
+	 * @param userId
 	 * @return
 	 */
-	public Integer queryNewMemberNum(Long coterieId);
+	public Response<Boolean> isBanSpeak(Long userId, Long coterieId);
 
 	/**
 	 * 私圈成员数量
 	 * @param coterieId
 	 * @return
 	 */
-	public Integer queryMemberNum(Long coterieId);
+//	public Integer queryMemberNum(Long coterieId);
 
 	/**
 	 * 查询私圈里的某个成员
@@ -113,7 +102,7 @@ public interface CoterieMemberAPI {
 	 * @param coterieId
 	 * @return
 	 */
-	public CoterieMemberVo queryCoterieMemberInfo(Long userId, Long coterieId);
+//	public CoterieMemberVo queryCoterieMemberInfo(Long userId, Long coterieId);
 
 	/**
 	 * 查询申请记录
@@ -121,6 +110,6 @@ public interface CoterieMemberAPI {
 	 * @param userId 申请人ID
 	 * @return
 	 */
-	public CoterieMemberApplyVo queryWaitingMemberApply(Long coterieId, Long userId);
+//	public CoterieMemberApplyVo queryWaitingMemberApply(Long coterieId, Long userId);
 	
 }

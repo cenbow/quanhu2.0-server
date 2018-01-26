@@ -27,4 +27,12 @@ public interface ActivityVoteConfigDao {
 
     ActivityVoteConfig selectByActivityInfoId(Long activityInfoId);
 
+
+
+    ActivityVoteConfig selectByPrimaryKey(Long kid);
+
+    ActivityVoteConfig selectByInfoId(Long kid);
+
+    ActivityVoteConfig selectVoteByActivityInfoId(Long activityInfoId);
+
 }

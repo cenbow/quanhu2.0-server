@@ -236,7 +236,6 @@ public class CoterieProvider implements CoterieApi {
 		Response<List<CoterieInfo>> responseCoterieInfo=coterieApi.getMyCreateCoterie(info.getOwnerId());
 		if(responseCoterieInfo.getData().size()>10)
 		{
-
 			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "当前用户创建私圈胡个数不得超过10个！");
 		}
 		//todo

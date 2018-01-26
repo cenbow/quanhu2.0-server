@@ -35,6 +35,7 @@ import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserRegQueryDTO;
 import com.yryz.quanhu.user.entity.UserOperateInfo;
 import com.yryz.quanhu.user.entity.UserRegLog;
+import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.service.UserOperateService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.vo.MyInviterDetailVO;
@@ -60,7 +61,9 @@ public class UserOperateServiceImpl implements UserOperateService {
 	private IdAPI idApi;
 	@Autowired
 	private UserService userService;
-
+	@Autowired
+	private EventManager eventService;
+	
 	@Override
 	public int save(UserOperateInfo record) {
 		record.setCreateDate(new Date());
@@ -205,7 +208,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 	public void commitInviterEvent(String inviterCode) {
 		String userId = this.selectUserIdByInviter(inviterCode);
 		// TODO:注册加积分
-		// eventService.inviterRegister(userId);
+		eventService.inviterRegister(userId);
 	}
 
 }

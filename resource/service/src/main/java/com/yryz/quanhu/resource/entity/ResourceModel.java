@@ -36,7 +36,7 @@ public class ResourceModel extends Entity implements Serializable {
     /**
      * 资源ID
      */
-    private Integer resourceId;
+    private Long resourceId;
 
     /**
      * 文章分类ID
@@ -100,11 +100,6 @@ public class ResourceModel extends Entity implements Serializable {
     private String recommend;
     
     /**
-     * 资源简介
-     */
-    private String summary;
-    
-    /**
      * 扩展字段，仅供展示使用，由前端的发布方和列表解析方解决
      */
     private String extJson;
@@ -162,14 +157,14 @@ public class ResourceModel extends Entity implements Serializable {
 	/**
 	 * @return the resourceId
 	 */
-	public Integer getResourceId() {
+	public Long getResourceId() {
 		return resourceId;
 	}
 
 	/**
 	 * @param resourceId the resourceId to set
 	 */
-	public void setResourceId(Integer resourceId) {
+	public void setResourceId(Long resourceId) {
 		this.resourceId = resourceId;
 	}
 
@@ -339,20 +334,6 @@ public class ResourceModel extends Entity implements Serializable {
 	 */
 	public void setRecommend(String recommend) {
 		this.recommend = recommend;
-	}
-
-	/**
-	 * @return the summary
-	 */
-	public String getSummary() {
-		return summary;
-	}
-
-	/**
-	 * @param summary the summary to set
-	 */
-	public void setSummary(String summary) {
-		this.summary = summary;
 	}
 
 	/**

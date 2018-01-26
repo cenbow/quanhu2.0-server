@@ -4,7 +4,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
+import com.yryz.quanhu.user.dao.UserRelationDao;
 import com.yryz.quanhu.user.dao.UserRelationRemarkDao;
+import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 import com.yryz.quanhu.user.service.UserRelationRemarkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,8 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
 
     @Autowired
     private UserRelationRemarkDao userRelationRemarkDao;
-
+    @Autowired
+    private UserRelationDao userRelationDao;
     @Reference
     private IdAPI idAPI;
 
@@ -45,7 +48,13 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
              * 自己不允许对自己设置备注
              */
             if(sourceUserId.equalsIgnoreCase(targetUserId)){
-                throw new QuanhuException("","","don't allow set remark name to self");
+                throw new QuanhuException("","","您不能对自己设置备注名");
+            }
+
+            //查询是否有关注关系
+            UserRelationDto dto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
+            if(dto==null||dto.getFriendStatus()==UserRelationConstant.NO){
+                throw new QuanhuException("","","您和目标用户暂不是好友关系");
             }
 
             /**
@@ -76,7 +85,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
                 updateCount = userRelationRemarkDao.update(dbRemarkDto);
             }
         }catch (Exception e){
-            throw new RuntimeException(e);
+            throw e;
         }
         return updateCount==1?true:false;
     }

@@ -30,4 +30,13 @@ public interface ActivityPrizesDao {
 
     List<ActivityPrizesVo> selectListCondition(@Param("activityInfoId") Long activityInfoId);
 
+
+
+
+
+
+    ActivityPrizes selectByPrimaryKey(Long kid);
+
+    List<ActivityPrizes> selectAvailablePrizes(@Param("activityInfoId") Long activityInfoId);
+
 }

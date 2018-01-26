@@ -7,12 +7,22 @@
  */
 package com.yryz.quanhu.user.manager;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.grow.service.GrowAPI;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountAPI;
+import com.yryz.quanhu.score.vo.EventAcount;
+import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.service.UserOperateService;
 
@@ -24,126 +34,122 @@ import com.yryz.quanhu.user.service.UserOperateService;
  */
 @Component
 public class EventManager {
-	private static final Logger logger = LoggerFactory.getLogger("event.logger");
-	private static final Logger LOGGER2 = LoggerFactory.getLogger(EventManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
 	private static final String STAR_AUTH_LEVEL = "5";
 	@Autowired
 	private UserOperateService regService;
-/*	@Autowired
+	@Reference
 	private EventAPI evenApi;
-	@Autowired
+	@Reference
 	private GrowAPI growApi;
-	@Autowired
-	private EventAcountAPI acountAPI;*/
+	@Reference
+	private EventAcountAPI acountAPI;
 
 	/**
-	 *  注册事件<br/>
-	 *  注册触发事件收集初始化用户积分账户初始化 影响用户积分<br/>
-	 *  有邀请码触发邀请注册事件
-	 * @param custId
+	 * 注册事件<br/>
+	 * 注册触发事件收集初始化用户积分账户初始化 影响用户积分<br/>
+	 * 有邀请码触发邀请注册事件
+	 * 
+	 * @param userId
 	 * @param phone
-	 * @param inviter 邀请码
+	 * @param inviter
+	 *            邀请码
 	 */
-	public void register(String custId,String phone,String inviter) {
-		if (StringUtils.isEmpty(custId)) {
+	public void register(String userId, String phone, String regType, String inviter) {
+		if (StringUtils.isEmpty(userId)) {
 			return;
 		}
+		EventInfo eventInfo = null;
 		try {
-			/*acountAPI.initAcount(custId);
-			if(StringUtils.isNotBlank(phone)){
-				EventInfo eventInfo = new EventInfo();
+			acountAPI.initAcount(userId);
+			// 手机号注册的用户提交会员注册事件
+			if (StringUtils.isNotBlank(phone) && StringUtils.equals(regType, RegType.PHONE.getText())) {
+				eventInfo = new EventInfo();
 				eventInfo.setEventCode(EventEnum.REGISTER.getCode());
-				eventInfo.setCustId(custId);
+				eventInfo.setUserId(userId);
 				eventInfo.setEventNum(1);
 				evenApi.commit(eventInfo);
 			}
-			//邀请注册事件
-			if(StringUtils.isNotBlank(inviter)){
-				String custRegId = regService.selectCustIdByInviter(inviter);
-				if(StringUtils.isNotBlank(custRegId)){
-					inviterRegister(custId);
+			// 邀请注册事件
+			if (StringUtils.isNotBlank(inviter)) {
+				String userRegId = regService.selectUserIdByInviter(inviter);
+				if (StringUtils.isNotBlank(userRegId)) {
+					inviterRegister(userId);
 				}
-			}*/
-			logger.info("event commit msg register custId:{}", custId);
-		} catch (RuntimeException e) {
-			LOGGER2.error("[event register]", e);
-			logger.info("event commit msg register error custId:{}", custId);
+			}
+			logger.info("[event_regiter]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), "");
 		} catch (Exception e) {
-			LOGGER2.error("[event register]", e);
-			logger.info("event commit msg register error custId:{}", custId);
+			logger.info("[event_regiter]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), e.getMessage());
+			logger.error("[event_regiter]", e);
 		}
-
 	}
-	
+
 	/**
 	 * 邀请注册事件
-	 * @param custId
+	 * 
+	 * @param userId
 	 */
-	public void inviterRegister(String custId){
-		if (StringUtils.isEmpty(custId)) {
+	public void inviterRegister(String userId) {
+		if (StringUtils.isEmpty(userId)) {
 			return;
 		}
+		EventInfo eventInfo = null;
 		try {
-			/*EventInfo eventInfo = new EventInfo();
+			eventInfo = new EventInfo();
 			eventInfo.setEventCode(EventEnum.INVITER_REGISTER.getCode());
-			eventInfo.setCustId(custId);
+			eventInfo.setUserId(userId);
 			eventInfo.setEventNum(1);
-			evenApi.commit(eventInfo);*/
-			logger.info("event commit msg inviter_register custId:{}", custId);
-		} catch (RuntimeException e) {
-			LOGGER2.error("[event inviter_register]", e);
-			logger.info("event commit msg inviter_register error custId:{}", custId);
+			evenApi.commit(eventInfo);
+			logger.info("[event_inviter_register]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), "");
 		} catch (Exception e) {
-			LOGGER2.error("[event inviter_register]", e);
-			logger.info("event commit msg inviter_register error custId:{}", custId);
+			logger.info("[event_inviter_register]:params:{},result:{}", JsonUtils.toFastJson(eventInfo),
+					e.getMessage());
+			logger.error("[event_inviter_register]", e);
 		}
 	}
-	
+
 	/**
 	 * 完善资料
 	 * 
 	 * @author danshiyu
 	 * @date 2017年9月11日
-	 * @param custInfo
+	 * @param userInfo
 	 *            更新后的用户信息
-	 * @param custInfo2
+	 * @param userInfo2
 	 *            旧的用户信息
 	 * @Description 用户完善资料后触发事件收集 影响用户积分
 	 */
-	public void userDataImprove(UserBaseInfo custInfo, UserBaseInfo custInfo2) {
-		if (custInfo == null || custInfo.getUserId() == null) {
+	public void userDataImprove(UserBaseInfo newUserInfo, UserBaseInfo oldUserInfo) {
+		if (newUserInfo == null || newUserInfo.getUserId() == null) {
 			return;
 		}
 		// 表示已经完善过的老用户
-		if (custInfo2 != null && StringUtils.isNotBlank(custInfo2.getUserDesc())
-				&& StringUtils.isNotBlank(custInfo2.getUserImg()) && StringUtils.isNotBlank(custInfo2.getUserLocation())
-				&& StringUtils.isNotBlank(custInfo2.getUserNickName()) && custInfo2.getUserGenders()== null) {
+		if (oldUserInfo != null && StringUtils.isNotBlank(oldUserInfo.getUserDesc())
+				&& StringUtils.isNotBlank(oldUserInfo.getUserImg()) && StringUtils.isNotBlank(oldUserInfo.getUserLocation())
+				&& StringUtils.isNotBlank(oldUserInfo.getUserNickName()) && oldUserInfo.getUserGenders() == null) {
 			return;
 		}
 		// 资料刚刚完善
-		if (StringUtils.isNotBlank(custInfo.getUserDesc()) && StringUtils.isNotBlank(custInfo.getUserImg())
-				&& StringUtils.isNotBlank(custInfo.getUserLocation()) && StringUtils.isNotBlank(custInfo.getUserNickName())
-				&& custInfo.getUserGenders() == null) {
+		if (StringUtils.isNotBlank(newUserInfo.getUserDesc()) && StringUtils.isNotBlank(newUserInfo.getUserImg())
+				&& StringUtils.isNotBlank(newUserInfo.getUserLocation())
+				&& StringUtils.isNotBlank(newUserInfo.getUserNickName()) && newUserInfo.getUserGenders() == null) {
 
 		} else {
 			return;
 		}
 
-/*		EventInfo info = new EventInfo();
-		info.setCustId(custInfo.getCustId());
+		EventInfo info = new EventInfo();
+		info.setUserId(newUserInfo.getUserId().toString());
 		info.setEventCode(EventEnum.USER_DATA_IMPROVE.getCode());
-		info.setCreateTime(DateUtil.nowToDetailString());
-		info.setEventNum(1);*/
-/*		try {
-			//evenApi.commit(info);
-			logger.info("event commit msg userDataImproveInfo:{}", JsonUtils.toFastJson(info));
-		} catch (RuntimeException e) {
-			LOGGER2.error("[event userDataImprove]", e);
-			logger.info("event commit msg userDataImprove error custId:{}", custInfo.getCustId());
+		info.setCreateTime(DateUtils.getDateTime());
+		info.setEventNum(1);
+		try {
+			evenApi.commit(info);
+			logger.info("[event userDataImprove]:params:{},result:{}", JsonUtils.toFastJson(info), "");
 		} catch (Exception e) {
-			LOGGER2.error("[event userDataImprove]", e);
-			logger.info("event commit msg userDataImprove error custId:{}", custInfo.getCustId());
-		}*/
+			logger.error("[event userDataImprove]", e);
+			logger.info("[event userDataImprove]:params:{},result:{}", JsonUtils.toFastJson(info), e.getMessage());
+		}
 	}
 
 	/**
@@ -151,69 +157,60 @@ public class EventManager {
 	 * 
 	 * @author danshiyu
 	 * @date 2017年9月20日
-	 * @param custId
+	 * @param userId
 	 * @Description 设置达人成功后等级不足5级的升到5级，其他不管，取消认证不回退
 	 */
-	public void starAuth(String custId) {
-		if (StringUtils.isEmpty(custId)) {
+	public void starAuth(String userId) {
+		if (StringUtils.isEmpty(userId)) {
 			return;
 		}
 		try {
-			//growApi.promoteGrowLevel(custId, STAR_AUTH_LEVEL,EventEnum.STAR_AUTH_SUCCESS.getCode());
-			logger.info("event commit msg starAuth success custId:{}", custId);
-		} catch (RuntimeException e) {
-			LOGGER2.error("[event starAuth]", e);
-			logger.info("event commit msg starAuth error custId:{}", custId);
+			growApi.promoteGrowLevel(userId, STAR_AUTH_LEVEL, EventEnum.STAR_AUTH_SUCCESS.getCode());
+			logger.info("[event starAuth]:params:{},result:{}", userId, "");
 		} catch (Exception e) {
-			LOGGER2.error("[event starAuth]", e);
-			logger.info("event commit msg starAuth error custId:{}", custId);
+			logger.error("[event starAuth]", e);
+			logger.info("[event starAuth]:params:{},result:{}", userId, e.getMessage());
 		}
 	}
 
 	/**
 	 * 获取用户等级和积分
 	 * 
-	 * @param custId
+	 * @param userId
 	 * @return
-	 *//*
-	public EventAcount getGrow(String custId) {
-		if (StringUtils.isEmpty(custId)) {
+	 */
+	public EventAcount getGrow(String userId) {
+		if (StringUtils.isEmpty(userId)) {
 			return null;
 		}
 		try {
-			EventAcount acount = acountAPI.getEventAcount(custId);
+			EventAcount acount = acountAPI.getEventAcount(userId);
 			return acount;
 		} catch (RuntimeException e) {
-			LOGGER2.error("[event acount]", e);
+			logger.error("[event_getLevel]", e);
 			return null;
 		} catch (Exception e) {
-			LOGGER2.error("[event acount]", e);
+			logger.error("[event_getLevel]", e);
 			return null;
 		}
-	}*/
+	}
 
 	/**
 	 * 获取用户等级
 	 * 
 	 * @date 2017年9月25日
-	 * @param custIds
+	 * @param userIds
 	 * @return
 	 */
-	/*public Map<String, UserAcountSimpleVo> getCustLevel(Set<String> custIds) {
-		if (CollectionUtils.isEmpty(custIds)) {
-			return null;
-		}
-		Map<String, UserAcountSimpleVo> map = new HashMap<>(custIds.size());
-		for (Iterator<String> iterator = custIds.iterator(); iterator.hasNext();) {
-			String custId = iterator.next();
-			EventAcount acount = getGrow(custId);
-			if (acount != null) {
-				map.put(custId, new UserAcountSimpleVo(custId, acount.getScore(),
-						"0".equals(acount.getGrowLevel()) ? "1" : acount.getGrowLevel()));
-			} else {
-				map.put(custId, new UserAcountSimpleVo(custId, 0L, "1"));
-			}
-		}
-		return map;
-	}*/
+	/*
+	 * public Map<String, UserAcountSimpleVo> getCustLevel(Set<String> userIds)
+	 * { if (CollectionUtils.isEmpty(userIds)) { return null; } Map<String,
+	 * UserAcountSimpleVo> map = new HashMap<>(userIds.size()); for
+	 * (Iterator<String> iterator = userIds.iterator(); iterator.hasNext();) {
+	 * String userId = iterator.next(); EventAcount acount = getGrow(userId); if
+	 * (acount != null) { map.put(userId, new UserAcountSimpleVo(userId,
+	 * acount.getScore(), "0".equals(acount.getGrowLevel()) ? "1" :
+	 * acount.getGrowLevel())); } else { map.put(userId, new
+	 * UserAcountSimpleVo(userId, 0L, "1")); } } return map; }
+	 */
 }

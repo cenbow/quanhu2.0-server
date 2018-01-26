@@ -19,11 +19,21 @@ public interface ActivityEnrolConfigDao {
 
     int delete(Long kid);
 
-    void insert(ActivityEnrolConfig activityEnrolConfig);
+    int insert(ActivityEnrolConfig activityEnrolConfig);
 
     void insertByPrimaryKeySelective(ActivityEnrolConfig activityEnrolConfig);
 
     int update(ActivityEnrolConfig activityEnrolConfig);
 
     ActivityEnrolConfig selectByActivityId(Long activityKid);
+
+
+
+
+
+
+
+    //ActivityEnrolConfig selectByPrimaryKey(Long id);
+
+    //void updateByActivityId(ActivityEnrolConfig activityEnrolConfig);
 }

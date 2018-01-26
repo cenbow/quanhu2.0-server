@@ -25,6 +25,8 @@ public interface UserRelationService{
 
     public PageList<UserRelationDto> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status);
 
+    public List<UserRelationDto> selectByAll(UserRelationDto dto,UserRelationConstant.STATUS status);
+
     public List<UserRelationDto> selectBy(String sourceUserId, Set<String> targetUserIds);
 
     public Set<String> selectBy(String sourceUserId, UserRelationConstant.STATUS status);

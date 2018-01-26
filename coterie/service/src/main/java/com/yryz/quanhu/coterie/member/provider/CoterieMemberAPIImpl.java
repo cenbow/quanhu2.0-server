@@ -6,24 +6,17 @@ import com.google.common.collect.Sets;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.coterie.coterie.entity.Coterie;
-import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForPermission;
+import com.yryz.quanhu.coterie.member.vo.*;
 import com.yryz.quanhu.user.service.UserApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -50,12 +43,13 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
 
-//        CoterieInfo info = coterieService.find(coterieId.toString());
-//        if (info == null) {
-////            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-//            throw new QuanhuException(ExceptionEnum.SysException);
-//        }
+        CoterieInfo info = coterieService.find(coterieId.toString());
+        if (info == null) {
+            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+        }
+
         CoterieMemberVoForJoin join = null;
+
         try {
             join = coterieMemberService.join(userId, coterieId, reason);
         } catch (Exception e) {
@@ -67,13 +61,20 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public Response<String> kick(Long userId, Long coterieId, String reason) {
-        logger.info("kick params: userId(" + userId + "),coterieId(" + coterieId + "),reason(" + reason + ")");
-        if (null == userId || null == coterieId) {
+    public Response<String> kick(Long userId, Long memberId, Long coterieId, String reason) {
+
+        //是否为圈主
+
+        //todo
+
+
+
+        logger.info("kick params: memberId(" + memberId + "),coterieId(" + coterieId + "),reason(" + reason + ")");
+        if (null == memberId || null == coterieId) {
             throw QuanhuException.busiError("");
         }
         try {
-            coterieMemberService.kick(userId, coterieId, reason);
+            coterieMemberService.kick(memberId, coterieId, reason);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -98,13 +99,13 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public Response<String> banSpeak(Long userId, Long coterieId, Integer type) {
-        logger.info("banSpeak params: userId(" + userId + "),coterieId(" + coterieId + ")");
-        if (null == userId || null == coterieId) {
+    public Response<String> banSpeak(Long userId, Long memberId, Long coterieId, Integer type) {
+        logger.info("banSpeak params: memberId(" + memberId + "),coterieId(" + coterieId + ")");
+        if (null == memberId || null == coterieId) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
         try {
-            coterieMemberService.banSpeak(userId, coterieId, type);
+            coterieMemberService.banSpeak(memberId, coterieId, type);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
 //            throw new QuanhuException(ExceptionEnum.SysException);
@@ -114,7 +115,11 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
     @Override
     public Response<CoterieMemberVoForPermission> permission(Long userId, Long coterieId) {
-        return null;
+        Integer permission = coterieMemberService.permission(userId, coterieId);
+
+        CoterieMemberVoForPermission permissionResult = new CoterieMemberVoForPermission();
+        permissionResult.setPermission(permission);
+        return new Response<>(permissionResult);
     }
 
 
@@ -122,6 +127,12 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
 
 
+    @Override
+    public Response<Boolean> isBanSpeak(Long userId, Long coterieId) {
+        Boolean flag = coterieMemberService.isBanSpeak(userId, coterieId);
+
+        return new Response<>(flag);
+    }
 
 
 
@@ -131,28 +142,67 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
 
     @Override
-    public void agree(Long userId, Long coterieId) {
-        logger.info("agree params: userId(" + userId + "),coterieId(" + coterieId + ")");
+    public Response audit(Long userId, Long memberId, Long coterieId, Integer type) {
+
+        //是否为圈主
+        //todo
+
+        logger.debug("audit params: memberId(" + memberId + "),coterieId(" + coterieId + "),type(" + type);
+
         if (null == userId || null == coterieId) {
             throw QuanhuException.busiError("");
         }
         try {
-            coterieMemberService.agree(userId, coterieId);
+            coterieMemberService.audit(memberId, coterieId, type);
 //            coterieEventManager.joinCoterieEvent(coterieId);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
             throw new QuanhuException(ExceptionEnum.SysException);
         }
+
+        return new Response();
     }
 
     @Override
-    public void disagree(Long userId, Long coterieId) {
-        logger.info("disagree params: userId(" + userId + "),coterieId(" + coterieId + ")");
-            if (null == userId || null == coterieId) {
-            throw QuanhuException.busiError("");
+    public Response<CoterieMemberVoForNewMemberCount> queryNewMemberNum(Long coterieId) {
+        logger.info("queryNewMemberNum params: coterieId(" + coterieId + ")");
+        if (coterieId == null) {
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
         try {
-            coterieMemberService.disagree(userId, coterieId);
+            Integer count = coterieMemberService.queryNewMemberNum(coterieId);
+            return new Response<>(new CoterieMemberVoForNewMemberCount(count));
+        } catch (Exception e) {
+            logger.error("unKown Exception", e);
+//            throw new QuanhuException(ExceptionEnum.SysException);
+        }
+        return new Response<>();
+    }
+
+    @Override
+    public Response<List<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize) {
+        logger.info("queryMemberApplyList params: coterieId(" + coterieId + ")");
+        if (coterieId == null) {
+            throw new QuanhuException(ExceptionEnum.SysException);
+        }
+        try {
+            List<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNum, pageSize);
+
+            Set<String> set = Sets.newHashSet();
+            for (int i = 0; i < applyList.size(); i++) {
+//                set.add(applyList.get(i).getUsertId());
+            }
+
+//            Map<String, CustInfo> custMap = custAPI.getCustInfo(set);
+//            for (int i = 0; i < applyList.size(); i++) {
+//                MemberApplyInfo info = applyList.get(i);
+//                CustInfo cust = custMap.get(info.getCustId());
+//                if (cust != null) {
+//                    info.setCustIcon(cust.getCustImg());
+//                    info.setCustName(cust.getCustNname());
+//                }
+//            }
+            return new Response<>(applyList);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -160,7 +210,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public List<CoterieMemberVo> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize) {
+    public Response<List<CoterieMemberVo>> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize) {
         logger.info("queryMemberList params: coterieId(" + coterieId + ")pageNum(" + pageNum + ")pageSize(" + pageSize + ")");
         if (coterieId == null || pageNum == null || pageSize == null || pageNum <= 0 || pageSize <= 0) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -200,97 +250,10 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 //                qz.setCustName(cust.getCustNname());
                 memberList.add(0, qz);//添加圈主
             }
-            return memberList;
+            return new Response<>(memberList);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
             throw new QuanhuException(ExceptionEnum.SysException);
         }
     }
-
-    @Override
-    public List<CoterieMemberApplyVo> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize) {
-        logger.info("queryMemberApplyList params: coterieId(" + coterieId + ")");
-            if (coterieId == null) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-        try {
-            List<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNum, pageSize);
-
-            Set<String> set = Sets.newHashSet();
-            for (int i = 0; i < applyList.size(); i++) {
-//                set.add(applyList.get(i).getUsertId());
-            }
-
-//            Map<String, CustInfo> custMap = custAPI.getCustInfo(set);
-//            for (int i = 0; i < applyList.size(); i++) {
-//                MemberApplyInfo info = applyList.get(i);
-//                CustInfo cust = custMap.get(info.getCustId());
-//                if (cust != null) {
-//                    info.setCustIcon(cust.getCustImg());
-//                    info.setCustName(cust.getCustNname());
-//                }
-//            }
-            return applyList;
-        } catch (Exception e) {
-            logger.error("unKown Exception", e);
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-    }
-
-    @Override
-    public Integer queryNewMemberNum(Long coterieId) {
-        logger.info("queryNewMemberNum params: coterieId(" + coterieId + ")");
-            if (coterieId == null) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-        try {
-            return coterieMemberService.queryNewMemberNum(coterieId);
-        } catch (Exception e) {
-            logger.error("unKown Exception", e);
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-    }
-
-    @Override
-    public Integer queryMemberNum(Long coterieId) {
-        logger.info("queryMemberNum params: coterieId(" + coterieId + ")");
-        if (coterieId == null) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-        try {
-            return coterieMemberService.queryMemberNum(coterieId);
-        } catch (Exception e) {
-            logger.error("unKown Exception", e);
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-    }
-
-    @Override
-    public CoterieMemberVo queryCoterieMemberInfo(Long custId, Long coterieId) {
-        logger.info("quit params: custId(" + custId + ") coterieId(" + coterieId + ")");
-        if (custId == null  || coterieId == null) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-        try {
-            return coterieMemberService.queryMemberInfo(custId, coterieId);
-        } catch (Exception e) {
-            logger.error("unKown Exception", e);
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-    }
-
-    @Override
-    public CoterieMemberApplyVo queryWaitingMemberApply(Long coterieId, Long userId) {
-        logger.info("quit params: userId(" + userId + ") coterieId(" + coterieId + ")");
-        if (null == userId || null == coterieId) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-        try {
-            return coterieMemberService.findWaitingMemberApply(coterieId, userId);
-        } catch (Exception e) {
-            logger.error("unKown Exception", e);
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-    }
-
 }

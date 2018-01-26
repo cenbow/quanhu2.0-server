@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
+import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 
@@ -67,5 +69,14 @@ public class ReleaseInfoController {
         upInfo.setLastUpdateUserId(headerUserId);
 
         return releaseInfoApi.deleteBykid(upInfo);
+    }
+
+    @ApiOperation("文章列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @GetMapping(value = "{version}/release/info/list")
+    public Response<PageList<ReleaseInfoVo>> list(ReleaseInfoDto dto, @RequestHeader("userId") Long headerUserId) {
+        return releaseInfoApi.pageByCondition(dto, headerUserId, false, true);
     }
 }

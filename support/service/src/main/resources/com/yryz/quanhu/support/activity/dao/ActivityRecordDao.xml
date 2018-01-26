@@ -126,4 +126,28 @@
 		where create_user_id = #{custId,jdbcType=BIGINT} and activity_info_id = #{activityId,jdbcType=BIGINT}
 	</select>
 
+
+	<select id="selectByPrimaryKey" resultType="com.yryz.quanhu.support.activity.entity.ActivityRecord" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_record
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<!-- (后台)报名类活动 -->
+	<select id="attendlist" parameterType="com.yryz.quanhu.support.activity.vo.AdminActivityRecordVo"
+			resultType="com.yryz.quanhu.support.activity.vo.AdminActivityRecordVo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_record
+		where activity_info_id = #{activityRecordVo.activityInfoId,jdbcType=BIGINT}
+		order by create_date desc
+	</select>
+	<select id="attendlistCount" parameterType="com.yryz.quanhu.support.activity.vo.AdminActivityRecordVo"
+			resultType="java.lang.Long">
+		select
+		count(1)
+		from qh_activity_record
+		where activity_info_id = #{activityRecordVo.activityInfoId,jdbcType=BIGINT}
+	</select>
 </mapper>
