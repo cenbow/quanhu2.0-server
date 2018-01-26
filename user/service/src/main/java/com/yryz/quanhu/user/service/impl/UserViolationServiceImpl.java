@@ -30,6 +30,7 @@ import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.RedisOptException;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
@@ -37,6 +38,8 @@ import com.yryz.quanhu.user.contants.ViolatType;
 import com.yryz.quanhu.user.dao.UserViolationDao;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserViolation;
+import com.yryz.quanhu.user.manager.ImManager;
+import com.yryz.quanhu.user.manager.MessageManager;
 import com.yryz.quanhu.user.service.AuthService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserViolationService;
@@ -56,18 +59,16 @@ public class UserViolationServiceImpl implements UserViolationService {
 	@Reference(check = false)
 	private IdAPI idApi;
 	@Resource
-	private RedisTemplate<String, Long> redisTemplate;
-	/*
-	 * @Autowired private AccountRedisDao userRedisDao;
-	 */
+	private RedisTemplateBuilder redisTemplateBuilder;
 	@Autowired
 	private UserService userService;
 	@Autowired
 	private AuthService authService;
-	/*
-	 * @Autowired private PushManager pushService;
-	 */
-
+	@Autowired
+	private MessageManager messageManager;
+	@Autowired
+	private ImManager imManager;
+	
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public void saveViolation(UserViolation violation, String appId) {
@@ -133,21 +134,6 @@ public class UserViolationServiceImpl implements UserViolationService {
 		} catch (Exception e) {
 			logger.error("[violation get cust list error]", e);
 			throw new MysqlOptException(e);
-		}
-	}
-
-	/**
-	 * 查询用户状态有效的违规记录
-	 * 
-	 * @param custId
-	 * @return
-	 */
-	private UserViolation getCustViolation(Long custId) {
-		try {
-			return mysqlDao.getCustViolation(custId);
-		} catch (Exception e) {
-			logger.error("[violation get error]", e);
-			return null;
 		}
 	}
 
@@ -232,7 +218,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 	private void updateUserStatus(UserViolation violation, String appId) {
 		// 警告推送
 		if (violation.getViolationType() == ViolatType.WARN.getType()) {
-			// pushService.warn(violation.getCustId());
+			messageManager.warn(violation.getUserId().toString());
 		} // 禁言
 		else if (violation.getViolationType().intValue() == ViolatType.NOTALK.getType()) {
 			// 同步用户状态
@@ -240,20 +226,22 @@ public class UserViolationServiceImpl implements UserViolationService {
 					.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(),
 							null, null, null, null, DateUtils.addDays(new Date(), Constants.NO_TALK_HOUR)));
 			// 消息
-			// messageManager.disTalk(violation.getCustId());
+			messageManager.disTalk(violation.getUserId().toString());
 		} // 冻结
 		else if (violation.getViolationType().intValue() == ViolatType.FREEZE.getType()) {
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.FREEZE.getStatus(), null, null, null, null, new Date()));
-			// TODO:请求im发送下线消息
+			//请求im发送下线消息
+			imManager.block(violation.getUserId(), appId);
 			authService.delToken(violation.getUserId(), appId);
 		}//注销 
 		else {
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.DISTORY.getStatus(), null, null, null, null, new Date()));
-			// TODO:请求im发送下线消息
+			//请求im发送下线消息
+			imManager.block(violation.getUserId(), appId);
 			authService.delToken(violation.getUserId(), appId);
 		}
 	}
@@ -266,10 +254,11 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 */
 	private long incrUserWarnTimes(String custId) {
 		String key = ViolationApi.warnTimesKey(custId);
+		RedisTemplate<String, Long> template = redisTemplateBuilder.buildRedisTemplate(Long.class);
 		try {
-			long times = redisTemplate.opsForValue().increment(key, 1);
+			long times = template.opsForValue().increment(key, 1);
 			if (times == 3) {
-				redisTemplate.expire(key, Constants.NO_TALK_HOUR, TimeUnit.HOURS);
+				template.expire(key, Constants.NO_TALK_HOUR, TimeUnit.HOURS);
 			}
 			return times;
 		} catch (Exception e) {
@@ -286,8 +275,9 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 */
 	private long getUserWarnTimes(String custId) {
 		String key = ViolationApi.warnTimesKey(custId);
+		RedisTemplate<String, Long> template = redisTemplateBuilder.buildRedisTemplate(Long.class);
 		try {
-			Long times = redisTemplate.opsForValue().get(key);
+			Long times = template.opsForValue().get(key);
 			if (times == null) {
 				return 0;
 			}
@@ -307,8 +297,9 @@ public class UserViolationServiceImpl implements UserViolationService {
 	 */
 	private void clearUserWarnTimes(String custId) {
 		String key = ViolationApi.warnTimesKey(custId);
+		RedisTemplate<String, Long> template = redisTemplateBuilder.buildRedisTemplate(Long.class);
 		try {
-			redisTemplate.delete(key);
+			template.delete(key);
 		} catch (Exception e) {
 			logger.error("UserRedis.clearUserWarnTimes", e);
 			throw new RedisOptException(e);
