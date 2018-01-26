@@ -5,7 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="kid" jdbcType="BIGINT" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
-    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="sms_type" property="type" jdbcType="TINYINT" />
     <result column="app_key" property="appKey" jdbcType="VARCHAR" />
     <result column="sms_channel" property="smsChannel" jdbcType="VARCHAR" />
     <result column="sms_sign" property="smsSign" jdbcType="VARCHAR" />
@@ -14,7 +14,7 @@
     <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, kid, phone, type, app_key, sms_channel, sms_sign, sms_template_code, create_date, 
+    id, kid, phone, sms_type, app_key, sms_channel, sms_sign, sms_template_code, create_date, 
     last_update_date
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -37,7 +37,7 @@
         phone,
       </if>
       <if test="type != null" >
-        type,
+        sms_type,
       </if>
       <if test="appKey != null" >
         app_key,

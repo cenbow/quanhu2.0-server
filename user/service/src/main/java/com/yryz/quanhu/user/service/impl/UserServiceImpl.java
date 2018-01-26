@@ -49,7 +49,7 @@ import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
- * @author suyongcheng
+ * @author danshiyu
  * @version 1.0
  * @date 2017年11月9日 下午12:03:33
  * @Description TODO 用户信息管理
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		//依赖积分系统，获取用户等级
 		EventAcount acount = eventManager.getGrow(userId.toString());
-		if(NumberUtils.toLong(acount.getGrowLevel()) < 1){
+		if(acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1){
 			simpleVO.setUserLevel("1");
 		}else{
 			simpleVO.setUserLevel(acount.getGrowLevel());
@@ -371,7 +371,6 @@ public class UserServiceImpl implements UserService {
 		baseInfo.setBanPostTime(new Date());
 		baseInfo.setUserAge((byte)18);
 		baseInfo.setUserBirthday("");
-		baseInfo.setUserGenders((byte)10);
 		baseInfo.setUserDesc("");
 		custbaseinfoDao.insert(baseInfo);
 

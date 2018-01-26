@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Lists;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
@@ -93,7 +95,7 @@ public class UserController {
 		refreshDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		refreshDTO.setType(DevType.getEnumByType(header.getDevType(), header.getUserAgent()));
 		AuthTokenVO tokenVO = ResponseUtils.getResponseData(authApi.refreshToken(refreshDTO));
-		return ResponseUtils.returnObjectSuccess(tokenVO);
+		return ResponseUtils.returnApiObjectSuccess(tokenVO);
 	}
 
 	@ApiOperation("用户信息查询")
@@ -108,7 +110,7 @@ public class UserController {
 		} else {
 			simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
 		}
-		return ResponseUtils.returnObjectSuccess(simpleVO);
+		return ResponseUtils.returnApiObjectSuccess(simpleVO);
 	}
 	
 	@ApiOperation("用户信息编辑")
@@ -119,7 +121,7 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		infoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(userApi.updateUserInfo(infoDTO));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 	
 	/**
@@ -142,7 +144,7 @@ public class UserController {
 				registerDTO.getActivityChannelCode(), devType, ip);
 		registerDTO.setRegLogDTO(logDTO);
 		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.register(registerDTO, header));
-		return ResponseUtils.returnObjectSuccess(loginVO);
+		return ResponseUtils.returnApiObjectSuccess(loginVO);
 	}
 
 	/**
@@ -160,7 +162,7 @@ public class UserController {
 	public Response<RegisterLoginVO> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.login(loginDTO, header));
-		return ResponseUtils.returnObjectSuccess(loginVO);
+		return ResponseUtils.returnApiObjectSuccess(loginVO);
 	}
 
 	/**
@@ -184,7 +186,7 @@ public class UserController {
 				registerDTO.getActivityChannelCode(), devType, ip);
 		registerDTO.setRegLogDTO(logDTO);
 		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.loginByVerifyCode(registerDTO,header));
-		return ResponseUtils.returnObjectSuccess(loginVO);
+		return ResponseUtils.returnApiObjectSuccess(loginVO);
 	}
 
 	/**
@@ -218,7 +220,7 @@ public class UserController {
 			map.put("authInfo", response.getData().getAuthInfo());
 			map.put("user", response.getData().getUser());
 		}
-		return ResponseUtils.returnObjectSuccess(map);
+		return ResponseUtils.returnApiObjectSuccess(map);
 	}
 
 	/**
@@ -243,7 +245,7 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
 		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.loginThirdBindPhone(loginDTO, header));
-		return ResponseUtils.returnObjectSuccess(loginVO);
+		return ResponseUtils.returnApiObjectSuccess(loginVO);
 	}
 
 	/**
@@ -302,6 +304,7 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("退出登录")
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/loginOut")
 	public Response<Boolean> loginOut() {
@@ -322,7 +325,7 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		phoneDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(accountApi.bindPhone(phoneDTO));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 
 	/**
@@ -339,7 +342,7 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		thirdDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(accountApi.bindThird(thirdDTO));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 
 	/**
@@ -356,7 +359,7 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		thirdDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(accountApi.unbindThird(thirdDTO));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 
 	/**
@@ -377,7 +380,7 @@ public class UserController {
 	public Response<Boolean> editPassword(@RequestBody Map<String,String> params,HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		Boolean result = ResponseUtils.getResponseData(accountApi.editPassword(NumberUtils.createLong(header.getUserId()), params.get("oldPassword"), params.get("newPassword")));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 
 	/**
@@ -393,7 +396,7 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		passwordDTO.setAppId(header.getAppId());
 		Boolean result = ResponseUtils.getResponseData(accountApi.forgotPassword(passwordDTO));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 	
 	/**
@@ -410,7 +413,31 @@ public class UserController {
 		tagDTO.setTagType(UserTagType.US_SELECT.getType());
 		tagDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(tagApi.batchSaveUserTag(tagDTO));
-		return ResponseUtils.returnObjectSuccess(result);
+		return ResponseUtils.returnApiObjectSuccess(result);
+	}
+	
+	/**
+	 * 用户选择标签
+	 * 
+	 * @param tagDTO
+	 */
+	@ApiOperation("查询用户选择的标签")
+	@UserBehaviorValidation(login=true)
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/user/getUserTags")
+	public Response<List<Map<String,String>>> getUserTags(HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		List<String> result = ResponseUtils.getResponseData(tagApi.getTags(NumberUtils.createLong(header.getUserId()), (int)UserTagType.US_SELECT.getType()));
+		if(CollectionUtils.isEmpty(result)){
+			return ResponseUtils.returnApiObjectSuccess(Lists.newArrayList());
+		}
+		List<Map<String,String>> maps = Lists.newArrayList();
+		for(int i = 0 ; i < result.size(); i++){
+			Map<String,String> map = new HashMap<>();
+			map.put("tagId", result.get(i));
+			maps.add(map);
+		}
+		return ResponseUtils.returnApiObjectSuccess(maps);
 	}
 	
 	/**
@@ -424,7 +451,7 @@ public class UserController {
 	public Response<UserRegInviterLinkVO> getInviterLink(HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		UserRegInviterLinkVO linkVO = ResponseUtils.getResponseData(operateApi.getInviterLinkByUserId(NumberUtils.createLong(header.getUserId())));
-		return ResponseUtils.returnObjectSuccess(linkVO);
+		return ResponseUtils.returnApiObjectSuccess(linkVO);
 	}
 	
 	/**
@@ -438,10 +465,10 @@ public class UserController {
 	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/getInviterUser")
-	public Response<MyInviterVO> getInviterUser(HttpServletRequest request,Integer inviterId, Integer limit) {
+	public Response<MyInviterVO> getInviterUser(HttpServletRequest request,Long inviterId, Integer limit) {
 		RequestHeader header = WebUtil.getHeader(request);
 		MyInviterVO inviterVO = ResponseUtils.getResponseData(operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId));
-		return ResponseUtils.returnObjectSuccess(inviterVO);
+		return ResponseUtils.returnApiObjectSuccess(inviterVO);
 	}
 	
 	/**

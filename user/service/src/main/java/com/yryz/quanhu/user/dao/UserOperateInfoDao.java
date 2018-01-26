@@ -52,7 +52,7 @@ public interface UserOperateInfoDao {
 	 * @return
 	 */
 	List<UserOperateInfo> listByUserId(@Param("userId") Long userId, @Param("limit") Integer limit,
-			@Param("inviterId") Integer inviterId);
+			@Param("inviterId") Long inviterId);
 
 	/**
 	 * 查询注册信息

@@ -28,7 +28,7 @@
 	</sql>
 	
 	<!-- 查询本人邀请码 -->
-	<select id="selectInviterCodeByUserId" resultType="java.lang.String">
+	<select id="selectInviterByUserId" resultType="java.lang.String">
 		select user_inviter_code
 		from qh_user_operate_info
 		where user_id = #{userId}
@@ -54,7 +54,7 @@
 		user_id as userId,
 		create_date as createDate
 		from qh_user_operate_info
-		where user_inviter_id = #{userInviterId}
+		where user_inviter_id = #{userId}
 		<if test="inviterId != null">
 			and kid &lt; #{inviterId}
 		</if>
