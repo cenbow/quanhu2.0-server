@@ -310,7 +310,7 @@
 	</foreach>
   </update>
   
-  <select id="selectByCoterieId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByCoterieId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from qh_coterie
