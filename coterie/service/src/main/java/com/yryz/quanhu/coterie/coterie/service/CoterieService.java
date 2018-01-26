@@ -6,6 +6,7 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -34,12 +35,12 @@ public interface CoterieService {
 	/**
 	 * 删除私圈
 	 */
-	void remove(String coterieId);
+	void remove(Long coterieId);
 	
 	/**
 	 * 查询私圈
 	 */
-	CoterieInfo find(String coterieId);
+	CoterieInfo find(Long coterieId);
 	
 	/**
 	 * 按状态查询私圈列表
@@ -54,7 +55,7 @@ public interface CoterieService {
 	/**
 	 * 查询私圈列表by私圈ID集合
 	 */
-	List<CoterieInfo> findList(List<String> coterieIdList);
+	List<CoterieInfo> findList(List<Long> coterieIdList);
 	
 	/**
 	 * 分页查询私圈列表
@@ -148,7 +149,7 @@ public interface CoterieService {
 	 * @param pageSize
 	 * @return
 	 */
-	List<CoterieAuditRecord> findAuditRecordList(String coterieId, Integer pageNum, Integer pageSize);
+	List<CoterieAuditRecord> findAuditRecordList(String Long, Integer pageNum, Integer pageSize);
 	
 	/**
 	 * 私圈数量
@@ -162,13 +163,13 @@ public interface CoterieService {
 	 * 推荐私圈设置
 	 * @param coterieIdList
 	 */
-	public void recommendCoterie(List<String> coterieIdList);
+	public void recommendCoterie(List<Long> coterieIdList);
 	
 	/**
 	 * 取消推荐私圈设置
 	 * @param coterieIdList
 	 */
-	public void cancelRecommendCoterie(List<String> coterieIdList);
+	public void cancelRecommendCoterie(List<Long> coterieIdList);
 	
 	/**
 	 * 获取运营推荐的私圈
@@ -221,4 +222,10 @@ public interface CoterieService {
 	 * @return
 	 */
 	public List<String> getCircleIdListByOwnerId(String ownerId);
+	/**
+	 *  修改私圈成员数目
+	 * @param coterieId
+	 * @return
+	 */
+	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum);
 }

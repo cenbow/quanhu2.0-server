@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.demo.mq.AmqpConstant;
 
 /**
@@ -49,8 +51,23 @@ public class MQTest {
 	
 	@Test
 	public void fanoutSend(){
-		String msg = "hello fanout demo mq";
-		rabbitTemplate.setExchange(AmqpConstant.DEMO_FANOUT_EXCHANGE);
+		ResourceTotal resourceTotal = new ResourceTotal();
+		resourceTotal.setClassifyId(1);
+		resourceTotal.setContent("测试正文2");
+		resourceTotal.setCoterieId("TestCoterieId");
+		resourceTotal.setCreateDate(DateUtils.getDateTime());
+		resourceTotal.setExtJson("{\"resourceId\":1000211}");
+		resourceTotal.setModuleEnum(1003);
+		resourceTotal.setPublicState("10");
+		resourceTotal.setResourceId(1000211L);
+		resourceTotal.setTalentType("1");
+		resourceTotal.setTitle("resource title test");
+		resourceTotal.setUserId(10000L);
+		resourceTotal.setTransmitType(1003);
+		resourceTotal.setTransmitNote("transmitNote");
+		
+		String msg = GsonUtils.parseJson(resourceTotal);
+		rabbitTemplate.setExchange("RESOURCE_DYNAMIC_FANOUT_EXCHANGE");
 //		rabbitTemplate.setRoutingKey(AmqpConfig.DEMO_QUEUE);
 		rabbitTemplate.convertAndSend(msg);
 	}

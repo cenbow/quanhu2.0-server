@@ -14,6 +14,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -62,7 +63,7 @@ public class UserStarServiceImpl implements UserStarService {
 	@Transactional
 	public int save(UserStarAuth record) {
 		record.setCreateDate(new Date());
-		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH).getData());
+		record.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH)));
 		record.setRecommendStatus(StarRecommendStatus.FALSE.getStatus());
 		record.setAuditStatus(StarAuditStatus.WAIT_AUDIT.getStatus());
 		if (StringUtils.isEmpty(record.getRealName())) {
@@ -288,7 +289,7 @@ public class UserStarServiceImpl implements UserStarService {
 			BeanUtils.copyProperties(oldAuth, logModel);
 		}
 		try {
-			logModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG).getData());
+			logModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG)));
 			logModel.setCreateDate(new Date());
 			starAuthLogDao.insert(logModel);
 		} catch (Exception e) {

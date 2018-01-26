@@ -21,7 +21,6 @@ public class CoterieMemberVoForPermission implements Serializable {
     public void setPermission(Integer permission) {
         this.permission = permission;
     }
-
 }
 
 

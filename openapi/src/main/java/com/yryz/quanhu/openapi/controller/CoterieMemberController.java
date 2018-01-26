@@ -2,10 +2,11 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
-import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForNewMemberCount;
+import com.yryz.quanhu.coterie.member.vo.*;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.support.category.api.CategoryAPI;
 import com.yryz.quanhu.support.category.vo.CategoryCheckedVo;
@@ -65,7 +66,11 @@ public class CoterieMemberController {
     @GetMapping(value = "/services/app/{version}/coterie/member/permission")
     public Response permission(@RequestHeader("userId") Long userId, Long coterieId) {
 
-        return coterieMemberAPI.permission(userId, coterieId);
+        CoterieMemberVoForPermission permissionResult = new CoterieMemberVoForPermission();
+        permissionResult.setPermission(ResponseUtils.getResponseData(coterieMemberAPI.permission(userId, coterieId)));
+
+        return new Response<>(permissionResult);
+
     }
 
     @ApiOperation("成员申请加入私圈的审批")
@@ -83,7 +88,10 @@ public class CoterieMemberController {
     @GetMapping(value = "/services/app/{version}/coterie/member/newMemberNum")
     public Response<CoterieMemberVoForNewMemberCount> newMemberNum(Long coterieId) {
 
-        return coterieMemberAPI.queryNewMemberNum(coterieId);
+        CoterieMemberVoForNewMemberCount newMemberCount = new CoterieMemberVoForNewMemberCount();
+        newMemberCount.setCount(ResponseUtils.getResponseData(coterieMemberAPI.queryNewMemberNum(coterieId)));
+
+        return new Response<>(newMemberCount);
     }
 
     @ApiOperation("申请加入私圈列表")
@@ -91,7 +99,8 @@ public class CoterieMemberController {
     @GetMapping(value = "/services/app/{version}/coterie/member/applyList")
     public Response applyList(Long coterieId, Integer pageNo, Integer pageSize) {
 
-        return coterieMemberAPI.queryMemberApplyList(coterieId, pageNo, pageSize);
+        Response<PageList<CoterieMemberApplyVo>> result = coterieMemberAPI.queryMemberApplyList(coterieId, pageNo, pageSize);
+        return result;
     }
 
     @ApiOperation("私圈成员列表")

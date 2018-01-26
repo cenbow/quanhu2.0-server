@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author xiepeng
@@ -36,7 +34,7 @@ public class DymaicTest {
     public void add() {
         Dymaic tmp = new Dymaic();
         tmp.setKid(1L);
-        tmp.setUserId(100L);
+        tmp.setUserId(USER_DEMO);
 
         Dymaic dymaic = new Dymaic();
         dymaic.setUserId(USER_DEMO);
@@ -51,20 +49,34 @@ public class DymaicTest {
 
     @Test
     public void delete() {
-        Response<Boolean> response = dymaicService.delete(USER_DEMO, 107226L);
+        Response<Boolean> response = dymaicService.delete(USER_DEMO, 107635L);
+        print(response);
+    }
+
+    @Test
+    public void shelve() {
+        Response<Boolean> response = dymaicService.shelve(USER_DEMO, 107641L, false);
         print(response);
     }
 
     @Test
     public void get() {
-        Response<Dymaic> response = dymaicService.get(107233L);
+        Response<Dymaic> response = dymaicService.get(107641L);
         print(response);
     }
 
     @Test
     public void getBatch() {
-        List<Long> kids = Arrays.asList(new Long[]{107226L,107227L,107230L,107232L});
+        List<Long> kids = Arrays.asList(new Long[]{107226L,107227L,107230L,107426L});
         Response<Map<Long, Dymaic>> response = dymaicService.get(kids);
+        print(response);
+    }
+
+    @Test
+    public void getLastSend() {
+        Set<Long> userIds = new HashSet<>();
+        userIds.add(724007310011252736L);
+        Response<Map<Long, Dymaic>> response = dymaicService.getLastSend(userIds);
         print(response);
     }
 

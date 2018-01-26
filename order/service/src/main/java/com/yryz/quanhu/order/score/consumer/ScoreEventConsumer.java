@@ -123,10 +123,10 @@ public class ScoreEventConsumer   {
                         logger.info("-------处理积分事件，事件类型eventType=4：签到区间循环,传入数据：" + data.toString());
                         String statusSignKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Sign);
                         String statusSign = redisTemplate.opsForValue().get(statusSignKey);
-                       // if (!"true".equals(statusSign)) {
+                        if (!"true".equals(statusSign)) {
                             ste = ScoreTypeEnum.Sign;
                             ruleScoreServiceProvider.getService(ste).processStatus(userId, eventCode, sei,  amount);
-                       // }
+                        }
                         break;
                     default:
                         break;

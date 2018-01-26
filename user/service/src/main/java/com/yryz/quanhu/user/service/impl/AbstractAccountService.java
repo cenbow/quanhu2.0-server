@@ -20,6 +20,7 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -59,7 +60,7 @@ public class AbstractAccountService implements AccountService {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAccountService.class);
 	@Autowired
 	private UserAccountDao mysqlDao;
-	@Reference(lazy=true,check=false)
+	@Reference(lazy = true, check = false)
 	private IdAPI idApi;
 	@Autowired
 	private UserLoginLogDao logDao;
@@ -71,7 +72,7 @@ public class AbstractAccountService implements AccountService {
 	protected UserService userService;
 	@Autowired
 	private UserSender mqSender;
-	
+
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public Long register(RegisterDTO registerDTO) {
@@ -83,7 +84,7 @@ public class AbstractAccountService implements AccountService {
 	public String agentRegister(AgentRegisterDTO registerDTO) {
 		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getAppId(), null);
 		if (checkAccount != null) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户已存在");
+			throw QuanhuException.busiError("该用户已存在");
 		}
 		String regChannel = Constants.ADMIN_REG_CHANNEL;
 		if (registerDTO.getIsVest() == null || registerDTO.getIsVest() == 0) {
@@ -100,10 +101,10 @@ public class AbstractAccountService implements AccountService {
 	public Long login(LoginDTO loginDTO, String appId) {
 		UserAccount account = selectOne(null, loginDTO.getPhone(), appId, null);
 		if (account == null) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户不存在");
+			throw QuanhuException.busiError("该用户不存在");
 		}
 		if (!StringUtils.equals(account.getUserPwd(), loginDTO.getPassword())) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "登录密码错误");
+			throw QuanhuException.busiError("登录密码错误");
 		}
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号
@@ -118,17 +119,19 @@ public class AbstractAccountService implements AccountService {
 	 * 手机验证码登录
 	 */
 	@Override
-	public Long loginByVerifyCode(RegisterDTO registerDTO,String appId) {
+	public Long loginByVerifyCode(RegisterDTO registerDTO, String appId) {
 		UserAccount account = selectOne(null, registerDTO.getUserPhone(), appId, null);
-		//用户不存在直接注册
+		// 用户不存在直接注册
 		if (account == null) {
-			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_REGISTER, appId)) {
-				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "验证码错误");
+			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
+					SmsType.CODE_REGISTER, appId)) {
+				throw QuanhuException.busiError("验证码错误");
 			}
 			return createUser(registerDTO);
 		}
-		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN, appId)) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "验证码错误");
+		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
+				appId)) {
+			throw QuanhuException.busiError("验证码错误");
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
@@ -146,9 +149,9 @@ public class AbstractAccountService implements AccountService {
 		if (userId == null) {
 			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
 		}
-		//兼容未绑定手机号的老用户
+		// 兼容未绑定手机号的老用户
 		UserAccount account = getUserAccountByUserId(userId);
-		if(StringUtils.isBlank(account.getUserPhone())){
+		if (StringUtils.isBlank(account.getUserPhone())) {
 			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号
@@ -171,7 +174,9 @@ public class AbstractAccountService implements AccountService {
 		Long userId = createUser(registerDTO);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
-				thirdUser.getNickName(),loginDTO.getRegLogDTO().getAppId()));
+				thirdUser.getNickName(), loginDTO.getRegLogDTO().getAppId()));
+		logger.info("[user_bindPhone]:userId:{},bindType:thirdLoginBindPhone,oldPhone:,newPhone:{}", userId,
+				loginDTO.getPhone());
 		return userId;
 	}
 
@@ -183,7 +188,7 @@ public class AbstractAccountService implements AccountService {
 		}
 		UserAccount account = selectOne(userId, null, null, null);
 		if (account == null) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该用户不存在");
+			throw QuanhuException.busiError("该用户不存在");
 		}
 		List<LoginMethodVO> list = JsonUtils.fromJson(JsonUtils.toFastJson(logins),
 				new TypeReference<List<LoginMethodVO>>() {
@@ -239,7 +244,7 @@ public class AbstractAccountService implements AccountService {
 		Long userId = createUser(registerDTO);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(),
-				(byte) RegType.getEnumByText(loginType).getType(), thirdUser.getNickName(),"appId"));
+				(byte) RegType.getEnumByText(loginType).getType(), thirdUser.getNickName(), "appId"));
 
 		return userId;
 	}
@@ -247,6 +252,7 @@ public class AbstractAccountService implements AccountService {
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public void bindPhone(Long userId, String phone, String password) {
+		UserAccount oldAccount = selectOne(userId, null, null, null);
 		UserAccount account = new UserAccount(null, phone, password);
 		account.setKid(userId);
 		account.setCreateDate(new Date());
@@ -254,6 +260,8 @@ public class AbstractAccountService implements AccountService {
 
 		// 同步手机号到用户基础信息表
 		userService.updateUserInfo(new UserBaseInfo(account.getKid(), phone, null, null));
+		logger.info("[user_bindPhone]:userId:{},bindType:bindPhone,oldPhone:{},newPhone:{}", userId,
+				oldAccount.getUserPhone(), phone);
 	}
 
 	@Override
@@ -310,13 +318,11 @@ public class AbstractAccountService implements AccountService {
 	@Override
 	public void forgotPasswordByPhone(String phone, String password, String verifyCode, String appId) {
 		if (!smsService.checkVerifyCode(phone, verifyCode, SmsType.CODE_FIND_PWD, appId)) {
-			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "验证码错误",
-					ExceptionEnum.BusiException.getErrorMsg());
+			throw QuanhuException.busiError("验证码错误");
 		}
 		UserAccount account = selectOne(null, phone, null, null);
 		if (account == null) {
-			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "该用户不存在",
-					ExceptionEnum.BusiException.getErrorMsg());
+			throw QuanhuException.busiError("该用户不存在");
 		}
 		account.setDelFlag(null);
 		account.setId(null);
@@ -428,7 +434,7 @@ public class AbstractAccountService implements AccountService {
 		loginLog.setCreateDate(new Date());
 		loginLog.setLoginX(0l);
 		loginLog.setLoginY(0l);
-		loginLog.setKid(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG).getData());
+		loginLog.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG)));
 		try {
 			logDao.insert(loginLog);
 		} catch (Exception e) {
@@ -447,7 +453,7 @@ public class AbstractAccountService implements AccountService {
 	 */
 	@Transactional(rollbackFor = RuntimeException.class)
 	protected Long createUser(RegisterDTO registerDTO) {
-		Long userId = NumberUtils.toLong(idApi.getUserId().getData());
+		Long userId = NumberUtils.toLong(ResponseUtils.getResponseData(idApi.getUserId()));
 		UserAccount account = new UserAccount(null, registerDTO.getUserPhone(), registerDTO.getUserPwd());
 		account.setKid(userId);
 		account.setAppId(registerDTO.getRegLogDTO().getAppId());
@@ -458,12 +464,12 @@ public class AbstractAccountService implements AccountService {
 				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
 						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode()));
 		registerDTO.getRegLogDTO().setUserId(userId);
-		
-		//异步处理
-		//创建运营信息
-		//发送注册消息 加积分
+
+		// 异步处理
+		// 创建运营信息
+		// 发送注册消息 加积分
 		mqSender.userCreate(registerDTO);
-		
+
 		return userId;
 	}
 

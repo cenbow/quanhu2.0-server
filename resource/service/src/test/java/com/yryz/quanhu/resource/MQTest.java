@@ -40,15 +40,15 @@ public class MQTest {
 	@Test
 	public void directSend(){
 		String msg = "hello dirct demo mq";
-		rabbitTemplate.setExchange(AmqpConstant.DEMO_DIRECT_EXCHANGE);
-		rabbitTemplate.setRoutingKey(AmqpConstant.DEMO_QUEUE);
+		rabbitTemplate.setExchange(AmqpConstant.RESOURCE_DYNAMIC_FANOUT_EXCHANGE);
+		rabbitTemplate.setRoutingKey(AmqpConstant.RESOURCE_COMMIT_QUEUE);
 		rabbitTemplate.convertAndSend(msg);
 	}
 	
 	@Test
 	public void fanoutSend(){
 		String msg = "hello fanout demo mq";
-		rabbitTemplate.setExchange(AmqpConstant.DEMO_FANOUT_EXCHANGE);
+		rabbitTemplate.setExchange(AmqpConstant.RESOURCE_DYNAMIC_FANOUT_EXCHANGE);
 //		rabbitTemplate.setRoutingKey(AmqpConfig.DEMO_QUEUE);
 		rabbitTemplate.convertAndSend(msg);
 	}

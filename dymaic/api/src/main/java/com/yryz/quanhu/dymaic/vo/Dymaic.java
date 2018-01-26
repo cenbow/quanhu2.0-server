@@ -44,14 +44,15 @@ public class Dymaic implements Serializable {
     private Integer transmitType;
 
     /**
-     * 发布说明
-     */
-    private String releaseNote;
-
-    /**
      * 文章、话题、私圈等标准json扩展属性
      */
     private String extJson;
+
+    /**
+     * 下架标记
+     * 10正常，11已下架
+     */
+    private Integer shelveFlag;
 
     /**
      * 删除标记
@@ -113,20 +114,20 @@ public class Dymaic implements Serializable {
         this.transmitType = transmitType;
     }
 
-    public String getReleaseNote() {
-        return releaseNote;
-    }
-
-    public void setReleaseNote(String releaseNote) {
-        this.releaseNote = releaseNote;
-    }
-
     public String getExtJson() {
         return extJson;
     }
 
     public void setExtJson(String extJson) {
         this.extJson = extJson;
+    }
+
+    public Integer getShelveFlag() {
+        return shelveFlag;
+    }
+
+    public void setShelveFlag(Integer shelveFlag) {
+        this.shelveFlag = shelveFlag;
     }
 
     public Integer getDelFlag() {

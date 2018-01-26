@@ -27,6 +27,7 @@ import com.yryz.common.context.Context;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.constants.RedisConstants;
@@ -80,7 +81,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(),
 					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
-			infoModel.setKid(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE).getData());
+			infoModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE)));
 			persistenceDao.insert(infoModel);
 		} catch (Exception e) {
 			Logger.error("getVerifyCode", e);

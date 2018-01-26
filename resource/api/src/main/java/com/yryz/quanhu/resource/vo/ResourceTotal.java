@@ -34,7 +34,7 @@ public class ResourceTotal {
     /**
      * 资源ID
      */
-    private Integer resourceId;
+    private Long resourceId;
 
     /**
      * 文章分类ID
@@ -72,11 +72,6 @@ public class ResourceTotal {
     private String publicState;
     
     /**
-     * 资源简介
-     */
-    private String summary;
-    
-    /**
      * 扩展字段，仅供展示使用，由前端的发布方和列表解析方解决
      */
     private String extJson;
@@ -92,9 +87,209 @@ public class ResourceTotal {
      */
     private Integer transmitType;
 
-    /**
-     * 发布说明
-     */
-    private String releaseNote;
+	/**
+	 * 
+	 * @exception 
+	 */
+	public ResourceTotal() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
+	/**
+	 * @return the kid
+	 */
+	public Long getKid() {
+		return kid;
+	}
+
+	/**
+	 * @param kid the kid to set
+	 */
+	public void setKid(Long kid) {
+		this.kid = kid;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public Long getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the moduleEnum
+	 */
+	public Integer getModuleEnum() {
+		return moduleEnum;
+	}
+
+	/**
+	 * @param moduleEnum the moduleEnum to set
+	 */
+	public void setModuleEnum(Integer moduleEnum) {
+		this.moduleEnum = moduleEnum;
+	}
+
+	/**
+	 * @return the resourceId
+	 */
+	public Long getResourceId() {
+		return resourceId;
+	}
+
+	/**
+	 * @param resourceId the resourceId to set
+	 */
+	public void setResourceId(Long resourceId) {
+		this.resourceId = resourceId;
+	}
+
+	/**
+	 * @return the classifyId
+	 */
+	public Integer getClassifyId() {
+		return classifyId;
+	}
+
+	/**
+	 * @param classifyId the classifyId to set
+	 */
+	public void setClassifyId(Integer classifyId) {
+		this.classifyId = classifyId;
+	}
+
+	/**
+	 * @return the coterieId
+	 */
+	public String getCoterieId() {
+		return coterieId;
+	}
+
+	/**
+	 * @param coterieId the coterieId to set
+	 */
+	public void setCoterieId(String coterieId) {
+		this.coterieId = coterieId;
+	}
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @return the content
+	 */
+	public String getContent() {
+		return content;
+	}
+
+	/**
+	 * @param content the content to set
+	 */
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	/**
+	 * @return the createDate
+	 */
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	/**
+	 * @param createDate the createDate to set
+	 */
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	/**
+	 * @return the talentType
+	 */
+	public String getTalentType() {
+		return talentType;
+	}
+
+	/**
+	 * @param talentType the talentType to set
+	 */
+	public void setTalentType(String talentType) {
+		this.talentType = talentType;
+	}
+
+	/**
+	 * @return the publicState
+	 */
+	public String getPublicState() {
+		return publicState;
+	}
+
+	/**
+	 * @param publicState the publicState to set
+	 */
+	public void setPublicState(String publicState) {
+		this.publicState = publicState;
+	}
+
+	/**
+	 * @return the extJson
+	 */
+	public String getExtJson() {
+		return extJson;
+	}
+
+	/**
+	 * @param extJson the extJson to set
+	 */
+	public void setExtJson(String extJson) {
+		this.extJson = extJson;
+	}
+
+	/**
+	 * @return the transmitNote
+	 */
+	public String getTransmitNote() {
+		return transmitNote;
+	}
+
+	/**
+	 * @param transmitNote the transmitNote to set
+	 */
+	public void setTransmitNote(String transmitNote) {
+		this.transmitNote = transmitNote;
+	}
+
+	/**
+	 * @return the transmitType
+	 */
+	public Integer getTransmitType() {
+		return transmitType;
+	}
+
+	/**
+	 * @param transmitType the transmitType to set
+	 */
+	public void setTransmitType(Integer transmitType) {
+		this.transmitType = transmitType;
+	}
+    
 }

@@ -1,5 +1,6 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
+import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -42,6 +43,10 @@ public class QuestionVo  implements Serializable {
     private UserSimpleVO user;
 
     private String moduleEnum;
+
+    private String orderId;
+
+    private BehaviorVo behaviorVo;
 
     public Long getKid() {
         return kid;
@@ -185,5 +190,21 @@ public class QuestionVo  implements Serializable {
 
     public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public BehaviorVo getBehaviorVo() {
+        return behaviorVo;
+    }
+
+    public void setBehaviorVo(BehaviorVo behaviorVo) {
+        this.behaviorVo = behaviorVo;
     }
 }
