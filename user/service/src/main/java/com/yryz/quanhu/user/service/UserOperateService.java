@@ -75,10 +75,4 @@ public interface UserOperateService {
 	 * @Description 根据邀请码更新邀请人数
 	 */
 	void updateInviterNum(String inviterCode);
-	
-	/**
-	 * 根据邀请码发送邀请人注册邀请事件
-	 * @param inviterCode
-	 */
-	void commitInviterEvent(String inviterCode);
 }

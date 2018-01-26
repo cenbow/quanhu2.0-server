@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
@@ -45,8 +46,8 @@ public class SmsManager {
 	 */
 	public SmsVerifyCodeVO sendCode(String phone, SmsType smsType, String appId) {
 		try {
-			VerifyCodeVO codeVO = commonSafeApi.getVerifyCode(new VerifyCodeDTO(smsType.getType(),
-					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId)).getData();
+			VerifyCodeVO codeVO = ResponseUtils.getResponseData(commonSafeApi.getVerifyCode(new VerifyCodeDTO(smsType.getType(),
+					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId)));
 			return new SmsVerifyCodeVO(String.valueOf(smsType.getType()), phone, String.valueOf(codeVO.getExpireAt()));
 		} catch (QuanhuException e) {
 			logger.error("[SmsAPI.sendCode]", e);
@@ -74,10 +75,10 @@ public class SmsManager {
 	public boolean checkVerifyCode(String phone, String code, String type, String appId, boolean needDelete) {
 		try {
 			smsLogger.info("[check_verifyCode]:phone->{},code->{},type->{},status->success", phone, code, type);
-			int result = commonSafeApi
+			int result = ResponseUtils.getResponseData(commonSafeApi
 					.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(type),
 							CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId, code, needDelete))
-					.getData();
+					);
 			if (result != 0) {
 				return false;
 			}

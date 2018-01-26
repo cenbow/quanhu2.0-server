@@ -27,6 +27,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserOperateInfoDao;
@@ -35,7 +36,6 @@ import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserRegQueryDTO;
 import com.yryz.quanhu.user.entity.UserOperateInfo;
 import com.yryz.quanhu.user.entity.UserRegLog;
-import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.service.UserOperateService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.vo.MyInviterDetailVO;
@@ -61,14 +61,12 @@ public class UserOperateServiceImpl implements UserOperateService {
 	private IdAPI idApi;
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private EventManager eventService;
 	
 	@Override
 	public int save(UserOperateInfo record) {
 		record.setCreateDate(new Date());
-		record.setKid(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO).getData());
-		record.setUserInviterCode(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO).getData().toString());
+		record.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO)));
+		record.setUserInviterCode(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO)).toString());
 		if (StringUtils.isNotBlank(record.getUserRegInviterCode())) {
 			String userRegId = selectUserIdByInviter(record.getUserRegInviterCode());
 			record.setUserRegId(userRegId);
@@ -202,13 +200,6 @@ public class UserOperateServiceImpl implements UserOperateService {
 			}
 		}
 		return new MyInviterVO(total, detailVOs);
-	}
-
-	@Override
-	public void commitInviterEvent(String inviterCode) {
-		String userId = this.selectUserIdByInviter(inviterCode);
-		// TODO:注册加积分
-		eventService.inviterRegister(userId);
 	}
 
 }

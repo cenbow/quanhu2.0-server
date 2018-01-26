@@ -15,10 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.sms.dao.SmsTemplateDao;
 import com.yryz.quanhu.message.sms.entity.SmsTemplate;
 import com.yryz.quanhu.message.sms.service.SmsTemplateService;
+import com.yryz.quanhu.support.id.api.IdAPI;
+
 /**
  * @author danshiyu
  * @version 1.0
@@ -28,62 +33,70 @@ import com.yryz.quanhu.message.sms.service.SmsTemplateService;
 @Service
 public class SmsTemplateServiceImpl implements SmsTemplateService {
 	private static final Logger logger = LoggerFactory.getLogger(SmsTemplateServiceImpl.class);
-	
+
 	@Autowired
 	private SmsTemplateDao dao;
-	
+	@Reference
+	private IdAPI idApi;
+
 	@Override
 	public int save(SmsTemplate template) {
 		try {
 			template.setCreateDate(new Date());
+			template.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_SMS_TEMPLATE)));
 			return dao.insert(template);
 		} catch (Exception e) {
-			logger.error("[SmsTemplateDao.save]",e);
+			logger.error("[SmsTemplateDao.save]", e);
 			throw new MysqlOptException(e);
 		}
 	}
+
 	@Override
 	public int update(SmsTemplate template) {
 		try {
 			return dao.update(template);
 		} catch (Exception e) {
-			logger.error("[SmsTemplateDao.update]",e);
+			logger.error("[SmsTemplateDao.update]", e);
 			throw new MysqlOptException(e);
 		}
 	}
+
 	@Override
 	public int delete(Integer id) {
 		try {
 			return 0;
 		} catch (Exception e) {
-			logger.error("[SmsTemplateDao.delete]",e);
+			logger.error("[SmsTemplateDao.delete]", e);
 			throw new MysqlOptException(e);
 		}
 	}
+
 	@Override
 	public SmsTemplate get(Long kid) {
 		try {
 			return dao.selectOne(kid);
 		} catch (Exception e) {
-			logger.error("[SmsTemplateDao.get]",e);
+			logger.error("[SmsTemplateDao.get]", e);
 			throw new MysqlOptException(e);
 		}
 	}
+
 	@Override
 	public SmsTemplate getByParams(String smsTemplateCode) {
 		try {
-			return null;//dao.getByParams(smsTemplateCode);
+			return null;// dao.getByParams(smsTemplateCode);
 		} catch (Exception e) {
-			logger.error("[SmsTemplateDao.getByParams]",e);
+			logger.error("[SmsTemplateDao.getByParams]", e);
 			throw new MysqlOptException(e);
 		}
 	}
+
 	@Override
 	public List<SmsTemplate> listTemplate() {
 		try {
-			return null;//dao.listTemplate();
+			return null;// dao.listTemplate();
 		} catch (Exception e) {
-			logger.error("[SmsTemplateDao.listTemplate]",e);
+			logger.error("[SmsTemplateDao.listTemplate]", e);
 			throw new MysqlOptException(e);
 		}
 	}
