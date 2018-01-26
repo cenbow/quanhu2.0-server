@@ -36,7 +36,7 @@ public class DymaicSender {
 		String msg = GsonUtils.parseJson(dymaic).toString();
 
 		rabbitTemplate.setExchange(AmqpConstant.DYMAIC_DIRECT_EXCHANGE);
-		rabbitTemplate.setRoutingKey(AmqpConstant.DYMAIC_QUEUE);
+		rabbitTemplate.setRoutingKey(AmqpConstant.DYMAIC_TIMELINE_QUEUE);
 		rabbitTemplate.convertAndSend(msg);
 	}
 

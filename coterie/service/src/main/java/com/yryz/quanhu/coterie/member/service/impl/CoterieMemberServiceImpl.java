@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
@@ -58,9 +59,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Resource
     private CoterieApplyDao coterieApplyDao;
-
-//    @Resource
-//    private CoterieMapper coterieMapper;
 
     @Resource
     private CoterieService coterieService;
@@ -248,7 +246,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     /************** 0124 ***********************************************************************/
 
     @Override
-    public Byte permission(Long userId, Long coterieId) {
+    public Integer permission(Long userId, Long coterieId) {
 
         //是否为圈主
         CoterieInfo coterie = null;
@@ -259,7 +257,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             String ownerId = coterie.getOwnerId();
 
-           Long oIdL = Long.parseLong(ownerId);
+            Long oIdL = Long.parseLong(ownerId);
 
             if (null != coterie && userId.longValue() == oIdL.longValue()) {
                 return MemberConstant.Permission.OWNER.getStatus();
@@ -305,9 +303,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         try {
             return coterieApplyDao.selectNewMemberNum(coterieId);
         } catch (Exception e) {
-//            throw new MysqlOptException("param coterieId:" + coterieId, e);
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
-        return null;
     }
 
     @Override
@@ -388,6 +385,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             vo.setJoinType(member.getJoinType());
             vo.setLastUpdateDate(member.getLastUpdateDate());
 
+//            Response<UserSimpleVO>
             UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(member.getUserId()));
             vo.setUser(user);
             memberVos.add(vo);
@@ -399,7 +397,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             CoterieInfo coterie = coterieService.find(coterieId);
 
-            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(getLong(coterie.getOwnerId())));
+            UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(Long.parseLong(coterie.getOwnerId())));
             qz.setUser(user);
 
 
@@ -471,12 +469,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             if (member == null) {
                 CoterieInfo coterie = coterieService.find(record.getCoterieId());
                 if (coterie != null) {
-//                    int count = coterieMapper.updateMemberNum(coterie.getCoterieId().toString(), coterie.getMemberNum() + 1, coterie.getMemberNum());
-//                    if (count > 0) {
-                    coterieMemberDao.insert(record);
-//                    } else {
-//                        throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
-//                    }
+                    int count = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
+                    if (count > 0) {
+                        coterieMemberDao.insert(record);
+                    } else {
+                        throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
+                    }
                 }
             }
         } catch (Exception e) {

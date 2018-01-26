@@ -6,6 +6,7 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
@@ -93,7 +94,12 @@ public class AnswerServiceImpl implements AnswerService {
         //向圈主支付回答的费用
         if(null!=questionCheck.getChargeAmount()){
             if(questionCheck.getChargeAmount().longValue()>0){
-
+              Long orderId=  orderSDK.executeOrder(OrderEnum.ANSWER_ORDER,answerdto.getCreateUserId(),questionCheck.getChargeAmount());
+              if(null!=orderId){
+                  question.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
+                  question.setOrderId(String.valueOf(orderId));
+                  this.questionService.updateByPrimaryKeySelective(question);
+              }
             }
         }
         return answerVo;

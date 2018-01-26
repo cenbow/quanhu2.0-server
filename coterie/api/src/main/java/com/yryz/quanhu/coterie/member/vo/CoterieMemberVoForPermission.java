@@ -11,14 +11,14 @@ public class CoterieMemberVoForPermission implements Serializable {
     /**
      * 圈主10 成员20 路人未审请30 路人待审核40
      */
-    private Byte permission;
+    private Integer permission;
 
 
-    public Byte getPermission() {
+    public Integer getPermission() {
         return permission;
     }
 
-    public void setPermission(Byte permission) {
+    public void setPermission(Integer permission) {
         this.permission = permission;
     }
 }

@@ -210,36 +210,41 @@ public class CoterieProvider implements CoterieApi {
 
 	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
-			throw ServiceException.paramsError();
-			//throw new QuanhuException
+			throw new QuanhuException( "info","对象为空","对象为空",null);
 		}
 		if (StringUtils.isEmpty(info.getIcon())) {
-			throw ServiceException.paramsError("icon");
+			throw new QuanhuException( "icon","参数错误","icon不能为空",null);
+
 		}
 		if (StringUtils.isEmpty(info.getIntro())) {
-			throw ServiceException.paramsError("intro");
+
+			throw new QuanhuException( "2007","参数错误","intro不能为空",null);
 		}
 		if (StringUtils.isEmpty(info.getName())) {
-			throw ServiceException.paramsError("name");
+
+			throw new QuanhuException( "2007","参数错误","name不能为空",null);
 		}
 		if (StringUtils.isEmpty(info.getOwnerId())) {
-			throw ServiceException.paramsError("ownerId");
+
+			throw new QuanhuException( "2007","参数错误","ownerId不能为空",null);
 		}
 		if (!(info.getJoinFee()!=null && info.getJoinFee()<=100 && info.getJoinFee()>=0)) {//私圈单位为分，0表示免费，小于100的  单位必定错误
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "加入私圈金额设置不正确。");
+
+			throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
 		}
 
 		//todo
 		List<CoterieInfo> coterieList = coterieService.findByName(StringUtils.trim(info.getName()));
 		if (!coterieList.isEmpty()) {
 			//return ResponseUtils.returnObjectSuccess(coterieService.save(info));
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "私圈名称已存在");
+
+			throw new QuanhuException( "2007","参数错误","私圈名称已存在",null);
 		}
 		Response<List<CoterieInfo>> responseCoterieInfo=coterieApi.getMyCreateCoterie(info.getOwnerId());
 		if(responseCoterieInfo.getData().size()>10)
 		{
 
-
+			throw new QuanhuException( "2007","参数错误","最多只能申请10个私圈",null);
 		}
 		//todo
 //		Response<UserSimpleVO> cust=userApi.getUserSimple(info.getOwnerId());
