@@ -8,33 +8,33 @@ import java.util.Date;
 /**
  * @author chengyunfei
  */
-public class CoterieMember extends GenericEntity implements Serializable{
+public class CoterieMember extends GenericEntity implements Serializable {
 	private static final long serialVersionUID = -312906342632969011L;
 
 	/**
-     * 私圈ID
-     */
-    private Long coterieId;
+	 * 私圈ID
+	 */
+	private Long coterieId;
 
-    /**
-     * 用户ID
-     */
-    private Long userId;
+	/**
+	 * 用户ID
+	 */
+	private Long userId;
 
 	/**
 	 * 通过10，未通过20,待审批30
 	 */
-	private Integer memberStatus;
+	private Byte memberStatus;
 
 	/**
 	 * 加入原因
 	 */
 	private String reason;
 
-    /**
+	/**
 	 * 未禁言20，禁言10
-     */
-    private Integer banSpeak;
+	 */
+	private Byte banSpeak;
 
 	/**
 	 * 审批时间
@@ -44,7 +44,7 @@ public class CoterieMember extends GenericEntity implements Serializable{
 	/**
 	 * 是否免费：是10，否20
 	 */
-	private Integer joinType;
+	private Byte joinType;
 
 	/**
 	 * 金额
@@ -54,12 +54,12 @@ public class CoterieMember extends GenericEntity implements Serializable{
 	/**
 	 * 是否被踢：是10，否20
 	 */
-	private Integer kickStatus;
+	private Byte kickStatus;
 
 	/**
 	 * 删除状态(正常10，已删除20)
 	 */
-	private Integer delFlag;
+	private Byte delFlag;
 
 	public static long getSerialVersionUID() {
 		return serialVersionUID;
@@ -81,28 +81,12 @@ public class CoterieMember extends GenericEntity implements Serializable{
 		this.userId = userId;
 	}
 
-	public Integer getMemberStatus() {
-		return memberStatus;
-	}
-
-	public void setMemberStatus(Integer memberStatus) {
-		this.memberStatus = memberStatus;
-	}
-
 	public String getReason() {
 		return reason;
 	}
 
 	public void setReason(String reason) {
 		this.reason = reason;
-	}
-
-	public Integer getBanSpeak() {
-		return banSpeak;
-	}
-
-	public void setBanSpeak(Integer banSpeak) {
-		this.banSpeak = banSpeak;
 	}
 
 	public Date getProcessTime() {
@@ -113,14 +97,6 @@ public class CoterieMember extends GenericEntity implements Serializable{
 		this.processTime = processTime;
 	}
 
-	public Integer getJoinType() {
-		return joinType;
-	}
-
-	public void setJoinType(Integer joinType) {
-		this.joinType = joinType;
-	}
-
 	public Long getAmount() {
 		return amount;
 	}
@@ -129,19 +105,44 @@ public class CoterieMember extends GenericEntity implements Serializable{
 		this.amount = amount;
 	}
 
-	public Integer getKickStatus() {
+	public Byte getMemberStatus() {
+		return memberStatus;
+	}
+
+	public void setMemberStatus(Byte memberStatus) {
+		this.memberStatus = memberStatus;
+	}
+
+	public Byte getBanSpeak() {
+		return banSpeak;
+	}
+
+	public void setBanSpeak(Byte banSpeak) {
+		this.banSpeak = banSpeak;
+	}
+
+	public Byte getJoinType() {
+		return joinType;
+	}
+
+	public void setJoinType(Byte joinType) {
+		this.joinType = joinType;
+	}
+
+	public Byte getKickStatus() {
 		return kickStatus;
 	}
 
-	public void setKickStatus(Integer kickStatus) {
+	public void setKickStatus(Byte kickStatus) {
 		this.kickStatus = kickStatus;
 	}
 
-	public Integer getDelFlag() {
+	public Byte getDelFlag() {
 		return delFlag;
 	}
 
-	public void setDelFlag(Integer delFlag) {
+	public void setDelFlag(Byte delFlag) {
 		this.delFlag = delFlag;
 	}
 }
+

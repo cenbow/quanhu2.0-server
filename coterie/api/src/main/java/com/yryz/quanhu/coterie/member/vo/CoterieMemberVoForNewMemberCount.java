@@ -12,10 +12,6 @@ public class CoterieMemberVoForNewMemberCount implements Serializable {
      */
     private Integer count;
 
-    public CoterieMemberVoForNewMemberCount(Integer count) {
-        this.count = count;
-    }
-
     public Integer getCount() {
         return count;
     }
