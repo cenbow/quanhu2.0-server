@@ -70,11 +70,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     private Boolean checkIdentity(Long userId,Long citeriaId,MemberConstant.Permission permission){
         //圈主10 成员20 路人未审请30 路人待审核40
-        Response<CoterieMemberVoForPermission> data=coterieMemberAPI.permission(userId,citeriaId);
+        Response<Byte> data=coterieMemberAPI.permission(userId,citeriaId);
         if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
-            CoterieMemberVoForPermission coterieMemberVoForPermission=data.getData();
+            Byte coterieMemberVoForPermission=data.getData();
             if(null!=coterieMemberVoForPermission){
-                if(MemberConstant.Permission.MEMBER.getStatus().compareTo(coterieMemberVoForPermission.getPermission())==0){
+                if(MemberConstant.Permission.MEMBER.getStatus().compareTo(coterieMemberVoForPermission)==0){
                     return true;
                 }
             }
@@ -107,7 +107,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          *校验私圈是否合法
          */
-        Response<CoterieInfo>  coterieInfoResponse= coterieApi.queryCoterieInfo(String.valueOf(citeriaId));
+        Response<CoterieInfo>  coterieInfoResponse= coterieApi.queryCoterieInfo(citeriaId);
         if(ResponseConstant.SUCCESS.getCode().equals(coterieInfoResponse.getCode())){
             CoterieInfo coterieInfo=coterieInfoResponse.getData();
             if(null ==coterieInfo){
