@@ -152,27 +152,27 @@ public class MemberConstant {
 		/**
 		 * 圈主
 		 */
-		OWNER((byte)10,"圈主"),
+		OWNER(10,"圈主"),
 		/**
 		 * 成员
 		 */
-		MEMBER((byte)20,"成员"),
+		MEMBER(20,"成员"),
 		/**
 		 * 路人未审核
 		 */
-		STRANGER_NON_CHECK((byte)30,"路人未审核"),
+		STRANGER_NON_CHECK(30,"路人未审核"),
 		/**
 		 * 路人待审核
 		 */
-		STRANGER_WAITING_CHECK((byte)40,"路人待审核");
+		STRANGER_WAITING_CHECK(40,"路人待审核");
 
-		private final Byte status;
+		private final Integer status;
 		private final String name;
-		Permission(Byte status, String name){
+		Permission(Integer status, String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Byte getStatus() {
+		public Integer getStatus() {
 			return status;
 		}
 		public String getName() {
