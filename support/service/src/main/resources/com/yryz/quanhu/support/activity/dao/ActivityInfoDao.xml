@@ -60,6 +60,9 @@
     <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.support.activity.entity.ActivityInfo">
 	    insert into qh_activity_info 
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
+		<if test="kid != null and kid != ''">
+			kid,
+		</if>
         <if test="title != null and title != ''">
 			title,
 	    </if>
@@ -125,6 +128,9 @@
 	    </if>
 	    </trim>
 	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="kid != null and kid != ''">
+			#{kid,jdbcType=BIGINT},
+		</if>
         <if test="title != null and title != ''">
 			#{title,jdbcType=VARCHAR},
 	    </if>
@@ -340,12 +346,14 @@
 		activity_type, online_time, begin_time,
 		end_time,remark,
 		create_user_id, last_update_user_id, content, content_sources
+		,activity_channel_code,module_enum
 		)
 		values (
 		#{id,jdbcType=BIGINT},#{kid,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{coverPlan,jdbcType=VARCHAR},
 		#{activityType,jdbcType=TINYINT}, #{onlineTime,jdbcType=TIMESTAMP}, #{beginTime,jdbcType=TIMESTAMP},
 		#{endTime,jdbcType=TIMESTAMP},#{remark,jdbcType=VARCHAR},
 		#{createUserId,jdbcType=VARCHAR}, #{lastUpdateUserId,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{contentSources,jdbcType=LONGVARCHAR}
+		, #{activityChannelCode,jdbcType=VARCHAR}, #{moduleEnum,jdbcType=VARCHAR}
 		)
 	</insert>
 
