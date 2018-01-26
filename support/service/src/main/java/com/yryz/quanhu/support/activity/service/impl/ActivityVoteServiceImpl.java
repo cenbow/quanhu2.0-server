@@ -1,14 +1,20 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.support.activity.constants.ActivityCandidateConstants;
 import com.yryz.quanhu.support.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.support.activity.dao.*;
+import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.support.activity.service.ActivityVoteService;
+import com.yryz.quanhu.support.activity.vo.ActivityPrizesVo;
+import com.yryz.quanhu.support.activity.vo.ActivityUserPrizesVo;
+import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -41,6 +48,9 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 
     @Autowired
     ActivityVoteDetailDao activityVoteDetailDao;
+
+    @Autowired
+    ActivityPrizesDao activityPrizesDao;
 
     @Autowired
     ActivityUserPrizesDao activityUserPrizesDao;
@@ -235,6 +245,31 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
      * */
     public int selectUserRoll(Long createUserId) {
         return activityUserPrizesDao.selectUserRoll(createUserId) > 0 ? 11 : 10;
+    }
+
+    /**
+     *  奖品列表
+     *  @param  activityVoteDto
+     *  @return
+     * */
+    public PageList<ActivityPrizesVo> prizesList(ActivityVoteDto activityVoteDto) {
+        PageHelper.startPage(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());
+        List<ActivityPrizesVo> list = activityPrizesDao.selectListCondition(activityVoteDto.getActivityInfoId());
+        PageList<ActivityPrizesVo> pageList = new PageList<>();
+        pageList.setCurrentPage(activityVoteDto.getCurrentPage());
+        pageList.setPageSize(activityVoteDto.getPageSize());
+        pageList.setEntities(list);
+
+        return pageList;
+    }
+
+    public ActivityUserPrizesVo getPrizes(Long activityInfoId, String phone, Long userId) {
+        //用户的投票数
+        int count = activityVoteRecordDao.voteRecordCount(activityInfoId, userId, 11, "fixed");
+        if(count == 0) {
+            throw QuanhuException.busiError("未在当前活动中投票，不能领取奖品");
+        }
+        return null;
     }
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {

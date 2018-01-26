@@ -20,8 +20,7 @@ public class LikeFrontDTO extends PageList {
         return resourceId;
     }
 
-    public LikeFrontDTO setResourceId(long resourceId) {
+    public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-        return this;
     }
 }

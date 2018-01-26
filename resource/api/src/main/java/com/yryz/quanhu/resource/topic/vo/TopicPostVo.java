@@ -35,6 +35,10 @@ public class TopicPostVo  implements Serializable {
 
     private Integer coterieId;
 
+    private String moduleEnum;
+
+    private BehaviorVo behaviorVo;
+
     public Long getKid() {
         return kid;
     }
@@ -145,5 +149,21 @@ public class TopicPostVo  implements Serializable {
 
     public void setCoterieId(Integer coterieId) {
         this.coterieId = coterieId;
+    }
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
+    }
+
+    public BehaviorVo getBehaviorVo() {
+        return behaviorVo;
+    }
+
+    public void setBehaviorVo(BehaviorVo behaviorVo) {
+        this.behaviorVo = behaviorVo;
     }
 }

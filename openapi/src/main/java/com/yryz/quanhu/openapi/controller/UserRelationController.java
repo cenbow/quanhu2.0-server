@@ -138,6 +138,47 @@ public class UserRelationController {
 
     }
 
+    @ApiOperation("用户关系-查询（指定条件）")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @RequestMapping("/{version}/user/relation/queryall")
+    public Response<List<UserRelationQueryVo>> getAllRelations(HttpServletRequest request){
+
+        String userId       = request.getHeader("userId");
+        String targetUserId = request.getParameter("targetUserId");
+        String relationType = request.getParameter("relationType");
+
+
+        //check
+        Assert.notNull(userId,"userId不能为空");
+        Assert.notNull(targetUserId,"targetUserId不能为空");
+        Assert.notNull(relationType,"relationType不能为空");
+
+
+        //package
+        UserRelationDto dto = new UserRelationDto();
+        dto.setSourceUserId(userId);
+        dto.setTargetUserId(targetUserId);
+        UserRelationConstant.STATUS  status = UserRelationConstant.STATUS.get(Integer.parseInt(relationType));
+
+        //invoke
+        Response<List<UserRelationDto>> rpc = userRelationApi.selectByAll(dto,status);
+        if(rpc.success()){
+            //逐条转换
+            List<UserRelationQueryVo> voList = new ArrayList<>();
+            List<UserRelationDto> dtoList = rpc.getData();
+            for(int i = 0 ; i < dtoList.size() ; i++){
+                UserRelationQueryVo vo = new UserRelationQueryVo();
+                UserRelationDto _dto = dtoList.get(i);
+                BeanUtils.copyProperties(_dto,vo);
+                voList.add(vo);
+            }
+            return new Response<List<UserRelationQueryVo>>(true, rpc.getCode(), rpc.getMsg(), rpc.getErrorMsg(), voList);
+        }else{
+            return new Response<List<UserRelationQueryVo>>(false, rpc.getCode(), rpc.getMsg(), rpc.getErrorMsg(), null);
+        }
+    }
+
+
 
     @ApiOperation("用户关系-查询（指定条件）")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -191,7 +232,6 @@ public class UserRelationController {
         }else{
             return new Response<PageList<UserRelationQueryVo>>(false, rpc.getCode(), rpc.getMsg(), rpc.getErrorMsg(), null);
         }
-
     }
 
     @ApiOperation("用户关系-统计查询")

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -176,7 +177,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (null != createUserId) {
             questionVo.setUser(apIservice.getUser(createUserId));
         }
-
+        questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
         questionAnswerVo.setQuestion(questionVo);
         questionAnswerVo.setAnswer(this.answerService.queryAnswerVoByquestionId(questionVo.getKid()));
         return questionAnswerVo;
@@ -283,5 +284,30 @@ public class QuestionServiceImpl implements QuestionService {
         questionAnswerVoPageList.setPageSize(pageSize);
         questionAnswerVoPageList.setEntities(questionAnswerVos);
         return questionAnswerVoPageList;
+    }
+
+    /**
+     * 查询有用的提问
+     * @param kid
+     * @return
+     */
+    @Override
+    public Question queryAvailableQuestionByKid(Long kid) {
+        QuestionExample example=new QuestionExample();
+        QuestionExample.Criteria criteria=example.createCriteria();
+        criteria.andKidEqualTo(kid);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
+        List<Question> questions=this.questionDao.selectByExample(example);
+        if(null!=questions && !questions.isEmpty()){
+            return questions.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public Integer updateByPrimaryKeySelective(Question question) {
+        return this.questionDao.updateByPrimaryKeySelective(question);
     }
 }

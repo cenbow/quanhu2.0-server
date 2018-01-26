@@ -26,17 +26,15 @@ public class CommentVO extends Comment {
         return commentCount;
     }
 
-    public CommentVO setCommentCount(int commentCount) {
+    public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
-        return this;
     }
 
     public List<Comment> getChildrenComments() {
         return childrenComments;
     }
 
-    public CommentVO setChildrenComments(List<Comment> childrenComments) {
+    public void setChildrenComments(List<Comment> childrenComments) {
         this.childrenComments = childrenComments;
-        return this;
     }
 }

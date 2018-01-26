@@ -222,4 +222,25 @@
 		and can_num = 0
 	</update>
 
+	<!-- 用户领取的奖品 -->
+	<select id="selectUserPrizesList" parameterType="com.yryz.quanhu.support.activity.dto.ActivityVoteDto"
+			resultType="com.yryz.quanhu.support.activity.entity.ActivityUserPrizes">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_user_prizes
+		where activity_info_id = #{activityInfoId,jdbcType=BIGINT}
+		<if test="createUserId != null">
+			and create_user_id = #{createUserId,jdbcType=BIGINT}
+		</if>
+		<if test="prizesType != null">
+			and prizes_type = #{prizesType, jdbcType=TINYINT}
+		</if>
+		<if test="isOverdue == 11">
+			and end_time &lt; now()
+		</if>
+		<if test="isOverdue == 10">
+			and end_time &gt; now()
+		</if>
+	</select>
+
 </mapper>
