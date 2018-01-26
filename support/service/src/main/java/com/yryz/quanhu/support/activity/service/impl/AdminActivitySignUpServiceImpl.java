@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.yryz.common.constant.ModuleEnum.*;
+import static com.yryz.common.constant.ModuleContants.*;
 
 
 @Service

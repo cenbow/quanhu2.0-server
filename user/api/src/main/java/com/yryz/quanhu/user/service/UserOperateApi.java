@@ -26,5 +26,5 @@ public interface UserOperateApi {
 	 * @return
 	 */
 	Response<MyInviterVO> getMyInviter(Long userId, Integer limit,
-			Integer inviterId);
+			Long inviterId);
 }

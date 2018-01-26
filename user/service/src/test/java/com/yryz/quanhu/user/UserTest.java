@@ -32,11 +32,14 @@ import com.yryz.quanhu.user.dto.UserTagDTO.UserTagType;
 import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserTagApi;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
+import com.yryz.quanhu.user.vo.MyInviterVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserRegInviterLinkVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 @RunWith(SpringRunner.class)
@@ -55,7 +58,8 @@ public class UserTest {
 	private UserTagApi tagApi;
 	@Autowired
 	private UserSender sender;
-	
+	@Reference
+	private UserOperateApi opApi;
 /*	@Test
 	public void sendMq(){
 		sender.userCreate("dsdsfdfdfdf");
@@ -241,6 +245,18 @@ public class UserTest {
 		dto.setTagType(UserTagType.US_SELECT.getType());
 		dto.setUserId(729671306726400000l);
 		Response<Boolean> response = tagApi.batchSaveUserTag(dto);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	//@Test
+	public void getInviter(){
+		Response<UserRegInviterLinkVO> response = opApi.getInviterLinkByUserId(731519998090690560l);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	@Test
+	public void getMyInviter(){
+		Response<MyInviterVO> response = opApi.getMyInviter(731519998090690560l, 10, null);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 }

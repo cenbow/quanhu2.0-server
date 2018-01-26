@@ -42,7 +42,7 @@ public class UserOperateProvider implements UserOperateApi {
 	}
 
 	@Override
-	public Response<MyInviterVO> getMyInviter(Long userId, Integer limit, Integer inviterId) {
+	public Response<MyInviterVO> getMyInviter(Long userId, Integer limit, Long inviterId) {
 		try {
 			if(limit == null || limit > 100){
 				limit = 10;

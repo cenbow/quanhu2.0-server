@@ -465,7 +465,7 @@ public class UserController {
 	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/getInviterUser")
-	public Response<MyInviterVO> getInviterUser(HttpServletRequest request,Integer inviterId, Integer limit) {
+	public Response<MyInviterVO> getInviterUser(HttpServletRequest request,Long inviterId, Integer limit) {
 		RequestHeader header = WebUtil.getHeader(request);
 		MyInviterVO inviterVO = ResponseUtils.getResponseData(operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId));
 		return ResponseUtils.returnApiObjectSuccess(inviterVO);

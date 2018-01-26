@@ -49,7 +49,7 @@ import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
- * @author suyongcheng
+ * @author danshiyu
  * @version 1.0
  * @date 2017年11月9日 下午12:03:33
  * @Description TODO 用户信息管理
