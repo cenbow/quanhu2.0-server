@@ -1,5 +1,6 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -9,6 +10,7 @@ import com.yryz.quanhu.support.activity.constants.ActivityCandidateConstants;
 import com.yryz.quanhu.support.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.support.activity.dao.*;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
+import com.yryz.quanhu.support.activity.entity.ActivityUserPrizes;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.support.activity.service.ActivityVoteService;
@@ -26,11 +28,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ActivityVoteServiceImpl implements ActivityVoteService {
@@ -72,34 +72,35 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
      * */
     public ActivityVoteInfoVo detail(Long kid, Long userId) {
         ActivityVoteInfoVo activityInfoVo = this.getVoteInfo(kid);
-        if(activityInfoVo != null) {
-            if(userId != null) {
-                //获取当前用户是否参与此活动
-                activityInfoVo.setJoinFlag(activityVoteDetailDao.selectCandidateCount(kid, userId) == 0 ? 10 : 11);
-            } else {
-                activityInfoVo.setJoinFlag(10);
-            }
-            //TODO:判断用户是否禁言
-            //设置已参与人数
-            Object joinCount = stringRedisTemplate.opsForHash().get(ActivityVoteConstants.getKeyConfig(activityInfoVo.getKid()), "joinCount");
-            activityInfoVo.setJoinCount( joinCount != null ? Integer.valueOf(joinCount.toString()) : 0);
-            Date now = new Date();
-            activityInfoVo.setCurrentDate(now);
-            //活动未开始
-            if(now.compareTo(activityInfoVo.getBeginTime()) == -1){
-                activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_NOSTART);
-            }
-            //活动已结束
-            else if(now.compareTo(activityInfoVo.getEndTime()) == 1){
-                activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_OVER);
-            }
-            //活动进行中
-            else if(now.compareTo(activityInfoVo.getBeginTime()) == 1 && now.compareTo(activityInfoVo.getEndTime()) == -1){
-                activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_PROCESSING);
-            }
-            //TODO:设置浏览数
-            activityInfoVo.setAmountOfAccess(0L);
+        if(activityInfoVo == null) {
+            throw QuanhuException.busiError("活动已关闭或不存在");
         }
+        if(userId != null) {
+            //获取当前用户是否参与此活动
+            activityInfoVo.setJoinFlag(activityVoteDetailDao.selectCandidateCount(kid, userId) == 0 ? 10 : 11);
+        } else {
+            activityInfoVo.setJoinFlag(10);
+        }
+        //TODO:判断用户是否禁言
+        //设置已参与人数
+        Object joinCount = stringRedisTemplate.opsForHash().get(ActivityVoteConstants.getKeyConfig(activityInfoVo.getKid()), "joinCount");
+        activityInfoVo.setJoinCount( joinCount != null ? Integer.valueOf(joinCount.toString()) : 0);
+        Date now = new Date();
+        activityInfoVo.setCurrentDate(now);
+        //活动未开始
+        if(now.compareTo(activityInfoVo.getBeginTime()) == -1){
+            activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_NOSTART);
+        }
+        //活动已结束
+        else if(now.compareTo(activityInfoVo.getEndTime()) == 1){
+            activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_OVER);
+        }
+        //活动进行中
+        else if(now.compareTo(activityInfoVo.getBeginTime()) == 1 && now.compareTo(activityInfoVo.getEndTime()) == -1){
+            activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_PROCESSING);
+        }
+        //TODO:设置浏览数
+        activityInfoVo.setAmountOfAccess(0L);
 
         return activityInfoVo;
     }
@@ -113,27 +114,6 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         Map<String, String> map = new HashMap<>();
         if(joinCount != null) {
             map.put("joinCount", joinCount.toString());//当前活动已参加的人员数量
-        }
-        if(activityVoteConfig.getUserNum() != null) {
-            map.put("userNum", activityVoteConfig.getUserNum().toString());//参与人数上限
-        }
-        if(StringUtils.isNotBlank(activityVoteConfig.getNoRewardContent())) {
-            map.put("noRewardContent", activityVoteConfig.getNoRewardContent());
-        }
-        if(StringUtils.isNotBlank(activityVoteConfig.getConfigSources())) {
-            map.put("configSources", activityVoteConfig.getConfigSources());
-        }
-        if(activityVoteConfig.getInAppVoteConfigCount() != null) {
-            map.put("inAppVoteConfigCount", activityVoteConfig.getInAppVoteConfigCount().toString());
-        }
-        if(activityVoteConfig.getInAppVoteType() != null) {
-            map.put("inAppVoteType", activityVoteConfig.getInAppVoteType().toString());
-        }
-        if(activityVoteConfig.getOtherAppVoteConfigCount() != null) {
-            map.put("otherAppVoteConfigCount", activityVoteConfig.getOtherAppVoteConfigCount().toString());
-        }
-        if(activityVoteConfig.getOtherAppVoteType() != null) {
-            map.put("otherAppVoteType", activityVoteConfig.getOtherAppVoteType().toString());
         }
 
         stringRedisTemplate.opsForHash().putAll(ActivityVoteConstants.getKeyConfig(activityVoteConfig.getActivityInfoId()), map);
@@ -166,6 +146,8 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
                 activityVoteInfoVo.setOtherAppVoteType(activityVoteConfig.getOtherAppVoteType());
                 activityVoteInfoVo.setOtherAppVoteConfigCount(activityVoteConfig.getOtherAppVoteConfigCount());
                 activityVoteInfoVo.setCommentFlag(activityVoteConfig.getCommentFlag());
+                activityVoteInfoVo.setConfigSources(activityVoteConfig.getConfigSources());//配置元数据
+                activityVoteInfoVo.setNoRewardContent(activityVoteConfig.getNoRewardContent());//无奖励配置文案
 
                 template.opsForValue().set(ActivityVoteConstants.getKeyInfo(activityVoteInfoVo.getKid()), activityVoteInfoVo);
                 this.setVoteConfig(activityVoteInfoVo.getJoinCount() == null ? 0 : activityVoteInfoVo.getJoinCount(), activityVoteConfig);
@@ -263,13 +245,94 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         return pageList;
     }
 
+    /**
+     * 领取奖品
+     * @param   activityInfoId
+     * @param   phone
+     * @param   userId
+     * @return
+     * */
     public ActivityUserPrizesVo getPrizes(Long activityInfoId, String phone, Long userId) {
         //用户的投票数
-        int count = activityVoteRecordDao.voteRecordCount(activityInfoId, userId, 11, "fixed");
+        int count = activityVoteRecordDao.voteRecordCount(activityInfoId, userId, 1, "fixed");
         if(count == 0) {
             throw QuanhuException.busiError("未在当前活动中投票，不能领取奖品");
         }
-        return null;
+        ActivityVoteDto activityVoteDto = new ActivityVoteDto();
+        activityVoteDto.setActivityInfoId(activityInfoId);
+        activityVoteDto.setCreateUserId(userId);
+        //获取用户是否领取过该活动
+        List<ActivityUserPrizes> activityUserPrizes = activityUserPrizesDao.selectUserPrizesList(activityVoteDto);
+        if (!CollectionUtils.isEmpty(activityUserPrizes)) {
+            throw QuanhuException.busiError("您已经领取过该奖品");
+        }
+        ActivityUserPrizesVo result = new ActivityUserPrizesVo();
+        List<ActivityUserPrizes> resultList = new ArrayList<>();
+        result.setPrizes(resultList);
+        result.setUserId(userId);
+        //获取可领取的奖品
+        List<ActivityPrizesVo> activityPrizes = activityPrizesDao.selectAvailablePrizes(activityInfoId);
+        if (!CollectionUtils.isEmpty(activityPrizes)) {
+            for (ActivityPrizesVo activity : activityPrizes) {
+                if (activity != null) {
+                    List<ActivityPrizesVo> prizesList = new ArrayList<>();
+                    //如果减少库存成功，加入待发放列表
+                    if(activityPrizesDao.updateIssueNum(activity.getKid()) > 0) {
+                        prizesList.add(activity);
+                    }
+                    //插入用户奖品数据
+                    if(!CollectionUtils.isEmpty(prizesList)) {
+                        for(ActivityPrizesVo prizes : prizesList) {
+                            ActivityUserPrizes userPrize = new ActivityUserPrizes();
+                            userPrize.setCreateUserId(userId);
+                            userPrize.setPrizesName(prizes.getPrizesName());
+                            userPrize.setPrizesType(prizes.getPrizesType());
+                            userPrize.setCanNum(prizes.getCanNum());
+                            userPrize.setPhone(phone);
+                            UUID id = UUID.randomUUID();
+                            String[] idd = id.toString().split("-");
+                            userPrize.setOnlyCode(idd[0]);
+                            userPrize.setPrizesNum(prizes.getPrizesNum());
+                            userPrize.setPrizesUnit(prizes.getPrizesUnit());
+                            userPrize.setBeginTime(prizes.getBeginTime());
+                            userPrize.setEndTime(prizes.getEndTime());
+                            userPrize.setRemark(prizes.getRemark());
+                            userPrize.setState(1);
+                            userPrize.setActivityInfoId(activityInfoId);
+                            //生成投票编号
+                            Response<Long> idResult = idAPI.getSnowflakeId();
+                            if(!idResult.success()) {
+                                throw QuanhuException.busiError("调用发号器失败");
+                            }
+                            userPrize.setKid(idResult.getData());
+                            activityUserPrizesDao.insertByPrimaryKeySelective(userPrize);
+                            resultList.add(userPrize);
+                        }
+                        //TODO:发送短信提醒中奖，需要确认是否批量发送
+                    }
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(resultList)) {
+            throw QuanhuException.busiError("奖品已经领完");
+        }
+
+        return result;
+    }
+
+    /**
+     * 我的卡劵
+     * @param   activityVoteDto
+     * @return
+     * */
+    public PageList<ActivityUserPrizes> userPrizesList(ActivityVoteDto activityVoteDto) {
+        Page<ActivityVoteDetailVo> page = PageHelper.startPage(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());
+        PageList<ActivityUserPrizes> pageList = new PageList<>();
+        pageList.setCurrentPage(activityVoteDto.getCurrentPage());
+        pageList.setPageSize(activityVoteDto.getPageSize());
+        pageList.setEntities(activityUserPrizesDao.selectUserPrizesList(activityVoteDto));
+        pageList.setCount(page.getTotal());
+        return pageList;
     }
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {

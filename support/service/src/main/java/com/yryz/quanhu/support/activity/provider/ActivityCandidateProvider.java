@@ -1,14 +1,17 @@
 package com.yryz.quanhu.support.activity.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.activity.api.ActivityCandidateApi;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.service.ActivityCandidateService;
+import com.yryz.quanhu.support.activity.service.ActivityVoteService;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteConfigVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
+import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,9 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
 
     @Autowired
     private ActivityCandidateService activityCandidateService;
+
+    @Autowired
+    private ActivityVoteService activityVoteService;
 
     /**
      * 增加参与者
@@ -46,7 +52,14 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
     public Response<ActivityVoteConfigVo> config(Long activityInfoId) {
         try {
             Assert.notNull(activityInfoId, "activityInfoId不能为空");
-            return ResponseUtils.returnObjectSuccess(activityCandidateService.config(activityInfoId));
+            ActivityVoteConfigVo activityVoteConfigVo = new ActivityVoteConfigVo();
+            ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(activityInfoId);
+            if(activityVoteInfoVo == null) {
+                throw QuanhuException.busiError("活动已关闭或不存在");
+            }
+            activityVoteConfigVo.setActivityInfoId(activityInfoId);
+            activityVoteConfigVo.setConfigSources(activityVoteInfoVo.getConfigSources());
+            return ResponseUtils.returnObjectSuccess(activityVoteConfigVo);
         } catch (Exception e) {
             logger.error("参与投票活动 失败", e);
             return ResponseUtils.returnException(e);

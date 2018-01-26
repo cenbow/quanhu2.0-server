@@ -14,13 +14,6 @@ public interface ActivityCandidateService {
     void join(ActivityVoteDto activityVoteDto);
 
     /**
-     * 活动配置信息
-     * @param   activityInfoId
-     * @return
-     * */
-    ActivityVoteConfigVo config(Long activityInfoId);
-
-    /**
      * 获取参与者详情
      * @param   activityVoteDto
      * @return
