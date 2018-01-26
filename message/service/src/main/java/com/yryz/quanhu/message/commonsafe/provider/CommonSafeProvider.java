@@ -79,7 +79,7 @@ public class CommonSafeProvider implements CommonSafeApi {
                 verifyCodeVO = new VerifyCodeVO();
             }
             logger.info("sendVerifyCodeForSlip result: {}", GsonUtils.parseJson(verifyCodeVO));
-            return ResponseUtils.returnObjectSuccess(null);
+            return ResponseUtils.returnObjectSuccess(verifyCodeVO);
 
 //			rrzMessageService.saveIpSendVerifyCodeCount(request);
         } catch (Exception e) {

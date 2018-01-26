@@ -2,6 +2,14 @@ package com.yryz.quanhu.openapi.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.Sets;
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.vo.Dymaic;
+import com.yryz.quanhu.user.vo.UserDynamicVO;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +39,21 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 @Api(description = "用户达人接口")
 @RestController
 @RequestMapping(value = "services/app")
 public class UserStarController {
     private static final Logger logger = LoggerFactory.getLogger(UserStarController.class);
 
-    @Reference
+    @Reference(check = false)
     private UserStarApi starApi;
+
+    @Reference
+    private DymaicService dymaicService;
 
     /**
      * 达人申请
@@ -135,15 +150,54 @@ public class UserStarController {
     @UserBehaviorValidation(login=false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/label/list")
-    public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage,  HttpServletRequest request) {
+    public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+
         paramDTO.setCategoryId(categoryId);
         paramDTO.setCurrentPage(currentPage);
         paramDTO.setPageSize(pageSize);
-        PageList<StarInfoVO> list = ResponseUtils.getResponseData(starApi.labelStarList(paramDTO));
-        return ResponseUtils.returnObjectSuccess(list);
+        Response<PageList<StarInfoVO>> labelStarList = starApi.labelStarList(paramDTO);
+
+        PageList<StarInfoVO> pageList = labelStarList.getData();
+        getStarDynamic(pageList);
+        return ResponseUtils.returnObjectSuccess(pageList);
+    }
+
+    private void getStarDynamic(PageList<StarInfoVO> pageList) {
+        try {
+            if (pageList != null) {
+                List<StarInfoVO> entities = pageList.getEntities();
+                if (CollectionUtils.isNotEmpty(entities)) {
+                    Set<Long> userIds = Sets.newHashSet();
+                    for (StarInfoVO entity : entities) {
+                        userIds.add(entity.getUserInfo().getUserId());
+                    }
+                    if (CollectionUtils.isNotEmpty(userIds)) {
+                        Response<Map<Long, Dymaic>> lastSends;
+                        lastSends = dymaicService.getLastSend(Sets.newHashSet(userIds));
+                        logger.info("dymaicService.getLastSend result: ", GsonUtils.parseJson(lastSends));
+                        Map<Long, Dymaic> dynaicMap = lastSends.getData();
+                        if (MapUtils.isNotEmpty(dynaicMap)) {
+                            for (StarInfoVO starInfoVO : entities) {
+                                try {
+                                    Dymaic dymaic = dynaicMap.get(starInfoVO.getUserInfo().getUserId());
+                                    UserDynamicVO userDynamicVO = new UserDynamicVO();
+                                    BeanUtils.copyProperties(userDynamicVO, dymaic);
+                                    starInfoVO.setDynamic(userDynamicVO);
+                                } catch (Exception e) {
+                                    logger.error("for setDynamic error", e);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            logger.error("getStarDynamic error", e);
+        }
     }
 
 }

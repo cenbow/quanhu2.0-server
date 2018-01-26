@@ -112,6 +112,12 @@
 		        <version>${commons.lang3.version}</version>
 		    </dependency>
 
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${commons.collections.version}</version>
+			</dependency>
+
 			<!-- elasticjob -->
 			<dependency>
 				<groupId>com.dangdang</groupId>
@@ -209,6 +215,9 @@
 		
 		<!-- common-lang -->
 		<commons.lang3.version>3.4</commons.lang3.version>
+
+		<!--commons.collections.version-->
+		<commons.collections.version>3.2.2</commons.collections.version>
 
 		<curator.version>2.10.0</curator.version>
     </properties>

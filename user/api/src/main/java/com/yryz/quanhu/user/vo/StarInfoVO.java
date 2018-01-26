@@ -20,7 +20,20 @@ public class StarInfoVO implements Serializable {
 	 * 达人信息
 	 */
 	private UserStarSimpleVo starInfo = new UserStarSimpleVo();
-	
+
+	/**
+	 * 达人动态
+	 */
+	private UserDynamicVO dynamic;
+
+	public UserDynamicVO getDynamic() {
+		return dynamic;
+	}
+
+	public void setDynamic(UserDynamicVO dynamic) {
+		this.dynamic = dynamic;
+	}
+
 	public void parseUser(String userId, Map<String, UserSimpleVO> userMap) {
 		if (userMap != null) {
 			UserSimpleVO info = userMap.get(userId);
