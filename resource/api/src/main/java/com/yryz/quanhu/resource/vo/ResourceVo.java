@@ -120,6 +120,11 @@ public class ResourceVo implements Serializable {
     private String extJson;
     
     /**
+     * 排序字段，管理使用
+     */
+    private Long sort;
+    
+    /**
      * 阅读数状态
      */
     private Long readNum;
@@ -390,6 +395,20 @@ public class ResourceVo implements Serializable {
 		this.extJson = extJson;
 	}
 	
+	/**
+	 * @return the sort
+	 */
+	public Long getSort() {
+		return sort;
+	}
+
+	/**
+	 * @param sort the sort to set
+	 */
+	public void setSort(Long sort) {
+		this.sort = sort;
+	}
+
 	/**
 	 * @return the readNum
 	 */

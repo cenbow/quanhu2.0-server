@@ -10,6 +10,7 @@ package com.yryz.quanhu.openapi.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -32,6 +33,7 @@ import io.swagger.annotations.ApiParam;
  */
 @Api(tags = "资源管理")
 @RestController
+@RequestMapping(value = "/services/app")
 public class ResourceController {
 	
 	@Reference(check = false)
@@ -41,7 +43,7 @@ public class ResourceController {
 	@NotLogin
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @GetMapping(value = "/{version}/appRecommend")
+    @GetMapping(value = "/{version}/resource/appRecommend")
 	public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度")String limit){
     	ResourceVo resourceVo = new ResourceVo();
     	return resourceApi.getResources(resourceVo, null, 0, 10, null, null);

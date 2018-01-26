@@ -80,6 +80,11 @@ public class ResourceModel extends Entity implements Serializable {
     private String talentType;
     
     /**
+     * 排序字段
+     */
+    private Long sort;
+    
+    /**
      * 创建时间
      */
     private Long createTime;
@@ -278,6 +283,20 @@ public class ResourceModel extends Entity implements Serializable {
 	 */
 	public void setTalentType(String talentType) {
 		this.talentType = talentType;
+	}
+	
+	/**
+	 * @return the sort
+	 */
+	public Long getSort() {
+		return sort;
+	}
+
+	/**
+	 * @param sort the sort to set
+	 */
+	public void setSort(Long sort) {
+		this.sort = sort;
 	}
 
 	/**
