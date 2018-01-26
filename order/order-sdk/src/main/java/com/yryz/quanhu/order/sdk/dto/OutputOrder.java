@@ -1,6 +1,7 @@
 package com.yryz.quanhu.order.sdk.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -21,6 +22,10 @@ public class OutputOrder implements Serializable {
     private Long resourceId;
     //扩展信息，预设回调返回的数据
     private String bizContent;
+    //创建人ID
+    private Long createUserId;
+    //创建时间
+    private Date createDate;
 
     public String getModuleEnum() {
         return moduleEnum;
@@ -52,5 +57,21 @@ public class OutputOrder implements Serializable {
 
     public void setBizContent(String bizContent) {
         this.bizContent = bizContent;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

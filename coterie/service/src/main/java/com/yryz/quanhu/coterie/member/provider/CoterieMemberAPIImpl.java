@@ -5,6 +5,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
@@ -43,7 +44,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
 
-        CoterieInfo info = coterieService.find(coterieId.toString());
+        CoterieInfo info = coterieService.find(coterieId);
         if (info == null) {
             throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
         }
@@ -108,23 +109,17 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
             coterieMemberService.banSpeak(memberId, coterieId, type);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
-//            throw new QuanhuException(ExceptionEnum.SysException);
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
         return new Response<>();
     }
 
     @Override
-    public Response<CoterieMemberVoForPermission> permission(Long userId, Long coterieId) {
-        Integer permission = coterieMemberService.permission(userId, coterieId);
+    public Response<Byte> permission(Long userId, Long coterieId) {
+        Byte permission = coterieMemberService.permission(userId, coterieId);
 
-        CoterieMemberVoForPermission permissionResult = new CoterieMemberVoForPermission();
-        permissionResult.setPermission(permission);
-        return new Response<>(permissionResult);
+        return new Response<>(permission);
     }
-
-
-    /************* 0124 *******************************************/
-
 
 
     @Override
@@ -134,15 +129,8 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
         return new Response<>(flag);
     }
 
-
-
-
-
-
-
-
     @Override
-    public Response audit(Long userId, Long memberId, Long coterieId, Integer type) {
+    public Response<String> audit(Long userId, Long memberId, Long coterieId, Byte type) {
 
         //是否为圈主
         //todo
@@ -164,14 +152,14 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public Response<CoterieMemberVoForNewMemberCount> queryNewMemberNum(Long coterieId) {
+    public Response<Integer> queryNewMemberNum(Long coterieId) {
         logger.info("queryNewMemberNum params: coterieId(" + coterieId + ")");
         if (coterieId == null) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
         try {
             Integer count = coterieMemberService.queryNewMemberNum(coterieId);
-            return new Response<>(new CoterieMemberVoForNewMemberCount(count));
+            return new Response<>(count);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
 //            throw new QuanhuException(ExceptionEnum.SysException);
@@ -180,28 +168,13 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public Response<List<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize) {
+    public Response<PageList<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize) {
         logger.info("queryMemberApplyList params: coterieId(" + coterieId + ")");
         if (coterieId == null) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
         try {
-            List<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNum, pageSize);
-
-            Set<String> set = Sets.newHashSet();
-            for (int i = 0; i < applyList.size(); i++) {
-//                set.add(applyList.get(i).getUsertId());
-            }
-
-//            Map<String, CustInfo> custMap = custAPI.getCustInfo(set);
-//            for (int i = 0; i < applyList.size(); i++) {
-//                MemberApplyInfo info = applyList.get(i);
-//                CustInfo cust = custMap.get(info.getCustId());
-//                if (cust != null) {
-//                    info.setCustIcon(cust.getCustImg());
-//                    info.setCustName(cust.getCustNname());
-//                }
-//            }
+            PageList<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNum, pageSize);
             return new Response<>(applyList);
         } catch (Exception e) {
             logger.error("unKown Exception", e);
@@ -210,46 +183,18 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     }
 
     @Override
-    public Response<List<CoterieMemberVo>> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize) {
+    public Response<PageList<CoterieMemberVo>> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize) {
         logger.info("queryMemberList params: coterieId(" + coterieId + ")pageNum(" + pageNum + ")pageSize(" + pageSize + ")");
         if (coterieId == null || pageNum == null || pageSize == null || pageNum <= 0 || pageSize <= 0) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
         try {
-//            CoterieInfo coterie = coterieService.find(coterieId);
-//            if (coterie == null) {
-//                throw new ServiceException(ServiceException.CODE_SYS_ERROR, "私圈（" + coterieId + "）不存在");
-//                throw new QuanhuException(ExceptionEnum.SysException);
-//            }
-            List<CoterieMemberVo> memberList = coterieMemberService.queryMemberList(coterieId, pageNum, pageSize);
+            CoterieInfo coterie = coterieService.find(coterieId);
+            if (coterie == null) {
+                throw new QuanhuException(ExceptionEnum.SysException);
+            }
+            PageList<CoterieMemberVo> memberList = coterieMemberService.queryMemberList(coterieId, pageNum, pageSize);
 
-            Set<Long> set = Sets.newHashSet();
-//            set.add(coterie.getOwnerId());
-            for (int i = 0; i < memberList.size(); i++) {
-                set.add(memberList.get(i).getUserId());
-            }
-
-//            Map<String, Long> custMap = userAPI.getCustInfo(set);
-            for (int i = 0; i < memberList.size(); i++) {
-                CoterieMemberVo info = memberList.get(i);
-//                CustInfo cust = custMap.get(info.getCustId());
-//                if (cust != null) {
-//                    info.setCustIcon(cust.getCustImg());
-//                    info.setCustName(cust.getCustNname());
-//                }
-            }
-            if (pageNum == 1) {
-//                CustInfo cust = custMap.get(coterie.getOwnerId());
-//                if (cust == null) {
-//                    throw new ServiceException(ServiceException.CODE_SYS_ERROR, "未获取到圈主信息");
-//                }
-                CoterieMemberVo qz = new CoterieMemberVo();
-                qz.setCoterieId(coterieId);
-//                qz.setCustIcon(cust.getCustImg());
-//                qz.setCustId(cust.getCustId());
-//                qz.setCustName(cust.getCustNname());
-                memberList.add(0, qz);//添加圈主
-            }
             return new Response<>(memberList);
         } catch (Exception e) {
             logger.error("unKown Exception", e);

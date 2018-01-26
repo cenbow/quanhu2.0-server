@@ -234,11 +234,11 @@
 	</select>
 
 	<!-- 批量获取投票活动 -->
-	<select id="batchVote" parameterType="java.util.List" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo">
+	<select id="batchVote" resultType="com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo">
 		select
 		<include refid="Base_Column_List"/>
 		from qh_activity_vote_detail
-		where kid in
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT} and kid in
 		<foreach collection="list" open="(" separator="," close=")" item="item">
 			#{item}
 		</foreach>

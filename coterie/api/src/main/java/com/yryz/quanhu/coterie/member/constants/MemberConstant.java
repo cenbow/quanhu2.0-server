@@ -13,23 +13,23 @@ public class MemberConstant {
 		/**
 		 * 待审
 		 */
-		WAIT(30,"待审"),
+		WAIT((byte)30,"待审"),
 		/**
 		 * 未通过
 		 */
-		NOTPASS(20,"未通过"),
+		NOTPASS((byte)20,"未通过"),
 		/**
 		 * 通过
 		 */
-		PASS(10,"通过");
+		PASS((byte)10,"通过");
 
-		private final Integer status;
+		private final Byte status;
 		private final String name;
-		MemberStatus(Integer status,String name){
+		MemberStatus(Byte status,String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Integer getStatus() {
+		public Byte getStatus() {
 			return status;
 		}
 		public String getName() {
@@ -44,19 +44,19 @@ public class MemberConstant {
 		/**
 		 * 被踢
 		 */
-		KICKED(10,"被踢"),
+		KICKED((byte)10,"被踢"),
 		/**
 		 * 未通过
 		 */
-		NORMAL(20,"未踢");
+		NORMAL((byte)20,"未踢");
 
-		private final Integer status;
+		private final Byte status;
 		private final String name;
-		KickStatus(Integer status,String name){
+		KickStatus(Byte status,String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Integer getStatus() {
+		public Byte getStatus() {
 			return status;
 		}
 		public String getName() {
@@ -71,19 +71,19 @@ public class MemberConstant {
 		/**
 		 * 禁言
 		 */
-		BANSPEAK(10,"禁言"),
+		BANSPEAK((byte)10,"禁言"),
 		/**
 		 * 未禁言
 		 */
-		NORMAL(20,"未禁言");
+		NORMAL((byte)20,"未禁言");
 
-		private final Integer status;
+		private final Byte status;
 		private final String name;
-		BanSpeak(Integer status,String name){
+		BanSpeak(Byte status,String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Integer getStatus() {
+		public Byte getStatus() {
 			return status;
 		}
 		public String getName() {
@@ -98,19 +98,19 @@ public class MemberConstant {
 		/**
 		 * 免费
 		 */
-		FREE(10,"免费"),
+		FREE((byte)10,"免费"),
 		/**
 		 * 收费
 		 */
-		NOTFREE(20,"收费");
+		NOTFREE((byte)20,"收费");
 
-		private final Integer status;
+		private final Byte status;
 		private final String name;
-		JoinType(Integer status,String name){
+		JoinType(Byte status,String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Integer getStatus() {
+		public Byte getStatus() {
 			return status;
 		}
 		public String getName() {
@@ -125,19 +125,19 @@ public class MemberConstant {
 		/**
 		 * 正常
 		 */
-		NORMAL(10,"正常"),
+		NORMAL((byte)10,"正常"),
 		/**
 		 * 已删
 		 */
-		DELETED(11,"已删");
+		DELETED((byte)11,"已删");
 
-		private final Integer status;
+		private final Byte status;
 		private final String name;
-		DelFlag(Integer status, String name){
+		DelFlag(Byte status, String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Integer getStatus() {
+		public Byte getStatus() {
 			return status;
 		}
 		public String getName() {
@@ -152,27 +152,27 @@ public class MemberConstant {
 		/**
 		 * 圈主
 		 */
-		OWNER(10,"圈主"),
+		OWNER((byte)10,"圈主"),
 		/**
 		 * 成员
 		 */
-		MEMBER(20,"成员"),
+		MEMBER((byte)20,"成员"),
 		/**
 		 * 路人未审核
 		 */
-		STRANGER_NON_CHECK(30,"路人未审核"),
+		STRANGER_NON_CHECK((byte)30,"路人未审核"),
 		/**
 		 * 路人待审核
 		 */
-		STRANGER_WAITING_CHECK(40,"路人待审核");
+		STRANGER_WAITING_CHECK((byte)40,"路人待审核");
 
-		private final Integer status;
+		private final Byte status;
 		private final String name;
-		Permission(Integer status, String name){
+		Permission(Byte status, String name){
 			this.status=status;
 			this.name=name;
 		}
-		public Integer getStatus() {
+		public Byte getStatus() {
 			return status;
 		}
 		public String getName() {
