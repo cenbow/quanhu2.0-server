@@ -9,7 +9,7 @@ public class MemberConstant {
 	/**
 	 * 私圈成员状态
 	 */
-	public static enum Status{
+	public static enum MemberStatus{
 		/**
 		 * 待审
 		 */
@@ -25,7 +25,7 @@ public class MemberConstant {
 
 		private final Integer status;
 		private final String name;
-		Status(Integer status,String name){
+		MemberStatus(Integer status,String name){
 			this.status=status;
 			this.name=name;
 		}
@@ -36,7 +36,34 @@ public class MemberConstant {
 			return name;
 		}
 	}
-	
+
+	/**
+	 * 私圈踢出状态
+	 */
+	public static enum KickStatus{
+		/**
+		 * 被踢
+		 */
+		KICKED(10,"被踢"),
+		/**
+		 * 未通过
+		 */
+		NORMAL(20,"未踢");
+
+		private final Integer status;
+		private final String name;
+		KickStatus(Integer status,String name){
+			this.status=status;
+			this.name=name;
+		}
+		public Integer getStatus() {
+			return status;
+		}
+		public String getName() {
+			return name;
+		}
+	}
+
 	/**
 	 * 私圈成员状态
 	 */

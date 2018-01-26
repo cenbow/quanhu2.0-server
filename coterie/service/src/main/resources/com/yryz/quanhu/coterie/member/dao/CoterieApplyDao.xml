@@ -26,19 +26,23 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
             parameterType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
         insert into qh_coterie_apply (
-        coterie_id
+        kid
+        ,coterie_id
         ,user_id
         ,member_status
         ,reason
         ,create_date
+        ,create_user_id
         ,process_time
         ,last_update_date
         ) values(
-        #{coterieId,jdbcType=BIGINT}
+        #{kid,jdbcType=BIGINT}
+        ,#{coterieId,jdbcType=BIGINT}
         ,#{userId,jdbcType=BIGINT}
         ,#{memberStatus,jdbcType=TINYINT}
         ,#{reason,jdbcType=VARCHAR}
         ,NOW()
+        ,#{createUserId,jdbcType=BIGINT}
         ,NOW()
         ,NOW()
         )
@@ -56,18 +60,15 @@
 
 
 
-    <!--<select id="selectOne" resultType="com.yryz.activeii.coterie.member.model.MemberApply">-->
-        <!--select * from coterie_apply t-->
-        <!--<where>-->
-            <!--<if test="coterieId != null">-->
-                <!--coterie_id = #{coterieId}-->
-            <!--</if>-->
-            <!--<if test="custId != null">-->
-                <!--and cust_id = #{custId}-->
-            <!--</if>-->
-        <!--</where>-->
-    <!--</select>-->
+    <select id="selectByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
+        select * from qh_coterie_apply WHERE coterie_id = #{coterieId} and user_id = #{userId} and del_flag != 11;
+    </select>
 
+    <select id="selectWaitingByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
+        select *
+        from qh_coterie_apply
+        WHERE coterie_id = #{coterieId} and user_id = #{userId} and member_status = 30 and del_flag != 11;
+    </select>
 
     <!--<update id="update" parameterType="com.yryz.activeii.coterie.member.model.MemberApply" >-->
         <!--update coterie_apply set-->
@@ -82,7 +83,7 @@
         update qh_coterie_apply set
         last_update_date = NOW()
         <if test="memberStatus != null">
-            ,kick_status = #{kickStatus}
+            ,member_status = #{memberStatus}
         </if>
         <if test="delFlag!= null">
             ,del_flag= #{delFlag}
@@ -93,5 +94,18 @@
         where coterie_id = #{coterieId} and user_id = #{userId}
     </update>
 
+    <select id="selectNewMemberNum" resultType="java.lang.Integer" parameterType="java.lang.Long" >
+        select count(*)
+        from qh_coterie_apply
+        where coterie_id = #{coterieId} and member_status=30 and del_flag != 11;
+    </select>
+
+    <select id="selectPageByCoterieId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
+        select *
+        from qh_coterie_apply
+        where coterie_id = #{coterieId} and del_flag = 10
+        order by create_date desc
+        limit #{start},#{pageSize}
+    </select>
 
 </mapper>
