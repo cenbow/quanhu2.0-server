@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		//依赖积分系统，获取用户等级
 		EventAcount acount = eventManager.getGrow(userId.toString());
-		if(NumberUtils.toLong(acount.getGrowLevel()) < 1){
+		if(acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1){
 			simpleVO.setUserLevel("1");
 		}else{
 			simpleVO.setUserLevel(acount.getGrowLevel());
