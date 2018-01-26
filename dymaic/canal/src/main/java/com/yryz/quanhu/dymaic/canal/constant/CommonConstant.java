@@ -14,6 +14,10 @@ public class CommonConstant {
         public final static String TABLE_TOPIC_POST="qh_topic_post";
         public final static String TABLE_RELEASE_INFO="qh_release_info";
         public final static String TABLE_COTERIE="qh_coterie";
+        /**
+         * MongoDB 热度数据变更直接发送的mq消息
+         */
+        public final static String TABLE_MONGODB_RESOURCE_HEAT="mongodb_resource_heat";
     }
     
     

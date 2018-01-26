@@ -132,4 +132,18 @@ public interface UserApi {
 	 */
 	Response<Page<UserBaseInfoVO>> listUserInfo(int pageNo,int pageSize,AdminUserInfoDTO custInfoDTO);
 
+	/**
+	 * 查询一段时间的全部用户ID，不分状态
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	Response<List<Long>> getUserIdByCreateDate(String startDate,String endDate);
+    
+	/**
+	 * 根据用户ID查询全部用户，不分状态
+	 * @param userIds
+	 * @return
+	 */
+	Response<List<UserBaseInfoVO>> getAllByUserIds(List<Long> userIds);
 }
