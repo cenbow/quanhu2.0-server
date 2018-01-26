@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 import java.util.Date;
 import java.util.List;
 
-import static com.yryz.common.constant.ModuleEnum.ACTIVITY_ENUM;
+import static com.yryz.common.constant.ModuleContants.ACTIVITY_ENUM;
 
 //import com.github.pagehelper.PageHelper;
 
