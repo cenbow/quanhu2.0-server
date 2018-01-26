@@ -21,7 +21,6 @@ import com.yryz.quanhu.user.vo.StarInfoVO;
 public class UserStarTest {
 	@Reference
 	UserStarApi starApi;
-	
 	//@Test
 	public void save(){
 		StarAuthInfo info = new StarAuthInfo();

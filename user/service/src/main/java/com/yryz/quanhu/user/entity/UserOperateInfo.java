@@ -35,7 +35,7 @@ public class UserOperateInfo extends GenericEntity{
     /**
      * 邀请人用户id
      */
-    private String userRegId;
+    private String userInviterId;
     /**
      * 账户邀请码
      */
@@ -61,18 +61,18 @@ public class UserOperateInfo extends GenericEntity{
 	 * @param userId
 	 * @param userRegChannel
 	 * @param userRegInviterCode
-	 * @param userRegId
+	 * @param userInviterId
 	 * @param userInviterCode
 	 * @param userRegInviterNum
 	 * @exception 
 	 */
-	public UserOperateInfo(Long userId, String userRegChannel, String userRegInviterCode, String userRegId,
+	public UserOperateInfo(Long userId, String userRegChannel, String userRegInviterCode, String userInviterId,
 			String userInviterCode, Integer userRegInviterNum) {
 		super();
 		this.userId = userId;
 		this.userRegChannel = userRegChannel;
 		this.userRegInviterCode = userRegInviterCode;
-		this.userRegId = userRegId;
+		this.userInviterId = userInviterId;
 		this.userInviterCode = userInviterCode;
 		this.userRegInviterNum = userRegInviterNum;
 	}
@@ -117,11 +117,11 @@ public class UserOperateInfo extends GenericEntity{
         this.userRegInviterNum = userRegInviterNum;
     }
 
-	public String getUserRegId() {
-		return userRegId;
+	public String getUserInviterId() {
+		return userInviterId;
 	}
 
-	public void setUserRegId(String userRegId) {
-		this.userRegId = userRegId;
+	public void setUserInviterId(String userInviterId) {
+		this.userInviterId = userInviterId;
 	}
 }

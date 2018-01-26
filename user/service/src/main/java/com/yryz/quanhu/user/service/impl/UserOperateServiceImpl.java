@@ -69,7 +69,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 		record.setUserInviterCode(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_OPERATION_INFO)).toString());
 		if (StringUtils.isNotBlank(record.getUserRegInviterCode())) {
 			String userRegId = selectUserIdByInviter(record.getUserRegInviterCode());
-			record.setUserRegId(userRegId);
+			record.setUserInviterId(userRegId);
 		}
 		try {
 			return mysqlDao.save(record);
@@ -123,7 +123,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 	 * @param inviterId
 	 * @return
 	 */
-	private List<UserOperateInfo> listByUserId(Long userId, Integer limit, Integer inviterId) {
+	private List<UserOperateInfo> listByUserId(Long userId, Integer limit, Long inviterId) {
 		try {
 			return mysqlDao.listByUserId(userId, limit, inviterId);
 		} catch (Exception e) {
@@ -171,7 +171,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 	}
 
 	@Override
-	public MyInviterVO getMyInviter(Long userId, Integer limit, Integer inviterId) {
+	public MyInviterVO getMyInviter(Long userId, Integer limit, Long inviterId) {
 		List<UserOperateInfo> list = this.listByUserId(userId, limit, inviterId);
 		int regLength = list == null ? 0 : list.size();
 		if (regLength == 0) {

@@ -58,7 +58,7 @@ public interface UserOperateService {
 	 * @return
 	 */
 	MyInviterVO getMyInviter(Long userId, Integer limit,
-			Integer inviterId);
+			Long inviterId);
 
 	/**
 	 * 查询注册信息
