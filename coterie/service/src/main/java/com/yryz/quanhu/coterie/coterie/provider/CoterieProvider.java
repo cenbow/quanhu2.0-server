@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -210,6 +211,7 @@ public class CoterieProvider implements CoterieApi {
 	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
 			throw ServiceException.paramsError();
+			//throw new QuanhuException
 		}
 		if (StringUtils.isEmpty(info.getIcon())) {
 			throw ServiceException.paramsError("icon");
