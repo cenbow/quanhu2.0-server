@@ -571,7 +571,8 @@ public class OrderController {
      * @throws Exception
      */
     @ApiOperation("支付宝支付回调")
-    @RequestMapping(value = "/pay/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @RequestMapping(value = "/{version}/pay/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
 	public void alipayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	logger.info("receive alipayNotify");
 		PayResponse payResp = null;
@@ -606,7 +607,8 @@ public class OrderController {
      * @throws Exception
      */
     @ApiOperation("微信支付回调")
-    @RequestMapping(value = "/pay/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @RequestMapping(value = "/{version}/pay/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
 	public void wxpayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("receive wxpayNotify...");
 		PayResponse payResp = null;
