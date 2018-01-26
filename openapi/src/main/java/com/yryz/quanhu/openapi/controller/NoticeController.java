@@ -53,4 +53,6 @@ public class NoticeController {
         Assert.notNull(noticeDto.getKid(), "公告id不能为空！");
         return noticeAPI.detail(noticeDto);
     }
+
+
 }
