@@ -49,9 +49,9 @@ public class PushMsgConsumer {
 	@RabbitListener(
 			bindings =
 			@QueueBinding(
-					value = @Queue(value = AmqpConstants.JPUSH_QUANHU_DIRECT_EXCHANGE, durable = "true"),
+					value = @Queue(value = AmqpConstants.JPUSH_QUANHU_DIRECT_QUEUE, durable = "true"),
 					exchange = @Exchange(value = AmqpConstants.JPUSH_QUANHU_DIRECT_EXCHANGE, ignoreDeclarationExceptions = "true", type = ExchangeTypes.DIRECT),
-					key = AmqpConstants.JPUSH_QUANHU_DIRECT_EXCHANGE)
+					key = AmqpConstants.JPUSH_QUANHU_DIRECT_QUEUE)
 	)
 	public void onMessage(String data) {
 		logger.info("get exchange mq: {}", data);

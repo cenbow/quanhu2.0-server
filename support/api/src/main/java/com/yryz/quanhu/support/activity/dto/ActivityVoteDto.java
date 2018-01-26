@@ -1,5 +1,7 @@
 package com.yryz.quanhu.support.activity.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class ActivityVoteDto implements Serializable {
@@ -33,9 +35,11 @@ public class ActivityVoteDto implements Serializable {
     /** 是否第三方 */
     private Integer otherFlag;
     /** 奖品类型 */
-    private Integer prizesType;
+    private Integer type;
     /** 是否过期  */
     private Integer isOverdue;
+    /** 手机号 */
+    private String phone;
 
     public Integer getCurrentPage() {
         return currentPage;
@@ -149,12 +153,12 @@ public class ActivityVoteDto implements Serializable {
         this.otherFlag = otherFlag;
     }
 
-    public Integer getPrizesType() {
-        return prizesType;
+    public Integer getType() {
+        return type;
     }
 
-    public void setPrizesType(Integer prizesType) {
-        this.prizesType = prizesType;
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public Integer getIsOverdue() {
@@ -164,4 +168,13 @@ public class ActivityVoteDto implements Serializable {
     public void setIsOverdue(Integer isOverdue) {
         this.isOverdue = isOverdue;
     }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
 }

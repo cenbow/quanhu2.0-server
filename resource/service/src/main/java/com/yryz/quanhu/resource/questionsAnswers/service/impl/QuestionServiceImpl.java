@@ -4,7 +4,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.member.constants.MemberConstant;
+import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForPermission;
+import com.yryz.quanhu.order.enums.AccountEnum;
+import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +58,30 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private AnswerService answerService;
 
+    @Reference
+    private CoterieApi coterieApi;
+
+    @Autowired
+    private OrderSDK orderSDK;
+
+
+    @Reference
+    private CoterieMemberAPI coterieMemberAPI;
+
+    private Boolean checkIdentity(Long userId,Long citeriaId,MemberConstant.Permission permission){
+        //圈主10 成员20 路人未审请30 路人待审核40
+        Response<Byte> data=coterieMemberAPI.permission(userId,citeriaId);
+        if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
+            Byte coterieMemberVoForPermission=data.getData();
+            if(null!=coterieMemberVoForPermission){
+                if(MemberConstant.Permission.MEMBER.getStatus().compareTo(coterieMemberVoForPermission)==0){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * 发布提问
      *
@@ -62,11 +96,36 @@ public class QuestionServiceImpl implements QuestionService {
         Long citeriaId = question.getCoterieId();
         String targetId = question.getTargetId();
         String conttent = question.getContent();
+        Long createUserId=question.getCreateUserId();
         Byte isAnonymity = question.getIsAnonymity();
         Byte isOnlyShowMe = question.getIsOnlyShowMe();
         if (null == citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(conttent)
-                || isAnonymity == null || null == isOnlyShowMe) {
+                || isAnonymity == null || null == isOnlyShowMe || null==createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+        }
+
+        /**
+         *校验私圈是否合法
+         */
+        Response<CoterieInfo>  coterieInfoResponse= coterieApi.queryCoterieInfo(citeriaId);
+        if(ResponseConstant.SUCCESS.getCode().equals(coterieInfoResponse.getCode())){
+            CoterieInfo coterieInfo=coterieInfoResponse.getData();
+            if(null ==coterieInfo){
+                throw  QuanhuException.busiError("提问的私圈不存在。");
+            }
+            Integer consultingFee=coterieInfo.getConsultingFee()==null?0:coterieInfo.getConsultingFee();
+            //保存提问费用
+            question.setChargeAmount(Long.valueOf(consultingFee));
+        }
+
+        //圈主10 成员20 路人未审请30 路人待审核40
+        if(!checkIdentity(createUserId,Long.valueOf(citeriaId),MemberConstant.Permission.MEMBER)){
+            throw  QuanhuException.busiError("非圈粉不能提问");
+        }
+
+
+        if(!checkIdentity(Long.valueOf(targetId),Long.valueOf(citeriaId),MemberConstant.Permission.OWNER)){
+            throw  QuanhuException.busiError("不能向非圈主用户提问.");
         }
 
         question.setKid(apIservice.getKid());
@@ -86,18 +145,23 @@ public class QuestionServiceImpl implements QuestionService {
         question.setDelFlag(CommonConstants.DELETE_NO);
         question.setShelveFlag(CommonConstants.SHELVE_YES);
 
-        /**
-         *校验圈主是否合法
-         */
-        // TODO: 2018/1/22 0022  
-
-
-        /**
-         * 校验是是否是圈粉，是否禁言
-         */
-        /// TODO: 2018/1/22 0022  
-
         questionDao.insertSelective(question);
+        if(question.getChargeAmount().longValue()>0){
+            InputOrder inputOrder=new InputOrder();
+            inputOrder.setBizContent(JSON.toJSONString(question));
+            inputOrder.setCost(question.getChargeAmount());
+            inputOrder.setCoterieId(question.getCoterieId());
+            inputOrder.setCreateUserId(question.getCreateUserId());
+            inputOrder.setFromId(question.getCreateUserId());
+            inputOrder.setToId(Long.valueOf(AccountEnum.SYSID));
+            inputOrder.setModuleEnum(ResourceTypeEnum.QUESTION);
+            inputOrder.setOrderEnum(OrderEnum.QUESTION_ORDER);
+            inputOrder.setResourceId(question.getKid());
+            Long orderId=orderSDK.createOrder(inputOrder);
+            question.setOrderId(String.valueOf(orderId));
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
+            this.questionDao.updateByPrimaryKeySelective(question);
+        }
         return question;
     }
 
@@ -186,7 +250,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     /**
      * 圈主拒接回答问题
-     *
      * @param kid
      * @param userId
      * @return
@@ -244,8 +307,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          *检查用户是否是圈主
          */
-        // TODO: 2018/1/24 0024
-        Boolean isCoteriaOwner = true;
+        Boolean isCoteriaOwner = checkIdentity(createUserId,coteriaId,MemberConstant.Permission.OWNER);
         if (isCoteriaOwner) {
             criteria.andTargetIdEqualTo(String.valueOf(createUserId));
             example.setOrderByClause("answerd_flag asc,create_date desc");
@@ -263,8 +325,8 @@ public class QuestionServiceImpl implements QuestionService {
             QuestionVo questionVo = new QuestionVo();
             BeanUtils.copyProperties(question, questionVo);
             Long questionCreateUserId = question.getCreateUserId();
-            if (null == questionCreateUserId) {
-                questionVo.setUser(apIservice.getUser(coteriaId));
+            if (null != questionCreateUserId) {
+                questionVo.setUser(apIservice.getUser(questionCreateUserId));
             }
 
             /**

@@ -1,5 +1,6 @@
 package com.yryz.quanhu.coterie.member.service;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
@@ -25,7 +26,7 @@ public interface CoterieMemberService {
 	 * 申请加入私圈  审批通过
 	 * @param coterieId 私圈ID
 	 */
-	public void audit(Long userId, Long coterieId, Integer type);
+	public void audit(Long userId, Long coterieId, Byte type);
 
 	/**
 	 * 踢出私圈
@@ -54,14 +55,14 @@ public interface CoterieMemberService {
 	 * @param coterieId
 	 * @return
 	 */
-	public List<CoterieMemberVo> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize);
+	public PageList<CoterieMemberVo> queryMemberList(Long coterieId, Integer pageNum, Integer pageSize);
 
 	/**
 	 * 申请加入私圈记录列表
 	 * @param coterieId
 	 * @return
 	 */
-	public List<CoterieMemberApplyVo> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize);
+	public PageList<CoterieMemberApplyVo> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize);
 
 	/**
 	 * 私圈新申请的成员数量
@@ -75,7 +76,7 @@ public interface CoterieMemberService {
 	 * @param userId
 	 * @param coterieId
 	 */
-	public Integer permission(Long userId, Long coterieId);
+	public Byte permission(Long userId, Long coterieId);
 
 	/**
 	 * 私圈成员权限

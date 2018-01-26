@@ -1,5 +1,6 @@
 package com.yryz.quanhu.support.activity.dao;
 
+import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.entity.ActivityUserPrizes;
 import com.yryz.quanhu.support.activity.vo.ActivityUserPrizesVo;
 import com.yryz.quanhu.support.activity.vo.AdminInActivityUserPrizes;
@@ -36,8 +37,7 @@ public interface ActivityUserPrizesDao {
 
     int updateStatus(@Param("createUserId") Long createUserId);
 
-
-
+    List<ActivityUserPrizes> selectUserPrizesList(ActivityVoteDto activityVoteDto);
 
     ActivityUserPrizes selectByPrimaryKey(Long kid);
 
