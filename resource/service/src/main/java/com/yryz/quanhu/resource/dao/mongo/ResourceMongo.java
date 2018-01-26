@@ -157,7 +157,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 		Criteria criteria = new Criteria();
 		if(resourceModel != null){
 			
-			criteria = Criteria.where("delFlag").is("0");
+			criteria = Criteria.where("delFlag").is(0);
 			
 			//资源ID，用户ID，是否达人，私圈ID
 			if(resourceModel.getResourceId() != null){
