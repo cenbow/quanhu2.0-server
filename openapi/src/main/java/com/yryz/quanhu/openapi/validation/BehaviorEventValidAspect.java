@@ -53,7 +53,7 @@ public class BehaviorEventValidAspect {
     /**
      * 定义切面 扫描注解切面
      */
-    @Pointcut("@annotation(com.yryz.common.annotation.UserBehaviorArgs) && @annotation(com.yryz.common.annotation.UserBehaviorValidation)")
+    @Pointcut("@annotation(com.yryz.common.annotation.UserBehaviorArgs) || @annotation(com.yryz.common.annotation.UserBehaviorValidation)")
     public void behaviorValid(){
 
     }
@@ -64,11 +64,18 @@ public class BehaviorEventValidAspect {
     @Before("behaviorValid()")
     public void beforeValid(JoinPoint joinPoint){
 
+        logger.info("[用户数据权限认证]-------------★start★-------------");
+
         //获取注解参数
         MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
         Method method = methodSignature.getMethod();
+
         //校验规则
         UserBehaviorValidation validation = method.getDeclaredAnnotation(UserBehaviorValidation.class);
+        if(validation==null){
+            return;
+        }
+
         //取值方式{注解中都用占位符标识，这需要通过切面方法参数中获取指定值}
         UserBehaviorArgs args = method.getDeclaredAnnotation(UserBehaviorArgs.class);
 
@@ -82,21 +89,20 @@ public class BehaviorEventValidAspect {
         BehaviorValidFilterChain filterChain = new BehaviorValidFilterChain();
 
         /**
-         * 获取公共参数（后续注解中有参数，则在此添加）
+         * 获取公共参数（后续注解中有参数，则在此添加），
+         * 亦可在自定义filter中，通过如下方式获取，
+         *
          */
         filterChain.setContextValue("loginUserId",behaviorArgsBuild.getParameterValue(args.loginUserId(),joinPointArgs));
         filterChain.setContextValue("loginToken",behaviorArgsBuild.getParameterValue(args.loginToken(),joinPointArgs));
         filterChain.setContextValue("sourceType",behaviorArgsBuild.getParameterValue(args.sourceType(),joinPointArgs));
         filterChain.setContextValue("sourceId",behaviorArgsBuild.getParameterValue(args.sourceId(),joinPointArgs));
         filterChain.setContextValue("sourceUserId",behaviorArgsBuild.getParameterValue(args.sourceUserId(),joinPointArgs));
-        filterChain.setContextValue("sourceTitle",behaviorArgsBuild.getParameterValue(args.sourceTitle(),joinPointArgs));
-        filterChain.setContextValue("sourceContext",behaviorArgsBuild.getParameterValue(args.sourceContext(),joinPointArgs));
 
         //后续相关过滤器实现可以从切面参数中获取自定义参数，
         filterChain.setJoinPoint(joinPoint);
         filterChain.setUserBehaviorArgs(args);
         filterChain.setUserBehaviorValidation(validation);
-
 
         //是否校验登录
         if (validation.login()){
@@ -120,6 +126,7 @@ public class BehaviorEventValidAspect {
         }
         //执行
         filterChain.execute();
-        logger.info("beforeValid.annotation={}");
+
+        logger.info("[用户数据权限认证]-------------★finish★-------------");
     }
 }

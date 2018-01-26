@@ -28,10 +28,9 @@ public class MyBehaviorController {
 
     private static final Logger logger = LoggerFactory.getLogger(MyBehaviorController.class);
 
-    @UserBehaviorValidation(event = "testRequest")
-    @UserBehaviorArgs(loginUserId = "request.head.userId",
-                        loginToken = "request.head.userToken",
-                        sourceType = "request.body.sourceType")
+    @UserBehaviorValidation(event = "测试提交")
+    @UserBehaviorArgs(loginUserId = "request.head.userId", loginToken = "request.head.userToken",
+            sourceId = "request.form.mySourceId")
     @RequestMapping("/request")
     public Response<String> testRequest(HttpServletRequest request){
         return null;
@@ -40,8 +39,8 @@ public class MyBehaviorController {
 
 
 
-    @UserBehaviorValidation(event = "资源发布Map", blacklist = true, illegalWords = true,login = false)
-    @UserBehaviorArgs(sourceTitle = "map.title",sourceContext = "map.contentSource",sourceUserId = "map.createUserId")
+    @UserBehaviorValidation(event = "资源发布", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+    @UserBehaviorArgs(sourceContexts = {"map.title","map.contentSource"},sourceUserId = "map.createUserId")
 
     @RequestMapping("/map")
     public Response<String> testMap(HttpServletRequest request, @RequestBody Map<String,Object> map){
@@ -51,9 +50,7 @@ public class MyBehaviorController {
 
 
     @UserBehaviorValidation(event = "资源发布", illegalWords = true)
-    @UserBehaviorArgs(sourceTitle = "object.ReleaseInfo.title", sourceContext = "object.ReleaseInfo.contentSource")
-
-
+    @UserBehaviorArgs(sourceContexts = {"object.ReleaseInfo.title","object.ReleaseInfo.contentSource"})
     @RequestMapping("/info")
     public Response<String> testInfo(HttpServletRequest request, @RequestBody ReleaseInfo info){
         logger.info("comment:"+ JSON.toJSONString(info));
@@ -61,7 +58,7 @@ public class MyBehaviorController {
     }
 
     @UserBehaviorValidation(event = "发表评论", illegalWords = true, blacklist = true)
-    @UserBehaviorArgs(sourceUserId = "object.Comment.targetUserId",sourceContext = "object.Comment.contentComment")
+    @UserBehaviorArgs(sourceUserId = "object.Comment.targetUserId",sourceContexts = {"object.Comment.contentComment"})
 
     @RequestMapping("/dto")
     public Response<String> testDto(HttpServletRequest request, @RequestBody Comment comment){

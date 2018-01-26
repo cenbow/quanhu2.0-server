@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.validation.filter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.validation.BehaviorValidFilterChain;
 import com.yryz.quanhu.openapi.validation.IBehaviorValidFilter;
@@ -30,16 +31,15 @@ public class UserMuteValidFilter implements IBehaviorValidFilter {
     @Override
     public void filter(BehaviorValidFilterChain filterChain) {
         logger.info("验证用户平台禁言={}",filterChain.getContext());
-        String loginUserId = (String) filterChain.getContext().get("loginUserId");
         /**
          * 平台禁言，不做强制性校验
          */
-        try{
-            Response<Boolean> rpc = accountApi.checkUserDisTalk(Long.parseLong(loginUserId));
-        }catch (Exception e){
-            logger.warn("");
-        }finally {
+        String loginUserId = (String) filterChain.getContext().get("loginUserId");
+        Response<Boolean> rpc = accountApi.checkUserDisTalk(Long.parseLong(loginUserId));
+        if(rpc.success()&&rpc.getData()){
             filterChain.execute();
+        }else{
+            throw new QuanhuException("","","您已被平台管理员禁言，不允许操作");
         }
     }
 }

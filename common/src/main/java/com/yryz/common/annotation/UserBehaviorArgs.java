@@ -15,18 +15,45 @@ import java.lang.annotation.*;
 @Documented
 public @interface UserBehaviorArgs {
 
+    /**
+     * 当前登录ID
+     * @return
+     */
     String loginUserId() default "request.head.userId";
 
+    /**
+     * 当前登录token
+     * @return
+     */
     String loginToken() default "request.head.token";
 
+    /**
+     * 操作资源类型
+     * @return
+     */
     String sourceType() default "";
 
+    /**
+     * 操作资源ID
+     * @return
+     */
     String sourceId() default "";
 
+    /**
+     * 操作资源所属着
+     * @return
+     */
     String sourceUserId() default "";
 
-    String sourceTitle() default "";
+    /**
+     * 操作资源内容
+     * @return
+     */
+    String[] sourceContexts() default {};
 
-    String sourceContext() default "";
+    /**
+     * 私圈ID
+     */
+    String coterieId() default "";
 
 }
