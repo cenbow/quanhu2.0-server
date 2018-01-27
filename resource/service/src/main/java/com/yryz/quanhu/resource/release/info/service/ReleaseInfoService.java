@@ -7,6 +7,7 @@ import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 
 /**
 * @author wangheng
@@ -105,4 +106,8 @@ public interface ReleaseInfoService {
     * @throws  
     */
     public void resourcePropertiesEmpty(ReleaseInfo record);
+    
+    public List<Long> getKidByCreatedate(String startDate,String endDate);
+    
+    public List<ReleaseInfoVo> getByKids(List<Long> kidList);
 }

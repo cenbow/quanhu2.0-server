@@ -40,4 +40,10 @@ public interface ActivityInfoApi {
      */
     Response<ActivityInfoVo> get(Long kid , Integer type);
 
+    /**
+     * 获取activityInfo固定列表
+     * @param type
+     * @return
+     */
+    Response<PageList<ActivityInfoAppListVo>> fixedList(Integer type);
 }

@@ -1,8 +1,11 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
@@ -16,6 +19,9 @@ public class APIServiceImpl implements APIservice {
 
     @Reference
     private UserApi userApi;
+
+    @Reference
+    private CoterieApi coterieApi;
 
     @Override
     public Long getKid() {
@@ -37,4 +43,16 @@ public class APIServiceImpl implements APIservice {
         }
         return null;
     }
+
+    @Override
+    public CoterieInfo getCoterieinfo(Long citeriaId){
+        Response<CoterieInfo>  coterieInfoResponse= coterieApi.queryCoterieInfo(citeriaId);
+        if(ResponseConstant.SUCCESS.getCode().equals(coterieInfoResponse.getCode())){
+            CoterieInfo coterieInfo=coterieInfoResponse.getData();
+            return coterieInfo;
+        }
+        return null;
+
+    }
+
 }

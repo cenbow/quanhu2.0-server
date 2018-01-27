@@ -1,5 +1,18 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.yryz.quanhu.resource.vo.ResourceTotal;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
@@ -22,6 +35,7 @@ import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
@@ -234,6 +248,32 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<Integer> shelvesByCondition(ReleaseInfo record, ReleaseInfoDto dto) {
         return ResponseUtils.returnObjectSuccess(0);
     }
+
+	@Override
+	public Response<List<Long>> getKidByCreatedate(String startDate, String endDate) {
+		try {
+			List<Long> data = this.releaseInfoService.getKidByCreatedate(startDate, endDate);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+	}
+
+	@Override
+	public Response<List<ReleaseInfoVo>> getByKids(List<Long> kidList) {
+		try {
+			List<ReleaseInfoVo> data = this.releaseInfoService.getByKids(kidList);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+	}
 
     /**
      * 提交资源动态

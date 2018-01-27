@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 public class TopicPostDto  implements Serializable {
 
+    private Long kid;
+
     private Long topicId;
 
     private String videoUrl;
@@ -32,6 +34,14 @@ public class TopicPostDto  implements Serializable {
     private Integer pageSize;
 
     private String orderBy;
+
+    public Long getKid() {
+        return kid;
+    }
+
+    public void setKid(Long kid) {
+        this.kid = kid;
+    }
 
     public Long getTopicId() {
         return topicId;
