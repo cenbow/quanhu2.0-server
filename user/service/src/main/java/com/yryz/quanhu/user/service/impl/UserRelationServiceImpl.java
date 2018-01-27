@@ -95,10 +95,16 @@ public class UserRelationServiceImpl implements UserRelationService{
             UserRelationDto targetDto = userRelationCacheDao.getCacheRelation(targetUserId,sourceUserId);
             if(sourceDto == null){
                 sourceDto = new UserRelationDto();
+                sourceDto.setBlackStatus(UserRelationConstant.NO);
+                sourceDto.setFriendStatus(UserRelationConstant.NO);
+                sourceDto.setFollowStatus(UserRelationConstant.NO);
                 sourceDto.setNewRecord(true);
             }
             if(targetDto == null){
                 targetDto = new UserRelationDto();
+                targetDto.setBlackStatus(UserRelationConstant.NO);
+                targetDto.setFriendStatus(UserRelationConstant.NO);
+                targetDto.setFollowStatus(UserRelationConstant.NO);
                 targetDto.setNewRecord(true);
             }
             /**
