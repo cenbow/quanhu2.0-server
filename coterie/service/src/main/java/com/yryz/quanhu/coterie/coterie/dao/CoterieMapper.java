@@ -78,4 +78,8 @@ public interface CoterieMapper {
     List<Coterie> selectLikeName(@Param("circleId") String circleId, @Param("name") String name, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
     
     List<String> selectCircleIdListByOwnerId(@Param("ownerId") String ownerId);
+    
+    List<Long> selectKidByCreateDate(@Param("startDate")String startDate,@Param("endDate")String endDate);
+    
+    List<Coterie> selectByKids(@Param("kidList")List<Long> kidList);
 }

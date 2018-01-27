@@ -17,6 +17,7 @@ import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.until.ImageUtils;
 import com.yryz.quanhu.coterie.coterie.until.ZxingHandler;
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
@@ -865,6 +866,31 @@ public class CoterieProvider implements CoterieApi {
 			logger.error("组装私圈二维码图片异常！", e);
 		}
 		return ResponseUtils.returnObjectSuccess(result);
+	}
+	
+	@Override
+	public Response<List<Long>> getKidByCreateDate(String startDate, String endDate) {
+		logger.info("CoterieApi.getKidByCreateDate startDate:" + startDate+",endDate:"+endDate);
+		try {
+			List<Long> kidList=coterieService.getKidByCreateDate(startDate, endDate);
+			return  ResponseUtils.returnObjectSuccess(kidList);
+		} catch (Exception e) {
+			logger.error("unKown Exception", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
+	@Override
+	public Response<List<Coterie>> getByKids(List<Long> kidList) {
+		logger.info("CoterieApi.getByKids kidList:" + kidList);
+		try {
+			List<com.yryz.quanhu.coterie.coterie.entity.Coterie> list=coterieService.getByKids(kidList);
+			List<Coterie> rstList=GsonUtils.parseList(list, Coterie.class);
+			return  ResponseUtils.returnObjectSuccess(rstList);
+		} catch (Exception e) {
+			logger.error("unKown Exception", e);
+			return ResponseUtils.returnException(e);
+		}
 	}
 }
 
