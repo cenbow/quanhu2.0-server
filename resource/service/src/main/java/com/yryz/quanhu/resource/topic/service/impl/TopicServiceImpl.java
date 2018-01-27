@@ -126,6 +126,12 @@ public class TopicServiceImpl implements TopicService {
         // Byte recommend =dto.getRecommend()==null?CommonConstants.recommend_YES:dto.getRecommend();
         String orderBy = StringUtils.isBlank(dto.getOrderBy()) ? "recommend desc ,create_date desc " : dto.getOrderBy();
         TopicExample example = new TopicExample();
+        TopicExample.Criteria criteria=example.createCriteria();
+        criteria.andShelveFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        if(dto.getRecommend()!=null){
+            criteria.andRecommendEqualTo(dto.getRecommend());
+        }
         example.setPageStartIndex(pageStartIndex);
         example.setPageSize(pageSize);
         example.setOrderByClause(orderBy);
@@ -140,7 +146,6 @@ public class TopicServiceImpl implements TopicService {
             }
             topicVos.add(vo);
         }
-
         pageList.setEntities(topicVos);
         pageList.setPageSize(pageSize);
         pageList.setCurrentPage(pageNum);

@@ -8,32 +8,57 @@ import java.util.Date;
 
 
 public class AdminActivityVoteVo extends ActivityInfo {
-	
-	private Integer joinFlag;
-	
-	private Integer joinCount;
-	
+
 	private Date currentDate;
 	
 	private Integer voteTotalCount;
 	
 	/**
-	 *活动状态 1未开始 2进行中 3已结束
+	 *活动状态 11未开始 12进行中 13已结束
 	 */
 	private Integer activityStatus;
 	
 	
 	private Long shareCount; 
 	
-	private Long voteCount; 
-	
+	private Integer userNum;
 
-	public Long getVoteCount() {
-		return voteCount;
+	private Long amount;
+
+	private Integer prizesFlag;
+
+	private Integer userFlag;
+
+	public Integer getUserFlag() {
+		return userFlag;
 	}
 
-	public void setVoteCount(Long voteCount) {
-		this.voteCount = voteCount;
+	public void setUserFlag(Integer userFlag) {
+		this.userFlag = userFlag;
+	}
+
+	public Integer getUserNum() {
+		return userNum;
+	}
+
+	public void setUserNum(Integer userNum) {
+		this.userNum = userNum;
+	}
+
+	public Long getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Long amount) {
+		this.amount = amount;
+	}
+
+	public Integer getPrizesFlag() {
+		return prizesFlag;
+	}
+
+	public void setPrizesFlag(Integer prizesFlag) {
+		this.prizesFlag = prizesFlag;
 	}
 
 	public Long getShareCount() {
@@ -42,23 +67,6 @@ public class AdminActivityVoteVo extends ActivityInfo {
 
 	public void setShareCount(Long shareCount) {
 		this.shareCount = shareCount;
-	}
-
-
-	public Integer getJoinFlag() {
-		return joinFlag;
-	}
-
-	public void setJoinFlag(Integer joinFlag) {
-		this.joinFlag = joinFlag;
-	}
-
-	public Integer getJoinCount() {
-		return joinCount;
-	}
-
-	public void setJoinCount(Integer joinCount) {
-		this.joinCount = joinCount;
 	}
 
 	public Date getCurrentDate() {

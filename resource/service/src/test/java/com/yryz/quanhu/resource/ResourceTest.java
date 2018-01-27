@@ -98,7 +98,7 @@ public class ResourceTest {
 	
 	@Test
 	public void getResource(){
-		ResourceVo resourceVo = resourceApi.getResourcesById("1000210").getData();
+		ResourceVo resourceVo = resourceApi.getResourcesById("1000211").getData();
 		System.out.println(GsonUtils.parseJson(resourceVo));
 	}
 

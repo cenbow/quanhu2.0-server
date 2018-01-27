@@ -109,7 +109,7 @@ public class ResourceServiceImpl implements ResourceService {
 		Map<String, ResourceModel> map = new HashMap<>();
 		if(CollectionUtils.isNotEmpty(resourceIds)){
 			for (String resourceId : resourceIds) {
-				ResourceModel resource = resourceMongo.findById(resourceId);
+				ResourceModel resource = resourceMongo.get(resourceId);
 				if(resource != null){
 					map.put(resourceId, resource);
 				}
@@ -126,7 +126,7 @@ public class ResourceServiceImpl implements ResourceService {
 	 */
 	@Override
 	public ResourceModel getResource(String resourceId) {
-		ResourceModel resourceModel = resourceMongo.findById(resourceId);
+		ResourceModel resourceModel = resourceMongo.get(resourceId);
 		return resourceModel;
 	}
 
