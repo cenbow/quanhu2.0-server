@@ -109,7 +109,9 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          *校验私圈是否合法
          */
-
+        if(targetId.equals(String.valueOf(createUserId))){
+            throw QuanhuException.busiError("不能向自己提问。");
+        }
         CoterieInfo coterieInfo = apIservice.getCoterieinfo(citeriaId);
         if (null == coterieInfo) {
             throw QuanhuException.busiError("提问的私圈不存在。");
@@ -161,8 +163,10 @@ public class QuestionServiceImpl implements QuestionService {
             question.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
             this.questionDao.updateByPrimaryKeySelective(question);
         }
-        MessageVo messageVo = new MessageVo();
-        messageAPI.sendMessage(messageVo, true);
+        Boolean  sendResult=questionMessageService.sendNotify4Question(question,MessageConstant.QUESTION_TO_BE_ANSWERED);
+        if(!sendResult){
+            logger.info("提问被删除，发送消息失败");
+        }
         return question;
     }
 
