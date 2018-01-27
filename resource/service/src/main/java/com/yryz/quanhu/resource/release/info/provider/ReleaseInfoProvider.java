@@ -287,7 +287,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 //        resourceTotal.setCoterieId(releaseInfo.getCoterieId().toString());
         resourceTotal.setCreateDate(DateUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         resourceTotal.setExtJson(GsonUtils.parseJson(releaseInfo));
-        resourceTotal.setModuleEnum(resourceTotal.getModuleEnum());
+        resourceTotal.setModuleEnum(new Integer(releaseInfo.getModuleEnum()));
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(releaseInfo.getKid());
         UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(userApi.getUserSimple(releaseInfo.getCreateUserId()));
