@@ -91,7 +91,7 @@ public class ResourceTest {
 		ResourceVo resource = new ResourceVo();
 //		resource.setCustId("yehao-test-id");
 		resource.setTitle("title");
-		resource.setResourceType(ResourceTypeEnum.RELEASE + "," + ResourceTypeEnum.TOPIC );
+		resource.setModuleEnum(ResourceTypeEnum.RELEASE + "," + ResourceTypeEnum.TOPIC );
 		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "orderby", 0, 2, "2018-1-17 1:1:1", "2018-1-17 14:1:1");
 		System.out.println(GsonUtils.parseJson(resonse.getData()));
 	}

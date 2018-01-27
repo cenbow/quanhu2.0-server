@@ -224,7 +224,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(sourceUserId.equalsIgnoreCase(targetUserId)){
-            throw new QuanhuException("","","不允许与自己设置关系");
+            throw new QuanhuException("","不允许与自己设置关系:"+sourceUserId,"不允许与自己设置关系");
         }
 
         /**
@@ -233,7 +233,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         Long followCount = userRelationDao.selectTotalCount(sourceUserId,UserRelationConstant.STATUS.FOLLOW.getCode());
 
         if(followCount>=maxFollowCount){
-            throw new QuanhuException("","","您已添加最大关注人数: "+maxFollowCount);
+            throw new QuanhuException("","您已添加最大关注人数: "+followCount,"您已添加最大关注人数: "+maxFollowCount);
         }
 
         /**
@@ -246,7 +246,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
         UserBaseInfo targetUser =userService.getUser(Long.parseLong(targetUserId));
         if(null == targetUser){
-            throw new QuanhuException("","","目标用户不存在或已注销");
+            throw new QuanhuException("","目标用户不存在或已注销："+targetUserId,"目标用户不存在或已注销");
         }
         return false;
     }
@@ -259,13 +259,13 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
         if(YES == sourceDto.getBlackStatus()){
             if(UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException("","","你已将该用户加入黑名单");
+                throw new QuanhuException("","你已将该用户加入黑名单","你已将该用户加入黑名单");
             }
         }
 
         if(YES == targetDto.getBlackStatus()){
             if(UserRelationConstant.EVENT.SET_BLACK != event&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException("","","对方已将你加入黑名单");
+                throw new QuanhuException("","对方已将你加入黑名单","对方已将你加入黑名单");
             }
         }
 
@@ -348,7 +348,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             sourceDto.setFollowStatus(UserRelationConstant.NO);
 
         }else{
-            throw new QuanhuException("","","系统参数异常");
+            throw new QuanhuException("","系统参数异常:"+event,"系统参数异常");
         }
     }
 
@@ -417,14 +417,14 @@ public class UserRelationServiceImpl implements UserRelationService{
                     UserRelationConstant.STATUS.FOLLOW!=status &&
                     UserRelationConstant.STATUS.TO_BLACK!=status){
 
-                throw new QuanhuException("","","查询参数非法,不允许操作");
+                throw new QuanhuException("","查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
             }
         }else{
             //查看他人
             if(UserRelationConstant.STATUS.FANS!=status &&
                     UserRelationConstant.STATUS.FOLLOW!=status){
                 //异常
-                throw new QuanhuException("","","查询参数非法,不允许操作");
+                throw new QuanhuException("","查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
             }
         }
     }
