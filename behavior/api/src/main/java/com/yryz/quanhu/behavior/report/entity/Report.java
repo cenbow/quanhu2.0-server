@@ -15,7 +15,7 @@ public class Report extends GenericEntity {
     //资源ID
     private long resourceId;
     //举报类型
-    private byte informType;
+    private String informType;
     //违规描述
     private String informDesc;
     //处理状态(10待处理，11已处理)
@@ -26,6 +26,14 @@ public class Report extends GenericEntity {
     private long beReportUserId;
     //处理时间
     private String disposeTime;
+
+    public String getInformType() {
+        return informType;
+    }
+
+    public void setInformType(String informType) {
+        this.informType = informType;
+    }
 
     public String getModuleEnum() {
         return moduleEnum;
@@ -41,14 +49,6 @@ public class Report extends GenericEntity {
 
     public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
-    }
-
-    public byte getInformType() {
-        return informType;
-    }
-
-    public void setInformType(byte informType) {
-        this.informType = informType;
     }
 
     public String getInformDesc() {
