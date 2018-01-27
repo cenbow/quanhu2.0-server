@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.topic.api;
 
 
+import java.util.List;
+
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
@@ -16,4 +18,8 @@ public interface TopicPostApi {
     public Response<PageList<TopicPostVo>> listPost(TopicPostDto dto);
 
     public Response<Integer> deleteTopicPost(Long kid,Long userId);
+    
+    public Response<List<Long>> getKidByCreatedate(String startDate,String endDate);
+    
+    public Response<List<TopicPostVo>> getByKids(List<Long> kidList);
 }

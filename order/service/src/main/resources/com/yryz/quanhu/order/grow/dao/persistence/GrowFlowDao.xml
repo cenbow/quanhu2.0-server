@@ -36,6 +36,28 @@
 		select  <include refid="columns" />  from grow_flow where user_id = #{userId}
 	</select>
 	
+
+		
+	<select id="countgetPage"  
+		resultType="java.lang.Long">
+		select  count(1)  
+		 from (
+		select  <include refid="columns" /> 
+		 from grow_flow where user_id = #{gfq.userId} 
+		<if test="gfq.eventCode != null">
+			and event_code = #{gfq.eventCode}
+		</if>
+		<if test="gfq.startTime != null">
+			and create_time &gt;= #{gfq.startTime}
+		</if>
+		<if test="gfq.endTime != null">
+			and create_time &lt;= #{gfq.endTime}
+		</if>
+		) a 
+		left join event_sys b on a.eventCode = b.event_code 
+		order by a.id desc
+		</select>
+	
 	<select id="getPage" resultType="com.yryz.quanhu.grow.entity.GrowFlow">
 		select 
 				a.id  ,

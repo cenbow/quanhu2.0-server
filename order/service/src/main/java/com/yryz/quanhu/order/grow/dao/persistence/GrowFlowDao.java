@@ -22,5 +22,7 @@ public interface GrowFlowDao {
     List<GrowFlow> getAll();
     
     List<GrowFlow> getPage(@Param("gfq") GrowFlowQuery gfq );
+    
+    long countgetPage(@Param("gfq") GrowFlowQuery gfq);
 
 }

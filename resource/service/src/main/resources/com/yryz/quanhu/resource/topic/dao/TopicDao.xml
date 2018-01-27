@@ -353,4 +353,24 @@
       gps = #{gps,jdbcType=VARCHAR}
     where kid = #{kid,jdbcType=BIGINT}
   </update>
+  
+  <select id="selectKidByCreatedate" resultType="java.lang.Long">
+    select 
+    kid 
+    from qh_topic 
+    where create_date between #{startDate} and #{endDate}
+  </select>
+  
+  <select id="selectByKids" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from qh_topic
+    where kid in 
+    <foreach item="item" index="index" collection="kidList" open="("
+			separator="," close=")">
+			#{item}
+	</foreach>
+  </select>
 </mapper>

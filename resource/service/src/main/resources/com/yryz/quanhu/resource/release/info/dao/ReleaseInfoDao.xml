@@ -493,4 +493,23 @@
 			</if>
 		</where>
 	</sql>
+	
+	<select id="selectKidByCreatedate" resultType="java.lang.Long">
+	    select 
+	    kid 
+	    from qh_release_info 
+	    where create_date between #{startDate} and #{endDate}
+	</select>
+	  
+  	<select id="selectByKids" resultMap="BaseResultMap">
+	    select 
+	    <include refid="Base_Column_List" />
+	    from qh_release_info
+	    where kid in 
+	    <foreach item="item" index="index" collection="kidList" open="("
+				separator="," close=")">
+				#{item}
+		</foreach>
+  	</select>
+  
 </mapper>

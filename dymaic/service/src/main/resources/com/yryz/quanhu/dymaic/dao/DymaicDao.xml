@@ -7,7 +7,7 @@
         <result column="kid" property="kid" jdbcType="BIGINT"/>
         <result column="create_user_id" property="userId" jdbcType="BIGINT"/>
         <result column="module_enum" property="moduleEnum" jdbcType="TINYINT"/>
-        <result column="target_id" property="resourceId" jdbcType="VARCHAR"/>
+        <result column="target_id" property="resourceId" jdbcType="BIGINT"/>
 
         <result column="transmit_note" property="transmitNote" jdbcType="VARCHAR"/>
         <result column="transmit_type" property="transmitType" jdbcType="TINYINT"/>
@@ -87,7 +87,7 @@
         insert into qh_dymaic (kid, create_user_id, module_enum, target_id,
           transmit_note, transmit_type, ext_json, create_date)
         values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},
-            #{moduleEnum,jdbcType=TINYINT},#{resourceId,jdbcType=VARCHAR},
+            #{moduleEnum,jdbcType=TINYINT},#{resourceId,jdbcType=BIGINT},
             #{transmitNote,jdbcType=VARCHAR},#{transmitType,jdbcType=VARCHAR},
             #{extJson,jdbcType=LONGVARCHAR}, #{createDate,jdbcType=TIMESTAMP})
     </insert>

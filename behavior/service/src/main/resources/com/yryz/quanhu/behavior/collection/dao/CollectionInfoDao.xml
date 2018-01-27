@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.behavior.collection.dao.CollectionInfoDao">
+
+	<!--Base_Column_List-->
+	<sql id="Base_Column_List">id,kid,resource_id,module_enum,coterie_id,user_id,title,content,img_url,del_flag,app_id,create_user_id,create_date,last_update_user_id,last_update_date
+    </sql>
+
+     <!-- 查询CollectionInfo详情 -->
+    <select id="selectByKid" resultType="com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_collection_info
+        where kid = #{kid,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 删除CollectionInfo-->
+    <delete id="delete" parameterType="java.lang.Long">
+   	 	delete from qh_collection_info
+    	where kid = #{kid,jdbcType=BIGINT}
+    </delete>
+
+	<delete id="deleteByResourceId">
+		delete from qh_collection_info
+		where resource_id = #{resourceId,jdbcType=BIGINT}
+		and module_enum = #{moduleEnum,jdbcType=VARCHAR}
+		and create_user_id = #{createUserId,jdbcType=BIGINT}
+	</delete>
+  
+  	<!-- 新增CollectionInfo-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.behavior.collection.entity.CollectionInfo">
+	    insert into qh_collection_info (kid,resource_id,module_enum,coterie_id,user_id,title,content,img_url,del_flag,app_id,create_user_id,last_update_user_id)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{resourceId,jdbcType=BIGINT}
+				,#{moduleEnum,jdbcType=VARCHAR}
+				,#{coterieId,jdbcType=BIGINT}
+				,#{userId,jdbcType=BIGINT}
+				,#{title,jdbcType=VARCHAR}
+				,#{content,jdbcType=VARCHAR}
+				,#{imgUrl,jdbcType=VARCHAR}
+				,#{delFlag,jdbcType=TINYINT}
+				,#{appId,jdbcType=VARCHAR}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{lastUpdateUserId,jdbcType=BIGINT}
+	    )
+	</insert>
+	
+	<!--按需新增CollectionInfo-->
+    <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.behavior.collection.entity.CollectionInfo">
+	    insert ignore into qh_collection_info
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="kid != null">
+			kid,
+	    </if>
+        <if test="resourceId != null">
+			resource_id,
+	    </if>
+        <if test="moduleEnum != null and moduleEnum != ''">
+			module_enum,
+	    </if>
+        <if test="coterieId != null">
+			coterie_id,
+	    </if>
+        <if test="userId != null">
+			user_id,
+	    </if>
+        <if test="title != null and title != ''">
+			title,
+	    </if>
+        <if test="content != null and content != ''">
+			content,
+	    </if>
+        <if test="imgUrl != null and imgUrl != ''">
+			img_url,
+	    </if>
+        <if test="delFlag != null">
+			del_flag,
+	    </if>
+        <if test="appId != null and appId != ''">
+			app_id,
+	    </if>
+        <if test="createUserId != null">
+			create_user_id,
+	    </if>
+        <if test="lastUpdateUserId != null">
+			last_update_user_id,
+	    </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="kid != null">
+			#{kid,jdbcType=BIGINT},
+	    </if>
+        <if test="resourceId != null">
+			#{resourceId,jdbcType=BIGINT},
+	    </if>
+        <if test="moduleEnum != null and moduleEnum != ''">
+			#{moduleEnum,jdbcType=VARCHAR},
+	    </if>
+        <if test="coterieId != null">
+			#{coterieId,jdbcType=BIGINT},
+	    </if>
+        <if test="userId != null">
+			#{userId,jdbcType=BIGINT},
+	    </if>
+        <if test="title != null and title != ''">
+			#{title,jdbcType=VARCHAR},
+	    </if>
+        <if test="content != null and content != ''">
+			#{content,jdbcType=VARCHAR},
+	    </if>
+        <if test="imgUrl != null and imgUrl != ''">
+			#{imgUrl,jdbcType=VARCHAR},
+	    </if>
+        <if test="delFlag != null">
+			#{delFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="appId != null and appId != ''">
+			#{appId,jdbcType=VARCHAR},
+	    </if>
+        <if test="createUserId != null">
+			#{createUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="lastUpdateUserId != null">
+			#{lastUpdateUserId,jdbcType=BIGINT},
+	    </if>
+	    </trim>
+	</insert>
+	
+	
+	<!-- 按需修改CollectionInfo-->   
+    <update id="update" parameterType="com.yryz.quanhu.behavior.collection.entity.CollectionInfo">
+        update qh_collection_info
+        <set>
+             <if test="resourceId != null">
+    			resource_id = #{resourceId,jdbcType=BIGINT},
+    		</if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+    			module_enum = #{moduleEnum,jdbcType=VARCHAR},
+    		</if>
+             <if test="coterieId != null">
+    			coterie_id = #{coterieId,jdbcType=BIGINT},
+    		</if>
+             <if test="userId != null">
+    			user_id = #{userId,jdbcType=BIGINT},
+    		</if>
+            <if test="title != null and title != ''">
+    			title = #{title,jdbcType=VARCHAR},
+    		</if>
+            <if test="content != null and content != ''">
+    			content = #{content,jdbcType=VARCHAR},
+    		</if>
+            <if test="imgUrl != null and imgUrl != ''">
+    			img_url = #{imgUrl,jdbcType=VARCHAR},
+    		</if>
+             <if test="delFlag != null">
+    			del_flag = #{delFlag,jdbcType=TINYINT},
+    		</if>
+            <if test="appId != null and appId != ''">
+    			app_id = #{appId,jdbcType=VARCHAR},
+    		</if>
+             <if test="createUserId != null">
+    			create_user_id = #{createUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="lastUpdateUserId != null">
+    			last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+    		</if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+    
+    <!-- 查询CollectionInfo列表 -->
+    <select id="selectList" parameterType="com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto"
+			resultType="com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_collection_info
+		where create_user_id = #{createUserId,jdbcType=BIGINT}
+    </select>
+
+	<select id="selectCount" resultType="int">
+		select count(1)
+		from qh_collection_info
+		where create_user_id = #{createUserId,jdbcType=BIGINT}
+		and module_enum = #{moduleEnum,jdbcType=VARCHAR}
+		and resource_id = #{resourceId,jdbcType=BIGINT}
+	</select>
+
+    
+</mapper>

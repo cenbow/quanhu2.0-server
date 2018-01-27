@@ -30,7 +30,7 @@ public class Dymaic implements Serializable {
     /**
      * 资源ID
      */
-    private Integer resourceId;
+    private Long resourceId;
 
     /**
      * 转发理由
@@ -90,11 +90,11 @@ public class Dymaic implements Serializable {
         this.moduleEnum = moduleEnum;
     }
 
-    public Integer getResourceId() {
+    public Long getResourceId() {
         return resourceId;
     }
 
-    public void setResourceId(Integer resourceId) {
+    public void setResourceId(Long resourceId) {
         this.resourceId = resourceId;
     }
 
