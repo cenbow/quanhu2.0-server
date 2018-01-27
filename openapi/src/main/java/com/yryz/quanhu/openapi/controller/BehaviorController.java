@@ -54,7 +54,7 @@ public class BehaviorController {
     Response<Map<String, Long>> getAllCountFlag(@RequestBody Map<String,Object> map,@RequestHeader Long userId){
         Map<String,Object> maps=new HashMap<String, Object>();
         maps.put("userId",userId);
-        maps.put("resourceId",map.get("resourceId"));
+        maps.put("resourceId",map.get("kid"));
         maps.put("moduleEnum",map.get("moduleEnum"));
         return  countFlagApi.getAllCountFlag(map.get("countType").toString(),Long.valueOf(map.get("kid").toString()),map.get("page").toString(),maps);
     }
