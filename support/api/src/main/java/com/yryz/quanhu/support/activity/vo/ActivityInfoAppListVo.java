@@ -21,9 +21,19 @@ public class ActivityInfoAppListVo implements Serializable{
 
     private String coverPlan;
     
-    private Byte activityType;
+    private Integer activityType;
     
     private Date createDate;
+
+	private Integer listType;
+
+	public Integer getListType() {
+		return listType;
+	}
+
+	public void setListType(Integer listType) {
+		this.listType = listType;
+	}
 
 	public Long getId() {
 		return id;
@@ -49,11 +59,11 @@ public class ActivityInfoAppListVo implements Serializable{
 		this.coverPlan = coverPlan;
 	}
 
-	public Byte getActivityType() {
+	public Integer getActivityType() {
 		return activityType;
 	}
 
-	public void setActivityType(Byte activityType) {
+	public void setActivityType(Integer activityType) {
 		this.activityType = activityType;
 	}
 
