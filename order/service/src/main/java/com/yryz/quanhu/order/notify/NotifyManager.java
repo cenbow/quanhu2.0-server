@@ -34,7 +34,7 @@ public class NotifyManager {
 	private final long EXECUTE_INTERVAL = 50;
 	
 	private NotifyManager(){
-		threadPool = (ThreadPoolTaskExecutor) SpringContextHelper.getBean("threadPool");
+		threadPool = (ThreadPoolTaskExecutor) SpringContextHelper.getBean(ThreadPoolTaskExecutor.class);
 		tasks = new DelayQueue<NotifyTask>();
 		start();
 	}

@@ -1,9 +1,12 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
@@ -59,11 +62,26 @@ public class PostController {
     public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         String userId = header.getUserId();
-        if (StringUtils.isNotBlank(userId)) {
-            topicPostDto.setCreateUserId(Long.valueOf(header.getUserId()));
+        if (StringUtils.isBlank(userId)) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "缺失用户编号"));
         }
+        topicPostDto.setCreateUserId(Long.valueOf(header.getUserId()));
         return topicPostApi.savePost(topicPostDto);
     }
 
 
+    @ApiOperation("删除帖子")
+    @ApiImplicitParams(
+            {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+                    @ApiImplicitParam(name = "userId", paramType = "header", required = true)
+            })
+    @PostMapping(value = "/services/app/{version}/post/single/delete")
+    public Response<Integer> deletePost(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        String userId = header.getUserId();
+        if (StringUtils.isBlank(userId)) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "缺失用户编号"));
+        }
+        return topicPostApi.deleteTopicPost(topicPostDto.getKid(),Long.valueOf(userId));
+    }
 }

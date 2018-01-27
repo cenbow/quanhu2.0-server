@@ -135,7 +135,7 @@ public class CalculationServiceImpl implements CalculationService {
 						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_RESOURCE, resourceId, Long.valueOf(eventHotValue));
 						if(heatInfo != null){
 							ResourceModel resourceModel = new ResourceModel();
-							resourceModel.setResourceId(Long.parseLong(resourceId));
+							resourceModel.setResourceId(resourceId);
 							resourceModel.setHeat(heatInfo.getHeat());
 							resourceMongo.update(resourceModel);
 						}

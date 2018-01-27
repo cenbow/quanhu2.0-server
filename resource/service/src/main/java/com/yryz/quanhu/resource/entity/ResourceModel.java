@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @date 2018年1月16日 下午2:01:43
  * @Description 资源实体管理类
  */
-public class ResourceModel extends Entity implements Serializable {
+public class ResourceModel implements Serializable {
 
     /**
      * 动态ID
@@ -31,12 +31,12 @@ public class ResourceModel extends Entity implements Serializable {
      * 资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     /**
      * 资源ID
      */
-    private Long resourceId;
+    private String resourceId;
 
     /**
      * 文章分类ID
@@ -78,6 +78,11 @@ public class ResourceModel extends Entity implements Serializable {
      * 达人状态：11，是；10，否
      */
     private String talentType;
+    
+    /**
+     * 排序字段
+     */
+    private Long sort;
     
     /**
      * 创建时间
@@ -143,28 +148,28 @@ public class ResourceModel extends Entity implements Serializable {
 	/**
 	 * @return the moduleEnum
 	 */
-	public Integer getModuleEnum() {
+	public String getModuleEnum() {
 		return moduleEnum;
 	}
 
 	/**
 	 * @param moduleEnum the moduleEnum to set
 	 */
-	public void setModuleEnum(Integer moduleEnum) {
+	public void setModuleEnum(String moduleEnum) {
 		this.moduleEnum = moduleEnum;
 	}
 
 	/**
 	 * @return the resourceId
 	 */
-	public Long getResourceId() {
+	public String getResourceId() {
 		return resourceId;
 	}
 
 	/**
 	 * @param resourceId the resourceId to set
 	 */
-	public void setResourceId(Long resourceId) {
+	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
 
@@ -278,6 +283,20 @@ public class ResourceModel extends Entity implements Serializable {
 	 */
 	public void setTalentType(String talentType) {
 		this.talentType = talentType;
+	}
+	
+	/**
+	 * @return the sort
+	 */
+	public Long getSort() {
+		return sort;
+	}
+
+	/**
+	 * @param sort the sort to set
+	 */
+	public void setSort(Long sort) {
+		this.sort = sort;
 	}
 
 	/**

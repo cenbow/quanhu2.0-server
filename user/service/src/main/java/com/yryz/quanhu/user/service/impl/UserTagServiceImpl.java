@@ -3,17 +3,16 @@ package com.yryz.quanhu.user.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserTagDao;
@@ -53,22 +52,24 @@ public class UserTagServiceImpl implements UserTagService {
 
 	@Override
 	public void batch(UserTagDTO tagDTO) {
-		List<String> tags = mysqlDao.selectTagByUserId(tagDTO.getUserId(), tagDTO.getTagType().intValue());
+		//List<String> tags = mysqlDao.selectTagByUserId(tagDTO.getUserId(), tagDTO.getTagType().intValue());
 		String[] tagIdArray = StringUtils.split(tagDTO.getTagIds(), ",");
 		List<UserTag> userTags = new ArrayList<>(); 
 		Date nowTime = new Date();
-		//遍历用户选择的tag,筛选重复的tag,把库里面不存在的tag作为新的tag插入数据库,没有选择tag直接插入
+		//删除旧的标签
+		delete(tagDTO.getUserId(), tagDTO.getTagType().intValue());
+		
 		for(int i = 0 ; i < tagIdArray.length;i++){
 			Long tagId = NumberUtils.toLong(tagIdArray[i]);
 			UserTag tag = new UserTag();
 			tag.setCreateDate(nowTime);
-			tag.setLastUpdateUserId(tagDTO.getUpdateUserId() == null ? 0l : tagDTO.getUpdateUserId());
+			tag.setLastUpdateUserId(tagDTO.getUpdateUserId() == null ? 0L : tagDTO.getUpdateUserId());
 			tag.setTagId(tagId);
 			tag.setUserId(tagDTO.getUserId());
 			tag.setTagType(tagDTO.getTagType());
-			tag.setKid(idApi.getKid(IdConstants.QUANUH_USER_TAG).getData());
-			
-			if(CollectionUtils.isNotEmpty(tags)){
+			tag.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANUH_USER_TAG)));
+			userTags.add(tag);
+			/*if(CollectionUtils.isNotEmpty(tags)){
 				boolean tagFlag = false;
 				Long oldTagId = null;
 				for(int j = 0 ; j < tags.size() ; j++){
@@ -82,7 +83,7 @@ public class UserTagServiceImpl implements UserTagService {
 				}
 			}else{
 				userTags.add(tag);
-			}
+			}*/
 		}
 		if(CollectionUtils.isNotEmpty(userTags)){
 			try {
@@ -91,6 +92,16 @@ public class UserTagServiceImpl implements UserTagService {
 				logger.error("[userTag.batch]",e);
 				throw new MysqlOptException(e);
 			}
+		}
+	}
+
+	@Override
+	public List<String> getTagByUserId(Long userId, Integer tagType) {
+		try {
+			return mysqlDao.selectTagByUserId(userId, tagType);
+		} catch (Exception e) {
+			logger.error("[userTag.batch]",e);
+			throw new MysqlOptException(e);
 		}
 	}
 

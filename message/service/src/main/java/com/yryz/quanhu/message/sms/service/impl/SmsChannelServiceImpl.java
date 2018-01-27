@@ -15,12 +15,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.sms.dao.SmsChannelDao;
 import com.yryz.quanhu.message.sms.dao.SmsSignDao;
 import com.yryz.quanhu.message.sms.entity.SmsChannel;
 import com.yryz.quanhu.message.sms.entity.SmsSign;
 import com.yryz.quanhu.message.sms.service.SmsChannelService;
+import com.yryz.quanhu.support.id.api.IdAPI;
 /**
  * @author danshiyu
  * @version 1.0
@@ -33,7 +37,8 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 	
 	@Autowired
 	private SmsChannelDao dao;
-	
+	@Reference
+	private IdAPI idApi;
 	@Autowired
 	private SmsSignDao signDao;
 	
@@ -41,6 +46,7 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 	public int save(SmsChannel channel) {
 		try {
 			channel.setCreateDate(new Date());
+			channel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_SMS_CHANNEL)));
 			return dao.insert(channel);
 		} catch (Exception e) {
 			logger.error("[SmsChannelDao.save]",e);

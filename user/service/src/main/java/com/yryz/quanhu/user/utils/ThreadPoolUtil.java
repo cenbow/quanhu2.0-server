@@ -14,7 +14,7 @@ public class ThreadPoolUtil {
 	
 	private static final ExecutorService API_LOG_EXE = new ThreadPoolExecutor(8, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(10000), new ThreadPoolExecutor.CallerRunsPolicy());
 
-	public static void insertApiLog(Runnable command) {
+	public static void execue(Runnable command) {
 		API_LOG_EXE.execute(command);
 	}
 

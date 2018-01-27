@@ -57,11 +57,13 @@ public class ActivityVoteProvider implements ActivityVoteApi {
             Assert.notNull(record.getCandidateId(), "candidateId不能为空");
             Assert.notNull(record.getOtherFlag(), "otherFlag不能为空");
             Assert.notNull(record.getVoteNo(), "voteNo不能为空");
-            int voteCount = activityVoteService.voteRecord(record);
+            ActivityVoteInfoVo activityVoteInfoVo = activityVoteService.getVoteInfo(record.getActivityInfoId());
+            int voteCount = activityVoteService.voteRecord(record, activityVoteInfoVo);
             Map<String, Object> map = new HashMap<>();
             map.put("haveFreeVote", ++voteCount);
             map.put("otherFlag", record.getOtherFlag());
             map.put("userRollFlag", activityVoteService.selectUserRoll(record.getCreateUserId()));
+            map.put("prizesFlag", activityVoteInfoVo.getPrizesFlag());
             return ResponseUtils.returnObjectSuccess(map);
         } catch (Exception e) {
             logger.error("确认投票 失败", e);

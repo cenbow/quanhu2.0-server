@@ -2,6 +2,7 @@ package com.yryz.quanhu.support.activity.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -160,11 +161,11 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
     /**
      *  确认投票
      *  @param  record
+     *  @param  activityVoteInfoVo
      *  @return
      * */
     @Transactional(propagation = Propagation.REQUIRED)
-    public int voteRecord(ActivityVoteRecord record) {
-        ActivityVoteInfoVo activityVoteInfoVo = this.getVoteInfo(record.getActivityInfoId());
+    public int voteRecord(ActivityVoteRecord record, ActivityVoteInfoVo activityVoteInfoVo) {
         //相关验证规则
         this.validateActivity(activityVoteInfoVo);
         //获取活动配置信息
@@ -206,7 +207,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         //生成投票编号
         Response<Long> result = idAPI.getSnowflakeId();
         if(!result.success()){
-            throw QuanhuException.busiError("调用发号器失败");
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
         record.setKid(result.getData());
         //插入投票记录
@@ -235,12 +236,13 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
      *  @return
      * */
     public PageList<ActivityPrizesVo> prizesList(ActivityVoteDto activityVoteDto) {
-        PageHelper.startPage(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());
+        Page<Object> page = PageHelper.startPage(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());
         List<ActivityPrizesVo> list = activityPrizesDao.selectListCondition(activityVoteDto.getActivityInfoId());
         PageList<ActivityPrizesVo> pageList = new PageList<>();
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
         pageList.setEntities(list);
+        pageList.setCount(page.getTotal());
 
         return pageList;
     }
@@ -302,7 +304,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
                             //生成投票编号
                             Response<Long> idResult = idAPI.getSnowflakeId();
                             if(!idResult.success()) {
-                                throw QuanhuException.busiError("调用发号器失败");
+                                throw new QuanhuException(ExceptionEnum.SysException);
                             }
                             userPrize.setKid(idResult.getData());
                             activityUserPrizesDao.insertByPrimaryKeySelective(userPrize);

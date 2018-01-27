@@ -10,6 +10,9 @@ import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +75,32 @@ public class TopicPostProvider implements TopicPostApi {
             return ResponseUtils.returnException(e);
         }
     }
+
+	@Override
+	public Response<List<Long>> getKidByCreatedate(String startDate, String endDate) {
+		try {
+			List<Long> data = this.topicPostService.getKidByCreatedate(startDate, endDate);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+	}
+
+	@Override
+	public Response<List<TopicPostVo>> getByKids(List<Long> kidList) {
+		try {
+			List<TopicPostVo> data = this.topicPostService.getByKids(kidList);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+	}
 
 
 }

@@ -2,6 +2,7 @@ package com.yryz.quanhu.grow.service;
 
 import java.util.List;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
@@ -56,7 +57,7 @@ public interface GrowAPI {
 	 * @return
 	 * @Description 获取成长流水记录
 	 */
-	public List<GrowFlow> getGrowFlowPage(GrowFlowQuery gfq, int start, int limit);
+	public PageList<GrowFlow> getGrowFlowPage(GrowFlowQuery gfq);
 	
 	/**
 	 * 手动提升用户成长等级

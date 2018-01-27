@@ -1,14 +1,21 @@
 package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.Response;
+import com.yryz.quanhu.message.im.api.ImAPI;
+import com.yryz.quanhu.message.im.entity.ImRelation;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dao.UserRelationDao;
 import com.yryz.quanhu.user.dao.UserRelationRemarkDao;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
+import com.yryz.quanhu.user.provider.UserRelationProvider;
 import com.yryz.quanhu.user.service.UserRelationRemarkService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +32,17 @@ import java.util.Set;
 @Service
 public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
 
-    private static final String TABLE_NAME = "qh_user_relation_remark";
+    private static final Logger logger = LoggerFactory.getLogger(UserRelationRemarkServiceImpl.class);
 
+    private static final String TABLE_NAME = "qh_user_relation_remark";
     @Autowired
     private UserRelationRemarkDao userRelationRemarkDao;
     @Autowired
     private UserRelationDao userRelationDao;
     @Reference
     private IdAPI idAPI;
-
+    @Reference
+    private ImAPI imAPI;
     @Override
     public Boolean setRemarkName(UserRelationRemarkDto remarkDto) {
 
@@ -48,13 +57,13 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
              * 自己不允许对自己设置备注
              */
             if(sourceUserId.equalsIgnoreCase(targetUserId)){
-                throw new QuanhuException("","","您不能对自己设置备注名");
+                throw new QuanhuException("","您不能对自己设置备注名","您不能对自己设置备注名");
             }
 
             //查询是否有关注关系
             UserRelationDto dto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
             if(dto==null||dto.getFriendStatus()==UserRelationConstant.NO){
-                throw new QuanhuException("","","您和目标用户暂不是好友关系");
+                throw new QuanhuException("","您和目标用户暂不是好友关系","您和目标用户暂不是好友关系");
             }
 
             /**
@@ -77,6 +86,22 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
             //重新赋值
             dbRemarkDto.setRemarkValue(remarkDto.getRemarkValue());
             dbRemarkDto.setLastUpdateUserId(Long.parseLong(sourceUserId));
+
+            //添加IM备注
+            ImRelation imFriend = new ImRelation();
+            imFriend.setNameNotes(dbRemarkDto.getRemarkValue());
+            imFriend.setTargetUserId(targetUserId);
+            imFriend.setUserId(sourceUserId);
+            try {
+                /**
+                 * 采用强制更新，抛出异常，不进行数据库操作
+                 */
+                logger.info("im friend remark={} start", JSON.toJSON(imFriend));
+//                Response<Boolean> rpc = imAPI.addFriend(imFriend);
+//                logger.info("im friend remark={} finish", rpc.getData());
+            }catch (Exception e){
+                throw new QuanhuException("","设置好友备注名失败","设置好友备注名失败");
+            }
 
             //新增，修改
             if(dbRemarkDto.isNewRecord()){

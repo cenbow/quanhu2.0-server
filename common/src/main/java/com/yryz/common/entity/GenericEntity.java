@@ -1,5 +1,8 @@
 package com.yryz.common.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.io.Serializable;
 
 /**
@@ -13,6 +16,7 @@ public abstract class GenericEntity extends BaseEntity implements Serializable {
     private Long id;
 
     //唯一ID
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     public Long getId() {

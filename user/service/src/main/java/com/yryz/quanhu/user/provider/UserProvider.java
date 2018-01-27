@@ -263,5 +263,34 @@ public class UserProvider implements UserApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
+
+	@Override
+	public Response<List<Long>> getUserIdByCreateDate(String startDate, String endDate) {
+		try {
+			logger.info("getUserIdByCreateDate startDate: {},endDate: {}", startDate,endDate);
+			List<Long> list = userService.getUserIdByCreateDate(startDate, endDate);
+			return ResponseUtils.returnListSuccess(list);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("用户ID查询异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<List<UserBaseInfoVO>> getAllByUserIds(List<Long> userIds) {
+		try {
+			logger.info("getAllByUserIds userIds: {}", userIds);
+			List<UserBaseInfo> list = userService.getAllByUserIds(userIds);
+			List<UserBaseInfoVO> blist = GsonUtils.parseList(list, UserBaseInfoVO.class);
+			return ResponseUtils.returnListSuccess(blist);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("用户信息查询异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
 	
 }

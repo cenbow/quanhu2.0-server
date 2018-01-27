@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
@@ -16,6 +17,7 @@ import com.yryz.quanhu.order.grow.manage.service.GrowEventManageService;
 import com.yryz.quanhu.order.grow.manage.service.GrowLevelManageService;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
+import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.vo.EventAcount;
 
 @Service(interfaceClass=GrowAPI.class)
@@ -54,8 +56,19 @@ public class GrowAPIImpl implements GrowAPI {
 	}
 
 	@Override
-	public List<GrowFlow> getGrowFlowPage(GrowFlowQuery gfq, int start, int limit) {
-		return growFlowService.getPage(gfq, start, limit);
+	public PageList<GrowFlow> getGrowFlowPage(GrowFlowQuery gfq) {
+		
+		
+		   PageList<GrowFlow> pageList = new PageList<>();
+	        pageList.setCurrentPage(gfq.getCurrentPage());
+	        pageList.setPageSize(gfq.getPageSize());
+
+	        List<GrowFlow> list = growFlowService.getPage(gfq);
+	        pageList.setEntities(list);
+
+	        return pageList;
+		
+
 	}
 
 	@Override

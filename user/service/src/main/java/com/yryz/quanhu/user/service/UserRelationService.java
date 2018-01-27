@@ -19,9 +19,9 @@ public interface UserRelationService{
 
     public UserRelationDto setRelation(String sourceUserId,String targetUserId, UserRelationConstant.EVENT event);
 
-    public UserRelationDto getCacheRelation(String sourceUserId, String targetUserId);
+    public UserRelationDto getRelation(String sourceUserId, String targetUserId);
 
-    public UserRelationDto getForceRelation(String sourceUserId, String targetUserId);
+    public UserRelationDto getRelationByTargetPhone(String sourceUserId, String targetPhoneNo);
 
     public PageList<UserRelationDto> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status);
 

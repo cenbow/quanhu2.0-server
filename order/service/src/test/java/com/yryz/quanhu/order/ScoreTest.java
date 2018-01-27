@@ -19,7 +19,6 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
-import com.yryz.quanhu.score.vo.EventSign;
 
 /**
  * @author syc
@@ -47,7 +46,7 @@ public class ScoreTest {
         info.setCircleId("62jqe12bhauv");
         info.setCoterieId("ctf8gkwjvo1q");
 //        info.setEventCode("11"); //ventType=1：一次性触发 //  成长值eventType=31：事件类型eventType=1：一次性触发
-        info.setEventCode("1"); //eventType=2：每次触发 //  成长值eventType=1：事件类型eventType=2： 每次触发
+        info.setEventCode("15"); //eventType=2：每次触发 //  成长值eventType=1：事件类型eventType=2： 每次触发
 //        info.setEventCode("3"); //eventType=3：循环触发 //  成长值eventType=3：事件类型eventType=3：循环触发 
 //        info.setEventCode("15"); //eventType=4：签到区间循环 //  成长值eventType=31：一次性触发
         
@@ -73,12 +72,12 @@ public class ScoreTest {
     }
 	
 	@Test
-    public   EventSign getEventSign()  {
+    public  void getEventSign()  {
 		String custId = "123456789";
 		String eventCode = "1";
-        return eventAcountApiService.getEventSign(custId, eventCode);
+       //return eventAcountApiService.getEventSign(custId, eventCode);
 
-      //  System.out.println("ScoreFlow list: "+list.size());
+     // System.out.println("ScoreFlow list: "+list.size());
     }
 	
 	

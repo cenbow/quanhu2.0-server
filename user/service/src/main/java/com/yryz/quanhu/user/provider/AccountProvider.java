@@ -105,20 +105,11 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
+	@Override
 	public Response<RegisterLoginVO> register(RegisterDTO registerDTO, RequestHeader header) {
 		try {
 			checkRegisterDTO(registerDTO, RegType.PHONE);
 			checkHeader(header);
-			/*
-			 * registerDTO.setDeviceId(header.getDevId()); DevType devType =
-			 * DevType.getEnumByType(header.getDevType(),
-			 * header.getUserAgent()); UserRegLogDTO logDTO =
-			 * getUserRegLog(header, RegType.PHONE,
-			 * registerDTO.getUserLocation(),
-			 * registerDTO.getActivityChannelCode(), devType,
-			 * WebUtil.getClientIP(params)); registerDTO.setRegLogDTO(logDTO);
-			 */
-
 			if (!smsManager.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, header.getAppId())) {
 				throw QuanhuException.busiError("验证码错误");
@@ -152,6 +143,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
+	@Override
 	public Response<RegisterLoginVO> login(LoginDTO loginDTO, RequestHeader header) {
 		try {
 			logger.info("user login request: {}", GsonUtils.parseJson(loginDTO));
@@ -181,6 +173,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
+	@Override
 	public Response<RegisterLoginVO> loginByVerifyCode(RegisterDTO registerDTO, RequestHeader header) {
 		try {
 			logger.info("loginByVerifyCode request, registerDTO: {}, header: {}", GsonUtils.parseJson(registerDTO),
@@ -211,6 +204,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
+	@Override
 	public Response<RegisterLoginVO> loginThird(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
 			logger.info("loginDTO request, loginDTO: {}, header: {}", JSON.toJSONString(loginDTO), JSON.toJSONString(header));
@@ -254,6 +248,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
+	@Override
 	public Response<RegisterLoginVO> loginThirdBindPhone(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
 			checkThirdLoginDTO(loginDTO);
@@ -300,6 +295,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description
 	 */
+	@Override
 	public Response<String> webLoginThird(String loginType, String returnUrl) {
 		try {
 			if (StringUtils.isEmpty(loginType) || StringUtils.isEmpty(returnUrl)) {
@@ -324,6 +320,7 @@ public class AccountProvider implements AccountApi {
 	 * @throws IOException
 	 * @Description 第三方回调成功后跳转到web端登录时传的地址
 	 */
+	@Override
 	public void webThirdLoginNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String code = request.getParameter("code");
 		String state = request.getParameter("state");
@@ -366,6 +363,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description 根据header信息获取登录方式
 	 */
+	@Override
 	public Response<List<LoginMethodVO>> getLoginMethod(Long userId) {
 		try {
 			if (userId == null) {
@@ -396,17 +394,6 @@ public class AccountProvider implements AccountApi {
 	}
 
 	/**
-	 * 退出登录
-	 * 
-	 * @param request
-	 * @return
-	 * @Description 获取header token的到userId退出登录
-	 *//*
-		 * public JSONObject loginOut(Map<String, Object> params) { return
-		 * ReturnModel.returnSuccess(); }
-		 */
-
-	/**
 	 * 绑定手机号
 	 * 
 	 * @param request
@@ -418,6 +405,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description 根据header信息绑定用户手机号码,也可以修改密码
 	 */
+	@Override
 	public Response<Boolean> bindPhone(BindPhoneDTO phoneDTO) {
 		try {
 			checkBindPhoneDTO(phoneDTO);
@@ -454,6 +442,7 @@ public class AccountProvider implements AccountApi {
 	 *            1，微信 2，微博 3，qq
 	 * @return 需要在header获取用户id
 	 */
+	@Override
 	public Response<Boolean> bindThird(BindThirdDTO thirdDTO) {
 		try {
 			checkBindThirdDTO(thirdDTO);
@@ -487,6 +476,7 @@ public class AccountProvider implements AccountApi {
 	 *            11，微信 12，微博 13，qq
 	 * @return 需要在header获取用户id
 	 */
+	@Override
 	public Response<Boolean> unbindThird(UnBindThirdDTO thirdDTO) {
 		try {
 			checkUnBindThirdDTO(thirdDTO);
@@ -513,6 +503,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description 需要在header获取用户id
 	 */
+	@Override
 	public Response<Boolean> editPassword(Long userId, String oldPassword, String newPassword) {
 		try {
 			if (userId == null) {
@@ -544,6 +535,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @Description 需要在header获取用户id
 	 */
+	@Override
 	public Response<Boolean> forgotPassword(ForgotPasswordDTO passwordDTO) {
 		try {
 			checkForgotPasswordDTO(passwordDTO);
@@ -572,7 +564,7 @@ public class AccountProvider implements AccountApi {
 			if (checkUserDistory(userId).getData()) {
 				return ResponseUtils.returnObjectSuccess(true);
 			}
-			if (baseInfo.getBanPostTime().getTime() > new Date().getTime()) {
+			if (baseInfo.getBanPostTime().getTime() > System.currentTimeMillis()) {
 				return ResponseUtils.returnObjectSuccess(true);
 			} else {
 				return ResponseUtils.returnObjectSuccess(false);
@@ -644,6 +636,20 @@ public class AccountProvider implements AccountApi {
 		}
 	}
 
+	@Override
+	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
+		try {
+			logger.info("sendVerifyCode request codeDTO: {}", GsonUtils.parseJson(codeDTO));
+			checkCodeDTO(codeDTO);
+			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO));
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("短信验证码发送异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
 	/*	*//**
 			 * 邀请码补录
 			 * 
@@ -944,26 +950,6 @@ public class AccountProvider implements AccountApi {
 		 * returnUrl.toString(); }
 		 */
 
-	/**
-	 * 得到初始化后的注册日志
-	 * 
-	 * @param request
-	 * @param regType
-	 * @param location
-	 * @param activityChannelCode
-	 * @return
-	 *//*
-		 * private static UserRegLogDTO getUserRegLog(RequestHeader header,
-		 * String regType, String location, String activityChannelCode, DevType
-		 * type, String ip) { UserRegLogDTO logDTO = new UserRegLogDTO(null,
-		 * header.getDitchCode(), header.getAppVersion(), regType,
-		 * type.getLabel(), header.getDevName(), header.getAppId(), ip,
-		 * location, activityChannelCode, null); // 拼接组合的圈乎渠道码 String
-		 * channelCode = StringUtils.join(new String[] { logDTO.getAppChannel(),
-		 * logDTO.getDevType(), logDTO.getRegType(),
-		 * logDTO.getActivityChannelCode() }, " ");
-		 * logDTO.setChannelCode(channelCode); return logDTO; }
-		 */
 
 	private void checkCodeDTO(SmsVerifyCodeDTO codeDTO) {
 		if (codeDTO == null) {
@@ -982,18 +968,6 @@ public class AccountProvider implements AccountApi {
 		}
 	}
 
-	@Override
-	public Response<SmsVerifyCodeVO> sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
-		try {
-			logger.info("sendVerifyCode request codeDTO: {}", GsonUtils.parseJson(codeDTO));
-			checkCodeDTO(codeDTO);
-			return ResponseUtils.returnObjectSuccess(smsService.sendVerifyCode(codeDTO));
-		} catch (QuanhuException e) {
-			return ResponseUtils.returnException(e);
-		} catch (Exception e) {
-			logger.error("短信验证码发送异常", e);
-			return ResponseUtils.returnException(e);
-		}
-	}
+
 
 }

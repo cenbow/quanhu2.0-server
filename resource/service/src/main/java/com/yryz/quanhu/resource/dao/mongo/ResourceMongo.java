@@ -133,11 +133,11 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 	 * 删除资源库，通过ID
 	 * @param resourceId
 	 */
-	public void delete(Long resourceId){
+	public void delete(String resourceId){
 		Query query = new Query();
 		query.addCriteria(Criteria.where("resourceId").is(resourceId));
 		Update update = new Update();
-		update.set("delFlag", "1");
+		update.set("delFlag", ResourceEnum.DEL_FLAG_TRUE);
 		mongoTemplate.updateMulti(query, update, ResourceModel.class);
 	}
 	
@@ -157,7 +157,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 		Criteria criteria = new Criteria();
 		if(resourceModel != null){
 			
-			criteria = Criteria.where("delFlag").is("0");
+			criteria = Criteria.where("delFlag").is(ResourceEnum.DEL_FLAG_FALSE);
 			
 			//资源ID，用户ID，是否达人，私圈ID
 			if(resourceModel.getResourceId() != null){
@@ -187,9 +187,9 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			}
 			
 			//资源类型,多条件查询，resourceType支持多类型的枚举值，以,分隔
-			if(StringUtils.isNotEmpty(resourceModel.getResourceType())){
+			if(StringUtils.isNotEmpty(resourceModel.getModuleEnum())){
 				Criteria resouceTypeCriteria = Criteria.where("moduleEnum");
-				String[] resourceTypes = resourceModel.getResourceType().split(",");
+				String[] resourceTypes = resourceModel.getModuleEnum().split(",");
 				if(resourceTypes != null && resourceTypes.length == 1){
 					resouceTypeCriteria = resouceTypeCriteria.is(resourceTypes[0]);
 				} else {

@@ -1,5 +1,7 @@
 package com.yryz.quanhu.behavior.comment.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.response.PageList;
 
 import java.io.Serializable;
@@ -13,6 +15,7 @@ import java.io.Serializable;
 public class CommentSubDTO extends PageList implements Serializable {
     private static final long serialVersionUID = 5278107300199813679L;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     public Long getKid() {

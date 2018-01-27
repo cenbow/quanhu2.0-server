@@ -20,7 +20,20 @@ public class StarInfoVO implements Serializable {
 	 * 达人信息
 	 */
 	private UserStarSimpleVo starInfo = new UserStarSimpleVo();
-	
+
+	/**
+	 * 达人动态
+	 */
+	private UserDynamicVO dynamic;
+
+	public UserDynamicVO getDynamic() {
+		return dynamic;
+	}
+
+	public void setDynamic(UserDynamicVO dynamic) {
+		this.dynamic = dynamic;
+	}
+
 	public void parseUser(String userId, Map<String, UserSimpleVO> userMap) {
 		if (userMap != null) {
 			UserSimpleVO info = userMap.get(userId);
@@ -37,8 +50,6 @@ public class StarInfoVO implements Serializable {
 			StarAuthInfo info = starMap.get(userId);
 			if (info != null) {
 				this.starInfo = (UserStarSimpleVo) GsonUtils.parseObj(info, UserStarSimpleVo.class);
-				this.starInfo.setAuthType(null);
-				this.starInfo.setAuthWay(null);
 				this.starInfo.setUserId(userId);
 			}else{
 				this.starInfo = new UserStarSimpleVo();				

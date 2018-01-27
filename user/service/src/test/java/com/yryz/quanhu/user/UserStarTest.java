@@ -21,7 +21,6 @@ import com.yryz.quanhu.user.vo.StarInfoVO;
 public class UserStarTest {
 	@Reference
 	UserStarApi starApi;
-	
 	//@Test
 	public void save(){
 		StarAuthInfo info = new StarAuthInfo();
@@ -52,7 +51,7 @@ public class UserStarTest {
 	@Test
 	public void labelStarListTest(){
 		StarAuthParamDTO paramDTO = new StarAuthParamDTO();
-		paramDTO.setCategoryId(5881248773L);
+		paramDTO.setCategoryId(13L);
 		paramDTO.setCurrentPage(1);
 		paramDTO.setPageSize(10);
 		paramDTO.setUserId(727061873573347328L);

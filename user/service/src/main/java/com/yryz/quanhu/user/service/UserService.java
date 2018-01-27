@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
@@ -137,5 +139,18 @@ public interface UserService {
 	 */
 	int updateUserInfo(UserBaseInfo custBaseInfo ) ;
 
-
+	/**
+	 * 查询一段时间的全部用户ID，不分状态
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	List<Long> getUserIdByCreateDate(String startDate,String endDate);
+    
+	/**
+	 * 根据用户ID查询全部用户，不分状态
+	 * @param userIds
+	 * @return
+	 */
+    List<UserBaseInfo> getAllByUserIds(List<Long> userIds);
 }

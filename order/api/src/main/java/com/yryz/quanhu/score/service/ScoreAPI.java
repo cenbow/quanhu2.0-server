@@ -1,7 +1,6 @@
 package com.yryz.quanhu.score.service;
 
-import java.util.List;
-
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.score.entity.ScoreEventInfo;
 import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
@@ -39,13 +38,13 @@ public interface ScoreAPI {
 	 * @return
 	 * @Description 分页查询积分明细
 	 */
-	public List<ScoreEventInfo> getScoreEventPage(int start , int limit);
+	public PageList<ScoreEventInfo> getScoreEventPage( );
 	/**
 	 * 
 	 * @return
 	 * @Description 查询全部积分明细
 	 */
-	public List<ScoreEventInfo> getScoreEvent();
+	public PageList<ScoreEventInfo> getScoreEvent();
 	
 	//用户积分操作API
 	/**
@@ -58,7 +57,7 @@ public interface ScoreAPI {
 	 * @return
 	 * @Description 获取积分流水记录
 	 */
-	public List<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq , int flowType , int start , int limit);
+	public PageList<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq );
 	/**
 	 * 
 	 * @param userId

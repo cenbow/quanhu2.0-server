@@ -39,4 +39,7 @@ public interface UserBaseInfoDao {
     
     List<String> getUserIdByExactParam(Map<String,Object> params);
     
+    List<Long> getUserIdByCreateDate(@Param("startDate")String startDate,@Param("endDate")String endDate);
+    
+    List<UserBaseInfo> getAllByUserIds(@Param("userIds")List<Long> userIds);
 }

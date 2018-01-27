@@ -1,7 +1,9 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -14,14 +16,14 @@ import com.yryz.quanhu.support.activity.dao.ActivityVoteConfigDao;
 import com.yryz.quanhu.support.activity.dao.ActivityVoteDetailDao;
 import com.yryz.quanhu.support.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
-import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.support.activity.service.ActivityCandidateService;
 import com.yryz.quanhu.support.activity.service.ActivityVoteService;
-import com.yryz.quanhu.support.activity.vo.ActivityVoteConfigVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     @Autowired
     ActivityVoteConfigDao activityVoteConfigDao;
 
+    @Reference
+    UserApi userApi;
+
     @Autowired
     RedisTemplateBuilder templateBuilder;
 
@@ -91,7 +96,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         ActivityVoteDetail voteDetail = new ActivityVoteDetail();
         Response<Long> result = idAPI.getSnowflakeId();
         if(!result.success()){
-            throw QuanhuException.busiError("调用发号器失败");
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
         voteDetail.setKid(result.getData());
         voteDetail.setActivityInfoId(activityVoteDto.getActivityInfoId());
@@ -220,6 +225,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     }
                 }
             }
+            this.setUserInfo(list);
         }
 
         return detail;
@@ -296,6 +302,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                 detailVo.setInAppVoteCount(inAppVoteCount);
                 detailVo.setOtherAppVoteCount(otherAppVoteCount);
             }
+            this.setUserInfo(resultList);
         }
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
@@ -362,6 +369,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                 detailVo.setInAppVoteCount(inAppVoteCount);
                 detailVo.setOtherAppVoteCount(otherAppVoteCount);
             }
+            this.setUserInfo(rankList);
         }
         PageList<ActivityVoteDetailVo> pageList = new PageList<>();
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
@@ -480,6 +488,20 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     });
             RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
             template.opsForZSet().add(key, set);
+        }
+    }
+
+    private void setUserInfo(List<ActivityVoteDetailVo> list) {
+        Set<String> set = new HashSet<>();
+        list.stream()
+                .filter(detailVo -> detailVo.getCreateUserId() != null)
+                .forEach(detailVo -> set.add(detailVo.getCreateUserId().toString()));
+        Response<Map<String, UserSimpleVO>> result = userApi.getUserSimple(set);
+        if(result.success()) {
+            Map<String, UserSimpleVO> simple = result.getData();
+            list.stream()
+                    .filter(detailVo -> detailVo.getCreateUserId() != null)
+                    .forEach(detailVo -> detailVo.setUser(simple.get(detailVo.getCreateUserId().toString())));
         }
     }
 

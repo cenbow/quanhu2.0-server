@@ -21,6 +21,7 @@
             <artifactId>support-api</artifactId>
             <version>${parent.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>quanhu-common</artifactId>

@@ -93,11 +93,14 @@ public class BehaviorEventValidAspect {
          * 亦可在自定义filter中，通过如下方式获取，
          *
          */
-        filterChain.setContextValue("loginUserId",behaviorArgsBuild.getParameterValue(args.loginUserId(),joinPointArgs));
-        filterChain.setContextValue("loginToken",behaviorArgsBuild.getParameterValue(args.loginToken(),joinPointArgs));
-        filterChain.setContextValue("sourceType",behaviorArgsBuild.getParameterValue(args.sourceType(),joinPointArgs));
-        filterChain.setContextValue("sourceId",behaviorArgsBuild.getParameterValue(args.sourceId(),joinPointArgs));
-        filterChain.setContextValue("sourceUserId",behaviorArgsBuild.getParameterValue(args.sourceUserId(),joinPointArgs));
+        if(args!=null){
+
+            filterChain.setContextValue("loginUserId",behaviorArgsBuild.getParameterValue(args.loginUserId(),joinPointArgs));
+            filterChain.setContextValue("loginToken",behaviorArgsBuild.getParameterValue(args.loginToken(),joinPointArgs));
+            filterChain.setContextValue("sourceType",behaviorArgsBuild.getParameterValue(args.sourceType(),joinPointArgs));
+            filterChain.setContextValue("sourceId",behaviorArgsBuild.getParameterValue(args.sourceId(),joinPointArgs));
+            filterChain.setContextValue("sourceUserId",behaviorArgsBuild.getParameterValue(args.sourceUserId(),joinPointArgs));
+        }
 
         //后续相关过滤器实现可以从切面参数中获取自定义参数，
         filterChain.setJoinPoint(joinPoint);

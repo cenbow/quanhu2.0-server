@@ -261,7 +261,7 @@ public class OrderController {
     @ApiOperation("获取账户信息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/pay/getUserAccount")
-	public Response<?> getUserAccount(@RequestHeader String userId) {
+	public Response<UserAccount> getUserAccount(@RequestHeader String userId) {
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
@@ -346,7 +346,7 @@ public class OrderController {
     @ApiOperation("绑定银行卡")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/pay/bindBankCard")
-	public Response<?> bindBankCard(@RequestHeader String userId, @RequestBody BindBankCardDTO bindBankCardDTO) {
+	public Response<UserBankDTO> bindBankCard(@RequestHeader String userId, @RequestBody BindBankCardDTO bindBankCardDTO) {
     	String bankCardNo = bindBankCardDTO.getBankCardNo();
     	String name = bindBankCardDTO.getName();
     	String bankCode = bindBankCardDTO.getBankCode();
@@ -537,7 +537,7 @@ public class OrderController {
     @ApiOperation("创建充值订单")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/pay/getNewPayFlowId")
-	public Response<?> getNewPayFlowId(@RequestHeader String userId, @RequestBody PayOrderDTO payOrderDTO, HttpServletRequest request) {
+	public Response<PayVO> getNewPayFlowId(@RequestHeader String userId, @RequestBody PayOrderDTO payOrderDTO, HttpServletRequest request) {
 		String payWay = payOrderDTO.getPayWay();
 		String orderSrc = payOrderDTO.getOrderSrc();
 		Long orderAmount = payOrderDTO.getOrderAmount();
@@ -571,7 +571,8 @@ public class OrderController {
      * @throws Exception
      */
     @ApiOperation("支付宝支付回调")
-    @RequestMapping(value = "/pay/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @RequestMapping(value = "/{version}/pay/alipayNotify" ,method = {RequestMethod.GET,RequestMethod.POST})
 	public void alipayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	logger.info("receive alipayNotify");
 		PayResponse payResp = null;
@@ -606,7 +607,8 @@ public class OrderController {
      * @throws Exception
      */
     @ApiOperation("微信支付回调")
-    @RequestMapping(value = "/pay/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @RequestMapping(value = "/{version}/pay/wxpayNotify",method = {RequestMethod.GET,RequestMethod.POST})
 	public void wxpayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("receive wxpayNotify...");
 		PayResponse payResp = null;
@@ -721,7 +723,7 @@ public class OrderController {
     @ApiOperation("获取订单列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/pay/getOrderList")
-	public Response<?> getOrderList(@RequestHeader String userId, String date, Integer productType, Integer type,
+	public Response<OrderListDTO> getOrderList(@RequestHeader String userId, String date, Integer productType, Integer type,
 									Long start, Long limit) {
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
@@ -870,7 +872,7 @@ public class OrderController {
     @ApiOperation("查询订单状态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/pay/getOrderInfo")
-	public Response<?> getOrderInfo(String orderId) {
+	public Response<OrderInfo> getOrderInfo(String orderId) {
 		if (StringUtils.isEmpty(orderId)) {
 			return ResponseUtils.returnCommonException("orderId必填");
 		}

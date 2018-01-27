@@ -434,4 +434,22 @@
     where user_id = #{userId}
   </update>
   
+  <select id="getUserIdByCreateDate" resultType="java.lang.Long">
+	select
+	user_id as userId
+	from qh_user_baseinfo a
+	where a.create_date &gt;= #{startDate}
+		and a.create_date &lt;= #{endDate}
+  </select>
+   
+  <select id="getAllByUserIds" resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from qh_user_baseinfo
+	where user_id in 
+	<foreach item="item" index="index" collection="userIds"
+		open="(" separator="," close=")">
+		#{item}
+	</foreach>
+  </select> 
 </mapper>

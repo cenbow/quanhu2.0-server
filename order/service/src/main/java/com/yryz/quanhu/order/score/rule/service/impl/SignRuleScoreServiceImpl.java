@@ -3,6 +3,7 @@ package com.yryz.quanhu.order.score.rule.service.impl;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,13 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 	@Autowired
 	EventAcountService eventAcountService;
 
+	@Value("${sing.values}")
+	private int[] singValues;
 	@Override
 	public boolean processStatus(String userId, String eventCode, ScoreEventInfo sei, 
 			double amount) {
 		// 进来的签到事件都是拦截器根据Redis状态判定后放行的，数据有可能不准确
+		//System.out.println("singValues is @@@@@@@@"+ singValues.length);
 		Date now = new Date();
 		String scoreSignKey = EventUtil.getScoreStatusKey(userId, eventCode, ScoreTypeEnum.Sign);
 		// 1.查询数据库中当前用户的签到信息
@@ -55,7 +59,7 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 				sss.setUpdateTime(now);
 				scoreStatusSignService.update(sss);
 				int eventLoopUnit = sei.getEventLoopUnit();
-				int newScore = newCount >= eventLoopUnit ? eventScore * eventLoopUnit : eventScore * newCount;
+				int newScore = newCount >= eventLoopUnit ? singValues[eventLoopUnit-1] : singValues[newCount-1];
 				saveScoreFlow(userId, eventCode, sei, newScore, amount);
 				return updateStatus(scoreSignKey, true, true);
 			default:
@@ -80,5 +84,25 @@ public class SignRuleScoreServiceImpl extends BaseRuleScoreServiceImpl implement
 		saveScoreFlow(userId, eventCode, sei, sei.getEventScore(), amount);
 		return updateStatus(scoreSignKey, true, true);
 	}
+	
+		public static void main(String[] args) {
+			String singValues[] ={"10","20","30","50","60","80","100"};
+			EventSign sss  =  new EventSign(); 
+			Date now = new Date();
+			//连续签到时间
+			int signCount = 2;
+			int newCount = signCount + 1; 
+			// 变更状态记录
+			sss.setLastSignTime(now);
+			sss.setSignCount(newCount);
+			sss.setUpdateTime(now);
+		//	scoreStatusSignService.update(sss);
+			int eventLoopUnit =7;
+			String newScore = newCount >= eventLoopUnit ? singValues[eventLoopUnit-1] : singValues[newCount-1];
+			System.out.println("newScore is: "+newScore); 
+			//saveScoreFlow(userId, eventCode, sei, newScore, amount);
+		//	return updateStatus(scoreSignKey, true, true);
+			
+		}
 
 }

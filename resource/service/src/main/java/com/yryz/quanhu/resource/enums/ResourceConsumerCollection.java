@@ -18,17 +18,17 @@ import java.util.Set;
  */
 public class ResourceConsumerCollection {
 	
-	private static Set<Integer> RESOURCE_CONSUMERS = new HashSet<>();
+	private static Set<String> RESOURCE_CONSUMERS = new HashSet<>();
 	
 	static {
-		RESOURCE_CONSUMERS.add(1003);
-		RESOURCE_CONSUMERS.add(1004);
-		RESOURCE_CONSUMERS.add(1005);
-		RESOURCE_CONSUMERS.add(1006);
-		RESOURCE_CONSUMERS.add(1007);
+		RESOURCE_CONSUMERS.add("1003");
+		RESOURCE_CONSUMERS.add("1004");
+		RESOURCE_CONSUMERS.add("1005");
+		RESOURCE_CONSUMERS.add("1006");
+		RESOURCE_CONSUMERS.add("1007");
 	}
 	
-	public static boolean check(Integer moduleEnum){
+	public static boolean check(String moduleEnum){
 		return RESOURCE_CONSUMERS.contains(moduleEnum);
 	}
 

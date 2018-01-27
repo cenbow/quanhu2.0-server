@@ -58,7 +58,7 @@ public interface UserOperateService {
 	 * @return
 	 */
 	MyInviterVO getMyInviter(Long userId, Integer limit,
-			Integer inviterId);
+			Long inviterId);
 
 	/**
 	 * 查询注册信息
@@ -75,10 +75,4 @@ public interface UserOperateService {
 	 * @Description 根据邀请码更新邀请人数
 	 */
 	void updateInviterNum(String inviterCode);
-	
-	/**
-	 * 根据邀请码发送邀请人注册邀请事件
-	 * @param inviterCode
-	 */
-	void commitInviterEvent(String inviterCode);
 }

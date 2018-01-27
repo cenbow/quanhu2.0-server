@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.yryz.quanhu.resource.entity.ResourceModel;
+import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
  * @author yehao
@@ -64,5 +65,18 @@ public interface ResourceService {
 	 * @return
 	 */
 	public ResourceModel getResource(String resourceId);
+	
+	/**
+	 * 创建首页缓存
+	 */
+	public void createRecommend();
+	
+	/**
+	 * app首页推荐
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	public List<ResourceVo> appRecommend(int start , int limit);
 
 }

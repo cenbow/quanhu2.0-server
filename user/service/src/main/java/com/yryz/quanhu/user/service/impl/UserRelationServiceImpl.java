@@ -13,12 +13,18 @@ import com.yryz.quanhu.user.dao.UserRelationDao;
 import com.yryz.quanhu.user.dao.UserRelationRemarkDao;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
+import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
+import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserStarAuth;
+import com.yryz.quanhu.user.provider.UserRelationProvider;
 import com.yryz.quanhu.user.service.UserRelationService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarService;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.yryz.quanhu.user.contants.UserRelationConstant.NO;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.YES;
 import static com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus.AUDIT_SUCCESS;
 
 /**
@@ -40,6 +48,8 @@ import static com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus.AUDIT_SUC
 @Transactional
 public class UserRelationServiceImpl implements UserRelationService{
 
+    private static final Logger logger = LoggerFactory.getLogger(UserRelationServiceImpl.class);
+
     private static final String TABLE_NAME = "qh_user_relation";
     @Autowired
     private UserRelationCacheDao userRelationCacheDao;
@@ -50,6 +60,7 @@ public class UserRelationServiceImpl implements UserRelationService{
     @Autowired
     private UserRelationRemarkDao userRelationRemarkDao;
 
+
     @Reference
     private IdAPI idAPI;
 
@@ -57,6 +68,9 @@ public class UserRelationServiceImpl implements UserRelationService{
     private UserService userService;
     @Autowired
     private UserStarService userStarService;
+
+    @Value("appId")
+    private String appId;
 
     /**
      * 用户最大关注数
@@ -81,10 +95,16 @@ public class UserRelationServiceImpl implements UserRelationService{
             UserRelationDto targetDto = userRelationCacheDao.getCacheRelation(targetUserId,sourceUserId);
             if(sourceDto == null){
                 sourceDto = new UserRelationDto();
+                sourceDto.setBlackStatus(UserRelationConstant.NO);
+                sourceDto.setFriendStatus(UserRelationConstant.NO);
+                sourceDto.setFollowStatus(UserRelationConstant.NO);
                 sourceDto.setNewRecord(true);
             }
             if(targetDto == null){
                 targetDto = new UserRelationDto();
+                targetDto.setBlackStatus(UserRelationConstant.NO);
+                targetDto.setFriendStatus(UserRelationConstant.NO);
+                targetDto.setFollowStatus(UserRelationConstant.NO);
                 targetDto.setNewRecord(true);
             }
             /**
@@ -134,6 +154,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         }catch (Exception e){
             throw e;
         }
+
     }
 
     /**
@@ -143,7 +164,6 @@ public class UserRelationServiceImpl implements UserRelationService{
      * @param userTargetKid
      * @return
      */
-    @Override
     public UserRelationDto getCacheRelation(String sourceUserId, String targetUserId) {
 
         UserRelationDto  sourceDto =  userRelationCacheDao.getCacheRelation(sourceUserId, targetUserId);
@@ -165,7 +185,7 @@ public class UserRelationServiceImpl implements UserRelationService{
      * @return
      */
     @Override
-    public UserRelationDto getForceRelation(String sourceUserId, String targetUserId) {
+    public UserRelationDto getRelation(String sourceUserId, String targetUserId) {
         //以用户维度查询
         UserRelationDto  sourceDto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
 
@@ -181,6 +201,20 @@ public class UserRelationServiceImpl implements UserRelationService{
     }
 
 
+
+    @Override
+    public UserRelationDto getRelationByTargetPhone(String sourceUserId, String targetPhoneNo) {
+
+        String targetUserId =  userService.getUserByPhone(targetPhoneNo,appId);
+        if(StringUtils.isBlank(targetUserId)){
+            return mergeRelation(null,null);
+        }else{
+            return getRelation(sourceUserId,targetUserId);
+        }
+
+    }
+
+
     private boolean verifyRelationBasic(String sourceUserId, String targetUserId,UserRelationConstant.EVENT event){
 
         /**
@@ -190,7 +224,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(sourceUserId.equalsIgnoreCase(targetUserId)){
-            throw new QuanhuException("","","您不能对着自己设置关系");
+            throw new QuanhuException("","不允许与自己设置关系:"+sourceUserId,"不允许与自己设置关系");
         }
 
         /**
@@ -199,7 +233,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         Long followCount = userRelationDao.selectTotalCount(sourceUserId,UserRelationConstant.STATUS.FOLLOW.getCode());
 
         if(followCount>=maxFollowCount){
-            throw new QuanhuException("","","您已添加最大关注人数: "+maxFollowCount);
+            throw new QuanhuException("","您已添加最大关注人数: "+followCount,"您已添加最大关注人数: "+maxFollowCount);
         }
 
         /**
@@ -210,8 +244,9 @@ public class UserRelationServiceImpl implements UserRelationService{
          *
          * 目标用户，（★强制检查★）
          */
-        if(true){
-
+        UserBaseInfo targetUser =userService.getUser(Long.parseLong(targetUserId));
+        if(null == targetUser){
+            throw new QuanhuException("","目标用户不存在或已注销："+targetUserId,"目标用户不存在或已注销");
         }
         return false;
     }
@@ -222,13 +257,16 @@ public class UserRelationServiceImpl implements UserRelationService{
          * 1，判断自己是否在对方黑名单中，如果在，不允许做任何操作
          * 2，判断对方是否在自己黑名单中，如果在，除取消拉黑，不允许做任何操作
          */
-
-        if(UserRelationConstant.YES == targetDto.getBlackStatus()){
-            throw new QuanhuException("","","目标用户已将您拉入黑名单");
+        if(YES == sourceDto.getBlackStatus()){
+            if(UserRelationConstant.EVENT.CANCEL_BLACK != event){
+                throw new QuanhuException("","你已将该用户加入黑名单","你已将该用户加入黑名单");
+            }
         }
 
-        if(UserRelationConstant.YES == sourceDto.getBlackStatus()&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-            throw new QuanhuException("","","您已将目标用户拉入黑名单");
+        if(YES == targetDto.getBlackStatus()){
+            if(UserRelationConstant.EVENT.SET_BLACK != event&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
+                throw new QuanhuException("","对方已将你加入黑名单","对方已将你加入黑名单");
+            }
         }
 
         return true;
@@ -251,14 +289,14 @@ public class UserRelationServiceImpl implements UserRelationService{
              */
 
             //判断对方是否关注,是则互为好友关系
-            if(UserRelationConstant.YES == targetDto.getFollowStatus()){
-                targetDto.setFriendStatus(UserRelationConstant.YES);
-                sourceDto.setFriendStatus(UserRelationConstant.YES);
+            if(YES == targetDto.getFollowStatus()){
+                targetDto.setFriendStatus(YES);
+                sourceDto.setFriendStatus(YES);
             }else{
                 sourceDto.setFriendStatus(UserRelationConstant.NO);
             }
             sourceDto.setBlackStatus(UserRelationConstant.NO);
-            sourceDto.setFollowStatus(UserRelationConstant.YES);
+            sourceDto.setFollowStatus(YES);
 
         }else if(UserRelationConstant.EVENT.CANCEL_FOLLOW == event){   //取消关注
             /**
@@ -280,15 +318,16 @@ public class UserRelationServiceImpl implements UserRelationService{
             /**
              * 设置 target 的 黑名单    保持不变
              * 设置 target 的 好友关系  否
-             * 设置 target 的 粉丝关系  保持不变
+             * 设置 target 的 粉丝关系  否
              *
              * 设置 source 的 黑名单    是
              * 设置 source 的 好友关系   否
              * 设置 source 的 粉丝关系   否
              */
             targetDto.setFriendStatus(UserRelationConstant.NO);
+            targetDto.setFollowStatus(UserRelationConstant.NO);
 
-            sourceDto.setBlackStatus(UserRelationConstant.YES);
+            sourceDto.setBlackStatus(YES);
             sourceDto.setFriendStatus(UserRelationConstant.NO);
             sourceDto.setFollowStatus(UserRelationConstant.NO);
 
@@ -309,58 +348,86 @@ public class UserRelationServiceImpl implements UserRelationService{
             sourceDto.setFollowStatus(UserRelationConstant.NO);
 
         }else{
-            throw new QuanhuException("","","系统参数异常");
+            throw new QuanhuException("","系统参数异常:"+event,"系统参数异常");
         }
     }
 
     /**
      * 合并用户关系，生产新对象
+     *
+     * 状态合并是站在source角度上，所有返回的是source对象
      * @param sourceDto
      * @param targetDto
      * @return
      */
-    private UserRelationDto mergeRelation(UserRelationDto sourceDto, UserRelationDto targetDto){
+    private UserRelationDto mergeRelation(UserRelationDto s, UserRelationDto t){
 
         UserRelationDto newDto = new UserRelationDto();
-
-        int finalStatus = UserRelationConstant.STATUS.NONE.getCode();
-
-        if(null==sourceDto){
-            //用户未与目标用户建立关系，则设置所以状态为no,
-
-            newDto.setToBlackStatus(UserRelationConstant.NO);
-            newDto.setToFollowStatus(UserRelationConstant.NO);
-            newDto.setBlackStatus(UserRelationConstant.NO);
-            newDto.setFollowStatus(UserRelationConstant.NO);
-            newDto.setFriendStatus(UserRelationConstant.NO);
-
-        }else{
-            //用户已与目标用户建立关系，则复制数据至新对象
-            BeanUtils.copyProperties(sourceDto,newDto);
-
-            newDto.setToFollowStatus(newDto.getFollowStatus());
-            newDto.setToBlackStatus(newDto.getBlackStatus());
+        /**
+         * 无关系
+         */
+        if(null==s){
+            s = new UserRelationDto();
+            s.setBlackStatus(UserRelationConstant.NO);
+            s.setFollowStatus(UserRelationConstant.NO);
+            s.setFriendStatus(UserRelationConstant.NO);
         }
-
-        if(null==targetDto){
-            //目标用户未与当前用户建立关系，则设置对象未被关注，和拉黑
-
-            newDto.setFromBlackStatus(UserRelationConstant.NO);
-            newDto.setFromFollowStatus(UserRelationConstant.NO);
-        }else{
-            //目标用户与当前用户建立关系，则过去目标用户关注，黑名单设置到新对象中
-
-            newDto.setFromFollowStatus(targetDto.getFollowStatus());
-            newDto.setFromBlackStatus(targetDto.getBlackStatus());
+        if(null==t){
+            t = new UserRelationDto();
+            t.setBlackStatus(UserRelationConstant.NO);
+            t.setFollowStatus(UserRelationConstant.NO);
+            t.setFriendStatus(UserRelationConstant.NO);
         }
         /**
-         * 转换为统一状态
+         * 转换关系
          */
-
-        return newDto;
+        if(s.getBlackStatus()==YES && t.getBlackStatus()==YES){         //互黑
+            s.setRelationStatus(UserRelationConstant.STATUS.BOTH_BLACK.getCode());
+        }else if(s.getBlackStatus()==YES && t.getBlackStatus()==NO){    //拉黑
+            s.setRelationStatus(UserRelationConstant.STATUS.TO_BLACK.getCode());
+        }else if(s.getBlackStatus()==NO && t.getBlackStatus()==YES){    //被拉黑
+            s.setRelationStatus(UserRelationConstant.STATUS.FROM_BLACK.getCode());
+        }else if(s.getFollowStatus()==YES && t.getFollowStatus()==YES){ //好友
+            s.setRelationStatus(UserRelationConstant.STATUS.FRIEND.getCode());
+        }else if(s.getFollowStatus()==YES && t.getFollowStatus()==NO){  //关注
+            s.setRelationStatus(UserRelationConstant.STATUS.FOLLOW.getCode());
+        }else if(s.getFollowStatus()==NO && t.getFollowStatus()==YES){  //粉丝
+            s.setRelationStatus(UserRelationConstant.STATUS.FANS.getCode());
+        }else if(s.getFollowStatus()==NO && t.getFollowStatus()==NO) {  //无状态
+            s.setRelationStatus(UserRelationConstant.STATUS.NONE.getCode());
+        }else {                                                         //异常默认无状态
+            s.setRelationStatus(UserRelationConstant.STATUS.NONE.getCode());
+        }
+        return s;
     }
 
 
+    private void verifyQueryCondition(String sourceUserId,String targetUserId,UserRelationConstant.STATUS status){
+
+        /**
+         * 判断查询是否合法
+         * 非本人用户，只能查询目标用户的     粉丝，关注
+         * 本人用户，只能查询        好友，粉丝，关注，黑名单
+         */
+
+        if(sourceUserId.equalsIgnoreCase(targetUserId)){
+            //查看本人
+            if(UserRelationConstant.STATUS.FANS!=status &&
+                    UserRelationConstant.STATUS.FRIEND!=status &&
+                    UserRelationConstant.STATUS.FOLLOW!=status &&
+                    UserRelationConstant.STATUS.TO_BLACK!=status){
+
+                throw new QuanhuException("","查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
+            }
+        }else{
+            //查看他人
+            if(UserRelationConstant.STATUS.FANS!=status &&
+                    UserRelationConstant.STATUS.FOLLOW!=status){
+                //异常
+                throw new QuanhuException("","查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
+            }
+        }
+    }
 
 
     @Override
@@ -370,6 +437,11 @@ public class UserRelationServiceImpl implements UserRelationService{
 
         String sourceUserId = dto.getSourceUserId();
         String targetUserId = dto.getTargetUserId();
+
+        //校验查询条件
+        this.verifyQueryCondition(sourceUserId,targetUserId,status);
+
+
         /**
          * 先查询sourceUserId的相关关系
          */
@@ -395,12 +467,26 @@ public class UserRelationServiceImpl implements UserRelationService{
 
         //查询 用户与目标集合的关系
         List<UserRelationDto> userAlls= userRelationDao.selectByUserAll(UserRelationDto.class,sourceUserId,targetUserIds);
-
+        if(CollectionUtils.isEmpty(userAlls)){
+            userAlls = new ArrayList<>();
+        }
         //查询用户基本信息
         Map<String,UserBaseInfoVO> userMaps = userService.getUser(targetUserIds);
-
+        if(null == userMaps){
+            userMaps = new HashMap<>();
+        }
         //查询达人信息
         List<UserStarAuth> starAuths = userStarService.get(Lists.newArrayList(targetUserIds));
+        if(CollectionUtils.isEmpty(starAuths)){
+            starAuths = new ArrayList<>();
+        }
+
+        //查询备注名信息(默认查询平台)
+        List<UserRelationRemarkDto> remarkDtos = userRelationRemarkDao.selectByUserIds(UserRelationRemarkDto.class,
+                UserRelationConstant.TYPE.PLATFORM.getCode(),sourceUserId,targetUserIds);
+        if(CollectionUtils.isEmpty(remarkDtos)){
+            remarkDtos = new ArrayList<>();
+        }
 
         /**
          * 匹配他人结果集与自己结果集
@@ -421,6 +507,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             UserRelationDto user2TargetDto = null;
             UserRelationDto target2UserDto = null;
 
+
             for (int j = 0 ; j < userAlls.size(); j++){
                 UserRelationDto _dto = userAlls.get(j);
                 if(_targetUserId.equalsIgnoreCase(_dto.getSourceUserId())){
@@ -438,19 +525,23 @@ public class UserRelationServiceImpl implements UserRelationService{
              * 主要为了赋值，to/from关系
              */
             UserRelationDto newDto = this.mergeRelation(user2TargetDto,target2UserDto);
+
             newDto.setSourceUserId(dto.getSourceUserId());
             newDto.setTargetUserId(targetUserId);
 
-            //合并用户基本信息
+            //合并用户基本信息(如果用户不存在，则不返回数据（异常数据）
             newDto.setUserId(_targetUserId);
             UserBaseInfoVO userInfo = userMaps.get(_targetUserId);
-            if(userInfo==null){
+            if(userInfo!=null){
+                newDto.setUserHeadImg(userInfo.getUserImg());
+                newDto.setUserName(userInfo.getUserNickName());
+                newDto.setUserSummary(userInfo.getUserDesc());
+            }else{
+                logger.warn("用户基本信息不存在：{}",_targetUserId);
                 continue;
             }
 
-            newDto.setUserHeadImg(userInfo.getUserImg());
-            newDto.setUserName(userInfo.getUserNickName());
-            newDto.setUserSummary(userInfo.getUserDesc());
+
 
             //判断是否为达人信息
             for(int k = 0 ; k < starAuths.size() ; k++){
@@ -459,8 +550,19 @@ public class UserRelationServiceImpl implements UserRelationService{
                 if (_targetUserId.equalsIgnoreCase(starAuthUserId)&&
                         starAuth.getAuditStatus()==AUDIT_SUCCESS.getStatus()){
                     newDto.setUserStarFlag(1);
+                    break;
                 }
             }
+
+            //匹配备注名
+            for(int j = 0 ;j<remarkDtos.size() ; j++){
+                UserRelationRemarkDto remarkDto = remarkDtos.get(j);
+                if(_targetUserId.equalsIgnoreCase(remarkDto.getTargetUserId())){
+                    newDto.setUserRemarkName(remarkDto.getRemarkValue());
+                    break;
+                }
+            }
+
             outList.add(newDto);
         }
         return new PageModel<UserRelationDto>().getPageList(outList);
@@ -475,6 +577,7 @@ public class UserRelationServiceImpl implements UserRelationService{
 
     @Override
     public List<UserRelationDto> selectBy(String sourceUserId, Set<String> targetUserIds) {
+
         return userRelationDao.selectUserToTarget(UserRelationDto.class,sourceUserId,targetUserIds);
     }
 

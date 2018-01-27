@@ -6,9 +6,9 @@ public class ActivityInfoAndEnrolConfig extends ActivityInfo {
 
 	private static final long serialVersionUID = 1126206832251240758L;
 	/**
-	 * 报名类型(1报名需支付货币 2报名需支付积分 3免费报名)
+	 * 报名类型(11报名需支付货币 12报名需支付积分 13免费报名)
 	 */
-	private Byte signUpType;
+	private Integer signUpType;
 	/**
 	 * 货币/积分数量
 	 */
@@ -18,9 +18,9 @@ public class ActivityInfoAndEnrolConfig extends ActivityInfo {
 	 */
     private Integer enrolUpper;
     /**
-	 * 手机号是否必填(0否 1是 2是否为空)
+	 * 手机号是否必填(10否 11是 12是否为空)
 	 */
-    private Byte phoneRequired;
+    private Integer phoneRequired;
     /**
 	 * 配置数据
 	 */
@@ -40,10 +40,10 @@ public class ActivityInfoAndEnrolConfig extends ActivityInfo {
 	public void setSourceMap(Map<String, String> sourceMap) {
 		this.sourceMap = sourceMap;
 	}
-	public Byte getSignUpType() {
+	public Integer getSignUpType() {
 		return signUpType;
 	}
-	public void setSignUpType(Byte signUpType) {
+	public void setSignUpType(Integer signUpType) {
 		this.signUpType = signUpType;
 	}
 	public Long getAmount() {
@@ -58,10 +58,10 @@ public class ActivityInfoAndEnrolConfig extends ActivityInfo {
 	public void setEnrolUpper(Integer enrolUpper) {
 		this.enrolUpper = enrolUpper;
 	}
-	public Byte getPhoneRequired() {
+	public Integer getPhoneRequired() {
 		return phoneRequired;
 	}
-	public void setPhoneRequired(Byte phoneRequired) {
+	public void setPhoneRequired(Integer phoneRequired) {
 		this.phoneRequired = phoneRequired;
 	}
 	public String getConfigSources() {

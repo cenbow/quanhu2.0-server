@@ -1,24 +1,32 @@
 package com.yryz.quanhu.dymaic.canal.rabbitmq.handler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
+import com.yryz.common.entity.CanalChangeInfo;
 import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.dao.ResourceInfoRepository;
 import com.yryz.quanhu.dymaic.canal.entity.ReleaseInfo;
+import com.yryz.quanhu.dymaic.canal.entity.ResourceHeat;
 import com.yryz.quanhu.dymaic.canal.entity.ResourceInfo;
 import com.yryz.quanhu.dymaic.canal.entity.TopicInfo;
 import com.yryz.quanhu.dymaic.canal.entity.TopicPostInfo;
+import com.yryz.quanhu.dymaic.canal.rabbitmq.ElasticsearchSyncConsumer;
 
 @Component
 public class ResourceInfoEsHandlerImpl implements SyncHandler{
+	private static Logger logger = LoggerFactory.getLogger(ResourceInfoEsHandlerImpl.class);
 	@Resource
 	private SyncExecutor syncExecutor;
 	
@@ -38,7 +46,8 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 		if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
 				&& (CommonConstant.QuanHuDb.TABLE_TOPIC.equals(msg.getTableName())
 				|| CommonConstant.QuanHuDb.TABLE_TOPIC_POST.equals(msg.getTableName())
-				|| CommonConstant.QuanHuDb.TABLE_RELEASE_INFO.equals(msg.getTableName()))) {
+				|| CommonConstant.QuanHuDb.TABLE_RELEASE_INFO.equals(msg.getTableName()))
+				|| CommonConstant.QuanHuDb.TABLE_MONGODB_RESOURCE_HEAT.equals(msg.getTableName())) {
 			return true;
 		}
 		return false;
@@ -57,6 +66,10 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 		if(CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
 				&& CommonConstant.QuanHuDb.TABLE_RELEASE_INFO.equals(msg.getTableName())){
 			doReleaseInfo(msg);
+		}
+		if(CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
+				&& CommonConstant.QuanHuDb.TABLE_MONGODB_RESOURCE_HEAT.equals(msg.getTableName())){
+			doHeatInfo(msg);
 		}
 	}
 	
@@ -193,4 +206,22 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 			}
 		}
 	}
+	
+	/**
+	 * 资源热度值处理
+	 */
+	private void doHeatInfo(CanalMsgContent msg){
+		ResourceHeat infoAfter = CanalEntityParser.parse(msg.getDataAfter(),ResourceHeat.class);
+		if(infoAfter==null || infoAfter.getKid()==null || infoAfter.getLastHeat()==null){
+			logger.warn("canal message：资源热度 资源kid和lastHeat");
+			return;
+		}
+		Optional<ResourceInfo> uinfo = resourceInfoRepository.findById(infoAfter.getKid());
+		if(uinfo.isPresent()){
+			ResourceInfo resource=uinfo.get();
+			resource.setLastHeat(infoAfter.getKid());
+			resourceInfoRepository.save(resource);
+		}
+	}
+	
 }

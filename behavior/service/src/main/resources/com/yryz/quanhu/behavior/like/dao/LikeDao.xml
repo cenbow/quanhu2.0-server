@@ -74,7 +74,7 @@
     </select>
 
     <delete id="cleanLike" parameterType="com.yryz.quanhu.behavior.like.entity.Like">
-      DELETE FROM qh_like WHERE module_enum=#{moduleEnum,jdbcType=VARCHAR} AND resource_id=#{resourceId,jdbcType=BIGINT} AND  user_id=#{userId,jdbcType=BIGINT}
+      DELETE FROM qh_like WHERE module_enum=#{moduleEnum,jdbcType=VARCHAR} AND resource_id=#{resourceId,jdbcType=BIGINT} AND user_id=#{userId,jdbcType=BIGINT}
     </delete>
 
     <select id="queryLikers" parameterType="com.yryz.quanhu.behavior.like.dto.LikeFrontDTO" resultType="com.yryz.quanhu.behavior.like.vo.LikeVO">

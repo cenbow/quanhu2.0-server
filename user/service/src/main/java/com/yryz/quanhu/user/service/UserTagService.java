@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user.service;
 
+import java.util.List;
+
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import com.yryz.quanhu.user.entity.UserTag;
 
@@ -22,4 +24,11 @@ public interface UserTagService {
      * @param tagDTO
      */
     void batch(UserTagDTO tagDTO);
+    /**
+     * 用户标签查询
+     * @param userId
+     * @param tagType
+     * @return
+     */
+    List<String> getTagByUserId(Long userId,Integer tagType);
 }

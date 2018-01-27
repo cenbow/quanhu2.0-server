@@ -1,7 +1,9 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.support.activity.dao.ActivityEnrolConfigDao;
 import com.yryz.quanhu.support.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.support.activity.dao.ActivityRecordDao;
@@ -9,14 +11,16 @@ import com.yryz.quanhu.support.activity.entity.ActivityEnrolConfig;
 import com.yryz.quanhu.support.activity.entity.ActivityInfo;
 import com.yryz.quanhu.support.activity.entity.ActivityInfoAndEnrolConfig;
 import com.yryz.quanhu.support.activity.service.AdminActivityEnrolConfigService;
-import com.yryz.quanhu.support.activity.service.AdminActivityRecordService;
 import com.yryz.quanhu.support.activity.service.AdminActivitySignUpService;
 import com.yryz.quanhu.support.activity.util.DateUtils;
 import com.yryz.quanhu.support.activity.util.JsonUtils;
 import com.yryz.quanhu.support.activity.vo.*;
-import com.yryz.quanhu.support.activity.constants.Constant;
 import com.yryz.quanhu.support.activity.dto.AdminActivityInfoDto;
 import com.yryz.quanhu.support.activity.dto.AdminActivityInfoSignUpDto;
+import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
@@ -28,11 +32,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-//import com.github.pagehelper.PageHelper;
+import static com.yryz.common.constant.ModuleContants.*;
 
 
 @Service
@@ -42,11 +44,13 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	@Autowired
 	AdminActivityEnrolConfigService activityEnrolConfigService;
 	@Autowired
-	AdminActivityRecordService activityRecordService;
-	@Autowired
 	ActivityRecordDao activityRecordDao;
 	@Autowired
 	ActivityEnrolConfigDao activityEnrolConfigDao;
+	@Reference(check=false)
+	private IdAPI idApi;
+	@Reference(check=false)
+	UserApi userApi;
 	/*@Autowired
 	EventReportDao eventReportDao;*/
 	/*@Autowired
@@ -60,13 +64,13 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 		Date date = new Date();
 		if (DateUtils.getDistanceOfTwoDate(date, activity.getBeginTime()) > 0) {
 			// 未开始
-			vo.setActivityStatus(1);
+			vo.setActivityStatus(11);
 			// 进行中
 		} else if (DateUtils.getDistanceOfTwoDate(activity.getBeginTime(), date) >= 0
 				&& DateUtils.getDistanceOfTwoDate(date, activity.getEndTime()) >= 0) {
-			vo.setActivityStatus(2);
+			vo.setActivityStatus(12);
 		} else if (DateUtils.getDistanceOfTwoDate(date, activity.getEndTime()) < 0) {
-			vo.setActivityStatus(3);
+			vo.setActivityStatus(13);
 		}
 	}
 	/**
@@ -82,24 +86,13 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			BeanUtilsBean.getInstance().getConvertUtils().register(new SqlDateConverter(null), Date.class);
 			BeanUtils.copyProperties(activityInfo, activityInfoAndEnrolConfig);
 			BeanUtils.copyProperties(activityEnrolConfig, activityInfoAndEnrolConfig);
-			activityInfo.setActivityChannelCode("");
-			activityInfo.setModuleEnum(Constant.ACTIVITY_ENUM);
-			activityInfoDao.addActivity(activityInfo);
-			if(null==activityInfo.getId() || activityInfo.getId().intValue()==0){
-				logger.info("insert activity return null");
-				Integer id = activityInfoDao.selectMaxId();
-				logger.info("insert activity getMaxId:"+id);
-				activityEnrolConfig.setActivityInfoId(Long.valueOf(id));
-				activityInfo.setSort(id);
-				activityInfo.setId((long)id);
-			}else{
-				activityInfo.setSort(activityInfo.getId().intValue());
-				activityEnrolConfig.setActivityInfoId(activityInfo.getId());
-			}
-			//activityInfo.setActivityLink("/activity/platform-activity/signup/"+activityEnrolConfig.getActivityInfoId());
-			activityInfo.setActivityChannelCode("HD-"+activityInfo.getId());
-			activityInfoDao.update(activityInfo);
-			result= activityEnrolConfigDao.insert(activityEnrolConfig);
+			activityInfo.setKid(idApi.getSnowflakeId().getData());
+			activityInfo.setActivityChannelCode("HD-"+activityInfo.getKid());
+			activityInfo.setModuleEnum(ACTIVITY_ENUM);
+			activityInfoDao.insertByPrimaryKeySelective(activityInfo);
+			activityEnrolConfig.setActivityInfoId(activityInfo.getKid());
+			activityEnrolConfig.setKid(idApi.getSnowflakeId().getData());
+			result= activityEnrolConfigDao.insertByPrimaryKeySelective(activityEnrolConfig);
 		
 		} catch (Exception e) {
 			logger.info(e.getMessage());
@@ -136,22 +129,22 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 				if(activityEnrolConfig == null){
 					//throw new CommonException("获取报名活动配置表失败");
 				}
-				else if(activityEnrolConfig.getSignUpType()==1){
-					//adminActivityInfoSignUpVo.setCurrencyTotalIncome(activityPayRecordDao.getTotalIncome(activityEnrolConfig.getSignUpType(),adminActivityInfoSignUpVo.getId()));
+				else if(activityEnrolConfig.getSignUpType()==11){
+					adminActivityInfoSignUpVo.setCurrencyTotalIncome(adminActivityInfoSignUpVo.getJoinCount()*activityEnrolConfig.getAmount());
 				}
-				else if(activityEnrolConfig.getSignUpType()==2){
-					//adminActivityInfoSignUpVo.setIntegralTotalIncome(activityPayRecordDao.getTotalIncome(activityEnrolConfig.getSignUpType(),adminActivityInfoSignUpVo.getId()));
+				else if(activityEnrolConfig.getSignUpType()==12){
+					adminActivityInfoSignUpVo.setIntegralTotalIncome(adminActivityInfoSignUpVo.getJoinCount()*activityEnrolConfig.getAmount());
 				}
 				//设置活动状态
 				if (DateUtils.getDistanceOfTwoDate(date, adminActivityInfoSignUpVo.getBeginTime()) > 0) {
 					// 未开始
-					adminActivityInfoSignUpVo.setActivityStatus(1);
+					adminActivityInfoSignUpVo.setActivityStatus(11);
 					// 进行中
 				} else if (DateUtils.getDistanceOfTwoDate(adminActivityInfoSignUpVo.getBeginTime(), date) >= 0
 						&& DateUtils.getDistanceOfTwoDate(date, adminActivityInfoSignUpVo.getEndTime()) >= 0) {
-					adminActivityInfoSignUpVo.setActivityStatus(2);
+					adminActivityInfoSignUpVo.setActivityStatus(12);
 				} else if (DateUtils.getDistanceOfTwoDate(date, adminActivityInfoSignUpVo.getEndTime()) < 0) {
-					adminActivityInfoSignUpVo.setActivityStatus(3);
+					adminActivityInfoSignUpVo.setActivityStatus(13);
 				}
 			} catch (Exception e) {
 				logger.info("获取报名列表失败");
@@ -171,12 +164,11 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 		ActivityInfoAndEnrolConfig activityInfoAndEnrolConfig =new ActivityInfoAndEnrolConfig();
 		try {
 			AdminActivityInfoVo1 activityInfo =activityInfoDao.selectByPrimaryKey(Long.valueOf(id));
-			ActivityEnrolConfig activityEnrolConfig = activityEnrolConfigDao.selectByActivityId(activityInfo.getId());
+			ActivityEnrolConfig activityEnrolConfig = activityEnrolConfigDao.selectByActivityId(activityInfo.getKid());
 			BeanUtilsBean.getInstance().getConvertUtils().register(new SqlDateConverter(null), Date.class);
 			BeanUtils.copyProperties(activityInfoAndEnrolConfig, activityInfo);
 			BeanUtils.copyProperties(activityInfoAndEnrolConfig, activityEnrolConfig);
-			activityInfoAndEnrolConfig.setId(activityInfo.getId());
-			@SuppressWarnings("unchecked")
+			activityInfoAndEnrolConfig.setKid(activityInfo.getKid());
 			Map<String,String> map = JsonUtils.fromJson(activityEnrolConfig.getConfigSources(), Map.class);
 			activityInfoAndEnrolConfig.setSourceMap(map);
 			
@@ -235,35 +227,22 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	@Override
 	public PageList<AdminActivityRecordVo> attendlist(Integer pageNo, Integer pageSize,
 													  AdminActivityRecordVo adminActivityRecordVo) {
-		//PageHelper.startPage(pageNo, pageSize);
-		/*if(pageNo==null||pageNo<=0){
-			pageNo=0;
-		}else{
-			pageNo=(pageNo-1)*pageSize;
-		}
-		if(pageSize==null||pageSize<=0){
-			pageSize=10;
-		}*/
-		pageNo=0;
-		pageSize=99999;
+		PageHelper.startPage(pageNo, pageSize);
 		List<AdminActivityRecordVo> list = activityRecordDao.attendlist(pageNo, pageSize, adminActivityRecordVo);
 		if(CollectionUtils.isEmpty(list)){
 			return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,0L);
 		}
+		Set<String> userIds = new HashSet<>();
 		for(AdminActivityRecordVo vo:list){
-			//TODO 根据用户id获取用户昵称、账号绑定的手机号
-			/*CustInfo custInfo = custAPI.getCustInfo(vo.getCreateUserId());
-			if(custInfo==null){
-				vo.setNickName("");
-				vo.setCustPhone("");
-			}else{
-				vo.setNickName(custInfo.getCustNname());
-				vo.setCustPhone(custInfo.getCustPhone());
-			}*/
-			@SuppressWarnings("unchecked")
 			List<Map<String,String>> voMap = JsonUtils.fromJson(vo.getEnrolSources(), List.class);
 			//Map<Object,Object> map=JSON.parseObject(JSON.toJSONString(vo.getEnrolSources()), Map.class);
 			vo.setMap(voMap);
+			userIds.add(String.valueOf(vo.getCreateUserId()));
+		}
+		Response<Map<String,UserBaseInfoVO>> users = userApi.getUser(userIds);
+		for(AdminActivityRecordVo vo:list){
+			vo.setNickName(users.getData().get(vo.getCreateUserId().toString()).getUserNickName());
+			vo.setCustPhone(users.getData().get(vo.getCreateUserId().toString()).getUserPhone());
 		}
 		return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,activityRecordDao.attendlistCount(adminActivityRecordVo));
 	}

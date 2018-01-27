@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
@@ -46,7 +47,7 @@ public class ComponentController {
 	private AuthService authService;
 	
 	@ApiOperation("短信验证码发送")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/component/sendVerifyCode")
 	public Response<SmsVerifyCodeVO> sendVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
@@ -56,35 +57,39 @@ public class ComponentController {
 			authService.checkToken(request);
 			codeDTO.setUserId(NumberUtils.toLong(header.getUserId()));
 		}
-		return accountApi.sendVerifyCode(codeDTO);
+		SmsVerifyCodeVO codeVO = ResponseUtils.getResponseData(accountApi.sendVerifyCode(codeDTO));
+		return ResponseUtils.returnApiObjectSuccess(codeVO);
 	}
 
 	@ApiOperation("验证码校验（只校验不删除）")
-	@NotLogin
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/component/checkVerifyCode")
 	public Response<Map<String,Integer>> checkVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
-		Response<Integer> response = commonSafeApi.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
+		Integer result = ResponseUtils.getResponseData(commonSafeApi.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
-				codeDTO.getVeriCode(), false));
+				codeDTO.getVeriCode(), false)));
 		Map<String,Integer> map = new HashMap<>();
-		map.put("check", response.getData());
-		return ResponseUtils.returnObjectSuccess(map);
+		map.put("check", result);
+		return ResponseUtils.returnApiObjectSuccess(map);
 	}
 
 
 	@ApiOperation("发送短信验证码（滑动验证）")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@UserBehaviorValidation(login=false)
 	@PostMapping(value = "/{version}/component/sendVerifyCodeForSlip")
-	public Response<VerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
+	public Response<SmsVerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
 		AfsCheckRequest afsCheckRequest = WebUtil.getAfsCheckRequest(request);
 
-		return commonSafeApi.sendVerifyCodeForSlip(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
+		VerifyCodeDTO verifyCodeDTO = new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
-				codeDTO.getVeriCode(), false), afsCheckRequest);
+				codeDTO.getVeriCode(), false);
+		VerifyCodeVO verifyCodeVO = commonSafeApi.sendVerifyCodeForSlip(verifyCodeDTO, afsCheckRequest).getData();
+		return ResponseUtils.returnApiObjectSuccess(new SmsVerifyCodeVO(String.valueOf(verifyCodeDTO.getCommonServiceType()), verifyCodeDTO.getVerifyKey(), String.valueOf(verifyCodeVO.getExpireAt())));
 	}
 }

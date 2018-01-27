@@ -48,7 +48,7 @@ public interface CoterieMemberAPI {
 	 * @param userId
 	 * @param coterieId
 	 */
-	public Response<Byte> permission(Long userId, Long coterieId);
+	public Response<Integer> permission(Long userId, Long coterieId);
 
 	/**
 	 * 申请加入私圈审批通过

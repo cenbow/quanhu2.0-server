@@ -45,7 +45,7 @@ public interface ResourceApi {
 	 * @param resourceId
 	 * @return
 	 */
-	public Response<?> deleteResourceById(Long resourceId);
+	public Response<?> deleteResourceById(String resourceId);
 	
 	/**
 	 * 资源列表获取,如果有排序字段，默认按字段倒序排序

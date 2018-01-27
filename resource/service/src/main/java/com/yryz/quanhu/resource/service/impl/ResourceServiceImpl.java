@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.entity.ResourceModel;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.service.ResourceService;
+import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
  * @author yehao
@@ -107,7 +109,7 @@ public class ResourceServiceImpl implements ResourceService {
 		Map<String, ResourceModel> map = new HashMap<>();
 		if(CollectionUtils.isNotEmpty(resourceIds)){
 			for (String resourceId : resourceIds) {
-				ResourceModel resource = resourceMongo.findById(resourceId);
+				ResourceModel resource = resourceMongo.get(resourceId);
 				if(resource != null){
 					map.put(resourceId, resource);
 				}
@@ -124,8 +126,78 @@ public class ResourceServiceImpl implements ResourceService {
 	 */
 	@Override
 	public ResourceModel getResource(String resourceId) {
-		ResourceModel resourceModel = resourceMongo.findById(resourceId);
+		ResourceModel resourceModel = resourceMongo.get(resourceId);
 		return resourceModel;
+	}
+
+	/**
+	 * 创建首页缓存
+	 * @see com.yryz.quanhu.resource.service.ResourceService#createRecommend()
+	 */
+	@Override
+	public void createRecommend() {
+		int pageSize = 10;
+		int recommendPageSize = 6;
+		int nonePageSize = 4;
+		int step = 0;
+		
+		List<ResourceModel> recommends = getRecommendResource(step * recommendPageSize, 10);
+	}
+	
+	
+	
+	/**
+	 * 返回推荐资源
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	public List<ResourceModel> getRecommendResource(int start , int limit){
+		ResourceModel resourceModel = new ResourceModel();
+		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_TRUE);
+		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
+		List<ResourceModel> list = resourceMongo.getList(resourceModel, "sort", null, null, start, limit);
+		return list;
+	}
+	
+	public static <T> List<T> addList(List<T> from ,List<T> to ,int index, int size){
+		if(from == null || CollectionUtils.isEmpty(to)){
+			return from;
+		}
+		for (int i = index; i < (index + size); i++) {
+			if(to.size() >= (i +1)){
+				from.add(to.get(i));
+			}
+		}
+		return from;
+	}
+	
+	/**
+	 * 返回非推荐资源
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	public List<ResourceModel> getNoneRecommendResource(int start , int limit){
+		ResourceModel resourceModel = new ResourceModel();
+		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_FALSE);
+		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
+		List<ResourceModel> list = resourceMongo.getList(resourceModel, "heat", null, null, start, limit);
+		return list;
+	}
+	
+
+	/**
+	 * APP首页推荐
+	 * @param start
+	 * @param limit
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceService#appRecommend(int, int)
+	 */
+	@Override
+	public List<ResourceVo> appRecommend(int start, int limit) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user.provider;
 
+import java.util.List;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ public class UserTagProvider implements UserTagApi{
 	@Autowired
 	private UserTagService tagService;
 	
+	@Override
 	public Response<Boolean> batchSaveUserTag(UserTagDTO tagDTO){
 		try {
 			checkUserTagDTO(tagDTO);
@@ -43,6 +46,25 @@ public class UserTagProvider implements UserTagApi{
 		}
 		if(ArrayUtils.isEmpty(StringUtils.split(tagDTO.getTagIds(), ","))){
 			throw QuanhuException.busiError("标签id不能为空");
+		}
+	}
+
+	@Override
+	public Response<List<String>> getTags(Long userId, Integer tagType) {
+		try {
+			if(userId == null){
+				throw QuanhuException.busiError("用户id不能为空");
+			}
+			if(tagType == null){
+				throw QuanhuException.busiError("标签类型不能为空");
+			}
+			
+			return ResponseUtils.returnListSuccess(tagService.getTagByUserId(userId, tagType));
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("[tag.batchSaveUserTag]", e);
+			return ResponseUtils.returnException(e);
 		}
 	}
 	

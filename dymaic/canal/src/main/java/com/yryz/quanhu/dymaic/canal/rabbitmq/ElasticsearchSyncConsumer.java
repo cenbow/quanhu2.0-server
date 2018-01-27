@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.ExchangeTypes;
@@ -47,13 +48,18 @@ public class ElasticsearchSyncConsumer {
 	)
 	public void handleMessage(String data){
 		logger.info("canal Message:" + data);
+		CanalMsgContent canalMsg=null;
 		try {
-			CanalMsgContent canalMsg=MAPPER.readValue(data, CanalMsgContent.class);
-			syncExecutor.process(canalMsg);
+			//解析不了的垃圾信息忽略
+			canalMsg=MAPPER.readValue(data, CanalMsgContent.class);
 		} catch (IOException e) {
-			throw new RuntimeException("消息同步处理失败");
+			canalMsg=null;
+			e.printStackTrace();
+		}
+		
+		if(canalMsg!=null){
+			syncExecutor.process(canalMsg);
 		}
 	}
-
 
 }

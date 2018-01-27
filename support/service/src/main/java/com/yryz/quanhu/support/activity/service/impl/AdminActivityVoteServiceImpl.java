@@ -1,15 +1,15 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.support.activity.dao.*;
+import com.yryz.quanhu.support.activity.dto.AdminActivityInfoVoteDto;
+import com.yryz.quanhu.support.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.support.activity.entity.ActivityInfo;
 import com.yryz.quanhu.support.activity.entity.ActivityPrizes;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.support.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.support.activity.util.DateUtils;
-import com.yryz.quanhu.support.activity.constants.Constant;
-import com.yryz.quanhu.support.activity.dto.AdminActivityInfoVoteDto;
-import com.yryz.quanhu.support.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.support.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.support.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.support.activity.vo.AdminActivityVoteVo;
@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 import java.util.Date;
 import java.util.List;
 
-//import com.github.pagehelper.PageHelper;
+import static com.yryz.common.constant.ModuleContants.ACTIVITY_ENUM;
 
 
 @Service
@@ -60,20 +60,10 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	 */
 	@Override
 	public PageList adminlist(AdminActivityInfoVoteDto param) {
-//		PageHelper.startPage(param.getPageNo(), param.getPageSize());
-		Integer pageNo = param.getPageNo();
-		Integer pageSize = param.getPageSize();
-		if(param.getPageNo()==null||param.getPageNo()<=0){
-			param.setPageNo(0);
-		}else{
-			param.setPageNo((param.getPageNo()-1)*param.getPageSize());
-		}
-		if(param.getPageSize()==null||param.getPageSize()<=0){
-			param.setPageSize(10);
-		}
+		PageHelper.startPage(param.getPageNo(), param.getPageSize());
 		List<AdminActivityVoteVo> list = activityVoteDao.adminlist(param);
 		if (CollectionUtils.isEmpty(list)) {
-			return new PageList(pageNo, pageSize, list, 0L);
+			return new PageList(param.getPageNo(), param.getPageSize(), list, 0L);
 		}
 		Date date = new Date();
 		for (AdminActivityVoteVo activity : list) {
@@ -87,7 +77,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 					activity.setShareCount(0l);
 				}*/
 				//设置总投票数
-				Integer voteTotalCount = activityVoteDao.getVoteTotalCount(activity.getId());
+				Integer voteTotalCount = activityVoteDao.getVoteTotalCount(activity.getKid());
 				if(voteTotalCount!=null && voteTotalCount>0){
 					activity.setVoteTotalCount(voteTotalCount);
 				}else{
@@ -96,20 +86,20 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 				// 设置活动状态
 				if (DateUtils.getDistanceOfTwoDate(date, activity.getBeginTime()) > 0) {
 					// 未开始
-					activity.setActivityStatus(1);
+					activity.setActivityStatus(11);
 					// 进行中
 				} else if (DateUtils.getDistanceOfTwoDate(activity.getBeginTime(), date) >= 0
 						&& DateUtils.getDistanceOfTwoDate(date, activity.getEndTime()) >= 0) {
-					activity.setActivityStatus(2);
+					activity.setActivityStatus(12);
 				} else if (DateUtils.getDistanceOfTwoDate(date, activity.getEndTime()) < 0) {
-					activity.setActivityStatus(3);
+					activity.setActivityStatus(13);
 				}
 				
 			} catch (Exception e) {
 				logger.info("获取报名列表失败");
 			}
 		}
-		return new PageList(pageNo, pageSize, list, activityVoteDao.adminlistCount(param));
+		return new PageList(param.getPageNo(), param.getPageSize(), list, activityVoteDao.adminlistCount(param));
 	}
 
 	@Override
@@ -117,7 +107,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 		Assert.notNull(activity, "activity 不能为空");
 		/*TODO activity.setCreateUserId(UserUtils.getUser().getId());*/
 		activity.setActivityChannelCode("");
-		activity.setModuleEnum(Constant.ACTIVITY_ENUM);
+		activity.setModuleEnum(ACTIVITY_ENUM);
 		activityInfoDao.insert(activity);		
 		Long activityInfoId = 0L;
 		if(null==activity.getId() || activity.getId().intValue()==0){
