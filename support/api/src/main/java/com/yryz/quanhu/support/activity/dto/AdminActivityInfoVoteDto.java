@@ -42,9 +42,27 @@ public class AdminActivityInfoVoteDto extends ActivityInfo {
 				
 		     
 	private Integer pageSize = 10;
-	
-	
-	
+
+	private Integer userFlag;
+
+	private Integer prizesFlag;
+
+	public Integer getUserFlag() {
+		return userFlag;
+	}
+
+	public void setUserFlag(Integer userFlag) {
+		this.userFlag = userFlag;
+	}
+
+	public Integer getPrizesFlag() {
+		return prizesFlag;
+	}
+
+	public void setPrizesFlag(Integer prizesFlag) {
+		this.prizesFlag = prizesFlag;
+	}
+
 	/**
 	 * @return the pageNo
 	 */

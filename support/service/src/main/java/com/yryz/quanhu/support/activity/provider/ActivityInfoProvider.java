@@ -96,4 +96,21 @@ public class ActivityInfoProvider implements ActivityInfoApi {
         return ResponseUtils.returnObjectSuccess(activityInfoVo1);
     }
 
+    /**
+     * 固定活动列表
+     * @param type
+     * @return
+     */
+    @Override
+    public Response<PageList<ActivityInfoAppListVo>> fixedList(Integer type) {
+        PageList<ActivityInfoAppListVo> pageList = null;
+        try {
+            pageList = activityInfoService.getActivityInfoAppListVoPageList(1, type==2?5:2, type);
+        } catch (Exception e) {
+            logger.error("查询活动列表失败");
+            return ResponseUtils.returnException(e);
+        }
+        return ResponseUtils.returnObjectSuccess(pageList);
+    }
+
 }
