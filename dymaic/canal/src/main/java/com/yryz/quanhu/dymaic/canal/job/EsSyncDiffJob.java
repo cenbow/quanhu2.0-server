@@ -16,7 +16,11 @@ import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
+import com.yryz.quanhu.dymaic.canal.dao.CoterieInfoRepository;
 import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
+import com.yryz.quanhu.dymaic.canal.entity.CoterieInfo;
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -25,11 +29,18 @@ public class EsSyncDiffJob  implements SimpleJob{
 	private static final Log logger = LogFactory.getLog(EsSyncDiffJob.class);
 	@Resource
 	private UserRepository userRepository;
+	
+	@Resource
+	private CoterieInfoRepository coterieInfoRepository;
+	
 	@Resource
 	private ElasticsearchTemplate elasticsearchTemplate;
 	
 	@Reference
 	private UserApi userApi;
+	
+	@Reference
+	private CoterieApi coterieApi;
 	
     @Override
     public void execute(ShardingContext shardingContext) {
@@ -37,8 +48,8 @@ public class EsSyncDiffJob  implements SimpleJob{
 
         switch (shardingContext.getShardingItem()) {
             case 0:
-            	diffUser();
-                break;
+				//diffUser();
+				//diffCoterie();
         }
     }
     
@@ -68,4 +79,79 @@ public class EsSyncDiffJob  implements SimpleJob{
     		}
     	}
     }
+    
+    public void diffCoterie(){
+    	String yesterday=DateUtils.getNextDay();
+    	Response<List<Long>> res=coterieApi.getKidByCreateDate(yesterday+" 00:00:00", yesterday+" 23:59:59");
+    	if(!res.success()){
+    		logger.error("diff coterie error:"+res.getErrorMsg());
+    		return;
+    	}
+    	
+    	List<Long> diffList=new ArrayList<>();
+    	List<Long> idList=res.getData();
+    	for (int i = 0; i < idList.size(); i++) {
+    		long id=idList.get(i);
+    		Optional<CoterieInfo> info=coterieInfoRepository.findById(id);
+    		if(!info.isPresent()){
+    			diffList.add(id);
+    		}
+		}
+    	
+    	if(!diffList.isEmpty()){
+    		Response<List<Coterie>> resList=coterieApi.getByKids(diffList);
+    		if(resList.success()){
+    			List<Coterie> clist=resList.getData();
+    			List<CoterieInfo> list=new ArrayList<>();
+    			for (int i = 0; i < clist.size(); i++) {
+    				Coterie c=clist.get(i);
+    				CoterieInfo info=GsonUtils.parseObj(c, CoterieInfo.class);
+    				info.setKid(c.getCoterieId());
+    				info.setCoterieName(c.getName());
+    				info.setState(c.getStatus());
+    				list.add(info);
+				}
+    			coterieInfoRepository.saveAll(list);
+    		}
+    	}
+    }
+    
+    public void diffTopic(){
+    	String yesterday=DateUtils.getNextDay();
+    	Response<List<Long>> res=coterieApi.getKidByCreateDate(yesterday+" 00:00:00", yesterday+" 23:59:59");
+    	if(!res.success()){
+    		logger.error("diff coterie error:"+res.getErrorMsg());
+    		return;
+    	}
+    	
+    	List<Long> diffList=new ArrayList<>();
+    	List<Long> idList=res.getData();
+    	for (int i = 0; i < idList.size(); i++) {
+    		long id=idList.get(i);
+    		Optional<CoterieInfo> info=coterieInfoRepository.findById(id);
+    		if(!info.isPresent()){
+    			diffList.add(id);
+    		}
+		}
+    	
+    	if(!diffList.isEmpty()){
+    		Response<List<Coterie>> resList=coterieApi.getByKids(diffList);
+    		if(resList.success()){
+    			List<Coterie> clist=resList.getData();
+    			List<CoterieInfo> list=new ArrayList<>();
+    			for (int i = 0; i < clist.size(); i++) {
+    				Coterie c=clist.get(i);
+    				CoterieInfo info=GsonUtils.parseObj(c, CoterieInfo.class);
+    				info.setKid(c.getCoterieId());
+    				info.setCoterieName(c.getName());
+    				info.setState(c.getStatus());
+    				list.add(info);
+				}
+    			coterieInfoRepository.saveAll(list);
+    		}
+    	}
+    }
+    
+    
+    
 }
