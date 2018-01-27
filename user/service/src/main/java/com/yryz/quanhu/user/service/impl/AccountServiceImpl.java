@@ -56,8 +56,8 @@ import com.yryz.quanhu.user.vo.ThirdUser;
  * @data 2017/11/9 0009 45
  */
 @Service
-public class AbstractAccountService implements AccountService {
-	private static final Logger logger = LoggerFactory.getLogger(AbstractAccountService.class);
+public class AccountServiceImpl implements AccountService {
+	private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 	@Autowired
 	private UserAccountDao mysqlDao;
 	@Reference(lazy = true, check = false)
@@ -81,20 +81,19 @@ public class AbstractAccountService implements AccountService {
 
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
-	public String agentRegister(AgentRegisterDTO registerDTO) {
+	public void agentRegister(AgentRegisterDTO registerDTO) {
 		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getAppId(), null);
 		if (checkAccount != null) {
 			throw QuanhuException.busiError("该用户已存在");
 		}
 		String regChannel = Constants.ADMIN_REG_CHANNEL;
-		if (registerDTO.getIsVest() == null || registerDTO.getIsVest() == 0) {
+		if (registerDTO.getIsVest() == 11) {
 			regChannel = Constants.ADMIN_REG_VEST_CHANNEL;
 		}
 		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, regChannel);
 		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
-		Long userId = createUser(
+		createUser(
 				new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO));
-		return userId.toString();
 	}
 
 	@Override
@@ -279,15 +278,15 @@ public class AbstractAccountService implements AccountService {
 	public void unbindThird(Long userId, String thirdId, Integer type, String appId) {
 		UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdId, appId);
 		if (thirdLogin == null) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "第三方账户不存在");
+			throw QuanhuException.busiError("第三方账户不存在");
 		}
 		if (!thirdLogin.getUserId().equals(userId)) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "不是本人不能操作");
+			throw QuanhuException.busiError("不是本人不能操作");
 		}
 		// 判断用户手机号是否都为空？
 		UserAccount account = selectOne(thirdLogin.getUserId(), null, null, null);
-		if (StringUtils.isBlank(account.getUserEmail()) && StringUtils.isBlank(account.getUserPhone())) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "主账号没有其他登录方式，不能解绑第三方");
+		if (StringUtils.isBlank(account.getUserPhone())) {
+			throw QuanhuException.busiError("主账号没有其他登录方式，不能解绑第三方");
 		}
 		thirdLoginService.delete(userId, thirdId);
 	}
@@ -296,8 +295,7 @@ public class AbstractAccountService implements AccountService {
 	public void editPassword(Long userId, String newPassword, String oldPassword) {
 		UserAccount account = selectOne(userId, null, null, oldPassword);
 		if (account == null) {
-			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "旧密码不正确",
-					ExceptionEnum.BusiException.getErrorMsg());
+			throw QuanhuException.busiError("旧密码不正确");
 		}
 		account.setDelFlag(null);
 		account.setId(null);
@@ -430,10 +428,11 @@ public class AbstractAccountService implements AccountService {
 	 * 
 	 * @param loginLog
 	 */
+	@Override
 	public void saveLoginLog(UserLoginLog loginLog) {
 		loginLog.setCreateDate(new Date());
-		loginLog.setLoginX(0l);
-		loginLog.setLoginY(0l);
+		loginLog.setLoginX(0L);
+		loginLog.setLoginY(0L);
 		loginLog.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUNAHU_LOGIN_LOG)));
 		try {
 			logDao.insert(loginLog);

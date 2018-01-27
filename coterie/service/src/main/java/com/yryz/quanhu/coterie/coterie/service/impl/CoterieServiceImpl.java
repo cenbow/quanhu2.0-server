@@ -1,6 +1,7 @@
 package com.yryz.quanhu.coterie.coterie.service.impl;
 
 import com.google.common.collect.Lists;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
@@ -57,7 +58,9 @@ public class CoterieServiceImpl implements CoterieService {
 			coterieMapper.insertSelective(coterie);
 			return (CoterieInfo) GsonUtils.parseObj(coterie, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterie:"+coterie,e);
+
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
+
 		}
 	}
 
@@ -67,7 +70,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			coterieMapper.updateByCoterieIdSelective(coterie);
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterie:"+coterie,e);
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
 		}
 	}
 
@@ -79,7 +82,7 @@ public class CoterieServiceImpl implements CoterieService {
 			coterie.setDeleted((byte)1);
 			coterieMapper.updateByCoterieIdSelective(coterie);
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterieId:"+coterieId,e);
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
 		}
 	}
 
@@ -89,7 +92,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			info=coterieMapper.selectByCoterieId(coterieId);
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterieId:"+coterieId,e);
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
 		}
 		return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 	}
@@ -100,7 +103,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			list=coterieMapper.selectListByStatus(status);
 		}catch (Exception e) {
-			throw new MysqlOptException("param status:"+status,e);
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -111,7 +114,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			list=coterieMapper.selectListByCoterie(coterie);
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterie:"+coterie,e);
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -124,7 +127,7 @@ public class CoterieServiceImpl implements CoterieService {
 			list=coterieMapper.findPageByStatus( start, pageSize, status);
 		}catch (Exception e) {
 			String msg="param pageNum:"+pageNum+"pageSize:"+pageSize+"status:"+status;
-			throw new MysqlOptException(msg,e);
+			throw new QuanhuException( "2007","参数错误","msg",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -136,7 +139,7 @@ public class CoterieServiceImpl implements CoterieService {
 			Integer start=(pageNum-1)*pageSize;
 			list=coterieMapper.findPage(start, pageSize);
 		}catch (Exception e) {
-			throw new MysqlOptException("param pageNum:"+pageNum+"pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param coterie",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -147,7 +150,8 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			list=coterieMapper.selectListByCoterieIdList(coterieIdList);
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterieIdList:"+coterieIdList,e);
+
+			throw new QuanhuException( "2007","参数错误","param coterieIdList",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -158,7 +162,8 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			list=coterieMapper.selectMyCreateCoterie(custId );
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId,e);
+
+			throw new QuanhuException( "2007","参数错误","param custId",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -169,7 +174,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			list=coterieMapper.selectMyJoinCoterie(custId );
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId,e);
+			throw new QuanhuException( "2007","参数错误","param custId",null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -180,7 +185,8 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			list=coterieMapper.selectByName(name);
 		}catch (Exception e) {
-			throw new MysqlOptException("param name:"+name,e);
+
+			throw new QuanhuException( "2007","参数错误","param name:"+name,null);
 		}
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
@@ -191,7 +197,8 @@ public class CoterieServiceImpl implements CoterieService {
 			Coterie info=coterieMapper.selectByCustIdAndCircleId(custId, circleId);
 			return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("find param custId:"+custId+",circleId:"+circleId,e);
+
+			throw new QuanhuException( "2007","参数错误","find param custId:"+custId+",circleId:",null);
 		}
 	}
 
@@ -200,7 +207,8 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			//coterieAuditRecordMapper.insert(record);
 		}catch (Exception e) {
-			throw new MysqlOptException("param record:"+record,e);
+
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -210,7 +218,8 @@ public class CoterieServiceImpl implements CoterieService {
 			int start = (pageNum-1)*pageSize;
 			return null;//coterieAuditRecordMapper.selectPage(coterieId,start, pageSize);
 		}catch (Exception e) {
-			throw new MysqlOptException("param pageNum:"+pageNum+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
+
 		}
 	}
 
@@ -243,7 +252,7 @@ public class CoterieServiceImpl implements CoterieService {
 			
 			return rstList;
 		}catch (Exception e) {
-			throw new MysqlOptException("param param:"+param,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -252,7 +261,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			return coterieMapper.selectCountByCircleId(circleId, status);
 		}catch (Exception e) {
-			throw new MysqlOptException("param circleId:"+circleId,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -264,7 +273,7 @@ public class CoterieServiceImpl implements CoterieService {
 			searchParam.setStart(start);
 			return coterieMapper.selectCountBySearchParam(searchParam);
 		}catch (Exception e) {
-			throw new MysqlOptException("param param:"+param,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -275,7 +284,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<Coterie> list=coterieMapper.selectMyCreateCoteriePage(custId, start, pageSize,status);
 			return GsonUtils.parseList(list, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId+",pageNum:"+pageNum+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -284,7 +293,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			return coterieMapper.selectMyCreateCoterieCount(custId,status);
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -295,7 +304,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<Coterie> list=coterieMapper.selectMyJoinCoteriePage(custId, start, pageSize);
 			return GsonUtils.parseList(list, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId+",pageNum:"+pageNum+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -304,7 +313,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			return coterieMapper.selectMyJoinCoterieCount(custId);
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -313,7 +322,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.YES.getStatus());
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterieIdList:"+coterieIdList,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -322,7 +331,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.NO.getStatus());
 		}catch (Exception e) {
-			throw new MysqlOptException("param coterieIdList:"+coterieIdList,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -332,7 +341,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<Coterie> list=coterieMapper.selectRecommendList(circleId, start, pageSize);
 			return GsonUtils.parseList(list, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param circleId:"+circleId+",start:"+start+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -342,7 +351,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<Coterie> list=coterieMapper.selectHeatList(circleId, expert, start, pageSize);
 			return GsonUtils.parseList(list, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param circleId:"+circleId+",expert:"+expert+",start:"+start+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -352,7 +361,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<Coterie> list=coterieMapper.selectHeatListByCircleId(circleId,start, pageSize);
 			return list;
 		}catch (Exception e) {
-			throw new MysqlOptException("param circleId:"+circleId+",start:"+start+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -375,7 +384,7 @@ public class CoterieServiceImpl implements CoterieService {
 	        });
 			return GsonUtils.parseList(list, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param start:"+pageNum+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -385,7 +394,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<Coterie> list=coterieMapper.selectLikeName(circleId,name, start, pageSize);
 			return GsonUtils.parseList(list, CoterieInfo.class);
 		}catch (Exception e) {
-			throw new MysqlOptException("param name:"+name+",start:"+start+",pageSize:"+pageSize,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -394,7 +403,7 @@ public class CoterieServiceImpl implements CoterieService {
 		try{
 			coterieMapper.updateExpert(custId, isExpert);
 		}catch (Exception e) {
-			throw new MysqlOptException("param custId:"+custId+",isExpert:"+isExpert,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 
@@ -404,7 +413,7 @@ public class CoterieServiceImpl implements CoterieService {
 			List<String> list=coterieMapper.selectCircleIdListByOwnerId(ownerId);
 			return list;
 		}catch (Exception e) {
-			throw new MysqlOptException("param ownerId:"+ownerId,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
 	@Override
@@ -414,7 +423,25 @@ public class CoterieServiceImpl implements CoterieService {
 			return  coterieMapper.updateMemberNum( coterieId,    newMemberNum,  oldMemberNum);
 
 		}catch (Exception e) {
-			throw new MysqlOptException("param ownerId:"+coterieId,e);
+			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
+		}
+	}
+
+	@Override
+	public List<Long> getKidByCreateDate(String startDate, String endDate) {
+		try{
+			return  coterieMapper.selectKidByCreateDate(startDate, endDate);
+		}catch (Exception e) {
+			throw new MysqlOptException("getKidByCreateDate startDate:"+startDate+",endDate:"+endDate,e);
+		}
+	}
+
+	@Override
+	public List<Coterie> getByKids(List<Long> kidList) {
+		try{
+			return  coterieMapper.selectByKids(kidList);
+		}catch (Exception e) {
+			throw new MysqlOptException("getByKids kidList:"+kidList,e);
 		}
 	}
 }

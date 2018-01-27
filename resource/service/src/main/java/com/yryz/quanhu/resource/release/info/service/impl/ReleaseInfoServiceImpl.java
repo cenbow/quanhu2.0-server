@@ -257,4 +257,14 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
         record.setVideoThumbnailUrl(null);
         record.setVideoUrl(null);
     }
+
+	@Override
+	public List<Long> getKidByCreatedate(String startDate, String endDate) {
+		return releaseInfoDao.selectKidByCreatedate(startDate, endDate);
+	}
+
+	@Override
+	public List<ReleaseInfoVo> getByKids(List<Long> kidList) {
+		return releaseInfoDao.selectByKids(kidList);
+	}
 }

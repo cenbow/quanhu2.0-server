@@ -26,7 +26,7 @@ public interface CoterieMemberService {
 	 * 申请加入私圈  审批通过
 	 * @param coterieId 私圈ID
 	 */
-	public void audit(Long userId, Long coterieId, Byte type);
+	public void audit(Long userId, Long coterieId, Byte memberStatus, Byte joinType);
 
 	/**
 	 * 踢出私圈

@@ -35,6 +35,14 @@ public interface UserRelationApi {
      */
     Response<UserRelationDto> getRelation(String sourceUserId,String targetUserId);
 
+    /**
+     * 通过手机号查询关系
+     * @param sourceUserId
+     * @param targetPhoneNo
+     * @return
+     */
+    Response<UserRelationDto> getRelationByTargetPhone(String sourceUserId,String targetPhoneNo);
+
 
     /**
      * 查询用户关系(分页)

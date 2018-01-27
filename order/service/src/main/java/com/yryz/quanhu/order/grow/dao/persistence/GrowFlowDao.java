@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 
@@ -20,6 +21,6 @@ public interface GrowFlowDao {
 
     List<GrowFlow> getAll();
     
-    List<GrowFlow> getPage(@Param("gfq") GrowFlowQuery gfq , @Param("start")int start , @Param("limit")int limit);
+    List<GrowFlow> getPage(@Param("gfq") GrowFlowQuery gfq );
 
 }

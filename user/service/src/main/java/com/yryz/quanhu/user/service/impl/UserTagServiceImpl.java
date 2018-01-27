@@ -63,7 +63,7 @@ public class UserTagServiceImpl implements UserTagService {
 			Long tagId = NumberUtils.toLong(tagIdArray[i]);
 			UserTag tag = new UserTag();
 			tag.setCreateDate(nowTime);
-			tag.setLastUpdateUserId(tagDTO.getUpdateUserId() == null ? 0l : tagDTO.getUpdateUserId());
+			tag.setLastUpdateUserId(tagDTO.getUpdateUserId() == null ? 0L : tagDTO.getUpdateUserId());
 			tag.setTagId(tagId);
 			tag.setUserId(tagDTO.getUserId());
 			tag.setTagType(tagDTO.getTagType());

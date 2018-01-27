@@ -60,7 +60,6 @@
 		) a 
 		left join event_sys b on a.eventCode = b.event_code 
 		order by id desc
-		limit #{limit} offset #{start}
 	</select>
 
 	<!-- 更新积分流水记录 -->

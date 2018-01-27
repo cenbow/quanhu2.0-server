@@ -7,7 +7,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
-import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
@@ -22,13 +22,11 @@ import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
-import com.yryz.quanhu.support.id.api.IdAPI;
-import com.yryz.quanhu.user.service.UserApi;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,6 +64,15 @@ public class TopicPostServiceImpl implements TopicPostService {
         Long createUserId = topicPostDto.getCreateUserId();
         if (null == topicId || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+        }
+        String imgUrl=topicPostDto.getImgUrl();
+        String viderUrl=topicPostDto.getVideoUrl();
+        String content=topicPostDto.getContent();
+        if(StringUtils.isNotBlank(imgUrl) && StringUtils.isNotBlank(viderUrl)){
+            throw QuanhuException.busiError("图片和视频不能同时发布");
+        }
+        if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(viderUrl) && StringUtils.isBlank(content)){
+            throw QuanhuException.busiError("文本，视频，图片不能都为空");
         }
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         BeanUtils.copyProperties(topicPostDto, topicPost);
@@ -213,5 +220,15 @@ public class TopicPostServiceImpl implements TopicPostService {
         return count;
     }
 
+	@Override
+	public List<Long> getKidByCreatedate(String startDate, String endDate) {
+		return topicPostDao.selectKidByCreatedate(startDate, endDate);
+	}
 
+	@Override
+	public List<TopicPostVo> getByKids(List<Long> kidList) {
+		List<TopicPostWithBLOBs> list=topicPostDao.selectByKids(kidList);
+		List<TopicPostVo> tlist=GsonUtils.parseList(list, TopicPostVo.class);
+		return tlist;
+	}
 }

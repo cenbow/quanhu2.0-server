@@ -593,4 +593,22 @@
     from qh_coterie
     WHERE owner_id=#{ownerId} and (state = 3 or state = 0)
   </select>
+  
+  <select id="selectKidByCreateDate" resultType="java.lang.Long">
+    select 
+    kid
+    from qh_coterie 
+    WHERE create_date between #{startDate} and #{endDate}
+  </select>
+  
+  <select id="selectByKids" resultMap="BaseResultMap">
+    select   
+    <include refid="Base_Column_List" /> 
+    from qh_coterie
+    WHERE kid in 
+    <foreach item="item" index="index" collection="kidList" open="("
+			separator="," close=")">
+			#{item}
+	</foreach>
+  </select>
 </mapper>

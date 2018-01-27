@@ -21,7 +21,6 @@ public interface ScoreFlowDao {
 
 	List<EventReportVo> getAll(@Param("userId")String userId);
 
-	List<ScoreFlow> getPage(@Param("sfq") ScoreFlowQuery sfq, @Param("consumeFlag") int consumeFlag,
-			@Param("start") int start, @Param("limit") int limit);
+	List<ScoreFlow> getPage(@Param("sfq") ScoreFlowQuery sfq);
 
 }

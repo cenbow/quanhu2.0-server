@@ -3,7 +3,6 @@ package com.yryz.quanhu.order.sdk.constant;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.quanhu.order.enums.AccountEnum;
-import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.AccountOrder;
 import com.yryz.quanhu.order.vo.IntegralOrder;
@@ -25,27 +24,37 @@ public enum OrderEnum {
     /**
      * 付费提问:"付费{cost}向圈主提问"
      */
-    QUESTION_ORDER(OrderType.ORDER_TYPE_MINUS, ProductEnum.COTERIE_ASK_PAY.getType() + "", ProductEnum.COTERIE_ASK_PAY.getType(), ProductEnum.COTERIE_ASK_PAY.getDesc(), OrderDescEnum.COTERIE_ASK_PAY, "付费提问", BranchFeesEnum.QUESTION),
+    QUESTION_ORDER(OrderType.ORDER_TYPE_MINUS, ProductEnum.COTERIE_ASK_PAY, BranchFeesEnum.QUESTION, "付费提问"),
 
     /**
      * 圈主回答
      */
-    ANSWER_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_ASK_PAY.getType() + "", ProductEnum.COTERIE_ASK_PAY.getType(), ProductEnum.COTERIE_ASK_PAY.getDesc(), OrderDescEnum.INTEGRA_ASK_ANSWER, "圈主回答问题", BranchFeesEnum.ANSWER),
+    ANSWER_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_ASK_PAY, BranchFeesEnum.ANSWER, "圈主回答问题"),
 
     /**
      * 未回答退款："圈主未回答问题，退款{cost}"
      */
-    NO_ANSWER_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_ASK_RETURN.getType() + "", ProductEnum.COTERIE_ASK_RETURN.getType(), ProductEnum.COTERIE_ASK_RETURN.getDesc(), OrderDescEnum.COTERIE_ASK_RETURN, "问答退款", BranchFeesEnum.NO_ANSWER),
+    NO_ANSWER_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_ASK_RETURN, BranchFeesEnum.NO_ANSWER, "问答退款"),
 
     /**
      * 付费阅读:"付费阅读文章,金额:{cost}"
      */
-    READ_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.RESOURCE_PAY.getType() + "", ProductEnum.RESOURCE_PAY.getType(), ProductEnum.RESOURCE_PAY.getDesc(), OrderDescEnum.RESOURCE_PAY, "付费阅读", BranchFeesEnum.READ),
+    READ_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.RESOURCE_PAY, BranchFeesEnum.READ, "付费阅读"),
 
     /**
      * 付费加入私圈:"付费加入私圈,金额:{cost}"
      */
-    JOIN_COTERIE_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_JOIN.getType() + "", ProductEnum.COTERIE_JOIN.getType(), ProductEnum.COTERIE_JOIN.getDesc(), OrderDescEnum.COTERIE_JOIN, "付费加入私圈", BranchFeesEnum.JOIN_COTERIE);
+    JOIN_COTERIE_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_JOIN, BranchFeesEnum.JOIN_COTERIE, "付费加入私圈"),
+
+    /**
+     * 付费活动报名
+     */
+    ACTIVITY_SIGNUP_ORDER(OrderType.ORDER_TYPE_MINUS, ProductEnum.ACTIVITY_SIGNUP, BranchFeesEnum.ACTIVITY_SIGNUP, "付费报名活动"),
+
+    /**
+     * 打赏付费
+     */
+    REWARD_ORDER(OrderType.ORDER_TYPE_MINUS, ProductEnum.REWARD_TYPE, BranchFeesEnum.REWARD, "打赏");
 
     /**
      * 支付类型，1，加币；0，减币
@@ -53,41 +62,26 @@ public enum OrderEnum {
     private Integer orderType;
 
     /**
-     * 产品ID
+     * 产品枚举
      */
-    private String productId;
+    private ProductEnum productEnum;
 
     /**
-     * 产品类型
+     * 分费枚举
      */
-    private Integer productType;
-
-    /**
-     * 产品说明
-     */
-    private String productDesc;
-
-    /**
-     * 订单说明
-     */
-    private String orderDesc;
+    private BranchFeesEnum branchFeesEnum;
 
     /**
      * 备注
      */
     private String remark;
 
-    private BranchFeesEnum branchFeesEnum;
 
-    OrderEnum(Integer orderType, String productId, Integer productType, String productDesc,
-              String orderDesc, String remark, BranchFeesEnum branchFeesEnum) {
+    OrderEnum(Integer orderType, ProductEnum productEnum, BranchFeesEnum branchFeesEnum, String remark) {
         this.orderType = orderType;
-        this.productId = productId;
-        this.productType = productType;
-        this.productDesc = productDesc;
-        this.orderDesc = orderDesc;
-        this.remark = remark;
+        this.productEnum = productEnum;
         this.branchFeesEnum = branchFeesEnum;
+        this.remark = remark;
     }
 
     public PreOrderVo getOrder(Long orderId, Long fromId, Long toId, long cost) {
@@ -291,12 +285,12 @@ public enum OrderEnum {
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setCustId(String.valueOf(fromId));
         orderInfo.setCost(cost);
-        orderInfo.setOrderDesc(orderDesc.replaceAll("\\{cost\\}", cost + ""));
+        orderInfo.setOrderDesc(productEnum.getDesc());
         orderInfo.setOrderId(String.valueOf(orderId));
         orderInfo.setOrderType(orderType);
-        orderInfo.setProductDesc(productDesc);
-        orderInfo.setProductId(productId);
-        orderInfo.setProductType(productType);
+        orderInfo.setProductDesc(productEnum.getDesc());
+        orderInfo.setProductId(String.valueOf(productEnum.getType()));
+        orderInfo.setProductType(productEnum.getType());
         orderInfo.setOrderState(OrderType.ORDER_STATE_CREATE);
         orderInfo.setRemark(remark);
         orderInfo.setType(OrderType.TYPE_THREE);
@@ -321,11 +315,11 @@ public enum OrderEnum {
         } else {
             accountOrder.setCustId(feeDetail.getCustId());
         }
-        accountOrder.setOrderDesc(orderDesc.replaceAll("\\{cost\\}", cost + ""));
+        accountOrder.setOrderDesc(feeDetail.getFeeDesc());
         accountOrder.setOrderId(String.valueOf(orderId));
-        accountOrder.setProductDesc(productDesc);
-        accountOrder.setProductId(productId);
-        accountOrder.setProductType(productType);
+        accountOrder.setProductDesc(productEnum.getDesc());
+        accountOrder.setProductId(String.valueOf(productEnum.getType()));
+        accountOrder.setProductType(productEnum.getType());
         accountOrder.setRemarks(remark);
         return accountOrder;
     }
@@ -348,11 +342,11 @@ public enum OrderEnum {
         } else {
             integralOrder.setCustId(feeDetail.getCustId());
         }
-        integralOrder.setOrderDesc(orderDesc.replaceAll("\\{cost\\}", cost + ""));
+        integralOrder.setOrderDesc(feeDetail.getFeeDesc());
         integralOrder.setOrderId(String.valueOf(orderId));
-        integralOrder.setProductDesc(productDesc);
-        integralOrder.setProductId(productId);
-        integralOrder.setProductType(productType);
+        integralOrder.setProductDesc(productEnum.getDesc());
+        integralOrder.setProductId(String.valueOf(productEnum.getType()));
+        integralOrder.setProductType(productEnum.getType());
         integralOrder.setRemarks(remark);
         return integralOrder;
     }

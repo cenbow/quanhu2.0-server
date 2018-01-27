@@ -3,6 +3,7 @@ package com.yryz.quanhu.user.dto;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.entity.UserRelationEntity;
 import com.yryz.quanhu.user.service.UserRelationApi;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -20,19 +21,10 @@ public class UserRelationDto extends UserRelationEntity{
     /**每页大小*/
     private Integer pageSize = 10;
 
-    private int toFollowStatus;
-
-    private int fromFollowStatus;
-
-    private int toBlackStatus;
-
-    private int fromBlackStatus;
-
     /**
      * 统一状态位标识
      */
     private int relationStatus;
-
     /**
      * 用户ID
      */
@@ -72,38 +64,6 @@ public class UserRelationDto extends UserRelationEntity{
 
     public void setUserRemarkName(String userRemarkName) {
         this.userRemarkName = userRemarkName;
-    }
-
-    public int getToBlackStatus() {
-        return toBlackStatus;
-    }
-
-    public void setToBlackStatus(int toBlackStatus) {
-        this.toBlackStatus = toBlackStatus;
-    }
-
-    public int getToFollowStatus() {
-        return toFollowStatus;
-    }
-
-    public void setToFollowStatus(int toFollowStatus) {
-        this.toFollowStatus = toFollowStatus;
-    }
-
-    public int getFromFollowStatus() {
-        return fromFollowStatus;
-    }
-
-    public void setFromFollowStatus(int fromFollowStatus) {
-        this.fromFollowStatus = fromFollowStatus;
-    }
-
-    public int getFromBlackStatus() {
-        return fromBlackStatus;
-    }
-
-    public void setFromBlackStatus(int fromBlackStatus) {
-        this.fromBlackStatus = fromBlackStatus;
     }
 
     public String getUserHeadImg() {

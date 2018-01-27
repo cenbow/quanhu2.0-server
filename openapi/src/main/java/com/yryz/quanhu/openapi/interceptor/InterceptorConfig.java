@@ -32,6 +32,11 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
 		return new CommonInterceptor();
 	}
 
+	@Bean
+	public LogInterceptor logInterceptor() {
+		return new LogInterceptor();
+	}
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// 注册拦截器
@@ -52,6 +57,12 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
 		// 配置不拦截的路径
 		// common.excludePathPatterns("/**.html");
 		common.addPathPatterns("/**");
+
+		/**
+		 * openapi接入日志收集
+		 */
+		InterceptorRegistration logInterceptor = registry.addInterceptor(logInterceptor());
+		logInterceptor.addPathPatterns("/**");
 	}
 
 }

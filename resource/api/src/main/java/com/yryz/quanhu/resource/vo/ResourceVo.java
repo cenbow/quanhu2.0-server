@@ -41,12 +41,12 @@ public class ResourceVo implements Serializable {
      * 资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     /**
      * 资源ID
      */
-    private Long resourceId;
+    private String resourceId;
 
     /**
      * 文章分类ID
@@ -110,11 +110,6 @@ public class ResourceVo implements Serializable {
     private String recommend;
     
     /**
-     * 资源分类搜索,搜索字段，仅供搜索使用，其他时间不要填。1003文章,1004话题,1005帖子,1006问题,1007答案
-     */
-    private String resourceType;
-    
-    /**
      * 扩展字段，仅供展示使用，由前端的发布方和列表解析方解决
      */
     private String extJson;
@@ -173,28 +168,28 @@ public class ResourceVo implements Serializable {
 	/**
 	 * @return the moduleEnum
 	 */
-	public Integer getModuleEnum() {
+	public String getModuleEnum() {
 		return moduleEnum;
 	}
 
 	/**
 	 * @param moduleEnum the moduleEnum to set
 	 */
-	public void setModuleEnum(Integer moduleEnum) {
+	public void setModuleEnum(String moduleEnum) {
 		this.moduleEnum = moduleEnum;
 	}
 
 	/**
 	 * @return the resourceId
 	 */
-	public Long getResourceId() {
+	public String getResourceId() {
 		return resourceId;
 	}
 
 	/**
 	 * @param resourceId the resourceId to set
 	 */
-	public void setResourceId(Long resourceId) {
+	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
 
@@ -366,21 +361,6 @@ public class ResourceVo implements Serializable {
 		this.recommend = recommend;
 	}
 
-
-	/**
-	 * @return the resourceType
-	 */
-	public String getResourceType() {
-		return resourceType;
-	}
-
-	/**
-	 * @param resourceType the resourceType to set
-	 */
-	public void setResourceType(String resourceType) {
-		this.resourceType = resourceType;
-	}
-	
 	/**
 	 * @return the extJson
 	 */

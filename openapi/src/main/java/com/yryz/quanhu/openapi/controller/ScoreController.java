@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
@@ -31,6 +31,7 @@ import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
+import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.enums.EventEnum;
@@ -144,25 +145,26 @@ public class ScoreController {
 	@NotLogin
     @ApiOperation("获取积分明细")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/score/flow")
+	@GetMapping(value = "/{version}/score/flow")
 //	@RequestMapping(path="/score/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
 //	@ResponseBody
-	public Response<List<ScoreFlow>> getScoreFlow(@RequestBody ScoreFlowQuery sfq ){
-		List<ScoreFlow> sfs = eventAcountApiService.getScoreFlow(sfq, sfq.getFlowType(), sfq.getStart(), sfq.getLimit());
+	public Response<PageList<ScoreFlow>> getScoreFlow( ScoreFlowQuery sfq ){
+		PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
 		//return ReturnModel.listToString(sfs);
-		return ResponseUtils.returnListSuccess(sfs);
+	
+		   return ResponseUtils.returnObjectSuccess(sfslist);
 	}
 	
 	@NotLogin
     @ApiOperation("获取成长明细")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/grow/flow")
+	@GetMapping(value = "/{version}/grow/flow")
 //	@RequestMapping(path="/grow/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
 //	@ResponseBody
-	public Response<List<GrowFlow>> getGrowFlow(@RequestBody GrowFlowQuery gfq){
-		List<GrowFlow> gfs = eventAcountApiService.getGrowFlow(gfq, gfq.getStart(), gfq.getLimit());
+	public Response<PageList<GrowFlow>> getGrowFlow( GrowFlowQuery gfq){
+		PageList<GrowFlow> growflowList = eventAcountApiService.getGrowFlow(gfq);
 		//return ReturnModel.listToString(gfs);
-		return ResponseUtils.returnListSuccess(gfs);
+		 return ResponseUtils.returnObjectSuccess(growflowList);
 	}
 	
 	

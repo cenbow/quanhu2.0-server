@@ -1,5 +1,7 @@
 package com.yryz.quanhu.resource.release.info.api;
 
+import java.util.List;
+
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
@@ -63,4 +65,8 @@ public interface ReleaseInfoApi {
     * @throws  
     */
     public Response<Integer> shelvesByCondition(ReleaseInfo record, ReleaseInfoDto dto);
+    
+    public Response<List<Long>> getKidByCreatedate(String startDate,String endDate);
+    
+    public Response<List<ReleaseInfoVo>> getByKids(List<Long> kidList);
 }

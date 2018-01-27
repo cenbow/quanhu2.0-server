@@ -114,9 +114,33 @@ public class UserRelationController {
 
     }
 
-    @ApiOperation("用户关系-查询（一对一）")
+    @ApiOperation("用户关系-查询（一对一）根据目标用户手机号查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("/{version}/user/relation/mapper")
+    @RequestMapping("/{version}/user/relation/query/phone")
+    public Response<UserRelationQueryVo> getRelationByPhone(HttpServletRequest request){
+        String userId       = request.getHeader("userId");
+        String targetPhoneNo = request.getParameter("targetPhoneNo");
+
+        //check
+        Assert.notNull(userId,"userId不能为空");
+        Assert.notNull(targetPhoneNo,"targetPhoneNo不能为空");
+
+        //invoke
+        Response<UserRelationDto> rpc =  userRelationApi.getRelationByTargetPhone(userId,targetPhoneNo);
+
+        if(rpc.success()){
+            UserRelationQueryVo vo = new UserRelationQueryVo();
+            BeanUtils.copyProperties(rpc.getData(),vo);
+            return new Response<UserRelationQueryVo>(true, rpc.getCode(), rpc.getMsg(), rpc.getErrorMsg(), vo);
+        }else{
+            return new Response<UserRelationQueryVo>(false, rpc.getCode(), rpc.getMsg(), rpc.getErrorMsg(), null);
+        }
+
+    }
+
+    @ApiOperation("用户关系-查询（一对一）根据ID查询")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @RequestMapping("/{version}/user/relation/query/id")
     public Response<UserRelationQueryVo> getRelation(HttpServletRequest request){
         String userId       = request.getHeader("userId");
         String targetUserId = request.getParameter("targetUserId");
@@ -140,7 +164,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-查询（指定条件）")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("/{version}/user/relation/queryall")
+    @RequestMapping("/{version}/user/relation/query/all")
     public Response<List<UserRelationQueryVo>> getAllRelations(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");
@@ -182,7 +206,7 @@ public class UserRelationController {
 
     @ApiOperation("用户关系-查询（指定条件）")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @RequestMapping("/{version}/user/relation/query")
+    @RequestMapping("/{version}/user/relation/query/page")
     public Response<PageList<UserRelationQueryVo>> getRelations(HttpServletRequest request){
 
         String userId       = request.getHeader("userId");

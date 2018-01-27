@@ -5,7 +5,7 @@
  * Created on 2017年12月11日
  * Id: CheckVerifyCodeReturnCode.java, 2017年12月11日 上午11:30:05 Administrator
  */
-package com.yryz.quanhu.message.push.enums;
+package com.yryz.quanhu.message.commonsafe.constants;
 
 /**
  * 验证码验证码返回码

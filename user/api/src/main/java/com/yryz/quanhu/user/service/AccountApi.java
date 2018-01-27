@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.contants.RedisConstants;
+import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.BindThirdDTO;
 import com.yryz.quanhu.user.dto.ForgotPasswordDTO;
@@ -19,7 +20,6 @@ import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
-import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
@@ -71,6 +71,15 @@ public interface AccountApi {
 	public Response<RegisterLoginVO> register(RegisterDTO registerDTO, RequestHeader header);
 
 	/**
+	 * 管理后台代理注册
+	 * 
+	 * @param registerDTO
+	 * @return
+	 * @Description
+	 */
+	public Response<Boolean> agentResiter(AgentRegisterDTO registerDTO);
+
+	/**
 	 * 手机号密码登录
 	 * 
 	 * @param loginDTO
@@ -80,6 +89,7 @@ public interface AccountApi {
 	 */
 	public Response<RegisterLoginVO> login(LoginDTO loginDTO, RequestHeader header);
 
+	
 	/**
 	 * 手机短信登录
 	 * 

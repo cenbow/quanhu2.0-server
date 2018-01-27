@@ -1,8 +1,6 @@
 package com.yryz.quanhu.score.service;
 
-import java.util.List;
-
-import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.score.entity.ScoreFlow;
@@ -34,17 +32,18 @@ public interface EventAcountApiService {
 	 * 获取积分明细
 	 * @param sfq
 	 * @param flowType
-	 * @param start
-	 * @param limit
+	 * @param currentPage  页码
+	 * @param pageSize 条数
 	 * @return
 	 */
-	List<ScoreFlow> getScoreFlow(ScoreFlowQuery sfq , int flowType , int start , int limit);
+	
+	PageList<ScoreFlow> getScoreFlow(ScoreFlowQuery sfq);
 	/**
 	 * 获取成长明细
 	 * @param gfq
-	 * @param start
-	 * @param limit
+	 * @param currentPage  页码
+	 * @param pageSize  条数
 	 * @return
 	 */
-	List<GrowFlow> getGrowFlow(GrowFlowQuery gfq , int start , int limit);
+	PageList<GrowFlow> getGrowFlow(GrowFlowQuery gfq );
 }
