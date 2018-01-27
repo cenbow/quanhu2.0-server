@@ -80,11 +80,11 @@
 			<if test="lastUpdateUserId != null">
 				and last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
 			</if>
-			<if test="createDate != null">
-				create_date &gt;= #{createDate}
+			<if test="beginDate != null">
+				and create_date &gt;= #{beginDate}
 			</if>
-			<if test="lastUpdateDate != null">
-				last_update_date &lt;= #{lastUpdateDate}
+			<if test="endDate != null">
+				and create_date &lt;= #{endDate}
 			</if>
 			<choose>
 				<when test="payFlag != null and payFlag == 0">

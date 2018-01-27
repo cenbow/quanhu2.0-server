@@ -1,6 +1,7 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private CountApi countApi;
 
@@ -66,7 +67,8 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             record.setShelveFlag(CommonConstants.SHELVE_YES);
 
             Assert.isNull(record.getCoterieId(), "平台文章发布 没有：CoterieId");
-            Assert.isNull(record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
+            Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() == 0L,
+                    "平台文章发布 不能设置付费：ContentPrice");
 
             if (StringUtils.isBlank(record.getModuleEnum())) {
                 record.setModuleEnum(ResourceTypeEnum.RELEASE);
@@ -122,7 +124,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
             Assert.notNull(createUser, "文章创建者用户不存在！userId:" + infoVo.getCreateUserId());
             infoVo.setUser(createUser);
-            
+
             // 若资源已删除、或者 已经下线 直接返回
             if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
                     || CommonConstants.SHELVE_NO.equals(infoVo.getShelveFlag())) {
@@ -151,36 +153,37 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
             boolean isGetCreateUser) {
         try {
+            // 只查询 平台文章
             dto.setCoterieId(0L);
-            PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, isCount);
+            PageList<ReleaseInfoVo> pageList = releaseInfoService.pageByCondition(dto, isCount);
+            if (!isGetCreateUser || null == pageList || CollectionUtils.isEmpty(pageList.getEntities())) {
+                return ResponseUtils.returnObjectSuccess(pageList);
+            }
 
-            // 设置创建者用户信息
-            if (isGetCreateUser && null != voList && CollectionUtils.isNotEmpty(voList.getEntities())) {
-                // 获取所有创建者用户ID
-                Set<Long> userIds = new HashSet<>();
-                for (ReleaseInfoVo info : voList.getEntities()) {
-                    if (null == info || null == info.getCreateUserId()) {
+            List<ReleaseInfoVo> voList = pageList.getEntities();
+
+            // 获取所有创建者用户ID
+            Set<Long> userIds = new HashSet<>();
+            for (ReleaseInfoVo info : voList) {
+                if (null == info || null == info.getCreateUserId()) {
+                    continue;
+                }
+                userIds.add(info.getCreateUserId());
+            }
+
+            // TODO 获取用户信息集合
+            Map<String, UserSimpleVO> userMap = ResponseUtils.getResponseData(userApi.getUserSimple(new HashSet<>()));
+            if (null != userMap) {
+                for (ReleaseInfoVo info : voList) {
+                    if (null == info || null == info.getCreateUserId() || null == userMap.get(info.getCreateUserId())) {
                         continue;
                     }
-                    userIds.add(info.getCreateUserId());
-                }
-
-                // TODO 获取用户信息集合
-                Map<String, UserSimpleVO> userMap = ResponseUtils
-                        .getResponseData(userApi.getUserSimple(new HashSet<>()));
-                if (null != userMap) {
-                    for (ReleaseInfoVo info : voList.getEntities()) {
-                        if (null == info || null == info.getCreateUserId()
-                                || null == userMap.get(info.getCreateUserId())) {
-                            continue;
-                        }
-                        UserSimpleVO userVo = userMap.get(info.getCreateUserId());
-                        info.setUser(userVo);
-                    }
+                    UserSimpleVO userVo = userMap.get(info.getCreateUserId());
+                    info.setUser(userVo);
                 }
             }
-            
-            return ResponseUtils.returnObjectSuccess(voList);
+
+            return ResponseUtils.returnObjectSuccess(pageList);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {

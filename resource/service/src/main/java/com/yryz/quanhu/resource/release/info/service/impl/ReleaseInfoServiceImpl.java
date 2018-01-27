@@ -49,7 +49,6 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
 
     @Override
     public List<ReleaseInfoVo> selectByCondition(ReleaseInfoDto dto) {
-        PageUtils.startPage(dto.getPageNo(), dto.getPageSize());
         return this.getDao().selectByCondition(dto);
     }
 
@@ -63,6 +62,7 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
         PageList<ReleaseInfoVo> pageList = new PageList<>();
         pageList.setCurrentPage(dto.getPageNo());
         pageList.setPageSize(dto.getPageSize());
+        PageUtils.startPage(dto.getPageNo(), dto.getPageSize());
 
         List<ReleaseInfoVo> list = this.selectByCondition(dto);
         pageList.setEntities(list);

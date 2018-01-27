@@ -63,7 +63,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private CountApi countApi;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private CoterieMemberAPI coterieMemberAPI;
 
@@ -71,7 +71,8 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
             Assert.notNull(record.getCoterieId(), "release() CoterieId is null !");
-            Assert.isTrue(record.getContentPrice() >= 0L, "release() ContentPrice is not unsigned !");
+            Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() >= 0L,
+                    "release() ContentPrice is not unsigned !");
             // 校验用户是否存在
             ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
 
