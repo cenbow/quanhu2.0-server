@@ -110,6 +110,9 @@ public class ActivityInfoProvider implements ActivityInfoApi {
             logger.error("查询活动列表失败");
             return ResponseUtils.returnException(e);
         }
+        for(ActivityInfoAppListVo activityInfoAppListVo:pageList.getEntities()){
+            activityInfoAppListVo.setListType(type);
+        }
         return ResponseUtils.returnObjectSuccess(pageList);
     }
 
