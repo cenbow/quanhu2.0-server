@@ -138,9 +138,13 @@ public class ResourceServiceImpl implements ResourceService {
 	public void createRecommend() {
 		int pageSize = 10;
 		int recommendPageSize = 6;
+		int nonePageSize = 4;
+		int step = 0;
 		
-		
+		List<ResourceModel> recommends = getRecommendResource(step * recommendPageSize, 10);
 	}
+	
+	
 	
 	/**
 	 * 返回推荐资源
@@ -154,6 +158,18 @@ public class ResourceServiceImpl implements ResourceService {
 		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
 		List<ResourceModel> list = resourceMongo.getList(resourceModel, "sort", null, null, start, limit);
 		return list;
+	}
+	
+	public static <T> List<T> addList(List<T> from ,List<T> to ,int index, int size){
+		if(from == null || CollectionUtils.isEmpty(to)){
+			return from;
+		}
+		for (int i = index; i < (index + size); i++) {
+			if(to.size() >= (i +1)){
+				from.add(to.get(i));
+			}
+		}
+		return from;
 	}
 	
 	/**
