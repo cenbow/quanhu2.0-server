@@ -240,7 +240,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
         UserBaseInfo targetUser =userService.getUser(Long.parseLong(targetUserId));
         if(null == targetUser){
-//            throw new QuanhuException("","","目标用户不存在或已注销");
+            throw new QuanhuException("","","目标用户不存在或已注销");
         }
         return false;
     }
@@ -531,8 +531,8 @@ public class UserRelationServiceImpl implements UserRelationService{
                 newDto.setUserName(userInfo.getUserNickName());
                 newDto.setUserSummary(userInfo.getUserDesc());
             }else{
-//                continue;
                 logger.warn("用户基本信息不存在：{}",_targetUserId);
+                continue;
             }
 
 
