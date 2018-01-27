@@ -163,20 +163,23 @@ public class CoterieProvider implements CoterieApi {
 		String name = StringUtils.trim(info.getName());
 		if (StringUtils.isNotEmpty(name)) {
 			List<CoterieInfo> clist = coterieService.findByName(name);
-			if (!clist.isEmpty()) {
-				throw new ServiceException(ServiceException.CODE_SYS_ERROR, "私圈名称已存在");
+			if (!clist.isEmpty()&&!clist.get(0).getCoterieId().equals(info.getCoterieId())) {
+				throw new QuanhuException( "2007","参数错误","私圈名称已存在",null);
 			}
 		}
 		//费用单位错误防范
 		if (!(info.getJoinFee()!=null && info.getJoinFee()<=100 && info.getJoinFee()>=0)) {
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "加入私圈金额设置不正确。");
+
+			throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
 		}
 		if (!(info.getConsultingFee()!=null && info.getConsultingFee()<=100 && info.getConsultingFee()>=0)) {
-			throw new ServiceException(ServiceException.CODE_SYS_ERROR, "私圈咨询费金额设置不正确。");
+			throw new QuanhuException( "2007","参数错误","私圈咨询费金额设置不正确。",null);
 		}
 		try {
 			coterieService.modify(info);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			logger.error(e.getMessage(), e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			throw ServiceException.sysError();
 		} catch (ServiceException e) {
@@ -203,6 +206,9 @@ public class CoterieProvider implements CoterieApi {
 					return ResponseUtils.returnException(e);
 				} catch (ServiceException e) {
 					return ResponseUtils.returnException(e);
+				}
+				catch (QuanhuException e) {
+					return ResponseUtils.returnException(e);
 				} catch (Exception e) {
 					logger.error("unKown Exception", e);
 					return ResponseUtils.returnException(e);
@@ -211,10 +217,10 @@ public class CoterieProvider implements CoterieApi {
 
 	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
-			throw new QuanhuException( "info","对象为空","对象为空",null);
+			throw new QuanhuException( "2007","对象为空","对象为空",null);
 		}
 		if (StringUtils.isEmpty(info.getIcon())) {
-			throw new QuanhuException( "icon","参数错误","icon不能为空",null);
+			throw new QuanhuException( "2007","参数错误","icon不能为空",null);
 
 		}
 		if (StringUtils.isEmpty(info.getIntro())) {
@@ -281,15 +287,19 @@ public class CoterieProvider implements CoterieApi {
 			fillCustInfo(list);
 			fillCircleInfo(list);
 			return ResponseUtils.returnListSuccess(list);
-		} catch (DatasOptException e) {
+		}
+		catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}
+		catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
 			return ResponseUtils.returnException(e);
-		} catch (Exception e) {
-			logger.error("unKown Exception", e);
-			return ResponseUtils.returnException(e);
-		}
+	} catch (Exception e) {
+		logger.error("unKown Exception", e);
+		return ResponseUtils.returnException(e);
+	}
 	}
 	/**
 	 * 我加入的私圈
@@ -309,7 +319,9 @@ public class CoterieProvider implements CoterieApi {
 			fillCircleInfo(list);
 			fillCustInfo(list);
 			return ResponseUtils.returnListSuccess(list);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -331,6 +343,8 @@ public class CoterieProvider implements CoterieApi {
 		logger.info("CoterieApi.getCoterieCount circleId: " + circleId);
 		try {
 			return  ResponseUtils.returnObjectSuccess(coterieService.getCoterieCount(circleId, status));
+		}catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
@@ -356,6 +370,8 @@ public class CoterieProvider implements CoterieApi {
 			fillCustInfo(list);
 			fillCircleInfo(list);
 			return ResponseUtils.returnListSuccess(list);
+		}catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
@@ -383,7 +399,9 @@ public class CoterieProvider implements CoterieApi {
 			fillCircleInfo(list);
 			fillCustInfo(list);
 			return ResponseUtils.returnListSuccess(list);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -404,6 +422,8 @@ public class CoterieProvider implements CoterieApi {
 		logger.info("CoterieApi.getMyCreateCoterieCount custId: " + custId);
 		try {
 			return  ResponseUtils.returnObjectSuccess(coterieService.findMyCreateCoterieCount(custId,status));
+		}catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
@@ -431,7 +451,9 @@ public class CoterieProvider implements CoterieApi {
 			fillCircleInfo(list);
 			fillCustInfo(list);
 			return ResponseUtils.returnListSuccess(list);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -452,7 +474,9 @@ public class CoterieProvider implements CoterieApi {
 		logger.info("CoterieApi.getMyJoinCoterieCount custId: " + custId);
 		try {
 			return  ResponseUtils.returnObjectSuccess(coterieService.findMyJoinCoterieCount(custId));
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -541,6 +565,8 @@ public class CoterieProvider implements CoterieApi {
 			fillCircleInfo(list);
 			fillCustInfo(list);
 			return ResponseUtils.returnListSuccess(list);
+		}catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
@@ -578,7 +604,9 @@ public class CoterieProvider implements CoterieApi {
 			fillCircleInfo(infoList);
 			fillCustInfo(infoList);
 			return ResponseUtils.returnListSuccess(infoList);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -602,6 +630,9 @@ public class CoterieProvider implements CoterieApi {
 		}
 		try {
 			coterieService.modifyCoterieExpert(custId, isExpert);
+		}catch (QuanhuException e) {
+			logger.error(e.getMessage(), e);
+			throw new QuanhuException( "2007","参数错误"," ",null);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			throw ServiceException.sysError();
@@ -627,7 +658,10 @@ public class CoterieProvider implements CoterieApi {
 		try {
 			List<String> circleIdList = coterieService.getCircleIdListByOwnerId(ownerId);
 			return ResponseUtils.returnListSuccess(circleIdList);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		}
+		catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -693,7 +727,10 @@ public class CoterieProvider implements CoterieApi {
 			Integer count=coterieService.findMyJoinCoterieCount(custId);
 			count+=coterieService.findMyCreateCoterieCount(custId,null);
 			return  ResponseUtils.returnObjectSuccess(count);
-		} catch (DatasOptException e) {
+		} catch (QuanhuException e) {
+			logger.error(e.getMessage(), e);
+			return ResponseUtils.returnException(e);
+		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
@@ -720,6 +757,9 @@ public class CoterieProvider implements CoterieApi {
 			record.setCreateDate(new Date());
 			record.setLastUpdateTime(new Date());
 			coterieService.saveAuditRecord(record);
+		} catch (QuanhuException e) {
+			logger.error(e.getMessage(), e);
+			throw new QuanhuException( "2007","参数错误"," ",null);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			throw ServiceException.sysError();

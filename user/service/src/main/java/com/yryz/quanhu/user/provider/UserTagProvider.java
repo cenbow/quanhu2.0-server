@@ -23,6 +23,7 @@ public class UserTagProvider implements UserTagApi{
 	@Autowired
 	private UserTagService tagService;
 	
+	@Override
 	public Response<Boolean> batchSaveUserTag(UserTagDTO tagDTO){
 		try {
 			checkUserTagDTO(tagDTO);

@@ -67,7 +67,7 @@ public class ResourceProvider implements ResourceApi {
 		return ResponseUtils.returnSuccess();
 	}
 	
-	public Response<?> deleteResourceById(Long resourceId){
+	public Response<?> deleteResourceById(String resourceId){
 		ResourceModel model = new ResourceModel();
 		model.setResourceId(resourceId);
 		List<ResourceModel> list = new ArrayList<>();

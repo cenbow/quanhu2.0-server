@@ -48,7 +48,7 @@ public class ResourceController {
     @GetMapping(value = "/services/app/{version}/resource/appRecommend")
     public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度") String limit) {
         ResourceVo resourceVo = new ResourceVo();
-        resourceVo.setModuleEnum(new Integer(ModuleContants.RELEASE));
+        resourceVo.setModuleEnum(ModuleContants.RELEASE);
         resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceVo.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
         resourceVo.setCoterieId("0");
@@ -63,6 +63,6 @@ public class ResourceController {
         ResourceVo resourceVo = new ResourceVo();
         resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceVo.setCoterieId(coterieId);
-        return resourceApi.getResources(resourceVo, null, 0, 10, null, null);
+        return resourceApi.getResources(resourceVo, "createTime", 0, 10, null, null);
     }
 }

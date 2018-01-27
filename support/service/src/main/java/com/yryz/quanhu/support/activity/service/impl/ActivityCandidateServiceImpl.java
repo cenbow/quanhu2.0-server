@@ -3,6 +3,7 @@ package com.yryz.quanhu.support.activity.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -15,14 +16,11 @@ import com.yryz.quanhu.support.activity.dao.ActivityVoteConfigDao;
 import com.yryz.quanhu.support.activity.dao.ActivityVoteDetailDao;
 import com.yryz.quanhu.support.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
-import com.yryz.quanhu.support.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.support.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.support.activity.service.ActivityCandidateService;
 import com.yryz.quanhu.support.activity.service.ActivityVoteService;
-import com.yryz.quanhu.support.activity.vo.ActivityVoteConfigVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
-import com.yryz.quanhu.support.activity.vo.UserActivityVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -98,7 +96,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         ActivityVoteDetail voteDetail = new ActivityVoteDetail();
         Response<Long> result = idAPI.getSnowflakeId();
         if(!result.success()){
-            throw QuanhuException.busiError("调用发号器失败");
+            throw new QuanhuException(ExceptionEnum.SysException);
         }
         voteDetail.setKid(result.getData());
         voteDetail.setActivityInfoId(activityVoteDto.getActivityInfoId());
@@ -503,16 +501,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             Map<String, UserSimpleVO> simple = result.getData();
             list.stream()
                     .filter(detailVo -> detailVo.getCreateUserId() != null)
-                    .forEach(detailVo -> {
-                        UserSimpleVO simpleVO = simple.get(detailVo.getCreateUserId().toString());
-                        if(simpleVO != null) {
-                            UserActivityVo userActivityVo = new UserActivityVo();
-                            userActivityVo.setNickName(simpleVO.getUserNickName());
-                            userActivityVo.setUserId(simpleVO.getUserId());
-                            userActivityVo.setUserImg(simpleVO.getUserImg());
-                            detailVo.setUser(userActivityVo);
-                        }
-            });
+                    .forEach(detailVo -> detailVo.setUser(simple.get(detailVo.getCreateUserId().toString())));
         }
     }
 

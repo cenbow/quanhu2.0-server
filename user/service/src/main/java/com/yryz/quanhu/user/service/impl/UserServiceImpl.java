@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
 		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
 		}
-		if(userId != null && userId != 0l){
+		if(userId != null && userId != 0L){
 			//TODO:聚合关系数据
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService {
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
 				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
-				if(userId != null && userId != 0l){
+				if(userId != null && userId != 0L){
 					//TODO:聚合关系数据
 				}
 				map.put(vo.getUserId().toString(), simpleVO);
