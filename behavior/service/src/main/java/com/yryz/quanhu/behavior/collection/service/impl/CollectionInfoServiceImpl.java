@@ -81,7 +81,6 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         if(collectionInfoDao.insertByPrimaryKeySelective(collectionInfo) == 0) {
             throw QuanhuException.busiError("已收藏不能重复收藏");
         }
-
         try {
             //递增收藏数
             countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, 1L);
@@ -116,7 +115,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         if(!CollectionUtils.isEmpty(list)) {
             Set<String> userSet = new HashSet<>();
             Set<String> resourceSet = new HashSet<>();
-            for(CollectionInfoVo collectionInfoVo : list){
+            for(CollectionInfoVo collectionInfoVo : list) {
                 if(collectionInfoVo.getUserId() != null) {
                     userSet.add(collectionInfoVo.getUserId().toString());
                 }
