@@ -22,11 +22,17 @@ public class FeeDetail {
      */
     private int type;
 
-    public FeeDetail(String custId, double fee, int type) {
+    /**
+     * 分费描述
+     */
+    private String feeDesc;
+
+    public FeeDetail(String custId, double fee, int type, String feeDesc) {
         super();
         this.custId = custId;
         this.fee = fee;
         this.type = type;
+        this.feeDesc = feeDesc;
     }
 
     public String getCustId() {
@@ -53,4 +59,11 @@ public class FeeDetail {
         this.type = type;
     }
 
+    public String getFeeDesc() {
+        return feeDesc;
+    }
+
+    public void setFeeDesc(String feeDesc) {
+        this.feeDesc = feeDesc;
+    }
 }

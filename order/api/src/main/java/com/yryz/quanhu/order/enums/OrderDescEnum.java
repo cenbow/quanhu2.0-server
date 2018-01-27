@@ -68,7 +68,7 @@ public class OrderDescEnum {
 
 	public final static String INTEGRAL_REDPACKET_SECRET_NORMAL = "私聊普通红包";
 
-	public final static String INTEGRAL_REWARD = "收到打赏";
+	public final static String INTEGRAL_REWARD = "被打赏";
 
 	public final static String INTEGRAL_FORWARD_ORIGINAL_TXT = "收到打赏";
 
@@ -89,8 +89,12 @@ public class OrderDescEnum {
 	public final static String ACTIVITY_USER_LOTTERY = "圈圈乐收入";
 	
 	public final static String COTERIE_JOIN = "加入私圈";
-	
+
+	public final static String MEMBER_JOIN_COTERIE_CHARGE = "成员入圈收费";
+
 	public final static String RESOURCE_PAY = "付费阅读";
+
+	public final static String RESOURCE_CHARGE = "收费阅读";
 	
 	public final static String COTERIE_ASK_PAY = "提问";
 	
