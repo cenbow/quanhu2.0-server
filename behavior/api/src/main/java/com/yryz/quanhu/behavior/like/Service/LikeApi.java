@@ -31,4 +31,19 @@ public interface LikeApi {
      */
     Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO);
 
+    /**
+     * 是否点过赞
+     * @param like
+     * @return
+     */
+    Response<Integer> isLike(Like like);
+
+
+    /**
+     * 获取点赞的状态
+     * @param map
+     * @return
+     */
+    Response<Long> getLikeFlag(Map<String,Object> map);
+
 }

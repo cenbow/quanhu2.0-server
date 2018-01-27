@@ -6,7 +6,7 @@
         <result column="kid" property="kid" jdbcType="BIGINT"/>
         <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
         <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
-        <result column="inform_type" property="informType" jdbcType="TINYINT"/>
+        <result column="inform_type" property="informType" jdbcType="VARCHAR"/>
         <result column="inform_desc" property="informDesc" jdbcType="VARCHAR"/>
         <result column="inform_status" property="informStatus" jdbcType="TINYINT"/>
         <result column="report_user_id" property="reportUserId" jdbcType="BIGINT"/>
@@ -32,7 +32,7 @@
                 AND inform_status=#{informStatus,jdbcType=TINYINT}
             </if>
             <if test="informType != null and informType != ''">
-                AND inform_type=#{informType,jdbcType=TINYINT}
+                AND inform_type=#{informType,jdbcType=VARCHAR}
             </if>
             <if test="moduleEnum != null and moduleEnum != ''">
                 AND module_enum=#{moduleEnum,jdbcType=VARCHAR}
@@ -96,7 +96,7 @@
                 #{resourceId,jdbcType=BIGINT},
             </if>
             <if test="informType != null">
-                #{informType,jdbcType=TINYINT},
+                #{informType,jdbcType=VARCHAR},
             </if>
             <if test="informDesc != null and informDesc != ''">
                 #{informDesc,jdbcType=VARCHAR},

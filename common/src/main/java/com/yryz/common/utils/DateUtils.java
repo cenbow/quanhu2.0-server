@@ -10,6 +10,8 @@ import java.util.Date;
 
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
+    private static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public static String getString(Date date) {
         if (date == null) {
             return null;
@@ -440,5 +442,25 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
                 && calendar.get(Calendar.DATE) == calendar2.get(Calendar.DATE);
     }
 
+
+    /**
+     * 获得当前时间的<code>java.util.Date</code>对象
+     *
+     * @return
+     */
+    public static Date now() {
+        return new Date();
+    }
+
+    /**
+     * 获得当前日期时间
+     * <p>
+     * 日期时间格式yyyy-MM-dd HH:mm:ss
+     *
+     * @return
+     */
+    public static String currentDatetime() {
+        return datetimeFormat.format(now());
+    }
 
 }
