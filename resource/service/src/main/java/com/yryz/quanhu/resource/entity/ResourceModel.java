@@ -36,7 +36,7 @@ public class ResourceModel extends Entity implements Serializable {
     /**
      * 资源ID
      */
-    private Long resourceId;
+    private String resourceId;
 
     /**
      * 文章分类ID
@@ -162,14 +162,14 @@ public class ResourceModel extends Entity implements Serializable {
 	/**
 	 * @return the resourceId
 	 */
-	public Long getResourceId() {
+	public String getResourceId() {
 		return resourceId;
 	}
 
 	/**
 	 * @param resourceId the resourceId to set
 	 */
-	public void setResourceId(Long resourceId) {
+	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
 

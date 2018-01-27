@@ -95,5 +95,11 @@ public class ResourceTest {
 		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "orderby", 0, 2, "2018-1-17 1:1:1", "2018-1-17 14:1:1");
 		System.out.println(GsonUtils.parseJson(resonse.getData()));
 	}
+	
+	@Test
+	public void getResource(){
+		ResourceVo resourceVo = resourceApi.getResourcesById("1000210").getData();
+		System.out.println(GsonUtils.parseJson(resourceVo));
+	}
 
 }
