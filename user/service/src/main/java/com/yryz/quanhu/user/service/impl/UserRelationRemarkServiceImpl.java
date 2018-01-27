@@ -57,13 +57,13 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
              * 自己不允许对自己设置备注
              */
             if(sourceUserId.equalsIgnoreCase(targetUserId)){
-                throw new QuanhuException("","","您不能对自己设置备注名");
+                throw new QuanhuException("","您不能对自己设置备注名","您不能对自己设置备注名");
             }
 
             //查询是否有关注关系
             UserRelationDto dto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
             if(dto==null||dto.getFriendStatus()==UserRelationConstant.NO){
-                throw new QuanhuException("","","您和目标用户暂不是好友关系");
+                throw new QuanhuException("","您和目标用户暂不是好友关系","您和目标用户暂不是好友关系");
             }
 
             /**
@@ -100,7 +100,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
 //                Response<Boolean> rpc = imAPI.addFriend(imFriend);
 //                logger.info("im friend remark={} finish", rpc.getData());
             }catch (Exception e){
-                throw new QuanhuException("","","设置好友备注名失败");
+                throw new QuanhuException("","设置好友备注名失败","设置好友备注名失败");
             }
 
             //新增，修改
