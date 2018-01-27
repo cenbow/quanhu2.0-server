@@ -115,7 +115,7 @@ public class QuestionMessageServiceImpl  implements QuestionMessageService {
             if (constant == MessageConstant.ANSWER_PAYED) {
                 logger.info("处理推送消息里的抽成后的金额开始");
                 //FeeDetail feeDetail = BranchFeesConstant.ANSWER.getFee().get(0);
-                FeeDetail feeDetail = new FeeDetail("", 1, 1);
+                FeeDetail feeDetail = new FeeDetail("", 1, 1,"");
                 logger.info("原始金额是 : " + count + ", 抽成规则是 : " + feeDetail.getFee());
                 double cost = count * feeDetail.getFee();
                 logger.info("抽成后金额是 : " + String.valueOf(cost));

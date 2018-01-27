@@ -67,7 +67,6 @@ public enum ProductEnum {
 	 * 提现手续费
 	 */
 	FEE_CASH_TYPE(2003, "提现手续费"),
-
 	/**
 	 * 运营账户赠送
 	 */
@@ -95,7 +94,7 @@ public enum ProductEnum {
 
 	private String desc;
 
-	private ProductEnum(int type, String desc) {
+	ProductEnum(int type, String desc) {
 		this.type = type;
 		this.desc = desc;
 	}
