@@ -60,6 +60,7 @@ public class UserRelationServiceImpl implements UserRelationService{
     @Autowired
     private UserRelationRemarkDao userRelationRemarkDao;
 
+
     @Reference
     private IdAPI idAPI;
 
@@ -67,6 +68,9 @@ public class UserRelationServiceImpl implements UserRelationService{
     private UserService userService;
     @Autowired
     private UserStarService userStarService;
+
+    @Value("appId")
+    private String appId;
 
     /**
      * 用户最大关注数
@@ -190,10 +194,12 @@ public class UserRelationServiceImpl implements UserRelationService{
         return newDto;
     }
 
+
+
     @Override
     public UserRelationDto getRelationByTargetPhone(String sourceUserId, String targetPhoneNo) {
 
-        String targetUserId =  userService.getUserByPhone(targetPhoneNo,"");
+        String targetUserId =  userService.getUserByPhone(targetPhoneNo,appId);
         if(StringUtils.isBlank(targetUserId)){
             return mergeRelation(null,null);
         }else{
