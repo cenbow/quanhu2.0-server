@@ -1,9 +1,11 @@
 package com.yryz.quanhu.resource.topic.dao;
 
+import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
 import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 @Mapper
@@ -29,4 +31,8 @@ public interface TopicPostDao {
     int updateByPrimaryKeyWithBLOBs(TopicPostWithBLOBs record);
 
     int updateByPrimaryKey(TopicPost record);
+    
+    List<Long> selectKidByCreatedate(@Param("startDate")String startDate,@Param("endDate")String endDate);
+    
+    List<TopicPostWithBLOBs> selectByKids(@Param("kidList")List<Long> kidList);
 }

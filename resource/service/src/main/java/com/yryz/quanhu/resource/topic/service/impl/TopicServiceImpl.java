@@ -1,11 +1,9 @@
 package com.yryz.quanhu.resource.topic.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
@@ -16,8 +14,6 @@ import com.yryz.quanhu.resource.topic.entity.TopicExample;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.service.TopicService;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
-import com.yryz.quanhu.support.id.api.IdAPI;
-import com.yryz.quanhu.user.service.UserApi;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -181,4 +177,14 @@ public class TopicServiceImpl implements TopicService {
         topicParam.setDelFlag(CommonConstants.DELETE_YES);
         return this.topicDao.updateByPrimaryKeySelective(topicParam);
     }
+
+	@Override
+	public List<Long> getKidByCreatedate(String startDate, String endDate) {
+		return topicDao.selectKidByCreatedate(startDate, endDate);
+	}
+
+	@Override
+	public List<Topic> getByKids(List<Long> kidList) {
+		return topicDao.selectByKids(kidList);
+	}
 }
