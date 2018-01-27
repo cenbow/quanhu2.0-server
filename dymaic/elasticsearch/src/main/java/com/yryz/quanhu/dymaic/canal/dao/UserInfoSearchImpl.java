@@ -26,11 +26,11 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 	public List<UserInfo> search(String keyWord, Integer page, Integer size) {
 		// WildcardQueryBuilder
 		// query1=QueryBuilders.wildcardQuery("userNickName", "*"+keyWord+"*");
-		QueryBuilder query1 = QueryBuilders.matchQuery("userDesc", keyWord);
-		QueryBuilder query2 = QueryBuilders.matchQuery("userNickName", keyWord);
-		QueryBuilder query3 = QueryBuilders.termQuery("delFlag", 10);
-		QueryBuilder query4 = QueryBuilders.termQuery("appId", quanhu_app_id);
-		Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "lastHeat"));
+		QueryBuilder query1 = QueryBuilders.matchQuery("userBaseInfo.userDesc", keyWord);
+		QueryBuilder query2 = QueryBuilders.matchQuery("userBaseInfo.userNickName", keyWord);
+		QueryBuilder query3 = QueryBuilders.termQuery("userBaseInfo.delFlag", 10);
+		QueryBuilder query4 = QueryBuilders.termQuery("userBaseInfo.appId", quanhu_app_id);
+		Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "userBaseInfo.lastHeat"));
 		SearchQuery query = new NativeSearchQueryBuilder()
 				.withFilter(QueryBuilders.boolQuery().must(query3).must(query4)
 						.must(QueryBuilders.boolQuery().should(query1).should(query2)))

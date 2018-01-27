@@ -5,7 +5,7 @@
  * Created on 2017年10月17日
  * Id: SmsTypeEunm.java, 2017年10月17日 下午2:10:53 Administrator
  */
-package com.yryz.quanhu.message.push.enums;
+package com.yryz.quanhu.message.sms.constants;
 
 /**
  * @author danshiyu

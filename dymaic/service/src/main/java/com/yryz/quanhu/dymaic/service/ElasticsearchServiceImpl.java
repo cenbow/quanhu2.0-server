@@ -39,8 +39,10 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		for (int i = 0; i < list.size(); i++) {
 			UserInfo info=list.get(i);
 			UserSimpleVo vo=new UserSimpleVo();
-			BeanUtils.copyProperties(info, vo);
-			rstList.add(vo);
+			if(info.getUserBaseInfo()!=null){
+				BeanUtils.copyProperties(info.getUserBaseInfo(), vo);
+				rstList.add(vo);
+			}
 		}
 		PageList<UserSimpleVo> pageList=new PageList<UserSimpleVo>();
 		pageList.setEntities(rstList);

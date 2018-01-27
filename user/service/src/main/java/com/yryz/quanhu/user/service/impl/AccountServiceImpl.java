@@ -81,20 +81,19 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
-	public String agentRegister(AgentRegisterDTO registerDTO) {
+	public void agentRegister(AgentRegisterDTO registerDTO) {
 		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getAppId(), null);
 		if (checkAccount != null) {
 			throw QuanhuException.busiError("该用户已存在");
 		}
 		String regChannel = Constants.ADMIN_REG_CHANNEL;
-		if (registerDTO.getIsVest() == null || registerDTO.getIsVest() == 0) {
+		if (registerDTO.getIsVest() == 11) {
 			regChannel = Constants.ADMIN_REG_VEST_CHANNEL;
 		}
 		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, regChannel);
 		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
-		Long userId = createUser(
+		createUser(
 				new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO));
-		return userId.toString();
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public interface AccountService {
 	 * @return
 	 * @Description 返回用户id
 	 */
-	String agentRegister(AgentRegisterDTO registerDTO);
+	void agentRegister(AgentRegisterDTO registerDTO);
 
 	/**
 	 * 手机号密码登录

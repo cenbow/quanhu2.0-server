@@ -3,14 +3,12 @@ package com.yryz.quanhu.dymaic.canal.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 public class TopicInfo implements Serializable{
 	private static final long serialVersionUID = -7955581440447209892L;
 
-//	@Id
     private Long kid;
 	
 	@Field(type = FieldType.text)

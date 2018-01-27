@@ -37,6 +37,7 @@ import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
+import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
@@ -136,6 +137,29 @@ public class AccountProvider implements AccountApi {
 
 	}
 
+
+	@Override
+	public Response<Boolean> agentResiter(AgentRegisterDTO registerDTO) {
+		try {
+			checkAgentRegisterDTO(registerDTO);
+			//默认不是马甲
+			if(registerDTO.getIsVest() == null){
+				registerDTO.setIsVest(10);
+			}
+			boolean flag = accountService.checkUserByPhone(registerDTO.getUserPhone(), registerDTO.getAppId());
+			if (flag) {
+				throw QuanhuException.busiError("该用户已存在");
+			}
+			accountService.agentRegister(registerDTO);
+			return ResponseUtils.returnObjectSuccess(true);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("代理注册未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
 	/**
 	 * 手机号密码登录
 	 * 
@@ -703,6 +727,18 @@ public class AccountProvider implements AccountApi {
 		}
 	}
 
+	private void checkAgentRegisterDTO(AgentRegisterDTO registerDTO) {
+		if (registerDTO == null) {
+			throw QuanhuException.busiError("传参不合法");
+		}
+		if (StringUtils.isEmpty(registerDTO.getUserPhone())) {
+			throw QuanhuException.busiError("手机号为空");
+		}
+		if (StringUtils.isBlank(registerDTO.getAppId())) {
+			throw QuanhuException.busiError("应用id不能为空");
+		}
+	}
+	
 	private void checkBindPhoneDTO(BindPhoneDTO phoneDTO) {
 		if (phoneDTO == null) {
 			throw QuanhuException.busiError("传参不合法");
@@ -967,6 +1003,7 @@ public class AccountProvider implements AccountApi {
 			throw QuanhuException.busiError("应用id不能为空");
 		}
 	}
+
 
 
 
