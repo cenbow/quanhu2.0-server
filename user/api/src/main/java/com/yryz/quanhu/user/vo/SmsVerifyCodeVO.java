@@ -29,7 +29,10 @@ public class SmsVerifyCodeVO implements Serializable{
 	 * 验证码过期时间
 	 */
 	private String expire;
-
+	/**
+	 * 是否需要滑动验证码
+	 */
+	private String isSendViewCode;
 	public String getCode() {
 		return code;
 	}
@@ -54,6 +57,14 @@ public class SmsVerifyCodeVO implements Serializable{
 		this.expire = expire;
 	}
 
+	public String getIsSendViewCode() {
+		return isSendViewCode;
+	}
+
+	public void setIsSendViewCode(String isSendViewCode) {
+		this.isSendViewCode = isSendViewCode;
+	}
+
 	/**
 	 * 
 	 * @exception 
@@ -73,6 +84,11 @@ public class SmsVerifyCodeVO implements Serializable{
 		this.code = code;
 		this.phone = phone;
 		this.expire = expire;
+	}
+
+	public SmsVerifyCodeVO(String isSendViewCode) {
+		super();
+		this.isSendViewCode = isSendViewCode;
 	}
 
 	@Override

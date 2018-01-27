@@ -5,7 +5,7 @@
  * Created on 2017年12月4日
  * Id: CommonServiceType.java, 2017年12月4日 下午3:31:10 Administrator
  */
-package com.yryz.quanhu.message.push.enums;
+package com.yryz.quanhu.message.commonsafe.constants;
 
 /**
  * 通用业务类型

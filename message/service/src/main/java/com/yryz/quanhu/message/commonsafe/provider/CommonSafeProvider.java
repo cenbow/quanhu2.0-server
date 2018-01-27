@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
+import com.yryz.quanhu.message.commonsafe.constants.CheckSlipCodeReturn;
 import com.yryz.quanhu.message.commonsafe.dto.IpLimitDTO;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.message.commonsafe.service.CommonSafeService;
@@ -56,32 +57,24 @@ public class CommonSafeProvider implements CommonSafeApi {
     }
 
     @Override
-    public Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
+    public Response<Integer> checkSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
         try {
             logger.info("sendVerifyCodeForSlip request, verifyCodeDTO: {}, afsCheckRequest: {}",
                     GsonUtils.parseJson(verifyCodeDTO), GsonUtils.parseJson(afsCheckReq));
-            checkSmsDTO(verifyCodeDTO);
-            VerifyCodeVO verifyCodeVO = new VerifyCodeVO();
-            if (!commonService.checkSmsSlipCode(verifyCodeDTO, afsCheckReq)) {
-                if (afsCheckReq == null) {
+            checkSplipCodeDTO(verifyCodeDTO);
+            boolean result = commonService.checkSmsSlipCode(verifyCodeDTO, afsCheckReq);
+            if(!result){
+            	if (afsCheckReq == null) {
                     //需要滑动验证码
-                    verifyCodeVO.setIsSendViewCode("1");
-                    return ResponseUtils.returnObjectSuccess(verifyCodeVO);
+            		return ResponseUtils.returnObjectSuccess(CheckSlipCodeReturn.NEED_CODE.getCode());
+                }else{
+                	return ResponseUtils.returnObjectSuccess(CheckSlipCodeReturn.FAIL.getCode());
                 }
-                return ResponseUtils.returnCommonException("验证码不通过");
+            }else{
+            	return ResponseUtils.returnObjectSuccess(CheckSlipCodeReturn.SUCCESS.getCode());
             }
-
-            /*if (!commonService.checkIpSendVerifyCodeLimit(request)) {
-                return ReturnModel.returnException("验证码发送失败");
-            }*/
-            verifyCodeVO = commonService.getVerifyCode(verifyCodeDTO);
-            if (verifyCodeVO == null) {
-                verifyCodeVO = new VerifyCodeVO();
-            }
-            logger.info("sendVerifyCodeForSlip result: {}", GsonUtils.parseJson(verifyCodeVO));
-            return ResponseUtils.returnObjectSuccess(verifyCodeVO);
-
-//			rrzMessageService.saveIpSendVerifyCodeCount(request);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
             logger.error("sendVerifyCodeForSlip error", e);
             return ResponseUtils.returnException(e);
@@ -115,19 +108,34 @@ public class CommonSafeProvider implements CommonSafeApi {
 
     private void checkSmsDTO(VerifyCodeDTO codeDTO) {
         if (codeDTO == null) {
-            throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "传参不合法");
+            throw QuanhuException.busiError("传参不合法");
         }
         if (StringUtils.isEmpty(codeDTO.getVerifyKey())) {
-            throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "手机号为空");
+            throw QuanhuException.busiError("手机号为空");
         }
         if (codeDTO.getServiceCode() == null) {
-            throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "功能码不能为空");
+            throw QuanhuException.busiError("功能码不能为空");
         }
         if (StringUtils.isBlank(codeDTO.getAppId())) {
-            throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "应用id不能为空");
+            throw QuanhuException.busiError("应用id不能为空");
         }
         if (StringUtils.isBlank(codeDTO.getCommonServiceType())) {
-            throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(), "业务类型不能为空");
+            throw QuanhuException.busiError("业务类型不能为空");
+        }
+    }
+    
+    private void checkSplipCodeDTO(VerifyCodeDTO codeDTO) {
+        if (codeDTO == null) {
+            throw QuanhuException.busiError("传参不合法");
+        }
+        if (StringUtils.isEmpty(codeDTO.getVerifyKey())) {
+            throw QuanhuException.busiError("手机号为空");
+        }
+        if (StringUtils.isBlank(codeDTO.getAppId())) {
+            throw QuanhuException.busiError("应用id不能为空");
+        }
+        if (StringUtils.isBlank(codeDTO.getCommonServiceType())) {
+            throw QuanhuException.busiError("业务类型不能为空");
         }
     }
 }
