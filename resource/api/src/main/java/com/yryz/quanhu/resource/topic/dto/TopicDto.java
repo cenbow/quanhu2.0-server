@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class TopicDto implements Serializable {
 
+    private Long kid;
+
     private String title;
 
     private String imgUrl;
@@ -27,6 +29,14 @@ public class TopicDto implements Serializable {
     private  Integer pageSize;
 
     private String orderBy;
+
+    public Long getKid() {
+        return kid;
+    }
+
+    public void setKid(Long kid) {
+        this.kid = kid;
+    }
 
     public String getTitle() {
         return title;
