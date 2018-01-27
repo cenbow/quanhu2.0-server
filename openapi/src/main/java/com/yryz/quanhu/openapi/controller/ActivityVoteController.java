@@ -4,7 +4,10 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.constants.ActivityCountConstant;
 import com.yryz.quanhu.support.activity.api.ActivityVoteApi;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.entity.ActivityUserPrizes;
@@ -15,6 +18,8 @@ import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +37,11 @@ public class ActivityVoteController {
     @Reference(check = false)
     private ActivityVoteApi activityVoteApi;
 
+    @Reference(check = false, timeout = 30000)
+    private CountApi countApi;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(ActivityVoteController.class);
     @NotLogin
     @ApiOperation("投票活动详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -41,7 +51,16 @@ public class ActivityVoteController {
         if(!StringUtils.isEmpty(request.getHeader("userId"))){
             userId = Long.valueOf(request.getHeader("userId"));
         }
-        return activityVoteApi.detail(activityInfoId, userId);
+        Response<ActivityVoteInfoVo> activityVoteInfoVoResponse = activityVoteApi.detail(activityInfoId, userId);
+        if(activityVoteInfoVoResponse.success()){
+            try {
+                countApi.commitCount(BehaviorEnum.RealRead,activityInfoId, ActivityCountConstant.VOTE_ACTIVITY_DETAIL,ActivityCountConstant.COUNT);
+            } catch (Exception e) {
+                logger.error("接入记数异常:"+e.getMessage());
+            }
+        }
+
+        return activityVoteInfoVoResponse;
     }
 
     @ApiOperation("确认投票")

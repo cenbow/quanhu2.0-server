@@ -4,14 +4,20 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.constants.ActivityCountConstant;
 import com.yryz.quanhu.support.activity.api.ActivityCandidateApi;
 import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteConfigVo;
 import com.yryz.quanhu.support.activity.vo.ActivityVoteDetailVo;
+import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +34,10 @@ public class ActivityCandidateController {
     @Reference(check = false)
     private ActivityCandidateApi activityCandidateApi;
 
+    @Reference(check = false, timeout = 30000)
+    private CountApi countApi;
+
+    private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")
@@ -35,7 +45,15 @@ public class ActivityCandidateController {
         String userId = request.getHeader("userId");
         Assert.hasText(userId, "userId不能为空");
         activityVoteDto.setCreateUserId(Long.valueOf(userId));
-        return activityCandidateApi.join(activityVoteDto);
+        Response response = activityCandidateApi.join(activityVoteDto);
+        if(response.success()){
+            try {
+                countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId), ActivityCountConstant.ACTIVITY_RECORD_COUNT,ActivityCountConstant.ACTIVITY_COUNT);
+            } catch (Exception e) {
+                logger.error("接入记数异常:"+e.getMessage());
+            }
+        }
+        return response;
     }
 
     @ApiOperation("参与投票活动")
@@ -54,7 +72,15 @@ public class ActivityCandidateController {
         if(!StringUtils.isEmpty(userId)){
             activityVoteDto.setCreateUserId(Long.valueOf(userId));
         }
-        return activityCandidateApi.detail(activityVoteDto);
+        Response<ActivityVoteDetailVo> activityVoteDetailVoResponse = activityCandidateApi.detail(activityVoteDto);
+        if(activityVoteDetailVoResponse.success()){
+            try {
+                countApi.commitCount(BehaviorEnum.RealRead,activityVoteDto.getCandidateId(),ActivityCountConstant.CANDIDATE_ACTIVITY_DETAIL,ActivityCountConstant.COUNT);
+            } catch (Exception e) {
+                logger.error("接入记数异常:"+e.getMessage());
+            }
+        }
+        return activityVoteDetailVoResponse;
     }
 
     @NotLogin
