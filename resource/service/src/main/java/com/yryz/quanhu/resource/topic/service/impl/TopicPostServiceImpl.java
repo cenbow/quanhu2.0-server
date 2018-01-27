@@ -24,6 +24,7 @@ import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,15 @@ public class TopicPostServiceImpl implements TopicPostService {
         Long createUserId = topicPostDto.getCreateUserId();
         if (null == topicId || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+        }
+        String imgUrl=topicPostDto.getImgUrl();
+        String viderUrl=topicPostDto.getVideoUrl();
+        String content=topicPostDto.getContent();
+        if(StringUtils.isNotBlank(imgUrl) && StringUtils.isNotBlank(viderUrl)){
+            throw QuanhuException.busiError("图片和视频不能同时发布");
+        }
+        if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(viderUrl) && StringUtils.isBlank(content)){
+            throw QuanhuException.busiError("文本，视频，图片不能都为空");
         }
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         BeanUtils.copyProperties(topicPostDto, topicPost);
