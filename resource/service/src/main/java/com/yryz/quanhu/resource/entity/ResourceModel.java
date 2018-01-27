@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @date 2018年1月16日 下午2:01:43
  * @Description 资源实体管理类
  */
-public class ResourceModel extends Entity implements Serializable {
+public class ResourceModel implements Serializable {
 
     /**
      * 动态ID
@@ -31,7 +31,7 @@ public class ResourceModel extends Entity implements Serializable {
      * 资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     /**
      * 资源ID
@@ -148,14 +148,14 @@ public class ResourceModel extends Entity implements Serializable {
 	/**
 	 * @return the moduleEnum
 	 */
-	public Integer getModuleEnum() {
+	public String getModuleEnum() {
 		return moduleEnum;
 	}
 
 	/**
 	 * @param moduleEnum the moduleEnum to set
 	 */
-	public void setModuleEnum(Integer moduleEnum) {
+	public void setModuleEnum(String moduleEnum) {
 		this.moduleEnum = moduleEnum;
 	}
 

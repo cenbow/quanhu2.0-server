@@ -187,9 +187,9 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			}
 			
 			//资源类型,多条件查询，resourceType支持多类型的枚举值，以,分隔
-			if(StringUtils.isNotEmpty(resourceModel.getResourceType())){
+			if(StringUtils.isNotEmpty(resourceModel.getModuleEnum())){
 				Criteria resouceTypeCriteria = Criteria.where("moduleEnum");
-				String[] resourceTypes = resourceModel.getResourceType().split(",");
+				String[] resourceTypes = resourceModel.getModuleEnum().split(",");
 				if(resourceTypes != null && resourceTypes.length == 1){
 					resouceTypeCriteria = resouceTypeCriteria.is(resourceTypes[0]);
 				} else {
