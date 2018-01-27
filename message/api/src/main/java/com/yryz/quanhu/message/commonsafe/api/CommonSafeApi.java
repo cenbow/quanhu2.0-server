@@ -97,12 +97,12 @@ public interface CommonSafeApi {
 
 
 	/**
-	 * 发送短信支持阿里滑动验证码
+	 * 检查支持阿里滑动验证码
 	 * @param verifyCodeDTO
 	 * @param afsCheckRequest
 	 * @return
 	 */
-	Response<VerifyCodeVO> sendVerifyCodeForSlip(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckRequest);
+	Response<Integer> checkSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckRequest);
 	
 	/**
 	 * 根据业务类型获取图形验证码

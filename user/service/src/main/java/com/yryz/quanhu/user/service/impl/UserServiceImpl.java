@@ -9,11 +9,13 @@ package com.yryz.quanhu.user.service.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,15 +35,18 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.contants.UserRelationConstant.STATUS;
 import com.yryz.quanhu.user.dao.UserBaseInfoDao;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
 import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.UserImgAuditService;
+import com.yryz.quanhu.user.service.UserRelationService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -67,6 +72,8 @@ public class UserServiceImpl implements UserService {
 	UserImgAuditDao custImgAuditDao;
 	@Autowired
 	UserImgAuditService userImgAuditService;
+	@Autowired
+	private UserRelationService relationService;
 	@Autowired
 	private UserSender mqSender;
 	@Autowired
@@ -152,26 +159,37 @@ public class UserServiceImpl implements UserService {
 		if (CollectionUtils.isEmpty(baseInfos)) {
 			return null;
 		}
-		if(userId != null && userId != 0L){
-			//TODO:聚合关系数据
-		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
 		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
+		//聚合关系数据
+		if(userId != null && userId != 0L){
+			Map<String,UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
+			UserRelationDto relationDto = map.get(friendId);
+			simpleVO.setNameNotes(relationDto.getUserRemarkName());
+			simpleVO.setRelationStatus(relationDto.getRelationStatus());
+		}
 		return simpleVO;
 	}
 
 	@Override
 	public Map<String, UserSimpleVO> getUserSimple(Long userId, Set<String> friendIds) {
 		if (CollectionUtils.isEmpty(friendIds)) {
-			return new HashMap<>();
+			return new HashMap<>(0);
 		}
 		List<UserBaseInfo> list = getUserInfo(friendIds);
 		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
+		Map<String,UserRelationDto> relationMap = null;
+		//聚合关系数据
+		if(userId != null && userId != 0L){
+			relationMap = getRelation(userId, friendIds);
+		}
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
 				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
-				if(userId != null && userId != 0L){
-					//TODO:聚合关系数据
+				if(MapUtils.isNotEmpty(relationMap)){
+					UserRelationDto dto = relationMap.get(vo.getUserId());
+					simpleVO.setNameNotes(dto.getUserRemarkName());
+					simpleVO.setRelationStatus(dto.getRelationStatus());
 				}
 				map.put(vo.getUserId().toString(), simpleVO);
 			}
@@ -443,6 +461,33 @@ public class UserServiceImpl implements UserService {
 		return custbaseinfoDao.getAllByUserIds(userIds);
 	}
 
-
-
+	/**
+	 * 获取用户关系<br/>
+	 * 找不到直接是陌生人
+	 * @param userId
+	 * @param friendIds
+	 * @return
+	 */
+	private Map<String,UserRelationDto> getRelation(Long userId,Set<String> friendIds){
+		List<UserRelationDto> dtos = relationService.selectBy(userId.toString(), friendIds);
+		Map<String,UserRelationDto> map = new HashMap<>();
+		for(Iterator<String> iterator = friendIds.iterator();iterator.hasNext();){
+			String friendId = iterator.next();
+			UserRelationDto dto = null;
+			if(CollectionUtils.isEmpty(dtos)){
+				dto = new UserRelationDto();
+				dto.setRelationStatus(STATUS.NONE.getCode());
+				dto.setUserRemarkName("");
+				map.put(friendId, dto);
+			}else{
+				for(int i = 0 ; i < dtos.size(); i++){
+					dto = dtos.get(i);
+					if(StringUtils.equals(dto.getUserId(), friendId)){
+						map.put(friendId, dto);
+					}
+				}
+			}
+		}
+		return map;
+	}
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.annotation.UserBehaviorValidation;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
@@ -22,6 +23,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
+import com.yryz.quanhu.message.commonsafe.constants.CheckSlipCodeReturn;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
@@ -84,12 +86,18 @@ public class ComponentController {
 	public Response<SmsVerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
-		AfsCheckRequest afsCheckRequest = WebUtil.getAfsCheckRequest(request);
-
 		VerifyCodeDTO verifyCodeDTO = new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
 				codeDTO.getVeriCode(), false);
-		VerifyCodeVO verifyCodeVO = commonSafeApi.sendVerifyCodeForSlip(verifyCodeDTO, afsCheckRequest).getData();
-		return ResponseUtils.returnApiObjectSuccess(new SmsVerifyCodeVO(String.valueOf(verifyCodeDTO.getCommonServiceType()), verifyCodeDTO.getVerifyKey(), String.valueOf(verifyCodeVO.getExpireAt())));
+		AfsCheckRequest afsCheckRequest = WebUtil.getAfsCheckRequest(request);
+		Integer checkSlipResult = ResponseUtils.getResponseData(commonSafeApi.checkSlipCode(verifyCodeDTO, afsCheckRequest));
+		if(CheckSlipCodeReturn.NEED_CODE.getCode() == checkSlipResult){
+			return ResponseUtils.returnApiObjectSuccess(new SmsVerifyCodeVO("1"));
+		}
+		if(CheckSlipCodeReturn.FAIL.getCode() == checkSlipResult){
+			return ResponseUtils.returnCommonException("滑动验证码不正确");
+		}
+		SmsVerifyCodeVO codeVO = ResponseUtils.getResponseData(accountApi.sendVerifyCode(codeDTO));
+		return ResponseUtils.returnApiObjectSuccess(codeVO);
 	}
 }
