@@ -162,8 +162,7 @@ public class CoterieProvider implements CoterieApi {
 		String name = StringUtils.trim(info.getName());
 		if (StringUtils.isNotEmpty(name)) {
 			List<CoterieInfo> clist = coterieService.findByName(name);
-			if (!clist.isEmpty()) {
-
+			if (!clist.isEmpty()&&!clist.get(0).getCoterieId().equals(info.getCoterieId())) {
 				throw new QuanhuException( "2007","参数错误","私圈名称已存在",null);
 			}
 		}
