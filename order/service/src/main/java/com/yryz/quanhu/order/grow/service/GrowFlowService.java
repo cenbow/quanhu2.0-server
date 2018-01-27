@@ -17,4 +17,6 @@ public interface GrowFlowService {
     List<GrowFlow> getAll();
     
     List<GrowFlow> getPage(GrowFlowQuery gfq );
+    
+    long countgetPage(GrowFlowQuery gfq);
 }
