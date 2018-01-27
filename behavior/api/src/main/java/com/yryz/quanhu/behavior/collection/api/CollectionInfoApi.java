@@ -28,4 +28,11 @@ public interface CollectionInfoApi {
      * */
     Response<PageList<CollectionInfoVo>> list(CollectionInfoDto collectionInfoDto);
 
+    /**
+     * 收藏状态
+     * @param   collectionInfoDto
+     * @return
+     * */
+    Response<Integer> collectionStatus(CollectionInfoDto collectionInfoDto);
+
 }
