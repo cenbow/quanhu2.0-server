@@ -1,16 +1,5 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
@@ -18,8 +7,12 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
@@ -29,15 +22,27 @@ import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
-* @Description 平台文章
-* @author wangheng
-* @date 2018年1月23日 上午11:11:44
-*/
+ * @author wangheng
+ * @Description 平台文章
+ * @date 2018年1月23日 上午11:11:44
+ */
 @Service(interfaceClass = ReleaseInfoApi.class)
 public class ReleaseInfoProvider implements ReleaseInfoApi {
 
@@ -54,9 +59,12 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private CountApi countApi;
+
+    @Reference
+    private ResourceDymaicApi resourceDymaicApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -92,8 +100,8 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             releaseInfoService.insertSelective(record);
 
             try {
-                // TODO 资源进聚合
-
+                // 资源进聚合
+                commitResource(record);
                 // 接入统计计数
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
             } catch (Exception e) {
@@ -122,7 +130,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
             Assert.notNull(createUser, "文章创建者用户不存在！userId:" + infoVo.getCreateUserId());
             infoVo.setUser(createUser);
-            
+
             // 若资源已删除、或者 已经下线 直接返回
             if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
                     || CommonConstants.SHELVE_NO.equals(infoVo.getShelveFlag())) {
@@ -149,7 +157,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Override
     public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
-            boolean isGetCreateUser) {
+                                                             boolean isGetCreateUser) {
         try {
             dto.setCoterieId(0L);
             PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, isCount);
@@ -179,7 +187,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
                     }
                 }
             }
-            
+
             return ResponseUtils.returnObjectSuccess(voList);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
@@ -227,4 +235,28 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
         return ResponseUtils.returnObjectSuccess(0);
     }
 
+    /**
+     * 提交资源动态
+     *
+     * @param releaseInfo
+     */
+    private void commitResource(ReleaseInfo releaseInfo) {
+        ResourceTotal resourceTotal = new ResourceTotal();
+        resourceTotal.setClassifyId(releaseInfo.getClassifyId().intValue());
+        resourceTotal.setContent(releaseInfo.getContent());
+//        resourceTotal.setCoterieId(releaseInfo.getCoterieId().toString());
+        resourceTotal.setCreateDate(DateUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        resourceTotal.setExtJson(GsonUtils.parseJson(releaseInfo));
+        resourceTotal.setModuleEnum(resourceTotal.getModuleEnum());
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+        resourceTotal.setResourceId(releaseInfo.getKid());
+        UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(userApi.getUserSimple(releaseInfo.getCreateUserId()));
+        if (userSimpleVO == null || userSimpleVO.getUserRole() == null) {
+            return;
+        }
+        resourceTotal.setTalentType(userSimpleVO.getUserRole().toString());
+        resourceTotal.setTitle(releaseInfo.getTitle());
+        resourceTotal.setUserId(releaseInfo.getCreateUserId());
+        resourceDymaicApi.commitResourceDymaic(resourceTotal);
+    }
 }
