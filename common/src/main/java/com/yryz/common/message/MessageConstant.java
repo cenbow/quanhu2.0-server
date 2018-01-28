@@ -84,14 +84,14 @@ public enum MessageConstant {
     ACTIVITY_HAVE_SIGNUP(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_ACTIVITY, "报名通知", "{count}已报名参加您发布的活动。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
-     * 内容被阅读付费提醒 私圈内容收费{您的付费内容被XXXX阅读，您收到奖励8.00。}
+     * 私圈内容收费   奖励通知    XXX阅读了您的付费内容，您获得N奖励。（XXX=用户昵称）
      */
-    CONTENT_READ_REMINDERS(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "内容奖励", "您的付费内容被{count}阅读，获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
+    CONTENT_READ_REMINDERS(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "奖励通知", "'{count}'阅读了您的付费内容，您获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
-     * 内容购买 私圈内付费阅读{您在XXX私圈付费阅读内容，支付100悠然币。}
+     * 私圈内付费阅读支付成功  支付成功    您在XXX私圈付费阅读内容，支付100悠然币。
      */
-    CONTENT_BUY_REMINDERS(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "付费阅读", "您在'{count}'私圈付费阅读内容，支付{money}悠然币。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
+    CONTENT_BUY_REMINDERS(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "支付成功", "您在'{count}'私圈付费阅读内容，支付{money}悠然币。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 问答奖励  {XXX}付费向你提问，您收到奖励{money}。

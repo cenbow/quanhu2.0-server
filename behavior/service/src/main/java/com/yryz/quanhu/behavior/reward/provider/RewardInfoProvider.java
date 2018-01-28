@@ -28,6 +28,8 @@ import com.yryz.quanhu.behavior.reward.entity.RewardInfo;
 import com.yryz.quanhu.behavior.reward.service.RewardInfoService;
 import com.yryz.quanhu.behavior.reward.vo.RewardInfoVo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
+import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.vo.ResourceVo;
@@ -61,20 +63,19 @@ public class RewardInfoProvider implements RewardInfoApi {
 
     @Reference(check = false, lazy = true, timeout = 1000)
     private ResourceApi resourceApi;
-    
+
     @Override
     public Response<Map<String, Object>> reward(RewardInfo record) {
         try {
+            Assert.notNull(record.getResourceId(), "打赏资源Id，为NULL！ ");
+            Assert.isTrue(null != record.getGiftNum() && record.getGiftNum() > 0, "打赏礼物数量，为NULL！ ");
+            Assert.notNull(record.getModuleEnum(), "打赏资源ModuleEnum，为NULL！ ");
+            Assert.notNull(record.getToUserId(), "打赏资源ToUserId，为NULL！ ");
             // 打赏礼物 校验
             GiftInfo giftInfo = giftInfoService.selectByKid(record.getGiftId());
             Assert.notNull(giftInfo, "打赏礼物不存在，giftId：" + record.getGiftId());
             Assert.isTrue(giftInfo.getGiftPrice().equals(record.getGiftPrice()), "打赏礼物价值与系统初始化礼物价值 不同！");
-            Assert.notNull(record.getResourceId(), "打赏资源Id，为NULL！ ");
             Assert.isTrue(!record.getCreateUserId().equals(record.getToUserId()), "打赏人不允许 打赏自己的资源！");
-
-            // 打赏
-            record.setRewardPrice(record.getGiftNum() * giftInfo.getGiftValue());
-            record.setRewardStatus(RewardConstants.reward_status_pay_not);
 
             // 创建订单
             InputOrder inputOrder = new InputOrder();
@@ -84,8 +85,8 @@ public class RewardInfoProvider implements RewardInfoApi {
             inputOrder.setCreateUserId(record.getCreateUserId());
             inputOrder.setFromId(record.getToUserId());
             // 调用订单 业务枚举
-            inputOrder.setModuleEnum("");
-            //inputOrder.setOrderEnum(OrderEnum.READ_ORDER);
+            inputOrder.setModuleEnum(BranchFeesEnum.REWARD.toString());
+            inputOrder.setOrderEnum(OrderEnum.REWARD_ORDER);
             inputOrder.setResourceId(record.getResourceId());
             inputOrder.setToId(record.getCreateUserId());
             Long orderId = 213145446L; //orderSDK.createOrder(inputOrder);
@@ -137,8 +138,16 @@ public class RewardInfoProvider implements RewardInfoApi {
             if (CollectionUtils.isNotEmpty(userIds)) {
                 // 获取用户信息集合
                 Map<String, UserSimpleVO> userMap = ResponseUtils.getResponseData(userApi.getUserSimple(userIds));
-                if (null != userMap) {
-                    for (RewardInfoVo info : entities) {
+
+                for (RewardInfoVo info : entities) {
+                    // 礼物信息
+                    GiftInfo giftInfo = giftInfoService.selectByKid(info.getGiftId());
+                    if (null != giftInfo) {
+                        info.setGiftImage(giftInfo.getGiftImage());
+                        info.setGiftName(giftInfo.getGiftName());
+                    }
+
+                    if (null != userMap) {
                         if (null == info || null == userMap.get(info.getCreateUserId())) {
                             continue;
                         }

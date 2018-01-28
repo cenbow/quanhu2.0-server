@@ -48,7 +48,7 @@ public class RewardInfoServiceImpl implements RewardInfoService {
         pageList.setCurrentPage(dto.getCurrentPage());
         pageList.setPageSize(dto.getPageSize());
 
-        PageUtils.startPage(dto.getCurrentPage(), dto.getPageSize(), isCount);
+        PageUtils.startPage(dto.getCurrentPage(), dto.getPageSize(), false);
         List<RewardInfoVo> list = this.getDao().selectByCondition(dto);
         pageList.setEntities(list);
 

@@ -44,7 +44,7 @@ public class GiftInfoServiceImpl implements GiftInfoService {
         pageList.setCurrentPage(dto.getCurrentPage());
         pageList.setPageSize(dto.getPageSize());
 
-        PageUtils.startPage(dto.getCurrentPage(), dto.getPageSize(), isCount);
+        PageUtils.startPage(dto.getCurrentPage(), dto.getPageSize() , false);
         List<GiftInfo> list = this.getDao().selectByCondition(dto);
         pageList.setEntities(list);
 

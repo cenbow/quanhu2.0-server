@@ -1,8 +1,10 @@
 package com.yryz.quanhu.dymaic.canal.job;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -227,7 +229,7 @@ public class EsSyncDiffJob  implements SimpleJob{
     		return;
     	}
     	
-    	List<Long> diffList=new ArrayList<>();
+    	Set<Long> diffList=new HashSet<>();
     	List<Long> idList=res.getData();
     	for (int i = 0; i < idList.size(); i++) {
     		long id=idList.get(i);
@@ -238,7 +240,7 @@ public class EsSyncDiffJob  implements SimpleJob{
 		}
     	
     	if(!diffList.isEmpty()){
-    		Response<List<ReleaseInfoVo>> resList=releaseInfoApi.getByKids(diffList);
+    		Response<List<ReleaseInfoVo>> resList=releaseInfoApi.selectByKids(diffList);
     		if(resList.success()){
     			List<ReleaseInfoVo> clist=resList.getData();
     			List<ResourceInfo> rlist=new ArrayList<>();
