@@ -35,7 +35,7 @@ public interface UserAccountDao {
 	 * @Description 分别根据用户id、手机号、邮箱查询用户账户 可用于登录验证
 	 */
 	UserAccount selectOne(@Param("userId") Long userId, @Param("userPhone") String userPhone,
-			@Param("appId")String appId,@Param("userPwd") String userPwd);
+			@Param("appId")String appId);
 
 	/**
 	 * 更新账户信息
