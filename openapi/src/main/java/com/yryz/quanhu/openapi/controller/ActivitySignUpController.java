@@ -47,7 +47,7 @@ public class ActivitySignUpController {
             try {
                 countApi.commitCount(BehaviorEnum.RealRead,activityInfoId, ActivityCountConstant.SIGNUP_ACTIVITY_DETAIL,ActivityCountConstant.COUNT);
             } catch (Exception e) {
-                logger.error("接入记数异常:"+e.getMessage());
+                logger.error("接入记数异常:",e);
             }
         }
         return activitySignUpHomeAppVo;
@@ -64,7 +64,7 @@ public class ActivitySignUpController {
             try {
                 countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId),ActivityCountConstant.ACTIVITY_RECORD_COUNT,ActivityCountConstant.ACTIVITY_COUNT);
             } catch (Exception e) {
-                logger.error("接入记数异常:"+e.getMessage());
+                logger.error("接入记数异常:",e);
             }
         }
         return activityRecordResponse;

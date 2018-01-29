@@ -5,6 +5,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.advertisement.api.AdvertisementAPI;
 import com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto;
+import com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto;
 import com.yryz.quanhu.resource.advertisement.entity.Advertisement;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo;
@@ -32,26 +33,26 @@ public class AdvertisementTest {
 
     @Test
     public void add(){
-        Advertisement advertisement = new Advertisement();
+        AdvertisementAdminDto advertisement = new AdvertisementAdminDto();
         advertisement.setAdvDef(1);
-        advertisement.setAdvName("贡嘎");
+        advertisement.setAdvName("哈哈");
         advertisement.setAdvSort(0);
         advertisement.setAdvStatus(10);
         advertisement.setAdvType(10);
         advertisement.setAdvUrl("/");
-        advertisement.setEndDate(DateUtils.formatDate(new Date(), "yyyy-MM-dd"));
-        advertisement.setEndTime(DateUtils.formatDate(new Date(), "HH:mm:ss"));
         advertisement.setImgUrl("/");
         advertisement.setNote("xxxxx");
         advertisement.setSkipType(5001);
-        advertisement.setStartDate("2018-1-23");
-        advertisement.setStartTime("09:00:00");
+        advertisement.setStartDate("2018-1-25");
+        advertisement.setStartTime("21:00:00");
+        advertisement.setEndDate(DateUtils.formatDate(new Date(), "yyyy-MM-dd"));
+        advertisement.setEndTime("22:30:00");
         Response<Integer> add = advertisementAPI.add(advertisement);
     }
 
     @Test
     public void update(){
-        Advertisement advertisement = new Advertisement();
+        AdvertisementAdminDto advertisement = new AdvertisementAdminDto();
         advertisement.setKid(180428L);
         advertisement.setAdvDef(1);
         advertisement.setAdvName("贡嘎嘎嘎嘎嘎嘎嘎");

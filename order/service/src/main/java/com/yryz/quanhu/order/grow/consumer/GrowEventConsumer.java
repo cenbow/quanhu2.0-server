@@ -66,6 +66,9 @@ public class GrowEventConsumer {
 		// 成长事件关注点： eventCode , userId ， resourceId , ownerId
 		String eventCode = data.get("eventCode");
 		String userId = data.get("userId");
+        //外部传入积分值
+        String eventGrow = data.get("eventGrow"); 
+        
 		if (StringUtils.isBlank(userId)) {
 			logger.info("-------处理成长事件，结果：直接丢掉消息，原因：userId为空,传入数据：" + data.toString());
 			return;
@@ -75,6 +78,13 @@ public class GrowEventConsumer {
 		GrowEventInfo sei = growEventManageService.getByCode(eventCode);
 		boolean isGrowEvent = (sei != null && sei.getId() != null);
 		logger.info("是否成长事件判定,结果：" + isGrowEvent + "传入数据：" + data.toString());
+		
+        // 判断外部传入的成长值是否存在,如果存在就取传入的分值
+        if (!StringUtils.isBlank(eventGrow)){
+        	sei.setEventGrow(Integer.valueOf(eventGrow));
+        }
+		
+		
 		// 成长配置管理表中不存在该类型事件，则不属于成长事件
 		if (isGrowEvent) {
 			double amount = 0.0;

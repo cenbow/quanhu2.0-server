@@ -101,17 +101,17 @@ public enum MessageConstant {
     /**
      * 提问支付  {XXX}付费向你提问，您收到奖励{money}。
      */
-    QUESTION_PAYED(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "付费提问", "您在{someone}私圈付费向圈主提问，支付{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    QUESTION_PAYED(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "付费提问", "您在{coterieName}私圈付费向圈主提问，支付{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 提问圈主未回答,回答超时
      */
-    QUESTION_INVALID(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "提问超时", "您向{someone}圈主提问，圈主回复超时，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    QUESTION_INVALID(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "提问超时", "您向{coterieName}圈主提问，圈主回复超时，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 删除未回答的付费提问
      */
-    QUESTION_DELETE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "删除提问", "您删除了向{someone}圈主提问，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    QUESTION_DELETE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "删除提问", "您删除了向{coterieName}圈主提问，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 付费加入私圈  您付费加入XXX私圈，支付99悠然币。
@@ -121,7 +121,12 @@ public enum MessageConstant {
     /**
      * 私圈奖励 XXX加入您的私圈，您收到奖励99.00。
      */
-    JOIN_COTERIE_REWARD(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "私圈奖励", "{name}加入您的私圈，您获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL);
+    JOIN_COTERIE_REWARD(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "私圈奖励", "{name}加入您的私圈，您获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
+
+    /**
+     * 付费参加活动
+     */
+    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT) ;
 
     private Integer type;
 

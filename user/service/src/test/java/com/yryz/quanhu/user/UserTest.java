@@ -142,10 +142,10 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void updateUser(){
 		UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
-		infoDTO.setUserId(724007310011252736L);
+		infoDTO.setUserId(731519998090690560l);
 		infoDTO.setUserGenders(10);
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -185,7 +185,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void login() {
 		LoginDTO loginDTO = new LoginDTO();
 		loginDTO.setPhone("16612345678");

@@ -24,10 +24,13 @@
         <result column="create_user_id" property="createUserId" jdbcType="BIGINT"/>
         <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="BIGINT"/>
         <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
+
+        <result column="start_date_time" property="startDateTime" jdbcType="TIMESTAMP"/>
+        <result column="end_date_time" property="endDateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!--Base_Column_List-->
-    <sql id="Base_Column_List">kid,img_url,adv_name,adv_url,skip_type,adv_type,adv_sort,adv_status,adv_def,start_date,start_time,end_date,end_time,note,create_date,last_update_date,create_user_id,last_update_user_id,module_enum
+    <sql id="Base_Column_List">kid,img_url,adv_name,adv_url,skip_type,adv_type,adv_sort,adv_status,adv_def,start_date,start_time,end_date,end_time,note,create_date,last_update_date,create_user_id,last_update_user_id,module_enum,start_date_time,end_date_time
     </sql>
 
     <!-- 查询Advertisement详情 -->
@@ -68,6 +71,8 @@
 				,#{createUserId,jdbcType=BIGINT}
 				,#{lastUpdateUserId,jdbcType=BIGINT}
 				,#{moduleEnum,jdbcType=VARCHAR}
+				,#{startDateTime,jdbcType=TIMESTAMP}
+				,#{end_date_time,jdbcType=TIMESTAMP}
 	    )
 	</insert>
 
@@ -132,6 +137,12 @@
             <if test="moduleEnum != null and moduleEnum != ''">
                 module_enum,
             </if>
+            <if test="startDateTime != null and startDateTime != ''">
+                start_date_time,
+            </if>
+            <if test="endDateTime != null and endDateTime != ''">
+                end_date_time,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="kid != null">
@@ -190,6 +201,12 @@
             </if>
             <if test="moduleEnum != null and moduleEnum != ''">
                 #{moduleEnum,jdbcType=VARCHAR},
+            </if>
+            <if test="startDateTime != null and startDateTime != ''">
+                #{startDateTime},
+            </if>
+            <if test="endDateTime != null and endDateTime != ''">
+                #{endDateTime},
             </if>
         </trim>
     </insert>
@@ -253,6 +270,12 @@
             <if test="moduleEnum != null and moduleEnum != ''">
                 module_enum = #{moduleEnum,jdbcType=VARCHAR},
             </if>
+            <if test="startDateTime != null and startDateTime != ''">
+                start_date_time = #{startDateTime},
+            </if>
+            <if test="endDateTime != null and endDateTime != ''">
+                end_date_time = #{endDateTime},
+            </if>
         </set>
         where kid = #{kid,jdbcType=BIGINT}
     </update>
@@ -264,13 +287,26 @@
         <include refid="Base_Column_List"/>
         from qh_adv
         where
-        adv_status = 20
-        and adv_type = #{advType}
+        adv_type = #{advType} AND adv_status != 30
         <![CDATA[  AND start_date <= #{nowDate} ]]>
-        <![CDATA[  AND end_date > #{nowDate} ]]>
+        <![CDATA[  AND end_date >= #{nowDate} ]]>
         <![CDATA[  AND start_time <= #{nowTime} ]]>
-        <![CDATA[  AND end_time > #{nowTime} ]]>
+        <![CDATA[  AND end_time >= #{nowTime} ]]>
         order by adv_sort desc, create_date desc
+        limit 0, 100
+    </select>
+
+    <select id="selectListBanner" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        where
+        adv_type = #{advType} AND adv_status != 30
+        <![CDATA[ AND start_date_time <= #{nowDateTime} ]]>
+        <![CDATA[ AND end_date_time >= #{nowDateTime} ]]>
+        order by adv_sort desc, create_date desc
+        limit 0, 100
     </select>
 
     <select id="selectListAdmin" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
@@ -279,14 +315,64 @@
         <include refid="Base_Column_List"/>
         from qh_adv
         <where>
-            <if test="advStatus != null">
-                adv_status = #{advStatus}
+            adv_type = #{advType}
+            <if test="advStatus != null and advStatus == 10">
+                AND adv_status != 30
+                <![CDATA[  AND start_date > #{nowDate} ]]>
+                <![CDATA[  AND end_date > #{nowDate}  ]]>
+                OR adv_type = #{advType} AND adv_status != 30 AND
+                <![CDATA[  start_date <= #{nowDate} ]]>
+                <![CDATA[  AND end_date >= #{nowDate} ]]>
+                <![CDATA[  AND start_time > #{nowTime} ]]>
             </if>
-            <if test="advType != null">
-                and adv_type = #{advType}
+
+            <if test="advStatus != null and advStatus == 20">
+                AND adv_status != 30
+                <![CDATA[  AND start_date <= #{nowDate} ]]>
+                <![CDATA[  AND end_date >= #{nowDate} ]]>
+                <![CDATA[  AND start_time <= #{nowTime} ]]>
+                <![CDATA[  AND end_time >= #{nowTime} ]]>
+            </if>
+
+            <if test="advStatus != null and advStatus == 30">
+                <![CDATA[  AND  start_date < #{nowDate} ]]>
+                <![CDATA[  AND end_date < #{nowDate} ]]>
+                OR adv_type = #{advType} AND
+                <![CDATA[   start_date <= #{nowDate} ]]>
+                <![CDATA[  AND end_date >= #{nowDate} ]]>
+                <![CDATA[  AND end_time < #{nowTime}  ]]>
+                OR adv_type = #{advType} AND
+                adv_status = 30
             </if>
         </where>
         order by adv_sort desc, create_date desc
+    </select>
+
+    <select id="selectListAdminBanner" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        <where>
+            adv_type = #{advType}
+            <if test="advStatus != null and advStatus == 10">
+                AND adv_status != 30
+                <![CDATA[  AND start_date_time > #{nowDateTime} ]]>
+            </if>
+
+            <if test="advStatus != null and advStatus == 20">
+                AND adv_status != 30
+                <![CDATA[  AND start_date_time <= #{nowDateTime} ]]>
+                <![CDATA[  AND end_date_time >= #{nowDateTime} ]]>
+            </if>
+
+            <if test="advStatus != null and advStatus == 30">
+                <![CDATA[  AND end_date_time < #{nowDateTime} ]]>
+                OR
+                adv_type = #{advType} AND adv_status = 30
+            </if>
+            order by adv_sort desc, create_date desc
+        </where>
     </select>
 
     <select id="selectDefaultAdvertisement"
@@ -294,8 +380,27 @@
         select
         <include refid="Base_Column_List"/>
         from qh_adv
-        where adv_def = 10
+        where adv_def = 10 AND adv_type = 20
         order by adv_sort desc, create_date desc
     </select>
 
+    <select id="checkConflict" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        <where>
+            <![CDATA[   start_date <= #{checkStartDate} ]]>
+            <![CDATA[  AND end_date > #{checkStartDate} ]]>
+            <![CDATA[  AND start_time <= #{checkStartTime} ]]>
+            <![CDATA[  AND end_time > #{checkStartTime} ]]>
+            AND adv_status != 30
+        </where>
+    </select>
+
+    <update id="cancelDefAd">
+        update qh_adv
+        SET adv_def = 20, adv_status = 30, end_date_time = now()
+        WHERE adv_type = 20 and adv_def = 10
+    </update>
 </mapper>

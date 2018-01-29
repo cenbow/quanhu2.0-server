@@ -77,8 +77,8 @@ public class ScoreController {
 	@NotLogin
     @ApiOperation("积分事件")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/score/commit")
-	public void commit(@ApiParam("事件对象")EventInfo event){
+	@PostMapping(value = "/{version}/order/score/commit")
+	public void commit(@RequestBody EventInfo event){
 		//EventInfo eventInfo = new EventInfo();
 		eventAPI.commit(event);
 	}
