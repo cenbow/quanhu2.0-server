@@ -1,5 +1,7 @@
 package com.yryz.quanhu.behavior.like.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.mongodb.Page;
 import com.yryz.common.response.PageList;
 
@@ -14,6 +16,7 @@ public class LikeFrontDTO extends PageList {
     /**
      * 资源ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private long resourceId;
 
     public long getResourceId() {

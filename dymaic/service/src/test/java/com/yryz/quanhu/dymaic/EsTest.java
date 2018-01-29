@@ -26,7 +26,7 @@ public class EsTest {
 	    public void exampleTest(){
 //	    	List<UserSimpleVo> list=elasticsearchService.searchUser("姜昆",0,3);
 //	        System.out.println(list);
-	    	elasticsearchTemplate.deleteIndex("quanhu-v2-resourceinfo");
+	    	elasticsearchTemplate.deleteIndex("quanhu-v2-userinfo");
 //	    	elasticsearchTemplate.deleteIndex("quanhu-v2");
 	    }
 }

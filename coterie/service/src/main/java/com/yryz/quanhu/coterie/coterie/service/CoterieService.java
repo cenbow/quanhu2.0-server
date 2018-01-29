@@ -228,4 +228,19 @@ public interface CoterieService {
 	 * @return
 	 */
 	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum);
+	
+	/**
+	 * 根据创建日期查询所有私圈ID
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	List<Long> getKidByCreateDate(String startDate,String endDate);
+    
+	/**
+	 * 查询私圈
+	 * @param kidList
+	 * @return
+	 */
+    List<Coterie> getByKids(List<Long> kidList);
 }

@@ -1,6 +1,7 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
@@ -54,26 +56,33 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private IdAPI idAPI;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private CountApi countApi;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private ResourceDymaicApi resourceDymaicApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
+            Assert.notNull(record.getContentSource(),"ContentSource is NULL !");
+            
             record.setClassifyId(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             record.setDelFlag(CommonConstants.DELETE_NO);
             record.setShelveFlag(CommonConstants.SHELVE_YES);
 
             Assert.isNull(record.getCoterieId(), "平台文章发布 没有：CoterieId");
-            Assert.isNull(record.getContentPrice(), "平台文章发布 不能设置付费：ContentPrice");
+            Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() == 0L,
+                    "平台文章发布 不能设置付费：ContentPrice");
 
             if (StringUtils.isBlank(record.getModuleEnum())) {
                 record.setModuleEnum(ResourceTypeEnum.RELEASE);
             }
 
             // 校验用户是否存在
-            ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+            UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+            Assert.isNull(createUser, "发布者用户不存在！userId：" + record.getCreateUserId());
 
             ReleaseConfigVo cfgVo = releaseConfigService.getTemplate(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             Assert.notNull(cfgVo, "平台发布文章，发布模板不存在！classifyId：" + ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
@@ -91,8 +100,10 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
+            // 资源进聚合
+            releaseInfoService.commitResource(resourceDymaicApi, record);
+
             try {
-                // TODO 资源进聚合
 
                 // 接入统计计数
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
@@ -122,7 +133,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
             Assert.notNull(createUser, "文章创建者用户不存在！userId:" + infoVo.getCreateUserId());
             infoVo.setUser(createUser);
-            
+
             // 若资源已删除、或者 已经下线 直接返回
             if (CommonConstants.DELETE_YES.equals(infoVo.getDelFlag())
                     || CommonConstants.SHELVE_NO.equals(infoVo.getShelveFlag())) {
@@ -151,36 +162,37 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
             boolean isGetCreateUser) {
         try {
+            // 只查询 平台文章
             dto.setCoterieId(0L);
-            PageList<ReleaseInfoVo> voList = releaseInfoService.pageByCondition(dto, isCount);
+            PageList<ReleaseInfoVo> pageList = releaseInfoService.pageByCondition(dto, isCount);
+            if (!isGetCreateUser || null == pageList || CollectionUtils.isEmpty(pageList.getEntities())) {
+                return ResponseUtils.returnObjectSuccess(pageList);
+            }
 
-            // 设置创建者用户信息
-            if (isGetCreateUser && null != voList && CollectionUtils.isNotEmpty(voList.getEntities())) {
-                // 获取所有创建者用户ID
-                Set<Long> userIds = new HashSet<>();
-                for (ReleaseInfoVo info : voList.getEntities()) {
-                    if (null == info || null == info.getCreateUserId()) {
+            List<ReleaseInfoVo> voList = pageList.getEntities();
+
+            // 获取所有创建者用户ID
+            Set<String> userIds = new HashSet<>();
+            for (ReleaseInfoVo info : voList) {
+                if (null == info || null == info.getCreateUserId()) {
+                    continue;
+                }
+                userIds.add(String.valueOf(info.getCreateUserId()));
+            }
+
+            // 获取用户信息集合
+            Map<String, UserSimpleVO> userMap = ResponseUtils.getResponseData(userApi.getUserSimple(userIds));
+            if (null != userMap) {
+                for (ReleaseInfoVo info : voList) {
+                    if (null == info || null == info.getCreateUserId() || null == userMap.get(info.getCreateUserId())) {
                         continue;
                     }
-                    userIds.add(info.getCreateUserId());
-                }
-
-                // TODO 获取用户信息集合
-                Map<String, UserSimpleVO> userMap = ResponseUtils
-                        .getResponseData(userApi.getUserSimple(new HashSet<>()));
-                if (null != userMap) {
-                    for (ReleaseInfoVo info : voList.getEntities()) {
-                        if (null == info || null == info.getCreateUserId()
-                                || null == userMap.get(info.getCreateUserId())) {
-                            continue;
-                        }
-                        UserSimpleVO userVo = userMap.get(info.getCreateUserId());
-                        info.setUser(userVo);
-                    }
+                    UserSimpleVO userVo = userMap.get(info.getCreateUserId());
+                    info.setUser(userVo);
                 }
             }
-            
-            return ResponseUtils.returnObjectSuccess(voList);
+
+            return ResponseUtils.returnObjectSuccess(pageList);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
@@ -227,4 +239,31 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
         return ResponseUtils.returnObjectSuccess(0);
     }
 
+    @Override
+    public Response<List<Long>> getKidByCreatedate(String startDate, String endDate) {
+        try {
+            List<Long> data = this.releaseInfoService.getKidByCreatedate(startDate, endDate);
+            return ResponseUtils.returnObjectSuccess(data);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<List<ReleaseInfoVo>> selectByKids(Set<Long> kids) {
+        try {
+            ReleaseInfoDto dto = new ReleaseInfoDto();
+            dto.setKids((Long[]) kids.toArray());
+            List<ReleaseInfoVo> list = this.releaseInfoService.selectByCondition(dto);
+            return ResponseUtils.returnObjectSuccess(list);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
 }

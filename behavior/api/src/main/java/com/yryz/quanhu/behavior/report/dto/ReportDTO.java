@@ -13,10 +13,18 @@ import java.io.Serializable;
 public class ReportDTO extends PageList implements Serializable {
     private static final long serialVersionUID = 6823220474426141657L;
     private String moduleEnum;
-    private byte informType;
+    private String informType;
     private byte informStatus;
     private String startTime;
     private String endTime;
+
+    public String getInformType() {
+        return informType;
+    }
+
+    public void setInformType(String informType) {
+        this.informType = informType;
+    }
 
     public String getModuleEnum() {
         return moduleEnum;
@@ -26,13 +34,6 @@ public class ReportDTO extends PageList implements Serializable {
         this.moduleEnum = moduleEnum;
     }
 
-    public byte getInformType() {
-        return informType;
-    }
-
-    public void setInformType(byte informType) {
-        this.informType = informType;
-    }
 
     public byte getInformStatus() {
         return informStatus;

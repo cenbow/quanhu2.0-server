@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class ActivityVoteDetailVo implements Serializable {
 
@@ -153,7 +155,9 @@ public class ActivityVoteDetailVo implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long createUserId;
 
-    private UserActivityVo user;
+    private Date createDate;
+
+    private UserSimpleVO user;
 
     public Long getId() {
         return id;
@@ -387,11 +391,19 @@ public class ActivityVoteDetailVo implements Serializable {
         this.createUserId = createUserId;
     }
 
-    public UserActivityVo getUser() {
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public UserSimpleVO getUser() {
         return user;
     }
 
-    public void setUser(UserActivityVo user) {
+    public void setUser(UserSimpleVO user) {
         this.user = user;
     }
 }

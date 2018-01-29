@@ -426,4 +426,22 @@ public class CoterieServiceImpl implements CoterieService {
 			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
 		}
 	}
+
+	@Override
+	public List<Long> getKidByCreateDate(String startDate, String endDate) {
+		try{
+			return  coterieMapper.selectKidByCreateDate(startDate, endDate);
+		}catch (Exception e) {
+			throw new MysqlOptException("getKidByCreateDate startDate:"+startDate+",endDate:"+endDate,e);
+		}
+	}
+
+	@Override
+	public List<Coterie> getByKids(List<Long> kidList) {
+		try{
+			return  coterieMapper.selectByKids(kidList);
+		}catch (Exception e) {
+			throw new MysqlOptException("getByKids kidList:"+kidList,e);
+		}
+	}
 }

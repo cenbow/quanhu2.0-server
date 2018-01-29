@@ -72,7 +72,7 @@ public class UserStarController {
         info.setUserId(header.getUserId());
         info.setAppId(header.getAppId());
         Boolean result = ResponseUtils.getResponseData(starApi.save(info));
-        return ResponseUtils.returnObjectSuccess(result);
+        return ResponseUtils.returnApiObjectSuccess(result);
     }
 
     /**
@@ -91,7 +91,7 @@ public class UserStarController {
         info.setUserId(header.getUserId());
         info.setAppId(header.getAppId());
         Boolean result = ResponseUtils.getResponseData(starApi.update(info));
-        return ResponseUtils.returnObjectSuccess(result);
+        return ResponseUtils.returnApiObjectSuccess(result);
     }
 
     /**
@@ -117,7 +117,7 @@ public class UserStarController {
         } else {
         	authInfo = ResponseUtils.getResponseData(starApi.get(header.getUserId()));
         }
-        return ResponseUtils.returnObjectSuccess(authInfo);
+        return ResponseUtils.returnApiObjectSuccess(authInfo);
     }
 
     /**
@@ -137,7 +137,7 @@ public class UserStarController {
         paramDTO.setCurrentPage(currentPage);
         paramDTO.setPageSize(pageSize);
         PageList<StarInfoVO> list = ResponseUtils.getResponseData(starApi.starList(paramDTO));
-        return ResponseUtils.returnObjectSuccess(list);
+        return ResponseUtils.returnApiObjectSuccess(list);
     }
 
     /**
@@ -162,7 +162,7 @@ public class UserStarController {
 
         PageList<StarInfoVO> pageList = labelStarList.getData();
         getStarDynamic(pageList);
-        return ResponseUtils.returnObjectSuccess(pageList);
+        return ResponseUtils.returnApiObjectSuccess(pageList);
     }
 
     private void getStarDynamic(PageList<StarInfoVO> pageList) {
@@ -183,9 +183,11 @@ public class UserStarController {
                             for (StarInfoVO starInfoVO : entities) {
                                 try {
                                     Dymaic dymaic = dynaicMap.get(starInfoVO.getUserInfo().getUserId());
-                                    UserDynamicVO userDynamicVO = new UserDynamicVO();
-                                    BeanUtils.copyProperties(userDynamicVO, dymaic);
-                                    starInfoVO.setDynamic(userDynamicVO);
+                                    if (dymaic != null) {
+                                        UserDynamicVO userDynamicVO = new UserDynamicVO();
+                                        BeanUtils.copyProperties(userDynamicVO, dymaic);
+                                        starInfoVO.setDynamic(userDynamicVO);
+                                    }
                                 } catch (Exception e) {
                                     logger.error("for setDynamic error", e);
                                 }

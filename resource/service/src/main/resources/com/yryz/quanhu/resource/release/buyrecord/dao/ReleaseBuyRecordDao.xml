@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.resource.release.buyrecord.dao.ReleaseBuyRecordDao">
+
+    <sql id="Base_Column_List">
+        kid, order_id, coterie_id, resource_id, amount, order_type, buy_type, remark, create_user_id, create_date,
+        last_update_user_id, last_update_date
+    </sql>
+
+    <insert id="insert" parameterType="com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord">
+        INSERT INTO qh_release_buy_record
+        (<include refid="Base_Column_List"/>)
+        VALUES
+        (
+        #{kid,jdbcType=BIGINT},
+        #{orderId,jdbcType=BIGINT},
+        #{coterieId,jdbcType=BIGINT},
+        #{resourceId,jdbcType=BIGINT},
+        #{amount,jdbcType=BIGINT},
+        #{orderType,jdbcType=TINYINT},
+        #{buyType,jdbcType=TINYINT},
+        #{remark,jdbcType=VARCHAR},
+        #{createUserId,jdbcType=BIGINT},
+        NOW(),
+        #{lastUpdateUserId,jdbcType=BIGINT},
+        NOW()
+        )
+    </insert>
+
+    <select id="selectByCondition" parameterType="com.yryz.quanhu.resource.release.buyrecord.dto.ReleaseBuyRecordDto"
+            resultType="com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM qh_release_buy_record
+        WHERE create_user_id = #{userId,jdbcType=BIGINT}
+        <if test="coterieId != null">
+            AND coterie_id = #{coterieId,jdbcType=BIGINT}
+        </if>
+    </select>
+</mapper>

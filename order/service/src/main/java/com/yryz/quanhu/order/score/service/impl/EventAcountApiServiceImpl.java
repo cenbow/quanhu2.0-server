@@ -1,7 +1,5 @@
 package com.yryz.quanhu.order.score.service.impl;
 
-import java.util.List;
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.PageList;

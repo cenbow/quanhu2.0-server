@@ -103,7 +103,7 @@ public class UserTest {
 
 	// @Test
 	public void getLoginMethod() {
-		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736l);
+		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
@@ -145,7 +145,7 @@ public class UserTest {
 	//@Test
 	public void updateUser(){
 		UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
-		infoDTO.setUserId(724007310011252736l);
+		infoDTO.setUserId(724007310011252736L);
 		infoDTO.setUserGenders(10);
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -153,7 +153,7 @@ public class UserTest {
 	
 	//@Test
 	public void bindPhone(){
-		BindPhoneDTO phoneDTO = new BindPhoneDTO(724007310011252736l, "16612345689", "5023", "vebff12m1762");
+		BindPhoneDTO phoneDTO = new BindPhoneDTO(724007310011252736L, "16612345689", "5023", "vebff12m1762");
 		Response<Boolean> response = accountApi.bindPhone(phoneDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
@@ -203,7 +203,7 @@ public class UserTest {
 	
 	//@Test
 	public void eidtPassowrd(){
-		Response<Boolean> response = accountApi.editPassword(724007310011252736l, "a123456", "a123456");
+		Response<Boolean> response = accountApi.editPassword(724007310011252736L, "a123456", "a123456");
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
@@ -220,13 +220,13 @@ public class UserTest {
 	
 	//@Test
 	public void checkUserDistory(){
-		Response<Boolean> response = accountApi.checkUserDisTalk(724007310011252736l);
+		Response<Boolean> response = accountApi.checkUserDisTalk(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
 	//@Test
 	public void getUserSimple(){
-		Response<UserSimpleVO> response = userApi.getUserSimple(0l);
+		Response<UserSimpleVO> response = userApi.getUserSimple(0L);
 		UserSimpleVO simpleVO = response.getData();
 		//Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
 		System.out.println(JsonUtils.toFastJson(simpleVO));
@@ -234,7 +234,7 @@ public class UserTest {
 	
 	//@Test
 	public void getUserLoginSimpleVO(){
-		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(724007310011252736l);
+		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
@@ -243,20 +243,20 @@ public class UserTest {
 		UserTagDTO dto = new UserTagDTO();
 		dto.setTagIds("1,2,3");
 		dto.setTagType(UserTagType.US_SELECT.getType());
-		dto.setUserId(729671306726400000l);
+		dto.setUserId(729671306726400000L);
 		Response<Boolean> response = tagApi.batchSaveUserTag(dto);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
 	//@Test
 	public void getInviter(){
-		Response<UserRegInviterLinkVO> response = opApi.getInviterLinkByUserId(731519998090690560l);
+		Response<UserRegInviterLinkVO> response = opApi.getInviterLinkByUserId(731519998090690560L);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
 	@Test
 	public void getMyInviter(){
-		Response<MyInviterVO> response = opApi.getMyInviter(731519998090690560l, 10, null);
+		Response<MyInviterVO> response = opApi.getMyInviter(731519998090690560L, 10, null);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 }

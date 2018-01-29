@@ -14,8 +14,6 @@ public class QuestionVo  implements Serializable {
 
     private String content;
 
-    private String targetId;
-
     private Byte questionType;
 
     private Byte shelveFlag;
@@ -23,8 +21,6 @@ public class QuestionVo  implements Serializable {
     private Byte delFlag;
 
     private Date createDate;
-
-    private Long createUserId;
 
     private String coterieId;
 
@@ -48,6 +44,8 @@ public class QuestionVo  implements Serializable {
 
     private BehaviorVo behaviorVo;
 
+    private  UserSimpleVO targetUser;
+
     public Long getKid() {
         return kid;
     }
@@ -70,14 +68,6 @@ public class QuestionVo  implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getTargetId() {
-        return targetId;
-    }
-
-    public void setTargetId(String targetId) {
-        this.targetId = targetId;
     }
 
     public Byte getQuestionType() {
@@ -110,14 +100,6 @@ public class QuestionVo  implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
-    }
-
-    public Long getCreateUserId() {
-        return createUserId;
-    }
-
-    public void setCreateUserId(Long createUserId) {
-        this.createUserId = createUserId;
     }
 
     public String getCoterieId() {
@@ -206,5 +188,13 @@ public class QuestionVo  implements Serializable {
 
     public void setBehaviorVo(BehaviorVo behaviorVo) {
         this.behaviorVo = behaviorVo;
+    }
+
+    public UserSimpleVO getTargetUser() {
+        return targetUser;
+    }
+
+    public void setTargetUser(UserSimpleVO targetUser) {
+        this.targetUser = targetUser;
     }
 }
