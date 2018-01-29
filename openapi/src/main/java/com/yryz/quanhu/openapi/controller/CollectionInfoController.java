@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.collection.api.CollectionInfoApi;
@@ -30,6 +31,7 @@ public class CollectionInfoController {
      * @param   collectionInfoDto
      * @return
      * */
+    @UserBehaviorValidation(login = true)
     @ApiOperation("收藏")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/collection/single")
@@ -40,6 +42,7 @@ public class CollectionInfoController {
         return collectionInfoApi.single(collectionInfoDto);
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("取消收藏")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/collection/del")
@@ -50,6 +53,7 @@ public class CollectionInfoController {
         return collectionInfoApi.del(collectionInfoDto);
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("收藏列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/collection/list")

@@ -184,15 +184,6 @@ public interface AccountService {
 	boolean checkUserByPhone(String phone,String appId);
 
 	/**
-	 * 根据手机号,登录密码查询用户账户信息<br/>
-	 * 不传密码就根据手机号查询
-	 * 
-	 * @param phone
-	 * @param password
-	 * @return
-	 */
-	UserAccount checkUserByPhonePassword(String phone, String password,String appId);
-	/**
 	 * 查询用户账号
 	 * @param userId
 	 * @return

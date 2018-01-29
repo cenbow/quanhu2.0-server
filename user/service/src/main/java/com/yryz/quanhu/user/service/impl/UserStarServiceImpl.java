@@ -216,6 +216,20 @@ public class UserStarServiceImpl implements UserStarService {
 		}
 	}
 
+
+	@Override
+	public int updateRecommendHeight(Long userId, Integer weight) {
+		try {
+			UserStarAuth auth = new UserStarAuth();
+			auth.setUserId(userId);
+			auth.setRecommendHeight(weight);
+			return persistenceDao.update(auth);
+		} catch (Exception e) {
+			logger.error("[UserStarAuthDao.update]", e);
+			throw new MysqlOptException(e);
+		}
+	}
+	
 	@Override
 	public Page<UserStarAuth> listByParams(Integer pageNo, Integer pageSize, StarAuthParamDTO paramDTO) {
 		Page<UserStarAuth> page = PageHelper.startPage(pageNo, pageSize);
@@ -307,5 +321,6 @@ public class UserStarServiceImpl implements UserStarService {
 			throw new MysqlOptException(e);
 		}
 	}
+
 
 }

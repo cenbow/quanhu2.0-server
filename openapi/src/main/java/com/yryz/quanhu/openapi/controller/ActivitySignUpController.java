@@ -2,15 +2,16 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.constants.ActivityCountConstant;
-import com.yryz.quanhu.support.activity.api.ActivitySignUpApi;
-import com.yryz.quanhu.support.activity.entity.ActivityEnrolConfig;
-import com.yryz.quanhu.support.activity.entity.ActivityRecord;
-import com.yryz.quanhu.support.activity.vo.ActivitySignUpHomeAppVo;
+import com.yryz.quanhu.other.activity.api.ActivitySignUpApi;
+import com.yryz.quanhu.other.activity.entity.ActivityEnrolConfig;
+import com.yryz.quanhu.other.activity.entity.ActivityRecord;
+import com.yryz.quanhu.other.activity.vo.ActivitySignUpHomeAppVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +35,7 @@ public class ActivitySignUpController {
     private CountApi countApi;
 
     private static final Logger logger = LoggerFactory.getLogger(ActivitySignUpController.class);
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiOperation("报名活动详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpHome")
@@ -51,11 +52,11 @@ public class ActivitySignUpController {
         }
         return activitySignUpHomeAppVo;
     }
-
+    @UserBehaviorValidation(login=true)
     @ApiOperation("确认报名-提交报名信息(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/activity/signUp/activitySignUpSubmit")
-    public Response<ActivityRecord> activitySignUpSubmit(@RequestBody ActivityRecord activityRecord,@RequestHeader("userId") String userId, HttpServletRequest request) {
+    public Response<ActivityRecord> activitySignUpSubmit(@RequestBody ActivityRecord activityRecord, @RequestHeader("userId") String userId, HttpServletRequest request) {
         Assert.notNull(activityRecord, "activityRecord is null");
         Assert.notNull(userId, "userId is null");
         Response<ActivityRecord> activityRecordResponse = activitySignUpApi.activitySignUpSubmit(activityRecord, userId);
@@ -68,16 +69,16 @@ public class ActivitySignUpController {
         }
         return activityRecordResponse;
     }
-
+    @UserBehaviorValidation(login=true)
     @ApiOperation("参与报名-获取活动配置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpFrom")
-    public Response<ActivityEnrolConfig> getActivitySignUpFrom(Long activityInfoId,@RequestHeader("userId") String userId, HttpServletRequest request) {
+    public Response<ActivityEnrolConfig> getActivitySignUpFrom(Long activityInfoId, @RequestHeader("userId") String userId, HttpServletRequest request) {
         Assert.notNull(activityInfoId, "activityInfoId is null");
         Assert.notNull(userId, "userId is null");
         return activitySignUpApi.getActivitySignUpFrom(activityInfoId, userId);
     }
-
+    @UserBehaviorValidation(login=true)
     @ApiOperation("查询报名状态(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpStatus")

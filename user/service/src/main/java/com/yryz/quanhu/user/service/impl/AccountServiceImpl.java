@@ -28,6 +28,7 @@ import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.dao.UserAccountDao;
+import com.yryz.quanhu.user.dao.UserAccountRedisDao;
 import com.yryz.quanhu.user.dao.UserLoginLogDao;
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
@@ -63,6 +64,8 @@ public class AccountServiceImpl implements AccountService {
 	@Reference(lazy = true, check = false)
 	private IdAPI idApi;
 	@Autowired
+	private UserAccountRedisDao accountRedisDao;
+	@Autowired
 	private UserLoginLogDao logDao;
 	@Autowired
 	protected UserThirdLoginService thirdLoginService;
@@ -82,7 +85,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public void agentRegister(AgentRegisterDTO registerDTO) {
-		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getAppId(), null);
+		UserAccount checkAccount = selectOne(null, registerDTO.getUserPhone(), registerDTO.getAppId());
 		if (checkAccount != null) {
 			throw QuanhuException.busiError("该用户已存在");
 		}
@@ -98,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Long login(LoginDTO loginDTO, String appId) {
-		UserAccount account = selectOne(null, loginDTO.getPhone(), appId, null);
+		UserAccount account = selectOne(null, loginDTO.getPhone(), appId);
 		if (account == null) {
 			throw QuanhuException.busiError("该用户不存在");
 		}
@@ -119,18 +122,18 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public Long loginByVerifyCode(RegisterDTO registerDTO, String appId) {
-		UserAccount account = selectOne(null, registerDTO.getUserPhone(), appId, null);
+		UserAccount account = selectOne(null, registerDTO.getUserPhone(), appId);
 		// 用户不存在直接注册
 		if (account == null) {
 			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, appId)) {
-				throw QuanhuException.busiError("验证码错误");
+				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			return createUser(registerDTO);
 		}
 		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
 				appId)) {
-			throw QuanhuException.busiError("验证码错误");
+			throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
@@ -185,7 +188,7 @@ public class AccountServiceImpl implements AccountService {
 		if (CollectionUtils.isEmpty(logins)) {
 			logins = new ArrayList<>();
 		}
-		UserAccount account = selectOne(userId, null, null, null);
+		UserAccount account = selectOne(userId, null, null);
 		if (account == null) {
 			throw QuanhuException.busiError("该用户不存在");
 		}
@@ -251,7 +254,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public void bindPhone(Long userId, String phone, String password) {
-		UserAccount oldAccount = selectOne(userId, null, null, null);
+		UserAccount oldAccount = selectOne(userId, null, null);
 		UserAccount account = new UserAccount(null, phone, password);
 		account.setKid(userId);
 		account.setCreateDate(new Date());
@@ -276,7 +279,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public void unbindThird(Long userId, String thirdId, Integer type, String appId) {
-		UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdId, appId);
+		UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdId, appId,type);
 		if (thirdLogin == null) {
 			throw QuanhuException.busiError("第三方账户不存在");
 		}
@@ -284,7 +287,7 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError("不是本人不能操作");
 		}
 		// 判断用户手机号是否都为空？
-		UserAccount account = selectOne(thirdLogin.getUserId(), null, null, null);
+		UserAccount account = selectOne(thirdLogin.getUserId(), null, null);
 		if (StringUtils.isBlank(account.getUserPhone())) {
 			throw QuanhuException.busiError("主账号没有其他登录方式，不能解绑第三方");
 		}
@@ -293,8 +296,11 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public void editPassword(Long userId, String newPassword, String oldPassword) {
-		UserAccount account = selectOne(userId, null, null, oldPassword);
+		UserAccount account = selectOne(userId, null, null);
 		if (account == null) {
+			throw QuanhuException.busiError("用户不存在");
+		}
+		if(!StringUtils.equals(oldPassword, account.getUserPwd())){
 			throw QuanhuException.busiError("旧密码不正确");
 		}
 		account.setDelFlag(null);
@@ -318,7 +324,7 @@ public class AccountServiceImpl implements AccountService {
 		if (!smsService.checkVerifyCode(phone, verifyCode, SmsType.CODE_FIND_PWD, appId)) {
 			throw QuanhuException.busiError("验证码错误");
 		}
-		UserAccount account = selectOne(null, phone, null, null);
+		UserAccount account = selectOne(null, phone, appId);
 		if (account == null) {
 			throw QuanhuException.busiError("该用户不存在");
 		}
@@ -353,23 +359,11 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public boolean checkUserByPhone(String phone, String appId) {
-		UserAccount account = selectOne(null, phone, appId, null);
+		UserAccount account = selectOne(null, phone, appId);
 		if (account == null) {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * 根据手机号,登录密码检查用户是否存在
-	 * 
-	 * @param phone
-	 * @param password
-	 * @return
-	 */
-	@Override
-	public UserAccount checkUserByPhonePassword(String phone, String password, String appId) {
-		return selectOne(null, phone, appId, password);
 	}
 
 	/**
@@ -391,21 +385,28 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	/**
-	 * 根据id、手机号、邮箱、登录密码查询账户
+	 * 根据id、手机号、登录密码查询账户
 	 * 
 	 * @param userId
 	 * @param custPhone
-	 * @param custEmail
 	 * @param appId
 	 * @return
 	 */
-	private UserAccount selectOne(Long userId, String custPhone, String appId, String custPwd) {
-		try {
-			return mysqlDao.selectOne(userId, custPhone, appId, custPwd);
+	private UserAccount selectOne(Long userId, String custPhone, String appId) {
+		UserAccount account = accountRedisDao.getAccount(userId, custPhone, appId);
+		if(account != null){
+			return account;
+		}
+		try {			
+			account = mysqlDao.selectOne(userId, custPhone, appId);
 		} catch (Exception e) {
 			logger.error("[accountDao.selectOne]", e);
 			throw new MysqlOptException(e);
 		}
+		if(account != null){
+			accountRedisDao.saveAccount(account);
+		}
+		return account;
 	}
 
 	/**
@@ -416,7 +417,12 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	private int update(UserAccount record) {
 		try {
-			return mysqlDao.update(record);
+			UserAccount account = mysqlDao.selectOne(record.getKid(), null, null);
+			int result = mysqlDao.update(record);
+			if(result != 0){				
+				accountRedisDao.deleteAccount(account.getKid(), account.getUserPhone(), account.getAppId());
+			}
+			return result;
 		} catch (Exception e) {
 			logger.error("[accountDao.update]", e);
 			throw new MysqlOptException(e);
@@ -474,7 +480,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public UserAccount getUserAccountByUserId(Long userId) {
-		return selectOne(userId, null, null, null);
+		return selectOne(userId, null, null);
 	}
 
 }

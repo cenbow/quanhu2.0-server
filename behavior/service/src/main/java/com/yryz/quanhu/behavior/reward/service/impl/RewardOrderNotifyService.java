@@ -34,12 +34,13 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         // 更新 打赏记录
 
         // 受赏 金额【存入 分费后的金额】
-        // TODO 分费比例 
+        // 分费比例 
         double fee = BranchFeesEnum.REWARD.getFee().get(1).getFee() / BranchFeesEnum.REWARD.getFee().get(0).getFee();
-        info.setRewardPrice(info.getGiftNum() * info.getGiftPrice() * (1L));
-        info.setRewardStatus(RewardConstants.reward_status_pay_success);
+        RewardInfo upInfo = new RewardInfo();
+        upInfo.setRewardPrice(new Double(info.getGiftNum() * info.getGiftPrice() * (fee)).longValue());
+        upInfo.setRewardStatus(RewardConstants.reward_status_pay_success);
 
-        rewardInfoService.updateByKid(info);
+        rewardInfoService.updateByKid(upInfo);
 
         // TODO 给打赏者 、 被打赏者 发送消息
         // TODO 更新打赏统计数据

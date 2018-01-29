@@ -24,18 +24,17 @@ public class EventTypeCollection {
 	static {
 		
 		//资源热度计算
-		resourceHots.add("4");
-		resourceHots.add("5");
-		resourceHots.add("6");
-		resourceHots.add("7");
-		resourceHots.add("13");
+		resourceHots.add("5"); //评论
+		resourceHots.add("6"); //转发
+		resourceHots.add("23");  //收藏
+		resourceHots.add("24");  //阅读
+		resourceHots.add("13"); //点赞
 		
-		//用户热度计算
-		userHots.add("21");
-		userHots.add("4");
-		userHots.add("5");
-		userHots.add("6");
-		userHots.add("7");
+		userHots.add("5"); //评论
+		userHots.add("6"); //转发
+		userHots.add("23");  //收藏
+		userHots.add("24");  //阅读
+		userHots.add("13"); //点赞
 		
 	}
 	

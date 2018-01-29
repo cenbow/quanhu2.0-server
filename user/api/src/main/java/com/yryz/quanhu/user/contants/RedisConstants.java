@@ -23,6 +23,10 @@ public class RedisConstants {
 	 */
 	public static final String ACCOUNT_USER = "ACUSER";
 	/**
+	 * 用户登录方式
+	 */
+	public static final String USER_LOGIN_METHOD = "UTLMD";
+	/**
 	 * 用户被警告次数
 	 */
 	public static final String USER_WARN_TIMES = "UWARN";
@@ -30,4 +34,8 @@ public class RedisConstants {
 	 * 用户基础信息
 	 */
 	public static final String USER_INFO = "UINFO";
+	/**
+	 * 用户手机号信息
+	 */
+	public static final String USER_PHONE_INFO = "UPINFO";
 }

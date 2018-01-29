@@ -4,6 +4,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.transmit.dto.TransmitInfoDto;
 import com.yryz.quanhu.behavior.transmit.entity.TransmitInfo;
+import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 
 public interface TransmitApi {
 
@@ -18,6 +19,6 @@ public interface TransmitApi {
      * @param   transmitInfoDto
      * @return
      * */
-    Response<PageList<TransmitInfo>> list(TransmitInfoDto transmitInfoDto);
+    Response<PageList<TransmitInfoVo>> list(TransmitInfoDto transmitInfoDto);
 
 }

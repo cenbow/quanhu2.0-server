@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
@@ -35,6 +36,9 @@ public interface AccountApi {
 	 * @return
 	 */
 	static String userCacheKey(Long userId){
+		if(userId == null || userId == 0l){
+			return null;
+		}
 		return String.format("%s.%s", RedisConstants.ACCOUNT_USER,userId);
 	}
 	/**
@@ -44,17 +48,36 @@ public interface AccountApi {
 	 * @return
 	 */
 	static String phoneAccountKey(String phone,String appId){
+		if(StringUtils.isBlank(phone) || StringUtils.isBlank(appId)){
+			return null;
+		}
 		return String.format("%s.p.%s", RedisConstants.ACCOUNT_USER,phone,appId);
 	}
 	/**
 	 * 第三方账户缓存key
 	 * @param thirdId
 	 * @param appId
+	 * @param type {@link RegType}
 	 * @return
 	 */
-	static String thirdAccountKey(String thirdId,String appId){
-		return String.format("%s.third.%s", RedisConstants.ACCOUNT_USER,thirdId,appId);
+	static String thirdAccountKey(String thirdId,String appId,int type){
+		if(StringUtils.isBlank(thirdId) || StringUtils.isBlank(appId)){
+			return null;
+		}
+		return String.format("%s.third.%s.%s", RedisConstants.ACCOUNT_USER,thirdId,appId,type);
 	}
+	/**
+	 * 用户登录方式
+	 * @param userId
+	 * @return
+	 */
+	static String thirdLoginMethodKey(Long userId){
+		if(userId == null || userId == 0l){
+			return null;
+		}
+		return String.format("%s.%s", RedisConstants.USER_LOGIN_METHOD,userId);
+	}
+	
 	/**
 	 * 发送短信验证码
 	 * @param codeDTO

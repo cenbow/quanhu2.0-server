@@ -12,7 +12,7 @@
     <artifactId>dymaic-canal</artifactId>
 
 	<properties>
-        <canal.version>1.0.22</canal.version>
+        <canal.version>1.0.24</canal.version>
         <spring.boot.version>2.0.0.M7</spring.boot.version>
     </properties>
     
@@ -71,6 +71,12 @@
         <dependency>
             <groupId>io.dubbo.springboot</groupId>
             <artifactId>spring-boot-starter-dubbo</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>com.101tec</groupId>
+            		<artifactId>zkclient</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
 	        <groupId>com.dangdang</groupId>

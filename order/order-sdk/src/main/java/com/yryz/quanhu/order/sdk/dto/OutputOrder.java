@@ -14,6 +14,12 @@ public class OutputOrder implements Serializable {
 
     private static final long serialVersionUID = 7050479619561450604L;
 
+    //订单ID
+    private Long orderId;
+    //金额
+    private Long cost;
+    //支付类型
+    private Integer payType;
     //功能枚举
     private String moduleEnum;
     //私圈ID
@@ -26,6 +32,30 @@ public class OutputOrder implements Serializable {
     private Long createUserId;
     //创建时间
     private Date createDate;
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public Long getCost() {
+        return cost;
+    }
+
+    public void setCost(Long cost) {
+        this.cost = cost;
+    }
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
 
     public String getModuleEnum() {
         return moduleEnum;

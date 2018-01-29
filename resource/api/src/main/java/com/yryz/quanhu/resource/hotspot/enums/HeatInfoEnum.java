@@ -26,9 +26,14 @@ public class HeatInfoEnum {
 	public static final String HEAT_TYPE_USER = "2";
 	
 	/**
-	 * 初始热度
+	 * 初始热度（USER）
 	 */
-	public static final long INIT_HOT = 1000;
+	public static final long INIT_USER_HOT = 1000;
+	
+	/**
+	 * 初始热度（）
+	 */
+	public static final long INIT_TALENT_HOT = 2000;
 	
 	/**
 	 * 热度公式切换的N

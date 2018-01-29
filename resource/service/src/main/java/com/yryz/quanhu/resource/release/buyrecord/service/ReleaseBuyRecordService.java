@@ -3,6 +3,7 @@ package com.yryz.quanhu.resource.release.buyrecord.service;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.resource.release.buyrecord.dto.ReleaseBuyRecordDto;
 import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
+import com.yryz.quanhu.resource.release.buyrecord.vo.ReleaseBuyRecordVo;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -15,5 +16,5 @@ public interface ReleaseBuyRecordService {
 
     int insert(ReleaseBuyRecord releaseBuyRecord);
 
-    PageList<ReleaseBuyRecord> selectByCondition(ReleaseBuyRecordDto releaseBuyRecordDto);
+    PageList<ReleaseBuyRecordVo> selectByCondition(ReleaseBuyRecordDto releaseBuyRecordDto);
 }

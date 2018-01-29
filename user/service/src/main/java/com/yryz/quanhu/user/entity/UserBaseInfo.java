@@ -65,7 +65,7 @@ public class UserBaseInfo extends GenericEntity {
 	private String userQr;
 
 	/**
-	 * 用户性别 0-女 1-男
+	 * 用户性别 10-女 11-男
 	 */
 	private Byte userGenders;
 
@@ -85,10 +85,25 @@ public class UserBaseInfo extends GenericEntity {
 	private String userDeviceId;
 
 	/**
-	 * 用户状态 10-正常 11-冻结 12-黑名单
+	 * 用户状态 10-正常 11-冻结 12-注销
 	 */
 	private Byte userStatus;
-
+	
+	public enum UserStatus{
+		/** 正常 */
+		NORMAL((byte)10),
+		/** 冻结 */
+		FREEZE((byte)11),
+		/** 注销  */
+		DISTORY((byte)12);
+		private byte status;
+		UserStatus(byte status) {
+			this.status = status;
+		}
+		public byte getStatus(){
+			return this.status;
+		}
+	}
 	/**
 	 * 国家
 	 */
@@ -187,7 +202,7 @@ public class UserBaseInfo extends GenericEntity {
 	/**
 	 * 最终热度值
 	 */
-	private Integer lastHeat;
+	private Long lastHeat;
 
 	/**
 	 * 删除标识 10:有效 11:删除
@@ -364,11 +379,11 @@ public class UserBaseInfo extends GenericEntity {
 		this.authStatus = authStatus;
 	}
 
-	public Integer getLastHeat() {
+	public Long getLastHeat() {
 		return lastHeat;
 	}
 
-	public void setLastHeat(Integer lastHeat) {
+	public void setLastHeat(Long lastHeat) {
 		this.lastHeat = lastHeat;
 	}
 
@@ -474,7 +489,7 @@ public class UserBaseInfo extends GenericEntity {
 	 * @param lastHeat
 	 * @param banPostTime
 	 */
-	public UserBaseInfo(Long userId, Byte userStatus, Byte userRole, Byte userVest, Byte authStatus, Integer lastHeat,
+	public UserBaseInfo(Long userId, Byte userStatus, Byte userRole, Byte userVest, Byte authStatus, Long lastHeat,
 			Date banPostTime) {
 		super();
 		this.userId = userId;
