@@ -20,4 +20,10 @@
                 disabled="false" overwrite="true" registry-center-ref="regCenter"
                 cron="* 0/3 * * * ? " sharding-total-count="1"
                 sharding-item-parameters="0=A" description="[framework]Demo任务"/> -->
+
+    <job:simple id="questioninValidRefundJob"
+                class="com.yryz.quanhu.resource.questionsAnswers.service.impl.QuestioninValidRefundJob"
+                registry-center-ref="regCenter" cron="0 0 0 * * ?"
+                sharding-total-count="1" description = "[圈子]失效问题退款"
+                disabled="false" overwrite="true" event-trace-rdb-data-source="dataSource" />
 </beans>

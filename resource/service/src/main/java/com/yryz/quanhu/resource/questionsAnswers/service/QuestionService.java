@@ -56,4 +56,6 @@ public interface QuestionService {
 
 
     public Integer updateByPrimaryKeySelective(Question question);
+
+    void updateInValidQuestionRefund();
 }
