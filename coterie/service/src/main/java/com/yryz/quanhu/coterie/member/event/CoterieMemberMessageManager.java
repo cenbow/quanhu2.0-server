@@ -1,5 +1,6 @@
 package com.yryz.quanhu.coterie.member.event;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
@@ -33,10 +34,10 @@ public class CoterieMemberMessageManager {
 	@Resource
 	private CoterieService coterieService;
 	
-	@Autowired
+	@Reference
 	private UserApi userApi;
 	
-	@Autowired
+	@Reference
 	private MessageAPI messageAPI;
 	
 	/**
