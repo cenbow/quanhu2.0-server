@@ -25,7 +25,27 @@ public class BasicConfigEntity extends GenericEntity {
 
     private String configDesc;
 
-    private int status;
+    private int configStatus;
+
+    private int delFlag;
+
+    private int version;
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(int delFlag) {
+        this.delFlag = delFlag;
+    }
 
     public String getAppId() {
         return appId;
@@ -83,11 +103,11 @@ public class BasicConfigEntity extends GenericEntity {
         this.configDesc = configDesc;
     }
 
-    public int getStatus() {
-        return status;
+    public int getConfigStatus() {
+        return configStatus;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setConfigStatus(int configStatus) {
+        this.configStatus = configStatus;
     }
 }

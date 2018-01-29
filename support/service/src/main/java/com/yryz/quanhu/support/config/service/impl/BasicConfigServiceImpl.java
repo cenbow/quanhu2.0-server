@@ -32,15 +32,15 @@ public class BasicConfigServiceImpl implements BasicConfigService {
     /**
      * 配置redis前缀
      */
-    @Value("basic.config.redis.prefix")
+    @Value("${basic.config.redis.prefix}")
     private String redisPrefix;
     /**
      * 配置失效天数
      */
-    @Value("basic.config.redis.expireDays")
+    @Value("${basic.config.redis.expireDays}")
     private String redisExpireDays;
 
-    @Value("appId")
+    @Value("${appId}")
     private String appId;
 
     @Autowired
@@ -59,9 +59,11 @@ public class BasicConfigServiceImpl implements BasicConfigService {
         if (value==null){
             //查询数据库
             BasicConfigDto dto = basicConfigDao.selectByKey(BasicConfigDto.class,key);
-            value = dto.getConfigValue();
-            //更新缓存
-            redisTemplate.opsForValue().set(key,value,Integer.parseInt(redisExpireDays), TimeUnit.DAYS);
+            if(dto!=null){
+                value = dto.getConfigValue();
+                //更新缓存
+                redisTemplate.opsForValue().set(key,value,Integer.parseInt(redisExpireDays), TimeUnit.DAYS);
+            }
         }
         return value;
     }
@@ -101,6 +103,9 @@ public class BasicConfigServiceImpl implements BasicConfigService {
         if(StringUtils.isBlank(dto.getConfigType())){
             dto.setConfigType("");
         }
+        if(StringUtils.isBlank(dto.getConfigDesc())){
+            dto.setConfigDesc("");
+        }
 
         int updateCount = 0;
         try {
@@ -108,10 +113,8 @@ public class BasicConfigServiceImpl implements BasicConfigService {
              * 新增，或更新
              */
             if(dto.getKid() == null){
-
                 dto.setAppId(appId);
-//                dto.setKid(iIdService.getKid(TABLE_NAME));
-                dto.setKid(System.currentTimeMillis());
+                dto.setKid(iIdService.getKid(TABLE_NAME));
                 updateCount = basicConfigDao.insert(dto);
             }else{
                 updateCount = basicConfigDao.update(dto);
@@ -119,7 +122,7 @@ public class BasicConfigServiceImpl implements BasicConfigService {
         }finally {
 
             //数据库更新成功,并生效
-            if(updateCount==1&&dto.getStatus()==1){
+            if(updateCount==1&&dto.getConfigStatus()==1){
                 redisTemplate.opsForValue().set(dto.getConfigKey(),dto.getConfigValue(),Integer.parseInt(redisExpireDays), TimeUnit.DAYS);
             }
         }
@@ -181,7 +184,7 @@ public class BasicConfigServiceImpl implements BasicConfigService {
             /**
              * 删除，或开启
              */
-            if(dbDto.getStatus()==1){   //生效
+            if(dbDto.getConfigStatus()==1){   //生效
                 redisTemplate.opsForValue().set(dbDto.getConfigKey(),dbDto.getConfigValue());
             }else{                      //失效
                 redisTemplate.delete(dbDto.getConfigKey());
