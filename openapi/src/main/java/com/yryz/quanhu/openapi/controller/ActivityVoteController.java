@@ -1,7 +1,6 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -35,7 +34,7 @@ import java.util.Map;
 @RestController
 public class ActivityVoteController {
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     private ActivityVoteApi activityVoteApi;
 
     @Reference(check = false, timeout = 30000)
@@ -57,7 +56,7 @@ public class ActivityVoteController {
             try {
                 countApi.commitCount(BehaviorEnum.RealRead,activityInfoId, ActivityCountConstant.VOTE_ACTIVITY_DETAIL,ActivityCountConstant.COUNT);
             } catch (Exception e) {
-                logger.error("接入记数异常:"+e.getMessage());
+                logger.error("接入记数异常:", e);
             }
         }
 
