@@ -1,14 +1,18 @@
 package com.yryz.quanhu.user.dao;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.quanhu.message.im.api.ImAPI;
+import com.yryz.quanhu.message.im.entity.ImRelation;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
@@ -35,6 +39,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static com.yryz.quanhu.user.contants.UserRelationConstant.NO;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.YES;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -74,6 +81,8 @@ public class UserRelationCacheDao {
     @Autowired
     private UserRelationDao userRelationDao;
 
+    @Reference
+    private ImAPI imAPI;
     /**
      * 获取唯一关系
      * @param sourceUserId
@@ -219,7 +228,9 @@ public class UserRelationCacheDao {
             logger.info("handleMessage.convert={}",JSON.toJSON(relationDto));
             //数据库存储
             userRelationDao.update(relationDto);
+
             //同步调用第三方建立关系
+            this.syncImRelation(relationDto);
 
             //统计数据
             logger.info("handleMessage.totalCount={} start",relationDto.getSourceUserId());
@@ -258,5 +269,66 @@ public class UserRelationCacheDao {
         dto.setFriendCount(count);
 
         return dto;
+    }
+
+    /**
+     * 同步Im用户关系
+     * 好友/黑名单
+     *
+     * 现dev阶段，im不通，不调用
+     * @param dto
+     * @return
+     */
+    public void syncImRelation(UserRelationDto dto){
+
+        ImRelation im = new ImRelation();
+        im.setUserId(dto.getSourceUserId());
+        im.setTargetUserId(dto.getTargetUserId());
+
+        //判断拉黑关系
+        if(dto.getBlackStatus()==YES){
+            im.setRelationType("1");
+            im.setRelationValue("1");
+            try{
+                logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
+//                imAPI.setSpecialRelation(im);
+            }catch (Exception e){
+                throw new QuanhuException("","[IM]"+e.getMessage(),"添加黑名单失败");
+            }finally {
+                logger.info("syncImRelation.setSpecialRelation ={} finish",JSON.toJSON(im));
+            }
+        }else{
+            im.setRelationType("1");
+            im.setRelationValue("0");
+            try{
+                logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
+//                imAPI.setSpecialRelation(im);
+            }catch (Exception e){
+                throw new QuanhuException("","[IM]"+e.getMessage(),"取消黑名单失败");
+            }finally {
+                logger.info("syncImRelation.setSpecialRelation ={} finish",JSON.toJSON(im));
+            }
+        }
+
+        //判断好友关系
+        if(dto.getFriendStatus()==YES){
+            try{
+                logger.info("syncImRelation.addFriend ={} start",JSON.toJSON(im));
+//                imAPI.addFriend(im);
+            }catch (Exception e){
+                throw new QuanhuException("","[IM]"+e.getMessage(),"添加好友关系失败");
+            }finally {
+                logger.info("syncImRelation.addFriend ={} finish",JSON.toJSON(im));
+            }
+        }else{
+            try{
+                logger.info("syncImRelation.deleteFriend ={} start",JSON.toJSON(im));
+                imAPI.deleteFriend(im);
+            }catch (Exception e){
+                throw new QuanhuException("","[IM]"+e.getMessage(),"删除好友关系失败");
+            }finally {
+                logger.info("syncImRelation.deleteFriend ={} finish",JSON.toJSON(im));
+            }
+        }
     }
 }
