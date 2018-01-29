@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 
-//@Component
+@Component
 public class ClusterCanalService extends AbstractCanalService {
 	protected final Logger logger = LoggerFactory.getLogger(ClusterCanalService.class);
 	private ClusterCanalService client;

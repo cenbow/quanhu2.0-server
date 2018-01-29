@@ -13,14 +13,14 @@
     <!-- spring.xml目前作为elasticjob的配置使用方式，不建议自定义其他配置 -->
 
     <!--elasticjob 注册中心-->
-    <reg:zookeeper id="regCenter" server-lists="${job.reg.address}"
+    <!-- <reg:zookeeper id="regCenter" server-lists="${job.reg.address}"
                    namespace="${job.reg.namespace}" base-sleep-time-milliseconds="1000"
-                   max-sleep-time-milliseconds="3000" max-retries="5" />
+                   max-sleep-time-milliseconds="3000" max-retries="5" /> -->
 
     <!-- elasticjob simplejob任务-->
-    <job:simple id="demoJob"
+    <!-- <job:simple id="demoJob"
                 class="com.yryz.quanhu.dymaic.canal.job.EsSyncDiffJob"
                 disabled="false" overwrite="true" registry-center-ref="regCenter"
                 cron="* 0/3 * * * ? " sharding-total-count="1"
-                sharding-item-parameters="0=A" description="[framework]Demo任务"/>
+                sharding-item-parameters="0=A" description="[framework]Demo任务"/> -->
 </beans>

@@ -13,16 +13,16 @@ import com.yryz.quanhu.dymaic.canal.service.SimpleCanalService;
 @Component
 public class CanalStartupRunner implements CommandLineRunner {
 	private static Logger logger = LoggerFactory.getLogger(CanalStartupRunner.class);
-	@Resource
-	private SimpleCanalService simpleCanalService;
 //	@Resource
-//	private ClusterCanalService clusterCanalService;
+//	private SimpleCanalService simpleCanalService;
+	@Resource
+	private ClusterCanalService clusterCanalService;
 	
 	@Override
 	public void run(String... args) throws Exception {
 		logger.info("CanalStartupRunner starting");
-		simpleCanalService.startup();
-//		clusterCanalService.startup();
+//		simpleCanalService.startup();
+		clusterCanalService.startup();
 	}
 
 }

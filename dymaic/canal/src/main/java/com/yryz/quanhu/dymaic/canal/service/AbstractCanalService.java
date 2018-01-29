@@ -94,18 +94,14 @@ public abstract class AbstractCanalService {
 		while (running) {
 			try {
 				connector.connect();
-				connector.subscribe(".*\\..*");
+				connector.subscribe();//"quanhu\\..*"  客户端不设置以服务端为准，客户端设置了已客户端为准
 				connector.rollback();
 				while (running) {
 					Message message = connector.getWithoutAck(batchSize); // 获取指定数量的数据
 					long batchId = message.getId();
 					int size = message.getEntries().size();
 					if (batchId == -1 || size == 0) {
-						try {
-							logger.debug("empty canal message");
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-						}
+						logger.debug("empty canal message");
 					} else {
 						//printSummary(message, batchId, size);
 						processEntry(message.getEntries());
@@ -152,17 +148,16 @@ public abstract class AbstractCanalService {
 				}
 
 				EventType eventType = rowChage.getEventType();
+				if (eventType == EventType.QUERY || rowChage.getIsDdl()) {
+//					logger.info(" sql ----> " + rowChage.getSql() + SEP);
+					continue;
+				}
+				
 				logger.info(row_format,
 						new Object[] { entry.getHeader().getLogfileName(),
 								String.valueOf(entry.getHeader().getLogfileOffset()), entry.getHeader().getSchemaName(),
 								entry.getHeader().getTableName(), eventType,
 								String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime) });
-				
-				if (eventType == EventType.QUERY || rowChage.getIsDdl()) {
-					logger.info(" sql ----> " + rowChage.getSql() + SEP);
-					continue;
-				}
-
 				CanalMsgContent canalMsgContent = new CanalMsgContent();
 	            canalMsgContent.setDbName(entry.getHeader().getSchemaName().toLowerCase());
 	            canalMsgContent.setTableName(entry.getHeader().getTableName().toLowerCase());
