@@ -8,11 +8,12 @@ import com.yryz.quanhu.behavior.transmit.api.TransmitApi;
 import com.yryz.quanhu.behavior.transmit.dto.TransmitInfoDto;
 import com.yryz.quanhu.behavior.transmit.entity.TransmitInfo;
 import com.yryz.quanhu.behavior.transmit.service.TransmitService;
+import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Service(interfaceClass=TransmitProvider.class)
+@Service(interfaceClass=TransmitApi.class)
 public class TransmitProvider implements TransmitApi {
 
     private static final Logger logger = LoggerFactory.getLogger(TransmitProvider.class);
@@ -26,7 +27,8 @@ public class TransmitProvider implements TransmitApi {
      * */
     public Response single(TransmitInfo transmitInfo) {
         try {
-            return ResponseUtils.returnObjectSuccess(null);
+            transmitService.single(transmitInfo);
+            return ResponseUtils.returnSuccess();
         } catch (Exception e) {
             logger.error("转发 失败", e);
             return ResponseUtils.returnException(e);
@@ -38,9 +40,9 @@ public class TransmitProvider implements TransmitApi {
      * @param   transmitInfoDto
      * @return
      * */
-    public Response<PageList<TransmitInfo>> list(TransmitInfoDto transmitInfoDto) {
+    public Response<PageList<TransmitInfoVo>> list(TransmitInfoDto transmitInfoDto) {
         try {
-            return ResponseUtils.returnObjectSuccess(null);
+            return ResponseUtils.returnObjectSuccess(transmitService.list(transmitInfoDto));
         } catch (Exception e) {
             logger.error("转发列表 失败", e);
             return ResponseUtils.returnException(e);

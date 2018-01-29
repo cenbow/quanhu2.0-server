@@ -4,15 +4,36 @@ import java.io.Serializable;
 
 public class TransmitInfoDto implements Serializable {
 
+    /**页码*/
+    private Integer currentPage = 1;
+    /**每页大小*/
+    private Integer pageSize = 10;
+
     private Long parentId;
 
     private Long resourceId;
 
-    private String moduleEnum;
+    private Integer moduleEnum;
 
     private String content;
 
     private Long targetUserId;
+
+    public Integer getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public Long getParentId() {
         return parentId;
@@ -30,11 +51,11 @@ public class TransmitInfoDto implements Serializable {
         this.resourceId = resourceId;
     }
 
-    public String getModuleEnum() {
+    public Integer getModuleEnum() {
         return moduleEnum;
     }
 
-    public void setModuleEnum(String moduleEnum) {
+    public void setModuleEnum(Integer moduleEnum) {
         this.moduleEnum = moduleEnum;
     }
 
