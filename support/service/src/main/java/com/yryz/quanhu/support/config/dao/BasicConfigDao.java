@@ -21,7 +21,7 @@ public interface BasicConfigDao extends BaseDao{
 
     <T> List<T> selectChildByKid(Class<T> t, @Param("kid") Long kid);
 
-    <T> int deleteChildByKid(Class<T> t, @Param("kids")Set<Long> kids);
+    <T> int deleteChildByKid(Class<T> t, @Param("kids")Set<Long> kids,@Param("lastUpdateUserId") Long lastUpdateUserId);
 
-    <T> int updateKeyStatus(Class<T> t, @Param("kid") Long kid);
+    <T> int updateStatus(T t);
 }

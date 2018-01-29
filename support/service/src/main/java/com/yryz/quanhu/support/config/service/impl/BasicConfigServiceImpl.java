@@ -52,17 +52,19 @@ public class BasicConfigServiceImpl implements BasicConfigService {
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
 
+
+
+
     @Override
     public String getValue(String key) {
         //查询缓存
-        String value = redisTemplate.opsForValue().get(key);
+        String value = this.getRedisValue(key);
         if (value==null){
             //查询数据库
             BasicConfigDto dto = basicConfigDao.selectByKey(BasicConfigDto.class,key);
             if(dto!=null){
-                value = dto.getConfigValue();
                 //更新缓存
-                redisTemplate.opsForValue().set(key,value,Integer.parseInt(redisExpireDays), TimeUnit.DAYS);
+                this.setRedisValue(dto.getConfigKey(),dto.getConfigValue());
             }
         }
         return value;
@@ -106,7 +108,9 @@ public class BasicConfigServiceImpl implements BasicConfigService {
         if(StringUtils.isBlank(dto.getConfigDesc())){
             dto.setConfigDesc("");
         }
-
+        if(dto.getParentKid()==null){
+            dto.setParentKid(Long.parseLong("0"));
+        }
         int updateCount = 0;
         try {
             /**
@@ -123,7 +127,7 @@ public class BasicConfigServiceImpl implements BasicConfigService {
 
             //数据库更新成功,并生效
             if(updateCount==1&&dto.getConfigStatus()==1){
-                redisTemplate.opsForValue().set(dto.getConfigKey(),dto.getConfigValue(),Integer.parseInt(redisExpireDays), TimeUnit.DAYS);
+                this.setRedisValue(dto.getConfigKey(),dto.getConfigValue());
             }
         }
         return updateCount==1?true:false;
@@ -147,10 +151,10 @@ public class BasicConfigServiceImpl implements BasicConfigService {
         this.builTreeData(kids,keys,dto);
 
         //删除数据库
-        int updateCount = basicConfigDao.deleteChildByKid(BasicConfigDto.class,kids);
+        int updateCount = basicConfigDao.deleteChildByKid(BasicConfigDto.class,kids,dto.getLastUpdateUserId());
 
         //删除缓存
-        redisTemplate.delete(keys);
+        this.deleteRedisValue(keys);
 
         return updateCount>0?true:false;
     }
@@ -172,10 +176,10 @@ public class BasicConfigServiceImpl implements BasicConfigService {
 
 
     @Override
-    public Boolean updateKeyStatus(BasicConfigDto dto) {
+    public Boolean updateStatus(BasicConfigDto dto) {
 
         //修改
-        int updateCount = basicConfigDao.updateKeyStatus(BasicConfigDto.class,dto.getKid());
+        int updateCount = basicConfigDao.updateStatus(dto);
         //查询
         BasicConfigDto dbDto = basicConfigDao.selectByKid(BasicConfigDto.class,dto.getKid());
 
@@ -184,10 +188,10 @@ public class BasicConfigServiceImpl implements BasicConfigService {
             /**
              * 删除，或开启
              */
-            if(dbDto.getConfigStatus()==1){   //生效
-                redisTemplate.opsForValue().set(dbDto.getConfigKey(),dbDto.getConfigValue());
-            }else{                      //失效
-                redisTemplate.delete(dbDto.getConfigKey());
+            if(dbDto.getConfigStatus()==1){     //生效
+                this.setRedisValue(dbDto.getConfigKey(),dbDto.getConfigValue());
+            }else{                              //失效
+                this.deleteRedisValue(dbDto.getConfigKey());
             }
         }
         return true;
@@ -195,7 +199,14 @@ public class BasicConfigServiceImpl implements BasicConfigService {
 
     @Override
     public BasicConfigDto get(BasicConfigDto dto) {
-        return basicConfigDao.selectByKid(BasicConfigDto.class,dto.getKid());
+        dto = basicConfigDao.selectByKid(BasicConfigDto.class,dto.getKid());
+        if(dto!=null){
+            BasicConfigDto parentDto = basicConfigDao.selectByKid(BasicConfigDto.class,dto.getParentKid());
+            if(parentDto!=null){
+                dto.setParentConfigName(parentDto.getConfigName());
+            }
+        }
+        return dto;
     }
 
     @Override
@@ -212,4 +223,36 @@ public class BasicConfigServiceImpl implements BasicConfigService {
 
         return new PageModel<BasicConfigDto>().getPageList(list);
     }
+
+
+    /**
+     * redis统一操作
+     * @param dto
+     */
+    private void setRedisValue(String key,String value){
+        String redisKey = buildRedisKey(key);
+        redisTemplate.opsForValue().set(redisKey,value,Long.parseLong(redisExpireDays),TimeUnit.DAYS);
+    }
+    private String getRedisValue(String key){
+        String redisKey = buildRedisKey(key);
+        return redisTemplate.opsForValue().get(redisKey);
+    }
+    private void deleteRedisValue(String key){
+        String redisKey = buildRedisKey(key);
+        redisTemplate.delete(redisKey);
+    }
+
+    private void deleteRedisValue(Set<String> keys){
+        Set<String> newSet = new HashSet<>();
+        Iterator<String> iterator = keys.iterator();
+        while(iterator.hasNext()){
+            newSet.add(buildRedisKey(iterator.next()));
+        }
+        redisTemplate.delete(newSet);
+    }
+
+    private String buildRedisKey(String key){
+        return redisPrefix+"."+appId+"."+key;
+    }
+
 }
