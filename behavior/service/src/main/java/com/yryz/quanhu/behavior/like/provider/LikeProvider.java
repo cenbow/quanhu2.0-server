@@ -5,6 +5,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
@@ -18,6 +19,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -46,9 +48,14 @@ public class LikeProvider implements LikeApi {
     @Reference(check = false)
     private UserApi userApi;
 
+    @Autowired
+    private RedisTemplateBuilder redisTemplateBuilder;
+
+
     @Override
     @Transactional
     public Response<Map<String, Object>> dian(Like like) {
+        RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         try {
             Map<String, Object> map = new HashMap<String, Object>();
             like.setKid(idAPI.getSnowflakeId().getData());
@@ -72,12 +79,24 @@ public class LikeProvider implements LikeApi {
                         map.put("userId", likeVO.getUserId());
                         map.put("createDate", likeVO.getCreateDate());
                     }
+                    try{
+                        redisTemplate.opsForValue().set("LIKE:"+like.getModuleEnum()+":"+like.getResourceId()+"_"+like.getUserId(),1L);
+                    }catch (Exception e){
+                        logger.info("同步点赞数据到redis出现异常:"+e);
+                    }
+
                 }
             } else {
                 int count = likeService.cleanLike(like);
                 tongCount=-1;
                 if (count > 0) {
                     map.put("result", 1);
+                    try{
+                        redisTemplate.delete("LIKE:"+like.getModuleEnum()+":"+like.getResourceId()+"_"+like.getUserId());
+                    }catch (Exception e){
+                        logger.info("从redis中清掉点赞数据出现异常:"+e);
+                    }
+
                 } else {
                     map.put("result", 0);
                 }
@@ -117,4 +136,43 @@ public class LikeProvider implements LikeApi {
             return ResponseUtils.returnException(e);
         }
     }
+
+    @Override
+    public Response<Integer> isLike(Like like) {
+        try{
+            return ResponseUtils.returnObjectSuccess(likeService.isLike(like));
+        }catch (Exception e){
+            logger.error("", e);
+            return ResponseUtils.returnException(e);
+        }
+
+    }
+
+    @Override
+    public Response<Long> getLikeFlag(Map<String, Object> map) {
+        try{
+            RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+            Long likeFlag=0L;
+            if(null!=redisTemplate){
+                likeFlag = redisTemplate.opsForValue().get("LIKE:"+map.get("moduleEnum")+":"+map.get("resourceId")+"_"+map.get("userId"));
+                if(null==likeFlag){
+                    likeFlag=0L;
+                }
+            }else{
+                Like like=new Like();
+                if(null!=map||map.size()>0){
+                    like.setResourceId(Long.valueOf(map.get("resourceId").toString()));
+                    like.setUserId(Long.valueOf(map.get("userId").toString()));
+                }
+                likeFlag = Long.valueOf(likeService.isLike(like));
+            }
+            return ResponseUtils.returnObjectSuccess(likeFlag);
+        }catch (Exception e){
+            logger.error("", e);
+            return ResponseUtils.returnException(e);
+        }
+
+    }
+
+
 }

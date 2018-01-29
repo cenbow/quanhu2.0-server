@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.support.config.dao.BasicConfigDao" >
+
+  <!--Base_Column_List-->
+  <sql id="Base_Column_List">
+    id,kid,create_date,create_user_id,last_update_date,last_update_user_id,del_flag,version,
+    appId,parent_kid,config_name,config_key,config_value,config_desc,config_status
+  </sql>
+
+
+  <insert id="insert" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+    <selectKey resultType="long" keyProperty="id" order="AFTER">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+
+    INSERT INTO qh_basic_config(
+    <include refid="Base_Column_List"/>
+    )VALUES (
+    #{id,jdbcType=BIGINT}
+    ,#{kid,jdbcType=BIGINT}
+    ,now()
+    ,#{createUserId,jdbcType=BIGINT}
+    ,now()
+    ,#{lastUpdateUserId,jdbcType=BIGINT}
+    ,#{delFlag,jdbcType=TINYINT}
+    ,#{version,jdbcType=TINYINT}
+
+    ,#{appId,jdbcType=VARCHAR}
+    ,#{parentKid,jdbcType=BIGINT}
+    ,#{configName,jdbcType=VARCHAR}
+    ,#{configKey,jdbcType=VARCHAR}
+    ,#{configValue,jdbcType=VARCHAR}
+    ,#{configDesc,jdbcType=VARCHAR}
+    ,#{configStatus,jdbcType=TINYINT}
+
+    )
+  </insert>
+
+  <update id="update" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+
+    UPDATE qh_basic_config SET
+
+    last_update_date = NOW()
+    ,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+
+    ,#{appId,jdbcType=VARCHAR}
+    ,#{parentKid,jdbcType=BIGINT}
+    ,#{configName,jdbcType=VARCHAR}
+    ,#{configKey,jdbcType=VARCHAR}
+    ,#{configValue,jdbcType=VARCHAR}
+    ,#{configDesc,jdbcType=VARCHAR}
+    ,#{configStatus,jdbcType=TINYINT}
+
+    WHERE kid = #{kid,jdbcType=BIGINT}
+
+  </update>
+
+  <select id="getList" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto"
+          resultType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM qh_basic_config
+    WHERE del_flag = 0
+    <if test="configKey != null and configKey != ''">
+      AND config_key = #{configKey,jdbcType=VARCHAR}
+    </if>
+    <if test="configName != null and configName != ''">
+      AND config_name = #{configName,jdbcType=VARCHAR}
+    </if>
+    <if test="parentKid != null and parentKid != ''">
+      AND parent_kid = #{parentKid,jdbcType=BIGINT}
+    </if>
+    ORDER BY last_update_date DESC
+  </select>
+
+
+  <select id="selectByKid" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto"
+          resultType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM qh_basic_config WHERE del_flag = 0 AND kid = #{kid,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectByKey" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto"
+          resultType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM qh_basic_config
+    WHERE del_flag = 0 AND config_key = #{configKey,jdbcType=VARCHAR}
+    limit 1
+
+  </select>
+
+
+  <select id="selectChildByKid" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto"
+          resultType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM qh_basic_config
+    WHERE del_flag = 0 AND parent_kid = #{kid,jdbcType=BIGINT}
+
+  </select>
+
+
+  <update id="deleteAllChildByKid" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+
+    UPDATE qh_basic_config SET
+    del_flag = 1,
+    last_update_date = Now(),
+    last_update_date_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+    WHERE
+    <choose>
+      <when test="kids != null and kids.size > 0">
+        kid IN
+        <foreach collection="kids" item="kid" index="index" open="(" separator="," close=")">
+            #{kid,jdbcType=BIGINT}
+        </foreach>
+      </when>
+      <otherwise>
+        FALSE
+      </otherwise>
+    </choose>
+
+  </update>
+
+  <update id="updateKeyStatus" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+
+    UPDATE qh_basic_config SET
+    config_status = #{configStatus,jdbcType=TINYINT},
+    last_update_date = Now(),
+    last_update_date_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+    WHERE kid = #{kid,jdbcType=BIGINT}
+
+  </update>
+
+</mapper>

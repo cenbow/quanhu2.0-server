@@ -183,9 +183,11 @@ public class UserStarController {
                             for (StarInfoVO starInfoVO : entities) {
                                 try {
                                     Dymaic dymaic = dynaicMap.get(starInfoVO.getUserInfo().getUserId());
-                                    UserDynamicVO userDynamicVO = new UserDynamicVO();
-                                    BeanUtils.copyProperties(userDynamicVO, dymaic);
-                                    starInfoVO.setDynamic(userDynamicVO);
+                                    if (dymaic != null) {
+                                        UserDynamicVO userDynamicVO = new UserDynamicVO();
+                                        BeanUtils.copyProperties(userDynamicVO, dymaic);
+                                        starInfoVO.setDynamic(userDynamicVO);
+                                    }
                                 } catch (Exception e) {
                                     logger.error("for setDynamic error", e);
                                 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.EventReportVo;
@@ -21,4 +22,7 @@ public interface ScoreFlowService {
 	List<EventReportVo> getAll(@Param("userId")String userId);
 
 	List<ScoreFlow> getPage(ScoreFlowQuery sfq);
+ 
+	long countgetPage(ScoreFlowQuery gfq) ;
+
 }

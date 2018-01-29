@@ -30,13 +30,7 @@
 		    	  and remark like CONCAT('%',#{remark},'%') 
 		    	 ]]>
 			</if>
-			<if test="userFlag != null ">  
-				AND user_flag = #{userFlag}   
-			</if>
-			<if test="prizesFlag != null ">  
-				AND prizes_flag = #{prizesFlag}   
-			</if>
-			<if test="onlineTimeStart != null">                                   
+			<if test="onlineTimeStart != null">
 		       <![CDATA[                                 
 		    	AND online_time >= #{onlineTimeStart}
 		       ]]>
@@ -69,15 +63,23 @@
 	</sql>
 	
 	<select id="adminlist" parameterType="com.yryz.quanhu.support.activity.dto.AdminActivityInfoVoteDto" resultType="com.yryz.quanhu.support.activity.vo.AdminActivityVoteVo">
-		select  info.*,
-				ifnull(vote.join_count,0) join_count,
-				ifnull(vote.vote_count,0) vote_count
+		select  info.id,info.kid,info.title,info.content,info.cover_plan,
+		info.activity_type,info.online_time,info.begin_time,info.end_time,recommend,
+		info.recommend_date,info.remark,info.join_count,info.shelve_flag,info.prizes_announcement_flag,
+		info.activity_channel_code,info.module_enum,
+		vote.user_flag,vote.user_num,vote.amount,vote.prizes_flag
 		from qh_activity_info info
-		left join ( select  activity_info_id , count(ifnull(vote_no,0))  join_count,  count(ifnull(vote_count,0))  vote_count from qh_activity_vote_detail  group by activity_info_id) vote
-				on info.id = vote.activity_info_id
+		INNER JOIN qh_activity_vote_config vote
+		on info.kid = vote.activity_info_id
 		<where>
 			activity_type = 12
 			<include refid="conditions"></include>
+			<if test="userFlag != null ">
+				AND vote.user_flag = #{userFlag}
+			</if>
+			<if test="prizesFlag != null ">
+				AND vote.prizes_flag = #{prizesFlag}
+			</if>
 		</where>		
 		order by online_time desc
 	</select>

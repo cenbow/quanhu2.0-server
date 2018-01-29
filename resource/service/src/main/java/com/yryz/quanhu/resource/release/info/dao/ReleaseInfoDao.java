@@ -25,4 +25,6 @@ public interface ReleaseInfoDao {
     int updateByUkSelective(@Param("record") ReleaseInfo record);
 
     int updateByCondition(@Param("record") ReleaseInfo record, @Param("dto") ReleaseInfoDto dto);
+    
+    List<Long> selectKidByCreatedate(@Param("startDate")String startDate,@Param("endDate")String endDate);
 }

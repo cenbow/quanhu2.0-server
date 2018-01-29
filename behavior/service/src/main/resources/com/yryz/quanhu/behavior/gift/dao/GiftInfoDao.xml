@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yryz.quanhu.behavior.gift.dao.GiftInfoDao">
+	<resultMap id="BaseResultMap" type="com.yryz.quanhu.behavior.gift.entity.GiftInfo">
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="kid" jdbcType="BIGINT" property="kid" />
+		<result column="gift_name" jdbcType="VARCHAR" property="giftName" />
+		<result column="gift_image" jdbcType="VARCHAR" property="giftImage" />
+		<result column="gift_price" jdbcType="BIGINT" property="giftPrice" />
+		<result column="gift_value" jdbcType="BIGINT" property="giftValue" />
+		<result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+		<result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, kid, gift_name, gift_image, gift_price, gift_value, create_date, last_update_date
+	</sql>
+
+	<select id="selectByKid" parameterType="java.lang.Long" resultType="com.yryz.quanhu.behavior.gift.entity.GiftInfo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_gift_info
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+		parameterType="com.yryz.quanhu.behavior.gift.entity.GiftInfo">
+		insert into qh_gift_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="kid != null">
+				kid,
+			</if>
+			<if test="giftName != null">
+				gift_name,
+			</if>
+			<if test="giftImage != null">
+				gift_image,
+			</if>
+			<if test="giftPrice != null">
+				gift_price,
+			</if>
+			<if test="giftValue != null">
+				gift_value,
+			</if>
+			create_date,
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="kid != null">
+				#{kid,jdbcType=BIGINT},
+			</if>
+			<if test="giftName != null">
+				#{giftName,jdbcType=VARCHAR},
+			</if>
+			<if test="giftImage != null">
+				#{giftImage,jdbcType=VARCHAR},
+			</if>
+			<if test="giftPrice != null">
+				#{giftPrice,jdbcType=BIGINT},
+			</if>
+			<if test="giftValue != null">
+				#{giftValue,jdbcType=BIGINT},
+			</if>
+			NOW,
+		</trim>
+	</insert>
+
+	<update id="updateByKid" parameterType="com.yryz.quanhu.behavior.gift.entity.GiftInfo">
+		update qh_gift_info
+		<set>
+			<if test="kid != null">
+				kid = #{kid,jdbcType=BIGINT},
+			</if>
+			<if test="giftName != null">
+				gift_name = #{giftName,jdbcType=VARCHAR},
+			</if>
+			<if test="giftImage != null">
+				gift_image = #{giftImage,jdbcType=VARCHAR},
+			</if>
+			<if test="giftPrice != null">
+				gift_price = #{giftPrice,jdbcType=BIGINT},
+			</if>
+			<if test="giftValue != null">
+				gift_value = #{giftValue,jdbcType=BIGINT},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate,jdbcType=TIMESTAMP},
+			</if>
+			last_update_date = NOW(),
+		</set>
+		where kid = #{kid,jdbcType=BIGINT}
+	</update>
+
+	<select id="selectByCondition" parameterType="com.yryz.quanhu.behavior.gift.dto.GiftInfoDto" resultType="com.yryz.quanhu.behavior.gift.entity.GiftInfo">
+		select
+		<include refid="Base_Column_List" />
+		from qh_gift_info
+		<include refid="select_where_sql"></include>
+	</select>
+
+	<sql id="select_where_sql">
+		<where>
+			1=1
+			<if test="kids != null">
+				and kid in
+				<foreach item="item" index="index" collection="kids" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+
+	<select id="countByCondition" parameterType="com.yryz.quanhu.behavior.gift.dto.GiftInfoDto" resultType="java.lang.Long">
+		select count(*)
+		from qh_gift_info
+		<include refid="select_where_sql"></include>
+	</select>
+</mapper>

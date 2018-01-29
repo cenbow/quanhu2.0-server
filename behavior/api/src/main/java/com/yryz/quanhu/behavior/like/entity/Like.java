@@ -1,5 +1,7 @@
 package com.yryz.quanhu.behavior.like.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.entity.GenericEntity;
 
 /**
@@ -13,6 +15,7 @@ public class Like extends GenericEntity {
     /**
      *资源ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private long resourceId;
 
     /**
@@ -23,6 +26,7 @@ public class Like extends GenericEntity {
     /**
      * 点赞人ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private long userId;
 
     public long getResourceId() {

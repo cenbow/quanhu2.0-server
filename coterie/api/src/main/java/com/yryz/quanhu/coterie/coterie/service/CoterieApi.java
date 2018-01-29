@@ -2,6 +2,7 @@ package com.yryz.quanhu.coterie.coterie.service;
 
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.coterie.exception.ServiceException;
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
@@ -53,7 +54,7 @@ public interface CoterieApi {
 	 * @param info  coterieId必填
 	 * @throws ServiceException
 	 */
-	public void modifyCoterieInfo(CoterieInfo info) throws ServiceException;
+	public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info) throws ServiceException;
 	
 	/**
 	 * 更新私圈主达人状态
@@ -213,4 +214,19 @@ public interface CoterieApi {
 	 * @throws
 	 */
 	public Response<String> regroupQr(CoterieInfo info);
+	
+	/**
+	 * 根据创建日期查询所有私圈ID
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	Response<List<Long>> getKidByCreateDate(String startDate,String endDate);
+    
+	/**
+	 * 查询私圈
+	 * @param kidList
+	 * @return
+	 */
+	Response<List<Coterie>> getByKids(List<Long> kidList);
 }

@@ -32,7 +32,7 @@ public class AgentRegisterDTO implements Serializable{
 	 */
 	private String userPwd;
 	/**
-	 * 是否马甲 0-否 1-是
+	 * 是否马甲 10-否 11-是
 	 */
 	private Integer isVest;
 	/**
