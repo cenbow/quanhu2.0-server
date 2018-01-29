@@ -11,7 +11,7 @@ public enum ExceptionEnum {
     NEEDTOKEN("1001", "用户未登录或者被挤掉了", "请重新登录"),
     TOKEN_EXPIRE("1002", "短期token过期", "请重新登录"),
     TOKEN_INVALID("1003", "无效token", "请重新登录"),
-    NO_TOKEN("1004", "token被后清掉了", "请重新登录"),
+    NO_TOKEN("1004", "token被后台清掉了", "请重新登录"),
     NEED_PHONE("1005", "需要绑定手机号", "需要绑定手机号"),
     USER_MISSING("1006", "用户不存在", "用户不存在"),
     USER_NO_TALK("1007", "用户被禁言", "用户被禁言"),
