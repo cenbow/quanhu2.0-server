@@ -61,7 +61,7 @@ public class HotSpotApiProvider implements HotSpotApi {
 	 */
 	@Override
 	public void saveHeat(String type, String objectId) {
-		hotspotService.saveHeat(type, objectId);
+		hotspotService.saveHeat(type, objectId,null);
 	}
 
 	/**

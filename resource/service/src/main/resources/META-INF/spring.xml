@@ -19,10 +19,34 @@
                 disabled="false" overwrite="true" registry-center-ref="regCenter"
                 cron="* 0/3 * * * ? " sharding-total-count="1"
                 sharding-item-parameters="0=A" description="[framework]Demo任务"/> -->
+                
+                <!--     <job:simple id="questioninValidRefundJob"
+                class="com.yryz.quanhu.resource.questionsAnswers.service.impl.QuestioninValidRefundJob"
+                registry-center-ref="regCenter" cron="0 0 0 * * ?"
+                sharding-total-count="1" description = "[圈子]失效问题退款"
+                disabled="false" overwrite="true" event-trace-rdb-data-source="dataSource" /> -->
 
     <job:simple id="questioninValidRefundJob"
                 class="com.yryz.quanhu.resource.questionsAnswers.service.impl.QuestioninValidRefundJob"
                 registry-center-ref="regCenter" cron="0 0 0 * * ?"
                 sharding-total-count="1" description = "[圈子]失效问题退款"
-                disabled="false" overwrite="true" event-trace-rdb-data-source="dataSource" />
+                disabled="false" overwrite="true" />
+    
+    <job:simple id="resourceCalculationJob"
+           class="com.yryz.quanhu.resource.task.ResourceCalculationJob"
+           registry-center-ref="regCenter" cron="0 0/10 * * * ? "
+           sharding-total-count="1" description = "资源热度计算"
+           disabled="false" overwrite="true" />
+           
+    <job:simple id="resourceRecommendJob"
+           class="com.yryz.quanhu.resource.task.ResourceRecommendJob"
+           registry-center-ref="regCenter" cron="0 0/10 * * * ? "
+           sharding-total-count="1" description = "资源首页缓存构建"
+           disabled="false" overwrite="true" />
+           
+    <job:simple id="resourceAttenuationJob"
+           class="com.yryz.quanhu.resource.task.ResourceAttenuationJob"
+           registry-center-ref="regCenter" cron="0 1 0/1 * * ? "
+           sharding-total-count="1" description = "资源热度衰减"
+           disabled="false" overwrite="true" />
 </beans>
