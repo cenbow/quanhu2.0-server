@@ -23,6 +23,7 @@ import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.dao.redis.ResourceRedis;
 import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.hotspot.service.HotspotService;
 import com.yryz.quanhu.resource.service.ResourceService;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
@@ -42,7 +43,10 @@ public class ResourceServiceImpl implements ResourceService {
 	
 	@Autowired
 	private ResourceRedis resourceRedis;
-
+	
+	@Autowired
+	HotspotService hotspotService;
+	
 	/**
 	 * 提交资源
 	 * @param resources
@@ -56,6 +60,8 @@ public class ResourceServiceImpl implements ResourceService {
 					resourceMongo.update(resourceModel);
 				} else {
 					resourceMongo.save(resourceModel);
+					//创建资源时候要创建对应的热度对象
+					hotspotService.saveHeat("1", resourceModel.getResourceId() , resourceModel.getTalentType());
 				}
 			}
 		}
@@ -345,7 +351,7 @@ public class ResourceServiceImpl implements ResourceService {
 	 */
 	@Override
 	public List<ResourceModel> appRecommend(int start, int limit) {
-		List<String> resourceIds = resourceRedis.getAppRecommendList(start -1 , limit);
+		List<String> resourceIds = resourceRedis.getAppRecommendList(start, limit);
 		List<ResourceModel> resources = new ArrayList<>();
 		for (String resourceId : resourceIds) {
 			resources.add(get(resourceId));

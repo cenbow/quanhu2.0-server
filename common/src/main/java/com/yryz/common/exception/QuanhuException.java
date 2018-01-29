@@ -36,14 +36,14 @@ public class QuanhuException extends IllegalArgumentException {
         return busiError(null, errorMsg);
     }
 
-    public static QuanhuException busiError(String code, String msg) {
-        if (StringUtils.isBlank(msg)) {
-            msg = ExceptionEnum.BusiException.getShowMsg();
+    public static QuanhuException busiError(String code, String errorMsg) {
+        if (StringUtils.isBlank(errorMsg)) {
+        	errorMsg = ExceptionEnum.BusiException.getShowMsg();
         }
         if (StringUtils.isBlank(code)) {
         	code = ExceptionEnum.BusiException.getCode();
         }
-        return new QuanhuException(code, msg, ExceptionEnum.BusiException.getErrorMsg());
+        return new QuanhuException(code, ExceptionEnum.BusiException.getShowMsg(), errorMsg);
     }
     
     public static QuanhuException busiError(String code,String msg, String errorMsg) {

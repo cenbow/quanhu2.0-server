@@ -93,7 +93,8 @@
   <select id="getByPhones" resultType="com.yryz.quanhu.user.entity.UserBaseInfo">
 	select
 	user_id as userId,
-	user_phone as userPhone
+	user_phone as userPhone,
+	app_id as appId
 	from qh_user_baseinfo
 	where del_flag = 10 and user_status != 12 and app_id = #{appId} 
 	and user_phone in		

@@ -61,7 +61,7 @@ public class ActivityCandidateController {
     @ApiOperation("参与投票活动")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/config")
-    public Response<ActivityVoteConfigVo> config(Long activityInfoId) {
+    public Response<ActivityVoteConfigVo> config(Long activityInfoId, HttpServletRequest request) {
         return activityCandidateApi.config(activityInfoId);
     }
 

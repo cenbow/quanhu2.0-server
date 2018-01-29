@@ -76,7 +76,7 @@ public class ActivityVoteController {
     @ApiOperation("奖品列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/prizeslist")
-    public Response<PageList<ActivityPrizesVo>> prizeslist(ActivityVoteDto activityVoteDto) {
+    public Response<PageList<ActivityPrizesVo>> prizeslist(ActivityVoteDto activityVoteDto, HttpServletRequest request) {
         return activityVoteApi.prizeslist(activityVoteDto);
     }
 
@@ -93,7 +93,7 @@ public class ActivityVoteController {
     @ApiOperation("无奖品文案")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/noPrize")
-    public Response<Map<String, String>> noPrize(Long activityInfoId) {
+    public Response<Map<String, String>> noPrize(Long activityInfoId, HttpServletRequest request) {
         return activityVoteApi.noPrize(activityInfoId);
     }
 
