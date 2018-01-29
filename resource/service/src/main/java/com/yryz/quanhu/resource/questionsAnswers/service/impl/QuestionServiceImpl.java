@@ -9,7 +9,9 @@ import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
@@ -26,12 +28,16 @@ import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
-import com.yryz.quanhu.resource.questionsAnswers.service.QuestionMessageService;
+import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,9 +78,12 @@ public class QuestionServiceImpl implements QuestionService {
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
 
+    @Reference
+    private EventAPI eventAPI;
+
 
     @Autowired
-    private QuestionMessageService questionMessageService;
+    private SendMessageService questionMessageService;
 
     /**
      * 发布提问
@@ -101,7 +110,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          *校验私圈是否合法
          */
-        if(targetId.equals(String.valueOf(createUserId))){
+        if (targetId.equals(String.valueOf(createUserId))) {
             throw QuanhuException.busiError("不能向自己提问。");
         }
         CoterieInfo coterieInfo = apIservice.getCoterieinfo(citeriaId);
@@ -155,8 +164,21 @@ public class QuestionServiceImpl implements QuestionService {
             question.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
             this.questionDao.updateByPrimaryKeySelective(question);
         }
-        Boolean  sendResult=questionMessageService.sendNotify4Question(question,MessageConstant.QUESTION_TO_BE_ANSWERED);
-        if(!sendResult){
+
+        /**
+         * 发送通知消息
+         */
+        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+        messageBusinessVo.setAmount(question.getChargeAmount());
+        messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+        messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
+        messageBusinessVo.setKid(question.getKid());
+        messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+        messageBusinessVo.setTosendUserId(question.getCreateUserId());
+        messageBusinessVo.setTitle(question.getContent());
+        messageBusinessVo.setImgUrl("");
+        Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_ANSWERED);
+        if (!sendResult) {
             logger.info("提问被删除，发送消息失败");
         }
         return question;
@@ -195,17 +217,28 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if(questionBySearch.getChargeAmount()>0){
-            Long orderId=orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER,questionBySearch.getCreateUserId(),questionBySearch.getChargeAmount());
-            if(null!=orderId){
+        if (questionBySearch.getChargeAmount() > 0) {
+            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
+            if (null != orderId) {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
                 questionBySearch.setRefundOrderId(String.valueOf(orderId));
+
+
                 //发送通知消息
-              Boolean  sendResult=questionMessageService.sendNotify4Question(questionBySearch,MessageConstant.QUESTION_DELETE);
-              if(!sendResult){
-                  logger.info("提问被删除，发送消息失败");
-              }
-            }else{
+                MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+                messageBusinessVo.setAmount(questionBySearch.getChargeAmount());
+                messageBusinessVo.setCoterieId(String.valueOf(questionBySearch.getCoterieId()));
+                messageBusinessVo.setIsAnonymity(questionBySearch.getIsAnonymity());
+                messageBusinessVo.setKid(questionBySearch.getKid());
+                messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+                messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
+                messageBusinessVo.setTitle(questionBySearch.getContent());
+                messageBusinessVo.setImgUrl("");
+                Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE);
+                if (!sendResult) {
+                    logger.info("提问被删除，发送消息失败");
+                }
+            } else {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
             }
         }
@@ -244,7 +277,7 @@ public class QuestionServiceImpl implements QuestionService {
          */
         Question questionBysearch = questions.get(0);
         Long createUserId = questionBysearch.getCreateUserId();
-        Long targetId=Long.valueOf(questionBysearch.getTargetId());
+        Long targetId = Long.valueOf(questionBysearch.getTargetId());
         if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
             if (createUserId.compareTo(userId) != 0) {
                 throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREAD);
@@ -255,12 +288,28 @@ public class QuestionServiceImpl implements QuestionService {
         if (null != createUserId) {
             questionVo.setUser(apIservice.getUser(createUserId));
         }
-        if(null !=targetId){
+        if (null != targetId) {
             questionVo.setTargetUser(apIservice.getUser(targetId));
         }
         questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
         questionAnswerVo.setQuestion(questionVo);
         questionAnswerVo.setAnswer(this.answerService.queryAnswerVoByquestionId(questionVo.getKid()));
+        //提交阅读数
+        // TODO: 2018/1/29 0029
+
+        /**
+         * 提交积分成长值事件
+         */
+        EventInfo eventInfo=new EventInfo();
+        eventInfo.setAmount(0D);
+        eventInfo.setCoterieId(questionVo.getCoterieId());
+        eventInfo.setCreateTime(DateUtils.getTime());
+        eventInfo.setEventCode(EventEnum.READ_RESOURCE.getCode());
+        eventInfo.setOwnerId(String.valueOf(createUserId));
+        eventInfo.setResourceId(String.valueOf(questionVo.getKid()));
+        eventInfo.setUserId(String.valueOf(userId));
+        eventInfo.setEventNum(1);
+        eventAPI.commit(eventInfo);
         return questionAnswerVo;
     }
 
@@ -294,14 +343,14 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if(question.getChargeAmount()>0){
-           Long orderId= orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER,question.getCreateUserId(),question.getChargeAmount());
-           if(null!=orderId){
-               question.setRefundOrderId(String.valueOf(orderId));
-               question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
-           }else{
-               question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
-           }
+        if (question.getChargeAmount() > 0) {
+            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
+            if (null != orderId) {
+                question.setRefundOrderId(String.valueOf(orderId));
+                question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
+            } else {
+                question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
+            }
         }
         return this.questionDao.updateByPrimaryKeySelective(question);
     }
@@ -323,7 +372,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (null == coteriaId || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        Integer pageNum = dto.getPageNum() == null ? 1 : dto.getPageNum();
+        Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
         Integer pageStartIndex = (pageNum - 1) * pageSize;
         QuestionExample example = new QuestionExample();
@@ -359,7 +408,7 @@ public class QuestionServiceImpl implements QuestionService {
                 questionVo.setUser(apIservice.getUser(questionCreateUserId));
             }
 
-            if(null !=question.getTargetId()){
+            if (null != question.getTargetId()) {
                 questionVo.setTargetUser(apIservice.getUser(Long.valueOf(question.getTargetId())));
             }
             questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
@@ -440,6 +489,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     /**
      * job 失效问题退款
+     *
      * @param
      */
     @Override
@@ -447,32 +497,45 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 查询失效的问题
          */
-        QuestionExample example=new QuestionExample();
-        QuestionExample.Criteria criteria=example.createCriteria();
+        QuestionExample example = new QuestionExample();
+        QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
         criteria.andChargeAmountGreaterThan(0L);
         criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
-        Calendar invaidDate=Calendar.getInstance();
-        invaidDate.add(Calendar.HOUR_OF_DAY,-48);
+        Calendar invaidDate = Calendar.getInstance();
+        invaidDate.add(Calendar.HOUR_OF_DAY, -48);
         criteria.andCreateDateLessThan(invaidDate.getTime());
         criteria.andAnswerdFlagEqualTo(QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED);
-        List<Question> questions=this.questionDao.selectByExample(example);
-        for(Question question:questions){
-            logger.info("==退款的提问编号==:{}",question.getKid());
+        List<Question> questions = this.questionDao.selectByExample(example);
+        for (Question question : questions) {
+            logger.info("==退款的提问编号==:{}", question.getKid());
             question.setIsValid(QuestionAnswerConstants.validType.NO);
             /**
              * 失效进行全额退款
              */
-            Long orderId=orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER,question.getCreateUserId(),question.getChargeAmount());
-            if(null!=orderId){
+            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
+            if (null != orderId) {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
                 question.setRefundOrderId(String.valueOf(orderId));
-            }else{
+            } else {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
+            }
+            MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+            messageBusinessVo.setAmount(question.getChargeAmount());
+            messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+            messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
+            messageBusinessVo.setKid(question.getKid());
+            messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+            messageBusinessVo.setTosendUserId(question.getCreateUserId());
+            messageBusinessVo.setTitle(question.getContent());
+            messageBusinessVo.setImgUrl("");
+            Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID);
+            if (!sendMessageResult) {
+                logger.error("失效问题发送问题失败,提问的kid{}", question.getKid());
             }
             this.questionDao.updateByPrimaryKeySelective(question);
         }
-   }
+    }
 }
