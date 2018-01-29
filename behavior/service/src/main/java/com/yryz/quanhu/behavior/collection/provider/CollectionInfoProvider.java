@@ -78,7 +78,7 @@ public class CollectionInfoProvider implements CollectionInfoApi {
     public Response<Integer> collectionStatus(CollectionInfoDto collectionInfoDto) {
         try {
             Assert.notNull(collectionInfoDto.getResourceId(), "resourceId不能为空");
-            Assert.hasText(collectionInfoDto.getModuleEnum(), "moduleEnum不能为空");
+//            Assert.hasText(collectionInfoDto.getModuleEnum(), "moduleEnum不能为空");
             return ResponseUtils.returnObjectSuccess(collectionInfoService.collectionStatus(collectionInfoDto));
         } catch (Exception e) {
             logger.error("收藏状态 失败", e);

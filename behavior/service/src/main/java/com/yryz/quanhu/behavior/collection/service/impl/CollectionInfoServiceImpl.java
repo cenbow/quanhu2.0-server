@@ -146,7 +146,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
     public int collectionStatus(CollectionInfoDto collectionInfoDto) {
         return collectionInfoDao.selectCount(collectionInfoDto.getResourceId(),
                 collectionInfoDto.getModuleEnum(),
-                collectionInfoDto.getCreateUserId()) > 0 ? 1 : 0;
+                collectionInfoDto.getCreateUserId()) > 0 ? 11 : 10;
     }
 
     private void setUserInfo(List<CollectionInfoVo> list, Set<String> set) {

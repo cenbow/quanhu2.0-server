@@ -80,7 +80,7 @@ public class LikeProvider implements LikeApi {
                         map.put("createDate", likeVO.getCreateDate());
                     }
                     try{
-                        redisTemplate.opsForValue().set("LIKE:"+like.getModuleEnum()+":"+like.getResourceId()+"_"+like.getUserId(),1L);
+                        redisTemplate.opsForValue().set("LIKE:"+like.getResourceId()+"_"+like.getUserId(),11L);
                     }catch (Exception e){
                         logger.info("同步点赞数据到redis出现异常:"+e);
                     }
@@ -92,7 +92,7 @@ public class LikeProvider implements LikeApi {
                 if (count > 0) {
                     map.put("result", 1);
                     try{
-                        redisTemplate.delete("LIKE:"+like.getModuleEnum()+":"+like.getResourceId()+"_"+like.getUserId());
+                        redisTemplate.delete("LIKE:"+like.getResourceId()+"_"+like.getUserId());
                     }catch (Exception e){
                         logger.info("从redis中清掉点赞数据出现异常:"+e);
                     }
@@ -158,9 +158,9 @@ public class LikeProvider implements LikeApi {
             RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
             Long likeFlag=0L;
             if(null!=redisTemplate){
-                likeFlag = redisTemplate.opsForValue().get("LIKE:"+map.get("moduleEnum")+":"+map.get("resourceId")+"_"+map.get("userId"));
+                likeFlag = redisTemplate.opsForValue().get("LIKE:"+map.get("resourceId")+"_"+map.get("userId"));
                 if(null==likeFlag){
-                    likeFlag=0L;
+                    likeFlag=10L;
                 }
             }else{
                 Like like=new Like();
