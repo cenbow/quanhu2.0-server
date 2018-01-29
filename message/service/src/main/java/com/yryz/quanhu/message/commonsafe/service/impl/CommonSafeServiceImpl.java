@@ -258,11 +258,23 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		return VerifyStatus.SUCCESS;
 	}
 
+	/**
+	 * 检查当前是否需要 滑动验证码/图像验证码
+	 *
+	 * @param codeDTO
+	 * @param configVO
+	 * @return
+	 */
+	private boolean checkNeedSlipCode(VerifyCodeConfigVO configVO, VerifyCodeDTO codeDTO) {
+		int num = redisDao.getImgCodeCount(codeDTO.getVerifyKey(), codeDTO.getAppId());
+		redisDao.saveImgCodeCount(codeDTO.getVerifyKey(), codeDTO.getAppId(), configVO);
+		return configVO.getImgCodeNumLimit() < num;
+	}
 
+	@Override
 	public boolean checkSmsSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
-		//不需要图像验证码直接成功
-		if (!checkVerifyCodeSendTime(configVO, verifyCodeDTO).equals(VerifyStatus.SUCCESS)
-				&& afsCheckReq == null) {
+		//不需要验证码直接成功
+		if ((afsCheckReq == null) && !checkNeedSlipCode(configVO, verifyCodeDTO)) {
 			return true;
 		}
 		//图形码为空直接返回false
