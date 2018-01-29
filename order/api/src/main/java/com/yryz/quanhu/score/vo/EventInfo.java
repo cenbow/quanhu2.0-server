@@ -75,7 +75,29 @@ public class EventInfo implements Serializable {
 	@ApiModelProperty(value="计数")
     private Double amount;
 
+	@ApiModelProperty(value="积分值")
+    private String eventScore;
+	
+	@ApiModelProperty(value="成长值")
+    private String eventGrow;
 
+	
+	public String getEventScore() {
+		return eventScore;
+	}
+
+	public void setEventScore(String eventScore) {
+		this.eventScore = eventScore;
+	}
+
+	public String getEventGrow() {
+		return eventGrow;
+	}
+
+	public void setEventGrow(String eventGrow) {
+		this.eventGrow = eventGrow;
+	}
+	
 	public String getUserId() {
 		return userId;
 	}

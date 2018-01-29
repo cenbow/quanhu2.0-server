@@ -79,6 +79,45 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	            return ResponseUtils.returnException(e);
 	        }
 	}
+
+	/**
+	 * 
+	 * @param userId
+	 * @param score
+	 * @param eventCode
+	 * @return
+	 * @Description 消费积分
+	 */
+	@Override
+	public int consumeScore(String userId , int score , String eventCode){
+		int consumeScore = 0;
+		try {
+			consumeScore = scoreAPI.consumeScore(userId, score, eventCode);
+		} catch (Exception e) {
+			logger.error("消费积分异常！", e);
+		}
+		return consumeScore;
+
+	}
 	
 
+	/**
+	 * 
+	 * @param userId
+	 * @param score
+	 * @param eventCode
+	 * @return
+	 * @Description 增加积分
+	 */
+	@Override
+	public int addScore(String userId , int score , String eventCode){
+		int flag = 0;
+		try {
+			flag = scoreAPI.addScore(userId, score, eventCode);
+		} catch (Exception e) {
+			logger.error("增加积分异常！", e);
+		}
+		return flag;
+	}
+	    
 }
