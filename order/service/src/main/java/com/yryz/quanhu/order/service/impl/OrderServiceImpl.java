@@ -135,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
 				return ResponseUtils.returnException(new CommonException("账户被冻结"));
 			}
 			if ((account.getSmallNopass().intValue() == 0
-					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 5000)
+					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 50000)
 					&& StringUtils.isEmpty(payPassword)){
 				return ResponseUtils.returnException(new CommonException("支付密码为空"));
 			}

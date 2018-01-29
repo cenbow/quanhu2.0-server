@@ -12,31 +12,18 @@ import java.util.List;
  * @description
  */
 public class UserTagInfo {
-    @Field(type= FieldType.Long)
-    private Long userId;
-
 
     /**
      * 用户标签信息
      */
     @Field(type= FieldType.Auto)
-    private List<TagInfo> userTagInfo;
+    private List<TagInfo> userTagInfoList;
 
-    public Long getUserId() {
-        return userId;
+    public List<TagInfo> getUserTagInfoList() {
+        return userTagInfoList;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserTagInfoList(List<TagInfo> userTagInfoList) {
+        this.userTagInfoList = userTagInfoList;
     }
-
-    public List<TagInfo> getUserTagInfo() {
-        return userTagInfo;
-    }
-
-    public void setUserTagInfo(List<TagInfo> userTagInfo) {
-        this.userTagInfo = userTagInfo;
-    }
-
-
 }

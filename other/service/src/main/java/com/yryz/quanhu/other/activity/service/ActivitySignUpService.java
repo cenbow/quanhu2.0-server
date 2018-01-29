@@ -14,4 +14,6 @@ public interface ActivitySignUpService {
     ActivityEnrolConfig getActivitySignUpFrom(Long activityInfoId, String custId);
 
     ActivityRecord activitySignUpSubmit(ActivityRecord activityRecord, String custId);
+
+    ActivityEnrolConfig getActivityEnrolConfigByActId(Long activityKid);
 }

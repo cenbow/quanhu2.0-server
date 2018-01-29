@@ -293,6 +293,7 @@
         <![CDATA[  AND start_time <= #{nowTime} ]]>
         <![CDATA[  AND end_time >= #{nowTime} ]]>
         order by adv_sort desc, create_date desc
+        limit 0, 100
     </select>
 
     <select id="selectListBanner" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto"
@@ -371,7 +372,6 @@
                 adv_type = #{advType} AND adv_status = 30
             </if>
             order by adv_sort desc, create_date desc
-            limit 0, 100
         </where>
     </select>
 

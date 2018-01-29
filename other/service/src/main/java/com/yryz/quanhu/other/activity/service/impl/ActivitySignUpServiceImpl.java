@@ -96,8 +96,8 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         activitySignUpHomeAppVo.setCurrentDate(new Date());
         return activitySignUpHomeAppVo;
     }
-
-    private ActivityEnrolConfig getActivityEnrolConfigByActId(Long activityKid) {
+    @Override
+    public ActivityEnrolConfig getActivityEnrolConfigByActId(Long activityKid) {
         return activityEnrolConfigDao.selectByActivityId(activityKid);
     }
 
@@ -129,7 +129,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
             return status;
         }
         //TODO 查询订单状态
-        boolean success = orderSDK.isBuyOrderSuccess("", NumberUtils.parseNumber(custId,Long.TYPE),activityRecordList.get(0).getKid());
+        boolean success = orderSDK.isBuyOrderSuccess(ModuleContants.ACTIVITY_ENUM, NumberUtils.parseNumber(custId,Long.TYPE),activityRecordList.get(0).getKid());
        if(success){
            status = ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;
        }
