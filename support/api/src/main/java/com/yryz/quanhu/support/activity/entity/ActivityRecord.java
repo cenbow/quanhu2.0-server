@@ -42,6 +42,15 @@ public class ActivityRecord extends GenericEntity{
 	 */
 	private  Integer shelveFlag;
 
+	private  String orderNo;
+
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
 
 	public Long getActivityInfoId() {
 		return this.activityInfoId;
