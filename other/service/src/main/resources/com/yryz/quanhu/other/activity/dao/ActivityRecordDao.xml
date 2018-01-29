@@ -150,4 +150,13 @@
 		from qh_activity_record
 		where activity_info_id = #{activityRecordVo.activityInfoId,jdbcType=BIGINT}
 	</select>
+
+	<select id="selectByCustIdAndActivityId"
+			resultType="com.yryz.quanhu.other.activity.entity.ActivityRecord">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_record
+		where activity_info_id = #{activityInfoId}
+		and create_user_id =#{createUserId}
+	</select>
 </mapper>
