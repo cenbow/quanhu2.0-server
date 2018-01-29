@@ -33,9 +33,6 @@
 		<if test="userPhone != null and userPhone != '' ">
 			and user_phone = #{userPhone}
 		</if>
-		<if test="userPwd != null and userPwd !='' ">
-			and user_pwd = #{userPwd}
-		</if>
 	</select>
 
 	<select id="selectByPhones" resultMap="BaseResultMap">
