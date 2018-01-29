@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.message.MessageType;
 import com.yryz.common.message.MessageVo;
@@ -39,15 +40,13 @@ public class QuanhuMessage {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-//	private static ThreadPool pool = ThreadPool.getThreadPool(10);
-	
 	@Autowired
 	private ThreadPoolTaskExecutor pool ; 
 	
-	@Autowired
+	@Reference
 	private PushAPI pushAPI;
 	
-	@Autowired
+	@Reference
 	private MessageAPI messageAPI;
 	
 	public void sendMessage(MessageConstant constant , String custId , String msg){
