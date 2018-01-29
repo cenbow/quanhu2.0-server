@@ -69,12 +69,20 @@ public class ScoreEventConsumer   {
         // 积分事件关注点： eventCode , userId
         String eventCode = data.get("eventCode");
         String userId = data.get("userId");
+        //外部传入积分值
+        String eventScore = data.get("eventScore"); 
+
+        
         if (StringUtils.isBlank(userId)) {
             logger.info("-------处理积分事件，结果：直接丢掉消息，原因：userId为空 , 传入数据：" + data.toString());
             return;
         }
         // 判断是否积分事件
         ScoreEventInfo sei = scoreEventManageService.getByCode(eventCode);
+        // 判断外部传入的积分值是否存在,如果存在就取传入的分值
+        if (!StringUtils.isBlank(eventScore)){
+        	sei.setEventScore(Integer.valueOf(eventScore));
+        }
         // 积分配置管理表中不存在该类型事件，则不属于积分事件
         boolean isScoreEvent = (sei != null && sei.getId() != null);
         logger.info("是否积分事件判定,结果：" + isScoreEvent + "传入数据：" + data.toString());

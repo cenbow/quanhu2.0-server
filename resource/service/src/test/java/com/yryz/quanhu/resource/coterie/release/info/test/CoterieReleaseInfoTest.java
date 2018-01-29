@@ -122,7 +122,7 @@ public class CoterieReleaseInfoTest {
     @Test
     public void test005() throws JsonProcessingException {
         System.out.println(new ObjectMapper()
-                .writeValueAsString(coterieReleaseInfoApi.createOrder(737091584287424512L, 727909974996672512L)));
+                .writeValueAsString(coterieReleaseInfoApi.createOrder(737091584287424512L, 727447149320273920L)));
     }
 
     /**  
@@ -135,13 +135,17 @@ public class CoterieReleaseInfoTest {
     @Test
     public void test006() throws JsonProcessingException {
         OutputOrder outputOrder = new OutputOrder();
-        outputOrder.setBizContent("{\"createUserId\":727909974996672512,\"createDate\":\"2018-01-29 13:54:14\",\"lastUpdateUserId\":0,\"lastUpdateDate\":\"2018-01-29 13:54:14\",\"id\":56,\"kid\":\"737091584287424512\",\"classifyId\":-2,\"coverPlanUrl\":\"\",\"title\":\"1278665436私圈标题哈哈哈\",\"description\":\"\",\"audioUrl\":\"\",\"videoUrl\":\"\",\"videoThumbnailUrl\":\"\",\"contentLabel\":\"\",\"cityCode\":\"\",\"gps\":\"\",\"coterieId\":8626948196,\"contentPrice\":100,\"shelveFlag\":10,\"delFlag\":10,\"recommend\":0,\"sort\":0,\"moduleEnum\":\"0092\",\"appId\":\"\",\"revision\":0,\"contentSource\":\"[{\\\"text\\\":\\\"1278665436私圈正文哈哈哈哈\\\"}]\",\"content\":\"1278665436私圈正文哈哈哈哈\",\"imgUrl\":\"imgUrl\",\"extend\":null,\"user\":null}");
+        // outputOrder.setBizContent("{\"createUserId\":727909974996672512,\"createDate\":\"2018-01-29 13:54:14\",\"lastUpdateUserId\":0,\"lastUpdateDate\":\"2018-01-29 13:54:14\",\"id\":56,\"kid\":\"737091584287424512\",\"classifyId\":-2,\"coverPlanUrl\":\"\",\"title\":\"1278665436私圈标题哈哈哈\",\"description\":\"\",\"audioUrl\":\"\",\"videoUrl\":\"\",\"videoThumbnailUrl\":\"\",\"contentLabel\":\"\",\"cityCode\":\"\",\"gps\":\"\",\"coterieId\":8626948196,\"contentPrice\":100,\"shelveFlag\":10,\"delFlag\":10,\"recommend\":0,\"sort\":0,\"moduleEnum\":\"0092\",\"appId\":\"\",\"revision\":0,\"contentSource\":\"[{\\\"text\\\":\\\"1278665436私圈正文哈哈哈哈\\\"}]\",\"content\":\"1278665436私圈正文哈哈哈哈\",\"imgUrl\":\"imgUrl\",\"extend\":null,\"user\":null}");
+        outputOrder.setBizContent(
+                "{\"createUserId\":727909974996672512,\"createDate\":\"2018-01-29 13:54:14\",\"lastUpdateUserId\":0,\"lastUpdateDate\":\"2018-01-29 13:54:14\",\"id\":56,\"kid\":\"737091584287424512\",\"classifyId\":-2,\"coverPlanUrl\":\"\",\"title\":\"1278665436私圈标题哈哈哈\",\"description\":\"\",\"audioUrl\":\"\",\"videoUrl\":\"\",\"videoThumbnailUrl\":\"\",\"contentLabel\":\"\",\"cityCode\":\"\",\"gps\":\"\",\"coterieId\":8626948196,\"contentPrice\":100,\"shelveFlag\":10,\"delFlag\":10,\"recommend\":0,\"sort\":0,\"moduleEnum\":\"0092\",\"appId\":\"\",\"revision\":0,\"contentSource\":\"[{\\\"text\\\":\\\"1278665436私圈正文哈哈哈哈\\\"}]\",\"content\":\"1278665436私圈正文哈哈哈哈\",\"imgUrl\":\"imgUrl\",\"extend\":null,\"user\":null}");
         outputOrder.setCoterieId(8626948196L);
-        outputOrder.setCreateDate(new Date(1517205254000L) );
+        outputOrder.setCreateDate(new Date());
         outputOrder.setCreateUserId(727909974996672512L);
         outputOrder.setModuleEnum("0092");
         outputOrder.setResourceId(737091584287424512L);
-        
+        outputOrder.setOrderId(20180129161248L);
+        outputOrder.setCost(100L);
+        outputOrder.setPayType(10);
         coterieReleaseOrderNotifyService.notify(outputOrder);
     }
 }

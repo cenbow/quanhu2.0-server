@@ -47,4 +47,25 @@ public interface EventAcountApiService {
 	 * @return
 	 */
 	Response<PageList<GrowFlow>> getGrowFlow(GrowFlowQuery gfq );
+	
+	/**
+	 * 
+	 * @param userId
+	 * @param score
+	 * @param eventCode
+	 * @return
+	 * @Description 消费积分
+	 */
+	public int consumeScore(String userId , int score , String eventCode);
+	
+	
+	/**
+	 * 
+	 * @param userId
+	 * @param score
+	 * @param eventCode
+	 * @return
+	 * @Description 增加积分
+	 */
+	public int addScore(String userId , int score , String eventCode);
 }
