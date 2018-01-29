@@ -77,7 +77,7 @@ public class UserLoginSimpleVO implements Serializable {
     /**
      * 最终热度值
      */
-    private Integer lastHeat;
+    private Long lastHeat;
 
     /**
      * 用户简介
@@ -154,10 +154,10 @@ public class UserLoginSimpleVO implements Serializable {
 	public void setAuthStatus(Byte authStatus) {
 		this.authStatus = authStatus;
 	}
-	public Integer getLastHeat() {
+	public Long getLastHeat() {
 		return lastHeat;
 	}
-	public void setLastHeat(Integer lastHeat) {
+	public void setLastHeat(Long lastHeat) {
 		this.lastHeat = lastHeat;
 	}
 	public String getUserDesc() {
@@ -220,7 +220,7 @@ public class UserLoginSimpleVO implements Serializable {
 	}
 	public UserLoginSimpleVO(Long userId, String userNickName, String userImg, String userSignature, String userPhone,
 			String userQr, Byte userAge, Byte userGenders, String userBirthday, String userLocation, String cityCode,
-			Byte userRole, Byte authStatus, Integer lastHeat, String userDesc, Date createDate) {
+			Byte userRole, Byte authStatus, Long lastHeat, String userDesc, Date createDate) {
 		super();
 		this.userId = userId;
 		this.userNickName = userNickName;

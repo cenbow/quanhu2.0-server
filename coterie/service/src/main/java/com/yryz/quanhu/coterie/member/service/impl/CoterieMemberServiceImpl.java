@@ -110,11 +110,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             String extJson = JsonUtils.toFastJson(coterieMemberNotify);
 
             //todo order
-//            Order order = new Order(custId, coterieInfo.getJoinFee() * 1L, extJson, CommonConstants.JOIN_COTERIE_MODULE_ENUM, coterieId,
-//                    CommonConstants.JOIN_COTERIE_RESOURCE_ID, custId, circleId);
-//            Long orderId = orderService.createOrder(OrderConstant.JOIN_COTERIE_ORDER, custId, coterieInfo.getOwnerId(), order);
-//            Long orderId = 1111111111L;
-
             InputOrder inputOrder = new InputOrder();
             inputOrder.setCreateUserId(userId);
             inputOrder.setCost(coterie.getJoinFee().longValue());
@@ -123,7 +118,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             inputOrder.setModuleEnum(ModuleContants.COTERIE);
             inputOrder.setOrderEnum(OrderEnum.JOIN_COTERIE_ORDER);
             inputOrder.setToId(Long.parseLong(coterie.getOwnerId()));
-//            inputOrder.setResourceId();
+            inputOrder.setResourceId(coterieId);
             inputOrder.setBizContent(extJson);
 
             Long orderId = orderSDK.createOrder(inputOrder);
@@ -513,6 +508,27 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         return apply;
     }
+
+//    private void saveMemberApply(CoterieMember record) {
+//        try {
+//            CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(record.getCoterieId(), record.getUserId());
+//            Integer result = null;
+//            if (member == null) {
+//                result = coterieMemberDao.insert(record);
+//            } else {
+//                result = coterieMemberDao.updateByCoterieMember(record);
+//            }
+//
+//            CoterieInfo coterie = coterieService.find(record.getCoterieId());
+//            Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
+//            if (updateNumberResult == 0) {
+//                throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
+//            }
+//        } catch (Exception e) {
+//            throw new QuanhuException(ExceptionEnum.SysException);
+//        }
+//    }
+
 
     private void saveMember(CoterieMember record) {
         try {

@@ -56,6 +56,32 @@ public class BasicConfigForAdminProvider implements BasicConfigForAdminApi{
     }
 
     @Override
+    public Response<Boolean> delete(BasicConfigDto dto) {
+        try {
+            logger.info("delete={} start", JSON.toJSON(dto));
+            return ResponseUtils.returnObjectSuccess(basicConfigService.delete(dto));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("delete={} finish", JSON.toJSON(dto));
+        }
+    }
+
+    @Override
+    public Response<Boolean> updateStatus(BasicConfigDto dto) {
+        try {
+            logger.info("updateStatus={} start", JSON.toJSON(dto));
+            return ResponseUtils.returnObjectSuccess(basicConfigService.updateStatus(dto));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("updateStatus={} finish", JSON.toJSON(dto));
+        }
+    }
+
+    @Override
     public Response<List<BasicConfigDto>> list(BasicConfigDto dto) {
         try {
             logger.info("list={} start", JSON.toJSON(dto));

@@ -20,6 +20,7 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.Objects;
@@ -40,20 +41,23 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     @Override
     public Response<CoterieMemberVoForJoin> join(Long userId, Long coterieId, String reason) {
         logger.debug("join params: userId(" + userId + "),coterieId(" + coterieId + ")reason(" + reason + ")");
-        if (null == userId || null == coterieId) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-
-        CoterieInfo info = coterieService.find(coterieId);
-        if (info == null) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
-
         try {
+
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
             CoterieMemberVoForJoin result = coterieMemberService.join(userId, coterieId, reason);
             return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("加入私圈时发生异常！", e);
+            return ResponseUtils.returnException(e);
         }
 
     }
@@ -63,88 +67,114 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         logger.debug("kick params: memberId(" + memberId + "),coterieId(" + coterieId + "),reason(" + reason + ")");
 
-        //是否为圈主
-        if (!isBoss(userId, coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NOT_HAVE_COTERIE);
-        }
-
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
-
-        if (null == memberId || null == coterieId) {
-            throw QuanhuException.busiError("");
-        }
-
         try {
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(memberId, "memberId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //是否为圈主
+            if (!isBoss(userId, coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NOT_HAVE_COTERIE);
+            }
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
             coterieMemberService.kick(memberId, coterieId, reason);
+            return ResponseUtils.returnSuccess();
+
+
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("圈主提出成中时发生异常！", e);
+            return ResponseUtils.returnException(e);
         }
 
-        return ResponseUtils.returnSuccess();
+
     }
 
     @Override
     public Response<String> quit(Long userId, Long coterieId) {
-
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
-
-        //用户是否存在
-        if (!isExistUser(userId)) {
-            throw new QuanhuException(ExceptionEnum.USER_MISSING);
-        }
+        Assert.notNull(userId, "userId is null !");
+        Assert.notNull(coterieId, "coterieId is null !");
 
         try {
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
+            //用户是否存在
+            if (!isExistUser(userId)) {
+                throw new QuanhuException(ExceptionEnum.USER_MISSING);
+            }
+
             coterieMemberService.quit(userId, coterieId);
             return ResponseUtils.returnSuccess();
+
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("圈主提出异常！", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
     @Override
     public Response<String> banSpeak(Long userId, Long memberId, Long coterieId, Integer type) {
 
-        //是否为圈主
-        if (!isBoss(userId, coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NOT_HAVE_COTERIE);
-        }
-
-        //用户是否存在
-        if (!isExistUser(userId)) {
-            throw new QuanhuException(ExceptionEnum.USER_MISSING);
-        }
-
         try {
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(memberId, "memberId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //是否为圈主
+            if (!isBoss(userId, coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NOT_HAVE_COTERIE);
+            }
+
+            //用户是否存在
+            if (!isExistUser(userId)) {
+                throw new QuanhuException(ExceptionEnum.USER_MISSING);
+            }
+
             coterieMemberService.banSpeak(memberId, coterieId, type);
             return ResponseUtils.returnSuccess();
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("圈主禁言时发生异常！", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
     @Override
     public Response<Integer> permission(Long userId, Long coterieId) {
 
-        //用户是否存在
-        if (!isExistUser(userId)) {
-            throw new QuanhuException(ExceptionEnum.USER_MISSING);
-        }
-
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
         try {
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //用户是否存在
+            if (!isExistUser(userId)) {
+                throw new QuanhuException(ExceptionEnum.USER_MISSING);
+            }
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
             Integer permission = coterieMemberService.permission(userId, coterieId);
             return ResponseUtils.returnObjectSuccess(permission);
+
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("获取用户在私圈里的权限时发生异常！", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
@@ -152,22 +182,27 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     @Override
     public Response<Boolean> isBanSpeak(Long userId, Long coterieId) {
 
-        //用户是否存在
-        if (!isExistUser(userId)) {
-            throw new QuanhuException(ExceptionEnum.USER_MISSING);
-        }
-
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
         try {
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //用户是否存在
+            if (!isExistUser(userId)) {
+                throw new QuanhuException(ExceptionEnum.USER_MISSING);
+            }
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
             Boolean flag = coterieMemberService.isBanSpeak(userId, coterieId);
             return ResponseUtils.returnObjectSuccess(flag);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("查看成员是否为禁言时发生异常！", e);
+            return ResponseUtils.returnException(e);
         }
-
     }
 
     @Override
@@ -175,28 +210,37 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         logger.debug("audit params: memberId(" + memberId + "),coterieId(" + coterieId + "),type(" + memberStatus);
 
-        //是否为圈主
-        if (!isBoss(userId, coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NOT_HAVE_COTERIE);
-        }
-
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
-
-        //用户是否存在
-        if (!isExistUser(memberId)) {
-            throw new QuanhuException(ExceptionEnum.USER_MISSING);
-        }
-
         try {
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(memberId, "memberId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+
+            //是否为圈主
+            if (!isBoss(userId, coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NOT_HAVE_COTERIE);
+            }
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
+            //用户是否存在
+            if (!isExistUser(memberId)) {
+                throw new QuanhuException(ExceptionEnum.USER_MISSING);
+            }
+
             coterieMemberService.audit(memberId, coterieId, memberStatus, MemberConstant.JoinType.FREE.getStatus());
 
             return ResponseUtils.returnSuccess();
 
+        } catch (QuanhuException e) {
+            logger.error("审核私圈成员发生异常", e);
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("审核私圈成员发生异常", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
@@ -205,32 +249,44 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         logger.debug("queryNewMemberNum params: coterieId(" + coterieId + ")");
 
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
-
         try {
+
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
             Integer count = coterieMemberService.queryNewMemberNum(coterieId);
             return ResponseUtils.returnObjectSuccess(count);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("查询新加入的人数时发生异常！", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
     @Override
-    public Response<PageList<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize) {
+    public Response<PageList<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNo, Integer pageSize) {
 
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
+        logger.debug("queryApplyList params: coterieId(" + coterieId + ")pageNo(" + pageNo + ")pageSize(" + pageSize + ")");
 
         try {
-            PageList<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNum, pageSize);
+            Assert.notNull(coterieId, "coterieId is null !");
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw QuanhuException.busiError("圈子不存在");
+            }
+
+            PageList<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNo, pageSize);
             return ResponseUtils.returnObjectSuccess(applyList);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("申请加入列表异常！", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
@@ -239,25 +295,32 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         logger.debug("queryMemberList params: coterieId(" + coterieId + ")pageNo(" + pageNo + ")pageSize(" + pageSize + ")");
 
-        //圈子是否存在
-        if (!isExistCoterie(coterieId)) {
-            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
-        }
-
-        if (Objects.isNull(pageNo) || Objects.isNull(pageSize) || pageNo <= 0 || pageNo <= 0) {
-            throw new QuanhuException(ExceptionEnum.PAGE_PARAM_ERROR);
-        }
-
         try {
+
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
+            if (Objects.isNull(pageNo) || Objects.isNull(pageSize) || pageNo <= 0 || pageNo <= 0) {
+                throw new QuanhuException(ExceptionEnum.PAGE_PARAM_ERROR);
+            }
+
             PageList<CoterieMemberVo> memberList = coterieMemberService.queryMemberList(coterieId, pageNo, pageSize);
             return ResponseUtils.returnObjectSuccess(memberList);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+            logger.error("私圈成员列表异常！", e);
+            return ResponseUtils.returnException(e);
         }
     }
 
     /**
      * 用户是否为圈主
+     *
      * @param userId
      * @param coterieId
      * @return
@@ -273,6 +336,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
     /**
      * 用户是否存在
+     *
      * @param userId
      * @return
      */
@@ -291,6 +355,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
     /**
      * 私圈是否存在
+     *
      * @param coterieId
      * @return
      */

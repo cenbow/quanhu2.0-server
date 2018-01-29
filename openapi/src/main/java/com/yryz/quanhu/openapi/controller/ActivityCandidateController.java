@@ -38,6 +38,7 @@ public class ActivityCandidateController {
     private CountApi countApi;
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
+
     @UserBehaviorValidation(login=true)
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -56,6 +57,7 @@ public class ActivityCandidateController {
         }
         return response;
     }
+
     @UserBehaviorValidation(login=true)
     @ApiOperation("参与投票活动")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -64,7 +66,7 @@ public class ActivityCandidateController {
         return activityCandidateApi.config(activityInfoId);
     }
 
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation
     @ApiOperation("参与者详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/detail")
@@ -84,7 +86,7 @@ public class ActivityCandidateController {
         return activityVoteDetailVoResponse;
     }
 
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation
     @ApiOperation("参与者列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/list")
@@ -96,7 +98,7 @@ public class ActivityCandidateController {
         return activityCandidateApi.list(activityVoteDto);
     }
 
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation
     @ApiOperation("排行榜")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/rank")
