@@ -1,14 +1,5 @@
 package com.yryz.quanhu.resource.coterie.release.info.service.impl;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.message.MessageVo;
@@ -23,9 +14,21 @@ import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.constant.FeeDetail;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
+import com.yryz.quanhu.resource.release.buyrecord.constants.BuyTypeEnum;
+import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
+import com.yryz.quanhu.resource.release.buyrecord.service.ReleaseBuyRecordService;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 /**
  * @author wangheng
@@ -46,6 +49,9 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
     @Reference(lazy = true, check = false, timeout = 10000)
     private UserApi userApi;
 
+    @Autowired
+    private ReleaseBuyRecordService releaseBuyRecordService;
+
     @Override
     public String getModuleEnum() {
         return BranchFeesEnum.READ.toString();
@@ -62,7 +68,18 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         CoterieInfo coterieInfo = ResponseUtils
                 .getResponseData(coterieApi.queryCoterieInfo(releaseInfo.getCoterieId()));
         Assert.notNull(coterieInfo, "私圈信息为NULL，coterieId : " + releaseInfo.getCoterieId());
-        // TODO 提交 资源购买记录
+        // 提交资源购买记录
+        ReleaseBuyRecord releaseBuyRecord = new ReleaseBuyRecord();
+        releaseBuyRecord.setOrderId(outputOrder.getOrderId());
+        releaseBuyRecord.setCoterieId(outputOrder.getCoterieId() == null ? 0 : outputOrder.getCoterieId());
+        releaseBuyRecord.setResourceId(outputOrder.getResourceId());
+        releaseBuyRecord.setAmount(outputOrder.getCost());
+        releaseBuyRecord.setPayType(outputOrder.getPayType());
+        releaseBuyRecord.setBuyType(BuyTypeEnum.RELEASE.getBuyType());
+        releaseBuyRecord.setRemark(BuyTypeEnum.RELEASE.getRemark());
+        releaseBuyRecord.setCreateUserId(outputOrder.getCreateUserId());
+        releaseBuyRecord.setLastUpdateUserId(outputOrder.getCreateUserId());
+        releaseBuyRecordService.insert(releaseBuyRecord);
 
         // 文章阅读者，文章作者
         UserSimpleVO sponsorUser = null;
@@ -104,8 +121,8 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         }
     }
 
-    /**  
-     * 付款成功后给作者推送 奖励消息 
+    /**
+     * 付款成功后给作者推送 奖励消息
      */
     private void payMessageToAuthor(ReleaseInfo info, UserSimpleVO sponsorUser, SystemBody systemBody) {
         logger.debug("付款成功后给作者推送 奖励消息，付费资源ID:" + info.getKid());
