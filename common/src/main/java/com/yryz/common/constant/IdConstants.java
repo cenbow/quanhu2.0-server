@@ -89,4 +89,8 @@ public class IdConstants {
      * 短信模板
      */
     public static final String QUANHU_SMS_TEMPLATE = "quanhu_sms_template";
+    /**
+     * 短信私圈信息表
+     */
+    public static final String QUANHU_COTERIE= "qh_coterie";
 }

@@ -66,6 +66,15 @@ public class CoterieInfo implements Serializable{
      */
     private String qrUrl;
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	private  User  user;
     /**
      * 加入私圈金额(悠然币)，0表示免费
      */

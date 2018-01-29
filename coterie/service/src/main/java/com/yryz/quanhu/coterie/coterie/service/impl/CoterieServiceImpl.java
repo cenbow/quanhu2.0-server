@@ -1,6 +1,8 @@
 package com.yryz.quanhu.coterie.coterie.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
@@ -16,14 +18,18 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.yryz.quanhu.resource.vo.ResourceTotal;
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
+import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 //import com.yryz.service.circle.modules.coterie.dao.persistence.CoterieAuditRecordMapper;
 
 /**
@@ -35,15 +41,32 @@ import java.util.List;
 public class CoterieServiceImpl implements CoterieService {
 	@Resource
 	private CoterieMapper coterieMapper;
-
-
-	//private CoterieAuditRecordMapper coterieAuditRecordMapper;
+   	@Reference(check=false)
+	private IdAPI idapi;
+	@Reference(check=false)
+	private ResourceDymaicApi resourceDymaicApi;
+	@Reference(check=false)
+	private EventAPI eventAPI;
 
 	@Override
 	public CoterieInfo save(CoterieBasicInfo info) {
 		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
-		//todo
-		 coterie.setCoterieId(Long.parseLong(IdUtils.randomappId()));
+		coterie.setCoterieId(idapi.getKid(IdConstants.QUANHU_COTERIE).getData());
+//		ResourceTotal resourceTotal=new ResourceTotal();
+//		 resourceTotal.setExtJson(GsonUtils.parseJson(info));
+//		resourceTotal.setKid(coterie.getCoterieId());
+//		resourceTotal.setUserId(Long.parseLong(coterie.getOwnerId()));
+//		resourceTotal.setModuleEnum(1000);
+//		resourceDymaicApi.commitResourceDymaic(resourceTotal);
+//		EventInfo eventInfo=new EventInfo();
+//		eventInfo.setEventCode(1+"");
+//		eventInfo.setCircleId(coterie.getCoterieId().toString());
+//		eventInfo.setUserId(coterie.getOwnerId());
+//		eventInfo.setOwnerId(coterie.getOwnerId());
+//		eventInfo.setEventNum(1000);
+//		eventInfo.setResourceId(coterie.getCoterieId().toString());
+//		eventInfo.setCreateTime(new Date().toString());
+//		eventAPI.commit(eventInfo);
 		String qrUrl= QrUtils.createQr("",coterie.getCoterieId()+"");
 		coterie.setQrUrl(qrUrl);
 		coterie.setConsultingFee(0);
