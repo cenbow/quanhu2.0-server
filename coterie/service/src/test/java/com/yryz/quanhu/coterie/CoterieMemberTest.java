@@ -23,11 +23,11 @@ public class CoterieMemberTest {
     private CoterieMemberAPI coterieMemberAPI;
 
     private static Long memberId = 730941139577331712L;
-    private static Long userId = 727061873573347328L;
+    private static Long userId = 731154152775909376L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
-    private static Long coterieId = 233665981858L;
+    private static Long coterieId = 9382818189L;
 
     @Test
     public void test010_Join() {
