@@ -125,4 +125,19 @@ public class ResourceProvider implements ResourceApi {
 		return ResponseUtils.returnObjectSuccess(resourceVo);
 	}
 
+	/**
+	 * APP首页推荐
+	 * @param start
+	 * @param limit
+	 * @return
+	 * @see com.yryz.quanhu.resource.api.ResourceApi#appRecommend(int, int)
+	 */
+	@Override
+	public Response<List<ResourceVo>> appRecommend(int start, int limit) {
+		List<ResourceModel> list = resourceService.appRecommend(start, limit);
+		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
+		listVo = resourceConvertService.addUser(listVo);
+		return ResponseUtils.returnListSuccess(listVo);
+	}
+
 }
