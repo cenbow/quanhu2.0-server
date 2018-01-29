@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import com.yryz.common.annotation.UserBehaviorValidation;
+import  com.yryz.common.annotation.UserBehaviorArgs;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,11 +43,11 @@ public class PostController {
     @ApiOperation("查询帖子列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/post/list")
-    public Response<PageList<TopicPostVo>> queryTopicPostList(Integer pageNum, Integer pageSize, Long topicId,
+    public Response<PageList<TopicPostVo>> queryTopicPostList(Integer currentPage, Integer pageSize, Long topicId,
                                                               String orderBy, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         TopicPostDto dto = new TopicPostDto();
-        dto.setPageNum(pageNum);
+        dto.setCurrentPage(currentPage);
         dto.setPageSize(pageSize);
         dto.setTopicId(topicId);
         dto.setOrderBy(orderBy);
@@ -58,6 +60,9 @@ public class PostController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
+    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+    @UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
+            sourceContexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/post/add")
     public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
@@ -75,6 +80,9 @@ public class PostController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
+    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+    @UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
+            sourceContexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/post/single/delete")
     public Response<Integer> deletePost(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
