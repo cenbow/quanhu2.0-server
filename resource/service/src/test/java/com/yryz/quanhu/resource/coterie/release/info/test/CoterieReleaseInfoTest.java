@@ -42,12 +42,12 @@ public class CoterieReleaseInfoTest {
         int random = new Random().nextInt();
 
         record.setModuleEnum("0092");
-        record.setCoterieId(233665981858L);
+        record.setCoterieId(8626948196L);
         // 设置价格
         record.setContentPrice(100L);
         record.setContent(random + "私圈正文哈哈哈哈");
         record.setContentSource("[{\"text\":\"" + record.getContent() + "\"}]");
-        record.setCreateUserId(724007310011252736L);
+        record.setCreateUserId(727909974996672512L);
         record.setImgUrl("imgUrl");
         record.setTitle(random + "私圈标题哈哈哈");
 
@@ -63,9 +63,17 @@ public class CoterieReleaseInfoTest {
     */
     @Test
     public void test002() throws JsonProcessingException {
-        System.out.println(new ObjectMapper().writeValueAsString(coterieReleaseInfoApi.infoByKid(728714439552114688L, 724007310011252736L)));
-        
-        //System.out.println(new ObjectMapper().writeValueAsString(coterieReleaseInfoApi.infoByKid(730193695008743424L, 726904523150958592L)));
+        System.out.println(new ObjectMapper()
+                .writeValueAsString(coterieReleaseInfoApi.infoByKid(728714439552114688L, 724007310011252736L)));
+
+        // 圈主 查看
+        //System.out.println(new ObjectMapper().writeValueAsString(coterieReleaseInfoApi.infoByKid(736943287656628224L, 727909974996672512L)));
+
+        // 圈粉 查看
+        //System.out.println(new ObjectMapper().writeValueAsString(coterieReleaseInfoApi.infoByKid(736943287656628224L, 727909974996672512L)));
+
+        // 路人 查看
+        //System.out.println(new ObjectMapper().writeValueAsString(coterieReleaseInfoApi.infoByKid(736943287656628224L, 727909974996672512L)));
     }
 
     /**  

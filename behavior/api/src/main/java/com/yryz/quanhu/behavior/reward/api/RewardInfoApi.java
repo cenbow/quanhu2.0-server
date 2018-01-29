@@ -26,7 +26,7 @@ public interface RewardInfoApi {
     Response<Map<String, Object>> reward(RewardInfo record);
 
     /**  
-    * @Description: 打赏记录
+    * @Description: 打赏记录 [付款成功]
     * @author wangheng
     * @param @param dto
     * @param @param isCount

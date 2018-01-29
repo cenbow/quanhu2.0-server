@@ -1,6 +1,9 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorArgs;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.transmit.api.TransmitApi;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Api(description = "转发")
 @RestController
@@ -30,6 +35,8 @@ public class TransmitController {
      * 转发
      * @param   transmitInfo
      * */
+//    @UserBehaviorArgs(sourceContexts = {"object.content"}, sourceUserId="object.targetUserId")
+//    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
     @ApiOperation("转发")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/transmit/single")
@@ -37,6 +44,8 @@ public class TransmitController {
         String userId = request.getHeader("userId");
         Assert.hasText(userId, "userId不能为空");
         transmitInfo.setCreateUserId(Long.valueOf(userId));
+        Assert.isTrue(this.matcher(transmitInfo.getModuleEnum(), "1003|1004|1005|1000"), "moduleEnum格式有误");
+
         return transmitApi.single(transmitInfo);
     }
 
@@ -45,11 +54,21 @@ public class TransmitController {
      * @param   transmitInfoDto
      * @return
      * */
+    @NotLogin
     @ApiOperation("转发列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/transmit/single")
     public Response<PageList<TransmitInfoVo>> list(TransmitInfoDto transmitInfoDto) {
         return transmitApi.list(transmitInfoDto);
+    }
+
+    private boolean matcher(Object obj, String regEx) {
+        if(obj == null || regEx == null){
+            return false;
+        }
+        Pattern pattern = Pattern.compile(regEx);
+        Matcher matcher = pattern.matcher(obj.toString());
+        return matcher.matches();
     }
 
 }

@@ -131,6 +131,7 @@
 	<select id="selectByCondition" parameterType="com.yryz.quanhu.behavior.reward.dto.RewardInfoDto" resultType="com.yryz.quanhu.behavior.reward.vo.RewardInfoVo">
 		select
 		<include refid="Base_Column_List" />
+		, gift_num * gift_price reward_amount
 		from qh_reward
 		<include refid="condition_where_sql" />
 	</select>

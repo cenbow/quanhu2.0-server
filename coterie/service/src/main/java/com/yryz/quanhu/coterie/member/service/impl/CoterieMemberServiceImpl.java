@@ -3,7 +3,9 @@ package com.yryz.quanhu.coterie.member.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -22,10 +24,17 @@ import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.entity.CoterieMember;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberNotify;
+import com.yryz.quanhu.coterie.member.event.CoterieEventManager;
+import com.yryz.quanhu.coterie.member.event.CoterieMemberMessageManager;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
+import com.yryz.quanhu.order.enums.OrderConstant;
+import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.order.sdk.dto.InputOrder;
+import com.yryz.quanhu.order.sdk.entity.Order;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -53,6 +62,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Reference
     private UserApi userApi;
 
+    @Reference
+    private OrderSDK orderSDK;
+
     @Resource
     private CoterieMemberDao coterieMemberDao;
 
@@ -62,8 +74,11 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Resource
     private CoterieService coterieService;
 
-//	@Resource
-//	private CoterieMemberMessageManager coterieMemberMessageManager;
+	@Resource
+	private CoterieMemberMessageManager coterieMemberMessageManager;
+
+    @Resource
+    private CoterieEventManager coterieEventManager;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -98,7 +113,20 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 //            Order order = new Order(custId, coterieInfo.getJoinFee() * 1L, extJson, CommonConstants.JOIN_COTERIE_MODULE_ENUM, coterieId,
 //                    CommonConstants.JOIN_COTERIE_RESOURCE_ID, custId, circleId);
 //            Long orderId = orderService.createOrder(OrderConstant.JOIN_COTERIE_ORDER, custId, coterieInfo.getOwnerId(), order);
-            Long orderId = 1111111111L;
+//            Long orderId = 1111111111L;
+
+            InputOrder inputOrder = new InputOrder();
+            inputOrder.setCreateUserId(userId);
+            inputOrder.setCost(coterie.getJoinFee().longValue());
+            inputOrder.setCoterieId(coterieId);
+            inputOrder.setFromId(userId);
+            inputOrder.setModuleEnum(ModuleContants.COTERIE);
+            inputOrder.setOrderEnum(OrderEnum.JOIN_COTERIE_ORDER);
+            inputOrder.setToId(Long.parseLong(coterie.getOwnerId()));
+//            inputOrder.setResourceId();
+            inputOrder.setBizContent(extJson);
+
+            Long orderId = orderSDK.createOrder(inputOrder);
 
             result.setStatus((byte) 10);
             result.setOrderId(orderId);
@@ -143,7 +171,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                     CoterieMemberApply apply = makeApplyInfo(userId, coterieId, reason, null);
                     coterieApplyDao.insert(apply);
                     //todo msg
-                    //coterieMemberMessageManager.joinMessage(custId, coterieId, reason);
+                    coterieMemberMessageManager.joinMessage(userId, coterieId, reason);
                 }
             } catch (Exception e) {
                 throw new QuanhuException(ExceptionEnum.SysException);
@@ -182,7 +210,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 }
             }
             //todo msg
-            //coterieMemberMessageManager.kickMessage(custId, coterieId, reason);
+            coterieMemberMessageManager.kickMessage(userId, coterieId, reason);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -232,7 +260,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         try {
             coterieMemberDao.updateByCoterieMember(record);
             //todo msg
-            //coterieMemberMessageManager.banSpeakMessage(custId, coterieId);
+            coterieMemberMessageManager.banSpeakMessage(userId, coterieId);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -350,6 +378,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                     coterieMemberDao.updateByCoterieMember(record);
                 }
             }
+
+            //todo event
+            coterieEventManager.joinCoterieEvent(coterieId);
+
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }

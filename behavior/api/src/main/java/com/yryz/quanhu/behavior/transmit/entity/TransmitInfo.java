@@ -36,6 +36,11 @@ public class TransmitInfo implements Serializable {
     private Long createUserId;
 
     /**
+     * 目标用户
+     * */
+    private Long targetUserId;
+
+    /**
      * 创建时间
      * */
     private Date createDate;
@@ -88,6 +93,14 @@ public class TransmitInfo implements Serializable {
 
     public void setCreateUserId(Long createUserId) {
         this.createUserId = createUserId;
+    }
+
+    public Long getTargetUserId() {
+        return targetUserId;
+    }
+
+    public void setTargetUserId(Long targetUserId) {
+        this.targetUserId = targetUserId;
     }
 
     public Date getCreateDate() {
