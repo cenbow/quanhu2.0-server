@@ -216,7 +216,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             Assert.isTrue(!headerUserId.equals(info.getCreateUserId()), "阅读资源文章，创建订单者 不能是作者");
 
             InputOrder inputOrder = new InputOrder();
-            inputOrder.setBizContent(JsonUtils.toFastJson(info));
+            inputOrder.setBizContent(JsonUtils.toFastJson(info, "yyyy-MM-dd HH:mm:ss"));
             inputOrder.setCost(info.getContentPrice());
             if (null != info.getCoterieId() && 0L != info.getCoterieId()) {
                 inputOrder.setCoterieId(info.getCoterieId());
