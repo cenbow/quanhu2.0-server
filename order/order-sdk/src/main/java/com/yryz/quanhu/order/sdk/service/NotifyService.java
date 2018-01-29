@@ -92,6 +92,9 @@ public class NotifyService {
             if (null != orderNotifyService) {
                 //回调业务
                 OutputOrder outputOrder = new OutputOrder();
+                outputOrder.setOrderId(localOrder.getKid());
+                outputOrder.setCost(localOrder.getCost());
+                outputOrder.setPayType(localOrder.getPayType());
                 outputOrder.setModuleEnum(localOrder.getModuleEnum());
                 outputOrder.setCoterieId(localOrder.getCoterieId());
                 outputOrder.setResourceId(localOrder.getResourceId());

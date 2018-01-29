@@ -93,6 +93,32 @@ public class Advertisement extends GenericEntity {
      */
     private String moduleEnum;
 
+    /**
+     * 首页广告开始时间
+     */
+    private String startDateTime;
+
+    /**
+     * 首页广告结束时间
+     */
+    private String endDateTime;
+
+    public String getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(String endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
+    public String getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(String startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
     public String getModuleEnum() {
         return moduleEnum;
     }

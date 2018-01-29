@@ -19,6 +19,10 @@ public interface BasicConfigForAdminApi {
 
     public Response<BasicConfigDto> get(BasicConfigDto dto);
 
+    public Response<Boolean> delete(BasicConfigDto dto);
+
+    public Response<Boolean> updateStatus(BasicConfigDto dto);
+
     public Response<List<BasicConfigDto>> list(BasicConfigDto dto);
 
     public Response<PageList<BasicConfigDto>> pages(BasicConfigDto dto);

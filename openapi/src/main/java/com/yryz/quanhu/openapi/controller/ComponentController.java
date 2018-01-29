@@ -5,9 +5,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.yryz.common.utils.BeanUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.openapi.utils.ComponentUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.annotation.UserBehaviorValidation;
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
 import com.yryz.quanhu.message.commonsafe.constants.CheckSlipCodeReturn;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
-import com.yryz.quanhu.message.commonsafe.vo.VerifyCodeVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.service.AuthService;
+import com.yryz.quanhu.openapi.utils.ComponentUtils;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;

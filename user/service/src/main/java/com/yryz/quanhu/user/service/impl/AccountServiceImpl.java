@@ -127,13 +127,13 @@ public class AccountServiceImpl implements AccountService {
 		if (account == null) {
 			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, appId)) {
-				throw QuanhuException.busiError("验证码错误");
+				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			return createUser(registerDTO);
 		}
 		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
 				appId)) {
-			throw QuanhuException.busiError("验证码错误");
+			throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
@@ -417,9 +417,10 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	private int update(UserAccount record) {
 		try {
+			UserAccount account = mysqlDao.selectOne(record.getKid(), null, null);
 			int result = mysqlDao.update(record);
-			if(result != 0){
-				accountRedisDao.saveAccount(record);
+			if(result != 0){				
+				accountRedisDao.deleteAccount(account.getKid(), account.getUserPhone(), account.getAppId());
 			}
 			return result;
 		} catch (Exception e) {
