@@ -283,7 +283,7 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
             ResourceTotal resourceTotal = new ResourceTotal();
             resourceTotal.setClassifyId(releaseInfo.getClassifyId().intValue());
             resourceTotal.setContent(releaseInfo.getContent());
-            if (null != releaseInfo.getCoterieId()) {
+            if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
                 resourceTotal.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
             }
 

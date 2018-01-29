@@ -216,7 +216,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JsonUtils.toFastJson(info));
             inputOrder.setCost(info.getContentPrice());
-            inputOrder.setCoterieId(info.getCoterieId());
+            if (null != info.getCoterieId() && 0L != info.getCoterieId()) {
+                inputOrder.setCoterieId(info.getCoterieId());
+            }
             inputOrder.setCreateUserId(headerUserId);
             inputOrder.setFromId(headerUserId);
             inputOrder.setModuleEnum(BranchFeesEnum.READ.toString());

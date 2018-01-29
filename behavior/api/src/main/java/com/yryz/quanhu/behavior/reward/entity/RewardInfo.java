@@ -11,7 +11,7 @@ public class RewardInfo extends GenericEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-    * 对应受赏价值（分）
+    * 对应受赏价值（分）（分费后金额）
     */
     private Long rewardPrice;
 

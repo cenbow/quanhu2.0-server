@@ -81,17 +81,20 @@ public class RewardInfoProvider implements RewardInfoApi {
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JsonUtils.toFastJson(record));
             inputOrder.setCost(record.getGiftNum() * giftInfo.getGiftPrice());
-            inputOrder.setCoterieId(record.getCoterieId());
+            if (null != record.getCoterieId() && 0L != record.getCoterieId()) {
+                inputOrder.setCoterieId(record.getCoterieId());
+            }
             inputOrder.setCreateUserId(record.getCreateUserId());
-            inputOrder.setFromId(record.getToUserId());
+            inputOrder.setFromId(record.getCreateUserId());
             // 调用订单 业务枚举
             inputOrder.setModuleEnum(BranchFeesEnum.REWARD.toString());
             inputOrder.setOrderEnum(OrderEnum.REWARD_ORDER);
             inputOrder.setResourceId(record.getResourceId());
-            inputOrder.setToId(record.getCreateUserId());
-            Long orderId = 213145446L; //orderSDK.createOrder(inputOrder);
+            inputOrder.setToId(record.getToUserId());
+            Long orderId = orderSDK.createOrder(inputOrder);
 
             record.setOrderId(orderId);
+            record.setRewardStatus(RewardConstants.reward_status_pay_not);
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             rewardInfoService.insertSelective(record);
 
@@ -110,8 +113,10 @@ public class RewardInfoProvider implements RewardInfoApi {
     @Override
     public Response<PageList<RewardInfoVo>> pageByCondition(RewardInfoDto dto, boolean isCount) {
         try {
+            // 只返回 打赏成功的记录
+            dto.setRewardStatus(RewardConstants.reward_status_pay_success);
             PageList<RewardInfoVo> pageList = rewardInfoService.pageByCondition(dto, isCount);
-            if (null == pageList || CollectionUtils.isEmpty(pageList.getEntities()) || null != dto.getQueryType()) {
+            if (null == pageList || CollectionUtils.isEmpty(pageList.getEntities()) || null == dto.getQueryType()) {
                 return ResponseUtils.returnObjectSuccess(pageList);
             }
 
