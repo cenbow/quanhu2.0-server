@@ -3,7 +3,6 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
-import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.PatternUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Api("广告")
 @RestController
 @RequestMapping("services/app")
@@ -30,7 +31,7 @@ public class AdvertisementController {
     @ApiOperation("广告")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/ad/list")
-    public Response<PageList<AdvertisementVo>> list(AdvertisementDto advertisementDto) {
+    public Response<List<AdvertisementVo>> list(AdvertisementDto advertisementDto) {
         Assert.notNull(advertisementDto, "缺少参数或参数错误！");
         Assert.isTrue(PatternUtils.matcher(advertisementDto.getAdvType(), "10|20"), "未知广告类型！");
         return advertisementAPI.list(advertisementDto);

@@ -7,7 +7,7 @@ public class CommonConstant {
     public final static int BATCH_SIZE = 2 * 1024;
 
     public class QuanHuDb {
-        public final static String DB_NAME = "db1";
+        public final static String DB_NAME = "quanhu";
         public final static String TABLE_USER = "qh_user_baseinfo";
         public final static String TABLE_TOPIC = "qh_topic";
         public final static String TABLE_TOPIC_POST = "qh_topic_post";

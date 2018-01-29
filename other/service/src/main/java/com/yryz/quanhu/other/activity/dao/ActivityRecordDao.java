@@ -40,4 +40,6 @@ public interface ActivityRecordDao {
                                            @Param("activityRecordVo") AdminActivityRecordVo adminActivityRecordVo);
 
     long attendlistCount(@Param("activityRecordVo") AdminActivityRecordVo adminActivityRecordVo);
+
+    ActivityRecord selectByCustIdAndActivityId(@Param("createUserId")Long createUserId, @Param("activityInfoId")Long activityInfoId);
 }

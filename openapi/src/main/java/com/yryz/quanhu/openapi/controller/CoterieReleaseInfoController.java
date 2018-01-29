@@ -1,5 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,5 +73,16 @@ public class CoterieReleaseInfoController {
         upInfo.setLastUpdateUserId(headerUserId);
 
         return ReleaseInfoApi.deleteBykid(upInfo);
+    }
+
+    @ApiOperation("付费阅读-订单创建")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+            @ApiImplicitParam(name = "kid", paramType = "query", required = true) })
+    @PostMapping(value = "{version}/coterie/release/info/order")
+    public Response<Map<String, Object>> createOrder(Long kid, @RequestHeader("userId") Long headerUserId) {
+
+        return coterieReleaseInfoApi.createOrder(kid, headerUserId);
     }
 }

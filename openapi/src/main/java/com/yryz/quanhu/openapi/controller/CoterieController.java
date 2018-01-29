@@ -144,10 +144,10 @@ public class CoterieController {
 	@ApiOperation("获取我创建的私圈列表")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/coterieInfo/creator")
-	public Response<List<CoterieInfo>> getMyCreateCoterie(HttpServletRequest request) {
+	public Response<List<CoterieInfo>> getMyCreateCoterie( HttpServletRequest request) {
 
 		RequestHeader header = WebUtil.getHeader(request);
-		String userid=header.getUserId();
+		 String userid=header.getUserId();
 		return coterieApi.getMyCreateCoterie(userid);
 	}
 
