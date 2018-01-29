@@ -4,9 +4,10 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto;
 import com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto;
-import com.yryz.quanhu.resource.advertisement.entity.Advertisement;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo;
+
+import java.util.List;
 
 /**
  * @author pengnian
@@ -30,7 +31,7 @@ public interface AdvertisementAPI {
      * @param advertisementDto
      * @return
      */
-    Response<PageList<AdvertisementVo>> list(AdvertisementDto advertisementDto);
+    Response<List<AdvertisementVo>> list(AdvertisementDto advertisementDto);
 
     /**
      * 获取Advertisement列表（admin）
@@ -43,16 +44,23 @@ public interface AdvertisementAPI {
     /**
      * 添加广告
      *
-     * @param advertisement
+     * @param advertisementAdminDto
      * @return
      */
-    Response<Integer> add(Advertisement advertisement);
+    Response<Integer> add(AdvertisementAdminDto advertisementAdminDto);
 
     /**
      * 更新广告
      *
-     * @param advertisement
+     * @param advertisementAdminDto
      * @return
      */
-    Response<Integer> update(Advertisement advertisement);
+    Response<Integer> update(AdvertisementAdminDto advertisementAdminDto);
+
+    /**
+     * 查询默认广告
+     *
+     * @return
+     */
+    Response<List<AdvertisementVo>> selectDefaultAdvertisement();
 }
