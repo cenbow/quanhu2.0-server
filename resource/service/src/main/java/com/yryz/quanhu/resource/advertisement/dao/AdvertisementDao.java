@@ -30,4 +30,12 @@ public interface AdvertisementDao extends BaseDao {
     Integer add(Advertisement advertisement);
 
     AdvertisementVo detail(Long kid);
+
+    List<AdvertisementAdminVo> checkConflict(AdvertisementAdminDto advertisementAdminDto);
+
+    List<AdvertisementAdminVo> selectListAdminBanner(AdvertisementAdminDto advertisementAdminDto);
+
+    List<AdvertisementVo> selectListBanner(AdvertisementDto advertisementDto);
+
+    Integer cancelDefAd();
 }

@@ -209,16 +209,16 @@ public class CoterieProvider implements CoterieApi {
 				} catch (DatasOptException e) {
 					logger.error(e.getMessage(), e);
 					return ResponseUtils.returnException(e);
-				} catch (ServiceException e) {
-					return ResponseUtils.returnException(e);
-				}
-				catch (QuanhuException e) {
-					return ResponseUtils.returnException(e);
-				} catch (Exception e) {
-					logger.error("unKown Exception", e);
-					return ResponseUtils.returnException(e);
+		} catch (ServiceException e) {
+		return ResponseUtils.returnException(e);
 		}
-	}
+		catch (QuanhuException e) {
+		return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+		logger.error("unKown Exception", e);
+		return ResponseUtils.returnException(e);
+		}
+		}
 
 	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
@@ -240,7 +240,7 @@ public class CoterieProvider implements CoterieApi {
 
 			throw new QuanhuException( "2007","参数错误","ownerId不能为空",null);
 		}
-		if (!(info.getJoinFee()!=null && info.getJoinFee()<=100 && info.getJoinFee()>=0)) {//私圈单位为分，0表示免费，小于100的  单位必定错误
+		if (!(info.getJoinFee()!=null && info.getJoinFee()<=500 && info.getJoinFee()>=0)) {//私圈单位为分，0表示免费，小于100的  单位必定错误
 
 			throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
 		}
@@ -717,6 +717,11 @@ public class CoterieProvider implements CoterieApi {
 			if(cust!=null){
 				o.setCustIcon(cust.getUserImg());
 				o.setOwnerName(cust.getUserNickName());
+				o.getUser().setHeadImg(cust.getUserImg());
+				o.getUser().setAuthStatus(cust.getAuthStatus().toString());
+				o.getUser().setNickName(cust.getUserNickName());
+
+
 			}
 		}
 	}

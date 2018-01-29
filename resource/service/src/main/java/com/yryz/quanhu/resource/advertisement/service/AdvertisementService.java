@@ -3,9 +3,10 @@ package com.yryz.quanhu.resource.advertisement.service;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto;
 import com.yryz.quanhu.resource.advertisement.dto.AdvertisementDto;
-import com.yryz.quanhu.resource.advertisement.entity.Advertisement;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo;
 import com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo;
+
+import java.util.List;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -17,13 +18,15 @@ import com.yryz.quanhu.resource.advertisement.vo.AdvertisementVo;
  */
 public interface AdvertisementService {
 
-    PageList<AdvertisementVo> list(AdvertisementDto advertisementDto);
+    List<AdvertisementVo> list(AdvertisementDto advertisementDto);
 
     PageList<AdvertisementAdminVo> listAdmin(AdvertisementAdminDto advertisementAdminDto);
 
-    Integer add(Advertisement advertisement);
+    Integer add(AdvertisementAdminDto advertisementAdminDto);
 
-    Integer update(Advertisement advertisement);
+    Integer update(AdvertisementAdminDto advertisementAdminDto);
 
     AdvertisementVo detail(Long kid);
+
+    List<AdvertisementVo> selectDefaultAdvertisement();
 }

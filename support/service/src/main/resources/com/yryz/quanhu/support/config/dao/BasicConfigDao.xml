@@ -40,18 +40,14 @@
   <update id="update" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
 
     UPDATE qh_basic_config SET
-
     last_update_date = NOW()
     ,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
-
-    ,#{appId,jdbcType=VARCHAR}
-    ,#{parentKid,jdbcType=BIGINT}
-    ,#{configName,jdbcType=VARCHAR}
-    ,#{configKey,jdbcType=VARCHAR}
-    ,#{configValue,jdbcType=VARCHAR}
-    ,#{configDesc,jdbcType=VARCHAR}
-    ,#{configStatus,jdbcType=TINYINT}
-
+    ,parent_kid = #{parentKid,jdbcType=BIGINT}
+    ,config_name = #{configName,jdbcType=VARCHAR}
+    ,config_key = #{configKey,jdbcType=VARCHAR}
+    ,config_value = #{configValue,jdbcType=VARCHAR}
+    ,config_desc = #{configDesc,jdbcType=VARCHAR}
+    ,config_status = #{configStatus,jdbcType=TINYINT}
     WHERE kid = #{kid,jdbcType=BIGINT}
 
   </update>
@@ -68,8 +64,8 @@
     <if test="configName != null and configName != ''">
       AND config_name = #{configName,jdbcType=VARCHAR}
     </if>
-    <if test="parentKid != null and parentKid != ''">
-      AND parent_kid = #{parentKid,jdbcType=BIGINT}
+    <if test="kid != null and kid != ''">
+      AND (kid = #{kid,jdbcType=BIGINT} OR parent_kid = #{kid,jdbcType=BIGINT})
     </if>
     ORDER BY last_update_date DESC
   </select>
@@ -105,12 +101,12 @@
   </select>
 
 
-  <update id="deleteAllChildByKid" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+  <update id="deleteChildByKid" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
 
     UPDATE qh_basic_config SET
     del_flag = 1,
     last_update_date = Now(),
-    last_update_date_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+    last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
     WHERE
     <choose>
       <when test="kids != null and kids.size > 0">
@@ -126,12 +122,12 @@
 
   </update>
 
-  <update id="updateKeyStatus" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
+  <update id="updateStatus" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
 
     UPDATE qh_basic_config SET
     config_status = #{configStatus,jdbcType=TINYINT},
     last_update_date = Now(),
-    last_update_date_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+    last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
     WHERE kid = #{kid,jdbcType=BIGINT}
 
   </update>

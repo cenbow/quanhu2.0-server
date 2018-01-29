@@ -10,9 +10,14 @@ package com.yryz.quanhu.openapi.controller;
 import java.util.List;
 
 import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.response.PageList;
+import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.PageUtils;
+import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -46,24 +51,41 @@ public class ResourceController {
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/appRecommend")
-    public Response<List<ResourceVo>> appRecommend(@ApiParam("开始长度") Integer start , @ApiParam("列表长度") Integer limit) {
-        if(start == null){
-        	start = 1;
+    public Response<PageList<ResourceVo>> appRecommend(@RequestParam Integer currentPage, @RequestParam Integer pageSize) {
+        int start = 0;
+        if (pageSize == null) {
+            pageSize = 10;
         }
-        if(limit == null){
-        	limit = 10;
+        if (currentPage != null && currentPage > 0) {
+            start = currentPage * pageSize;
         }
-        return resourceApi.appRecommend(start, limit);
+        PageList<ResourceVo> pageList = new PageList<>();
+        pageList.setCurrentPage(currentPage);
+        pageList.setEntities(ResponseUtils.getResponseData(resourceApi.appRecommend(start, pageSize)));
+        pageList.setPageSize(pageSize);
+        return ResponseUtils.returnObjectSuccess(pageList);
+
     }
 
     @NotLogin
     @ApiOperation("私圈首页动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/coterieRecommend")
-    public Response<List<ResourceVo>> coterieRecommend(@ApiParam("私圈ID") String coterieId, @ApiParam("列表长度") String limit) {
+    public Response<PageList<ResourceVo>> coterieRecommend(@RequestParam String coterieId, @RequestParam Integer currentPage, @RequestParam Integer pageSize) {
+        int start = 0;
+        if (pageSize == null) {
+            pageSize = 10;
+        }
+        if (currentPage != null && currentPage > 0) {
+            start = currentPage * pageSize;
+        }
         ResourceVo resourceVo = new ResourceVo();
         resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceVo.setCoterieId(coterieId);
-        return resourceApi.getResources(resourceVo, "createTime", 0, 10, null, null);
+        PageList<ResourceVo> pageList = new PageList<>();
+        pageList.setCurrentPage(currentPage);
+        pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
+        pageList.setPageSize(pageSize);
+        return ResponseUtils.returnObjectSuccess(pageList);
     }
 }

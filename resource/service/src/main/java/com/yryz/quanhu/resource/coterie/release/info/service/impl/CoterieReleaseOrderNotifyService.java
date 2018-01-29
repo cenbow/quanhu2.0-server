@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -23,6 +24,9 @@ import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.constant.FeeDetail;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
+import com.yryz.quanhu.resource.release.buyrecord.constants.BuyTypeEnum;
+import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
+import com.yryz.quanhu.resource.release.buyrecord.service.ReleaseBuyRecordService;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -46,6 +50,9 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
     @Reference(lazy = true, check = false, timeout = 10000)
     private UserApi userApi;
 
+    @Autowired
+    private ReleaseBuyRecordService releaseBuyRecordService;
+
     @Override
     public String getModuleEnum() {
         return BranchFeesEnum.READ.toString();
@@ -59,10 +66,23 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         Assert.notNull(outputOrder.getCoterieId(), "coterieId is null !");
         ReleaseInfo releaseInfo = JsonUtils.fromJson(outputOrder.getBizContent(), ReleaseInfo.class);
 
+        Assert.notNull(releaseInfo, "fromJson releaseInfo is null !");
+
         CoterieInfo coterieInfo = ResponseUtils
                 .getResponseData(coterieApi.queryCoterieInfo(releaseInfo.getCoterieId()));
         Assert.notNull(coterieInfo, "私圈信息为NULL，coterieId : " + releaseInfo.getCoterieId());
-        // TODO 提交 资源购买记录
+        // 提交资源购买记录
+        ReleaseBuyRecord releaseBuyRecord = new ReleaseBuyRecord();
+        releaseBuyRecord.setOrderId(outputOrder.getOrderId());
+        releaseBuyRecord.setCoterieId(outputOrder.getCoterieId() == null ? 0 : outputOrder.getCoterieId());
+        releaseBuyRecord.setResourceId(outputOrder.getResourceId());
+        releaseBuyRecord.setAmount(outputOrder.getCost());
+        releaseBuyRecord.setPayType(outputOrder.getPayType());
+        releaseBuyRecord.setBuyType(BuyTypeEnum.RELEASE.getBuyType());
+        releaseBuyRecord.setRemark(BuyTypeEnum.RELEASE.getRemark());
+        releaseBuyRecord.setCreateUserId(outputOrder.getCreateUserId());
+        releaseBuyRecord.setLastUpdateUserId(outputOrder.getCreateUserId());
+        releaseBuyRecordService.insert(releaseBuyRecord);
 
         // 文章阅读者，文章作者
         UserSimpleVO sponsorUser = null;
@@ -79,7 +99,7 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
             systemBody.setBodyImg(StringUtils.split(releaseInfo.getImgUrl(), ",")[0]);
             systemBody.setBodyTitle(releaseInfo.getTitle());
             systemBody.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
-            systemBody.setCoterieName(coterieInfo.getCircleName());
+            systemBody.setCoterieName(coterieInfo.getName());
         } catch (Exception e) {
             logger.error("notify ==>> , 付费阅读成功，构建 SystemBody 异常!", e);
             return;
@@ -95,10 +115,10 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         try {
             // 付费阅读成功 给阅读者发送扣费消息
             MessageVo messageVo = MessageUtils.buildMessage(MessageConstant.CONTENT_BUY_REMINDERS,
-                    String.valueOf(sponsorUser.getUserId()), coterieInfo.getCircleName(), systemBody);
+                    String.valueOf(sponsorUser.getUserId()), coterieInfo.getName(), systemBody);
             messageVo.setContent(messageVo.getContent().replaceAll("\\{money\\}",
                     String.valueOf(releaseInfo.getContentPrice() / 100)));
-            // messageAPI.sendMessage(messageVo, true);
+            messageAPI.sendMessage(messageVo, true);
         } catch (Exception e) {
             logger.error("payMessageToSponsor ==>> , 付费阅读成功 给文章阅读者发送消息失败 !", e);
         }
@@ -124,6 +144,6 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
                     .multiply(new BigDecimal(fee.getFee()).divide(new BigDecimal(100))));
         }
         messageVo.setContent(messageVo.getContent().replaceAll("\\{money\\}", money));
-        // messageAPI.sendMessage(messageVo, true);
+        messageAPI.sendMessage(messageVo, true);
     }
 }

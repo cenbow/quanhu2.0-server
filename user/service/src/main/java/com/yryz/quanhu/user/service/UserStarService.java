@@ -55,6 +55,13 @@ public interface UserStarService {
      * @return
      */
     int updateRecommend(UserStarAuth authModel);
+    /**
+     * 推荐权重更新
+     * @param userId
+     * @param weight
+     * @return
+     */
+    int updateRecommendHeight(Long userId,Integer weight);
     
     /**
      * 后台达人认证信息列表

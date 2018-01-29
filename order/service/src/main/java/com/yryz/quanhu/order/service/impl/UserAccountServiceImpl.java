@@ -67,11 +67,12 @@ public class UserAccountServiceImpl implements UserAccountService {
 			} else {
 				account.setAccountState(1);
 			}
-			if (userAccount.getSmallNopass() != null) {
-				account.setSmallNopass(userAccount.getSmallNopass());
-			} else {
-				account.setSmallNopass(0);
-			}
+//			if (userAccount.getSmallNopass() != null) {
+//				account.setSmallNopass(userAccount.getSmallNopass());
+//			} else {
+			//小额免密默认开启
+			account.setSmallNopass(1);
+//			}
 			account.setCreateTime(new Date());
 			saveUserAccount(account);
 		}
@@ -109,7 +110,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 			account.setCostSum(0L);
 			account.setIntegralSum(0L);
 			account.setAccountState(1);
-			account.setSmallNopass(0);
+			account.setSmallNopass(1);
 			account.setCreateTime(new Date());
 			saveUserAccount(account);
 		}

@@ -21,7 +21,7 @@ public class ReleaseBuyRecord extends GenericEntity {
     //支付的金额
     private Long amount;
     //支付类型（10:扣费，11加费或退款）
-    private Integer orderType;
+    private Integer payType;
     //购买类型'10资源购买付费
     private Integer buyType;
     //支付备注
@@ -59,12 +59,12 @@ public class ReleaseBuyRecord extends GenericEntity {
         this.amount = amount;
     }
 
-    public Integer getOrderType() {
-        return orderType;
+    public Integer getPayType() {
+        return payType;
     }
 
-    public void setOrderType(Integer orderType) {
-        this.orderType = orderType;
+    public void setPayType(Integer payType) {
+        this.payType = payType;
     }
 
     public Integer getBuyType() {

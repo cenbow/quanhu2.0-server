@@ -66,7 +66,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
-            Assert.notNull(record.getContentSource(),"ContentSource is NULL !");
+            Assert.hasText(record.getContentSource(),"ContentSource is NULL !");
             
             record.setClassifyId(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             record.setDelFlag(CommonConstants.DELETE_NO);
