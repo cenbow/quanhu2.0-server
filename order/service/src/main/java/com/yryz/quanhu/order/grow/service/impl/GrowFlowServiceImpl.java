@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yryz.common.response.PageList;
 import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
@@ -42,8 +41,17 @@ public class GrowFlowServiceImpl implements GrowFlowService{
 
 	@Override
 	public List<GrowFlow> getPage(GrowFlowQuery gfq) {
-		PageUtils.startPage(gfq.getCurrentPage(), gfq.getPageSize());
+		//PageUtils.startPage(gfq.getCurrentPage(), gfq.getPageSize());
 		return growFlowDao.getPage(gfq);
 	}
+	
+
+    @Override
+    public long countgetPage(GrowFlowQuery gfq) {
+        return growFlowDao.countgetPage(gfq);
+    }
+
+
+
 
 }

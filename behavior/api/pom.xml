@@ -10,6 +10,11 @@
     </parent>
 
     <artifactId>behavior-api</artifactId>
+    
+    <properties>
+        <user.api.version>2.0-SNAPSHOT</user.api.version>
+        <resource.api.version>2.0-SNAPSHOT</resource.api.version>
+    </properties>
 
     <!--api里面不写死依赖 全部设置为provided 以便部分使用api内容 例如仅仅使用vo的情况-->
     <dependencies>
@@ -32,5 +37,19 @@
             <artifactId>service-starter</artifactId>
             <scope>provided</scope>
         </dependency>
+
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>user-api</artifactId>
+			<scope>provided</scope>
+			<version>${user.api.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>resource-api</artifactId>
+			<scope>provided</scope>
+			<version>${resource.api.version}</version>
+		</dependency>
     </dependencies>
 </project>

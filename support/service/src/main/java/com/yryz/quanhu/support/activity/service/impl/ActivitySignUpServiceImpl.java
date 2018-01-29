@@ -1,10 +1,19 @@
 package com.yryz.quanhu.support.activity.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.order.api.OrderApi;
+import com.yryz.quanhu.order.api.OrderAsynApi;
+import com.yryz.quanhu.order.enums.AccountEnum;
+import com.yryz.quanhu.order.enums.ProductEnum;
+import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.support.activity.constant.ActivityConstant;
 import com.yryz.quanhu.support.activity.dao.ActivityEnrolConfigDao;
 import com.yryz.quanhu.support.activity.dao.ActivityRecordDao;
@@ -25,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.NumberUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -44,8 +54,8 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     ActivityRecordDao activityRecordDao;
     @Reference(check=false)
     private IdAPI idApi;
-    /*@Reference(check=false)
-    CustAPI custAPI;*/
+    @Reference(check=false)
+    OrderSDK orderSDK;
 
     @Override
     public ActivitySignUpHomeAppVo getActivitySignUpHome(Long activityInfoId, String custId) {
@@ -122,19 +132,10 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
             return status;
         }
         //TODO 查询订单状态
-       /* List<OrderInfo> localOrderInfoList = null;
-        localOrderInfoList=orderService.getLocalOrderInfo(custId, activityKid.toString(), String.valueOf(ProductEnum.ACTIVITY_SIGNUP.getType()),ActivityConstant.ACTIVITY_ENROL_ORDER_STATE_SUCCESS);
-        if(!CollectionUtils.isEmpty(localOrderInfoList)){
-            return ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;
-        }
-        localOrderInfoList=orderService.getLocalOrderInfo(custId, activityKid.toString(), String.valueOf(ProductEnum.ACTIVITY_SIGNUP.getType()),ActivityConstant.ACTIVITY_ENROL_ORDER_STATE_CREATER);
-        OrderInfo apiOrderInfo =null;
-        for(OrderInfo oif : localOrderInfoList){
-            apiOrderInfo = orderService.getApiOrderInfo(oif.getOrderId());
-            if(apiOrderInfo.getOrderState()==ActivityConstant.ACTIVITY_ENROL_ORDER_STATE_SUCCESS){
-                return ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;
-            }
-        }*/
+        boolean success = orderSDK.isBuyOrderSuccess("", NumberUtils.parseNumber(custId,Long.TYPE),activityRecordList.get(0).getKid());
+       if(success){
+           status = ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;
+       }
         return status;
     }
 
@@ -175,9 +176,6 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     @Transactional(rollbackFor = RuntimeException.class)
     public ActivityRecord activitySignUpSubmit(ActivityRecord activityRecord, String custId) {
         Assert.notNull(custId, "custId不能为空");
-        // TODO 校验用户是否存在
-        /*CustInfo custInfo = custAPI.getCustInfo(custId);
-        Assert.notNull(custInfo, "custInfo is null !");*/
         Assert.notNull(activityRecord, "activityRecord不能为空");
         Assert.notNull(activityRecord.getActivityInfoId(), "活动id不能为空");
         Assert.notNull(activityRecord.getEnrolSources(), "报名数据不能为空");
@@ -224,14 +222,14 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 }
                 //TODO 数据提交至订单模块
                 // 创建订单
-               /* String orderNo = null;
+                String orderNo = null;
                 try {
-                    orderNo = this.generateOrder(activityRecord, custInfo);
+                    orderNo = this.generateOrder(activityRecord, custId);
                 } catch (Exception e1) {
-                    throw new CommonException("余额不足，请充值!");
+                    throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "余额不足，请充值!", "余额不足，请充值!");
                 }
-                //Assert.hasText(orderNo, "货币支付，创建订单失败！");
-                activityRecord.setOrderNo(orderNo);*/
+                Assert.hasText(orderNo, "货币支付，创建订单失败！");
+                activityRecord.setOrderNo(orderNo);
                 return activityRecord;
             case 12:
                 int flag = 0;
@@ -259,6 +257,22 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         activityInfoService.updateJoinCount(activityInfo.getKid(),activityEnrolConfig.getEnrolUpper());
         return activityRecord;
     }
+
+    private String generateOrder(ActivityRecord activityRecord, String custId) {
+        InputOrder inputOrder = new InputOrder();
+        inputOrder.setOrderEnum(OrderEnum.ACTIVITY_SIGNUP_ORDER);
+        inputOrder.setFromId(activityRecord.getCreateUserId());
+        //TODO 字段封装
+       inputOrder.setToId(NumberUtils.parseNumber(AccountEnum.SYSID,Long.TYPE));
+        inputOrder.setModuleEnum(ModuleContants.ACTIVITY_ENUM);
+        inputOrder.setBizContent(JSON.toJSONString(activityRecord));
+        inputOrder.setResourceId(activityRecord.getKid());
+        inputOrder.setCost(Long.valueOf(activityRecord.getAmount()));
+        inputOrder.setCreateUserId(activityRecord.getCreateUserId());
+        Long oderId = orderSDK.createOrder(inputOrder);
+        return oderId.toString();
+    }
+
     public String replaceIllagelWordsEnrolSources(String text) {
         /*@SuppressWarnings("unchecked")
         List<Map<String,String>> voMap = JsonUtils.fromJson(text, List.class);

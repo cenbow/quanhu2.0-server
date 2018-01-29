@@ -70,8 +70,8 @@ public class CoterieController {
 	@ApiOperation("设置私圈， 更新圈子的数据")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping (value = "/{version}/coterieInfo/config")
-	public Response<Boolean> config(String coterieId, @RequestBody CoterieInfo config, HttpServletRequest request) {
-		Response<CoterieInfo> rpcRecord = coterieApi.queryCoterieInfo(Long.parseLong(coterieId) );
+	public Response<CoterieInfo>  config(  @RequestBody CoterieInfo config, HttpServletRequest request) {
+		Response<CoterieInfo> rpcRecord = coterieApi.queryCoterieInfo(config.getCoterieId() );
 		CoterieInfo  record=rpcRecord.getData();
 
 		String tempStr;
@@ -107,8 +107,8 @@ public class CoterieController {
 		if (config.getJoinCheck() != null) {
 			record.setJoinCheck(config.getJoinCheck());
 		}
-		 coterieApi.modifyCoterieInfo(record);
-		return ResponseUtils.returnObjectSuccess(true);
+		Response<CoterieInfo> result =coterieApi.modifyCoterieInfo(record);
+		return result;
 	}
 	
 	/**
@@ -120,9 +120,9 @@ public class CoterieController {
 	@ApiOperation("获取私圈详情")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/coterieInfo/single")
-	public Response<CoterieInfo> details(String coterieId, HttpServletRequest request) {
+	public Response<CoterieInfo> details(Long coterieId, HttpServletRequest request) {
 		//Assert.notNull(coterieId, "私圈id不能为null！");
-		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(coterieId));
+		Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo( coterieId );
 		CoterieInfo rpcCoterieInfo = (CoterieInfo)coterieInfo.getData();
 		try {
 			//todo
@@ -141,7 +141,7 @@ public class CoterieController {
 	 * 获取我创建的私圈详情
 	 * @return
 	 */
-	@ApiOperation("获取我创建的私圈详情")
+	@ApiOperation("获取我创建的私圈列表")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/coterieInfo/creator")
 	public Response<List<CoterieInfo>> getMyCreateCoterie(HttpServletRequest request) {
@@ -155,7 +155,7 @@ public class CoterieController {
 	 * 获取我加入的私圈详情
 	 * @return
 	 */
-	@ApiOperation("获取我加入的私圈详情")
+	@ApiOperation("获取我加入的私圈列表")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/coterieInfo/list/join")
 	public Response<List<CoterieInfo>> getMyJoinCoterie(HttpServletRequest request) {

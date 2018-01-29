@@ -1,26 +1,51 @@
 package com.yryz.quanhu.behavior.transmit.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
+import java.io.Serializable;
 import java.util.Date;
 
-public class TransmitInfo {
+public class TransmitInfo implements Serializable {
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    /**
+     * 唯一id
+     * */
     private Long kid;
 
+    /**
+     * 原文ID或动态ID
+     * */
     private Long parentId;
 
+    /**
+     * 资源ID
+     * */
     private Long resourceId;
 
+    /**
+     * 资源类型
+     * */
     private Integer moduleEnum;
 
+    /**
+     * 内容
+     * */
     private String content;
 
+    /**
+     * 创建用户ID
+     * */
     private Long createUserId;
 
+    /**
+     * 目标用户
+     * */
+    private Long targetUserId;
+
+    /**
+     * 创建时间
+     * */
     private Date createDate;
+
+    private Long createDateLong;
 
     public Long getKid() {
         return kid;
@@ -70,11 +95,27 @@ public class TransmitInfo {
         this.createUserId = createUserId;
     }
 
+    public Long getTargetUserId() {
+        return targetUserId;
+    }
+
+    public void setTargetUserId(Long targetUserId) {
+        this.targetUserId = targetUserId;
+    }
+
     public Date getCreateDate() {
         return createDate;
     }
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Long getCreateDateLong() {
+        return createDateLong;
+    }
+
+    public void setCreateDateLong(Long createDateLong) {
+        this.createDateLong = createDateLong;
     }
 }

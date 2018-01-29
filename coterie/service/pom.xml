@@ -47,6 +47,22 @@
             <version>${quanhu.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>order-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>message-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>order-sdk</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+
         <!--公司内部库-->
         <dependency>
             <groupId>com.yryz.framework</groupId>

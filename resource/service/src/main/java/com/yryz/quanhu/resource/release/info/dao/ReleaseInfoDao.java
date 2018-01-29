@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
-import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 
 @Mapper
 public interface ReleaseInfoDao {
@@ -28,6 +27,4 @@ public interface ReleaseInfoDao {
     int updateByCondition(@Param("record") ReleaseInfo record, @Param("dto") ReleaseInfoDto dto);
     
     List<Long> selectKidByCreatedate(@Param("startDate")String startDate,@Param("endDate")String endDate);
-    
-    List<ReleaseInfoVo> selectByKids(@Param("kidList")List<Long> kidList);
 }

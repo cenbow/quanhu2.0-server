@@ -27,6 +27,15 @@ public interface UserApi {
 		return String.format("%s.%s", RedisConstants.USER_INFO,userId);
 	}
 	/**
+	 * 用户手机号缓存key
+	 * @param phone
+	 * @param appId
+	 * @return
+	 */
+	static String userPhoneKey(String phone,String appId){
+		return String.format("%s.%s.%s", RedisConstants.USER_PHONE_INFO,phone,appId);
+	}
+	/**
 	 * 查询用户简要信息
 	 * @param userId
 	 * @return

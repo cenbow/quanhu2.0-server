@@ -36,7 +36,7 @@ public class ReleaseInfoDto extends ReleaseInfo {
     */
     private Byte payFlag;
 
-    private int pageNo = 1;
+    private int currentPage = 1;
 
     private int pageSize = 30;
 
@@ -87,12 +87,12 @@ public class ReleaseInfoDto extends ReleaseInfo {
         this.payFlag = payFlag;
     }
 
-    public int getPageNo() {
-        return pageNo;
+    public int getCurrentPage() {
+        return currentPage;
     }
 
-    public void setPageNo(int pageNo) {
-        this.pageNo = pageNo;
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
     }
 
     public int getPageSize() {

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.order.score.dao.persistence.ScoreFlowDao;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
 import com.yryz.quanhu.score.entity.ScoreFlow;
@@ -43,9 +42,17 @@ public class ScoreFlowServiceImpl implements ScoreFlowService {
 	@Override
 	public List<ScoreFlow> getPage(ScoreFlowQuery sfq) {
 		
-		PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize());
-		
+		//PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize());
+//com.github.pagehelper.Page<ScoreFlowQuery> pageHelp =PageHelper.startPage(sfq.getCurrentPage(), sfq.getPageSize());
+
 		return scoreFlowDao.getPage(sfq);
 	}
+	
+	
+    @Override
+    public long countgetPage(ScoreFlowQuery gfq) {
+        return scoreFlowDao.countgetPage(gfq);
+    }
+
 
 }

@@ -2,6 +2,7 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.count.api.CountApi;
@@ -38,6 +39,7 @@ public class ActivityCandidateController {
     private CountApi countApi;
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
+    @UserBehaviorValidation(login=true)
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")
@@ -55,15 +57,15 @@ public class ActivityCandidateController {
         }
         return response;
     }
-
+    @UserBehaviorValidation(login=true)
     @ApiOperation("参与投票活动")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/config")
-    public Response<ActivityVoteConfigVo> config(Long activityInfoId) {
+    public Response<ActivityVoteConfigVo> config(Long activityInfoId, HttpServletRequest request) {
         return activityCandidateApi.config(activityInfoId);
     }
 
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiOperation("参与者详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/detail")
@@ -83,7 +85,7 @@ public class ActivityCandidateController {
         return activityVoteDetailVoResponse;
     }
 
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiOperation("参与者列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/list")
@@ -95,7 +97,7 @@ public class ActivityCandidateController {
         return activityCandidateApi.list(activityVoteDto);
     }
 
-    @NotLogin
+    @UserBehaviorValidation(login=false)
     @ApiOperation("排行榜")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/rank")

@@ -1,15 +1,20 @@
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.order.score.manage.service.ScoreEventManageService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
+import com.yryz.quanhu.order.utils.Page;
 import com.yryz.quanhu.score.entity.ScoreEventInfo;
 import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
@@ -47,20 +52,40 @@ public class ScoreAPIImpl implements ScoreAPI {
 	public PageList<ScoreEventInfo> getScoreEventPage() {
 		return scoreEventManageService.getPage();
 	}
+	
+
 
 	@Override
-	public PageList<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq) {
+	public  PageList<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq) {
 		
 		   PageList<ScoreFlow> pageList = new PageList<>();
 	        pageList.setCurrentPage(sfq.getCurrentPage());
 	        pageList.setPageSize(sfq.getPageSize());
 
-	        List<ScoreFlow> list = scoreFlowService.getPage(sfq);
-	        pageList.setEntities(list);
+			Page<ScoreFlow> page = new Page<ScoreFlow>();
+			page.setPageNo(sfq.getCurrentPage());
+			page.setPageSize(sfq.getPageSize());
+			//PageHelper.startPage(sfq.getCurrentPage(), sfq.getPageSize());
+	        @SuppressWarnings("unchecked")
+			com.github.pagehelper.Page<ScoreFlow> pageHelp = PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
+			//com.github.pagehelper.Page<ScoreFlow> pageHelp =   PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
+	        pageHelp = (com.github.pagehelper.Page<ScoreFlow>) scoreFlowService.getPage(sfq);
+			List<ScoreFlow> list =  new ArrayList<ScoreFlow>(pageHelp.getResult());
+//			List<ScoreFlow> list =   scoreFlowService.getPage(sfq);
+//			page.setResult(pageHelp.getResult());
+//			page.setTotalCount(pageHelp.getTotal());
 
-	        return pageList;
+//	        if ( CollectionUtils.isEmpty(list)) {
+//	            pageList.setCount(0L);
+//	        } else {
+//	            pageList.setCount(scoreFlowService.countgetPage(sfq));
+//	        }
+			pageList.setEntities(list);
+			pageList.setCount(pageHelp.getTotal());
+ 
 		
-		//return scoreFlowService.getPage(sfq, flowType, start, limit);
+	        return pageList;
+	        
 	}
 
 	@Override

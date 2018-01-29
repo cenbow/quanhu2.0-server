@@ -79,8 +79,8 @@ public class ScoreController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/order/score/commit")
 	public void commit(@ApiParam("事件对象")EventInfo event){
-		EventInfo eventInfo = new EventInfo();
-		eventAPI.commit(eventInfo);
+		//EventInfo eventInfo = new EventInfo();
+		eventAPI.commit(event);
 	}
 	
 	@NotLogin
@@ -149,10 +149,10 @@ public class ScoreController {
 //	@RequestMapping(path="/score/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
 //	@ResponseBody
 	public Response<PageList<ScoreFlow>> getScoreFlow( ScoreFlowQuery sfq ){
-		PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
+		//PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
 		//return ReturnModel.listToString(sfs);
-	
-		   return ResponseUtils.returnObjectSuccess(sfslist);
+		return eventAcountApiService.getScoreFlow(sfq);
+		 //  return ResponseUtils.returnObjectSuccess(sfslist);
 	}
 	
 	@NotLogin
@@ -162,9 +162,10 @@ public class ScoreController {
 //	@RequestMapping(path="/grow/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
 //	@ResponseBody
 	public Response<PageList<GrowFlow>> getGrowFlow( GrowFlowQuery gfq){
-		PageList<GrowFlow> growflowList = eventAcountApiService.getGrowFlow(gfq);
+		//PageList<GrowFlow> growflowList = 
+		return eventAcountApiService.getGrowFlow(gfq);
 		//return ReturnModel.listToString(gfs);
-		 return ResponseUtils.returnObjectSuccess(growflowList);
+		// return ResponseUtils.returnObjectSuccess(growflowList);
 	}
 	
 	

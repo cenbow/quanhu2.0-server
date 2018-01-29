@@ -16,9 +16,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.grow.entity.GrowFlow;
+import com.yryz.quanhu.grow.entity.GrowFlowQuery;
+import com.yryz.quanhu.score.entity.ScoreFlow;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventSign;
 
 /**
  * @author syc
@@ -75,10 +81,44 @@ public class ScoreTest {
     public  void getEventSign()  {
 		String custId = "123456789";
 		String eventCode = "1";
-       //return eventAcountApiService.getEventSign(custId, eventCode);
+		EventSign  sign = eventAcountApiService.getEventSign(custId, eventCode);
+		System.out.println("sign list: "+sign);
 
      // System.out.println("ScoreFlow list: "+list.size());
     }
 	
+
+	@Test
+    public  void getScoreFlow()  {
+		String userId = "123456789";
+		String consumeFlag = "";
+		ScoreFlowQuery sfq =new ScoreFlowQuery();
+		sfq.setUserId(userId);
+		sfq.setConsumeFlag(consumeFlag);
+//		PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
+//		
+//		System.out.println("sfslist size(): "+sfslist.getCount());
+
+     // System.out.println("ScoreFlow list: "+list.size());
+    }
+	
+	
+
+	@Test
+    public  void getGrowFlow()  {
+		String userId = "123456789";
+		String consumeFlag = "";
+		GrowFlowQuery sfq =new GrowFlowQuery();
+		sfq.setUserId(userId);
+		sfq.setConsumeFlag(consumeFlag);
+//		PageList<GrowFlow> sfslist = eventAcountApiService.getGrowFlow(sfq);
+//		
+//		System.out.println("sfslist size(): "+sfslist.getCount());
+
+     // System.out.println("ScoreFlow list: "+list.size());
+    }
+	
+	
+
 	
 }

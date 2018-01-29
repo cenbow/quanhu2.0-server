@@ -68,6 +68,12 @@
 	<sql id="select_condition_where">
 		<where>
 			1=1
+			<if test="kids != null">
+				and kid in
+				<foreach item="item" index="index" collection="kids" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
 			<if test="coterieId != null">
 				and coterie_id = #{coterieId,jdbcType=BIGINT}
 			</if>
@@ -80,11 +86,11 @@
 			<if test="lastUpdateUserId != null">
 				and last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
 			</if>
-			<if test="createDate != null">
-				create_date &gt;= #{createDate}
+			<if test="beginDate != null">
+				and create_date &gt;= #{beginDate}
 			</if>
-			<if test="lastUpdateDate != null">
-				last_update_date &lt;= #{lastUpdateDate}
+			<if test="endDate != null">
+				and create_date &lt;= #{endDate}
 			</if>
 			<choose>
 				<when test="payFlag != null and payFlag == 0">
@@ -500,16 +506,4 @@
 	    from qh_release_info 
 	    where create_date between #{startDate} and #{endDate}
 	</select>
-	  
-  	<select id="selectByKids" resultMap="BaseResultMap">
-	    select 
-	    <include refid="Base_Column_List" />
-	    from qh_release_info
-	    where kid in 
-	    <foreach item="item" index="index" collection="kidList" open="("
-				separator="," close=")">
-				#{item}
-		</foreach>
-  	</select>
-  
 </mapper>

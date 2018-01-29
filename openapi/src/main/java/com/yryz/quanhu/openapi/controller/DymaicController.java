@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -39,19 +40,19 @@ public class DymaicController {
     private DymaicService dymaicService;
 
 
-    @UserBehaviorValidation(login = true)
+//    @UserBehaviorValidation(login = true)
     @ApiOperation("动态tab的所关注的全部动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/gettimeline")
-    public Response<List<DymaicVo>> getTimeLine(@RequestHeader Long userId, @RequestParam("上页最后数据的kid") Long kid, @RequestParam("列表长度") Long limit) {
+    public Response<List<DymaicVo>> getTimeLine(@RequestHeader Long userId, @RequestParam("上页最后数据的kid") Long kid, @RequestParam("列表长度") Long limit, HttpServletRequest request) {
         return dymaicService.getTimeLine(userId, kid, limit);
     }
 
-    @UserBehaviorValidation(login = true)
+//    @UserBehaviorValidation(login = true)
     @ApiOperation("用户个人主页")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/homepage")
-    public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam("目标用户ID") Long targetUserId, @RequestParam("上页最后数据的kid") Long kid, @RequestParam("列表长度") Long limit) {
+    public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam("目标用户ID") Long targetUserId, @RequestParam("上页最后数据的kid") Long kid, @RequestParam("列表长度") Long limit, HttpServletRequest request) {
         return dymaicService.getSendList(userId, targetUserId, kid, limit);
     }
 }

@@ -174,9 +174,9 @@ public class OrderService implements OrderSDK {
         if (StringUtils.isBlank(inputOrder.getModuleEnum()))
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "moduleEnum is null");
-        if (null == inputOrder.getCoterieId())
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "coterieId is null");
+//        if (null == inputOrder.getCoterieId())
+//            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+//                    ExceptionEnum.ValidateException.getShowMsg(), "coterieId is null");
         if (null == inputOrder.getResourceId())
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "resourceId is null");

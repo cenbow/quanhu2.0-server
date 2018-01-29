@@ -19,10 +19,13 @@ import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.order.sdk.OrderSDK;
+import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoApi;
 import com.yryz.quanhu.resource.coterie.release.info.vo.CoterieReleaseInfoVo;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
@@ -63,23 +66,35 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private CountApi countApi;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private CoterieMemberAPI coterieMemberAPI;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private ResourceDymaicApi resourceDymaicApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
             Assert.notNull(record.getCoterieId(), "release() CoterieId is null !");
-            Assert.isTrue(record.getContentPrice() >= 0L, "release() ContentPrice is not unsigned !");
-            // 校验用户是否存在
-            ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+            Assert.notNull(record.getContentSource(),"release() ContentSource is NULL !");
+            Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() >= 0L,
+                    "release() ContentPrice is not unsigned !");
 
             if (StringUtils.isBlank(record.getModuleEnum())) {
                 record.setModuleEnum(ResourceTypeEnum.RELEASE + "-");
             }
 
-            // TODO 校验是否为圈主
+            // 校验用户是否存在
+            UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+            Assert.notNull(createUser, "发布者用户不存在！userId：" + record.getCreateUserId());
+            
+            // 校验是否为圈主
+            Assert.isTrue(
+                    MemberConstant.Permission.OWNER.getStatus()
+                            .equals(ResponseUtils.getResponseData(
+                                    coterieMemberAPI.permission(record.getCreateUserId(), record.getCoterieId()))),
+                    "非圈主不能发布私圈文章！");
 
             record.setClassifyId(ReleaseConstants.COTERIE_DEFAULT_CLASSIFY_ID);
             record.setDelFlag(CommonConstants.DELETE_NO);
@@ -101,9 +116,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
+            // 资源进聚合
+            releaseInfoService.commitResource(resourceDymaicApi, record, createUser);
             try {
-                // TODO 资源聚合
-
                 // 资源计数接入
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
             } catch (Exception e) {
@@ -143,22 +158,25 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             }
 
             Byte canReadFlag = ReleaseConstants.CanReadType.NO;
-            // 访问用户角色
-            Byte headerUserRole = 0;
+
             // 付费文章 设置可读标识
-            if (null == headerUserId) {
-                if (infoVo.getContentPrice() == 0L) {
+            if (infoVo.getContentPrice() == 0L) {
+                canReadFlag = ReleaseConstants.CanReadType.YES;
+            } else if (null != headerUserId) {
+                // 访问用户在私圈角色
+                Integer headerUserRole = ResponseUtils
+                        .getResponseData(coterieMemberAPI.permission(headerUserId, vo.getCoterieId()));
+                // 圈主可直接访问
+                if (MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)) {
                     canReadFlag = ReleaseConstants.CanReadType.YES;
                 }
-            } else {
-                // 若需要付费文章,并且是非圈主，查询 购买记录
-                if (infoVo.getContentPrice() > 0L && headerUserRole == 0) {
+                // 付费文章,圈粉查询购买记录
+                else if (MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)) {
                     // TODO 查询 购买记录
-                    canReadFlag = ReleaseConstants.CanReadType.YES;
-                } else {
                     canReadFlag = ReleaseConstants.CanReadType.YES;
                 }
             }
+
             infoVo.setCanReadFlag(canReadFlag);
 
             // 登录用户不可读文章，对资源属性 做特殊处理
@@ -167,8 +185,6 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             }
 
             try {
-                // TODO 资源聚合
-
                 // 资源计数接入
                 countApi.commitCount(BehaviorEnum.Read, infoVo.getKid(), null, 1L);
             } catch (Exception e) {
@@ -193,17 +209,19 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             Assert.notNull(info, "资源文章不存在！");
             Assert.isTrue(CommonConstants.DELETE_NO.equals(info.getDelFlag())
                     && CommonConstants.SHELVE_YES.equals(info.getShelveFlag()), "资源文章已删除或者已下架！");
-            Assert.isTrue(info.getContentPrice() > 0L, "当前资源文章免费，不能创建订单");
+            Assert.isTrue(null != info.getContentPrice() && info.getContentPrice() > 0L, "当前资源文章免费，不能创建订单");
             // 创建订单者 不能是作者
             Assert.isTrue(!headerUserId.equals(info.getCreateUserId()), "阅读资源文章，创建订单者 不能是作者");
 
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JsonUtils.toFastJson(info));
             inputOrder.setCost(info.getContentPrice());
-            inputOrder.setCoterieId(info.getCoterieId());
+            if (null != info.getCoterieId() && 0L != info.getCoterieId()) {
+                inputOrder.setCoterieId(info.getCoterieId());
+            }
             inputOrder.setCreateUserId(headerUserId);
             inputOrder.setFromId(headerUserId);
-            inputOrder.setModuleEnum(info.getModuleEnum());
+            inputOrder.setModuleEnum(BranchFeesEnum.READ.toString());
             inputOrder.setOrderEnum(OrderEnum.READ_ORDER);
             inputOrder.setResourceId(info.getKid());
             inputOrder.setToId(info.getCreateUserId());
