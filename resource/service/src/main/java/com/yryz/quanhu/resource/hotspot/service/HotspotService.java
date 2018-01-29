@@ -41,7 +41,7 @@ public interface HotspotService {
 	 * @param type
 	 * @param objectId
 	 */
-	void saveHeat(String type ,String objectId);
+	void saveHeat(String type ,String objectId , String talentType);
 	
 	/**
 	 * 保存统计对象

@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapreduce.MapReduceResults;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.entity.ResourceModel;
@@ -27,6 +28,8 @@ import com.yryz.quanhu.resource.hotspot.dao.HotMongoConstant;
 import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.enums.HeatInfoEnum;
 import com.yryz.quanhu.resource.hotspot.service.CalculationService;
+import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
+import com.yryz.quanhu.user.service.UserApi;
 
 /**
  * @author yehao
@@ -44,6 +47,9 @@ public class CalculationServiceImpl implements CalculationService {
 	
 	@Autowired
 	private ResourceMongo resourceMongo;
+	
+	@Reference
+	private UserApi userApi;
 	
 	@Autowired
 	MongoTemplate mongoTemplate;
@@ -92,14 +98,22 @@ public class CalculationServiceImpl implements CalculationService {
 			results.forEach(new Consumer<HashMap>(){
 				@Override
 				public void accept(HashMap m) {
-					String resourceId = m.get("_id").toString();
+					String userId = m.get("_id").toString();
 					String eventHotValue = ((Map) m.get("value")).get("heat").toString();
 					if(StringUtils.isNotEmpty(eventHotValue)){
+						Double dhotValue = Double.parseDouble(eventHotValue);
 						//更新热度对象表
-						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_USER, resourceId, Long.valueOf(eventHotValue));
+						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_USER, userId, dhotValue.longValue());
 						if(heatInfo != null){
 							//通知用户热度更新
-							
+							try {
+								UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
+								infoDTO.setUserId(Long.parseLong(userId));
+//								infoDTO.setLastHeat(dhotValue.longValue());
+								userApi.updateUserInfo(infoDTO);
+							} catch (Exception e) {
+								logger.info("更新用户热度信息失败...userId:" + userId + "--eventHotValue：" + eventHotValue);
+							}
 						}
 					}
 				}
@@ -124,20 +138,25 @@ public class CalculationServiceImpl implements CalculationService {
 			String reduce = "function(key,values){   " + " var reducedVal = { count: 0, heat: 0 };  "
 					+ " for (var i = 0; i < values.length; i++) {  " + "reducedVal.count += values[i].count;  "
 					+ " reducedVal.heat += values[i].heat;  " + " }" + "  return reducedVal;  }  ";
-			MapReduceResults<HashMap> results = mongoTemplate.mapReduce(HotMongoConstant.USER_HOT_CALCULATION_MODEL, map, reduce, HashMap.class);
+			MapReduceResults<HashMap> results = mongoTemplate.mapReduce(HotMongoConstant.RESOURCE_HOT_CALCULATION_MODEL, map, reduce, HashMap.class);
 			results.forEach(new Consumer<HashMap>(){
 				@Override
 				public void accept(HashMap m) {
 					String resourceId = m.get("_id").toString();
 					String eventHotValue = ((Map) m.get("value")).get("heat").toString();
 					if(StringUtils.isNotEmpty(eventHotValue)){
+						Double dhotValue = Double.parseDouble(eventHotValue);
 						//更新热度对象表
-						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_RESOURCE, resourceId, Long.valueOf(eventHotValue));
+						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_RESOURCE, resourceId, dhotValue.longValue());
 						if(heatInfo != null){
-							ResourceModel resourceModel = new ResourceModel();
-							resourceModel.setResourceId(resourceId);
-							resourceModel.setHeat(heatInfo.getHeat());
-							resourceMongo.update(resourceModel);
+							try {
+								ResourceModel resourceModel = new ResourceModel();
+								resourceModel.setResourceId(resourceId);
+								resourceModel.setHeat(heatInfo.getHeat());
+								resourceMongo.update(resourceModel);
+							} catch (Exception e) {
+								logger.info("更新资源热度失败：resourceId:" + resourceId);
+							}
 						}
 					}
 				}
