@@ -9,6 +9,7 @@ package com.yryz.quanhu.user.service.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,11 +33,13 @@ import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant.STATUS;
 import com.yryz.quanhu.user.dao.UserBaseInfoDao;
+import com.yryz.quanhu.user.dao.UserBaseInfoRedisDao;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UserRelationDto;
@@ -66,7 +69,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserBaseInfoDao custbaseinfoDao;
-	@Reference(check=false)
+	@Autowired
+	private UserBaseInfoRedisDao baseInfoRedisDao;
+	@Reference(check = false)
 	IdAPI idApi;
 	@Autowired
 	UserImgAuditDao custImgAuditDao;
@@ -78,7 +83,7 @@ public class UserServiceImpl implements UserService {
 	private UserSender mqSender;
 	@Autowired
 	private EventManager eventManager;
-	
+
 	/**
 	 * 更新用户信息，
 	 * 
@@ -115,26 +120,37 @@ public class UserServiceImpl implements UserService {
 				userImgAuditService.auditImg(auditModel, ImgAuditStatus.NO_AUDIT.getStatus());
 			}
 		}
-		custbaseinfoDao.update(baseInfo);
-		
-		//同步im
-		mqSender.userUpdate(baseInfo);
-		//提交资料完善事件
-		eventManager.userDataImprove(baseInfo, user);
-		
-		return custbaseinfoDao.update(baseInfo);
 
+		int result = custbaseinfoDao.update(baseInfo);
+
+		if (result != 0) {
+			// 用户信息
+			baseInfoRedisDao.deleteUserInfo(baseInfo.getUserId());
+
+			// 删除旧的用户手机号信息
+			if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
+				baseInfoRedisDao.deleteUserPhoneInfo(user.getUserPhone(), user.getAppId());
+				logger.info("[update_user_baseinfo]:oldUser:{},newUser:{}", JsonUtils.toFastJson(user),
+						JsonUtils.toFastJson(baseInfo));
+			}
+
+			// 同步im
+			mqSender.userUpdate(baseInfo);
+			// 提交资料完善事件
+			eventManager.userDataImprove(baseInfo, user);
+		}
+		return result;
 	}
 
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId) {
 		UserBaseInfo baseInfo = getUser(userId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
-		//依赖积分系统，获取用户等级
+		// 依赖积分系统，获取用户等级
 		EventAcount acount = eventManager.getGrow(userId.toString());
-		if(acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1){
+		if (acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1) {
 			simpleVO.setUserLevel("1");
-		}else{
+		} else {
 			simpleVO.setUserLevel(acount.getGrowLevel());
 		}
 		return simpleVO;
@@ -149,9 +165,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public UserSimpleVO getUserSimple(Long userId) {
-		return getUserSimple(null,userId);
+		return getUserSimple(null, userId);
 	}
-	
+
 	@Override
 	public UserSimpleVO getUserSimple(Long userId, Long friendId) {
 		// 查询单个用户基础信息
@@ -161,9 +177,9 @@ public class UserServiceImpl implements UserService {
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
 		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
-		//聚合关系数据
-		if(userId != null && userId != 0L){
-			Map<String,UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
+		// 聚合关系数据
+		if (userId != null && userId != 0L) {
+			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
 			UserRelationDto relationDto = map.get(friendId);
 			simpleVO.setNameNotes(relationDto.getUserRemarkName());
 			simpleVO.setRelationStatus(relationDto.getRelationStatus());
@@ -178,15 +194,15 @@ public class UserServiceImpl implements UserService {
 		}
 		List<UserBaseInfo> list = getUserInfo(friendIds);
 		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
-		Map<String,UserRelationDto> relationMap = null;
-		//聚合关系数据
-		if(userId != null && userId != 0L){
+		Map<String, UserRelationDto> relationMap = null;
+		// 聚合关系数据
+		if (userId != null && userId != 0L) {
 			relationMap = getRelation(userId, friendIds);
 		}
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
 				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
-				if(MapUtils.isNotEmpty(relationMap)){
+				if (MapUtils.isNotEmpty(relationMap)) {
 					UserRelationDto dto = relationMap.get(vo.getUserId());
 					simpleVO.setNameNotes(dto.getUserRemarkName());
 					simpleVO.setRelationStatus(dto.getRelationStatus());
@@ -196,14 +212,14 @@ public class UserServiceImpl implements UserService {
 		}
 		return map;
 	}
-	
+
 	@Override
 	public Map<String, UserSimpleVO> getUserSimple(Set<String> userIds) {
-		return getUserSimple(null,userIds);
+		return getUserSimple(null, userIds);
 	}
-	
+
 	/**
-	 * 根据手机号查询简单用户信息
+	 * 根据手机号查询用户id
 	 * 
 	 * @param phone
 	 * @return UserSimpleVO
@@ -219,11 +235,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * 根据手机号查询简单用户信息
+	 * 根据手机号查询用户id
 	 * 
 	 * @param Set<String>
 	 *            phones
-	 * @return Map<String, UserSimpleVO>
+	 * @return Map<String, String>
 	 * @Description
 	 */
 	@Override
@@ -234,14 +250,12 @@ public class UserServiceImpl implements UserService {
 		List<UserBaseInfo> list = getUserIdByPhone(phones, appId);
 		Map<String, String> map = new HashMap<>();
 		if (list != null) {
-			for (UserBaseInfo info:list) {
+			for (UserBaseInfo info : list) {
 				map.put(info.getUserPhone(), info.getUserId().toString());
 			}
 		}
 		return map;
 	}
-
-
 
 	/**
 	 * 查询用户信息
@@ -252,7 +266,15 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public UserBaseInfo getUser(Long userId) {
-		return custbaseinfoDao.selectByUserId(userId.toString());
+		UserBaseInfo info = baseInfoRedisDao.getUserInfo(userId);
+		if (info != null) {
+			return info;
+		}
+		info = custbaseinfoDao.selectByUserId(userId.toString());
+		if (info != null) {
+			baseInfoRedisDao.saveUserInfo(info);
+		}
+		return info;
 	}
 
 	/**
@@ -297,7 +319,34 @@ public class UserServiceImpl implements UserService {
 	 * @return
 	 */
 	private List<UserBaseInfo> getUserInfo(Set<String> userIds) {
-		return custbaseinfoDao.getByUserIds(Lists.newArrayList(userIds));
+		List<UserBaseInfo> infos = baseInfoRedisDao.getUserInfo(userIds);
+		Set<String> nullUserId = new HashSet<>();
+		// 收集缓存不存在的用户id
+		for (Iterator<String> iterator = userIds.iterator(); iterator.hasNext();) {
+			Long userId = NumberUtils.createLong(iterator.next());
+			boolean nullFlag = true;
+			for (UserBaseInfo baseInfo : infos) {
+				if (userId == baseInfo.getUserId()) {
+					nullFlag = false;
+				}
+			}
+			if (nullFlag) {
+				nullUserId.add(userId.toString());
+			}
+		}
+		if (CollectionUtils.isEmpty(nullUserId)) {
+			return infos;
+		}
+		// 查询mysql
+		List<UserBaseInfo> mysqlInfos = custbaseinfoDao.getByUserIds(Lists.newArrayList(nullUserId));
+		if (CollectionUtils.isNotEmpty(mysqlInfos)) {
+			baseInfoRedisDao.saveUserInfo(mysqlInfos);
+		}
+		// 合并缓存的用户
+		if (CollectionUtils.isNotEmpty(infos)) {
+			mysqlInfos.addAll(infos);
+		}
+		return mysqlInfos;
 	}
 
 	/**
@@ -308,7 +357,35 @@ public class UserServiceImpl implements UserService {
 	 * @return
 	 */
 	private List<UserBaseInfo> getUserIdByPhone(Set<String> phones, String appId) {
-		return custbaseinfoDao.getByPhones(Lists.newArrayList(phones), appId);
+		List<UserBaseInfo> infos = baseInfoRedisDao.getUserPhoneInfo(phones, appId);
+		Set<String> nullPhone = new HashSet<>();
+		// 收集缓存不存在的用户id
+		for (Iterator<String> iterator = phones.iterator(); iterator.hasNext();) {
+			String phone = iterator.next();
+			boolean nullFlag = true;
+			for (UserBaseInfo baseInfo : infos) {
+				if (StringUtils.equals(phone, baseInfo.getUserPhone())) {
+					nullFlag = false;
+				}
+			}
+			if (nullFlag) {
+				nullPhone.add(phone);
+			}
+		}
+		if (CollectionUtils.isEmpty(nullPhone)) {
+			return infos;
+		}
+		// 查询mysql
+		List<UserBaseInfo> mysqlInfos = custbaseinfoDao.getByPhones(Lists.newArrayList(phones), appId);
+		//保存缓存
+		if(CollectionUtils.isNotEmpty(mysqlInfos)){
+			baseInfoRedisDao.saveUserPhoneInfo(mysqlInfos);
+		}
+		// 合并缓存的用户
+		if (CollectionUtils.isNotEmpty(infos)) {
+			mysqlInfos.addAll(infos);
+		}
+		return mysqlInfos;
 	}
 
 	/**
@@ -387,7 +464,7 @@ public class UserServiceImpl implements UserService {
 		baseInfo.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO)));
 		baseInfo.setCreateDate(new Date());
 		baseInfo.setBanPostTime(new Date());
-		baseInfo.setUserAge((byte)18);
+		baseInfo.setUserAge((byte) 18);
 		baseInfo.setUserBirthday("");
 		baseInfo.setUserDesc("");
 		custbaseinfoDao.insert(baseInfo);
@@ -396,7 +473,7 @@ public class UserServiceImpl implements UserService {
 		if (StringUtils.isNotBlank(baseInfo.getUserImg())) {
 			UserImgAudit record = new UserImgAudit();
 			record.setUserId(baseInfo.getUserId());
-			record.setAuditStatus((byte)ImgAuditStatus.NO_AUDIT.getStatus());
+			record.setAuditStatus((byte) ImgAuditStatus.NO_AUDIT.getStatus());
 			record.setUserImg(baseInfo.getUserImg());
 			userImgAuditService.auditImg(record, ImgAuditStatus.NO_AUDIT.getStatus());
 		}
@@ -464,28 +541,32 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * 获取用户关系<br/>
 	 * 找不到直接是陌生人
+	 * 
 	 * @param userId
 	 * @param friendIds
 	 * @return
 	 */
-	private Map<String,UserRelationDto> getRelation(Long userId,Set<String> friendIds){
+	private Map<String, UserRelationDto> getRelation(Long userId, Set<String> friendIds) {
 		List<UserRelationDto> dtos = relationService.selectBy(userId.toString(), friendIds);
-		Map<String,UserRelationDto> map = new HashMap<>();
-		for(Iterator<String> iterator = friendIds.iterator();iterator.hasNext();){
+		Map<String, UserRelationDto> map = new HashMap<>();
+		for (Iterator<String> iterator = friendIds.iterator(); iterator.hasNext();) {
 			String friendId = iterator.next();
 			UserRelationDto dto = null;
-			if(CollectionUtils.isEmpty(dtos)){
+			boolean noRelation = true;
+			if (CollectionUtils.isNotEmpty(dtos)) {
+				for (int i = 0; i < dtos.size(); i++) {
+					dto = dtos.get(i);
+					if (StringUtils.equals(dto.getUserId(), friendId)) {
+						map.put(friendId, dto);
+						noRelation = false;
+					}
+				}
+			}
+			if (noRelation) {
 				dto = new UserRelationDto();
 				dto.setRelationStatus(STATUS.NONE.getCode());
 				dto.setUserRemarkName("");
 				map.put(friendId, dto);
-			}else{
-				for(int i = 0 ; i < dtos.size(); i++){
-					dto = dtos.get(i);
-					if(StringUtils.equals(dto.getUserId(), friendId)){
-						map.put(friendId, dto);
-					}
-				}
 			}
 		}
 		return map;

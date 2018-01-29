@@ -72,5 +72,13 @@ public interface ResourceApi {
 	 * @return
 	 */
 	public Response<ResourceVo> getResourcesById(String resourceId);
+	
+	/**
+	 * 首页推荐
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	public Response<List<ResourceVo>> appRecommend(int start , int limit);
 
 }

@@ -3,7 +3,7 @@ package com.yryz.quanhu.resource.release.buyrecord.api;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.release.buyrecord.dto.ReleaseBuyRecordDto;
-import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
+import com.yryz.quanhu.resource.release.buyrecord.vo.ReleaseBuyRecordVo;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -14,5 +14,5 @@ import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
  */
 public interface ReleaseBuyRecordApi {
 
-    Response<PageList<ReleaseBuyRecord>> listPage(ReleaseBuyRecordDto releaseBuyRecordDto);
+    Response<PageList<ReleaseBuyRecordVo>> listPage(ReleaseBuyRecordDto releaseBuyRecordDto);
 }

@@ -185,17 +185,17 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void login() {
 		LoginDTO loginDTO = new LoginDTO();
-		loginDTO.setPhone("16612345679");
+		loginDTO.setPhone("16612345678");
 		loginDTO.setPassword("a12345");
 		RequestHeader header = new RequestHeader();
 		header.setAppId("vebff12m1762");
 		header.setAppVersion("2.0");
 		header.setDevId("24456241457878");
 		header.setDevName("HUAWEI");
-		header.setDevType("1");
+		header.setDevType("11");
 		header.setDitchCode("APP");
 		Response<RegisterLoginVO> response = accountApi.login(loginDTO, header);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -226,10 +226,10 @@ public class UserTest {
 	
 	//@Test
 	public void getUserSimple(){
-		Response<UserSimpleVO> response = userApi.getUserSimple(0L);
-		UserSimpleVO simpleVO = response.getData();
+		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560l);
+		//UserSimpleVO simpleVO = response.getData();
 		//Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
-		System.out.println(JsonUtils.toFastJson(simpleVO));
+		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
 	//@Test
@@ -254,9 +254,16 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void getMyInviter(){
 		Response<MyInviterVO> response = opApi.getMyInviter(731519998090690560L, 10, null);
 		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	//@Test
+	public void getUserByPhone(){
+		//Response<String> response = userApi.getUserIdByPhone("13429878385", "vebff12m1762");
+		Response<Map<String,String>> response2 = userApi.getUserIdByPhone(Sets.newHashSet("13429878385"), "vebff12m1762");
+		System.out.println(JsonUtils.toFastJson(response2));
 	}
 }

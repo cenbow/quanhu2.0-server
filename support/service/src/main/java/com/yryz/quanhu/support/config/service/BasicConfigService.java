@@ -21,7 +21,9 @@ public interface BasicConfigService {
 
     public Boolean save(BasicConfigDto dto);
 
-    public Boolean updateKeyStatus(BasicConfigDto dto);
+    public Boolean delete(BasicConfigDto dto);
+
+    public Boolean updateStatus(BasicConfigDto dto);
 
     public BasicConfigDto get(BasicConfigDto dto);
 

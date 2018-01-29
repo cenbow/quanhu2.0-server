@@ -10,6 +10,7 @@ package com.yryz.quanhu.user.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.dao.UserAccountRedisDao;
 import com.yryz.quanhu.user.dao.UserThirdLoginDao;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
 import com.yryz.quanhu.user.service.UserThirdLoginService;
@@ -38,10 +40,15 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	private UserThirdLoginDao mysqlDao;
 	@Reference(check=false)
 	private IdAPI idApi;
+	@Autowired
+	private UserAccountRedisDao accountRedisDao;
+	
 	@Override
 	public int delete(Long userId,String thirdId) {
 		try {
-			return mysqlDao.delete(userId,thirdId);
+			int result = mysqlDao.delete(userId,thirdId);
+			accountRedisDao.deleteLoginMethod(userId);
+			return result;
 		} catch (Exception e) {
 			logger.error("[CustThirdLoginDao.delete]",e);
 			throw new MysqlOptException(e);
@@ -63,22 +70,38 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 
 	@Override
 	public List<UserThirdLogin> selectByUserId(Long userId) {
+		List<UserThirdLogin> logins = accountRedisDao.getLoginMethod(userId);
+		if(CollectionUtils.isNotEmpty(logins)){
+			return logins;
+		}
 		try {
-			return mysqlDao.selectByUserId(userId);
+			logins = mysqlDao.selectByUserId(userId);
 		} catch (Exception e) {
 			logger.error("[CustThirdLoginDao.selectByUserId]",e);
 			throw new MysqlOptException(e);
 		}
+		if(CollectionUtils.isNotEmpty(logins)){
+			accountRedisDao.saveLoginMethod(userId, logins);
+		}
+		return logins;
 	}
 
 	@Override
-	public UserThirdLogin selectByThirdId(String thirdId,String appId) {
+	public UserThirdLogin selectByThirdId(String thirdId,String appId,Integer type) {
+		UserThirdLogin login = accountRedisDao.getUserThird(thirdId, appId, type);
+		if(login != null){
+			return login;
+		}
 		try {
-			return mysqlDao.selectByThirdId(thirdId,appId);
+			login = mysqlDao.selectByThirdId(thirdId,appId);
 		} catch (Exception e) {
 			logger.error("[CustThirdLoginDao.selectByThirdId]",e);
 			throw new MysqlOptException(e);
 		}
+		if(login != null){
+			accountRedisDao.saveUserThird(login);
+		}
+		return login;
 	}
 
 }

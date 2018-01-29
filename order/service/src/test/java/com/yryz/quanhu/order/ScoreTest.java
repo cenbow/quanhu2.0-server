@@ -95,9 +95,9 @@ public class ScoreTest {
 		ScoreFlowQuery sfq =new ScoreFlowQuery();
 		sfq.setUserId(userId);
 		sfq.setConsumeFlag(consumeFlag);
-		PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
-		
-		System.out.println("sfslist size(): "+sfslist.getCount());
+//		PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
+//		
+//		System.out.println("sfslist size(): "+sfslist.getCount());
 
      // System.out.println("ScoreFlow list: "+list.size());
     }
@@ -111,9 +111,9 @@ public class ScoreTest {
 		GrowFlowQuery sfq =new GrowFlowQuery();
 		sfq.setUserId(userId);
 		sfq.setConsumeFlag(consumeFlag);
-		PageList<GrowFlow> sfslist = eventAcountApiService.getGrowFlow(sfq);
-		
-		System.out.println("sfslist size(): "+sfslist.getCount());
+//		PageList<GrowFlow> sfslist = eventAcountApiService.getGrowFlow(sfq);
+//		
+//		System.out.println("sfslist size(): "+sfslist.getCount());
 
      // System.out.println("ScoreFlow list: "+list.size());
     }

@@ -41,7 +41,7 @@ public class ReleaseInfoTest {
         record.setModuleEnum("0091");
         record.setContent(random + "正文哈哈哈哈");
         record.setContentSource("[{\"text\":\"" + record.getContent() + "\"}]");
-        record.setCreateUserId(724007310011252736L);
+        record.setCreateUserId(724011759597371392L);
         record.setImgUrl("imgUrl");
         record.setTitle(random + "标题哈哈哈");
 
@@ -58,7 +58,7 @@ public class ReleaseInfoTest {
     @Test
     public void test002() throws JsonProcessingException {
         System.out.println(new ObjectMapper()
-                .writeValueAsString(releaseInfoApi.infoByKid(730182871691157504L, 724007310011252736L)));
+                .writeValueAsString(releaseInfoApi.infoByKid(736943287656628224L, 724011759597371392L)));
     }
 
     /**  

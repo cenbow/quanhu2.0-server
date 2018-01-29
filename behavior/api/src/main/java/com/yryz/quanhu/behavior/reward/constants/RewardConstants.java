@@ -19,7 +19,7 @@ public final class RewardConstants {
 
     /**  
     * @Description: 打赏查询类型
-    * 查询类型：我打赏的-人-列表，我打赏的-资源-列表，打赏我的-人-列表，打赏我的-资源-列表
+    * 查询类型：我打赏的-人-列表，我打赏的-资源-列表，打赏我的-人-列表，打赏我的-资源-列表，某资源被打赏-用户-列表
     * @author wangheng
     * @date 2018年1月27日 下午4:00:17  
     *    
@@ -32,6 +32,8 @@ public final class RewardConstants {
         public static final Byte reward_my_user_list = 13;
 
         public static final Byte reward_my_resource_list = 14;
+
+        public static final Byte reward_resource_user_list = 15;
     }
 
 }

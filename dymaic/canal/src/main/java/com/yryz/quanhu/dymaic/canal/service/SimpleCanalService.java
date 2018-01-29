@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 
-@Component
+//@Component
 public class SimpleCanalService extends AbstractCanalService {
 	private SimpleCanalService client;
 	@Value("${canal.host}")

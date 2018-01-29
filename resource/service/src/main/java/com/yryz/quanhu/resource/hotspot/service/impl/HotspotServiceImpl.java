@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.hotspot.dao.CalculationConfigMongo;
 import com.yryz.quanhu.resource.hotspot.dao.HeatInfoMongo;
 import com.yryz.quanhu.resource.hotspot.dao.ResourceHotCalculationMongo;
@@ -134,11 +136,15 @@ public class HotspotServiceImpl implements HotspotService {
 	 * @see com.yryz.quanhu.resource.hotspot.service.HotspotService#saveHeat(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void saveHeat(String type, String objectId) {
+	public void saveHeat(String type, String objectId , String talentType) {
 		HeatInfo heatInfo = new HeatInfo();
 		heatInfo.setObjectId(objectId);
 		heatInfo.setType(type);
-		heatInfo.setInitHeat(HeatInfoEnum.INIT_HOT);
+		if(StringUtils.isNotEmpty(talentType) && ResourceEnum.TALENT_TYPE_TRUE.equals(talentType)){
+			heatInfo.setInitHeat(HeatInfoEnum.INIT_TALENT_HOT);
+		} else {
+			heatInfo.setInitHeat(HeatInfoEnum.INIT_USER_HOT);
+		}
 		heatInfo.setAttenuation(0L);
 		heatInfo.setBehaviorHeat(0L);
 		heatInfo.setCreateTime(System.currentTimeMillis());

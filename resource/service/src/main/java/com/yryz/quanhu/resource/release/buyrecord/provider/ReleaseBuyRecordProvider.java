@@ -6,8 +6,8 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.release.buyrecord.api.ReleaseBuyRecordApi;
 import com.yryz.quanhu.resource.release.buyrecord.dto.ReleaseBuyRecordDto;
-import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
 import com.yryz.quanhu.resource.release.buyrecord.service.ReleaseBuyRecordService;
+import com.yryz.quanhu.resource.release.buyrecord.vo.ReleaseBuyRecordVo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -24,7 +24,7 @@ public class ReleaseBuyRecordProvider implements ReleaseBuyRecordApi {
     private ReleaseBuyRecordService releaseBuyRecordService;
 
     @Override
-    public Response<PageList<ReleaseBuyRecord>> listPage(ReleaseBuyRecordDto releaseBuyRecordDto) {
+    public Response<PageList<ReleaseBuyRecordVo>> listPage(ReleaseBuyRecordDto releaseBuyRecordDto) {
         return ResponseUtils.returnObjectSuccess(releaseBuyRecordService.selectByCondition(releaseBuyRecordDto));
     }
 }

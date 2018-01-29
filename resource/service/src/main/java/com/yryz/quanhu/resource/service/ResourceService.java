@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.yryz.quanhu.resource.entity.ResourceModel;
-import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
  * @author yehao
@@ -77,6 +76,6 @@ public interface ResourceService {
 	 * @param limit
 	 * @return
 	 */
-	public List<ResourceVo> appRecommend(int start , int limit);
+	public List<ResourceModel> appRecommend(int start , int limit);
 
 }

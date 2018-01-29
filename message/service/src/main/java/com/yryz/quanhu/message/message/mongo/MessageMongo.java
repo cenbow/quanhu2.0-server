@@ -2,9 +2,9 @@ package com.yryz.quanhu.message.message.mongo;
 
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageVo;
 import com.yryz.common.mongodb.AbsBaseMongoDAO;
 import com.yryz.quanhu.message.message.dto.MessageDto;
-import com.yryz.quanhu.message.message.vo.MessageVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

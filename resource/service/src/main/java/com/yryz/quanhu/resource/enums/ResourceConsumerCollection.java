@@ -26,8 +26,15 @@ public class ResourceConsumerCollection {
 		RESOURCE_CONSUMERS.add("1005");
 		RESOURCE_CONSUMERS.add("1006");
 		RESOURCE_CONSUMERS.add("1007");
+		RESOURCE_CONSUMERS.add("1008");
+		RESOURCE_CONSUMERS.add("10081");
 	}
 	
+	/**
+	 * 检查是否包含类型
+	 * @param moduleEnum
+	 * @return
+	 */
 	public static boolean check(String moduleEnum){
 		return RESOURCE_CONSUMERS.contains(moduleEnum);
 	}

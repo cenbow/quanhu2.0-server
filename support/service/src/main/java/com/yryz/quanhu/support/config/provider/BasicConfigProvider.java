@@ -44,7 +44,8 @@ public class BasicConfigProvider implements BasicConfigApi{
     public Response<String> getValue(String key, String defaultValue) {
         try {
             logger.info("getValue={}/{} start",key,defaultValue);
-            return ResponseUtils.returnObjectSuccess(basicConfigService.getValue(key));
+            String value = basicConfigService.getValue(key);
+            return ResponseUtils.returnObjectSuccess(value==null?defaultValue:value);
         }catch (Exception e){
             logger.error(e.getMessage(),e);
         }finally {

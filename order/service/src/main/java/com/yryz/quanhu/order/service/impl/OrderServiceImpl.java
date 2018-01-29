@@ -22,12 +22,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.order.common.EventManager;
+import com.yryz.quanhu.order.common.QuanhuMessage;
 import com.yryz.quanhu.order.dao.persistence.RrzOrderCust2bankDao;
 import com.yryz.quanhu.order.dao.persistence.RrzOrderInfoDao;
 import com.yryz.quanhu.order.dao.persistence.RrzOrderPayHistoryDao;
@@ -95,11 +98,11 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	private OrderAccountHistoryService orderAccountHistoryService;
 	
-//	@Autowired
-//	private QuanhuMessage quanhuMessage;
-//	
-//	@Autowired
-//	private EventManager eventManager;
+	@Autowired
+	private QuanhuMessage quanhuMessage;
+	
+	@Autowired
+	private EventManager eventManager;
 	
 	@Autowired
 	private RrzOrderInfoRedis rrzOrderInfoRedis;
@@ -132,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
 				return ResponseUtils.returnException(new CommonException("账户被冻结"));
 			}
 			if ((account.getSmallNopass().intValue() == 0
-					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 5000)
+					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 50000)
 					&& StringUtils.isEmpty(payPassword)){
 				return ResponseUtils.returnException(new CommonException("支付密码为空"));
 			}
@@ -231,7 +234,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		//如果是退款订单，则发送推销消息
 		if(orderInfo.getProductType().intValue() == ProductEnum.CASH_REFUND.getType()){ 
-//			quanhuMessage.sendMessage(MessageConstant.CASH_REFUND, orderInfo.getCustId(), orderInfo.getCost().toString());
+			quanhuMessage.sendMessage(MessageConstant.CASH_REFUND, orderInfo.getCustId(), orderInfo.getCost().toString());
 		}
 		return ResponseUtils.returnSuccess();
 	}
@@ -445,8 +448,8 @@ public class OrderServiceImpl implements OrderService {
 			feeOrderPayHistory.setHistoryId(IdGen.uuid());
 			rrzOrderPayHistoryDao.insert(feeOrderPayHistory);
 			//提交事件
-//			eventManager.commitRecharge(rrzOrderPayInfo.getCustId(),rrzOrderPayInfo.getCostTrue());
-//			quanhuMessage.sendMessage(MessageConstant.RECHARGE, rrzOrderPayInfo.getCustId(), "" + rrzOrderPayInfo.getCost());
+			eventManager.commitRecharge(rrzOrderPayInfo.getCustId(),rrzOrderPayInfo.getCostTrue());
+			quanhuMessage.sendMessage(MessageConstant.RECHARGE, rrzOrderPayInfo.getCustId(), "" + rrzOrderPayInfo.getCost());
 			return true;
 		} else {
 			return false;
@@ -523,7 +526,7 @@ public class OrderServiceImpl implements OrderService {
 			feeOrderPayHistory.setProductType(ProductEnum.FEE_CASH_TYPE.getType());
 			feeOrderPayHistory.setHistoryId(IdGen.uuid());
 			rrzOrderPayHistoryDao.insert(feeOrderPayHistory);
-//			quanhuMessage.sendMessage(MessageConstant.CASH, rrzOrderPayInfo.getCustId(), rrzOrderPayInfo.getCost() + "");
+			quanhuMessage.sendMessage(MessageConstant.CASH, rrzOrderPayInfo.getCustId(), rrzOrderPayInfo.getCost() + "");
 			return true;
 		} else {
 			return false;

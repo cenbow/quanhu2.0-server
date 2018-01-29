@@ -1,7 +1,11 @@
 package com.yryz.quanhu.coterie;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
+import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import org.junit.FixMethodOrder;
@@ -19,11 +23,11 @@ public class CoterieMemberTest {
     private CoterieMemberAPI coterieMemberAPI;
 
     private static Long memberId = 730941139577331712L;
-    private static Long userId = 727061873573347328L;
+    private static Long userId = 731154152775909376L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
-    private static Long coterieId = 233665981858L;
+    private static Long coterieId = 9382818189L;
 
     @Test
     public void test010_Join() {
@@ -34,13 +38,23 @@ public class CoterieMemberTest {
 
     @Test
     public void test020_audit() {
-        Response response = coterieMemberAPI.audit(1L,memberId,coterieId,null);
-        System.out.println(JsonUtils.toFastJson(response));
+
+        try {
+            Response response = coterieMemberAPI.audit(userId,memberId,coterieId,null);
+            System.out.println(JsonUtils.toFastJson(response));
+        } catch (QuanhuException e) {
+            e.getMsg();
+            e.getErrorMsg();
+            System.out.println(JsonUtils.toFastJson(e));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Test
     public void test030_banSpeak() {
-        Response response = coterieMemberAPI.banSpeak(1L,memberId,coterieId, 1);
+        Response response = coterieMemberAPI.banSpeak(userId,memberId,coterieId, 1);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
@@ -70,7 +84,7 @@ public class CoterieMemberTest {
 
     @Test
     public void test080_kick() {
-        Response response = coterieMemberAPI.kick(1L,memberId,coterieId,"就要踢你");
+        Response response = coterieMemberAPI.kick(userId,memberId,coterieId,"就要踢你");
         System.out.println(JsonUtils.toFastJson(response));
     }
 

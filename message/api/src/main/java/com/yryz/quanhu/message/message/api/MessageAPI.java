@@ -1,9 +1,9 @@
 package com.yryz.quanhu.message.message.api;
 
+import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.message.dto.MessageDto;
 import com.yryz.quanhu.message.message.vo.MessageStatusVo;
-import com.yryz.quanhu.message.message.vo.MessageVo;
 
 import java.util.List;
 import java.util.Map;

@@ -28,6 +28,8 @@ public class AmqpConstant {
 	
 	public static final String EVENT_DIRECT_EXCHANGE_DEMO = "EVENT_DIRECT_EXCHANGE_DEMO";//exchange
 	
+	public static final String HOT_SPOT_QUEUE = "HOT_SPOT_QUEUE";  //热度计算
+	
 //	public static final String Fanout =  "Fanout" ;
 	
 //	public static final String QUEUE_EVENT =   "QUEUE_EVENT";

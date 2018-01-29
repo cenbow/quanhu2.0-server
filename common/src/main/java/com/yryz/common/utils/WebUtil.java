@@ -100,20 +100,4 @@ public class WebUtil {
         return header;
     }
 
-    public static AfsCheckRequest getAfsCheckRequest(HttpServletRequest request) {
-        AfsCheckRequest afsCheckReq = null;
-        String session = request.getParameter("session");//阿里验证码所需参数
-        String sig = request.getParameter("sig");//阿里验证码所需参数
-        String token = request.getParameter("token");//阿里验证码所需参数
-        String scene = request.getParameter("scene");//阿里验证码所需参数
-        if (org.apache.commons.lang.StringUtils.isNotBlank(session) && org.apache.commons.lang.StringUtils.isNotBlank(sig) && org.apache.commons.lang.StringUtils.isNotBlank(token)
-                && org.apache.commons.lang.StringUtils.isNotBlank(scene)) {
-            afsCheckReq = new AfsCheckRequest();
-            afsCheckReq.setScene(scene);
-            afsCheckReq.setSession(session);
-            afsCheckReq.setSig(sig);
-            afsCheckReq.setToken(token);
-        }
-        return afsCheckReq;
-    }
 }

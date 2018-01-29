@@ -29,6 +29,11 @@ public class RewardInfoVo extends RewardInfo {
     */
     private String giftImage;
 
+    /**  
+    * @Fields : 用户真实 打赏金额
+    */
+    private Long rewardAmount;
+
     public UserSimpleVO getUser() {
         return user;
     }
@@ -59,5 +64,13 @@ public class RewardInfoVo extends RewardInfo {
 
     public void setResourceVo(ResourceVo resourceVo) {
         this.resourceVo = resourceVo;
+    }
+
+    public Long getRewardAmount() {
+        return rewardAmount;
+    }
+
+    public void setRewardAmount(Long rewardAmount) {
+        this.rewardAmount = rewardAmount;
     }
 }

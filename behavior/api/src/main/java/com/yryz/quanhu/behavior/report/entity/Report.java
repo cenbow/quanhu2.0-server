@@ -18,7 +18,7 @@ public class Report extends GenericEntity {
     @JsonSerialize(using = ToStringSerializer.class)
     private long resourceId;
     //举报类型
-    private String informType;
+    private String informTypeName;
     //违规描述
     private String informDesc;
     //处理状态(10待处理，11已处理)
@@ -32,12 +32,12 @@ public class Report extends GenericEntity {
     //处理时间
     private String disposeTime;
 
-    public String getInformType() {
-        return informType;
+    public String getInformTypeName() {
+        return informTypeName;
     }
 
-    public void setInformType(String informType) {
-        this.informType = informType;
+    public void setInformTypeName(String informTypeName) {
+        this.informTypeName = informTypeName;
     }
 
     public String getModuleEnum() {

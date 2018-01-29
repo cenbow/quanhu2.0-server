@@ -274,20 +274,17 @@ public class UserStarProvider implements UserStarApi {
 	}
 
 	@Override
-	public Response<Boolean> updateStarWeight(String userId, Integer weight) {
+	public Response<Boolean> updateStarWeight(Long userId, Integer weight) {
 
 		try {
-			if (StringUtils.isEmpty(userId) || weight == null) {
+			if (userId == null || userId == 0l || weight == null) {
 				throw QuanhuException.busiError("userId、weight为空");
 			}
-			UserStarAuth model = userStarService.get(userId, null);
+			UserStarAuth model = userStarService.get(userId.toString(), null);
 			if (model == null || model.getAuditStatus() != StarAuditStatus.AUDIT_SUCCESS.getStatus()) {
 				throw QuanhuException.busiError("非达人不能设置排序权重");
 			}
-			UserBaseInfo info = new UserBaseInfo();
-			info.setUserId(NumberUtils.createLong(userId));
-			info.setLastHeat(weight);
-			userService.updateUserInfo(info);
+			userStarService.updateRecommendHeight(userId, weight);
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);

@@ -2,13 +2,13 @@ package com.yryz.quanhu.message.message.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.message.message.dto.MessageDto;
 import com.yryz.quanhu.message.message.service.MessageService;
 import com.yryz.quanhu.message.message.vo.MessageStatusVo;
-import com.yryz.quanhu.message.message.vo.MessageVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
