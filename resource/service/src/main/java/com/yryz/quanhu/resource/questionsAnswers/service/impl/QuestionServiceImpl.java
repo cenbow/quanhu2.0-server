@@ -1,28 +1,37 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
-import java.text.DecimalFormat;
-import java.util.*;
-
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
-import com.yryz.common.message.InteractiveBody;
+import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
-import com.yryz.common.utils.DateUtils;
+import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.message.message.api.MessageAPI;
-import com.yryz.quanhu.message.message.vo.MessageVo;
 import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
-import com.yryz.quanhu.order.sdk.constant.FeeDetail;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
+import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
+import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
+import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
+import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
+import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionMessageService;
+import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
+import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,24 +39,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.constant.CommonConstants;
-import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
-import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
-import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
-import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
-import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
-import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
-import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
-import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
-import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
-import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
-import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
-import org.springframework.util.Assert;
+import java.util.*;
 
 /**
  * @author wanght
@@ -444,4 +436,43 @@ public class QuestionServiceImpl implements QuestionService {
         }
         return false;
     }
+
+
+    /**
+     * job 失效问题退款
+     * @param
+     */
+    @Override
+    public void updateInValidQuestionRefund() {
+        /**
+         * 查询失效的问题
+         */
+        QuestionExample example=new QuestionExample();
+        QuestionExample.Criteria criteria=example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
+        criteria.andChargeAmountGreaterThan(0L);
+        criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
+        Calendar invaidDate=Calendar.getInstance();
+        invaidDate.add(Calendar.HOUR_OF_DAY,-48);
+        criteria.andCreateDateLessThan(invaidDate.getTime());
+        criteria.andAnswerdFlagEqualTo(QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED);
+        List<Question> questions=this.questionDao.selectByExample(example);
+        for(Question question:questions){
+            logger.info("==退款的提问编号==:{}",question.getKid());
+            question.setIsValid(QuestionAnswerConstants.validType.NO);
+            /**
+             * 失效进行全额退款
+             */
+            Long orderId=orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER,question.getCreateUserId(),question.getChargeAmount());
+            if(null!=orderId){
+                question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
+                question.setRefundOrderId(String.valueOf(orderId));
+            }else{
+                question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
+            }
+            this.questionDao.updateByPrimaryKeySelective(question);
+        }
+   }
 }

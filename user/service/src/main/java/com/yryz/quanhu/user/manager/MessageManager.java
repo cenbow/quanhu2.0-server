@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.user.manager;
 
+import com.yryz.common.message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,18 +17,12 @@ import com.alibaba.dubbo.rpc.RpcContext;
 import com.google.common.collect.Lists;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.context.Context;
-import com.yryz.common.message.MessageActionCode;
-import com.yryz.common.message.MessageLabel;
-import com.yryz.common.message.MessageType;
-import com.yryz.common.message.MessageViewCode;
-import com.yryz.common.message.MsgEnumType;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.message.api.MessageAPI;
-import com.yryz.quanhu.message.message.vo.MessageVo;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 import com.yryz.quanhu.message.push.entity.PushReqVo.CommonPushType;

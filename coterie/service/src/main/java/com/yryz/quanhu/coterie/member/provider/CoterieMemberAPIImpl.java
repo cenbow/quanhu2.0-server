@@ -2,31 +2,27 @@ package com.yryz.quanhu.coterie.member.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.google.common.collect.Sets;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
-import com.yryz.quanhu.coterie.ApplicationCoterieService;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
-import com.yryz.quanhu.coterie.member.vo.*;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 
 @Service(interfaceClass = CoterieMemberAPI.class)
@@ -40,9 +36,6 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
     @Reference
     private UserApi userApi;
-
-//	@Resource
-//	private CoterieEventManager coterieEventManager;
 
     @Override
     public Response<CoterieMemberVoForJoin> join(Long userId, Long coterieId, String reason) {
@@ -58,7 +51,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         try {
             CoterieMemberVoForJoin result = coterieMemberService.join(userId, coterieId, reason);
-            return new Response<>(result);
+            return ResponseUtils.returnObjectSuccess(result);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -90,7 +83,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
 
-        return new Response<>();
+        return ResponseUtils.returnSuccess();
     }
 
     @Override
@@ -108,7 +101,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         try {
             coterieMemberService.quit(userId, coterieId);
-            return new Response<>();
+            return ResponseUtils.returnSuccess();
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -129,7 +122,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         try {
             coterieMemberService.banSpeak(memberId, coterieId, type);
-            return new Response<>();
+            return ResponseUtils.returnSuccess();
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -149,7 +142,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
         }
         try {
             Integer permission = coterieMemberService.permission(userId, coterieId);
-            return new Response<Integer>(permission);
+            return ResponseUtils.returnObjectSuccess(permission);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -170,7 +163,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
         }
         try {
             Boolean flag = coterieMemberService.isBanSpeak(userId, coterieId);
-            return new Response<>(flag);
+            return ResponseUtils.returnObjectSuccess(flag);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -200,10 +193,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
         try {
             coterieMemberService.audit(memberId, coterieId, memberStatus, MemberConstant.JoinType.FREE.getStatus());
 
-            //todo event
-            //coterieEventManager.joinCoterieEvent(coterieId);
-
-            return new Response();
+            return ResponseUtils.returnSuccess();
 
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -222,7 +212,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         try {
             Integer count = coterieMemberService.queryNewMemberNum(coterieId);
-            return new Response<>(count);
+            return ResponseUtils.returnObjectSuccess(count);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -238,7 +228,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         try {
             PageList<CoterieMemberApplyVo> applyList = coterieMemberService.queryMemberApplyList(coterieId, pageNum, pageSize);
-            return new Response<>(applyList);
+            return ResponseUtils.returnObjectSuccess(applyList);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -260,7 +250,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
         try {
             PageList<CoterieMemberVo> memberList = coterieMemberService.queryMemberList(coterieId, pageNo, pageSize);
-            return new Response<>(memberList);
+            return ResponseUtils.returnObjectSuccess(memberList);
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }

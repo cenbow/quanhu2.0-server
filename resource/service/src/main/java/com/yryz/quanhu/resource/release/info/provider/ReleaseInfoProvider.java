@@ -82,7 +82,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             // 校验用户是否存在
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
-            Assert.isNull(createUser, "发布者用户不存在！userId：" + record.getCreateUserId());
+            Assert.notNull(createUser, "发布者用户不存在！userId：" + record.getCreateUserId());
 
             ReleaseConfigVo cfgVo = releaseConfigService.getTemplate(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             Assert.notNull(cfgVo, "平台发布文章，发布模板不存在！classifyId：" + ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
@@ -101,7 +101,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             releaseInfoService.insertSelective(record);
 
             // 资源进聚合
-            releaseInfoService.commitResource(resourceDymaicApi, record);
+            releaseInfoService.commitResource(resourceDymaicApi, record, createUser);
 
             try {
 

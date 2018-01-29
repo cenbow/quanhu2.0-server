@@ -174,5 +174,10 @@ public class OrderTest {
 			return false;
 		}
 	}
+	
+	@Test
+	public void getPayinfoWeb(){
+		System.out.println(GsonUtils.parseJson(orderAPI.getPayInfoWeb("yehao-test", null, null, 0, 0))); 
+	}
 
 }

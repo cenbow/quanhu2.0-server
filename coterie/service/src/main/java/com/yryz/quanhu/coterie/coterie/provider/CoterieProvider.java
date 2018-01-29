@@ -155,30 +155,34 @@ public class CoterieProvider implements CoterieApi {
 	 * @throws ServiceException
 	 */
 	@Override
-	public void modifyCoterieInfo(CoterieInfo info) {
+	public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info) {
 		logger.info("CoterieApi.modifyCoterieInfo params:" + info);
-		if (info == null ||  info.getCoterieId()==null) {
-			throw ServiceException.paramsError();
-		}
-		String name = StringUtils.trim(info.getName());
-		if (StringUtils.isNotEmpty(name)) {
-			List<CoterieInfo> clist = coterieService.findByName(name);
-			if (!clist.isEmpty()&&!clist.get(0).getCoterieId().equals(info.getCoterieId())) {
-				throw new QuanhuException( "2007","参数错误","私圈名称已存在",null);
-			}
-		}
-		//费用单位错误防范
-		if (!(info.getJoinFee()!=null && info.getJoinFee()<=100 && info.getJoinFee()>=0)) {
 
-			throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
-		}
-		if (!(info.getConsultingFee()!=null && info.getConsultingFee()<=100 && info.getConsultingFee()>=0)) {
-			throw new QuanhuException( "2007","参数错误","私圈咨询费金额设置不正确。",null);
-		}
 		try {
+			if (info == null ||  info.getCoterieId()==null) {
+				throw new QuanhuException( "2007","参数错误","coterieId",null);
+
+			}
+			String name = StringUtils.trim(info.getName());
+			if (StringUtils.isNotEmpty(name)) {
+				List<CoterieInfo> clist = coterieService.findByName(name);
+				if (!clist.isEmpty()&&!clist.get(0).getCoterieId().equals(info.getCoterieId())) {
+					throw new QuanhuException( "2007","参数错误","私圈名称已存在",null);
+				}
+			}
+			//费用单位错误防范
+			if (!(info.getJoinFee()!=null && info.getJoinFee()<=100 && info.getJoinFee()>=0)) {
+
+				throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
+			}
+			if (!(info.getConsultingFee()!=null && info.getConsultingFee()<=100 && info.getConsultingFee()>=0)) {
+				throw new QuanhuException( "2007","参数错误","私圈咨询费金额设置不正确。",null);
+			}
 			coterieService.modify(info);
+
 		} catch (QuanhuException e) {
 			logger.error(e.getMessage(), e);
+			return ResponseUtils.returnException(e);
 		}catch (DatasOptException e) {
 			logger.error(e.getMessage(), e);
 			throw ServiceException.sysError();
@@ -188,6 +192,7 @@ public class CoterieProvider implements CoterieApi {
 			logger.error("unKown Exception", e);
 			throw ServiceException.sysError();
 		}
+		return ResponseUtils.returnObjectSuccess(info);
 	}
 	/**
 	 * 申请创建私圈

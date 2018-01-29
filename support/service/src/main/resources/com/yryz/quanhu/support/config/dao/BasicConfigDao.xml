@@ -5,7 +5,7 @@
   <!--Base_Column_List-->
   <sql id="Base_Column_List">
     id,kid,create_date,create_user_id,last_update_date,last_update_user_id,del_flag,version,
-    appId,parent_kid,config_name,config_key,config_value,config_desc,status
+    appId,parent_kid,config_name,config_key,config_value,config_desc,config_status
   </sql>
 
 
@@ -22,7 +22,7 @@
     ,now()
     ,#{createUserId,jdbcType=BIGINT}
     ,now()
-    ,#{lastUpdateUserId,jdbcType=VARCHAR}
+    ,#{lastUpdateUserId,jdbcType=BIGINT}
     ,#{delFlag,jdbcType=TINYINT}
     ,#{version,jdbcType=TINYINT}
 
@@ -32,7 +32,7 @@
     ,#{configKey,jdbcType=VARCHAR}
     ,#{configValue,jdbcType=VARCHAR}
     ,#{configDesc,jdbcType=VARCHAR}
-    ,#{status,jdbcType=TINYINT}
+    ,#{configStatus,jdbcType=TINYINT}
 
     )
   </insert>
@@ -42,7 +42,7 @@
     UPDATE qh_basic_config SET
 
     last_update_date = NOW()
-    ,last_update_user_id = #{lastUpdateUserId,jdbcType=VARCHAR}
+    ,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
 
     ,#{appId,jdbcType=VARCHAR}
     ,#{parentKid,jdbcType=BIGINT}
@@ -50,7 +50,7 @@
     ,#{configKey,jdbcType=VARCHAR}
     ,#{configValue,jdbcType=VARCHAR}
     ,#{configDesc,jdbcType=VARCHAR}
-    ,#{status,jdbcType=TINYINT}
+    ,#{configStatus,jdbcType=TINYINT}
 
     WHERE kid = #{kid,jdbcType=BIGINT}
 
@@ -79,8 +79,7 @@
           resultType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
     SELECT
     <include refid="Base_Column_List"/>
-    FROM qh_basic_config WHERE
-  
+    FROM qh_basic_config WHERE del_flag = 0 AND kid = #{kid,jdbcType=BIGINT}
   </select>
 
   <select id="selectByKey" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto"
@@ -102,7 +101,6 @@
     <include refid="Base_Column_List"/>
     FROM qh_basic_config
     WHERE del_flag = 0 AND parent_kid = #{kid,jdbcType=BIGINT}
-    limit 1
 
   </select>
 
@@ -112,7 +110,7 @@
     UPDATE qh_basic_config SET
     del_flag = 1,
     last_update_date = Now(),
-    last_update_date_user_id = #{lastUpdateUserId,jdbcType=VARCHAR}
+    last_update_date_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
     WHERE
     <choose>
       <when test="kids != null and kids.size > 0">
@@ -131,9 +129,9 @@
   <update id="updateKeyStatus" parameterType="com.yryz.quanhu.support.config.dto.BasicConfigDto">
 
     UPDATE qh_basic_config SET
-    status = #{status,jdbcType=TINYINT},
+    config_status = #{configStatus,jdbcType=TINYINT},
     last_update_date = Now(),
-    last_update_date_user_id = #{lastUpdateUserId,jdbcType=VARCHAR}
+    last_update_date_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
     WHERE kid = #{kid,jdbcType=BIGINT}
 
   </update>

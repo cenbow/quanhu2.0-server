@@ -1,13 +1,18 @@
-package com.yryz.quanhu.behavior.transmit.entity;
+package com.yryz.quanhu.behavior.transmit.vo;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class TransmitInfo implements Serializable {
+public class TransmitInfoVo implements Serializable {
 
     /**
      * 唯一id
      * */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     /**
@@ -36,16 +41,16 @@ public class TransmitInfo implements Serializable {
     private Long createUserId;
 
     /**
-     * 目标用户
-     * */
-    private Long targetUserId;
-
-    /**
      * 创建时间
      * */
     private Date createDate;
 
     private Long createDateLong;
+
+    /**
+     * 用户对象
+     * */
+    private UserSimpleVO user;
 
     public Long getKid() {
         return kid;
@@ -95,14 +100,6 @@ public class TransmitInfo implements Serializable {
         this.createUserId = createUserId;
     }
 
-    public Long getTargetUserId() {
-        return targetUserId;
-    }
-
-    public void setTargetUserId(Long targetUserId) {
-        this.targetUserId = targetUserId;
-    }
-
     public Date getCreateDate() {
         return createDate;
     }
@@ -117,5 +114,13 @@ public class TransmitInfo implements Serializable {
 
     public void setCreateDateLong(Long createDateLong) {
         this.createDateLong = createDateLong;
+    }
+
+    public UserSimpleVO getUser() {
+        return user;
+    }
+
+    public void setUser(UserSimpleVO user) {
+        this.user = user;
     }
 }

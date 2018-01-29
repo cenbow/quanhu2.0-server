@@ -26,6 +26,7 @@ import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
 * @author wangheng
@@ -277,7 +278,7 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
     * @return void
     * @throws  
     */
-    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo) {
+    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo, UserSimpleVO createUser) {
         try {
             ResourceTotal resourceTotal = new ResourceTotal();
             resourceTotal.setClassifyId(releaseInfo.getClassifyId().intValue());
@@ -291,6 +292,10 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
             resourceTotal.setModuleEnum(new Integer(releaseInfo.getModuleEnum()));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(releaseInfo.getKid());
+
+            // 设置达人标识 createUser
+            resourceTotal.setTalentType(String.valueOf(createUser.getUserRole()));
+            
             resourceTotal.setTitle(releaseInfo.getTitle());
             resourceTotal.setUserId(releaseInfo.getCreateUserId());
             resourceDymaicApi.commitResourceDymaic(resourceTotal);
