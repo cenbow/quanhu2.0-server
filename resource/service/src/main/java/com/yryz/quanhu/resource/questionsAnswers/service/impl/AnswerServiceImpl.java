@@ -1,16 +1,14 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
-import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.message.MessageConstant;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
-import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.AnswerDto;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Answer;
 import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample;
@@ -18,11 +16,10 @@ import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
+import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
-import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
-import com.yryz.quanhu.support.id.api.IdAPI;
-import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,9 +39,12 @@ public class AnswerServiceImpl implements AnswerService {
     @Autowired
     private APIservice apIservice;
 
-
     @Autowired
     OrderSDK orderSDK;
+
+
+    @Autowired
+    private SendMessageService questionMessageService;
 
     @Override
     public AnswerVo saveAnswer(AnswerDto answerdto) {
@@ -102,6 +102,15 @@ public class AnswerServiceImpl implements AnswerService {
               }
             }
         }
+        MessageBusinessVo messageBusinessVo =new MessageBusinessVo();
+        messageBusinessVo.setCoterieId(String.valueOf(answerWithBLOBs.getCoterieId()));
+        messageBusinessVo.setIsAnonymity(null);
+        messageBusinessVo.setKid(answerWithBLOBs.getKid());
+        messageBusinessVo.setModuleEnum(ResourceTypeEnum.ANSWER);
+        messageBusinessVo.setTosendUserId(questionCheck.getCreateUserId());
+        messageBusinessVo.setTitle(answerWithBLOBs.getContent());
+        messageBusinessVo.setAmount(questionCheck.getChargeAmount());
+        questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED);
         return answerVo;
     }
 

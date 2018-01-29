@@ -29,7 +29,7 @@ public class TopicPostDto  implements Serializable {
 
     private Long createUserId;
 
-    private Integer pageNum;
+    private Integer currentPage;
 
     private Integer pageSize;
 
@@ -131,12 +131,12 @@ public class TopicPostDto  implements Serializable {
         this.createUserId = createUserId;
     }
 
-    public Integer getPageNum() {
-        return pageNum;
+    public Integer getCurrentPage() {
+        return currentPage;
     }
 
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
     }
 
     public Integer getPageSize() {

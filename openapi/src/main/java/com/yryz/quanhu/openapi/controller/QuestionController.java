@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
+import com.yryz.common.annotation.UserBehaviorValidation;
+import  com.yryz.common.annotation.UserBehaviorArgs;
+
+
 @Api(description = "圈粉提问接口")
 @RestController
 public class QuestionController {
@@ -36,6 +40,10 @@ public class QuestionController {
 			@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 	})
 	@PostMapping(value = "/services/app/{version}/coterie/question/add")
+	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
+			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
+			coterieId="object.QuestionDto.coterieId")
 	public Response<QuestionVo> saveQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId=header.getUserId();
@@ -51,6 +59,10 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
+	@UserBehaviorValidation(event = "圈粉删除未回答的问题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
+			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
+			coterieId="object.QuestionDto.coterieId")
 	@PostMapping(value = "/services/app/{version}/coterie/question/delete")
 	public Response<Integer> deleteQueston(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
@@ -66,6 +78,10 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
+	@UserBehaviorValidation(event = "圈主拒接回答问题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
+			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
+			coterieId="object.QuestionDto.coterieId")
 	@PostMapping(value = "/services/app/{version}/coterie/question/reject")
 	public Response<Integer> rejectQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
@@ -99,7 +115,7 @@ public class QuestionController {
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
 	@GetMapping(value = "/services/app/{version}/coterie/question/list")
-	public Response<PageList<QuestionAnswerVo>> queryQuestionAnswerList(Long coterieId, Integer pageNum, Integer pageSize, HttpServletRequest request) {
+	public Response<PageList<QuestionAnswerVo>> queryQuestionAnswerList(Long coterieId, Integer currentPage, Integer pageSize, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId=header.getUserId();
 		if(StringUtils.isBlank(userId)){
@@ -108,7 +124,7 @@ public class QuestionController {
 		QuestionDto dto=new QuestionDto();
 		dto.setCreateUserId(Long.valueOf(userId));
 		dto.setCoterieId(coterieId);
-		dto.setPageNum(pageNum);
+		dto.setCurrentPage(currentPage);
 		dto.setPageSize(pageSize);
 		return questionApi.queryQuestionAnswerVoList(dto);
 	}
