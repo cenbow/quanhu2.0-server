@@ -21,7 +21,7 @@
         <module>resource</module>
         <module>support</module>
         <module>user</module>
-
+		<module>other</module>
         <module>openapi</module>
         <module>common</module>
 		<module>demo</module>

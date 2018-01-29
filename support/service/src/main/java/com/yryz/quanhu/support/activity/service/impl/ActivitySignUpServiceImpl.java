@@ -9,6 +9,7 @@ import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.api.OrderAsynApi;
+import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
@@ -262,8 +263,8 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         inputOrder.setOrderEnum(OrderEnum.ACTIVITY_SIGNUP_ORDER);
         inputOrder.setFromId(activityRecord.getCreateUserId());
         //TODO 字段封装
-       /* inputOrder.setToId();
-        inputOrder.setModuleEnum();*/
+       inputOrder.setToId(NumberUtils.parseNumber(AccountEnum.SYSID,Long.TYPE));
+        inputOrder.setModuleEnum(ModuleContants.ACTIVITY_ENUM);
         inputOrder.setBizContent(JSON.toJSONString(activityRecord));
         inputOrder.setResourceId(activityRecord.getKid());
         inputOrder.setCost(Long.valueOf(activityRecord.getAmount()));
