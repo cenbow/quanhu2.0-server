@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.other.activity.dao.ActivityVoteConfigDao">
+
+	<!--Base_Column_List-->
+	<sql id="Base_Column_List">id,kid,activity_info_id,comment_flag,config_sources,create_date,create_user_id,last_update_date,last_update_user_id,no_reward_content,activity_join_begin,activity_join_end,activity_vote_begin,activity_vote_end,in_app_vote_type,in_app_vote_config_count,other_app_vote_type,other_app_vote_config_count,user_flag,prizes_flag,user_num,amount
+    </sql>
+
+     <!-- 查询ActivityVoteConfig详情 -->
+    <select id="selectByKid" resultType="com.yryz.quanhu.other.activity.vo.ActivityVoteConfigVo" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_activity_vote_config
+        where del_flag = 0
+		and kid = #{kid,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 删除ActivityVoteConfig-->
+    <delete id="delete" parameterType="java.lang.Long">
+   	 	delete from qh_activity_vote_config
+    	where kid = #{kid,jdbcType=BIGINT}
+    </delete>
+  
+  
+  	<!-- 新增ActivityVoteConfig-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig">
+	    insert into qh_activity_vote_config (kid,activity_info_id,comment_flag,config_sources,create_user_id,last_update_user_id,no_reward_content,activity_join_begin,activity_join_end,activity_vote_begin,activity_vote_end,in_app_vote_type,in_app_vote_config_count,other_app_vote_type,other_app_vote_config_count,user_flag,prizes_flag,user_num,amount)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{activityInfoId,jdbcType=BIGINT}
+				,#{commentFlag,jdbcType=TINYINT}
+				,#{configSources,jdbcType=VARCHAR}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{lastUpdateUserId,jdbcType=BIGINT}
+				,#{noRewardContent,jdbcType=VARCHAR}
+				,#{activityJoinBegin,jdbcType=TIMESTAMP}
+				,#{activityJoinEnd,jdbcType=TIMESTAMP}
+				,#{activityVoteBegin,jdbcType=TIMESTAMP}
+				,#{activityVoteEnd,jdbcType=TIMESTAMP}
+				,#{inAppVoteType,jdbcType=TINYINT}
+				,#{inAppVoteConfigCount,jdbcType=INTEGER}
+				,#{otherAppVoteType,jdbcType=TINYINT}
+				,#{otherAppVoteConfigCount,jdbcType=INTEGER}
+				,#{userFlag,jdbcType=TINYINT}
+				,#{prizesFlag,jdbcType=TINYINT}
+				,#{userNum,jdbcType=INTEGER}
+				,#{amount,jdbcType=INTEGER}
+	    )
+	</insert>
+	
+	<!--按需新增ActivityVoteConfig-->
+    <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig">
+	    insert into qh_activity_vote_config 
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="activityInfoId != null">
+			activity_info_id,
+	    </if>
+        <if test="commentFlag != null">
+			comment_flag,
+	    </if>
+        <if test="configSources != null and configSources != ''">
+			config_sources,
+	    </if>
+        <if test="createDate != null">
+			create_date,
+	    </if>
+        <if test="createUserId != null">
+			create_user_id,
+	    </if>
+        <if test="lastUpdateDate != null">
+			last_update_date,
+	    </if>
+        <if test="lastUpdateUserId != null">
+			last_update_user_id,
+	    </if>
+        <if test="noRewardContent != null and noRewardContent != ''">
+			no_reward_content,
+	    </if>
+        <if test="activityJoinBegin != null">
+			activity_join_begin,
+	    </if>
+        <if test="activityJoinEnd != null">
+			activity_join_end,
+	    </if>
+        <if test="activityVoteBegin != null">
+			activity_vote_begin,
+	    </if>
+        <if test="activityVoteEnd != null">
+			activity_vote_end,
+	    </if>
+        <if test="inAppVoteType != null">
+			in_app_vote_type,
+	    </if>
+        <if test="inAppVoteConfigCount != null">
+			in_app_vote_config_count,
+	    </if>
+        <if test="otherAppVoteType != null">
+			other_app_vote_type,
+	    </if>
+        <if test="otherAppVoteConfigCount != null">
+			other_app_vote_config_count,
+	    </if>
+        <if test="userFlag != null">
+			user_flag,
+	    </if>
+        <if test="prizesFlag != null">
+			prizes_flag,
+	    </if>
+        <if test="userNum != null">
+			user_num,
+	    </if>
+        <if test="amount != null">
+			amount,
+	    </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="activityInfoId != null">
+			#{activityInfoId,jdbcType=BIGINT},
+	    </if>
+        <if test="commentFlag != null">
+			#{commentFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="configSources != null and configSources != ''">
+			#{configSources,jdbcType=VARCHAR},
+	    </if>
+        <if test="createDate != null">
+			#{createDate,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="createUserId != null">
+			#{createUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="lastUpdateDate != null">
+			#{lastUpdateDate,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="lastUpdateUserId != null">
+			#{lastUpdateUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="noRewardContent != null and noRewardContent != ''">
+			#{noRewardContent,jdbcType=VARCHAR},
+	    </if>
+        <if test="activityJoinBegin != null">
+			#{activityJoinBegin,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="activityJoinEnd != null">
+			#{activityJoinEnd,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="activityVoteBegin != null">
+			#{activityVoteBegin,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="activityVoteEnd != null">
+			#{activityVoteEnd,jdbcType=TIMESTAMP},
+	    </if>
+        <if test="inAppVoteType != null">
+			#{inAppVoteType,jdbcType=TINYINT},
+	    </if>
+        <if test="inAppVoteConfigCount != null">
+			#{inAppVoteConfigCount,jdbcType=INTEGER},
+	    </if>
+        <if test="otherAppVoteType != null">
+			#{otherAppVoteType,jdbcType=TINYINT},
+	    </if>
+        <if test="otherAppVoteConfigCount != null">
+			#{otherAppVoteConfigCount,jdbcType=INTEGER},
+	    </if>
+        <if test="userFlag != null">
+			#{userFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="prizesFlag != null">
+			#{prizesFlag,jdbcType=TINYINT},
+	    </if>
+        <if test="userNum != null">
+			#{userNum,jdbcType=INTEGER},
+	    </if>
+        <if test="amount != null">
+			#{amount,jdbcType=INTEGER},
+	    </if>
+	    </trim>
+	</insert>
+
+	<!-- 按需修改ActivityVoteConfig-->   
+    <update id="update" parameterType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig">
+        update qh_activity_vote_config
+        <set>
+             <if test="activityInfoId != null">
+    			activity_info_id = #{activityInfoId,jdbcType=BIGINT},
+    		</if>
+             <if test="commentFlag != null">
+    			comment_flag = #{commentFlag,jdbcType=TINYINT},
+    		</if>
+            <if test="configSources != null and configSources != ''">
+    			config_sources = #{configSources,jdbcType=VARCHAR},
+    		</if>
+             <if test="createUserId != null">
+    			create_user_id = #{createUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="lastUpdateUserId != null">
+    			last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+    		</if>
+            <if test="noRewardContent != null and noRewardContent != ''">
+    			no_reward_content = #{noRewardContent,jdbcType=VARCHAR},
+    		</if>
+             <if test="activityJoinBegin != null">
+    			activity_join_begin = #{activityJoinBegin,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="activityJoinEnd != null">
+    			activity_join_end = #{activityJoinEnd,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="activityVoteBegin != null">
+    			activity_vote_begin = #{activityVoteBegin,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="activityVoteEnd != null">
+    			activity_vote_end = #{activityVoteEnd,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="inAppVoteType != null">
+    			in_app_vote_type = #{inAppVoteType,jdbcType=TINYINT},
+    		</if>
+             <if test="inAppVoteConfigCount != null">
+    			in_app_vote_config_count = #{inAppVoteConfigCount,jdbcType=INTEGER},
+    		</if>
+             <if test="otherAppVoteType != null">
+    			other_app_vote_type = #{otherAppVoteType,jdbcType=TINYINT},
+    		</if>
+             <if test="otherAppVoteConfigCount != null">
+    			other_app_vote_config_count = #{otherAppVoteConfigCount,jdbcType=INTEGER},
+    		</if>
+             <if test="userFlag != null">
+    			user_flag = #{userFlag,jdbcType=TINYINT},
+    		</if>
+             <if test="prizesFlag != null">
+    			prizes_flag = #{prizesFlag,jdbcType=TINYINT},
+    		</if>
+             <if test="userNum != null">
+    			user_num = #{userNum,jdbcType=INTEGER},
+    		</if>
+             <if test="amount != null">
+    			amount = #{amount,jdbcType=INTEGER},
+    		</if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+	<!-- 查询ActivityVoteConfig详情 -->
+	<select id="selectByActivityInfoId" resultType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_vote_config
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+	</select>
+
+
+
+	<select id="selectByPrimaryKey" resultType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_vote_config
+		where kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<select id="selectByInfoId" resultType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long" >
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_vote_config
+		where activity_info_id = #{kid,jdbcType=BIGINT}
+	</select>
+
+	<select id="selectVoteByActivityInfoId" resultType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from qh_activity_vote_config
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+	</select>
+</mapper>
