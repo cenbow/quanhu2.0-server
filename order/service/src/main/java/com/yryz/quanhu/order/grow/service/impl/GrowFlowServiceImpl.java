@@ -41,7 +41,7 @@ public class GrowFlowServiceImpl implements GrowFlowService{
 
 	@Override
 	public List<GrowFlow> getPage(GrowFlowQuery gfq) {
-		PageUtils.startPage(gfq.getCurrentPage(), gfq.getPageSize());
+		//PageUtils.startPage(gfq.getCurrentPage(), gfq.getPageSize());
 		return growFlowDao.getPage(gfq);
 	}
 	
