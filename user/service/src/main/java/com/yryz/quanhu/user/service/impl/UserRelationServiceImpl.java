@@ -80,6 +80,8 @@ public class UserRelationServiceImpl implements UserRelationService{
 
     @Override
     public UserRelationDto setRelation(String sourceUserId, String targetUserId,UserRelationConstant.EVENT event){
+        UserRelationDto sourceDto = null;
+        UserRelationDto targetDto = null;
         try{
 
             /**
@@ -91,8 +93,8 @@ public class UserRelationServiceImpl implements UserRelationService{
              * 查询双方用户关系，进行更新
              * 更新缓存，及时响应结果信息
              */
-            UserRelationDto sourceDto = userRelationCacheDao.getCacheRelation(sourceUserId,targetUserId);
-            UserRelationDto targetDto = userRelationCacheDao.getCacheRelation(targetUserId,sourceUserId);
+            sourceDto = userRelationCacheDao.getCacheRelation(sourceUserId,targetUserId);
+            targetDto = userRelationCacheDao.getCacheRelation(targetUserId,sourceUserId);
             if(sourceDto == null){
                 sourceDto = new UserRelationDto();
                 sourceDto.setBlackStatus(UserRelationConstant.NO);
@@ -131,7 +133,11 @@ public class UserRelationServiceImpl implements UserRelationService{
                 sourceDto.setLastUpdateUserId(Long.parseLong(targetUserId));
 
                 sourceDto.setKid(idAPI.getKid(TABLE_NAME).getData());
+                //保存数据库
                 userRelationDao.insert(sourceDto);
+                //同步IM关系
+                userRelationCacheDao.syncImRelation(sourceDto);
+
             }else{
                 userRelationCacheDao.sendMQ(sourceDto);
             }
@@ -150,11 +156,10 @@ public class UserRelationServiceImpl implements UserRelationService{
             //同步单向关系至redis
             userRelationCacheDao.refreshCacheRelation(sourceDto);
 
-            return mergeRelation(sourceDto,targetDto);
         }catch (Exception e){
             throw e;
         }
-
+        return mergeRelation(sourceDto,targetDto);
     }
 
     /**
@@ -621,8 +626,4 @@ public class UserRelationServiceImpl implements UserRelationService{
         }
         return targetUserIds;
     }
-
-
-
-
 }
