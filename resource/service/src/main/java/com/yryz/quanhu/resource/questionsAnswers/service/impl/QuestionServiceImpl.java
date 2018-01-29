@@ -23,7 +23,9 @@ import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionMessageService;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -444,4 +446,43 @@ public class QuestionServiceImpl implements QuestionService {
         }
         return false;
     }
+
+
+    /**
+     * job 失效问题退款
+     * @param
+     */
+    @Override
+    public void updateInValidQuestionRefund() {
+        /**
+         * 查询失效的问题
+         */
+        QuestionExample example=new QuestionExample();
+        QuestionExample.Criteria criteria=example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
+        criteria.andChargeAmountGreaterThan(0L);
+        criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
+        Calendar invaidDate=Calendar.getInstance();
+        invaidDate.add(Calendar.HOUR_OF_DAY,-48);
+        criteria.andCreateDateLessThan(invaidDate.getTime());
+        criteria.andAnswerdFlagEqualTo(QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED);
+        List<Question> questions=this.questionDao.selectByExample(example);
+        for(Question question:questions){
+            logger.info("==退款的提问编号==:{}",question.getKid());
+            question.setIsValid(QuestionAnswerConstants.validType.NO);
+            /**
+             * 失效进行全额退款
+             */
+            Long orderId=orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER,question.getCreateUserId(),question.getChargeAmount());
+            if(null!=orderId){
+                question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
+                question.setRefundOrderId(String.valueOf(orderId));
+            }else{
+                question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
+            }
+            this.questionDao.updateByPrimaryKeySelective(question);
+        }
+   }
 }
