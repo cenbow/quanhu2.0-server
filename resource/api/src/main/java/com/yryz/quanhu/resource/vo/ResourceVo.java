@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -127,7 +128,7 @@ public class ResourceVo implements Serializable {
     /**
      * 用户基础信息
      */
-    private UserBaseInfoVO user;
+    private UserSimpleVO user;
 
 	/**
 	 * 
@@ -406,14 +407,14 @@ public class ResourceVo implements Serializable {
 	/**
 	 * @return the user
 	 */
-	public UserBaseInfoVO getUser() {
+	public UserSimpleVO getUser() {
 		return user;
 	}
 
 	/**
 	 * @param user the user to set
 	 */
-	public void setUser(UserBaseInfoVO user) {
+	public void setUser(UserSimpleVO user) {
 		this.user = user;
 	}
     
