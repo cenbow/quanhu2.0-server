@@ -53,7 +53,7 @@ public interface CoterieApi {
 	 * @param info  coterieId必填
 	 * @throws ServiceException
 	 */
-	public void modifyCoterieInfo(CoterieInfo info) throws ServiceException;
+	public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info) throws ServiceException;
 	
 	/**
 	 * 更新私圈主达人状态
