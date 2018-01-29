@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
@@ -74,8 +75,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Resource
     private CoterieService coterieService;
 
-	@Resource
-	private CoterieMemberMessageManager coterieMemberMessageManager;
+    @Resource
+    private CoterieMemberMessageManager coterieMemberMessageManager;
 
     @Resource
     private CoterieEventManager coterieEventManager;
@@ -132,26 +133,19 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         if (coterie.getJoinFee() == 0 && coterie.getJoinCheck() == 10) {
 
             //先入审请表
-            CoterieMemberApply apply = makeApplyInfo(userId, coterieId, reason, MemberConstant.MemberStatus.PASS.getStatus());
-            coterieApplyDao.insert(apply);
+            //用户是否为待审核或审核通过
+            CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
+            if (null == memberApply) {
+                //insert member apply
+                saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
+            } else {
+
+                throw QuanhuException.busiError("用户已是待审核或审核通过");
+            }
+            Integer resultApply = saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.PASS.getStatus());
 
             //再入成员表
-            CoterieMember record = new CoterieMember();
-            record.setKid(idApi.getSnowflakeId().getData());
-            record.setUserId(userId);
-            record.setCoterieId(coterieId);
-            record.setReason(reason);
-            record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
-            record.setCreateDate(new Date());
-            record.setLastUpdateDate(new Date());
-            record.setMemberStatus(MemberConstant.MemberStatus.PASS.getStatus());
-            record.setProcessTime(new Date());
-            record.setJoinType(MemberConstant.JoinType.NOTFREE.getStatus());
-            record.setKickStatus(MemberConstant.KickStatus.NORMAL.getStatus());
-            record.setDelFlag(MemberConstant.DelFlag.NORMAL.getStatus());
-            record.setAmount(Long.valueOf(coterie.getJoinFee()));
-            record.setCreateUserId(userId);
-            saveMember(record);
+            saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
 
             result.setStatus((byte) 20);
             return result;
@@ -160,21 +154,25 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         //免费要审核
         if (coterie.getJoinFee() == 0 && coterie.getJoinCheck() == 11) {
             try {
-                //不能有通过或是不通过的审请
+                //用户是否为待审核或审核通过
                 CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
                 if (null == memberApply) {
-                    CoterieMemberApply apply = makeApplyInfo(userId, coterieId, reason, null);
-                    coterieApplyDao.insert(apply);
+                    //insert member apply
+                    saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
                     //todo msg
                     coterieMemberMessageManager.joinMessage(userId, coterieId, reason);
+                } else {
+
+                    throw QuanhuException.busiError("用户已是待审核或审核通过");
                 }
             } catch (Exception e) {
                 throw new QuanhuException(ExceptionEnum.SysException);
             }
             result.setStatus((byte) 30);
+            return result;
         }
 
-        return result;
+        throw QuanhuException.busiError("传参有误，请检查私圈是否收费是否需要审核");
     }
 
     @Override
@@ -314,64 +312,19 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void audit(Long userId, Long coterieId, Byte memberStatus, Byte joinType) {
+    public void audit(Long userId, Long coterieId, Byte memberStatus) {
         Integer result = null;
-        CoterieMemberApply apply = null;
-        CoterieMember record = new CoterieMember();
 
+        String reason = null;
         try {
-            if (joinType.equals(MemberConstant.JoinType.FREE.getStatus())) {
-                //免费审请，先update再insert member
-                apply = new CoterieMemberApply();
-                apply.setCoterieId(coterieId);
-                apply.setUserId(userId);
-                apply.setLastUpdateDate(new Date());
-                apply.setProcessTime(new Date());
-                if (null == memberStatus) {
-                    apply.setMemberStatus(MemberConstant.MemberStatus.PASS.getStatus());
-                } else {
-                    apply.setMemberStatus(memberStatus);
-                }
-                result = coterieApplyDao.updateByCoterieApply(apply);
-
-                //免费审核
-                record.setJoinType(MemberConstant.JoinType.FREE.getStatus());
-                record.setAmount(0L);
-
-                CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
-                record.setReason(memberApply.getReason());
-
+            if (null == memberStatus) {
+                result = saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
             } else {
-                //收费，先insert member apply再 insert member
-                apply = makeApplyInfo(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
-                result = coterieApplyDao.insert(apply);
-
-                //收费不用审核，直接加入
-                CoterieInfo coterie = coterieService.find(coterieId);
-                record.setJoinType(MemberConstant.JoinType.NOTFREE.getStatus());
-                record.setAmount(coterie.getJoinFee().longValue());
-                record.setReason("");
+                result = saveOrUpdateApply(userId, coterieId, "", memberStatus);
             }
 
-            if (result > 0 && apply.getMemberStatus() == MemberConstant.MemberStatus.PASS.getStatus()) {
-                record.setKid(idApi.getSnowflakeId().getData());
-                record.setUserId(userId);
-                record.setCoterieId(coterieId);
-                record.setLastUpdateDate(new Date());
-                record.setMemberStatus(MemberConstant.MemberStatus.PASS.getStatus());
-                record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
-                record.setDelFlag(MemberConstant.DelFlag.NORMAL.getStatus());
-                record.setKickStatus(MemberConstant.KickStatus.NORMAL.getStatus());
-                record.setProcessTime(apply.getProcessTime());
-                record.setCreateUserId(userId);
-
-                CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
-                if (member == null) {
-                    record.setCreateDate(new Date());
-                    saveMember(record);
-                } else {
-                    coterieMemberDao.updateByCoterieMember(record);
-                }
+            if (result > 0 && memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
+                saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
             }
 
             //todo event
@@ -489,64 +442,101 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         return pageList;
     }
 
-    private CoterieMemberApply makeApplyInfo(Long userId, Long coterieId, String reason, Byte status) {
-        CoterieMemberApply apply = new CoterieMemberApply();
-        apply.setCoterieId(coterieId);
-        apply.setCreateDate(new Date());
-        apply.setUserId(userId);
-        apply.setLastUpdateDate(new Date());
-        apply.setReason(reason);
-        apply.setCreateUserId(userId);
-        if (null != status) {
-            apply.setMemberStatus(status);
-        } else {
-            apply.setMemberStatus(MemberConstant.MemberStatus.WAIT.getStatus());
-        }
+    /******************************************/
 
-        Long kid = idApi.getSnowflakeId().getData();
-        apply.setKid(kid);
+    private Integer saveOrUpdateApply(Long userId, Long coterieId, String reason, Byte status) {
 
-        return apply;
-    }
-
-//    private void saveMemberApply(CoterieMember record) {
-//        try {
-//            CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(record.getCoterieId(), record.getUserId());
-//            Integer result = null;
-//            if (member == null) {
-//                result = coterieMemberDao.insert(record);
-//            } else {
-//                result = coterieMemberDao.updateByCoterieMember(record);
-//            }
-//
-//            CoterieInfo coterie = coterieService.find(record.getCoterieId());
-//            Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
-//            if (updateNumberResult == 0) {
-//                throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
-//            }
-//        } catch (Exception e) {
-//            throw new QuanhuException(ExceptionEnum.SysException);
-//        }
-//    }
-
-
-    private void saveMember(CoterieMember record) {
         try {
-            CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(record.getCoterieId(), record.getUserId());
-            Integer result = null;
-            if (member == null) {
-                result = coterieMemberDao.insert(record);
+
+            CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
+
+            if (null == memberApply) {
+
+                Long kid = idApi.getSnowflakeId().getData();
+
+                memberApply = new CoterieMemberApply();
+
+                memberApply.setKid(kid);
+                memberApply.setCoterieId(coterieId);
+                memberApply.setCreateDate(new Date());
+                memberApply.setUserId(userId);
+                memberApply.setLastUpdateDate(new Date());
+                if (StringUtils.isBlank(reason)) {
+                    memberApply.setReason("");
+                } else {
+                    memberApply.setReason(reason);
+                }
+                memberApply.setCreateUserId(userId);
+                memberApply.setMemberStatus(status);
+
+                return coterieApplyDao.insert(memberApply);
             } else {
-                result = coterieMemberDao.updateByCoterieMember(record);
+                memberApply.setMemberStatus(status);
+                memberApply.setProcessTime(new Date());
+                return coterieApplyDao.updateByCoterieApply(memberApply);
             }
 
-            CoterieInfo coterie = coterieService.find(record.getCoterieId());
-            Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
-            if (updateNumberResult == 0) {
-                throw new QuanhuException(ExceptionEnum.SysException);//"更新成员人数失败"
-            }
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
+    }
+
+
+    private Boolean saveOrUpdateMember(Long userId, Long coterieId, String reason, Byte joinType) {
+        try {
+
+            Integer result = null;
+
+            CoterieInfo coterie = coterieService.find(coterieId);
+
+            Long amount = 0L;
+            if (joinType.equals(MemberConstant.JoinType.NOTFREE.getStatus())) {
+                amount = coterie.getJoinFee().longValue();
+            }
+
+            CoterieMember coterieMember = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
+            if (coterieMember == null) {
+
+                coterieMember = new CoterieMember();
+
+                coterieMember.setKid(idApi.getSnowflakeId().getData());
+                coterieMember.setUserId(userId);
+                coterieMember.setCoterieId(coterieId);
+                coterieMember.setReason(reason);
+                coterieMember.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
+                coterieMember.setCreateDate(new Date());
+                coterieMember.setLastUpdateDate(new Date());
+                coterieMember.setMemberStatus(MemberConstant.MemberStatus.PASS.getStatus());
+                coterieMember.setProcessTime(new Date());
+                coterieMember.setJoinType(joinType);
+                coterieMember.setKickStatus(MemberConstant.KickStatus.NORMAL.getStatus());
+                coterieMember.setDelFlag(MemberConstant.DelFlag.NORMAL.getStatus());
+                coterieMember.setAmount(Long.valueOf(amount));
+                coterieMember.setCreateUserId(userId);
+
+                result = coterieMemberDao.insert(coterieMember);
+            } else {
+                coterieMember.setReason(reason);
+                coterieMember.setCreateDate(new Date());
+                coterieMember.setLastUpdateDate(new Date());
+                coterieMember.setMemberStatus(MemberConstant.MemberStatus.PASS.getStatus());
+                coterieMember.setProcessTime(new Date());
+                coterieMember.setJoinType(joinType);
+                coterieMember.setKickStatus(MemberConstant.KickStatus.NORMAL.getStatus());
+                coterieMember.setDelFlag(MemberConstant.DelFlag.NORMAL.getStatus());
+                coterieMember.setAmount(Long.valueOf(amount));
+                coterieMember.setCreateUserId(userId);
+
+                result = coterieMemberDao.updateByCoterieMember(coterieMember);
+            }
+
+            Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
+            if (result == 0 || updateNumberResult == 0) {
+                throw QuanhuException.busiError("更新成员人数失败");
+            }
+        } catch (Exception e) {
+            throw QuanhuException.busiError("保存或更新私圈成员异常");
+        }
+        return true;
     }
 }
