@@ -11,7 +11,7 @@
 
     <artifactId>other-service</artifactId>
     <properties>
-    	<spring.boot.version>2.0.0.M7</spring.boot.version>
+        <common.version>2.0-SNAPSHOT</common.version>
 	</properties>
 
     <dependencies>
@@ -19,6 +19,13 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>other-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+
+        <!--项目内部依赖-->
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>support-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
 
@@ -35,6 +42,14 @@
 
         <!-- spring -->
         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-eureka</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -47,33 +62,10 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-        </dependency>
-        
-        <dependency>  
-			<groupId>org.springframework.boot</groupId>  
-			<artifactId>spring-boot-starter-amqp</artifactId>  
-		</dependency>
-
-        <!-- 第三方依赖 解决Springboot2.0的冲突-->
-        <dependency>
-             <groupId>org.apache.zookeeper</groupId>
-             <artifactId>zookeeper</artifactId>
-             <version>3.4.7</version>
-             <!-- 与springboot包冲突 -->
-             <exclusions>
-                 <exclusion>
-                     <groupId>org.slf4j</groupId>
-                     <artifactId>slf4j-log4j12</artifactId>
-                 </exclusion>
-             </exclusions>
-         </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
+        <!-- 第三方依赖 -->
         <dependency>
             <groupId>com.dangdang</groupId>
             <artifactId>elastic-job-lite-core</artifactId>
@@ -82,6 +74,11 @@
         <dependency>
             <groupId>com.dangdang</groupId>
             <artifactId>elastic-job-lite-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>order-sdk</artifactId>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
