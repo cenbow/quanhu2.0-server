@@ -70,7 +70,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 			if (userAccount.getSmallNopass() != null) {
 				account.setSmallNopass(userAccount.getSmallNopass());
 			} else {
-				account.setSmallNopass(0);
+				account.setSmallNopass(1);
 			}
 			account.setCreateTime(new Date());
 			saveUserAccount(account);

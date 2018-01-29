@@ -202,7 +202,7 @@ public class UserBaseInfo extends GenericEntity {
 	/**
 	 * 最终热度值
 	 */
-	private Integer lastHeat;
+	private Long lastHeat;
 
 	/**
 	 * 删除标识 10:有效 11:删除
@@ -379,11 +379,11 @@ public class UserBaseInfo extends GenericEntity {
 		this.authStatus = authStatus;
 	}
 
-	public Integer getLastHeat() {
+	public Long getLastHeat() {
 		return lastHeat;
 	}
 
-	public void setLastHeat(Integer lastHeat) {
+	public void setLastHeat(Long lastHeat) {
 		this.lastHeat = lastHeat;
 	}
 
@@ -489,7 +489,7 @@ public class UserBaseInfo extends GenericEntity {
 	 * @param lastHeat
 	 * @param banPostTime
 	 */
-	public UserBaseInfo(Long userId, Byte userStatus, Byte userRole, Byte userVest, Byte authStatus, Integer lastHeat,
+	public UserBaseInfo(Long userId, Byte userStatus, Byte userRole, Byte userVest, Byte authStatus, Long lastHeat,
 			Date banPostTime) {
 		super();
 		this.userId = userId;

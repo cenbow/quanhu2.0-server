@@ -42,7 +42,6 @@ public class ResourceInfoSearchImpl implements ResourceInfoSearch {
 		QueryBuilder R2=QueryBuilders.boolQuery().must(q2).must(q3).must(q4).must(q1);
 		
 		List<Order> orders=new ArrayList<>();
-		orders.add(Order.desc("lastHeat"));
 		orders.add(Order.desc("createDate"));
 		Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
 		SearchQuery query = new NativeSearchQueryBuilder()

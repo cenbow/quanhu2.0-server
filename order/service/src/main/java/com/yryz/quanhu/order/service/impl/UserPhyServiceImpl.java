@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.order.common.QuanhuMessage;
 import com.yryz.quanhu.order.dao.persistence.RrzOrderUserPhyDao;
 import com.yryz.quanhu.order.dao.redis.RrzOrderUserPhyDaoRedis;
 import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
@@ -28,7 +30,7 @@ import com.yryz.quanhu.order.service.UserPhyService;
  * @author yehao
  * @version 2.0
  * @date 2018年1月18日 下午2:27:03
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 用户安全信息处理
  */
 @Transactional
 @Service
@@ -43,8 +45,8 @@ public class UserPhyServiceImpl implements UserPhyService{
 	@Autowired
 	private UserAccountService userAccountService;
 	
-//	@Autowired
-//	private QuanhuMessage quanhuMessage;
+	@Autowired
+	private QuanhuMessage quanhuMessage;
 	
 	private static final int ERROR_COUNT = 4;
 
@@ -156,7 +158,7 @@ public class UserPhyServiceImpl implements UserPhyService{
 					} else {
 						return ResponseUtils.returnException(new CommonException("验证失败"));
 					}
-//					quanhuMessage.sendMessage(MessageConstant.EDIT_PAY_PASSWORD, userPhy.getCustId(), null);
+					quanhuMessage.sendMessage(MessageConstant.EDIT_PAY_PASSWORD, userPhy.getCustId(), null);
 				}
 			} else {
 				if (rrzOrderUserPhy.getCustIdcardType() != null) {

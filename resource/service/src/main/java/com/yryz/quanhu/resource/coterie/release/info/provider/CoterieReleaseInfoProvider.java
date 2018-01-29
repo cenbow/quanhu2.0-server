@@ -77,7 +77,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
             Assert.notNull(record.getCoterieId(), "release() CoterieId is null !");
-            Assert.notNull(record.getContentSource(),"release() ContentSource is NULL !");
+            Assert.hasText(record.getContentSource(),"release() ContentSource is NULL !");
             Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() >= 0L,
                     "release() ContentPrice is not unsigned !");
 
@@ -172,8 +172,10 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
                 }
                 // 付费文章,圈粉查询购买记录
                 else if (MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)) {
-                    // TODO 查询 购买记录
-                    canReadFlag = ReleaseConstants.CanReadType.YES;
+                    // 查询 购买记录
+                    if (orderSDK.isBuyOrderSuccess(BranchFeesEnum.READ.toString(), headerUserId, kid)) {
+                        canReadFlag = ReleaseConstants.CanReadType.YES;
+                    }
                 }
             }
 

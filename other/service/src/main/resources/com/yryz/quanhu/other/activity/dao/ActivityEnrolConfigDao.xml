@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.other.activity.dao.ActivityEnrolConfigDao">
+
+	<!--Base_Column_List-->
+	<sql id="Base_Column_List">id,kid,activity_info_id,sign_up_type,amount,enrol_upper,phone_required,config_sources,create_date,create_user_id,last_update_date,last_update_user_id
+    </sql>
+
+     <!-- 查询ActivityEnrolConfig详情 -->
+    <select id="selectByKid" resultType="com.yryz.quanhu.other.activity.vo.ActivityEnrolConfigVo" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_activity_enrol_config
+        where kid = #{kid,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 删除ActivityEnrolConfig-->
+    <delete id="delete" parameterType="java.lang.Long">
+   	 	delete from qh_activity_enrol_config
+    	where kid = #{kid,jdbcType=BIGINT}
+    </delete>
+  
+  	<!-- 新增ActivityEnrolConfig-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.other.activity.entity.ActivityEnrolConfig">
+	    insert into qh_activity_enrol_config (kid,activity_info_id,sign_up_type,amount,enrol_upper,phone_required,config_sources,create_user_id,last_update_user_id)
+	    values (
+	    	#{kid,jdbcType=BIGINT}
+				,#{activityInfoId,jdbcType=BIGINT}
+				,#{signUpType,jdbcType=TINYINT}
+				,#{amount,jdbcType=INTEGER}
+				,#{enrolUpper,jdbcType=INTEGER}
+				,#{phoneRequired,jdbcType=TINYINT}
+				,#{configSources,jdbcType=VARCHAR}
+				,#{createUserId,jdbcType=BIGINT}
+				,#{lastUpdateUserId,jdbcType=BIGINT}
+	    )
+	</insert>
+	
+	<!--按需新增ActivityEnrolConfig-->
+    <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.other.activity.entity.ActivityEnrolConfig">
+	    insert into qh_activity_enrol_config 
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="kid != null">
+			kid,
+	    </if>
+        <if test="activityInfoId != null">
+			activity_info_id,
+	    </if>
+        <if test="signUpType != null">
+			sign_up_type,
+	    </if>
+        <if test="amount != null">
+			amount,
+	    </if>
+        <if test="enrolUpper != null">
+			enrol_upper,
+	    </if>
+        <if test="phoneRequired != null">
+			phone_required,
+	    </if>
+        <if test="configSources != null and configSources != ''">
+			config_sources,
+	    </if>
+        <if test="createUserId != null">
+			create_user_id,
+	    </if>
+        <if test="lastUpdateUserId != null">
+			last_update_user_id,
+	    </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="kid != null">
+			#{kid,jdbcType=BIGINT},
+	    </if>
+        <if test="activityInfoId != null">
+			#{activityInfoId,jdbcType=BIGINT},
+	    </if>
+        <if test="signUpType != null">
+			#{signUpType,jdbcType=TINYINT},
+	    </if>
+        <if test="amount != null">
+			#{amount,jdbcType=INTEGER},
+	    </if>
+        <if test="enrolUpper != null">
+			#{enrolUpper,jdbcType=INTEGER},
+	    </if>
+        <if test="phoneRequired != null">
+			#{phoneRequired,jdbcType=TINYINT},
+	    </if>
+        <if test="configSources != null and configSources != ''">
+			#{configSources,jdbcType=VARCHAR},
+	    </if>
+        <if test="createUserId != null">
+			#{createUserId,jdbcType=BIGINT},
+	    </if>
+        <if test="lastUpdateUserId != null">
+			#{lastUpdateUserId,jdbcType=BIGINT},
+	    </if>
+	    </trim>
+	</insert>
+	
+	<!-- 按需修改ActivityEnrolConfig-->
+    <update id="update" parameterType="com.yryz.quanhu.other.activity.entity.ActivityEnrolConfig">
+        update qh_activity_enrol_config
+        <set>
+             <if test="activityInfoId != null">
+    			activity_info_id = #{activityInfoId,jdbcType=BIGINT},
+    		</if>
+             <if test="signUpType != null">
+    			sign_up_type = #{signUpType,jdbcType=TINYINT},
+    		</if>
+             <if test="amount != null">
+    			amount = #{amount,jdbcType=INTEGER},
+    		</if>
+             <if test="enrolUpper != null">
+    			enrol_upper = #{enrolUpper,jdbcType=INTEGER},
+    		</if>
+             <if test="phoneRequired != null">
+    			phone_required = #{phoneRequired,jdbcType=TINYINT},
+    		</if>
+            <if test="configSources != null and configSources != ''">
+    			config_sources = #{configSources,jdbcType=VARCHAR},
+    		</if>
+             <if test="createDate != null">
+    			create_date = #{createDate,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="createUserId != null">
+    			create_user_id = #{createUserId,jdbcType=BIGINT},
+    		</if>
+             <if test="lastUpdateDate != null">
+    			last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+    		</if>
+             <if test="lastUpdateUserId != null">
+    			last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+    		</if>
+        </set>
+        where kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+	<!-- 查询ActivityEnrolConfig详情 -->
+	<select id="selectByActivityId" resultType="com.yryz.quanhu.other.activity.entity.ActivityEnrolConfig" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List"/>
+		from qh_activity_enrol_config
+		where activity_info_id = #{activityKid,jdbcType=BIGINT}
+	</select>
+
+</mapper>

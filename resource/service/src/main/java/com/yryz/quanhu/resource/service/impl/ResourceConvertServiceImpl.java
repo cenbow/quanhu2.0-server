@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.resource.service.ResourceConvertService;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
  * @author yehao
@@ -34,6 +36,9 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	
 	@Reference(check=false)
 	private UserApi userApi;
+	
+	@Reference
+	private CountApi countApi;
 
 	/**
 	 * 填充用户对象
@@ -48,9 +53,9 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 			for (ResourceVo resourceVo : list) {
 				userIds.add(resourceVo.getUserId().toString());
 			}
-			Response<Map<String,UserBaseInfoVO>> response = userApi.getUser(userIds);
+			Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(userIds);
 			if(response.success()){
-				Map<String,UserBaseInfoVO> map = response.getData();
+				Map<String,UserSimpleVO> map = response.getData();
 				for (ResourceVo resourceVo : list) {
 					resourceVo.setUser(map.get(resourceVo.getUserId().toString()));
 				}

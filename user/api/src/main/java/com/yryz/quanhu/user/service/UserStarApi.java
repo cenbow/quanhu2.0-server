@@ -67,7 +67,7 @@ public interface UserStarApi {
      * @param weight
      * @throws ServiceException
      */
-    public Response<Boolean> updateStarWeight(String userId,Integer weight);
+    public Response<Boolean> updateStarWeight(Long userId,Integer weight);
     /**
      * 后台达人认证信息列表
      * @param pageNo

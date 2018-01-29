@@ -13,6 +13,16 @@ public class BasicConfigDto extends BasicConfigEntity {
     private int pageSize;
     private int pageNo;
 
+    private String parentConfigName;
+
+
+    public String getParentConfigName() {
+        return parentConfigName;
+    }
+
+    public void setParentConfigName(String parentConfigName) {
+        this.parentConfigName = parentConfigName;
+    }
 
     public int getPageSize() {
         return pageSize;
