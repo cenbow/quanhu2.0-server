@@ -78,6 +78,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         collectionInfo.setCoterieId(StringUtils.isBlank(resourceVo.getCoterieId()) ? 0L : Long.valueOf(resourceVo.getCoterieId()));
         collectionInfo.setUserId(resourceVo.getUserId());
         collectionInfo.setCreateUserId(collectionInfoDto.getCreateUserId());
+        collectionInfo.setDelFlag(ResourceEnum.DEL_FLAG_FALSE);
         if(collectionInfoDao.insertByPrimaryKeySelective(collectionInfo) == 0) {
             throw QuanhuException.busiError("已收藏不能重复收藏");
         }

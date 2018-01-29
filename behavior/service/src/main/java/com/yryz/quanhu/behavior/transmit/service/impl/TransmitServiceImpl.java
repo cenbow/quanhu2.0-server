@@ -109,6 +109,7 @@ public class TransmitServiceImpl implements TransmitService {
                     BeanUtils.copyProperties(transmitInfo, transmitInfoVo);
                     return transmitInfoVo;
                 }).collect(Collectors.toList());
+                //设置用户
                 this.setUserInfo(resultList);
             }
         }
