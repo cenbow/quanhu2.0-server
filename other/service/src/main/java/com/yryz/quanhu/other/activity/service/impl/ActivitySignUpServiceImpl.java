@@ -21,6 +21,8 @@ import com.yryz.quanhu.other.activity.service.ActivityInfoService;
 import com.yryz.quanhu.other.activity.service.ActivitySignUpService;
 import com.yryz.quanhu.other.activity.util.DateUtils;
 import com.yryz.quanhu.other.activity.vo.ActivitySignUpHomeAppVo;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
@@ -53,6 +55,8 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     private IdAPI idApi;
     @Reference(check=false)
     OrderSDK orderSDK;
+    @Reference(check=false)
+    ScoreAPI scoreAPI;
 
     @Override
     public ActivitySignUpHomeAppVo getActivitySignUpHome(Long activityInfoId, String custId) {
@@ -231,15 +235,15 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
             case 12:
                 int flag = 0;
                 // TODO 支付积分
-               /* try {
+                try {
                     Assert.notNull(activityEnrolConfig.getAmount(), "积分支付失败！");
-                    flag = scoreAPI.consumeScore(custId, activityEnrolConfig.getAmount().intValue(), "-2");
+                    flag = scoreAPI.consumeScore(custId, activityEnrolConfig.getAmount().intValue(), EventEnum.CONSUME_SCORE.getCode());
                 } catch (Exception e) {
-                    throw new CommonException("支付积分失败：" + e.getMessage());
+                    throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "支付积分失败", "支付积分失败");
                 }
                 if (flag == 0) {
-                    throw new CommonException("积分不足!");
-                }*/
+                    throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "积分不足!", "积分不足!");
+                }
                 break;
             case 13:
                 break;
@@ -259,8 +263,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         InputOrder inputOrder = new InputOrder();
         inputOrder.setOrderEnum(OrderEnum.ACTIVITY_SIGNUP_ORDER);
         inputOrder.setFromId(activityRecord.getCreateUserId());
-        //TODO 字段封装
-       inputOrder.setToId(NumberUtils.parseNumber(AccountEnum.SYSID,Long.TYPE));
+        inputOrder.setToId(NumberUtils.parseNumber(AccountEnum.SYSID,Long.TYPE));
         inputOrder.setModuleEnum(ModuleContants.ACTIVITY_ENUM);
         inputOrder.setBizContent(JSON.toJSONString(activityRecord));
         inputOrder.setResourceId(activityRecord.getKid());
