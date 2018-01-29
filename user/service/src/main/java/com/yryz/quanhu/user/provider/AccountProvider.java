@@ -113,7 +113,7 @@ public class AccountProvider implements AccountApi {
 			checkHeader(header);
 			if (!smsManager.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, header.getAppId())) {
-				throw QuanhuException.busiError("验证码错误");
+				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, registerDTO.getUserPhone());
@@ -285,7 +285,7 @@ public class AccountProvider implements AccountApi {
 			} else {
 				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
 						SmsType.CODE_CHANGE_PHONE, header.getAppId())) {
-					throw QuanhuException.busiError("验证码错误");
+					throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 				}
 				// 手机号加锁
 				lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());

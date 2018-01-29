@@ -140,6 +140,9 @@ public class UserController {
 		String ip = WebUtil.getClientIP(request);
 		registerDTO.setDeviceId(header.getDevId());
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
+		if(devType == null){
+			throw QuanhuException.busiError("设备类型不合法");
+		}
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, registerDTO.getUserLocation(),
 				registerDTO.getActivityChannelCode(), devType, ip);
 		registerDTO.setRegLogDTO(logDTO);
@@ -182,6 +185,9 @@ public class UserController {
 		String ip = WebUtil.getClientIP(request);
 		registerDTO.setDeviceId(header.getDevId());
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
+		if(devType == null){
+			throw QuanhuException.busiError("设备类型不合法");
+		}
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, registerDTO.getUserLocation(),
 				registerDTO.getActivityChannelCode(), devType, ip);
 		registerDTO.setRegLogDTO(logDTO);
@@ -206,6 +212,9 @@ public class UserController {
 		String ip = WebUtil.getClientIP(request);
 		loginDTO.setDeviceId(header.getDevId());
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
+		if(devType == null){
+			throw QuanhuException.busiError("设备类型不合法");
+		}
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
 		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
@@ -240,6 +249,9 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		String ip = WebUtil.getClientIP(request);
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
+		if(devType == null){
+			throw QuanhuException.busiError("设备类型不合法");
+		}
 		loginDTO.setDevType(devType);
 		loginDTO.setDeviceId(header.getDevId());
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);

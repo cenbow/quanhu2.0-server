@@ -127,13 +127,13 @@ public class AccountServiceImpl implements AccountService {
 		if (account == null) {
 			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, appId)) {
-				throw QuanhuException.busiError("验证码错误");
+				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			return createUser(registerDTO);
 		}
 		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
 				appId)) {
-			throw QuanhuException.busiError("验证码错误");
+			throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
