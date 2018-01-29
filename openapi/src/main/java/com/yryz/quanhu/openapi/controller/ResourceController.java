@@ -10,6 +10,7 @@ package com.yryz.quanhu.openapi.controller;
 import java.util.List;
 
 import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +55,8 @@ public class ResourceController {
         if (pageNo != null && pageNo > 0) {
             start = pageNo * pageSize;
         }
-        return resourceApi.appRecommend(start, pageSize);
+        return ResponseUtils.returnListSuccess(ResponseUtils.getResponseData(resourceApi.appRecommend(start, pageSize)));
+
     }
 
     @NotLogin
@@ -72,6 +74,6 @@ public class ResourceController {
         ResourceVo resourceVo = new ResourceVo();
         resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceVo.setCoterieId(coterieId);
-        return resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null);
+        return ResponseUtils.returnListSuccess(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
     }
 }

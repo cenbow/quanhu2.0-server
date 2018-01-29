@@ -112,7 +112,7 @@ public class UserBaseInfoVO implements Serializable{
     /**
      * 最终热度值
      */
-    private Integer lastHeat;
+    private Long lastHeat;
 
     /**
      * 删除标识 10:有效  11:删除
@@ -253,10 +253,10 @@ public class UserBaseInfoVO implements Serializable{
 	public void setAuthStatus(Byte authStatus) {
 		this.authStatus = authStatus;
 	}
-	public Integer getLastHeat() {
+	public Long getLastHeat() {
 		return lastHeat;
 	}
-	public void setLastHeat(Integer lastHeat) {
+	public void setLastHeat(Long lastHeat) {
 		this.lastHeat = lastHeat;
 	}
 	public Byte getDelFlag() {
@@ -292,7 +292,7 @@ public class UserBaseInfoVO implements Serializable{
 	public UserBaseInfoVO(Long userId, String appId, String userNickName, String userImg, String userSignature,
 			String userPhone, Byte userAge, String userQr, Byte userGenders, String userBirthday, String userLocation,
 			String userDeviceId, Byte userStatus, String userCountry, String userProvince, String userCity,
-			String cityCode, Byte userRole, Byte userVest, Byte authStatus, Integer lastHeat, Date banPostTime,
+			String cityCode, Byte userRole, Byte userVest, Byte authStatus, Long lastHeat, Date banPostTime,
 			String userDesc, Date createDate) {
 		super();
 		this.userId = userId;
