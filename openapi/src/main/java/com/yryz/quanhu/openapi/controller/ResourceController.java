@@ -51,7 +51,7 @@ public class ResourceController {
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/appRecommend")
-    public Response<PageList<ResourceVo>> appRecommend(@RequestParam("开始长度") Integer currentPage, @RequestParam("列表长度") Integer pageSize) {
+    public Response<PageList<ResourceVo>> appRecommend(@RequestParam Integer currentPage, @RequestParam Integer pageSize) {
         int start = 0;
         if (pageSize == null) {
             pageSize = 10;
@@ -71,7 +71,7 @@ public class ResourceController {
     @ApiOperation("私圈首页动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/coterieRecommend")
-    public Response<PageList<ResourceVo>> coterieRecommend(@RequestParam("私圈ID") String coterieId, @RequestParam("开始长度") Integer currentPage, @RequestParam("列表长度") Integer pageSize) {
+    public Response<PageList<ResourceVo>> coterieRecommend(@RequestParam String coterieId, @RequestParam Integer currentPage, @RequestParam Integer pageSize) {
         int start = 0;
         if (pageSize == null) {
             pageSize = 10;
