@@ -33,16 +33,26 @@ public class RewardTest {
     */
     @Test
     public void test001() throws JsonProcessingException {
+        /**
+        {
+        "giftId": 1,
+        "giftNum": 1,
+        "giftPrice": 100,
+        "moduleEnum": "0092",
+        "resourceId": 737186863841918976,
+        "toUserId": 724011759597371392
+        }
+         */
         RewardInfo info = new RewardInfo();
-        info.setCreateUserId(732985870429003776L);
-        info.setCoterieId(9382818189L);
+        info.setCreateUserId(727447149320273920L);
+        //        info.setCoterieId(9382818189L);
         info.setRewardPrice(80L);
         info.setGiftId(1L);
         info.setGiftNum(1);
         info.setGiftPrice(100L);
         info.setModuleEnum("0092");
-        info.setResourceId(736842510543519744L);
-        info.setToUserId(72744714932027392L);
+        info.setResourceId(737186863841918976L);
+        info.setToUserId(724011759597371392L);
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoApi.reward(info)));
     }
 
@@ -57,11 +67,11 @@ public class RewardTest {
     public void test002() throws JsonProcessingException {
         RewardInfoDto dto = new RewardInfoDto();
         // 我打赏的-人-列表
-        dto.setQueryType(QueryType.my_reward_user_list);
-        
+        // dto.setQueryType(QueryType.my_reward_user_list);
+
         // 我打赏的-资源-列表
-        // dto.setQueryType(QueryType.my_reward_resource_list);
-        dto.setCreateUserId(729671306726400000L);
+        dto.setQueryType(QueryType.my_reward_resource_list);
+        dto.setCreateUserId(727447149320273920L);
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoApi.pageByCondition(dto, true)));
     }
 }

@@ -417,9 +417,10 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	private int update(UserAccount record) {
 		try {
+			UserAccount account = mysqlDao.selectOne(record.getKid(), null, null);
 			int result = mysqlDao.update(record);
-			if(result != 0){
-				accountRedisDao.saveAccount(record);
+			if(result != 0){				
+				accountRedisDao.deleteAccount(account.getKid(), account.getUserPhone(), account.getAppId());
 			}
 			return result;
 		} catch (Exception e) {
