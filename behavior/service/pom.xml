@@ -42,6 +42,12 @@
 
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>message-api</artifactId>
+			<version>${quanhu.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>order-sdk</artifactId>
 			<version>${order.sdk.version}</version>
 		</dependency>
@@ -51,7 +57,7 @@
             <artifactId>resource-api</artifactId>
             <version>${resource.api.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>dymaic-api</artifactId>
@@ -102,7 +108,8 @@
 			<artifactId>elastic-job-lite-spring</artifactId>
 		</dependency>
 
-	</dependencies>
+
+    </dependencies>
 
 	<build>
 		<finalName>behavior</finalName>

@@ -8,13 +8,13 @@ import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.constants.ActivityCountConstant;
-import com.yryz.quanhu.support.activity.api.ActivityVoteApi;
-import com.yryz.quanhu.support.activity.dto.ActivityVoteDto;
-import com.yryz.quanhu.support.activity.entity.ActivityUserPrizes;
-import com.yryz.quanhu.support.activity.entity.ActivityVoteRecord;
-import com.yryz.quanhu.support.activity.vo.ActivityPrizesVo;
-import com.yryz.quanhu.support.activity.vo.ActivityUserPrizesVo;
-import com.yryz.quanhu.support.activity.vo.ActivityVoteInfoVo;
+import com.yryz.quanhu.other.activity.api.ActivityVoteApi;
+import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
+import com.yryz.quanhu.other.activity.entity.ActivityUserPrizes;
+import com.yryz.quanhu.other.activity.entity.ActivityVoteRecord;
+import com.yryz.quanhu.other.activity.vo.ActivityPrizesVo;
+import com.yryz.quanhu.other.activity.vo.ActivityUserPrizesVo;
+import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -76,7 +76,7 @@ public class ActivityVoteController {
     @ApiOperation("奖品列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/prizeslist")
-    public Response<PageList<ActivityPrizesVo>> prizeslist(ActivityVoteDto activityVoteDto) {
+    public Response<PageList<ActivityPrizesVo>> prizeslist(ActivityVoteDto activityVoteDto, HttpServletRequest request) {
         return activityVoteApi.prizeslist(activityVoteDto);
     }
 
@@ -93,7 +93,7 @@ public class ActivityVoteController {
     @ApiOperation("无奖品文案")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/noPrize")
-    public Response<Map<String, String>> noPrize(Long activityInfoId) {
+    public Response<Map<String, String>> noPrize(Long activityInfoId, HttpServletRequest request) {
         return activityVoteApi.noPrize(activityInfoId);
     }
 

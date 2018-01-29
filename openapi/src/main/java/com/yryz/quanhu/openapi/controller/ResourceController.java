@@ -46,23 +46,32 @@ public class ResourceController {
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/appRecommend")
-    public Response<List<ResourceVo>> appRecommend(@ApiParam("列表长度") String limit) {
-        ResourceVo resourceVo = new ResourceVo();
-        resourceVo.setModuleEnum(ModuleContants.RELEASE);
-        resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-        resourceVo.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
-        resourceVo.setCoterieId("0");
-        return resourceApi.getResources(resourceVo, null, 0, 10, null, null);
+    public Response<List<ResourceVo>> appRecommend(@ApiParam("开始长度") Integer pageNo, @ApiParam("列表长度") Integer pageSize) {
+        int start = 0;
+        if (pageSize == null) {
+            pageSize = 10;
+        }
+        if (pageNo != null && pageNo > 0) {
+            start = pageNo * pageSize;
+        }
+        return resourceApi.appRecommend(start, pageSize);
     }
 
     @NotLogin
     @ApiOperation("私圈首页动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/coterieRecommend")
-    public Response<List<ResourceVo>> coterieRecommend(@ApiParam("私圈ID") String coterieId, @ApiParam("列表长度") String limit) {
+    public Response<List<ResourceVo>> coterieRecommend(@ApiParam("私圈ID") String coterieId, @ApiParam("开始长度") Integer pageNo, @ApiParam("列表长度") Integer pageSize) {
+        int start = 0;
+        if (pageSize == null) {
+            pageSize = 10;
+        }
+        if (pageNo != null && pageNo > 0) {
+            start = pageNo * pageSize;
+        }
         ResourceVo resourceVo = new ResourceVo();
         resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceVo.setCoterieId(coterieId);
-        return resourceApi.getResources(resourceVo, "createTime", 0, 10, null, null);
+        return resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null);
     }
 }

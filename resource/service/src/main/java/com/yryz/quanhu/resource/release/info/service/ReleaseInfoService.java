@@ -8,6 +8,7 @@ import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
 * @author wangheng
@@ -116,5 +117,5 @@ public interface ReleaseInfoService {
     * @return void
     * @throws  
     */
-    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo);
+    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo, UserSimpleVO createUser);
 }

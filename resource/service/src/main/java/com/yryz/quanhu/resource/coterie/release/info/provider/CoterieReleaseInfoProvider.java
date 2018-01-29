@@ -77,17 +77,18 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
             Assert.notNull(record.getCoterieId(), "release() CoterieId is null !");
-            Assert.notNull(record.getContentSource(),"release() ContentSource is NULL !");
+            Assert.hasText(record.getContentSource(),"release() ContentSource is NULL !");
             Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() >= 0L,
                     "release() ContentPrice is not unsigned !");
-            // 校验用户是否存在
-            Assert.isTrue(null != ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId())),
-                    "私圈发布文章，发布者用户为NULL！");
 
             if (StringUtils.isBlank(record.getModuleEnum())) {
                 record.setModuleEnum(ResourceTypeEnum.RELEASE + "-");
             }
 
+            // 校验用户是否存在
+            UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+            Assert.notNull(createUser, "发布者用户不存在！userId：" + record.getCreateUserId());
+            
             // 校验是否为圈主
             Assert.isTrue(
                     MemberConstant.Permission.OWNER.getStatus()
@@ -116,7 +117,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             releaseInfoService.insertSelective(record);
 
             // 资源进聚合
-            releaseInfoService.commitResource(resourceDymaicApi, record);
+            releaseInfoService.commitResource(resourceDymaicApi, record, createUser);
             try {
                 // 资源计数接入
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
@@ -171,8 +172,10 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
                 }
                 // 付费文章,圈粉查询购买记录
                 else if (MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)) {
-                    // TODO 查询 购买记录
-                    canReadFlag = ReleaseConstants.CanReadType.YES;
+                    // 查询 购买记录
+                    if (orderSDK.isBuyOrderSuccess(BranchFeesEnum.READ.toString(), headerUserId, kid)) {
+                        canReadFlag = ReleaseConstants.CanReadType.YES;
+                    }
                 }
             }
 
@@ -215,7 +218,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JsonUtils.toFastJson(info));
             inputOrder.setCost(info.getContentPrice());
-            inputOrder.setCoterieId(info.getCoterieId());
+            if (null != info.getCoterieId() && 0L != info.getCoterieId()) {
+                inputOrder.setCoterieId(info.getCoterieId());
+            }
             inputOrder.setCreateUserId(headerUserId);
             inputOrder.setFromId(headerUserId);
             inputOrder.setModuleEnum(BranchFeesEnum.READ.toString());

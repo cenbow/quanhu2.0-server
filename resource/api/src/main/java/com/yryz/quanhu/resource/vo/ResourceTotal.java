@@ -7,13 +7,15 @@
  */
 package com.yryz.quanhu.resource.vo;
 
+import java.io.Serializable;
+
 /**
  * @author yehao
  * @version 2.0
  * @date 2018年1月26日 上午10:03:00
  * @Description 资源动态全局字段
  */
-public class ResourceTotal {	
+public class ResourceTotal implements Serializable {	
 	
     /**
      * 动态ID

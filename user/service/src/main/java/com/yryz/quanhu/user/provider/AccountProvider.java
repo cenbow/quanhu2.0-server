@@ -8,6 +8,7 @@
 package com.yryz.quanhu.user.provider;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,6 @@ import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
-import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
@@ -113,7 +113,7 @@ public class AccountProvider implements AccountApi {
 			checkHeader(header);
 			if (!smsManager.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, header.getAppId())) {
-				throw QuanhuException.busiError("验证码错误");
+				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, registerDTO.getUserPhone());
@@ -177,7 +177,7 @@ public class AccountProvider implements AccountApi {
 			Long userId = accountService.login(loginDTO, header.getAppId());
 
 			// 判断用户状态
-			if (checkUserDisable(userId).getData()) {
+			if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 			}
 
@@ -209,7 +209,7 @@ public class AccountProvider implements AccountApi {
 			Long userId = accountService.loginByVerifyCode(registerDTO, header.getAppId());
 
 			// 判断用户状态
-			if (checkUserDisable(userId).getData()) {
+			if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 			}
 			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header));
@@ -236,14 +236,14 @@ public class AccountProvider implements AccountApi {
 			checkHeader(header);
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
 
-			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
+			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId(),loginDTO.getType());
 			logger.info("thirdLoginService.selectByThirdId result: {}", GsonUtils.parseJson(login));
 			Long userId = null;
 			// 已存在账户直接登录
 			if (login != null) {
 				userId = login.getUserId();
 				// 判断用户状态
-				if (checkUserDisable(userId).getData()) {
+				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 				}
 			} else {
@@ -278,21 +278,20 @@ public class AccountProvider implements AccountApi {
 			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
-			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId());
+			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId(),loginDTO.getType());
 			// 已存在账户直接登录
 			if (login != null) {
 				throw QuanhuException.busiError("该用户已存在");
 			} else {
 				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
 						SmsType.CODE_CHANGE_PHONE, header.getAppId())) {
-					throw QuanhuException.busiError("验证码错误");
+					throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 				}
 				// 手机号加锁
 				lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());
 
-				UserAccount account = accountService.checkUserByPhonePassword(loginDTO.getPhone(), null,
-						header.getAppId());
-				if (account != null) {
+				boolean accountFlag = accountService.checkUserByPhone(loginDTO.getPhone(),header.getAppId());
+				if (accountFlag) {
 					throw QuanhuException.busiError("该手机号已存在");
 				} else {
 					Long userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
@@ -440,9 +439,8 @@ public class AccountProvider implements AccountApi {
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, phoneDTO.getPhone());
 
-			UserAccount account = accountService.checkUserByPhonePassword(phoneDTO.getPhone(), null,
-					phoneDTO.getAppId());
-			if (account != null) {
+			boolean accountFlag = accountService.checkUserByPhone(phoneDTO.getPhone(),phoneDTO.getAppId());
+			if (accountFlag) {
 				throw QuanhuException.busiError("手机号已存在");
 			}
 			accountService.bindPhone(phoneDTO.getUserId(), phoneDTO.getPhone(), null);
@@ -476,7 +474,7 @@ public class AccountProvider implements AccountApi {
 			loginDTO.setOpenId(thirdDTO.getOpenId());
 			loginDTO.setType(thirdDTO.getThirdType());
 			ThirdUser thirdUser = getThirdUser(loginDTO, thirdDTO.getAppId());
-			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), thirdDTO.getAppId());
+			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), thirdDTO.getAppId(),thirdDTO.getThirdType());
 			if (thirdLogin != null) {
 				throw QuanhuException.busiError("第三方账户已存在");
 			}
@@ -585,7 +583,7 @@ public class AccountProvider implements AccountApi {
 			if (baseInfo == null) {
 				throw QuanhuException.busiError("参数为空");
 			}
-			if (checkUserDistory(userId).getData()) {
+			if (ResponseUtils.getResponseData(checkUserDistory(userId))) {
 				return ResponseUtils.returnObjectSuccess(true);
 			}
 			if (baseInfo.getBanPostTime().getTime() > System.currentTimeMillis()) {
@@ -614,9 +612,9 @@ public class AccountProvider implements AccountApi {
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
 			if (baseInfo == null) {
-				throw QuanhuException.busiError("参数为空");
+				throw QuanhuException.busiError("用户不存在");
 			}
-			if (checkUserDistory(userId).getData()) {
+			if (ResponseUtils.getResponseData(checkUserDistory(userId))) {
 				return ResponseUtils.returnObjectSuccess(true);
 			}
 			if (baseInfo.getUserStatus().intValue() == UserAccountStatus.FREEZE.getStatus()) {
@@ -627,7 +625,7 @@ public class AccountProvider implements AccountApi {
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-			logger.error("forgotPassword未知异常", e);
+			logger.error("checkUserDisable未知异常", e);
 			return ResponseUtils.returnException(e);
 		}
 	}

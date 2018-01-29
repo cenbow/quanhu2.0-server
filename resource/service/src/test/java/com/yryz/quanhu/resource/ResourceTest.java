@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -23,6 +24,8 @@ import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.resource.hotspot.service.CalculationService;
+import com.yryz.quanhu.resource.service.ResourceService;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
@@ -37,6 +40,12 @@ public class ResourceTest {
 	
 	@Reference
 	private ResourceApi resourceApi;
+	
+	@Autowired
+	private ResourceService resourceService;
+	
+	@Autowired
+	private CalculationService calculationService;
 	
 	@Test
 	public void commitResource(){
@@ -100,6 +109,22 @@ public class ResourceTest {
 	public void getResource(){
 		ResourceVo resourceVo = resourceApi.getResourcesById("1000211").getData();
 		System.out.println(GsonUtils.parseJson(resourceVo));
+	}
+	
+	@Test
+	public void createResource(){
+		resourceService.createRecommend();
+	}
+	
+	@Test
+	public void appRecommend(){
+		List<ResourceVo> list = resourceApi.appRecommend(0, 10).getData();
+		System.out.println(GsonUtils.parseJson(list));
+	}
+	
+	@Test
+	public void calculation(){
+		calculationService.calculation();
 	}
 
 }

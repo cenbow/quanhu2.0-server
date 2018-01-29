@@ -81,17 +81,20 @@ public class RewardInfoProvider implements RewardInfoApi {
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JsonUtils.toFastJson(record));
             inputOrder.setCost(record.getGiftNum() * giftInfo.getGiftPrice());
-            inputOrder.setCoterieId(record.getCoterieId());
+            if (null != record.getCoterieId() && 0L != record.getCoterieId()) {
+                inputOrder.setCoterieId(record.getCoterieId());
+            }
             inputOrder.setCreateUserId(record.getCreateUserId());
-            inputOrder.setFromId(record.getToUserId());
+            inputOrder.setFromId(record.getCreateUserId());
             // 调用订单 业务枚举
             inputOrder.setModuleEnum(BranchFeesEnum.REWARD.toString());
             inputOrder.setOrderEnum(OrderEnum.REWARD_ORDER);
             inputOrder.setResourceId(record.getResourceId());
-            inputOrder.setToId(record.getCreateUserId());
-            Long orderId = 213145446L; //orderSDK.createOrder(inputOrder);
+            inputOrder.setToId(record.getToUserId());
+            Long orderId = orderSDK.createOrder(inputOrder);
 
             record.setOrderId(orderId);
+            record.setRewardStatus(RewardConstants.reward_status_pay_not);
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             rewardInfoService.insertSelective(record);
 
@@ -110,8 +113,21 @@ public class RewardInfoProvider implements RewardInfoApi {
     @Override
     public Response<PageList<RewardInfoVo>> pageByCondition(RewardInfoDto dto, boolean isCount) {
         try {
+            Assert.notNull(dto.getQueryType(), "QueryType is NULL ！");
+            if (RewardConstants.QueryType.reward_resource_user_list.equals(dto.getQueryType())) {
+                Assert.notNull(dto.getResourceId(), "ResourceId is NULL ！QueryType：" + dto.getQueryType());
+            } else if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())
+                    || RewardConstants.QueryType.my_reward_resource_list.equals(dto.getQueryType())) {
+                Assert.notNull(dto.getCreateUserId(), "CreateUserId is NULL ！QueryType：" + dto.getQueryType());
+            } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())
+                    || RewardConstants.QueryType.reward_my_resource_list.equals(dto.getQueryType())) {
+                Assert.notNull(dto.getToUserId(), "ToUserId is NULL ！QueryType：" + dto.getQueryType());
+            }
+
+            // 只返回 打赏成功的记录
+            dto.setRewardStatus(RewardConstants.reward_status_pay_success);
             PageList<RewardInfoVo> pageList = rewardInfoService.pageByCondition(dto, isCount);
-            if (null == pageList || CollectionUtils.isEmpty(pageList.getEntities()) || null != dto.getQueryType()) {
+            if (null == pageList || CollectionUtils.isEmpty(pageList.getEntities()) || null == dto.getQueryType()) {
                 return ResponseUtils.returnObjectSuccess(pageList);
             }
 
@@ -140,6 +156,9 @@ public class RewardInfoProvider implements RewardInfoApi {
                 Map<String, UserSimpleVO> userMap = ResponseUtils.getResponseData(userApi.getUserSimple(userIds));
 
                 for (RewardInfoVo info : entities) {
+                    if (null == info) {
+                        continue;
+                    }
                     // 礼物信息
                     GiftInfo giftInfo = giftInfoService.selectByKid(info.getGiftId());
                     if (null != giftInfo) {
@@ -148,10 +167,12 @@ public class RewardInfoProvider implements RewardInfoApi {
                     }
 
                     if (null != userMap) {
-                        if (null == info || null == userMap.get(info.getCreateUserId())) {
-                            continue;
+                        UserSimpleVO userVo = null;
+                        if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())) {
+                            userVo = userMap.get(String.valueOf(info.getToUserId()));
+                        } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())) {
+                            userVo = userMap.get(String.valueOf(info.getCreateUserId()));
                         }
-                        UserSimpleVO userVo = userMap.get(info.getCreateUserId());
                         info.setUser(userVo);
                     }
                 }
@@ -162,10 +183,10 @@ public class RewardInfoProvider implements RewardInfoApi {
                         .getResponseData(resourceApi.getResourcesByIds(resourceIds));
                 if (null != resourceMap) {
                     for (RewardInfoVo info : entities) {
-                        if (null == info || null == resourceMap.get(info.getResourceId())) {
+                        if (null == info) {
                             continue;
                         }
-                        ResourceVo resourceVo = resourceMap.get(info.getResourceId());
+                        ResourceVo resourceVo = resourceMap.get(String.valueOf(info.getResourceId()));
                         info.setResourceVo(resourceVo);
                     }
                 }

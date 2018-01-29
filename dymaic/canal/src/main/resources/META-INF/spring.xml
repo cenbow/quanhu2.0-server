@@ -17,10 +17,10 @@
                    namespace="${job.reg.namespace}" base-sleep-time-milliseconds="1000"
                    max-sleep-time-milliseconds="3000" max-retries="5" />
 
-    <!-- elasticjob simplejob任务-->
-    <job:simple id="demoJob"
+    <!-- 凌晨2点定时执行 -->
+    <job:simple id="diffJob"
                 class="com.yryz.quanhu.dymaic.canal.job.EsSyncDiffJob"
                 disabled="false" overwrite="true" registry-center-ref="regCenter"
-                cron="* 0/3 * * * ? " sharding-total-count="1"
-                sharding-item-parameters="0=A" description="[framework]Demo任务"/>
+                cron="0 0 2 * * ? " sharding-total-count="1"
+                sharding-item-parameters="0=A" description="canal es data diff"/>
 </beans>
