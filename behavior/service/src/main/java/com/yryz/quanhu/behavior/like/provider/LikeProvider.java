@@ -126,8 +126,12 @@ public class LikeProvider implements LikeApi {
             PageList<LikeVO> likeVOS=likeService.queryLikers(likeFrontDTO);
             for(LikeVO likeVO:likeVOS.getEntities()){
                UserSimpleVO userSimpleVO=userApi.getUserSimple(likeVO.getUserId()).getData();
-               likeVO.setUserNickName(userSimpleVO.getUserNickName());
-               likeVO.setUserImg(userSimpleVO.getUserImg());
+               if(null != userSimpleVO){
+                   likeVO.setUserNickName(userSimpleVO.getUserNickName());
+                   likeVO.setUserImg(userSimpleVO.getUserImg());
+               }else{
+                   break;
+               }
             }
             likeVOS.setCount(count);
             return ResponseUtils.returnObjectSuccess(likeVOS);

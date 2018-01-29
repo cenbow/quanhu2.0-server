@@ -5,7 +5,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.openapi.utils.ComponentUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +46,8 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value="services/app")
 public class ComponentController {
+	private static final Logger logger = LoggerFactory.getLogger(ComponentController.class);
+	
 	@Reference(lazy=true,check=false)
 	private AccountApi accountApi;
 	@Reference(lazy=true,check=false)
@@ -84,12 +91,14 @@ public class ComponentController {
 	@UserBehaviorValidation(login=false)
 	@PostMapping(value = "/{version}/component/sendVerifyCodeForSlip")
 	public Response<SmsVerifyCodeVO> sendVerifyCodeForSlip(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
+		logger.info("sendVerifyCodeForSlip request, codeDTO: {}", GsonUtils.parseJson(codeDTO));
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
 		VerifyCodeDTO verifyCodeDTO = new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
 				codeDTO.getVeriCode(), false);
-		AfsCheckRequest afsCheckRequest = WebUtil.getAfsCheckRequest(request);
+
+		AfsCheckRequest afsCheckRequest = ComponentUtils.getAfsCheckRequest(codeDTO);
 		Integer checkSlipResult = ResponseUtils.getResponseData(commonSafeApi.checkSlipCode(verifyCodeDTO, afsCheckRequest));
 		if(CheckSlipCodeReturn.NEED_CODE.getCode() == checkSlipResult){
 			return ResponseUtils.returnApiObjectSuccess(new SmsVerifyCodeVO("1"));

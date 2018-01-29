@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +139,7 @@ public class CommonSafeRedisDao {
 		String rediskey = CommonSafeApi.getImgCodeCount(key, appId);
 		try {
 			RedisTemplate<String, Integer> template = templateBuilder.buildRedisTemplate(Integer.class);
-			template.opsForValue().increment(key, 1);
+			template.opsForValue().increment(rediskey, 1);
 			if(template.getExpire(key) < 0){
 				template.expire(rediskey, configVO.getImgCodeNumLimit()*configVO.getImgCodeExpireTime(),TimeUnit.SECONDS);
 			}
@@ -157,7 +158,7 @@ public class CommonSafeRedisDao {
 		String redisKey = CommonSafeApi.getImgCodeCount(key, appId);
 		try {
 			RedisTemplate<String, Integer> template = templateBuilder.buildRedisTemplate(Integer.class);
-			return template.opsForValue().get(redisKey);
+			return template.opsForValue().get(redisKey) == null ? 0 : template.opsForValue().get(redisKey);
 		} catch (Exception e) {
 			logger.error("[getImgCodeCount]", e);
 			throw new RedisOptException(e);

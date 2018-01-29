@@ -13,6 +13,7 @@ import com.yryz.quanhu.behavior.comment.service.CommentService;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
+import com.yryz.quanhu.behavior.count.api.CountFlagApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
@@ -21,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author:sun
@@ -39,6 +42,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Reference(check = false)
     private UserApi userApi;
+
+    @Reference(check = false)
+    private CountFlagApi countFlagApi;
 
     @Override
     public int accretion(Comment comment) {
@@ -58,18 +64,23 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
         Page<Comment> page = PageHelper.startPage(commentFrontDTO.getCurrentPage().intValue(), commentFrontDTO.getPageSize().intValue());
-        List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
         PageList pageList = new PageList();
+        List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
         pageList.setCurrentPage(commentFrontDTO.getCurrentPage());
         pageList.setPageSize(commentFrontDTO.getPageSize());
-        List<CommentVO> commentVOS_ =null;
-        List<Comment> commentsnew = new ArrayList<Comment>();
+        List<CommentVO> commentVOS_ = null;
+        List<Comment> commentsnew = null;
         for (CommentVO commentVO : commentVOS) {
             CommentFrontDTO commentFrontDTOnew = new CommentFrontDTO();
             commentFrontDTOnew.setTopId(commentVO.getKid());
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
             commentVOS_ = commentDao.queryComments(commentFrontDTOnew);
+            commentsnew = new ArrayList<Comment>();
             int i = 0;
+            Map<String,Object> map=new HashMap<String, Object>();
+            map.put("resourceId",commentVO.getResourceId());
+            map.put("userId",commentVO.getCreateUserId());
+            map.put("moduleEnum",commentVO.getModuleEnum());
             for (CommentVO commentVOsnew : commentVOS_) {
                 i++;
                 Comment comment = new Comment();
@@ -80,8 +91,12 @@ public class CommentServiceImpl implements CommentService {
                 comment.setParentUserId(commentVOsnew.getParentUserId());
                 comment.setModuleEnum(commentVOsnew.getModuleEnum());
                 comment.setTargetUserId(commentVOsnew.getTargetUserId());
-                UserSimpleVO userSimpleVO=this.getUserSimple(commentVOsnew.getTargetUserId());
-                comment.setTargetUserNickName(userSimpleVO.getUserNickName());
+                UserSimpleVO userSimpleVO = this.getUserSimple(commentVOsnew.getTargetUserId());
+                if (null != userSimpleVO) {
+                    comment.setTargetUserNickName(userSimpleVO.getUserNickName());
+                } else {
+                    comment.setTargetUserNickName("");
+                }
                 comment.setDelFlag(commentVOsnew.getDelFlag());
                 comment.setRecommend(commentVOsnew.getRecommend());
                 comment.setCreateUserId(commentVOsnew.getCreateUserId());
@@ -95,19 +110,21 @@ public class CommentServiceImpl implements CommentService {
                 comment.setUserImg(commentVOsnew.getUserImg());
                 comment.setLastUpdateUserId(commentVOsnew.getLastUpdateUserId());
                 comment.setLastUpdateDate(commentVOsnew.getLastUpdateDate());
-                //需要接统计
-                comment.setLikeCount(0);
-                comment.setLikeFlag((byte) 0);
                 commentsnew.add(comment);
                 if (i >= 3) {
                     break;
                 }
             }
             //需要接统计
-            commentVO.setLikeCount(0);
-            commentVO.setLikeFlag((byte) 0);
-
-            commentVO.setCommentCount(commentsnew.size());
+            Map<String,Long> maps=null;
+            try{
+                maps= countFlagApi.getAllCountFlag("11",commentVO.getResourceId(),"",map).getData();
+            }catch (Exception e){
+                logger.info("调用统计信息失败:" + e);
+            }
+            commentVO.setLikeCount(maps.get("likeCount").intValue());
+            commentVO.setLikeFlag(maps.get("likeFlag").byteValue());
+            commentVO.setCommentCount(commentVOS_.size());
             commentVO.setChildrenComments(commentsnew);
         }
         pageList.setCount(Long.valueOf(commentVOS.size()));
@@ -148,8 +165,8 @@ public class CommentServiceImpl implements CommentService {
         pageList.setCurrentPage(commentSubDTO.getCurrentPage());
         pageList.setPageSize(commentSubDTO.getPageSize());
         List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
-        for(CommentVO commentVO:commentVOS){
-            UserSimpleVO userSimpleVO=this.getUserSimple(commentVO.getTargetUserId());
+        for (CommentVO commentVO : commentVOS) {
+            UserSimpleVO userSimpleVO = this.getUserSimple(commentVO.getTargetUserId());
             commentVO.setTargetUserNickName(userSimpleVO.getUserNickName());
         }
         pageList.setEntities(commentVOS);
