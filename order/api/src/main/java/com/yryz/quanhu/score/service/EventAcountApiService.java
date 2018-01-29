@@ -1,6 +1,7 @@
 package com.yryz.quanhu.score.service;
 
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.score.entity.ScoreFlow;
@@ -37,7 +38,7 @@ public interface EventAcountApiService {
 	 * @return
 	 */
 	
-	PageList<ScoreFlow> getScoreFlow(ScoreFlowQuery sfq);
+	Response<PageList<ScoreFlow>> getScoreFlow(ScoreFlowQuery sfq);
 	/**
 	 * 获取成长明细
 	 * @param gfq
@@ -45,5 +46,5 @@ public interface EventAcountApiService {
 	 * @param pageSize  条数
 	 * @return
 	 */
-	PageList<GrowFlow> getGrowFlow(GrowFlowQuery gfq );
+	Response<PageList<GrowFlow>> getGrowFlow(GrowFlowQuery gfq );
 }

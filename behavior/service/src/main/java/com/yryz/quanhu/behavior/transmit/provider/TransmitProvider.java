@@ -12,6 +12,7 @@ import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 @Service(interfaceClass=TransmitApi.class)
 public class TransmitProvider implements TransmitApi {
@@ -27,6 +28,10 @@ public class TransmitProvider implements TransmitApi {
      * */
     public Response single(TransmitInfo transmitInfo) {
         try {
+            Assert.notNull(transmitInfo.getModuleEnum(), "moduleEnum不能为空");
+            Assert.notNull(transmitInfo.getParentId(), "parentId不能为空");
+            Assert.notNull(transmitInfo.getResourceId(), "resourceId不能为空");
+            Assert.notNull(transmitInfo.getTargetUserId(), "targetUserId不能为空");
             transmitService.single(transmitInfo);
             return ResponseUtils.returnSuccess();
         } catch (Exception e) {
@@ -42,6 +47,8 @@ public class TransmitProvider implements TransmitApi {
      * */
     public Response<PageList<TransmitInfoVo>> list(TransmitInfoDto transmitInfoDto) {
         try {
+            Assert.notNull(transmitInfoDto.getModuleEnum(), "moduleEnum不能为空");
+            Assert.notNull(transmitInfoDto.getParentId(), "parentId不能为空");
             return ResponseUtils.returnObjectSuccess(transmitService.list(transmitInfoDto));
         } catch (Exception e) {
             logger.error("转发列表 失败", e);
