@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -48,6 +49,7 @@ public class RewardController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "record", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "资源打赏", login = true)
     @PostMapping(value = "{version}/reward")
     public Response<Map<String, Object>> reward(@RequestBody RewardInfo record,
             @RequestHeader("userId") Long headerUserId) {
@@ -61,6 +63,7 @@ public class RewardController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "打赏列表", login = true)
     @GetMapping(value = "{version}/reward/list")
     public Response<PageList<RewardInfoVo>> list(RewardInfoDto dto, @RequestHeader("userId") Long headerUserId) {
 
@@ -79,6 +82,7 @@ public class RewardController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "我打赏/收到打赏 金额", login = true)
     @GetMapping(value = "{version}/reward/amount")
     public Response<RewardCount> amountCount(@RequestHeader("userId") Long headerUserId) {
         RewardCount rewardCount = ResponseUtils.getResponseData(rewardCountApi.selectByTargetId(headerUserId));

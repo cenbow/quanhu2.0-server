@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoApi;
@@ -44,6 +45,7 @@ public class CoterieReleaseInfoController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "record", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "私圈文章发布", login = true, mute = true)
     @PostMapping(value = "{version}/coterie/release/info/single")
     public Response<ReleaseInfo> release(@RequestBody ReleaseInfo record, @RequestHeader("userId") Long headerUserId) {
 
@@ -56,9 +58,10 @@ public class CoterieReleaseInfoController {
     @ApiOperation("文章详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = false) })
     @GetMapping(value = "{version}/coterie/release/info/detail")
-    public Response<CoterieReleaseInfoVo> infoByKid(Long kid, @RequestHeader("userId") Long headerUserId) {
+    public Response<CoterieReleaseInfoVo> infoByKid(Long kid,
+            @RequestHeader(name = "userId", required = false) Long headerUserId) {
         return coterieReleaseInfoApi.infoByKid(kid, headerUserId);
     }
 
@@ -66,6 +69,7 @@ public class CoterieReleaseInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "私圈文章删除", login = true, mute = true)
     @PostMapping(value = "{version}/coterie/release/info/delete")
     public Response<Integer> deleteBykid(Long kid, @RequestHeader("userId") Long headerUserId) {
         ReleaseInfo upInfo = new ReleaseInfo();
@@ -80,6 +84,7 @@ public class CoterieReleaseInfoController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
             @ApiImplicitParam(name = "kid", paramType = "query", required = true) })
+    @UserBehaviorValidation(event = "付费阅读-订单创建", login = true)
     @PostMapping(value = "{version}/coterie/release/info/order")
     public Response<Map<String, Object>> createOrder(Long kid, @RequestHeader("userId") Long headerUserId) {
 

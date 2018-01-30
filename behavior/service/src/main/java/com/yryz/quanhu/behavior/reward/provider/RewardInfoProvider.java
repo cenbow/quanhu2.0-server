@@ -186,6 +186,13 @@ public class RewardInfoProvider implements RewardInfoApi {
                         if (null == info) {
                             continue;
                         }
+                        // 礼物信息
+                        GiftInfo giftInfo = giftInfoService.selectByKid(info.getGiftId());
+                        if (null != giftInfo) {
+                            info.setGiftImage(giftInfo.getGiftImage());
+                            info.setGiftName(giftInfo.getGiftName());
+                        }
+
                         ResourceVo resourceVo = resourceMap.get(String.valueOf(info.getResourceId()));
                         info.setResourceVo(resourceVo);
                     }

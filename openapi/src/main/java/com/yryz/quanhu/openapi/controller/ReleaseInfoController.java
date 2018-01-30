@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -40,6 +41,7 @@ public class ReleaseInfoController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "record", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "文章发布", login = true, mute = true)
     @PostMapping(value = "{version}/release/info/single")
     public Response<ReleaseInfo> release(@RequestBody ReleaseInfo record, @RequestHeader("userId") Long headerUserId) {
 
@@ -52,9 +54,10 @@ public class ReleaseInfoController {
     @ApiOperation("文章详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = false) })
     @GetMapping(value = "{version}/release/info/detail")
-    public Response<ReleaseInfoVo> infoByKid(Long kid, @RequestHeader("userId") Long headerUserId) {
+    public Response<ReleaseInfoVo> infoByKid(Long kid,
+            @RequestHeader(name = "userId", required = false) Long headerUserId) {
         return releaseInfoApi.infoByKid(kid, headerUserId);
     }
 
@@ -62,6 +65,7 @@ public class ReleaseInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "文章删除", login = true)
     @PostMapping(value = "{version}/release/info/delete")
     public Response<Integer> deleteBykid(Long kid, @RequestHeader("userId") Long headerUserId) {
         ReleaseInfo upInfo = new ReleaseInfo();
@@ -75,6 +79,7 @@ public class ReleaseInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "文章列表", login = true)
     @GetMapping(value = "{version}/release/info/list")
     public Response<PageList<ReleaseInfoVo>> list(ReleaseInfoDto dto, @RequestHeader("userId") Long headerUserId) {
         return releaseInfoApi.pageByCondition(dto, headerUserId, false, true);
