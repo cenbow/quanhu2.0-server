@@ -13,9 +13,9 @@ public class FeeDetail {
     private String custId;
 
     /**
-     * 分费比例(%)
+     * 分费占比
      */
-    private double fee;
+    private Long fee;
 
     /**
      * 账户规则，0消费减费，1消费加费，2积分减费，3积分加费
@@ -27,7 +27,7 @@ public class FeeDetail {
      */
     private String feeDesc;
 
-    public FeeDetail(String custId, double fee, int type, String feeDesc) {
+    public FeeDetail(String custId, Long fee, int type, String feeDesc) {
         super();
         this.custId = custId;
         this.fee = fee;
@@ -43,11 +43,11 @@ public class FeeDetail {
         this.custId = custId;
     }
 
-    public double getFee() {
+    public Long getFee() {
         return fee;
     }
 
-    public void setFee(double fee) {
+    public void setFee(Long fee) {
         this.fee = fee;
     }
 
