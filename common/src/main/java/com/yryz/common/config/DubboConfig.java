@@ -7,6 +7,7 @@
  */
 package com.yryz.common.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import com.alibaba.dubbo.config.ConsumerConfig;
  * @Description dubbo配置中心的配置项
  */
 @Configuration
+@ConditionalOnClass({ ConsumerConfig.class})
 public class DubboConfig {
 	
     @Bean

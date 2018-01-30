@@ -50,11 +50,11 @@ public class EventAPIImpl implements EventAPI {
 
 	    
 	@Override
-	public   Response<List<EventReportVo>> getScoreFlowList(EventInfo log) {
+	public   Response<EventReportVo> getScoreFlowList(EventInfo log) {
 		logger.info("Response<List<EventReportVo>> getScoreFlowList: " + log );
 	try {
-		List<EventReportVo> list = eventService.getScoreFlowList(log);
-		return ResponseUtils.returnListSuccess(list);
+		EventReportVo list = eventService.getScoreFlowList(log);
+		return ResponseUtils.returnObjectSuccess(list);
 	    }  catch (ServiceException e) {
 		 return ResponseUtils.returnException(e);
 	    } catch (Exception e) {

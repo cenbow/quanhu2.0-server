@@ -44,4 +44,15 @@ public class AnswerController {
     }
 
 
+    @ApiOperation("查询回答详情")
+    @ApiImplicitParams(
+            {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+                    @ApiImplicitParam(name = "userId", paramType = "header", required = true)
+            })
+    @PostMapping(value = "/services/app/{version}/coterie/answer/single")
+    public Response<AnswerVo> saveAnswer(Long kid, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        return answerApi.getDetail(kid);
+    }
+
 }

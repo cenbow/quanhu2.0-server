@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.topic.entity;
 
-public class TopicPostWithBLOBs extends TopicPost {
+import java.io.Serializable;
+
+public class TopicPostWithBLOBs extends TopicPost implements Serializable {
     private String content;
 
     private String contentSource;

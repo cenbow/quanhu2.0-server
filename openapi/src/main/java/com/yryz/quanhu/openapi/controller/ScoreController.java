@@ -87,7 +87,7 @@ public class ScoreController {
     @ApiOperation("积分统计查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/score/getScoreFlowList")
-	public Response<List<EventReportVo>> getScoreFlowList(EventInfo event){
+	public Response<EventReportVo> getScoreFlowList(EventInfo event){
 		return eventAPI.getScoreFlowList(event);
 	}
 

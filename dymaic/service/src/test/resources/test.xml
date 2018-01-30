@@ -21,5 +21,8 @@
 		interface="com.yryz.quanhu.dymaic.service.DymaicService"
 					 check="false" />
 
+	<dubbo:reference id="elasticsearchService"
+					 interface="com.yryz.quanhu.dymaic.service.ElasticsearchService"
+					 check="false" url="dubbo://127.0.0.1:20880" />
 	
 </beans>

@@ -1,11 +1,12 @@
 package com.yryz.quanhu.dymaic.service;
 
-import java.util.List;
-
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
 import com.yryz.quanhu.dymaic.vo.CoterieInfoVo;
 import com.yryz.quanhu.dymaic.vo.ResourceInfoVo;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
+import com.yryz.quanhu.user.vo.StarInfoVO;
 
 public interface ElasticsearchService {
 	/**
@@ -17,6 +18,12 @@ public interface ElasticsearchService {
 	 */
 	PageList<UserSimpleVo> searchUser(String keyWord,Integer page,Integer size);
 	
+	/**
+     * 按标签搜索(达人)用户接口
+     *
+     */
+    Response<PageList<StarInfoVO>> searchStarUser(StarInfoDTO starInfoDTO);
+    
 	/**
 	 * 搜索话题帖子信息
 	 * @param keyWord
@@ -43,4 +50,22 @@ public interface ElasticsearchService {
 	 * @return
 	 */
 	PageList<CoterieInfoVo> searchCoterieInfo(String keyWord,Integer page,Integer size);
+	
+	/**
+	 * 全量重建用户es index
+	 * 不能随便调用
+	 */
+	void rebuildUserInfo();
+	
+	/**
+	 * 全量重建私圈es index
+	 * 不能随便调用
+	 */
+	void rebuildCoterieInfo();
+	
+	/**
+	 * 全量重建资源es index
+	 * 不能随便调用
+	 */
+	void rebuildResourceInfo();
 }

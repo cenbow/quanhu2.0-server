@@ -55,7 +55,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     ActivityRecordDao activityRecordDao;
     @Reference(check=false)
     private IdAPI idApi;
-    @Reference(check=false)
+    @Autowired
     OrderSDK orderSDK;
     @Reference(check=false)
     ScoreAPI scoreAPI;
@@ -131,7 +131,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         if (CollectionUtils.isEmpty(activityRecordList)) {
             status = ActivityConstant.ACTIVITY_ENROL_STATUS_TAKE_JOIN;
         } else {
-            status = ActivityConstant.ACTIVITY_ENROL_STATUS_ALREADY_JOIN;
+            return ActivityConstant.ACTIVITY_ENROL_STATUS_ALREADY_JOIN;
         }
         if (status == ActivityConstant.ACTIVITY_ENROL_STATUS_ALREADY_JOIN || SignUpType != ActivityConstant.ACTIVITY_ENROL_TYPE_MONEY) {
             return status;
@@ -139,7 +139,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         //TODO 查询订单状态
         boolean success = false;
         try {
-            success = orderSDK.isBuyOrderSuccess(ModuleContants.ACTIVITY_ENUM, Long.valueOf(custId),activityRecordList.get(0).getKid());
+            success = orderSDK.isBuyOrderSuccess(ModuleContants.ACTIVITY_ENUM, Long.valueOf(custId),activityKid);
         } catch (Exception e) {
             logger.error("查询订单异常:",e);
             status = ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;

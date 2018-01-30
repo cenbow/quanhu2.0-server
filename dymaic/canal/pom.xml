@@ -46,7 +46,7 @@
             <artifactId>resource-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
-        
+
     	<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -92,7 +92,6 @@
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
             <version>3.4.7</version>
-            <!-- 与springboot包冲突 -->
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -118,11 +117,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-configuration-processor</artifactId>
-        	<optional>true</optional>
         </dependency>
         <dependency>
         	<groupId>org.springframework.boot</groupId>

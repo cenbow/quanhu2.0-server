@@ -248,7 +248,9 @@ public class CoterieAdminProvider implements CoterieAdminAPI {
 			param.setPageSize(10);
 		}
 		try{
-			List<CoterieMemberInfo> list=coterieMemberService.find(param);
+//			List<CoterieMemberInfo> list=coterieMemberService.find(param);
+			//todo  暂未提供
+			List<CoterieMemberInfo> list=null;
 			Set<String> custIdSet=Sets.newHashSet();
 			for (int i = 0; i < list.size(); i++) {
 				custIdSet.add(list.get(i).getCustId());
@@ -290,7 +292,9 @@ public class CoterieAdminProvider implements CoterieAdminAPI {
 			param.setPageSize(10);
 		}
 		try{
-			return ResponseUtils.returnObjectSuccess(coterieMemberService.findCount(param));
+			//todo  暂未提供
+//			return ResponseUtils.returnObjectSuccess(coterieMemberService.findCount(param));
+			return null;
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(),e);
 			throw ServiceException.sysError();
