@@ -274,7 +274,7 @@
                 notice_status in (0,1)
             </if>
             <if test="keyword != null and keyword != ''">
-                AND (tilte LIKE concat('%',trim(#{keyword},'%')) or notice_desc LIKE concat('%',trim(#{keyword},'%')))
+                AND (title LIKE concat('%',trim(#{keyword}),'%') or notice_desc LIKE concat('%',trim(#{keyword}),'%'))
             </if>
             <if test="startDate != null and startDate != ''">
                 <![CDATA[ AND create_date >= #{startDate} ]]>

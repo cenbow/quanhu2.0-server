@@ -5,6 +5,7 @@ import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.im.api.ImAPI;
 import com.yryz.quanhu.message.im.entity.BlackAndMuteListVo;
 import com.yryz.quanhu.message.im.entity.ImRelation;
+import com.yryz.quanhu.message.im.entity.ImUser;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 import org.assertj.core.util.Lists;
@@ -30,10 +31,20 @@ public class ImTest {
     ImAPI imAPI;
 
     @Test
+    public void addTest() {
+        ImUser user = new ImUser();
+        user.setUserId("724011759597371393");
+        user.setIconUrl("fefef");
+        user.setNick("fefef");
+        Response<Boolean> response = imAPI.addUser(user);
+        System.out.println("addTest: "+ response);
+    }
+
+    @Test
     public void setSpecialRelationTest() {
         ImRelation imRelation = new ImRelation();
-        imRelation.setUserId("626942183000989696");
-        imRelation.setTargetUserId("626942183ifjeofjeo");
+        imRelation.setUserId("724011759597371392");
+        imRelation.setTargetUserId("724011759597371393");
         imRelation.setRelationType("1");
         imRelation.setRelationValue("1");
         Response<Boolean> response = imAPI.setSpecialRelation(imRelation);
@@ -43,7 +54,7 @@ public class ImTest {
     @Test
     public void blackAndMuteListTest() {
         ImRelation imRelation = new ImRelation();
-        imRelation.setUserId("626942183000989696");
+        imRelation.setUserId("724011759597371392");
         Response<BlackAndMuteListVo> blackAndMuteList = imAPI.listBlackAndMuteList(imRelation);
         System.out.println("blackAndMuteList: " + JSON.toJSONString(blackAndMuteList));
     }
