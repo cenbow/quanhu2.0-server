@@ -120,7 +120,8 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+            parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
         insert into qh_topic_post (id, kid, topic_id,
         video_url, video_thumbnail_url, audio_url,
         shelve_flag, del_flag, sort,
@@ -136,7 +137,8 @@
         #{gps,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, #{contentSource,jdbcType=LONGVARCHAR},
         #{imgUrl,jdbcType=LONGVARCHAR}, #{imgThumbnailUrl,jdbcType=LONGVARCHAR}, #{coterieId,jdbcType=BIGINT})
     </insert>
-    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+            parameterType="com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs">
         insert into qh_topic_post
         <trim prefix="(" suffix=")" suffixOverrides=",">
             id,
@@ -379,24 +381,31 @@
       gps = #{gps,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  
-  <select id="selectKidByCreatedate" resultType="java.lang.Long">
+
+    <update id="deleteByTipocId" parameterType="com.yryz.quanhu.resource.topic.entity.TopicPost">
+    update qh_topic_post
+    set
+      del_flag = #{delFlag,jdbcType=TINYINT}
+    where topic_id = #{topicId,jdbcType=BIGINT}
+  </update>
+
+    <select id="selectKidByCreatedate" resultType="java.lang.Long">
     select 
     kid 
     from qh_topic_post 
     where create_date between #{startDate} and #{endDate}
   </select>
-  
-  <select id="selectByKids" resultMap="ResultMapWithBLOBs">
-    select 
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from qh_topic_post
-    where kid in 
-    <foreach item="item" index="index" collection="kidList" open="("
-			separator="," close=")">
-			#{item}
-	</foreach>
-  </select>
+
+    <select id="selectByKids" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from qh_topic_post
+        where kid in
+        <foreach item="item" index="index" collection="kidList" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
