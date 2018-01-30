@@ -46,11 +46,13 @@ public class UserInfoSearchImpl implements UserInfoSearch {
     @Override
     public List<UserInfo> searchStarUser(Long tagId, Long userId, Integer pageNo, Integer pageSize) {
         QueryBuilder queryTagId = QueryBuilders.termQuery("userTagInfo.userTagInfoList.tagId", tagId);
-        QueryBuilder queryUserRole = QueryBuilders.termQuery("userBaseInfo.userRole", 10);
+        QueryBuilder queryUserRole = QueryBuilders.termQuery("userBaseInfo.userRole", 11);
         SearchQuery query = null;
 
         //分页信息
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Direction.DESC, "userBaseInfo.lastHeat"));
+        Pageable pageable = PageRequest.of(pageNo, pageSize,
+                Sort.by(Direction.DESC,
+                        "userStarInfo.recommendHeight", "userStarInfo.recommendTime", "userBaseInfo.lastHeat"));
         if (userId != null) {
             //当前用户
             QueryBuilder queryMyself = QueryBuilders.termQuery("userId", userId.toString());
