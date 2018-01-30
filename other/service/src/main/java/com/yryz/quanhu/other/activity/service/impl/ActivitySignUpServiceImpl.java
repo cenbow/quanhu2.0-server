@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.Response;
 import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
@@ -24,6 +26,7 @@ import com.yryz.quanhu.other.activity.vo.ActivitySignUpHomeAppVo;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.support.illegalWord.api.IllegalWordsApi;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.slf4j.Logger;
@@ -57,6 +60,8 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     OrderSDK orderSDK;
     @Reference(check=false)
     ScoreAPI scoreAPI;
+    @Reference(check = false)
+    private IllegalWordsApi illegalWordsApi;
 
     @Override
     public ActivitySignUpHomeAppVo getActivitySignUpHome(Long activityInfoId, String custId) {
@@ -274,17 +279,16 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     }
 
     public String replaceIllagelWordsEnrolSources(String text) {
-        /*@SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked")
         List<Map<String,String>> voMap = JsonUtils.fromJson(text, List.class);
         try {
             for(Map<String,String> map :voMap){
-                map.put("value", illegalWordsService.replaceIllagelWords(map.get("value")));
+                Response<String> rpc = illegalWordsApi.replaceIllegalWords(map.get("value"),"*");
+                map.put("value", rpc.getData());
             }
         } catch (Exception e) {
             logger.error("调用RPC服务出错");
         }
-        return JSON.toJSONString(voMap);*/
-        //TODO 敏感词替换
-        return text;
+        return JSON.toJSONString(voMap);
     }
 }

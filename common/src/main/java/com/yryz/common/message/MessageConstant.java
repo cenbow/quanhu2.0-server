@@ -124,6 +124,11 @@ public enum MessageConstant {
     JOIN_COTERIE_REWARD(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "私圈奖励", "{name}加入您的私圈，您获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
+     *在第三方绑定手机号获得奖励券
+     */
+    PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE,MessageLabel.SYSTEM_NOTICE,"投票活动奖励","您已通过活动获得{count1} {count2}张",MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
+
+    /**
      * 付费参加活动
      */
     ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT) ;

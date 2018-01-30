@@ -21,6 +21,7 @@ import com.yryz.quanhu.other.activity.service.ActivityCandidateService;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
+import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -72,6 +73,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
+    @Reference(check = false, timeout = 30000)
+    ScoreAPI scoreAPI;
+
     /**
      * 增加参与者
      * @param activityVoteDto
@@ -116,10 +120,6 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         voteDetail.setShelveFlag(10);
         //保存参与信息
         activityVoteDetailDao.insertByPrimaryKeySelective(voteDetail);
-        //TODO:调用平台获得积分
-        if(activityVoteInfoVo.getAmount() != 0) {
-
-        }
         //递增参与人数
         stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityVoteDto.getActivityInfoId()),
                 "joinCount",
@@ -128,7 +128,14 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         stringRedisTemplate.delete(ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId()));
         //删除排行榜
         stringRedisTemplate.delete(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()));
-
+        //设置平台积分
+        if(activityVoteInfoVo.getAmount() != 0) {
+            try {
+                scoreAPI.addScore(activityVoteDto.getCreateUserId().toString(), activityVoteInfoVo.getAmount(), "37");
+            } catch (Exception e) {
+                logger.error("增加平台积分 失败", e);
+            }
+        }
         //增加首页列表
 //        String keyId = ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId());
 //        if(!stringRedisTemplate.hasKey(keyId)) {
@@ -196,6 +203,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     }
                 }
             }
+            //设置用户信息
             this.setUserInfo(list);
         }
 
