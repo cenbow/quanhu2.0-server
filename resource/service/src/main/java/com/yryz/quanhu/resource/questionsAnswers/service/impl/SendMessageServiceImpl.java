@@ -44,7 +44,7 @@ public class SendMessageServiceImpl implements SendMessageService {
      * @return
      */
     @Override
-    public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant) {
+    public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant,Boolean persistent) {
         Long kid=messageBusinessVo.getKid();
         Long tosendUserId=messageBusinessVo.getTosendUserId();
         long fromUserId=messageBusinessVo.getFromUserId();
@@ -128,7 +128,7 @@ public class SendMessageServiceImpl implements SendMessageService {
         messageVo.setViewCode(messageConstant.getMessageViewCode());
         messageVo.setBody(interactiveBody);
         messageVo.setModuleEnum(moduleEnum);
-        Response<Boolean> data = messageAPI.sendMessage(messageVo, true);
+        Response<Boolean> data = messageAPI.sendMessage(messageVo, persistent);
         if (ResponseConstant.SUCCESS.getCode().equals(data.getCode())) {
             return data.getData();
         }

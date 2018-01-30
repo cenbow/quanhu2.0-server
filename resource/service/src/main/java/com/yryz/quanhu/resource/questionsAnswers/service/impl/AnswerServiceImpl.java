@@ -1,11 +1,17 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
@@ -20,6 +26,10 @@ import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
+import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +51,10 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Autowired
     OrderSDK orderSDK;
+
+
+    @Reference
+    private ResourceDymaicApi resourceDymaicApi;
 
 
     @Autowired
@@ -91,9 +105,6 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
 
-
-
-
         //向圈主支付回答的费用
         if(null!=questionCheck.getChargeAmount()){
             if(questionCheck.getChargeAmount().longValue()>0){
@@ -114,7 +125,7 @@ public class AnswerServiceImpl implements AnswerService {
                   messageBusinessVo.setTosendUserId(answerWithBLOBs.getCreateUserId());
                   messageBusinessVo.setTitle(answerWithBLOBs.getContent());
                   messageBusinessVo.setAmount(questionCheck.getChargeAmount());
-                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED);
+                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED,true);
               }
             }
         }
@@ -130,7 +141,33 @@ public class AnswerServiceImpl implements AnswerService {
         messageBusinessVo.setTosendUserId(questionCheck.getCreateUserId());
         messageBusinessVo.setTitle(answerWithBLOBs.getContent());
         messageBusinessVo.setAmount(questionCheck.getChargeAmount());
-        questionMessageService.sendNotify4Question(messageBusinessVo,MessageConstant.QUESTION_HAVE_ANSWERED);
+        questionMessageService.sendNotify4Question(messageBusinessVo,MessageConstant.QUESTION_HAVE_ANSWERED,true);
+
+        /**
+         * 资源聚合
+         */
+        ResourceTotal resourceTotal=new ResourceTotal();
+        resourceTotal.setCreateDate(DateUtils.getDate());
+        QuestionAnswerVo questionAnswerVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
+        if(questionAnswerVo!=null) {
+            resourceTotal.setExtJson(JSON.toJSONString(questionAnswerVo));
+        }
+        resourceTotal.setResourceId(questionCheck.getKid());
+        resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
+        resourceTotal.setUserId(questionCheck.getCreateUserId());
+        resourceDymaicApi.commitResourceDymaic(resourceTotal);
+
+
+        ResourceTotal resourceTotalCoterie=new ResourceTotal();
+        resourceTotalCoterie.setCreateDate(DateUtils.getDate());
+        CoterieInfo coterieInfo=this.apIservice.getCoterieinfo(questionCheck.getCoterieId());
+        if(null!=coterieInfo) {
+            resourceTotalCoterie.setExtJson(JSON.toJSONString(coterieInfo));
+            resourceTotalCoterie.setResourceId(coterieInfo.getCoterieId());
+            resourceTotalCoterie.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
+            resourceTotalCoterie.setUserId(Long.valueOf(coterieInfo.getOwnerId()));
+            resourceDymaicApi.commitResourceDymaic(resourceTotal);
+        }
         return answerVo;
     }
 

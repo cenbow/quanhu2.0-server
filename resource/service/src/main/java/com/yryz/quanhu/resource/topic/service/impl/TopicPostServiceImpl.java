@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
@@ -118,7 +119,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         messageBusinessVo.setKid(topicPost.getKid());
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setCoterieId(null);
-        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST);
+        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST,true);
 
         /**
          * 资源聚合
@@ -127,10 +128,12 @@ public class TopicPostServiceImpl implements TopicPostService {
         resourceTotal.setCreateDate(DateUtils.getDate());
         TopicPostWithBLOBs post=this.topicPostDao.selectByPrimaryKey(topicPost.getKid());
         TopicPostVo topicPostVo=new TopicPostVo();
-        BeanUtils.copyProperties(post,topicPostVo);
-        resourceTotal.setExtJson(JSON.toJSONString(topicPostVo));
+        if(post!=null) {
+            BeanUtils.copyProperties(post, topicPostVo);
+            resourceTotal.setExtJson(JSON.toJSONString(topicPostVo));
+        }
         resourceTotal.setResourceId(post.getKid());
-        resourceTotal.setModuleEnum(Integer.valueOf(ResourceTypeEnum.POSTS));
+        resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC_POST));
         resourceTotal.setUserId(topicPost.getCreateUserId());
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
         return result;

@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
@@ -20,6 +21,7 @@ import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
@@ -34,7 +36,10 @@ import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
+import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
@@ -80,6 +85,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Reference
     private EventAPI eventAPI;
+
+    @Reference
+    private ResourceDymaicApi resourceDymaicApi;
 
 
     @Autowired
@@ -178,10 +186,26 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setTosendUserId(Long.valueOf(question.getTargetId()));
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setImgUrl("");
-        Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_ANSWERED);
+        Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_ANSWERED,true);
         if (!sendResult) {
             logger.info("提问被删除，发送消息失败");
         }
+
+        /**
+         * 资源聚合
+         */
+        ResourceTotal resourceTotal=new ResourceTotal();
+        resourceTotal.setCreateDate(DateUtils.getDate());
+        Question questionQuery=this.questionDao.selectByPrimaryKey(question.getKid());
+        QuestionVo vo=new QuestionVo();
+        if(questionQuery!=null) {
+            BeanUtils.copyProperties(questionQuery, vo);
+            resourceTotal.setExtJson(JSON.toJSONString(vo));
+        }
+        resourceTotal.setResourceId(question.getKid());
+        resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
+        resourceTotal.setUserId(questionQuery.getCreateUserId());
+        resourceDymaicApi.commitResourceDymaic(resourceTotal);
         return question;
     }
 
@@ -236,7 +260,7 @@ public class QuestionServiceImpl implements QuestionService {
                 messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
                 messageBusinessVo.setTitle(questionBySearch.getContent());
                 messageBusinessVo.setImgUrl("");
-                Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE);
+                Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE,true);
                 if (!sendResult) {
                     logger.info("提问被删除，发送消息失败");
                 }
@@ -354,7 +378,19 @@ public class QuestionServiceImpl implements QuestionService {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
             }
         }
-        return this.questionDao.updateByPrimaryKeySelective(question);
+
+        MessageBusinessVo messageBusinessVo =new MessageBusinessVo();
+        messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+        messageBusinessVo.setIsAnonymity(null);
+        messageBusinessVo.setKid(question.getKid());
+        messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+        messageBusinessVo.setFromUserId(question.getCreateUserId());
+        messageBusinessVo.setTitle(question.getContent());
+        messageBusinessVo.setTosendUserId(question.getCreateUserId());
+        messageBusinessVo.setAmount(question.getChargeAmount());
+        questionMessageService.sendNotify4Question(messageBusinessVo,MessageConstant.QUESTION_TO_BE_REJECT,false);
+        int result= this.questionDao.updateByPrimaryKeySelective(question);
+        return result;
     }
 
     /**
@@ -533,7 +569,7 @@ public class QuestionServiceImpl implements QuestionService {
             messageBusinessVo.setTosendUserId(question.getCreateUserId());
             messageBusinessVo.setTitle(question.getContent());
             messageBusinessVo.setImgUrl("");
-            Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID);
+            Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID,true);
             if (!sendMessageResult) {
                 logger.error("失效问题发送问题失败,提问的kid{}", question.getKid());
             }
