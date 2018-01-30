@@ -135,12 +135,12 @@ public class EventServiceImpl implements EventService {
 			logger.info("-----------分发事件至成长队列---------,传入数据："+ bodys.toString());
 		}
 
-//		if (typeCodes.contains(EventTypeEnum.Hot.getTypeCode())) {
+		if (typeCodes.contains(EventTypeEnum.Hot.getTypeCode())) {
 			rabbitTemplate.setExchange(AmqpConstant.EVENT_DIRECT_EXCHANGE);
 			rabbitTemplate.setRoutingKey(AmqpConstant.HOT_SPOT_QUEUE);
 			rabbitTemplate.convertAndSend(bodys);
 			logger.info("-----------分发事件至热度队列---------,传入数据："+ bodys.toString());
-//		}
+		}
 //		mqSender.sendEvent(EventExchangeEnum.Fanout, null, bodys);
 //		logger.info("-----------分发事件至统计分发队列---------,传入数据："+ bodys.toString());
 	}
