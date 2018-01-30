@@ -65,6 +65,12 @@
             <scope>provided</scope>
         </dependency>
 
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>coterie-api</artifactId>
+			<version>${quanhu.version}</version>
+		</dependency>
+
 		<!--公司内部库 -->
 		<dependency>
 			<groupId>com.yryz.framework</groupId>

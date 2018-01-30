@@ -130,13 +130,13 @@ public class EventManager {
 		if (oldUserInfo != null && StringUtils.isNotBlank(oldUserInfo.getUserDesc())
 				&& StringUtils.isNotBlank(oldUserInfo.getUserImg())
 				&& StringUtils.isNotBlank(oldUserInfo.getUserLocation())
-				&& StringUtils.isNotBlank(oldUserInfo.getUserNickName()) && oldUserInfo.getUserGenders() == null) {
+				&& StringUtils.isNotBlank(oldUserInfo.getUserNickName()) && oldUserInfo.getUserGenders() != null) {
 			return;
 		}
 		// 资料刚刚完善
 		if (StringUtils.isNotBlank(newUserInfo.getUserDesc()) && StringUtils.isNotBlank(newUserInfo.getUserImg())
 				&& StringUtils.isNotBlank(newUserInfo.getUserLocation())
-				&& StringUtils.isNotBlank(newUserInfo.getUserNickName()) && newUserInfo.getUserGenders() == null) {
+				&& StringUtils.isNotBlank(newUserInfo.getUserNickName()) && newUserInfo.getUserGenders() != null) {
 
 		} else {
 			return;

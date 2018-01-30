@@ -1,11 +1,13 @@
 package com.yryz.quanhu.behavior.transmit.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.transmit.dao.TransmitMongoDao;
@@ -13,6 +15,8 @@ import com.yryz.quanhu.behavior.transmit.dto.TransmitInfoDto;
 import com.yryz.quanhu.behavior.transmit.entity.TransmitInfo;
 import com.yryz.quanhu.behavior.transmit.service.TransmitService;
 import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
@@ -39,39 +43,56 @@ public class TransmitServiceImpl implements TransmitService {
 
     private static final Logger logger = LoggerFactory.getLogger(TransmitServiceImpl.class);
 
-    @Reference
+    @Reference(check = false, timeout = 30000)
     IdAPI idAPI;
 
     @Autowired
     TransmitMongoDao transmitMongoDao;
 
-    @Reference
+    @Reference(check = false, timeout = 30000)
     CountApi countApi;
 
-    @Reference
+    @Reference(check = false, timeout = 30000)
     ResourceApi resourceApi;
 
-    @Reference
+    @Reference(check = false, timeout = 30000)
     ResourceDymaicApi resourceDymaicApi;
 
-    @Reference
+    @Reference(check = false, timeout = 30000)
     UserApi userApi;
+
+    @Reference(check = false, timeout = 30000)
+    CoterieApi coterieApi;
 
     /**
      * 转发
      * @param   transmitInfo
      * */
     public void single(TransmitInfo transmitInfo) {
-        Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
-        if(!result.success()) {
-            throw new QuanhuException(ExceptionEnum.SysException);
-        }
-        ResourceVo resourceVo = result.getData();
-        if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
-            throw QuanhuException.busiError("资源不存在或者已删除");
+        String extJson = "";
+        if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
+            Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
+            if(!coterieInfoResponse.success()) {
+                throw new QuanhuException(ExceptionEnum.SysException);
+            }
+            CoterieInfo coterieInfo = coterieInfoResponse.getData();
+            if(coterieInfo == null || !Integer.valueOf(CommonConstants.SHELVE_YES).equals(coterieInfo.getShelveFlag()) ) {
+                throw QuanhuException.busiError("私圈不存在或者已下架");
+            }
+            extJson = JsonUtils.toFastJson(coterieInfo);
+        } else {
+            Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
+            if(!result.success()) {
+                throw new QuanhuException(ExceptionEnum.SysException);
+            }
+            ResourceVo resourceVo = result.getData();
+            if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
+                throw QuanhuException.busiError("资源不存在或者已删除");
+            }
+            extJson = resourceVo.getExtJson();
         }
         //发送动态
-        this.sendDymaic(transmitInfo, resourceVo);
+        this.sendDymaic(transmitInfo, extJson);
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -121,12 +142,12 @@ public class TransmitServiceImpl implements TransmitService {
         return pageList;
     }
 
-    private void sendDymaic(TransmitInfo transmitInfo, ResourceVo resourceVo) {
+    private void sendDymaic(TransmitInfo transmitInfo, String extJson) {
         ResourceTotal resourceTotal = new ResourceTotal();
         resourceTotal.setUserId(transmitInfo.getCreateUserId());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TRANSMIT));
         resourceTotal.setResourceId(transmitInfo.getResourceId());
-        resourceTotal.setExtJson(resourceVo.getExtJson());
+        resourceTotal.setExtJson(extJson);
         resourceTotal.setTransmitNote(transmitInfo.getContent());
         resourceTotal.setTransmitType(transmitInfo.getModuleEnum());
 
