@@ -196,18 +196,19 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public PageList<NoticeAdminVo> listAdmin(NoticeAdminDto noticeAdminDto) {
         try {
-            RedisTemplate<String, PageList> redisTemplate = redisTemplateBuilder.buildRedisTemplate(PageList.class);
-            PageList<NoticeAdminVo> pageList = redisTemplate.opsForValue().get(QH_NOTICE_LIST_ + noticeAdminDto.getPageNo() + ":" + noticeAdminDto.getPageSize());
-            if (pageList != null) {
-                return pageList;
-            }
+            /*RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
+            String s = redisTemplate.opsForValue().get(QH_NOTICE_LIST_ + noticeAdminDto.getPageNo() + ":" + noticeAdminDto.getPageSize());
+            if (StringUtils.isNotBlank(s)) {
+                return JSON.parseObject(s, new TypeReference<PageList<NoticeAdminVo>>() {});
+            }*/
 
             PageHelper.startPage(noticeAdminDto.getPageNo(), noticeAdminDto.getPageSize());
             List<NoticeAdminVo> list = noticeDao.listAdmin(noticeAdminDto);
             PageList<NoticeAdminVo> pageList1 = new PageModel<NoticeAdminVo>().getPageList(list);
-            if (CollectionUtils.isNotEmpty(list)) {
-                redisTemplate.opsForValue().set(QH_NOTICE_LIST_ + noticeAdminDto.getPageNo() + ":" + noticeAdminDto.getPageSize(), pageList1, EXPIRE_DAYS, TimeUnit.DAYS);
-            }
+            /*if (CollectionUtils.isNotEmpty(list) && pageList1 != null) {
+                String jsonString = JSON.toJSONString(pageList1);
+                redisTemplate.opsForValue().set(QH_NOTICE_LIST_ + noticeAdminDto.getPageNo() + ":" + noticeAdminDto.getPageSize(), jsonString, EXPIRE_DAYS, TimeUnit.DAYS);
+            }*/
 
             return pageList1;
         } catch (QuanhuException e) {
