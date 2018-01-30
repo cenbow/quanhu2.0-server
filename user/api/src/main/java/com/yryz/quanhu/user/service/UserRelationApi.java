@@ -70,19 +70,20 @@ public interface UserRelationApi {
 
     /**
      * 查询用户关系
-     * @param userSourceId     用户
-     * @param userTargetIds    目标用户
+     * @param sourceUserId     用户
+     * @param targetUserIds    目标用户
      * @return
      */
-    Response<List<UserRelationDto>> selectBy(String userSourceId, Set<String> userTargetIds);
+    Response<List<UserRelationDto>> selectBy(String sourceUserId, Set<String> targetUserIds);
 
 
 
     /**
      * 统计用户所有关系数量
-     * @param userSourceId
+     * @param sourceUserId
+     * @param targetUserId
      * @return
      */
-    Response<UserRelationCountDto> totalBy(String userSourceId);
+    Response<UserRelationCountDto> totalBy(String sourceUserId,String targetUserId);
 
 }

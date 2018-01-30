@@ -124,15 +124,15 @@ public class UserRelationProvider implements UserRelationApi{
     }
 
     @Override
-    public Response<UserRelationCountDto> totalBy(String userSourceKid) {
+    public Response<UserRelationCountDto> totalBy(String sourceUserId,String targetUserId){
         try {
-            logger.info("totalBy={} start",userSourceKid);
-            return ResponseUtils.returnObjectSuccess(userRelationService.totalBy(userSourceKid));
+            logger.info("totalBy={}/{} start",sourceUserId,targetUserId);
+            return ResponseUtils.returnObjectSuccess(userRelationService.totalBy(sourceUserId,targetUserId));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("totalBy={} finish",userSourceKid);
+            logger.info("totalBy={}/{} finish",sourceUserId,targetUserId);
         }
     }
 }

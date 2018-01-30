@@ -2,14 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yryz.quanhu.user.dao.UserRelationDao">
 
-    <!--测试目录-->
-
-
+    <!--所有字段-->
     <sql id="Base_Column_List">
         id,kid,create_date,create_user_id,last_update_date,last_update_user_id,del_flag,version,
-        source_user_id,target_user_id,black_status,follow_status,friend_status
+        source_user_id,target_user_id,relation_status
     </sql>
 
+    <!--  查询粉丝，关注时，需带上好友，查询拉黑是，需带上互相拉黑-->
+    <sql id="statusChoose">
+        <choose>
+            <when test="relationStatus !=null and relationStatus == 1">
+                AND (relation_status = 1 OR relation_status = 5)
+            </when>
+            <when test="relationStatus !=null and relationStatus == 2">
+                AND (relation_status = 2 OR relation_status = 5)
+            </when>
+            <when test="relationStatus !=null and relationStatus == 3">
+                AND (relation_status = 3 OR relation_status = 6)
+            </when>
+            <when test="relationStatus !=null and relationStatus == 4">
+                AND (relation_status = 4 OR relation_status = 6)
+            </when>
+            <when test="relationStatus !=null and relationStatus == 5">
+                AND (relation_status = 5)
+            </when>
+            <when test="relationStatus !=null and relationStatus == 6">
+                AND (relation_status = 6)
+            </when>
+            <otherwise>
+                AND FALSE
+            </otherwise>
+        </choose>
+    </sql>
+
+    <!--新增-->
     <insert id="insert" parameterType="com.yryz.quanhu.user.dto.UserRelationDto">
         <selectKey resultType="long" keyProperty="id" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -27,37 +53,26 @@
         ,#{delFlag,jdbcType=TINYINT}
         ,#{version,jdbcType=TINYINT}
 
-
         ,#{sourceUserId,jdbcType=VARCHAR}
         ,#{targetUserId,jdbcType=VARCHAR}
-
-        ,#{blackStatus,jdbcType=TINYINT}
-        ,#{followStatus,jdbcType=TINYINT}
-        ,#{friendStatus,jdbcType=TINYINT}
+        ,#{relationStatus,jdbcType=TINYINT}
         )
     </insert>
 
-
+    <!--修改-->
     <update id="update" parameterType="com.yryz.quanhu.user.dto.UserRelationDto">
-
         UPDATE qh_user_relation SET
-
-        create_date= NOW()
-        ,create_user_id = #{createUserId,jdbcType=VARCHAR}
-        ,last_update_date = NOW()
-        ,last_update_user_id = #{lastUpdateUserId,jdbcType=VARCHAR}
-
-        ,black_status  = #{blackStatus,jdbcType=TINYINT}
-        ,follow_status = #{followStatus,jdbcType=TINYINT}
-        ,friend_status = #{friendStatus,jdbcType=TINYINT}
-
+        last_update_date = NOW()
+        ,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+        ,relation_status  = #{relationStatus,jdbcType=TINYINT}
         WHERE kid = #{kid,jdbcType=BIGINT}
         AND source_user_id = #{sourceUserId,jdbcType=VARCHAR}
         AND target_user_id = #{targetUserId,jdbcType=VARCHAR}
-
     </update>
 
-    <select id="selectByUser" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
+
+    <!--查询用户一对一关系-->
+    <select id="selectUser" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
             resultType="com.yryz.quanhu.user.dto.UserRelationDto">
         SELECT
         <include refid="Base_Column_List"/>
@@ -66,151 +81,51 @@
         limit 1
     </select>
 
-    <!--由于存储是单向存储，所有查询全部，需要都查询-->
-    <select id="selectByUserAll" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
+    <!--查询用户所有关系-->
+    <select id="selectTargets" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
             resultType="com.yryz.quanhu.user.dto.UserRelationDto">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM qh_user_relation WHERE
-        del_flag = 10 AND
+        FROM qh_user_relation
+        WHERE del_flag = 10 AND source_user_id = #{sourceUserId,jdbcType=VARCHAR}
         <choose>
             <when test="targetUserIds != null and targetUserIds.size > 0">
-
-                (source_user_id = #{sourceUserId,jdbcType=VARCHAR}
-
                 AND target_user_id IN
                 <foreach collection="targetUserIds" item="userId" index="index" open="(" separator="," close=")">
                     #{userId,jdbcType=VARCHAR}
                 </foreach>
-
-                ) OR (
-
-                target_user_id = #{sourceUserId,jdbcType=VARCHAR}
-                AND source_user_id IN
-                <foreach collection="targetUserIds" item="userId" index="index" open="(" separator="," close=")">
-                    #{userId,jdbcType=VARCHAR}
-                </foreach>
-
-                )
-            </when>
-            <otherwise>
-                FALSE
-            </otherwise>
-        </choose>
-
-    </select>
-
-    <!--
-        FANS        (1),                              //粉丝
-        FOLLOW      (2),                              //关注
-        TO_BLACK    (3),                              //拉黑
-        FROM_BLACK  (4),                              //被拉黑
-        FRIEND      (5)                               //好友
-    -->
-    <select id="selectByUserStatus" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
-            resultType="com.yryz.quanhu.user.dto.UserRelationDto">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM qh_user_relation WHERE
-        del_flag = 10 AND
-        <choose>
-            <when test="statusValue == 1">
-                target_user_id = #{userId,jdbcType=VARCHAR}
-                AND follow_status = 11
-            </when>
-            <when test="statusValue == 2">
-                source_user_id = #{userId,jdbcType=VARCHAR}
-                AND follow_status = 11
-            </when>
-            <when test="statusValue == 3">
-                source_user_id = #{userId,jdbcType=VARCHAR}
-                AND black_status = 11
-            </when>
-            <when test="statusValue == 4">
-                target_user_id = #{userId,jdbcType=VARCHAR}
-                AND black_status = 11
-            </when>
-            <when test="statusValue == 5">
-                source_user_id = #{userId,jdbcType=VARCHAR}
-                AND friend_status = 11
-            </when>
-            <otherwise>
-                FALSE
-            </otherwise>
-        </choose>
-    </select>
-
-    <select id="selectUserToTarget" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
-            resultType="com.yryz.quanhu.user.dto.UserRelationDto">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM qh_user_relation WHERE
-        del_flag = 10 AND
-        <choose>
-            <when test="targetUserIds != null and targetUserIds.size > 0">
-                source_user_id = #{userId,jdbcType=VARCHAR}
-                AND target_user_id IN
-                <foreach collection="targetUserIds" item="targetUserId" index="index" open="(" separator="," close=")">
-                    #{targetUserId,jdbcType=VARCHAR}
-                </foreach>
-            </when>
-            <otherwise>
-                FALSE
-            </otherwise>
-        </choose>
-    </select>
-
-    <select id="selectTargetToUser" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
-            resultType="com.yryz.quanhu.user.dto.UserRelationDto">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM qh_user_relation WHERE
-        del_flag = 10 AND
-        <choose>
-            <when test="targetUserIds != null and targetUserIds.size > 0">
-                target_user_id = #{userId,jdbcType=VARCHAR}
-                AND source_user_id IN
-                <foreach collection="targetUserIds" item="targetUserId" index="index" open="(" separator="," close=")">
-                    #{targetUserId,jdbcType=VARCHAR}
-                </foreach>
-            </when>
-            <otherwise>
-                FALSE
-            </otherwise>
-        </choose>
-    </select>
-
-
-    <select id="selectTotalCount" resultType="java.lang.Long" >
-        SELECT
-        COUNT(1) AS totalCount
-        FROM qh_user_relation WHERE
-        del_flag = 10
-        <choose>
-            <when test="statusValue == 1">
-                AND target_user_id = #{userId,jdbcType=VARCHAR}
-                AND follow_status = 11
-            </when>
-            <when test="statusValue == 2">
-                AND source_user_id = #{userId,jdbcType=VARCHAR}
-                AND follow_status = 11
-            </when>
-            <when test="statusValue == 3">
-                AND source_user_id = #{userId,jdbcType=VARCHAR}
-                AND black_status = 11
-            </when>
-            <when test="statusValue == 4">
-                AND target_user_id = #{userId,jdbcType=VARCHAR}
-                AND black_status = 11
-            </when>
-            <when test="statusValue == 5">
-                AND source_user_id = #{userId,jdbcType=VARCHAR}
-                AND friend_status = 11
             </when>
             <otherwise>
                 AND FALSE
             </otherwise>
         </choose>
+    </select>
+
+    <!--根据状态查询-->
+    <select id="selectStatus" parameterType="com.yryz.quanhu.user.dto.UserRelationDto"
+            resultType="com.yryz.quanhu.user.dto.UserRelationDto">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM qh_user_relation WHERE
+        del_flag = 10 AND source_user_id = #{userId,jdbcType=VARCHAR}
+        <include refid="statusChoose"/>
+    </select>
+
+    <!--汇总查询-->
+    <select id="selectCount" resultType="java.lang.Long" >
+        SELECT
+        COUNT(1) AS totalCount
+        FROM qh_user_relation WHERE
+        del_flag = 10 AND source_user_id = #{userId,jdbcType=VARCHAR}
+        <include refid="statusChoose"/>
+    </select>
+
+
+    <select id="selectTotalCount" resultType="java.util.Map" >
+        SELECT relation_status AS relationStatus,COUNT(*) AS totalCount
+        FROM qh_user_relation WHERE
+        del_flag = 10 AND source_user_id = #{userId,jdbcType=VARCHAR}
+        GROUP BY relation_status
     </select>
 
 </mapper>
