@@ -5,12 +5,10 @@ import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.coterie.member.vo.*;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
-import com.yryz.quanhu.support.category.api.CategoryAPI;
-import com.yryz.quanhu.support.category.vo.CategoryCheckedVo;
-import com.yryz.quanhu.support.category.vo.CategoryDiscoverVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -78,7 +76,7 @@ public class CoterieMemberController {
     @PostMapping(value = "/services/app/{version}/coterie/member/audit")
     public Response audit(@RequestHeader("userId") Long userId, Long memberId, Long coterieId) {
 
-        coterieMemberAPI.audit(userId, memberId, coterieId, null);
+        coterieMemberAPI.audit(userId, memberId, coterieId, MemberConstant.MemberStatus.PASS.getStatus());
 
         return new Response();
     }
