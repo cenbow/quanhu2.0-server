@@ -8,6 +8,7 @@ import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
@@ -53,10 +54,11 @@ public class AnswerServiceImpl implements AnswerService {
     @Autowired
     OrderSDK orderSDK;
 
-
     @Reference
     private ResourceDymaicApi resourceDymaicApi;
 
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private SendMessageService questionMessageService;
@@ -156,18 +158,22 @@ public class AnswerServiceImpl implements AnswerService {
         resourceTotal.setResourceId(questionCheck.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionCheck.getCreateUserId());
+        resourceTotal.setCoterieId(String.valueOf(coterieId));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
 
-
+        /**
+         * 私圈信息 聚合
+         */
         ResourceTotal resourceTotalCoterie=new ResourceTotal();
         resourceTotalCoterie.setCreateDate(DateUtils.getDate());
+        resourceTotalCoterie.setCoterieId(String.valueOf(coterieId));
         CoterieInfo coterieInfo=this.apIservice.getCoterieinfo(questionCheck.getCoterieId());
         if(null!=coterieInfo) {
             resourceTotalCoterie.setExtJson(JSON.toJSONString(coterieInfo));
             resourceTotalCoterie.setResourceId(coterieInfo.getCoterieId());
             resourceTotalCoterie.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
             resourceTotalCoterie.setUserId(Long.valueOf(coterieInfo.getOwnerId()));
-            resourceDymaicApi.commitResourceDymaic(resourceTotal);
+            resourceDymaicApi.commitResourceDymaic(resourceTotalCoterie);
         }
         return answerVo;
     }
@@ -215,6 +221,10 @@ public class AnswerServiceImpl implements AnswerService {
             answerVo.setUser(apIservice.getUser(createUserId));
         }
         answerVo.setModuleEnum(ResourceTypeEnum.ANSWER);
+
+
+        //虚拟阅读数
+        readApi.read(kid);
         return answerVo;
     }
 

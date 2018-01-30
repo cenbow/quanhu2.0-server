@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
@@ -62,6 +63,9 @@ public class TopicPostServiceImpl implements TopicPostService {
 
     @Reference
     private CountApi countApi;
+
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private SendMessageService sendMessageService;
@@ -175,6 +179,9 @@ public class TopicPostServiceImpl implements TopicPostService {
             vo.setUser(apIservice.getUser(createUserId));
         }
         vo.setModuleEnum(ResourceTypeEnum.POSTS);
+
+        //虚拟阅读数
+        readApi.read(kid);
         return vo;
     }
 

@@ -17,6 +17,13 @@
     </properties>
     
     <dependencies>
+        <!-- 项目内部依赖 -->
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>quanhu-common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     	<!--公司内部库-->
         <dependency>
             <groupId>com.yryz.framework</groupId>
