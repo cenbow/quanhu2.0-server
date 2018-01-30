@@ -98,11 +98,11 @@ public class CoterieController {
 		}
 		if ((tempNum = config.getJoinFee()) != null) {
 			//Assert.isTrue(config.getJoinFee() <= 100,"加入费用不能超过100！" );
-			record.setJoinFee(tempNum);
+			record.setJoinFee(tempNum/100);
 		}
 		if ((tempNum = config.getConsultingFee()) != null) {
 			//Assert.isTrue(config.getConsultingFee() <= 100 , "咨询费用不能超过100悠然币！" );
-			record.setConsultingFee(tempNum);
+			record.setConsultingFee(tempNum/100);
 		}
 		if (config.getJoinCheck() != null) {
 			record.setJoinCheck(config.getJoinCheck());

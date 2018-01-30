@@ -77,7 +77,7 @@ public class EventManager {
 			if (StringUtils.isNotBlank(inviter)) {
 				String userRegId = regService.selectUserIdByInviter(inviter);
 				if (StringUtils.isNotBlank(userRegId)) {
-					inviterRegister(userId);
+					inviterRegister(userRegId);
 				}
 			}
 			logger.info("[event_regiter]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), "");
@@ -99,7 +99,7 @@ public class EventManager {
 		EventInfo eventInfo = null;
 		try {
 			eventInfo = new EventInfo();
-			eventInfo.setEventCode(EventEnum.INVITER_REGISTER.getCode());
+			eventInfo.setEventCode(EventEnum.INVITE_FRIENDS_TO_REGISTER.getCode());
 			eventInfo.setUserId(userId);
 			eventInfo.setEventNum(1);
 			commit(eventInfo);
@@ -130,13 +130,13 @@ public class EventManager {
 		if (oldUserInfo != null && StringUtils.isNotBlank(oldUserInfo.getUserDesc())
 				&& StringUtils.isNotBlank(oldUserInfo.getUserImg())
 				&& StringUtils.isNotBlank(oldUserInfo.getUserLocation())
-				&& StringUtils.isNotBlank(oldUserInfo.getUserNickName()) && oldUserInfo.getUserGenders() == null) {
+				&& StringUtils.isNotBlank(oldUserInfo.getUserNickName()) && oldUserInfo.getUserGenders() != null) {
 			return;
 		}
 		// 资料刚刚完善
 		if (StringUtils.isNotBlank(newUserInfo.getUserDesc()) && StringUtils.isNotBlank(newUserInfo.getUserImg())
 				&& StringUtils.isNotBlank(newUserInfo.getUserLocation())
-				&& StringUtils.isNotBlank(newUserInfo.getUserNickName()) && newUserInfo.getUserGenders() == null) {
+				&& StringUtils.isNotBlank(newUserInfo.getUserNickName()) && newUserInfo.getUserGenders() != null) {
 
 		} else {
 			return;

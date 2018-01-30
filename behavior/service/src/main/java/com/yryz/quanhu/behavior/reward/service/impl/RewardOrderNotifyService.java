@@ -1,10 +1,5 @@
 package com.yryz.quanhu.behavior.reward.service.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.dubbo.common.utils.Assert;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.utils.JsonUtils;
@@ -17,12 +12,16 @@ import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
 import com.yryz.quanhu.resource.api.ResourceApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
-* @Description: 打赏 订单回调
-* @author wangheng
-* @date 2018年1月28日 下午10:48:42
-*/
+ * @author wangheng
+ * @Description: 打赏 订单回调
+ * @date 2018年1月28日 下午10:48:42
+ */
 @Service
 public class RewardOrderNotifyService implements IOrderNotifyService {
 
@@ -49,10 +48,10 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         Assert.notNull(info, "回调订单 RewardInfo is null ！");
 
         // 更新 打赏记录
-        // 受赏 金额【存入 分费后的金额】
-        double fee = BranchFeesEnum.REWARD.getFee().get(1).getFee() / BranchFeesEnum.REWARD.getFee().get(0).getFee();
         RewardInfo upInfo = new RewardInfo();
-        upInfo.setRewardPrice(new Double(info.getGiftNum() * info.getGiftPrice() * (fee)).longValue());
+        // 受赏 金额【存入 分费后的金额】
+        Long rewardedPrice = info.getGiftNum() * info.getGiftPrice() * BranchFeesEnum.REWARD.getFee().get(1).getFee() / 100L;
+        upInfo.setRewardPrice(rewardedPrice);
         upInfo.setRewardStatus(RewardConstants.reward_status_pay_success);
 
         rewardInfoService.updateByKid(upInfo);
@@ -69,7 +68,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         RewardCount uBeCount = new RewardCount();
         uBeCount.setTargetId(info.getToUserId());
         uBeCount.setTargetType(RewardConstants.target_type_user);
-        uBeCount.setTotalRewardedAmount(info.getGiftNum() * info.getGiftPrice());
+        uBeCount.setTotalRewardedAmount(rewardedPrice);
         uBeCount.setTotalRewardedCount(1);
         rewardCountService.addCountByTargetId(uCount);
 

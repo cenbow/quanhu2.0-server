@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
@@ -70,6 +71,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private AnswerService answerService;
 
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private OrderSDK orderSDK;
@@ -205,6 +208,7 @@ public class QuestionServiceImpl implements QuestionService {
         resourceTotal.setResourceId(question.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionQuery.getCreateUserId());
+        resourceTotal.setCoterieId(String.valueOf(questionQuery.getCoterieId()));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
         return question;
     }
@@ -279,7 +283,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
-    public QuestionAnswerVo getDetail(Long kid, Long userId) {
+    public QuestionVo getDetail(Long kid, Long userId) {
         QuestionAnswerVo questionAnswerVo = new QuestionAnswerVo();
         /**
          * 参数校验
@@ -290,8 +294,8 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionExample example = new QuestionExample();
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+      //  criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         List<Question> questions = this.questionDao.selectByExample(example);
         if (null == questions || questions.isEmpty()) {
             //throw QuanhuException.busiError("查询的问题不存在");
@@ -318,11 +322,10 @@ public class QuestionServiceImpl implements QuestionService {
             questionVo.setTargetUser(apIservice.getUser(targetId));
         }
         questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
-        questionAnswerVo.setQuestion(questionVo);
-        questionAnswerVo.setAnswer(this.answerService.queryAnswerVoByquestionId(questionVo.getKid()));
-        //提交阅读数
-        // TODO: 2018/1/29 0029
 
+
+        //虚拟阅读数
+        readApi.read(kid);
         /**
          * 提交积分成长值事件
          */
@@ -336,7 +339,7 @@ public class QuestionServiceImpl implements QuestionService {
         eventInfo.setUserId(String.valueOf(userId));
         eventInfo.setEventNum(1);
         eventAPI.commit(eventInfo);
-        return questionAnswerVo;
+        return questionVo;
     }
 
 

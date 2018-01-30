@@ -1,8 +1,6 @@
 package com.yryz.quanhu.order.score.service.impl;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +15,14 @@ import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.common.AmqpConstant;
 import com.yryz.quanhu.order.score.dao.mongo.EventLogDao;
-import com.yryz.quanhu.order.score.entity.ScoreStatus;
+import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
 import com.yryz.quanhu.order.score.service.ScoreStatusService;
 import com.yryz.quanhu.order.score.service.SysEventManageService;
 import com.yryz.quanhu.order.score.type.EventTypeEnum;
 import com.yryz.quanhu.score.entity.SysEventInfo;
+import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
 
@@ -56,6 +55,9 @@ public class EventServiceImpl implements EventService {
 	@Autowired
 	ScoreStatusService scoreStatusService;
 	
+	@Autowired
+	EventAcountService  eventAcountService;
+	
 	/**
 	 * rabbitTemplate 可以直接注入，由spring-boot负责维护连接池对象
 	 */
@@ -75,9 +77,34 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<EventReportVo> getScoreFlowList(EventInfo log) {
+	public EventReportVo getScoreFlowList(EventInfo log) {
 		
-		return scoreFlowService.getOne(log.getUserId());
+		EventAcount eventAcount = eventAcountService.getLastAcount(log.getUserId());
+		EventReportVo eventReportVo = new EventReportVo();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		if (StringUtils.isNotBlank("" + eventAcount.getScore())) {
+			eventReportVo.setAllScore(eventAcount.getScore());
+		}
+		if (StringUtils.isNotBlank("" + eventAcount.getGrow())) {
+			eventReportVo.setGrow(eventAcount.getGrow());
+		}
+		if (StringUtils.isNotBlank(eventAcount.getGrowLevel())) {
+			eventReportVo.setGrowLevel(eventAcount.getGrowLevel());
+		}
+		if (StringUtils.isNotBlank(eventAcount.getUserId())) {
+			eventReportVo.setUserId(eventAcount.getUserId());
+		}
+		
+		if (StringUtils.isNotBlank(""+eventAcount.getCreateTime())) {
+			eventReportVo.setCreateTime(sdf.format(eventAcount.getCreateTime()));
+		}
+		if (StringUtils.isNotBlank(""+eventAcount.getUpdateTime())) {
+			eventReportVo.setUpdateTime(sdf.format(eventAcount.getUpdateTime()));
+		}
+		
+		return eventReportVo;
+		//return scoreFlowService.getOne(log.getUserId());
 		
 //		ScoreStatus ss = new ScoreStatus();
 //		try {

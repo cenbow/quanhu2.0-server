@@ -7,6 +7,8 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
+import com.yryz.quanhu.resource.topic.entity.TopicPost;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
@@ -38,9 +40,9 @@ public class TopicPostProvider implements TopicPostApi {
     }
 
     @Override
-    public Response<TopicAndPostVo> quetyDetail(Long kid, Long userId) {
+    public Response<TopicPostVo> quetyDetail(Long kid, Long userId) {
         try {
-            TopicAndPostVo vo = this.topicPostService.getDetail(kid, userId);
+            TopicPostVo vo = this.topicPostService.getDetail(kid, userId);
             return ResponseUtils.returnObjectSuccess(vo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
@@ -90,9 +92,9 @@ public class TopicPostProvider implements TopicPostApi {
 	}
 
 	@Override
-	public Response<List<TopicPostVo>> getByKids(List<Long> kidList) {
+	public Response<List<TopicPostWithBLOBs>> getByKids(List<Long> kidList) {
 		try {
-			List<TopicPostVo> data = this.topicPostService.getByKids(kidList);
+			List<TopicPostWithBLOBs> data = this.topicPostService.getByKids(kidList);
             return ResponseUtils.returnObjectSuccess(data);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

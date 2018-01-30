@@ -18,6 +18,9 @@ import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieMemberInfo;
+import com.yryz.quanhu.coterie.coterie.vo.MemberSearch;
+import com.yryz.quanhu.coterie.coterie.vo.MemberSearchParam;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dao.CoterieApplyDao;
 import com.yryz.quanhu.coterie.member.dao.CoterieMemberDao;
@@ -37,7 +40,10 @@ import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.sdk.entity.Order;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.contants.UserRelationConstant;
+import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
@@ -62,6 +68,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Reference
     private UserApi userApi;
+
+    @Reference
+    private UserRelationApi userRelationApi;
 
     @Reference
     private OrderSDK orderSDK;
@@ -137,15 +146,20 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
             if (null == memberApply) {
                 //insert member apply
-                saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
+                saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.PASS.getStatus());
             } else {
 
-                throw QuanhuException.busiError("用户已是待审核或审核通过");
+                throw QuanhuException.busiError("用户已申请加入私圈!");
             }
-            Integer resultApply = saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.PASS.getStatus());
 
-            //再入成员表
-            saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
+
+            //如果没有拉黑则自动关注圈主
+            //todo
+            Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
+            if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
+                //再入成员表
+                saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
+            }
 
             result.setStatus((byte) 20);
             return result;
@@ -321,7 +335,14 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             if (memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
                 saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
 
-                saveOrUpdateMember(userId, coterieId, memberApply.getReason(), joinType );
+                CoterieInfo coterie = coterieService.find(coterieId);
+
+                //如果没有拉黑则自动关注圈主
+                //todo
+                Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
+                if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
+                    saveOrUpdateMember(userId, coterieId, memberApply.getReason(), joinType);
+                }
 
                 //todo event
                 coterieEventManager.joinCoterieEvent(coterieId);

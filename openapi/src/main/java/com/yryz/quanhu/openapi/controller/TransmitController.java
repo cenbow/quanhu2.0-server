@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -42,9 +43,8 @@ public class TransmitController {
      * 转发
      * @param   transmitInfo
      * */
-//    @UserBehaviorArgs(sourceContexts = {"object.content"}, sourceUserId="object.targetUserId")
-//    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
-    @UserBehaviorValidation(login = true)
+    @UserBehaviorArgs(sourceContexts = {"object.TransmitInfo.content"}, sourceUserId="object.TransmitInfo.targetUserId")
+    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
     @ApiOperation("转发")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/transmit/single")

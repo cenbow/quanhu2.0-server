@@ -13,6 +13,10 @@ import com.yryz.quanhu.user.service.UserRelationApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -35,8 +39,18 @@ public class UserBlacklistValidFilter implements IBehaviorValidFilter{
     public void filter(BehaviorValidFilterChain filterChain) {
         logger.info("验证用户关系黑名单={}",filterChain.getContext());
 
-        String sourceUserId = (String) filterChain.getContext().get("sourceUserId");
-        String loginUserId = (String) filterChain.getContext().get("loginUserId");
+        //获取资源作者
+        String  sourceUserId = null;
+        Object objValue = filterChain.getContext().get("sourceUserId");
+        if(objValue==null){
+            throw new QuanhuException("","","该资源作者ID参数异常");
+        }else{
+            sourceUserId = String.valueOf(objValue);
+        }
+
+        //从上下文获取request 获取当前登录用户
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String loginUserId = request.getHeader("userId");
 
         //当前登录用户，和作者的关系
         Response<UserRelationDto> rpc = userRelationApi.getRelation(loginUserId,sourceUserId);

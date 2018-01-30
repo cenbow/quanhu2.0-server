@@ -10,7 +10,9 @@ import com.yryz.quanhu.resource.topic.api.TopicApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
+import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
@@ -20,6 +22,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -117,8 +122,49 @@ public class TopicPostTest {
     /**
      * 帖子详情
      */
-    @Test  public void queryPostDetail(){
-       Response<TopicAndPostVo> data= topicPostApi.quetyDetail(164439L,0L);
+    @Test
+    public void queryPostDetail(){
+       Response<TopicPostVo> data= topicPostApi.quetyDetail(164439L,0L);
         System.out.println("========"+ JSON.toJSONString(data));
     }
+
+
+    @Test
+    public void dd(){
+        List<Long> list=new ArrayList<>();
+        list.add(180504L);
+        Response<List<Topic>> data=topicApi.getByKids(list);
+        if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
+            System.out.println(JSON.toJSON(data.getData()));
+        }
+    }
+
+
+    @Test
+    public  void tt(){
+        Response<List<Long>> data=topicApi.getKidByCreatedate("2018-01-20 00:00:00","2018-01-29 00:00:00");
+        if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
+            System.out.println(JSON.toJSON(data.getData()));
+        }
+    }
+
+
+    @Test
+    public  void gg(){
+        Response<List<Long>> data=topicPostApi.getKidByCreatedate("2018-01-20 00:00:00","2018-01-29 00:00:00");
+        if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
+            System.out.println(JSON.toJSON(data.getData()));
+        }
+    }
+
+    @Test
+    public void kk(){
+        List<Long> list=new ArrayList<>();
+        list.add(732485712897449984L);
+        Response<List<TopicPostWithBLOBs>> data=topicPostApi.getByKids(list);
+        if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
+            System.out.println(JSON.toJSON(data.getData()));
+        }
+    }
+
 }

@@ -7,8 +7,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import com.google.common.collect.Lists;
-import com.yryz.quanhu.dymaic.canal.entity.TagInfo;
-import com.yryz.quanhu.dymaic.canal.entity.UserTagInfo;
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.dymaic.canal.entity.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +20,6 @@ import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
-import com.yryz.quanhu.dymaic.canal.entity.UserBaseInfo;
-import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 
 /**
  * 利用MQ处理canal消息处理
@@ -47,7 +46,9 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
     @Override
     public Boolean watch(CanalMsgContent msg) {
         if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
-                && (CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName()) || (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName())))) {
+                && (CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())
+                || (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName()))
+                || (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName())))) {
             return true;
         }
         return false;
@@ -66,12 +67,58 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
         }
         if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
                 && CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName())) {
-            logger.info("user tag table get change");
+            logger.info("user tag table get change: {}", GsonUtils.parseJson(msg));
             doUserTagInfo(msg);
+        }
+
+        if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
+                && CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName())) {
+            logger.info("star table get change: {}", GsonUtils.parseJson(msg));
+            doStarInfo(msg);
         }
 
 
     }
+
+    private void doStarInfo(CanalMsgContent msg) {
+        UserStarInfo starInfoBefore = CanalEntityParser.parse(msg.getDataBefore(), UserStarInfo.class);
+        UserStarInfo starInfoAfter = CanalEntityParser.parse(msg.getDataAfter(), UserStarInfo.class);
+
+        if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
+            Optional<UserInfo> uinfo = userRepository.findById(starInfoBefore.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                //UserStarInfo userStarInfo = userInfo.getUserStarInfo();
+                //if (userStarInfo != null && starInfoAfter.getKid().equals(userStarInfo.getKid())) {
+                userInfo.setUserStarInfo(starInfoAfter);
+                userRepository.save(userInfo);
+                //}
+            }
+        } else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
+            //删除
+            Optional<UserInfo> uinfo = userRepository.findById(starInfoBefore.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                UserStarInfo userStarInfo = userInfo.getUserStarInfo();
+                if (userStarInfo != null && starInfoBefore.getKid().equals(userStarInfo.getKid())) {
+                    userInfo.setUserStarInfo(null);
+                    userRepository.save(userInfo);
+                }
+            }
+
+        } else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
+            // 新增
+            Optional<UserInfo> uinfo = userRepository.findById(starInfoAfter.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                if (userInfo != null) {
+                    userInfo.setUserStarInfo(starInfoAfter);
+                    userRepository.save(userInfo);
+                }
+            }
+        }
+    }
+
 
     private void doUserTagInfo(CanalMsgContent msg) {
         TagInfo tagInfoBefore = CanalEntityParser.parse(msg.getDataBefore(), TagInfo.class);
@@ -81,7 +128,7 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
             Optional<UserInfo> uinfo = userRepository.findById(tagInfoBefore.getUserId());
             if (uinfo.isPresent()) {
                 UserInfo userInfo = uinfo.get();
-                UserTagInfo userTagInfo = userInfo.getUserTagInfo();//CanalEntityParser.parse(userInfo.getUserTagInfo().getUserTagInfo(), msg.getDataAfter(), TagInfo.class);
+                UserTagInfo userTagInfo = userInfo.getUserTagInfo();
                 if (userTagInfo != null) {
                     updateUserTagInfo(userTagInfo, tagInfoAfter);
                 }
@@ -114,7 +161,7 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
     private void addUserTagInfo(UserInfo userInfo, TagInfo tagInfo) {
         UserTagInfo userTagInfo = userInfo.getUserTagInfo();
-        if (userTagInfo == null) {
+        if (userTagInfo == null || CollectionUtils.isEmpty(userTagInfo.getUserTagInfoList())) {
             UserTagInfo newUserTagInfo = new UserTagInfo();
             newUserTagInfo.setUserTagInfoList(Lists.newArrayList(tagInfo));
             userInfo.setUserTagInfo(newUserTagInfo);
@@ -123,11 +170,14 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
         }
     }
 
-    private void deleteUserTagInfo(UserTagInfo userTagInfo, TagInfo tagInfoBefore) {
-        if (CollectionUtils.isNotEmpty(userTagInfo.getUserTagInfoList()) && tagInfoBefore != null) {
+    private void deleteUserTagInfo(UserTagInfo userTagInfo, TagInfo before) {
+        if (CollectionUtils.isNotEmpty(userTagInfo.getUserTagInfoList()) && before != null) {
             List<TagInfo> after = Lists.newArrayList();
             for (TagInfo tagInfo : userTagInfo.getUserTagInfoList()) {
-                if (!tagInfoBefore.getUserId().equals(tagInfo.getUserId())) {
+                if (!(
+                        before.getKid().equals(tagInfo.getKid())
+                        //before.getTagType().equals(tagInfo.getTagType()) && before.getTagId().equals(tagInfo.getTagId())
+                )) {
                     after.add(tagInfo);
                 }
             }
@@ -135,12 +185,13 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
         }
     }
 
-    private void updateUserTagInfo(UserTagInfo userTagInfo, TagInfo tagInfoAfter) {
-        if (CollectionUtils.isNotEmpty(userTagInfo.getUserTagInfoList()) && tagInfoAfter != null) {
+    private void updateUserTagInfo(UserTagInfo userTagInfo, TagInfo after) {
+        if (CollectionUtils.isNotEmpty(userTagInfo.getUserTagInfoList()) && after != null) {
             for (TagInfo tagInfo : userTagInfo.getUserTagInfoList()) {
-                if (tagInfoAfter.getUserId().equals(tagInfo.getUserId())) {
-                    tagInfo.setTagId(tagInfoAfter.getTagId());
-                    tagInfo.setTagType(tagInfoAfter.getTagType());
+                if (after.getKid().equals(tagInfo.getKid())) {
+                    tagInfo.setTagType(after.getTagType());
+                    tagInfo.setTagId(after.getTagId());
+                    tagInfo.setDelFlag(after.getDelFlag());
                 }
             }
         }

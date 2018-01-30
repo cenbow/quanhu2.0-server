@@ -66,6 +66,26 @@ public class CoterieInfo implements Serializable{
      */
     private String qrUrl;
 
+
+
+	private Integer shelveFlag;
+
+	public Integer getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Integer deleted) {
+		this.deleted = deleted;
+	}
+
+	private Integer  deleted;
+	public Integer getShelveFlag() {
+		return shelveFlag;
+	}
+
+	public void setShelveFlag(Integer shelveFlag) {
+		this.shelveFlag = shelveFlag;
+	}
 	public User getUser() {
 		return user;
 	}

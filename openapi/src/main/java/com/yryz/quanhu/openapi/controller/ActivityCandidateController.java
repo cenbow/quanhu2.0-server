@@ -38,7 +38,7 @@ public class ActivityCandidateController {
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
 
-    @UserBehaviorValidation
+    @UserBehaviorValidation(login = true, mute = true)
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")
@@ -57,7 +57,7 @@ public class ActivityCandidateController {
         return response;
     }
 
-    @UserBehaviorValidation
+    @UserBehaviorValidation(login = true)
     @ApiOperation("参与投票活动")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/config")

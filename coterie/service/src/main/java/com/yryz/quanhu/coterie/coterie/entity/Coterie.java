@@ -131,6 +131,14 @@ public class Coterie implements Serializable {
 	 * 最后更新文章时间
 	 */
 	private Date lastInfoTime;
+	private Integer shelveFlag;
+	public Integer getShelveFlag() {
+		return shelveFlag;
+	}
+	public void setShelveFlag(Integer shelveFlag) {
+		this.shelveFlag = shelveFlag;
+	}
+
 
 	public Long getId() {
 		return id;

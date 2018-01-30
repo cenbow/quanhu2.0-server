@@ -4,12 +4,16 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.other.activity.constants.ActivityCandidateConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityPageConstants;
+import com.yryz.quanhu.other.activity.constants.ActivityRedisConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.other.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteConfigDao;
@@ -21,6 +25,9 @@ import com.yryz.quanhu.other.activity.service.ActivityCandidateService;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
@@ -39,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,6 +83,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
 
     @Reference(check = false, timeout = 30000)
     ScoreAPI scoreAPI;
+
+    @Reference(check = false, timeout = 30000)
+    ResourceDymaicApi resourceDymaicApi;
 
     /**
      * 增加参与者
@@ -116,10 +127,12 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         voteDetail.setVoteCount(0);
         voteDetail.setAddVote(0);
         voteDetail.setCreateUserId(activityVoteDto.getCreateUserId());
-        //TODO:功能枚举
+        voteDetail.setModuleEnum(ModuleContants.ACTIVITY_WORKS_ENUM);
         voteDetail.setShelveFlag(10);
         //保存参与信息
         activityVoteDetailDao.insertByPrimaryKeySelective(voteDetail);
+        //进入资源库
+        this.setResource(voteDetail, activityVoteInfoVo);
         //递增参与人数
         stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityVoteDto.getActivityInfoId()),
                 "joinCount",
@@ -129,11 +142,11 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         //删除排行榜
         stringRedisTemplate.delete(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()));
         //设置平台积分
-        if(activityVoteInfoVo.getAmount() != 0) {
+        if(activityVoteInfoVo.getAmount() != null && activityVoteInfoVo.getAmount() != 0) {
             try {
                 scoreAPI.addScore(activityVoteDto.getCreateUserId().toString(), activityVoteInfoVo.getAmount(), "37");
             } catch (Exception e) {
-                logger.error("增加平台积分 失败", e);
+                logger.error("增加活动积分 失败", e);
             }
         }
         //增加首页列表
@@ -318,12 +331,14 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             List<ActivityVoteDetailVo> list = activityVoteDetailDao.batchVote(activityInfoId, ids);
             if(!CollectionUtils.isEmpty(list)) {
                 RedisTemplate<String, ActivityVoteDetailVo> template = templateBuilder.buildRedisTemplate(ActivityVoteDetailVo.class);
-                Map<String, ActivityVoteDetailVo> map = new HashMap<>();
+//                Map<String, ActivityVoteDetailVo> map = new HashMap<>();
                 list.stream()
                         .forEach(detailVo -> {
-                    map.put(ActivityCandidateConstants.getKeyInfo(activityInfoId, detailVo.getKid()), detailVo);
+//                    map.put(ActivityCandidateConstants.getKeyInfo(activityInfoId, detailVo.getKid()), detailVo);
+                    template.opsForValue().set(ActivityCandidateConstants.getKeyInfo(activityInfoId, detailVo.getKid()),
+                            detailVo, ActivityRedisConstants.TIMEOUT_VERY_LONG, TimeUnit.SECONDS);
                 });
-                template.opsForValue().multiSet(map);
+//                template.opsForValue().multiSet(map);
             }
 
             return list;
@@ -382,6 +397,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     });
             RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
             template.opsForZSet().add(key, set);
+            template.expire(key, ActivityRedisConstants.TIMEOUT_VERY_LONG, TimeUnit.SECONDS);
         }
     }
 
@@ -431,6 +447,8 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             stringRedisTemplate.opsForHash().putIfAbsent(ActivityVoteConstants.ACTIVITY_VOTE_NO,
                     activityInfoId.toString(),
                     maxVoteNo == null ? "0" : String.valueOf(maxVoteNo));
+            stringRedisTemplate.expire(ActivityVoteConstants.ACTIVITY_VOTE_NO,
+                    ActivityRedisConstants.TIMEOUT_VERY_LONG, TimeUnit.SECONDS);
         }
 
         Long voteNo = stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.ACTIVITY_VOTE_NO, activityInfoId.toString(), 1);
@@ -526,6 +544,31 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                 detailVo.setOtherAppVoteCount(otherAppVoteCount);
             }
             this.setUserInfo(resultList);
+        }
+    }
+
+    private void setResource(ActivityVoteDetail voteDetail, ActivityVoteInfoVo activityVoteInfoVo) {
+        try {
+            ResourceTotal resourceTotal = new ResourceTotal();
+            resourceTotal.setContent(voteDetail.getContent());
+            resourceTotal.setCreateDate(DateUtils.getString(new Date()));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(voteDetail));
+            resourceTotal.setModuleEnum(new Integer(voteDetail.getModuleEnum()));
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+            resourceTotal.setResourceId(voteDetail.getKid());
+
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(voteDetail.getCreateUserId());
+            if(userSimple.success()
+                    && userSimple.getData() != null
+                    && userSimple.getData().getUserRole() != null) {
+                resourceTotal.setTalentType(String.valueOf(userSimple.getData().getUserRole()));
+            }
+
+            resourceTotal.setTitle(activityVoteInfoVo.getTitle());
+            resourceTotal.setUserId(voteDetail.getCreateUserId());
+            resourceDymaicApi.commitResourceDymaic(resourceTotal);
+        } catch (Exception e) {
+            logger.error("资源聚合 接入异常！", e);
         }
     }
 

@@ -23,7 +23,7 @@ import com.yryz.quanhu.dymaic.canal.entity.ResourceInfo;
 import com.yryz.quanhu.dymaic.canal.entity.TopicPostInfo;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
-import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
 @Component
@@ -63,7 +63,7 @@ public class TopicPostDiffHandler implements DiffHandler{
 		}
     	
     	if(!diffList.isEmpty()){
-    		Response<List<TopicPostVo>> resList=topicPostApi.getByKids(diffList);
+    		Response<List<TopicPostWithBLOBs>> resList=topicPostApi.getByKids(diffList);
     		if(resList.success()){
     			//热度信息获取
     			Set<String> resourceIds=new HashSet<>();
@@ -75,7 +75,7 @@ public class TopicPostDiffHandler implements DiffHandler{
     			}
     			Map<String, ResourceVo> resMap=response.getData();
     			
-    			List<TopicPostVo> clist=resList.getData();
+    			List<TopicPostWithBLOBs> clist=resList.getData();
     			List<ResourceInfo> rlist=new ArrayList<>();
     			for (int i = 0; i < clist.size(); i++) {
     				TopicPostInfo d=GsonUtils.parseObj(clist.get(i), TopicPostInfo.class);

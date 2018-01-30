@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
@@ -62,6 +63,9 @@ public class TopicPostServiceImpl implements TopicPostService {
 
     @Reference
     private CountApi countApi;
+
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private SendMessageService sendMessageService;
@@ -148,7 +152,7 @@ public class TopicPostServiceImpl implements TopicPostService {
      * @return
      */
     @Override
-    public TopicAndPostVo getDetail(Long kid, Long userId) {
+    public TopicPostVo getDetail(Long kid, Long userId) {
         TopicAndPostVo topicAndPostVo = new TopicAndPostVo();
         /**
          * 检验参数
@@ -159,8 +163,8 @@ public class TopicPostServiceImpl implements TopicPostService {
 
         TopicPostExample example=new TopicPostExample();
         TopicPostExample.Criteria criteria=example.createCriteria();
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+       // criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+       // criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andKidEqualTo(kid);
         List<TopicPostWithBLOBs> topicPostWithBLOBsList = this.topicPostDao.selectByExampleWithBLOBs(example);
         if (null == topicPostWithBLOBsList || topicPostWithBLOBsList.isEmpty()) {
@@ -176,13 +180,9 @@ public class TopicPostServiceImpl implements TopicPostService {
         }
         vo.setModuleEnum(ResourceTypeEnum.POSTS);
 
-        topicAndPostVo.setPost(vo);
-
-        if (topicPostWithBLOBs.getTopicId() != null) {
-            TopicVo topicVo = topicService.queryDetail(topicPostWithBLOBs.getTopicId(), 0l);
-            topicAndPostVo.setTopic(topicVo);
-        }
-        return topicAndPostVo;
+        //虚拟阅读数
+        readApi.read(kid);
+        return vo;
     }
 
     /**
@@ -285,9 +285,11 @@ public class TopicPostServiceImpl implements TopicPostService {
 	}
 
 	@Override
-	public List<TopicPostVo> getByKids(List<Long> kidList) {
-		List<TopicPostWithBLOBs> list=topicPostDao.selectByKids(kidList);
-		List<TopicPostVo> tlist=GsonUtils.parseList(list, TopicPostVo.class);
-		return tlist;
+	public List<TopicPostWithBLOBs> getByKids(List<Long> kidList) {
+        TopicPostExample example=new TopicPostExample();
+        TopicPostExample.Criteria criteria=example.createCriteria();
+        criteria.andKidIn(kidList);
+		List<TopicPostWithBLOBs> list=topicPostDao.selectByExampleWithBLOBs(example);
+        return list;
 	}
 }

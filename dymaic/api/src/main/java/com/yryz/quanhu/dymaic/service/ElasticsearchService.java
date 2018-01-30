@@ -1,11 +1,12 @@
 package com.yryz.quanhu.dymaic.service;
 
-import java.util.List;
-
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
 import com.yryz.quanhu.dymaic.vo.CoterieInfoVo;
 import com.yryz.quanhu.dymaic.vo.ResourceInfoVo;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
+import com.yryz.quanhu.user.vo.StarInfoVO;
 
 public interface ElasticsearchService {
 	/**

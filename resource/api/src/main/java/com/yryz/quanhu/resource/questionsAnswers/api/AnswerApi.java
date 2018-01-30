@@ -10,4 +10,6 @@ public interface AnswerApi {
 
     public Response<Integer> deletetAnswer(AnswerDto answerDto);
 
+    public Response<AnswerVo> getDetail(Long kid);
+
 }

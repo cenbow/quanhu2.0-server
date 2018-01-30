@@ -99,9 +99,9 @@ public class QuestionProvider implements QuestionApi {
     }
 
     @Override
-    public Response<QuestionAnswerVo> queryQuestionAnswerDetail(Long kid, Long userId) {
+    public Response<QuestionVo> queryQuestionDetail(Long kid, Long userId) {
         try {
-            QuestionAnswerVo result = this.questionService.getDetail(kid,userId);
+            QuestionVo result = this.questionService.getDetail(kid,userId);
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
