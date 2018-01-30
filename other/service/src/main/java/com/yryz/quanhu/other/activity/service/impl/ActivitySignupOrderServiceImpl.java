@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.UUID;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.message.SystemBody;
@@ -63,7 +64,7 @@ public class ActivitySignupOrderServiceImpl implements IOrderNotifyService {
 			return;
 		}
 		// 支付成功 将报名信息插入 报名记录表
-		activityRecordDao.insert(activityRecord);
+		activityRecordDao.insertByPrimaryKeySelective(activityRecord);
 		// 更新主表的当前报名人人数信息
 		ActivityInfo activityInfo = activityInfoDao.selectByPrimaryKey(activityRecord.getActivityInfoId());
 		activityInfoDao.updateJoinCount(activityInfo.getKid(),activityEnrolConfig.getEnrolUpper());
@@ -103,7 +104,7 @@ public class ActivitySignupOrderServiceImpl implements IOrderNotifyService {
 
 	@Override
 	public String getModuleEnum() {
-		return null;
+		return ModuleContants.ACTIVITY_ENUM;
 	}
 
 }
