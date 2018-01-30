@@ -88,16 +88,16 @@
 	<update id="addCountByTargetId" parameterType="com.yryz.quanhu.behavior.reward.entity.RewardCount">
 		update qh_reward_count
 		<set>
-			<if test="record.totalRewardCount != null">
+			<if test="totalRewardCount != null">
 				total_reward_count = total_reward_count + #{record.totalRewardCount,jdbcType=INTEGER},
 			</if>
-			<if test="record.totalRewardAmount != null">
+			<if test="totalRewardAmount != null">
 				total_reward_amount = total_reward_amount + #{record.totalRewardAmount,jdbcType=BIGINT},
 			</if>
-			<if test="record.totalRewardedCount != null">
+			<if test="totalRewardedCount != null">
 				total_rewarded_count = total_rewarded_count + #{record.totalRewardedCount,jdbcType=INTEGER},
 			</if>
-			<if test="record.totalRewardedAmount != null">
+			<if test="totalRewardedAmount != null">
 				total_rewarded_amount = total_rewarded_amount + #{record.totalRewardedAmount,jdbcType=BIGINT},
 			</if>
 		</set>

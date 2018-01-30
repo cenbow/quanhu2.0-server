@@ -1,6 +1,7 @@
 package com.yryz.quanhu.order.sdk.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
@@ -51,19 +52,23 @@ public class NotifyService {
         // 验证平台订单状态
         Response<OrderInfo> response = orderAsynApi.getOrderInfo(orderInfo.getOrderId());
         if (!response.success() || !OrderType.ORDER_STATE_SUCCESS.equals(response.getData().getOrderState())) {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
-                    ExceptionEnum.BusiException.getShowMsg(), "notify method , check rpcOrder pay faild !");
+            logger.error("notify method , check rpcOrder pay faild ! rpc data = {}",
+                    response.getData() == null ? "" : JSON.toJSONString(response.getData()));
+            return;
         }
         // 查询本地订单
         Order localOrder = orderDao.selectByKid(Long.valueOf(orderInfo.getOrderId()));
         // 对比本地订单和回调订单信息是否一致
-        verify(orderInfo, localOrder);
+        if(!verify(orderInfo, localOrder)){
+            logger.error("verify orderInfo localOrder failure");
+            return;
+        }
         logger.info("notify method , check callback is repeat .");
         // 校验是否重复回调
         if (OrderConstants.OrderState.SUCCESS.equals(localOrder.getOrderState())) {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
-                    ExceptionEnum.BusiException.getShowMsg(),
-                    "notify method , check localOrder already success ! don't repeat notify !");
+            logger.error("notify method , check localOrder already success ! don't repeat notify ! local data = {}",
+                    JSON.toJSONString(localOrder));
+            return;
         }
         logger.info("notify method , update local order state is success .");
         // 修改订单完成状态
@@ -112,31 +117,40 @@ public class NotifyService {
      * @param orderInfo
      * @param order
      */
-    private void verify(OrderInfo orderInfo, Order order) {
+    private boolean verify(OrderInfo orderInfo, Order order) {
         // 校验createUserId,cost,payType,orderType,productId,productType,callback
-        if (orderInfo == null || order == null)
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "orderInfo or order is null");
-        if (!orderInfo.getCustId().equals(String.valueOf(order.getCreateUserId())))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "createUserId is difference");
-        if (!orderInfo.getCost().equals(order.getCost()))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "cost is difference");
-        if (!orderInfo.getOrderType().equals(order.getPayType() - 10))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "payType is difference");
-        if (!orderInfo.getType().equals(order.getOrderType() - 10))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "orderType is difference");
-        if (!orderInfo.getProductId().equals(order.getProductId()))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "productId is difference");
-        if (!orderInfo.getProductType().equals(order.getProductType()))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "productType is difference");
-        if (!orderInfo.getCallback().equals(order.getCallback()))
-            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
-                    ExceptionEnum.ValidateException.getShowMsg(), "callback is difference");
+        if (orderInfo == null || order == null) {
+            logger.error("orderInfo or order is null");
+            return false;
+        }
+        if (!orderInfo.getCustId().equals(String.valueOf(order.getCreateUserId()))) {
+            logger.error("createUserId is difference");
+            return false;
+        }
+        if (!orderInfo.getCost().equals(order.getCost())) {
+            logger.error("cost is difference");
+            return false;
+        }
+        if (!orderInfo.getOrderType().equals(order.getPayType() - 10)) {
+            logger.error("payType is difference");
+            return false;
+        }
+        if (!orderInfo.getType().equals(order.getOrderType() - 10)) {
+            logger.error("orderType is difference");
+            return false;
+        }
+        if (!orderInfo.getProductId().equals(order.getProductId())) {
+            logger.error("productId is difference");
+            return false;
+        }
+        if (!orderInfo.getProductType().equals(order.getProductType())) {
+            logger.error("productType is difference");
+            return false;
+        }
+        if (!orderInfo.getCallback().equals(order.getCallback())) {
+            logger.error("callback is difference");
+            return false;
+        }
+        return true;
     }
 }
