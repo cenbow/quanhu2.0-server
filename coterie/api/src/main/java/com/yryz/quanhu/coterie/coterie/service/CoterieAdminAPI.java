@@ -10,7 +10,7 @@ import com.yryz.quanhu.coterie.coterie.vo.MemberSearchParam;
 
 /**
  * 私圈管理后台 接口
- * @author jk
+ * @author wt
  *
  */
 public interface CoterieAdminAPI {
@@ -85,11 +85,11 @@ public interface CoterieAdminAPI {
 	 * 推荐私圈设置
 	 * @param coterieIdList
 	 */
-	public void recommendCoterie(List<String> coterieIdList);
+	public void recommendCoterie(List<Long> coterieIdList);
 	
 	/**
 	 * 取消推荐私圈设置
 	 * @param coterieIdList
 	 */
-	public void cancelRecommendCoterie(List<String> coterieIdList);
+	public void cancelRecommendCoterie(List<Long> coterieIdList);
 }

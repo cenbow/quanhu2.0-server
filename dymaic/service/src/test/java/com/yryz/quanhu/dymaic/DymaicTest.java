@@ -23,7 +23,7 @@ import java.util.*;
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class DymaicTest {
 
-    private final static Long USER_DEMO = 724007310011252736L;
+    private final static Long USER_DEMO = 729671306726400000L;
     private final Long USER_DEBAR = 200L;
 
 

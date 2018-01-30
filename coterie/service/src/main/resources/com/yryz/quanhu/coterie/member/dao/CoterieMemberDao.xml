@@ -3,6 +3,19 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yryz.quanhu.coterie.member.dao.CoterieMemberDao">
+	<resultMap id="BaseResultMap" type="com.yryz.quanhu.coterie.member.entity.CoterieMember" >
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="coterie_id" property="coterieId" jdbcType="CHAR" />
+		<result column="cust_id" property="custId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="TINYINT" />
+		<result column="reason" property="reason" jdbcType="VARCHAR" />
+		<result column="ban_speak" property="banSpeak" jdbcType="TINYINT" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="process_time" property="processTime" jdbcType="TIMESTAMP" />
+		<result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+		<result column="join_type" property="joinType" jdbcType="TINYINT" />
+		<result column="amount" property="amount" jdbcType="BIGINT" />
+	</resultMap>
 	<!--
 
 	/* 私圈成员表 */
@@ -100,5 +113,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by create_date desc
 		limit #{start},#{pageSize}
 	</select>
+	<select id="selectBySearchParam" resultMap="BaseResultMap" parameterType="com.yryz.quanhu.coterie.coterie.vo.MemberSearch">
+		select
+		<include refid="Base_Column_List" />
+		from coterie_member
+		where coterie_id = #{coterieId}
+		<if test="joinType !=null"> and join_type=#{joinType}</if>
+		<if test="startTime !=null"> and create_date between #{startTime} and #{endTime}</if>
+		order by create_date desc
+		limit #{start},#{pageSize}
+	</select>
 
+	<select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.coterie.coterie.vo.MemberSearch">
+		select
+		count(*)
+		from coterie_member
+		where coterie_id = #{coterieId}
+		<if test="joinType !=null"> and join_type=#{joinType}</if>
+		<if test="startTime !=null"> and create_date between #{startTime} and #{endTime}</if>
+	</select>
 </mapper>

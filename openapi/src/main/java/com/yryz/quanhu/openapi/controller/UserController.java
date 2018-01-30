@@ -138,7 +138,7 @@ public class UserController {
 	@ApiOperation("查询用户权限")
 	@UserBehaviorValidation(login = true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/user/getPermission")
+	@GetMapping(value = "/{version}/user/getPermission")
 	public Response<Map<String, Object>> getPermission(HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		boolean disTalk = ResponseUtils

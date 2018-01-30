@@ -149,12 +149,9 @@
 		<if test="endTime != null">
 			,end_time = #{endTime,jdbcType=TIMESTAMP}
 		</if>
-		<if test="activityLink != null">
-			,activity_link = #{activityLink,jdbcType=VARCHAR}
-		</if>
 		<if test="recommend != null">
 			,recommend = #{recommend,jdbcType=TINYINT}
-			<if test="recommend ==1">
+			<if test="recommend ==11">
 				,recommend_date = NOW()
 			</if>
 		</if>
@@ -163,18 +160,6 @@
 		</if>
 		<if test="sort != null">
 			,sort = #{sort,jdbcType=INTEGER}
-		</if>
-		<if test="userFlag != null">
-			,user_flag = #{userFlag,jdbcType=TINYINT}
-		</if>
-		<if test="userNum != null">
-			,user_num = #{userNum,jdbcType=INTEGER}
-		</if>
-		<if test="amount != null">
-			,amount = #{amount,jdbcType=BIGINT}
-		</if>
-		<if test="prizesFlag != null">
-			,prizes_flag = #{prizesFlag,jdbcType=TINYINT}
 		</if>
 		<if test="shelveFlag != null">
 			,shelve_flag = #{shelveFlag,jdbcType=TINYINT}
@@ -189,9 +174,6 @@
 		<if test="createUserId != null">
 			,create_user_id = #{createUserId,jdbcType=VARCHAR}
 		</if>
-		<!-- <if test="lastUpdateDate != null" > ,last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP} 
-			</if> <if test="lastUpdateUserId != null" > ,last_update_user_id = #{lastUpdateUserId,jdbcType=VARCHAR} 
-			</if> -->
 		<if test="content != null">
 			,content = #{content,jdbcType=LONGVARCHAR}
 		</if>

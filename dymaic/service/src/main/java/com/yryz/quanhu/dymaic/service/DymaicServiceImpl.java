@@ -2,6 +2,8 @@ package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import com.yryz.quanhu.dymaic.dao.redis.DymaicCache;
 import com.yryz.quanhu.dymaic.mq.DymaicSender;
@@ -55,6 +57,9 @@ public class DymaicServiceImpl {
 
     @Reference
     IdAPI idAPI;
+    
+    @Reference
+    CountApi countApi;
 
     /**
      * 发布动态
@@ -369,20 +374,18 @@ public class DymaicServiceImpl {
             }
         }
 
-        //3 查询统计数据
-        Map<String, Dymaic> statistics = null;
-        if (!kids.isEmpty()) {
-            try {
-                //todo rpcInvoke
-            } catch (Exception e) {
-                // ignore
-            }
-            statistics = new HashMap<>();
-        }
+//        //3 查询统计数据 评论数，点赞数，转发数
+//        Map<String, Long> statistics = null;
+//        if (dymaicMap != null) {
+//        	String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
+//        	dymaicMap.forEach((kid,dymaic)->{
+//        		Map<String, Long> map = countApi.getCount(countType , kid, null).getData();
+//        	});
+//        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("debug findusers hit " + (users == null ? 0 : users.size()));
-            logger.debug("debug findstatics hit " + (statistics == null ? 0 : statistics.size()));
+//            logger.debug("debug findstatics hit " + (statistics == null ? 0 : statistics.size()));
         }
 
         //4, 聚合动态、用户、统计信息
@@ -399,13 +402,12 @@ public class DymaicServiceImpl {
                     } else {
                         vo.setUser(new UserSimpleVO());
                     }
+                    
+                    //添加统计数  评论数，点赞数，转发数
+                    String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
+                    Map<String, Long> statistics = countApi.getCount(countType , kid, null).getData();
+                    vo.setStatistics(statistics);
 
-                    //todo
-                    if (statistics != null && statistics.containsKey(kid)) {
-                        vo.setStatistics(null);
-                    } else {
-                        vo.setStatistics(null);
-                    }
                     result.add(vo);
                 }
             }

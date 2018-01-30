@@ -29,7 +29,7 @@ public class ActivityInfoController {
     @Reference(check = false, timeout = 30000)
     private ActivityInfoApi activityInfoApi;
 
-    @UserBehaviorValidation
+    @UserBehaviorValidation(login = true)
     @ApiOperation("我参加/报名的活动列表(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/myList")
