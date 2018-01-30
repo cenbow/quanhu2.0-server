@@ -195,7 +195,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
         UserBaseInfo targetUser =userService.getUser(Long.parseLong(targetUserId));
         if(null == targetUser){
-//            throw new QuanhuException("","目标用户不存在或已注销："+targetUserId,"目标用户不存在或已注销");
+            throw new QuanhuException("","目标用户不存在或已注销："+targetUserId,"目标用户不存在或已注销");
         }
         return false;
     }
@@ -379,7 +379,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             _dto.setUserHeadImg(info.getUserImg());
             _dto.setUserSummary(info.getUserSignature());
         }else{
-            info=null;      //用户集合查询不到，则不返回
+            _dto=null;      //用户集合查询不到，则不返回
         }
     }
 
