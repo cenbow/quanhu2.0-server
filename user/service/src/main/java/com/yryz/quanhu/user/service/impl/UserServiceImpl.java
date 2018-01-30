@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
 			for (UserBaseInfo vo : list) {
 				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
 				if (MapUtils.isNotEmpty(relationMap)) {
-					UserRelationDto dto = relationMap.get(vo.getUserId());
+					UserRelationDto dto = relationMap.get(vo.getUserId().toString());
 					simpleVO.setNameNotes(dto.getUserRemarkName());
 					simpleVO.setRelationStatus(dto.getRelationStatus());
 				}

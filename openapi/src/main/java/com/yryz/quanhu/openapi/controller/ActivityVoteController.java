@@ -63,7 +63,7 @@ public class ActivityVoteController {
         return activityVoteInfoVoResponse;
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("确认投票")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/vote/single")
@@ -74,7 +74,7 @@ public class ActivityVoteController {
         return activityVoteApi.single(record);
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("奖品列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/prizeslist")
@@ -82,7 +82,7 @@ public class ActivityVoteController {
         return activityVoteApi.prizeslist(activityVoteDto);
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("领取奖品")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/vote/getPrize")
@@ -105,7 +105,7 @@ public class ActivityVoteController {
      * @param   activityVoteDto
      * @return
      * */
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("我的卡劵")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/myPrizeslist")

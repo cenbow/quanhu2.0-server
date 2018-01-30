@@ -4,8 +4,11 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.report.dto.ReportDTO;
 import com.yryz.quanhu.behavior.report.entity.Report;
+import com.yryz.quanhu.behavior.report.vo.ReportVo;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @Author:sun
@@ -35,4 +38,10 @@ public interface ReportApi {
      * @return:Report
      **/
     Response<Report> querySingleReport(Report report);
+
+    /**
+     * 违规描述列表
+     * @return
+     */
+    Response<List<ReportVo>> queryInformDesc();
 }
