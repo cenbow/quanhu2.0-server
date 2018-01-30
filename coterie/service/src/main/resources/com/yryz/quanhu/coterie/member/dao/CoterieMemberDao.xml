@@ -89,7 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<select id="selectByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMember">
-		select * from qh_coterie_member WHERE coterie_id = #{coterieId} and user_id = #{userId} and del_flag != 11;
+		select * from qh_coterie_member WHERE coterie_id = #{coterieId} and user_id = #{userId};
 	</select>
 
 

@@ -18,7 +18,12 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.resource.service.ResourceConvertService;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.user.service.UserApi;
@@ -34,11 +39,21 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 @Service
 public class ResourceConvertServiceImpl implements ResourceConvertService {
 	
-	@Reference(check=false)
+	@Reference
 	private UserApi userApi;
 	
 	@Reference
 	private CountApi countApi;
+	
+	@Reference
+	private CoterieApi coterieApi;
+	
+	public List<ResourceVo> addBatch(List<ResourceVo> list){
+		list = addUser(list);
+		list = addCount(list);
+		list = addCoterie(list);
+		return list;
+	}
 
 	/**
 	 * 填充用户对象
@@ -81,6 +96,71 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 			}
 		}
 		return null;
+	}
+	
+	public List<ResourceVo> addCount(List<ResourceVo> list){
+		if(CollectionUtils.isNotEmpty(list)){
+			for (ResourceVo resourceVo : list) {
+				Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
+				if(map != null && map.containsKey(BehaviorEnum.Read.getCode())){
+					Long readNum = map.get(BehaviorEnum.Read.getCode());
+					resourceVo.setReadNum(readNum);
+				}
+			}
+		}
+		return list;
+	}
+	
+	public ResourceVo addCount(ResourceVo resourceVo){
+		Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
+		if(map != null && map.containsKey(BehaviorEnum.Read.getCode())){
+			Long readNum = map.get(BehaviorEnum.Read.getCode());
+			resourceVo.setReadNum(readNum);
+		}
+		return resourceVo;
+	}
+	
+	/**
+	 * 添加私圈信息
+	 * @param list
+	 * @return
+	 */
+	public List<ResourceVo> addCoterie(List<ResourceVo> list){
+		if(CollectionUtils.isNotEmpty(list)){
+			for (ResourceVo resourceVo : list) {
+				if(StringUtils.isNotEmpty(resourceVo.getCoterieId())){
+					CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
+					resourceVo.setCoterie(coterieInfo);
+				}
+			}
+		}
+		return list;
+	}
+	
+	/**
+	 * 获取私圈信息
+	 * @param resourceVo
+	 * @return
+	 */
+	public ResourceVo addCoterie(ResourceVo resourceVo){
+		if(StringUtils.isNotEmpty(resourceVo.getCoterieId())){
+			CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
+			resourceVo.setCoterie(coterieInfo);
+		}
+		return resourceVo;
+	}
+
+	/**
+	 * @param resource
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceConvertService#addBatch(com.yryz.quanhu.resource.vo.ResourceVo)
+	 */
+	@Override
+	public ResourceVo addBatch(ResourceVo resource) {
+		resource = addUser(resource);
+		resource = addCoterie(resource);
+		resource = addCount(resource);
+		return resource;
 	}
 
 }

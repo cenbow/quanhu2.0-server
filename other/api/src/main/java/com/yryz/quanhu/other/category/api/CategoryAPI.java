@@ -1,9 +1,8 @@
-package com.yryz.quanhu.support.category.api;
+package com.yryz.quanhu.other.category.api;
 
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.support.category.vo.CategoryCheckedVo;
-import com.yryz.quanhu.support.category.vo.CategoryDiscoverVo;
-import com.yryz.quanhu.support.category.vo.CategoryVo;
+import com.yryz.quanhu.other.category.vo.CategoryCheckedVo;
+import com.yryz.quanhu.other.category.vo.CategoryDiscoverVo;
 
 import java.util.List;
 

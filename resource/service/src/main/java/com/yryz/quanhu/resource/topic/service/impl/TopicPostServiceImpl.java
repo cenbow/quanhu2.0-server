@@ -1,16 +1,20 @@
 package com.yryz.quanhu.resource.topic.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.message.message.entity.Message;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
@@ -29,6 +33,7 @@ import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
 import net.sf.jsqlparser.statement.select.Top;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -61,9 +66,11 @@ public class TopicPostServiceImpl implements TopicPostService {
     @Autowired
     private SendMessageService sendMessageService;
 
+    @Reference
+    private ResourceDymaicApi resourceDymaicApi;
+
     /**
      * 发布帖子
-     *
      * @param topicPostDto
      * @return
      */
@@ -112,7 +119,23 @@ public class TopicPostServiceImpl implements TopicPostService {
         messageBusinessVo.setKid(topicPost.getKid());
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setCoterieId(null);
-        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST);
+        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST,true);
+
+        /**
+         * 资源聚合
+         */
+        ResourceTotal resourceTotal=new ResourceTotal();
+        resourceTotal.setCreateDate(DateUtils.getDate());
+        TopicPostWithBLOBs post=this.topicPostDao.selectByPrimaryKey(topicPost.getKid());
+        TopicPostVo topicPostVo=new TopicPostVo();
+        if(post!=null) {
+            BeanUtils.copyProperties(post, topicPostVo);
+            resourceTotal.setExtJson(JSON.toJSONString(topicPostVo));
+        }
+        resourceTotal.setResourceId(post.getKid());
+        resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC_POST));
+        resourceTotal.setUserId(topicPost.getCreateUserId());
+        resourceDymaicApi.commitResourceDymaic(resourceTotal);
         return result;
     }
 

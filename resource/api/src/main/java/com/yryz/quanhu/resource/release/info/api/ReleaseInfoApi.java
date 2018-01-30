@@ -70,4 +70,14 @@ public interface ReleaseInfoApi {
     public Response<List<Long>> getKidByCreatedate(String startDate,String endDate);
     
     public Response<List<ReleaseInfoVo>> selectByKids(Set<Long> kidList);
+
+    /**  
+    * @Description: 记录查询[无分页]
+    * @author wangheng
+    * @param @param dto
+    * @param @return
+    * @return Response<List<ReleaseInfoVo>>
+    * @throws  
+    */
+    public Response<List<ReleaseInfoVo>> selectByCondition(ReleaseInfoDto dto);
 }

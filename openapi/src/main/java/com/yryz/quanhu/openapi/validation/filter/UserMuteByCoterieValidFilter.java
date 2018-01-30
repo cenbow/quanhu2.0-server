@@ -48,7 +48,7 @@ public class UserMuteByCoterieValidFilter implements IBehaviorValidFilter {
         Response<Boolean> rpc =
                 coterieMemberAPI.isBanSpeak(Long.parseLong(loginUserId),Long.parseLong(coterieId));
 
-        if(rpc.success()&&rpc.getData()){
+        if(rpc.success()&&!rpc.getData()){
             //执行下一个
             filterChain.execute();
         }else{

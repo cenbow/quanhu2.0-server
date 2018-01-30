@@ -229,8 +229,10 @@ public class OrderServiceImpl implements OrderService {
 				}
 			}
 			
-		} else {// 已经检查过余额不足的话，就直接返回结果
-			throw new SourceNotEnoughException(OrderMsgEnum.NOT_ENOUGH.getMsg());
+		} else {
+			// 已经检查过余额不足的话，就直接返回结果
+			return ResponseUtils.returnCommonException(OrderMsgEnum.NOT_ENOUGH.getMsg());
+//			throw new SourceNotEnoughException(OrderMsgEnum.NOT_ENOUGH.getMsg());
 		}
 		//如果是退款订单，则发送推销消息
 		if(orderInfo.getProductType().intValue() == ProductEnum.CASH_REFUND.getType()){ 

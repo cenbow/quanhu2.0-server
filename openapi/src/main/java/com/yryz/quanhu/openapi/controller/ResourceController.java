@@ -56,8 +56,8 @@ public class ResourceController {
         if (pageSize == null) {
             pageSize = 10;
         }
-        if (currentPage != null && currentPage > 0) {
-            start = currentPage * pageSize;
+        if (currentPage != null && currentPage >= 1) {
+            start = (currentPage - 1) * pageSize;
         }
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);
@@ -76,8 +76,8 @@ public class ResourceController {
         if (pageSize == null) {
             pageSize = 10;
         }
-        if (currentPage != null && currentPage > 0) {
-            start = currentPage * pageSize;
+        if (currentPage != null && currentPage >= 1) {
+            start = (currentPage - 1) * pageSize;
         }
         ResourceVo resourceVo = new ResourceVo();
         resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);

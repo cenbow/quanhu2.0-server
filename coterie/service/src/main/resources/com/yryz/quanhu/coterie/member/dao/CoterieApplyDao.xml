@@ -91,7 +91,7 @@
         <if test="processTime!= null">
             ,process_time= #{processTime}
         </if>
-        where coterie_id = #{coterieId} and user_id = #{userId}
+        where coterie_id = #{coterieId} and user_id = #{userId} and del_flag != 11;
     </update>
 
     <select id="selectNewMemberNum" resultType="java.lang.Integer" parameterType="java.lang.Long" >
