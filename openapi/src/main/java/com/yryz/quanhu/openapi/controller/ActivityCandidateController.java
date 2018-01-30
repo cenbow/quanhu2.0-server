@@ -38,7 +38,7 @@ public class ActivityCandidateController {
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
 
-    @UserBehaviorValidation(login = true)
+    @UserBehaviorValidation(login = true, mute = true)
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")

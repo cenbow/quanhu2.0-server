@@ -45,5 +45,23 @@ public class AnswerProvider implements AnswerApi {
         }
     }
 
+    /**
+     * 回答详情
+     * @param kid
+     * @return
+     */
+    @Override
+    public Response<AnswerVo> getDetail(Long kid) {
+        try {
+            AnswerVo result = this.answerService.getDetail(kid);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
 
 }

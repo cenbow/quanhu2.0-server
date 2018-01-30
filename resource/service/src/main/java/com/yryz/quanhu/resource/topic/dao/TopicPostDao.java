@@ -35,4 +35,6 @@ public interface TopicPostDao {
     List<Long> selectKidByCreatedate(@Param("startDate")String startDate,@Param("endDate")String endDate);
     
     List<TopicPostWithBLOBs> selectByKids(@Param("kidList")List<Long> kidList);
+
+    int deleteByTipocId(TopicPost record);
 }

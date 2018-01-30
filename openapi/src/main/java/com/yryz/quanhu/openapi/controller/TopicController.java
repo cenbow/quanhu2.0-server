@@ -15,6 +15,7 @@ import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,7 +56,10 @@ public class TopicController {
 
 
 	@ApiOperation("删除话题")
-	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			})
 	@UserBehaviorValidation(event = "删除话题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
 	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
 			sourceContexts={"object.TopicDto.content","object.TopicDto.contentSource"})

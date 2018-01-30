@@ -560,7 +560,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             Response<UserSimpleVO> userSimple = userApi.getUserSimple(voteDetail.getCreateUserId());
             if(userSimple.success()
                     && userSimple.getData() != null
-                    && userSimple.getData().getUserRole() != null){
+                    && userSimple.getData().getUserRole() != null) {
                 resourceTotal.setTalentType(String.valueOf(userSimple.getData().getUserRole()));
             }
 

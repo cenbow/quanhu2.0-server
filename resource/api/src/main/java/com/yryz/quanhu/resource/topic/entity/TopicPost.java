@@ -1,8 +1,9 @@
 package com.yryz.quanhu.resource.topic.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TopicPost {
+public class TopicPost implements Serializable {
     private Long id;
 
     private Long kid;

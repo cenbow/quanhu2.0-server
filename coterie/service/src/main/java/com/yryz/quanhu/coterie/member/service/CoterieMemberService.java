@@ -85,18 +85,18 @@ public interface CoterieMemberService {
 	 * @param coterieId
 	 */
 	public Boolean isBanSpeak(Long userId, Long coterieId);
-	/**
-	 * 搜索 私圈成员
-	 * @param param
-	 * @return
-	 */
-	List<CoterieMemberInfo> find(MemberSearchParam param);
-
-	/**
-	 * 搜索 私圈成员数量
-	 * @param param
-	 * @return
-	 */
-	Integer findCount(MemberSearchParam param);
+//	/**
+//	 * 搜索 私圈成员
+//	 * @param param
+//	 * @return
+//	 */
+//	List<CoterieMemberInfo> find(MemberSearchParam param);
+//
+//	/**
+//	 * 搜索 私圈成员数量
+//	 * @param param
+//	 * @return
+//	 */
+//	Integer findCount(MemberSearchParam param);
 
 }

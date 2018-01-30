@@ -28,7 +28,7 @@ public interface QuestionService {
      * @param userId
      * @return
      */
-    QuestionAnswerVo getDetail(Long kid, Long userId);
+    QuestionVo getDetail(Long kid, Long userId);
 
     /**
      * 圈主拒绝回答问题

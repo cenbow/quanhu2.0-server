@@ -27,6 +27,7 @@ import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
@@ -148,7 +149,7 @@ public class AnswerServiceImpl implements AnswerService {
          */
         ResourceTotal resourceTotal=new ResourceTotal();
         resourceTotal.setCreateDate(DateUtils.getDate());
-        QuestionAnswerVo questionAnswerVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
+        QuestionVo questionAnswerVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
         if(questionAnswerVo!=null) {
             resourceTotal.setExtJson(JSON.toJSONString(questionAnswerVo));
         }
@@ -186,14 +187,14 @@ public class AnswerServiceImpl implements AnswerService {
         return this.answerDao.updateByPrimaryKey(answer);
     }
 
+
     /**
-     * 查询查询回答详情
-     *
+     * 查询回答详情
      * @param kid
      * @return
      */
     @Override
-    public AnswerVo getDetailByQuestionId(Long kid) {
+    public AnswerVo getDetail(Long kid) {
         /**
          *校验传入的参数
          */
@@ -203,14 +204,10 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerExample example=new AnswerExample();
         AnswerExample.Criteria criteria=example.createCriteria();
         criteria.andQuestionIdEqualTo(kid);
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
-        List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
-        if (null==answerWithBLOBsList || answerWithBLOBsList.isEmpty()) {
-            //throw QuanhuException.busiError("查询的回答不存在");
-            return null;
-        }
-        AnswerWithBLOBs answerWithBLOBs=answerWithBLOBsList.get(0);
+       // criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        AnswerWithBLOBs answerWithBLOBs = this.answerDao.selectByPrimaryKey(kid);
+
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
         Long createUserId = answerWithBLOBs.getCreateUserId();
@@ -221,10 +218,17 @@ public class AnswerServiceImpl implements AnswerService {
         return answerVo;
     }
 
+    /**
+     * 通过questionId查询answer
+     * @param kid
+     * @return
+     */
     @Override
     public AnswerVo queryAnswerVoByquestionId(Long kid) {
         AnswerExample example = new AnswerExample();
         AnswerExample.Criteria criteria = example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andQuestionIdEqualTo(kid);
         List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
         if (!answerWithBLOBsList.isEmpty()) {

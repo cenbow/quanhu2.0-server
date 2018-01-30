@@ -18,5 +18,5 @@ public interface QuestionApi {
 
     Response<PageList<QuestionAnswerVo>> queryQuestionAnswerVoList(QuestionDto questionDto);
 
-    Response<QuestionAnswerVo> queryQuestionAnswerDetail(Long kid,Long userId);
+    Response<QuestionVo> queryQuestionDetail(Long kid,Long userId);
 }

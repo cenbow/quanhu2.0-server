@@ -279,7 +279,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
-    public QuestionAnswerVo getDetail(Long kid, Long userId) {
+    public QuestionVo getDetail(Long kid, Long userId) {
         QuestionAnswerVo questionAnswerVo = new QuestionAnswerVo();
         /**
          * 参数校验
@@ -290,8 +290,8 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionExample example = new QuestionExample();
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+      //  criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         List<Question> questions = this.questionDao.selectByExample(example);
         if (null == questions || questions.isEmpty()) {
             //throw QuanhuException.busiError("查询的问题不存在");
@@ -318,8 +318,7 @@ public class QuestionServiceImpl implements QuestionService {
             questionVo.setTargetUser(apIservice.getUser(targetId));
         }
         questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
-        questionAnswerVo.setQuestion(questionVo);
-        questionAnswerVo.setAnswer(this.answerService.queryAnswerVoByquestionId(questionVo.getKid()));
+
         //提交阅读数
         // TODO: 2018/1/29 0029
 
@@ -336,7 +335,7 @@ public class QuestionServiceImpl implements QuestionService {
         eventInfo.setUserId(String.valueOf(userId));
         eventInfo.setEventNum(1);
         eventAPI.commit(eventInfo);
-        return questionAnswerVo;
+        return questionVo;
     }
 
 

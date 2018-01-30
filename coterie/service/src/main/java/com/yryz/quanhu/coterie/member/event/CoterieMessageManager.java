@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 @Service
 public class CoterieMessageManager {
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	@Autowired
+	@Reference
 	private MessageAPI messageAPI;
 	
 

@@ -8,9 +8,12 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
+import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
 import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicExample;
+import com.yryz.quanhu.resource.topic.entity.TopicPost;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.service.TopicService;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
@@ -28,6 +31,9 @@ public class TopicServiceImpl implements TopicService {
 
     @Autowired
     private TopicDao topicDao;
+
+    @Autowired
+    private TopicPostDao topicPostDao;
 
     @Autowired
     private APIservice apIservice;
@@ -90,8 +96,8 @@ public class TopicServiceImpl implements TopicService {
         TopicExample example=new TopicExample();
         TopicExample.Criteria criteria=example.createCriteria();
         criteria.andKidEqualTo(kid);
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+     //   criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
 
         List<Topic> topics = this.topicDao.selectByExample(example);
         if (null == topics || topics.isEmpty()) {
@@ -108,6 +114,7 @@ public class TopicServiceImpl implements TopicService {
         Long replyCount=this.topicPostService.countPostByTopicId(topicVo.getKid());
         topicVo.setReplyCount(replyCount);
         topicVo.setModuleEnum(ResourceTypeEnum.TOPIC);
+
         return topicVo;
     }
 
@@ -181,7 +188,17 @@ public class TopicServiceImpl implements TopicService {
         Topic topicParam = new Topic();
         topicParam.setKid(kid);
         topicParam.setDelFlag(CommonConstants.DELETE_YES);
-        return this.topicDao.updateByPrimaryKeySelective(topicParam);
+        int result= this.topicDao.updateByPrimaryKeySelective(topicParam);
+
+
+        /**
+         * 话题下架，同时下架话题下的帖子
+         */
+        TopicPost topicPost=new TopicPost();
+        topicPost.setTopicId(kid);
+        topicPost.setDelFlag(CommonConstants.DELETE_YES);
+        this.topicPostDao.deleteByTipocId(topicPost);
+        return  result;
     }
 
 	@Override

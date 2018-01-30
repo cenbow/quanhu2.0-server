@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
+import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 
@@ -11,7 +12,7 @@ public interface TopicPostService {
 
     public Integer saveTopicPost(TopicPostDto topicPostDto);
 
-    public TopicAndPostVo getDetail(Long kid, Long userId);
+    public TopicPostVo getDetail(Long kid, Long userId);
 
     public PageList<TopicPostVo> queryList(TopicPostDto dto);
 
@@ -21,5 +22,5 @@ public interface TopicPostService {
     
     public List<Long> getKidByCreatedate(String startDate,String endDate);
     
-    public List<TopicPostVo> getByKids(List<Long> kidList);
+    public List<TopicPostWithBLOBs> getByKids(List<Long> kidList);
 }

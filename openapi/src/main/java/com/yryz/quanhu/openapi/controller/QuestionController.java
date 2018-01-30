@@ -92,20 +92,19 @@ public class QuestionController {
 		return questionApi.rejectAnswerQuestion(questionDto.getKid(),Long.valueOf(userId));
 	}
 
-
-	@ApiOperation("查询问答的详情")
+	@ApiOperation("查询提问的详情")
 	@ApiImplicitParams(
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
-	@GetMapping(value = "/services/app/{version}/coterie/questionAnswer/single")
-	public Response<QuestionAnswerVo> queryQuestionAnswer(Long kid, HttpServletRequest request) {
+	@GetMapping(value = "/services/app/{version}/coterie/question/single")
+	public Response<QuestionVo> queryQuestionAnswer(Long kid, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId=header.getUserId();
 		if(StringUtils.isBlank(userId)){
 			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
 		}
-		return questionApi.queryQuestionAnswerDetail(kid,Long.valueOf(userId));
+		return questionApi.queryQuestionDetail(kid,Long.valueOf(userId));
 	}
 
 

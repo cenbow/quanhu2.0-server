@@ -29,7 +29,7 @@ import java.util.Map;
  * @Desc: 计数系统count服务
  * @Date: 2018/1/23.
  */
-@Service(interfaceClass = CountApi.class, timeout = 1000 * 60)
+@Service(interfaceClass = CountApi.class)
 public class CountProvider implements CountApi {
 
     private static final Logger logger = LoggerFactory.getLogger(CountProvider.class);

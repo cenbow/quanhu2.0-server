@@ -128,7 +128,7 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	public List<ResourceVo> addCoterie(List<ResourceVo> list){
 		if(CollectionUtils.isNotEmpty(list)){
 			for (ResourceVo resourceVo : list) {
-				if(StringUtils.isNotEmpty(resourceVo.getCoterieId())){
+				if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
 					CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
 					resourceVo.setCoterie(coterieInfo);
 				}
@@ -143,7 +143,7 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 * @return
 	 */
 	public ResourceVo addCoterie(ResourceVo resourceVo){
-		if(StringUtils.isNotEmpty(resourceVo.getCoterieId())){
+		if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
 			CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
 			resourceVo.setCoterie(coterieInfo);
 		}

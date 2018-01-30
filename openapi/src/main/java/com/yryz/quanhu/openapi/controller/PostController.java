@@ -35,7 +35,7 @@ public class PostController {
     @ApiOperation("查询帖子详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/post/single")
-    public Response<TopicAndPostVo> queryTopicDetail(Long kid, HttpServletRequest request) {
+    public Response<TopicPostVo> queryTopicDetail(Long kid, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         return topicPostApi.quetyDetail(kid, null);
     }
