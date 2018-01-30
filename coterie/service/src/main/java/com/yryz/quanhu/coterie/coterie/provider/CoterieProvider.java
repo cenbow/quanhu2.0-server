@@ -31,7 +31,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.common.FrontendConfig;
-import com.yryz.quanhu.coterie.coterie.entity.CoterieAuditRecord;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.coterie.exception.DatasOptException;
 import com.yryz.quanhu.coterie.coterie.exception.ServiceException;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
@@ -59,14 +59,14 @@ public class CoterieProvider implements CoterieApi {
 	@Autowired
 	private CoterieService coterieService;
 
-	 @Reference
-	 private UserApi userApi;
+	@Reference
+	private UserApi userApi;
 	@Reference
 	private AccountApi accountApi;
 	@Reference
 	private CoterieApi coterieApi;
-	 /**
-	  * 查询私圈信息列表
+	/**
+	 * 查询私圈信息列表
 	 * @param coterieIdList 私圈ID集合
 	 * @return
 	 * @throws ServiceException
@@ -208,23 +208,23 @@ public class CoterieProvider implements CoterieApi {
 	 */
 	@Override
 	public Response<CoterieInfo> applyCreate(CoterieBasicInfo info) {
-				logger.info("CoterieApi.applyCreate params:" + info);
-				try {
-					checkApplyCreateParam(info);
-					return ResponseUtils.returnObjectSuccess(coterieService.save(info));
-				} catch (DatasOptException e) {
-					logger.error(e.getMessage(), e);
-					return ResponseUtils.returnException(e);
+		logger.info("CoterieApi.applyCreate params:" + info);
+		try {
+			checkApplyCreateParam(info);
+			return ResponseUtils.returnObjectSuccess(coterieService.save(info));
+		} catch (DatasOptException e) {
+			logger.error(e.getMessage(), e);
+			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
-		return ResponseUtils.returnException(e);
+			return ResponseUtils.returnException(e);
 		}
 		catch (QuanhuException e) {
-		return ResponseUtils.returnException(e);
+			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
-		logger.error("unKown Exception", e);
-		return ResponseUtils.returnException(e);
+			logger.error("unKown Exception", e);
+			return ResponseUtils.returnException(e);
 		}
-		}
+	}
 
 	private void checkApplyCreateParam(CoterieBasicInfo info) {
 		if (info == null) {
@@ -307,10 +307,10 @@ public class CoterieProvider implements CoterieApi {
 			return ResponseUtils.returnException(e);
 		} catch (ServiceException e) {
 			return ResponseUtils.returnException(e);
-	} catch (Exception e) {
-		logger.error("unKown Exception", e);
-		return ResponseUtils.returnException(e);
-	}
+		} catch (Exception e) {
+			logger.error("unKown Exception", e);
+			return ResponseUtils.returnException(e);
+		}
 	}
 	/**
 	 * 我加入的私圈
@@ -523,24 +523,24 @@ public class CoterieProvider implements CoterieApi {
 		List<CoterieInfo> expertList=coterieService.getHeatList("", CoterieConstant.Expert.YES.getStatus(), 0, 20);
 		//获取非达人的私圈
 		List<CoterieInfo> list=coterieService.getHeatList("", CoterieConstant.Expert.NO.getStatus(), 0, 20);
-		
+
 		List<CoterieInfo> resultList=Lists.newArrayList();
 		resultList.addAll(recommendList);
-		
+
 		for (int i = 0; i < expertList.size(); i++) {
 			CoterieInfo info=expertList.get(i);
 			if(resultList.size()<5 && !resultList.contains(info)){
 				resultList.add(info);
 			}
 		}
-		
+
 		for (int i = 0; i < list.size(); i++) {
 			CoterieInfo info=list.get(i);
 			if(resultList.size()<10 && !resultList.contains(info)){
 				resultList.add(info);
 			}
 		}
-		
+
 		//如果不够10个则取上线的任意圈子补
 		List<CoterieInfo> allList=coterieService.findPage(  1, 20, CoterieConstant.Status.PUTON.getStatus());
 		for (int i = 0; i < allList.size(); i++) {
@@ -549,7 +549,7 @@ public class CoterieProvider implements CoterieApi {
 				resultList.add(info);
 			}
 		}
-		
+
 		fillCustInfo(resultList);
 		fillCircleInfo(resultList);
 		return ResponseUtils.returnListSuccess(resultList);
@@ -570,7 +570,7 @@ public class CoterieProvider implements CoterieApi {
 		if(pageSize == null){
 			pageSize=10;
 		}
-		
+
 		try {
 			List<CoterieInfo> list=coterieService.queryPageForApp(pageNum, pageSize);
 			fillCircleInfo(list);
@@ -609,7 +609,7 @@ public class CoterieProvider implements CoterieApi {
 		if(pageSize==null){
 			pageSize=10;
 		}
-		
+
 		try {
 			List<CoterieInfo> infoList = coterieService.getCoterieLikeName(circleId,name, start, pageSize);
 			fillCircleInfo(infoList);
@@ -665,7 +665,7 @@ public class CoterieProvider implements CoterieApi {
 		if (StringUtils.isEmpty(ownerId)) {
 			ServiceException.paramsError("ownerId");
 		}
-		
+
 		try {
 			List<String> circleIdList = coterieService.getCircleIdListByOwnerId(ownerId);
 			return ResponseUtils.returnListSuccess(circleIdList);
@@ -682,7 +682,7 @@ public class CoterieProvider implements CoterieApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	private void fillCircleInfo(List<CoterieInfo> infoList){
 		if(infoList==null || infoList.isEmpty()){
 			return;
@@ -697,7 +697,7 @@ public class CoterieProvider implements CoterieApi {
 		}
 
 	}
-	
+
 	private void fillCustInfo(List<CoterieInfo> infoList){
 		if(infoList==null || infoList.isEmpty()){
 			return;
@@ -767,7 +767,7 @@ public class CoterieProvider implements CoterieApi {
 				|| StringUtils.isEmpty(info.getCustName()) || info.getStatus() == null) {
 			throw ServiceException.paramsError();
 		}
-		
+
 		try {
 			CoterieAuditRecord record= GsonUtils.parseObj(info, CoterieAuditRecord.class);
 			record.setCreateDate(new Date());
@@ -883,7 +883,7 @@ public class CoterieProvider implements CoterieApi {
 		}
 		return ResponseUtils.returnObjectSuccess(result);
 	}
-	
+
 	@Override
 	public Response<List<Long>> getKidByCreateDate(String startDate, String endDate) {
 		logger.info("CoterieApi.getKidByCreateDate startDate:" + startDate+",endDate:"+endDate);
@@ -895,7 +895,7 @@ public class CoterieProvider implements CoterieApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	@Override
 	public Response<List<Coterie>> getByKids(List<Long> kidList) {
 		logger.info("CoterieApi.getByKids kidList:" + kidList);
@@ -905,6 +905,17 @@ public class CoterieProvider implements CoterieApi {
 			return  ResponseUtils.returnObjectSuccess(rstList);
 		} catch (Exception e) {
 			logger.error("unKown Exception", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<List<CoterieInfo> > getResourcesByIds(List<Long> coterieIdList) {
+		try {
+			List<CoterieInfo> CoterieInfos = coterieService.findList(coterieIdList);
+			return ResponseUtils.returnListSuccess(CoterieInfos);
+		} catch (QuanhuException e) {
+			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);
 		}
 	}

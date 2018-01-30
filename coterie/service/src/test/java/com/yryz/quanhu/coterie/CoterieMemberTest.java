@@ -22,21 +22,17 @@ public class CoterieMemberTest {
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
 
-    //    private static Long memberId = 730941139577331712L;
-//    private static Long userId = 731154152775909376L;
-//    private static Long coterieId = 9382818189L;
+    private static Long memberId = 730941139577331712L;
+    private static Long userId = 731154152775909376L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
-
-    private static Long userId = 727909974996672512L;
-    private static Long coterieId = 233665981858L;
-    private static Long memberId = 737251236811898880L;
-
+    private static Long coterieId = 9382818189L;
 
     @Test
     public void test010_Join() {
-        Response response = coterieMemberAPI.join(memberId, coterieId, "Think test");
+//        Response response = coterieMemberAPI.join(730941139577331712L,5536534415L,"我要加入,不审核的");
+        Response response = coterieMemberAPI.join(userId,coterieId,"我要加入,要审核的");
         System.out.println(JsonUtils.toFastJson(response));
     }
 
@@ -44,7 +40,7 @@ public class CoterieMemberTest {
     public void test020_audit() {
 
         try {
-            Response response = coterieMemberAPI.audit(userId, memberId, coterieId, null);
+            Response response = coterieMemberAPI.audit(userId,memberId,coterieId,null);
             System.out.println(JsonUtils.toFastJson(response));
         } catch (QuanhuException e) {
             e.getMsg();
@@ -58,13 +54,13 @@ public class CoterieMemberTest {
 
     @Test
     public void test030_banSpeak() {
-        Response response = coterieMemberAPI.banSpeak(userId, memberId, coterieId, 1);
+        Response response = coterieMemberAPI.banSpeak(userId,memberId,coterieId, 1);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
     public void test040_permission() {
-        Response response = coterieMemberAPI.permission(userId, coterieId);
+        Response response = coterieMemberAPI.permission(userId,coterieId);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
@@ -76,25 +72,25 @@ public class CoterieMemberTest {
 
     @Test
     public void test060_memberApplyList() {
-        Response response = coterieMemberAPI.queryMemberApplyList(coterieId, 1, 10);
+        Response response = coterieMemberAPI.queryMemberApplyList(coterieId,1,10);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
     public void test070_memberList() {
-        Response response = coterieMemberAPI.queryMemberList(coterieId, 1, 10);
+        Response response = coterieMemberAPI.queryMemberList(coterieId,1,10);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
     public void test080_kick() {
-        Response response = coterieMemberAPI.kick(userId, memberId, coterieId, "就要踢你");
+        Response response = coterieMemberAPI.kick(userId,memberId,coterieId,"就要踢你");
         System.out.println(JsonUtils.toFastJson(response));
     }
 
     @Test
     public void test090_quit() {
-        Response response = coterieMemberAPI.quit(memberId, coterieId);
+        Response response = coterieMemberAPI.quit(memberId,coterieId);
         System.out.println(JsonUtils.toFastJson(response));
     }
 }
