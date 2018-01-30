@@ -8,12 +8,12 @@ package com.yryz.quanhu.behavior.count.contants;
  */
 public enum BehaviorEnum {
     Comment("10", "commentCount", false, "评论"),
-    Like("11", "likeCount", true, "点赞"),
+    Like("11", "likeCount", false, "点赞"),
     Read("12", "readCount", true, "浏览"),
     Transmit("13", "transmitCount", false, "转发"),
     Reward("14", "rewardCount", false, "打赏"),
     Collection("15", "collectionCount", false, "收藏"),
-    Share("16", "shareCount", true, "分享"),
+    Share("16", "shareCount", false, "分享"),
     Report("17", "reportCount", false, "举报"),
     Release("18", "releaseCount", false, "发布数"),
     Coterie("19", "coterieCount", false, "私圈数"),

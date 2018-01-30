@@ -463,4 +463,47 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return datetimeFormat.format(now());
     }
 
+    /**
+     * 获取两个时间差的小时数
+     *
+     * @param dateA
+     * @param dateB
+     * @return
+     */
+    public static long getDistanceHours(Date dateA, Date dateB) {
+        long diff = dateA.getTime() - dateB.getTime();
+        return Math.abs(diff / 1000 / 60 / 60);
+    }
+
+    /**
+     * 获取当前时间所在日的分钟数
+     *
+     * @return
+     */
+    public static long getCurMinutes() {
+        Date date = new Date();
+        long curMinutes = date.getTime();
+        long beginMinutes = getBeginTimeOfDate(date).getTime();
+        long minutes = (curMinutes - beginMinutes) / 1000 / 60;
+        return minutes > 0 ? minutes : 0;
+    }
+
+    /**
+     * 获取当前日开始时间
+     *
+     * @param date
+     * @return
+     */
+    public static Date getBeginTimeOfDate(Date date) {
+        String strDate = formatDate(date, new Object[]{"yyyy-MM-dd"}) + " 00:00:00";
+        Date beginOfDate = null;
+
+        try {
+            beginOfDate = parseDate(strDate, new String[]{"yyyy-MM-dd HH:mm:ss"});
+        } catch (ParseException var4) {
+            var4.printStackTrace();
+        }
+
+        return beginOfDate;
+    }
 }
