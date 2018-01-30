@@ -51,6 +51,7 @@ public class TopicPostVo  implements Serializable {
         this.kid = kid;
     }
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public Long getTopicId() {
         return topicId;
     }

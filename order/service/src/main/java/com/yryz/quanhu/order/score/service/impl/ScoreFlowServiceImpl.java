@@ -38,6 +38,11 @@ public class ScoreFlowServiceImpl implements ScoreFlowService {
 	public List<EventReportVo> getAll(String userId) {
 		return scoreFlowDao.getAll(userId);
 	}
+	
+	@Override
+	public List<EventReportVo> getOne(String userId) {
+		return scoreFlowDao.getOne(userId);
+	}
 
 	@Override
 	public List<ScoreFlow> getPage(ScoreFlowQuery sfq) {

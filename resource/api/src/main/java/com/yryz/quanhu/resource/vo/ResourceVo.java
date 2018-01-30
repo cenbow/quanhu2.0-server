@@ -9,6 +9,9 @@ package com.yryz.quanhu.resource.vo;
 
 import java.io.Serializable;
 
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -129,6 +132,8 @@ public class ResourceVo implements Serializable {
      * 用户基础信息
      */
     private UserSimpleVO user;
+    
+    private CoterieInfo coterie;
 
 	/**
 	 * 
@@ -417,5 +422,19 @@ public class ResourceVo implements Serializable {
 	public void setUser(UserSimpleVO user) {
 		this.user = user;
 	}
-    
+
+	/**
+	 * @return the coterie
+	 */
+	public CoterieInfo getCoterie() {
+		return coterie;
+	}
+
+	/**
+	 * @param coterie the coterie to set
+	 */
+	public void setCoterie(CoterieInfo coterie) {
+		this.coterie = coterie;
+	}
+	
 }

@@ -27,5 +27,29 @@
 		select <include refid="columns" />  from score_status where user_id = #{userId} and event_code = #{eventCode} and
 		DATE_FORMAT(#{createDate} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d')
 	</select>
+	
+	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventReportVo">
+		select
+			<include refid="columns" />
+			from score_status where user_id = #{userId} 
+		
+		<if test="circleId != null">
+			and circle_id = #{circleId}
+		</if>
+		<if test="eventCode != null">
+			and event_code = #{eventCode}
+		</if>
+		<if test="eventCode != null">
+			and event_code = #{eventCode}
+		</if>
+		<if test="createTime != null">
+			and create_time &gt;= #{createTime}
+		</if>
+		<if test="updateTime != null">
+			and update_time &lt;= #{updateTime}
+		</if>
+		<!-- user_id = #{userId} and event_code = #{eventCode} and
+		DATE_FORMAT(#{createDate} , '%Y-%m-%d') = DATE_FORMAT(create_time , '%Y-%m-%d') -->
+	</select>
 
 </mapper>

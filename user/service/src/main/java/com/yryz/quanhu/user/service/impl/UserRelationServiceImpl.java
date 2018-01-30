@@ -583,7 +583,34 @@ public class UserRelationServiceImpl implements UserRelationService{
     @Override
     public List<UserRelationDto> selectBy(String sourceUserId, Set<String> targetUserIds) {
 
-        return userRelationDao.selectUserToTarget(UserRelationDto.class,sourceUserId,targetUserIds);
+        /**
+         * 合并双向关系数据
+         */
+        List<UserRelationDto> userAlls = userRelationDao.selectByUserAll(UserRelationDto.class,sourceUserId,targetUserIds);
+        Iterator<String> iterator = targetUserIds.iterator();
+        List<UserRelationDto> newArray = new ArrayList<>();
+
+        while (iterator.hasNext()){
+
+            String _targetUserId = iterator.next();
+
+            UserRelationDto user2TargetDto = null;
+            UserRelationDto target2UserDto = null;
+
+            for (int j = 0 ; j < userAlls.size(); j++){
+                UserRelationDto _dto = userAlls.get(j);
+                if(_targetUserId.equalsIgnoreCase(_dto.getSourceUserId())){
+                    target2UserDto = _dto;
+                    break;
+                }
+                if(_targetUserId.equalsIgnoreCase(_dto.getTargetUserId())){
+                    user2TargetDto = _dto;
+                    break;
+                }
+            }
+            newArray.add(mergeRelation(user2TargetDto,target2UserDto));
+        }
+        return newArray;
     }
 
     @Override

@@ -44,9 +44,10 @@ public class SendMessageServiceImpl implements SendMessageService {
      * @return
      */
     @Override
-    public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant) {
+    public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant,Boolean persistent) {
         Long kid=messageBusinessVo.getKid();
         Long tosendUserId=messageBusinessVo.getTosendUserId();
+        long fromUserId=messageBusinessVo.getFromUserId();
         String title=messageBusinessVo.getTitle();
         Byte isAnonymity=messageBusinessVo.getIsAnonymity();
         String coterieId=messageBusinessVo.getCoterieId();
@@ -54,8 +55,8 @@ public class SendMessageServiceImpl implements SendMessageService {
         String imgUrl=messageBusinessVo.getImgUrl();
         String moduleEnum=messageBusinessVo.getModuleEnum();
 
-        UserSimpleVO tosendUser = this.apIservice.getUser(tosendUserId);
-        if (null == tosendUser){
+        UserSimpleVO fromUser = this.apIservice.getUser(fromUserId);
+        if (null == fromUser){
             return false;
         }
 
@@ -74,10 +75,10 @@ public class SendMessageServiceImpl implements SendMessageService {
         if(coterieInfo!=null) {
             interactiveBody.setCoterieName(coterieInfo.getName());
         }
-        interactiveBody.setCustImg(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity) ? null : tosendUser.getUserImg());
+        interactiveBody.setCustImg(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity) ? null : fromUser.getUserImg());
         interactiveBody.setCustName(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity)
-                ? QuestionAnswerConstants.ANONYMOUS_USER_NAME : tosendUser.getUserNickName());
-        interactiveBody.setCustId(String.valueOf(tosendUser.getUserId()));
+                ? QuestionAnswerConstants.ANONYMOUS_USER_NAME : fromUser.getUserNickName());
+        interactiveBody.setCustId(String.valueOf(fromUser.getUserId()));
         interactiveBody.setCoterieId(coterieId);
 
         /**
@@ -98,8 +99,8 @@ public class SendMessageServiceImpl implements SendMessageService {
          */
         String content = messageConstant.getContent();
         if (messageConstant == MessageConstant.QUESTION_TO_BE_ANSWERED || messageConstant == MessageConstant.ANSWER_PAYED) {
-            if (StringUtils.isNotEmpty(tosendUser.getUserNickName())) {
-                content = content.replaceAll("\\{someone\\}", tosendUser.getUserNickName());
+            if (StringUtils.isNotEmpty(fromUser.getUserNickName())) {
+                content = content.replaceAll("\\{someone\\}", fromUser.getUserNickName());
             }
         }
 
@@ -123,11 +124,11 @@ public class SendMessageServiceImpl implements SendMessageService {
             }
         }
         messageVo.setContent(content);
-        messageVo.setToCust(String.valueOf(tosendUser.getUserId()));
+        messageVo.setToCust(String.valueOf(tosendUserId));
         messageVo.setViewCode(messageConstant.getMessageViewCode());
         messageVo.setBody(interactiveBody);
         messageVo.setModuleEnum(moduleEnum);
-        Response<Boolean> data = messageAPI.sendMessage(messageVo, true);
+        Response<Boolean> data = messageAPI.sendMessage(messageVo, persistent);
         if (ResponseConstant.SUCCESS.getCode().equals(data.getCode())) {
             return data.getData();
         }

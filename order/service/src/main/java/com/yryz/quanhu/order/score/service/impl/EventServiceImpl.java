@@ -1,5 +1,7 @@
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -12,10 +14,13 @@ import org.springframework.http.converter.json.GsonBuilderUtils;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.google.gson.Gson;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.common.AmqpConstant;
 import com.yryz.quanhu.order.score.dao.mongo.EventLogDao;
+import com.yryz.quanhu.order.score.entity.ScoreStatus;
 import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
+import com.yryz.quanhu.order.score.service.ScoreStatusService;
 import com.yryz.quanhu.order.score.service.SysEventManageService;
 import com.yryz.quanhu.order.score.type.EventTypeEnum;
 import com.yryz.quanhu.score.entity.SysEventInfo;
@@ -23,7 +28,7 @@ import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
- * @author xiepeng
+ * @author syc
  * @version 1.0
  */
 @Service
@@ -48,6 +53,9 @@ public class EventServiceImpl implements EventService {
 	@Autowired
 	ConversionService conversionService;
 	
+	@Autowired
+	ScoreStatusService scoreStatusService;
+	
 	/**
 	 * rabbitTemplate 可以直接注入，由spring-boot负责维护连接池对象
 	 */
@@ -68,8 +76,30 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<EventReportVo> getScoreFlowList(EventInfo log) {
-		return scoreFlowService.getAll(log.getUserId());
- 
+		
+		return scoreFlowService.getOne(log.getUserId());
+		
+//		ScoreStatus ss = new ScoreStatus();
+//		try {
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//			if (!StringUtils.isBlank(log.getCircleId())) {
+//				ss.setCircleId(log.getCircleId());
+//			}
+//			if (!StringUtils.isBlank(log.getUserId())) {
+//				ss.setUserId(log.getUserId());
+//			}
+//			if (!StringUtils.isBlank(log.getEventCode())) {
+//				ss.setEventCode(log.getEventCode());
+//			}
+//			if (log.getCreateTime() != null && !"".equals(log.getCreateTime())) {
+//				ss.setCreateTime(sdf.parse(log.getCreateTime()));
+//			}
+//		} catch (ParseException e) {
+//			logger.info("getScoreFlowList is error : " + e);
+//			//e.printStackTrace();
+//		}
+		//return scoreStatusService.getAll(ss);
+
 	}
 
 	@Override
@@ -105,12 +135,12 @@ public class EventServiceImpl implements EventService {
 			logger.info("-----------分发事件至成长队列---------,传入数据："+ bodys.toString());
 		}
 
-//		if (typeCodes.contains(EventTypeEnum.Hot.getTypeCode())) {
+		if (typeCodes.contains(EventTypeEnum.Hot.getTypeCode())) {
 			rabbitTemplate.setExchange(AmqpConstant.EVENT_DIRECT_EXCHANGE);
 			rabbitTemplate.setRoutingKey(AmqpConstant.HOT_SPOT_QUEUE);
 			rabbitTemplate.convertAndSend(bodys);
 			logger.info("-----------分发事件至热度队列---------,传入数据："+ bodys.toString());
-//		}
+		}
 //		mqSender.sendEvent(EventExchangeEnum.Fanout, null, bodys);
 //		logger.info("-----------分发事件至统计分发队列---------,传入数据："+ bodys.toString());
 	}

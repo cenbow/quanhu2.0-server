@@ -10,6 +10,8 @@ public class MessageBusinessVo {
 
    private  Long kid;
 
+   private  Long fromUserId;
+
    private Long tosendUserId;
 
     private String title;
@@ -30,6 +32,14 @@ public class MessageBusinessVo {
 
     public void setKid(Long kid) {
         this.kid = kid;
+    }
+
+    public Long getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(Long fromUserId) {
+        this.fromUserId = fromUserId;
     }
 
     public Long getTosendUserId() {

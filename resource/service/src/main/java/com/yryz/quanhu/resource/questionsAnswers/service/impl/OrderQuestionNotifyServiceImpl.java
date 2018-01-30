@@ -48,10 +48,11 @@ public class OrderQuestionNotifyServiceImpl implements IOrderNotifyService {
          messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
          messageBusinessVo.setKid(question.getKid());
          messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+         messageBusinessVo.setFromUserId(question.getCreateUserId());
          messageBusinessVo.setTosendUserId(question.getCreateUserId());
          messageBusinessVo.setTitle(question.getContent());
          messageBusinessVo.setImgUrl("");
-         Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID);
+         Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID,true);
          if (!sendMessageResult) {
              logger.error("问题支付成功发送问题失败,提问的kid{}", question.getKid());
          }

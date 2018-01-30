@@ -5,9 +5,9 @@
  * ---------------------------------------------------------------------
  * 2017-08-23 Created
  */
-package com.yryz.quanhu.support.category.dao;
+package com.yryz.quanhu.other.category.dao;
 
-import com.yryz.quanhu.support.category.entity.Category;
+import com.yryz.quanhu.other.category.entity.Category;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

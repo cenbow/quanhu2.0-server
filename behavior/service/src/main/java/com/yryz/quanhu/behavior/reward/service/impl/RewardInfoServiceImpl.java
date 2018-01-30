@@ -2,6 +2,9 @@ package com.yryz.quanhu.behavior.reward.service.impl;
 
 import java.util.List;
 
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
+import com.yryz.quanhu.behavior.reward.vo.RewardFlowVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +70,29 @@ public class RewardInfoServiceImpl implements RewardInfoService {
     @Override
     public int updateByKid(RewardInfo record) {
         return this.getDao().updateByKid(record);
+    }
+
+    @Override
+    public PageList<RewardFlowVo> selectRewardFlow(Long userId, Integer currentPage, Integer pageSize) {
+        if (null == userId) {
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "用户ID不能为空");
+        }
+        if (null == currentPage) {
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "页码不能为空");
+        }
+        if (null == pageSize) {
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "每页条数不能为空");
+        }
+        PageList<RewardFlowVo> pageList = new PageList<>();
+        pageList.setCurrentPage(currentPage);
+        pageList.setPageSize(pageSize);
+        //开启分页
+        PageUtils.startPage(currentPage, pageSize);
+        pageList.setEntities(this.getDao().selectRewardFlow(userId));
+        return pageList;
     }
 
 }

@@ -11,7 +11,7 @@ package com.yryz.quanhu.resource.dao.redis;
  * @author yehao
  * @version 2.0
  * @date 2018年1月29日 上午9:44:20
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description redis的key枚举管理
  */
 public class RedisConstant {
 	

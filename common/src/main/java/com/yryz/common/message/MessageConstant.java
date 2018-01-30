@@ -41,6 +41,11 @@ public enum MessageConstant {
     QUESTION_TO_BE_ANSWERED(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_ANSWER, "问题待回答通知", "{someone}向您提了一个问题。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
+     *
+     */
+    QUESTION_TO_BE_REJECT(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_ANSWER, "圈主拒绝回答问题", "{someone}拒绝了您的提问。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+
+    /**
      * 问题待回答
      */
     QUESTION_HAVE_ANSWERED(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_ANSWER, "问题回答通知", "{someone}回答了您的提问。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),

@@ -76,7 +76,7 @@ public class BehaviorEventValidAspect {
             return;
         }
 
-        logger.info("[用户行为说明]------------★["+validation.event()+"]★-------------");
+        logger.info("[用户说明]------------★["+validation.event()+"]★-------------");
 
         //取值方式{注解中都用占位符标识，这需要通过切面方法参数中获取指定值}
         UserBehaviorArgs args = method.getDeclaredAnnotation(UserBehaviorArgs.class);

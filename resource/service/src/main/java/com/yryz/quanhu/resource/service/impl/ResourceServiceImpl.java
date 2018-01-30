@@ -19,13 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.yryz.quanhu.resource.dao.canal.ResourceCanalDao;
 import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.dao.redis.ResourceRedis;
 import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.hotspot.service.HotspotService;
 import com.yryz.quanhu.resource.service.ResourceService;
-import com.yryz.quanhu.resource.vo.ResourceVo;
 
 /**
  * @author yehao
@@ -47,6 +47,9 @@ public class ResourceServiceImpl implements ResourceService {
 	@Autowired
 	HotspotService hotspotService;
 	
+	@Autowired
+	ResourceCanalDao resourceCanalDao;
+	
 	/**
 	 * 提交资源
 	 * @param resources
@@ -58,15 +61,29 @@ public class ResourceServiceImpl implements ResourceService {
 			for (ResourceModel resourceModel : resources) {
 				if(resourceMongo.get(resourceModel) != null){
 					resourceMongo.update(resourceModel);
+					updateCache(resourceModel.getResourceId());
 				} else {
 					resourceMongo.save(resourceModel);
 					//创建资源时候要创建对应的热度对象
 					hotspotService.saveHeat("1", resourceModel.getResourceId() , resourceModel.getTalentType());
+					resourceCanalDao.sendToCannel(resourceModel.getResourceId(), 0L);
+					updateCache(resourceModel.getResourceId());
 				}
 			}
 		}
 	}
-
+	
+	/**
+	 * 更新redis缓存
+	 * @param resourceId
+	 */
+	public void updateCache(String resourceId){
+		ResourceModel model = resourceMongo.get(resourceId);
+		if(model != null){
+			resourceRedis.saveResource(model);
+		}
+	}
+	
 	/**
 	 * 更新资源
 	 * @param resources
@@ -77,6 +94,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
 				resourceMongo.update(resourceModel);
+				updateCache(resourceModel.getResourceId());
 			}
 		}
 		
@@ -92,6 +110,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
 				resourceMongo.delete(resourceModel);
+				updateCache(resourceModel.getResourceId());
 			}
 		}
 	}

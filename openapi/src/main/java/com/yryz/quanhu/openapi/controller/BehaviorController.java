@@ -2,7 +2,10 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
@@ -50,12 +53,12 @@ public class BehaviorController {
     @NotLogin
     @ApiOperation("查询统计以及状态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/behavior/countFlag")
-    Response<Map<String, Long>> getAllCountFlag(@RequestBody Map<String,Object> map,@RequestHeader Long userId){
-        Map<String,Object> maps=new HashMap<String, Object>();
-        maps.put("userId",userId);
-        maps.put("resourceId",map.get("kid"));
-        return  countFlagApi.getAllCountFlag(map.get("countType").toString(),Long.valueOf(map.get("kid").toString()),map.get("page").toString(),maps);
+    @PostMapping(value = "/services/app/{version}/behavior/getCountFlag")
+    Response<Map<String, Long>> getCountFlag(@RequestHeader Long userId, @RequestParam String countType, @RequestParam Long kid, HttpServletRequest request) {
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("用户ID为空"));
+        }
+        return countApi.getCountFlag(countType, kid, "", userId);
     }
 
 

@@ -100,7 +100,7 @@ public class AuthServiceImpl implements AuthService {
 				return TokenCheckEnum.SUCCESS;
 			} else {
 				// refreshToken存在时，校验长期token，否则判断token为过期
-				if(StringUtils.isBlank(refreshToken)){
+				if(StringUtils.isNotBlank(refreshToken)){
 					if (StringUtils.equals(refreshToken, tokenVO.getRefreshToken())
 							&& System.currentTimeMillis() < tokenVO.getRefreshExpireAt()) {
 						return TokenCheckEnum.EXPIRE;
