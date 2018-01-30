@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
@@ -70,6 +71,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private AnswerService answerService;
 
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private OrderSDK orderSDK;
@@ -205,6 +208,7 @@ public class QuestionServiceImpl implements QuestionService {
         resourceTotal.setResourceId(question.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionQuery.getCreateUserId());
+        resourceTotal.setCoterieId(String.valueOf(questionQuery.getCoterieId()));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
         return question;
     }
@@ -319,9 +323,9 @@ public class QuestionServiceImpl implements QuestionService {
         }
         questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
 
-        //提交阅读数
-        // TODO: 2018/1/29 0029
 
+        //虚拟阅读数
+        readApi.read(kid);
         /**
          * 提交积分成长值事件
          */

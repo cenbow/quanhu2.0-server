@@ -1,10 +1,12 @@
 package com.yryz.quanhu.resource.topic.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
@@ -38,13 +40,14 @@ public class TopicServiceImpl implements TopicService {
     @Autowired
     private APIservice apIservice;
 
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private TopicPostService topicPostService;
 
     /**
      * 发布话题
-     *
      * @param topicDto
      * @return
      */
@@ -114,6 +117,9 @@ public class TopicServiceImpl implements TopicService {
         Long replyCount=this.topicPostService.countPostByTopicId(topicVo.getKid());
         topicVo.setReplyCount(replyCount);
         topicVo.setModuleEnum(ResourceTypeEnum.TOPIC);
+
+        //虚拟阅读数
+        readApi.read(kid);
 
         return topicVo;
     }
