@@ -244,7 +244,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      *
      * @return
      */
-    public static String getNextDay() {
+    public static String getYesterDay() {
         Calendar calendar = Calendar.getInstance();
         Date date = new Date();
         calendar.setTime(date);
