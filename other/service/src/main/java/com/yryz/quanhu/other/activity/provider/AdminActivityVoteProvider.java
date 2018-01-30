@@ -59,14 +59,14 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 
 	@Override
 	public Response<AdminActivityInfoVo1> getActivityDetail(Long id){
-		AdminActivityInfoVo1 adminActivityInfoVo1 = null;
+		AdminActivityInfoVo1 activityInfo = null;
 		try {
-			adminActivityInfoVo1 = adminActivityVoteService.getActivityDetail(id);
+			activityInfo = adminActivityVoteService.getActivityDetail(id);
 		} catch (Exception e) {
 			logger.error("后台获取活动失败:"+ id);
 			return ResponseUtils.returnException(e);
 		}
-		return ResponseUtils.returnObjectSuccess(adminActivityInfoVo1);
+		return ResponseUtils.returnObjectSuccess(activityInfo);
 	}
 
 	@Override
