@@ -1,6 +1,7 @@
 package com.yryz.quanhu.order.score.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yryz.quanhu.order.score.dao.persistence.ScoreStatusDao;
 import com.yryz.quanhu.order.score.entity.ScoreStatus;
 import com.yryz.quanhu.order.score.service.ScoreStatusService;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * Created by lsn on 2017/8/28.
@@ -35,6 +37,11 @@ public class ScoreStatusServiceImpl implements ScoreStatusService{
 	@Override
 	public ScoreStatus getById(String userId, String appId, Long id , Date createDate) {
 		return scoreStatusDao.getById(userId, appId, id , createDate);
+	}
+
+	@Override
+	public List<EventReportVo> getAll(ScoreStatus ss){
+		return scoreStatusDao.getAll(ss);
 	}
 
 	@Override

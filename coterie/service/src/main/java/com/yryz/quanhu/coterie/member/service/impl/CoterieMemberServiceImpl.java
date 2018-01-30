@@ -181,16 +181,16 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         try {
             CoterieInfo coterie = coterieService.find(coterieId);
             if (coterie != null) {
-                //update kickStatus
+                //update member kickStatus
                 CoterieMember coterieMember = new CoterieMember();
                 coterieMember.setUserId(userId);
                 coterieMember.setCoterieId(coterieId);
                 coterieMember.setReason(reason);
                 coterieMember.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
-                coterieMember.setDelFlag(MemberConstant.KickStatus.KICKED.getStatus());
+                coterieMember.setKickStatus(MemberConstant.KickStatus.KICKED.getStatus());
                 int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
 
-                //update delFlag
+                //update apply delFlag
                 CoterieMemberApply apply = new CoterieMemberApply();
                 apply.setUserId(userId);
                 apply.setCoterieId(coterieId);
@@ -273,7 +273,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             //是否为成员
             CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
-            if (null != member) {
+            if (null != member && member.getDelFlag().equals(MemberConstant.DelFlag.NORMAL.getStatus())) {
                 return MemberConstant.Permission.MEMBER.getStatus();
             }
 
@@ -295,7 +295,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
 
-        if (member.getBanSpeak() == MemberConstant.BanSpeak.BANSPEAK.getStatus()) {
+        if (member.getDelFlag().equals(MemberConstant.DelFlag.NORMAL.getStatus()) && member.getBanSpeak() == MemberConstant.BanSpeak.BANSPEAK.getStatus()) {
             return true;
         }
         return false;
@@ -312,23 +312,23 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void audit(Long userId, Long coterieId, Byte memberStatus) {
-        Integer result = null;
+    public void audit(Long userId, Long coterieId, Byte memberStatus, Byte joinType) {
 
-        String reason = null;
         try {
-            if (null == memberStatus) {
-                result = saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
+
+            CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
+
+            if (memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
+                saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
+
+                saveOrUpdateMember(userId, coterieId, memberApply.getReason(), joinType );
+
+                //todo event
+                coterieEventManager.joinCoterieEvent(coterieId);
             } else {
-                result = saveOrUpdateApply(userId, coterieId, "", memberStatus);
+                saveOrUpdateApply(userId, coterieId, "", memberStatus);
             }
 
-            if (result > 0 && memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
-                saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
-            }
-
-            //todo event
-            coterieEventManager.joinCoterieEvent(coterieId);
 
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);

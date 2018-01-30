@@ -5,9 +5,7 @@
  * Created on 2018年1月22日
  * Id: PayMsgConstant.java, 2018年1月22日 下午4:03:47 yehao
  */
-package com.yryz.quanhu.support.category.constants;
-
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+package com.yryz.quanhu.other.category.constants;
 
 /**
  * @author chengyunfei

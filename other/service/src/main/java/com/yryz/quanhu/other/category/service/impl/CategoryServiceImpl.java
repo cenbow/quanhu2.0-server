@@ -1,13 +1,13 @@
-package com.yryz.quanhu.support.category.service.impl;
+package com.yryz.quanhu.other.category.service.impl;
 
 import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.support.category.constants.CategoryConstant;
-import com.yryz.quanhu.support.category.dao.CategoryDao;
-import com.yryz.quanhu.support.category.entity.Category;
-import com.yryz.quanhu.support.category.service.ICategoryService;
-import com.yryz.quanhu.support.category.vo.CategoryCheckedVo;
-import com.yryz.quanhu.support.category.vo.CategoryDiscoverVo;
-import com.yryz.quanhu.support.category.vo.CategoryVo;
+import com.yryz.quanhu.other.category.constants.CategoryConstant;
+import com.yryz.quanhu.other.category.dao.CategoryDao;
+import com.yryz.quanhu.other.category.entity.Category;
+import com.yryz.quanhu.other.category.service.ICategoryService;
+import com.yryz.quanhu.other.category.vo.CategoryCheckedVo;
+import com.yryz.quanhu.other.category.vo.CategoryDiscoverVo;
+import com.yryz.quanhu.other.category.vo.CategoryVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -123,14 +123,14 @@ public class CategoryServiceImpl implements ICategoryService {
             categoryVo.setCategoryName(category.getCategoryName());
 
             if (checkAll) {
-                categoryVo.setChecked(1);
+                categoryVo.setChecked(10);
             } {
                 int index = categories.indexOf(category);
 
                 if (checkSet.contains(index)) {
-                    categoryVo.setChecked(1);
+                    categoryVo.setChecked(10);
                 } else {
-                    categoryVo.setChecked(0);
+                    categoryVo.setChecked(11);
                 }
             }
 

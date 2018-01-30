@@ -22,6 +22,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.resource.api.ResourceApi;
+import com.yryz.quanhu.resource.dao.canal.ResourceCanalDao;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.hotspot.service.CalculationService;
@@ -46,6 +47,9 @@ public class ResourceTest {
 	
 	@Autowired
 	private CalculationService calculationService;
+	
+	@Autowired
+	private ResourceCanalDao resourceCanalDao;
 	
 	@Test
 	public void commitResource(){
@@ -125,6 +129,11 @@ public class ResourceTest {
 	@Test
 	public void calculation(){
 		calculationService.calculation();
+	}
+	
+	@Test
+	public void sendToCanal(){
+		resourceCanalDao.sendToCannel("100001", 0L);
 	}
 
 }

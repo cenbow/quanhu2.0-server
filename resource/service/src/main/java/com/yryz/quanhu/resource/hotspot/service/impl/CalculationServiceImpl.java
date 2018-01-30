@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.resource.dao.canal.ResourceCanalDao;
 import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.hotspot.dao.HeatInfoMongo;
@@ -53,6 +54,9 @@ public class CalculationServiceImpl implements CalculationService {
 	
 	@Autowired
 	MongoTemplate mongoTemplate;
+	
+	@Autowired
+	private ResourceCanalDao resourceCanalDao;
 
 	/**
 	 * 热度统计
@@ -154,6 +158,7 @@ public class CalculationServiceImpl implements CalculationService {
 								resourceModel.setResourceId(resourceId);
 								resourceModel.setHeat(heatInfo.getHeat());
 								resourceMongo.update(resourceModel);
+								resourceCanalDao.sendToCannel(resourceId, heatInfo.getHeat());
 							} catch (Exception e) {
 								logger.info("更新资源热度失败：resourceId:" + resourceId);
 							}

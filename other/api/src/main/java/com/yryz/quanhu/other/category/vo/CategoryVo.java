@@ -1,14 +1,11 @@
-package com.yryz.quanhu.support.category.vo;
+package com.yryz.quanhu.other.category.vo;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-public class CategoryDiscoverVo implements Serializable {
+public class CategoryVo implements Serializable {
 
     private Long categoryId;
     private String categoryName;
-    private List<CategoryVo> subordinate = new ArrayList<>();
 
     public Long getCategoryId() {
         return categoryId;
@@ -24,13 +21,5 @@ public class CategoryDiscoverVo implements Serializable {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
-    }
-
-    public List<CategoryVo> getSubordinate() {
-        return subordinate;
-    }
-
-    public void setSubordinate(List<CategoryVo> subordinate) {
-        this.subordinate = subordinate;
     }
 }
