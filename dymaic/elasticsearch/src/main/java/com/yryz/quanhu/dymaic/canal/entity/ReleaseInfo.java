@@ -8,13 +8,16 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * @author jk
  * @table qh_release_info
  */
 public class ReleaseInfo implements Serializable {
 	private static final long serialVersionUID = 2924158707369787205L;
-	// 唯一ID
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long kid;
 	/**
 	 * 分类ID

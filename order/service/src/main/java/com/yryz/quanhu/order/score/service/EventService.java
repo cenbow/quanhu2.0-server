@@ -31,5 +31,5 @@ public interface EventService {
      * 查询积分流水记录
      * @return List
      */
-    List<EventReportVo> getScoreFlowList(EventInfo log);
+    EventReportVo getScoreFlowList(EventInfo log);
 }
