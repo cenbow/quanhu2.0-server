@@ -271,7 +271,20 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            logger.error("未知异常", e);
+            logger.error("selectByKids 未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<List<ReleaseInfoVo>> selectByCondition(ReleaseInfoDto dto) {
+        try {
+            Assert.notNull(dto, "dto is null !");
+            return ResponseUtils.returnListSuccess(this.releaseInfoService.selectByCondition(dto));
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("selectByCondition 未知异常", e);
             return ResponseUtils.returnException(e);
         }
     }
