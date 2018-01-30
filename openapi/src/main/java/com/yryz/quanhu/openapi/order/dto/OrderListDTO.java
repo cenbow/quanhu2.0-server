@@ -1,11 +1,13 @@
 /**
  * Copyright (c) 2018-2019 Wuhan Yryz Network Company LTD.
  * All rights reserved.
- * 
+ * <p>
  * Created on 2018年1月22日
  * Id: OrderListDTO.java, 2018年1月22日 下午4:51:23 yehao
  */
 package com.yryz.quanhu.openapi.order.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
@@ -16,166 +18,167 @@ import java.util.Date;
  * @Description 订单列表的DTO
  */
 public class OrderListDTO {
-	
-	/**
-	 * 客户ID
-	 */
-	private String custId;
-	/**
-	 * 订单ID
-	 */
-	private String orderId;
-	/**
-	 * 订单类型：1，加币；0，减币
-	 */
-	private Integer orderType;
-	/**
-	 * 交易金额
-	 */
-	private Long cost;
-	/**
-	 * 交易余额
-	 */
-	private Long accountSum;
-	/**
-	 * 产品ID
-	 */
-	private String productId;
-	/**
-	 * 产品类型
-	 */
-	private Integer productType;
-	/**
-	 * 产品说明
-	 */
-	private String productDesc;
-	/**
-	 * 订单描述
-	 */
-	private String orderDesc;
-	/**
-	 * 备注信息
-	 */
-	private String remarks;
-	/**
-	 * 创建时间
-	 */
-	private Date createTime;
 
-	public OrderListDTO() {
-		super();
-	}
+    /**
+     * 客户ID
+     */
+    @JsonProperty("userId")
+    private String custId;
+    /**
+     * 订单ID
+     */
+    private String orderId;
+    /**
+     * 订单类型：1，加币；0，减币
+     */
+    private Integer orderType;
+    /**
+     * 交易金额
+     */
+    private Long cost;
+    /**
+     * 交易余额
+     */
+    private Long accountSum;
+    /**
+     * 产品ID
+     */
+    private String productId;
+    /**
+     * 产品类型
+     */
+    private Integer productType;
+    /**
+     * 产品说明
+     */
+    private String productDesc;
+    /**
+     * 订单描述
+     */
+    private String orderDesc;
+    /**
+     * 备注信息
+     */
+    private String remarks;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
-	public OrderListDTO(String custId, String orderId, Integer orderType, Long cost, Long accountSum, String productId,
-			Integer productType, String productDesc, String orderDesc, String remarks, Date createTime) {
-		super();
-		this.custId = custId;
-		this.orderId = orderId;
-		this.orderType = orderType;
-		this.cost = cost;
-		this.accountSum = accountSum;
-		this.productId = productId;
-		this.productType = productType;
-		this.productDesc = productDesc;
-		this.orderDesc = orderDesc;
-		this.remarks = remarks;
-		this.createTime = createTime;
-	}
+    public OrderListDTO() {
+        super();
+    }
 
-	public String getCustId() {
-		return custId;
-	}
+    public OrderListDTO(String custId, String orderId, Integer orderType, Long cost, Long accountSum, String productId,
+                        Integer productType, String productDesc, String orderDesc, String remarks, Date createTime) {
+        super();
+        this.custId = custId;
+        this.orderId = orderId;
+        this.orderType = orderType;
+        this.cost = cost;
+        this.accountSum = accountSum;
+        this.productId = productId;
+        this.productType = productType;
+        this.productDesc = productDesc;
+        this.orderDesc = orderDesc;
+        this.remarks = remarks;
+        this.createTime = createTime;
+    }
 
-	public void setCustId(String custId) {
-		this.custId = custId;
-	}
+    public String getCustId() {
+        return custId;
+    }
 
-	public String getOrderId() {
-		return orderId;
-	}
+    public void setCustId(String custId) {
+        this.custId = custId;
+    }
 
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
+    public String getOrderId() {
+        return orderId;
+    }
 
-	public Integer getOrderType() {
-		return orderType;
-	}
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
 
-	public void setOrderType(Integer orderType) {
-		this.orderType = orderType;
-	}
+    public Integer getOrderType() {
+        return orderType;
+    }
 
-	public Long getCost() {
-		return cost;
-	}
+    public void setOrderType(Integer orderType) {
+        this.orderType = orderType;
+    }
 
-	public void setCost(Long cost) {
-		this.cost = cost;
-	}
+    public Long getCost() {
+        return cost;
+    }
 
-	public Long getAccountSum() {
-		return accountSum;
-	}
+    public void setCost(Long cost) {
+        this.cost = cost;
+    }
 
-	public void setAccountSum(Long accountSum) {
-		this.accountSum = accountSum;
-	}
+    public Long getAccountSum() {
+        return accountSum;
+    }
 
-	public String getProductId() {
-		return productId;
-	}
+    public void setAccountSum(Long accountSum) {
+        this.accountSum = accountSum;
+    }
 
-	public void setProductId(String productId) {
-		this.productId = productId;
-	}
+    public String getProductId() {
+        return productId;
+    }
 
-	public Integer getProductType() {
-		return productType;
-	}
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
 
-	public void setProductType(Integer productType) {
-		this.productType = productType;
-	}
+    public Integer getProductType() {
+        return productType;
+    }
 
-	public String getProductDesc() {
-		return productDesc;
-	}
+    public void setProductType(Integer productType) {
+        this.productType = productType;
+    }
 
-	public void setProductDesc(String productDesc) {
-		this.productDesc = productDesc;
-	}
+    public String getProductDesc() {
+        return productDesc;
+    }
 
-	public String getOrderDesc() {
-		return orderDesc;
-	}
+    public void setProductDesc(String productDesc) {
+        this.productDesc = productDesc;
+    }
 
-	public void setOrderDesc(String orderDesc) {
-		this.orderDesc = orderDesc;
-	}
+    public String getOrderDesc() {
+        return orderDesc;
+    }
 
-	public String getRemarks() {
-		return remarks;
-	}
+    public void setOrderDesc(String orderDesc) {
+        this.orderDesc = orderDesc;
+    }
 
-	public void setRemarks(String remarks) {
-		this.remarks = remarks;
-	}
+    public String getRemarks() {
+        return remarks;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	@Override
-	public String toString() {
-		return "OrderList [custId=" + custId + ", orderId=" + orderId + ", orderType=" + orderType + ", cost=" + cost
-				+ ", accountSum=" + accountSum + ", productId=" + productId + ", productType=" + productType
-				+ ", productDesc=" + productDesc + ", orderDesc=" + orderDesc + ", remarks=" + remarks + ", createTime="
-				+ createTime + "]";
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderList [custId=" + custId + ", orderId=" + orderId + ", orderType=" + orderType + ", cost=" + cost
+                + ", accountSum=" + accountSum + ", productId=" + productId + ", productType=" + productType
+                + ", productDesc=" + productDesc + ", orderDesc=" + orderDesc + ", remarks=" + remarks + ", createTime="
+                + createTime + "]";
+    }
 
 }

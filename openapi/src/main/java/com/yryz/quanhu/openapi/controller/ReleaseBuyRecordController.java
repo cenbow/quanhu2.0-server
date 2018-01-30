@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -11,6 +12,7 @@ import com.yryz.quanhu.resource.release.buyrecord.dto.ReleaseBuyRecordDto;
 import com.yryz.quanhu.resource.release.buyrecord.vo.ReleaseBuyRecordVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,7 +35,11 @@ public class ReleaseBuyRecordController {
     private ReleaseBuyRecordApi releaseBuyRecordApi;
 
     @ApiOperation("查询购买记录分页列表")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+            @ApiImplicitParam(name = "token", paramType = "header", required = true)
+    })
+    @UserBehaviorValidation(event = "查询购买记录分页列表", login = true)
     @GetMapping(value = "{version}/release/buyrecord/list")
     public Response<PageList<ReleaseBuyRecordVo>> list(ReleaseBuyRecordDto releaseBuyRecordDto, @RequestHeader("userId") Long userId) {
         if (null == releaseBuyRecordDto) {

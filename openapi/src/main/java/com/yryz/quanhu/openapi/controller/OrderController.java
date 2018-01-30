@@ -12,6 +12,7 @@ import com.rongzhong.component.pay.api.YryzPaySDK;
 import com.rongzhong.component.pay.entity.PayResponse;
 import com.rongzhong.component.pay.iospay.IosVerify;
 import com.rongzhong.component.pay.wxpay.Wxpay;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.exception.RpcOptException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -32,6 +33,7 @@ import com.yryz.quanhu.order.vo.*;
 import com.yryz.quanhu.user.service.UserApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
 import org.json.JSONObject;
@@ -65,18 +67,22 @@ public class OrderController {
 	
 	@Reference
 	private CommonSafeApi commonSafeApi;
-	
+
 	@Autowired
 	private PayService payService;
-	
+
 	/**
 	 * 设置支付密码
 	 * @param userPhy
 	 * @return
 	 */
     @ApiOperation("设置支付密码")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/pay/setPayPassword")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
+	@PostMapping(value = "/{version}/pay/setPayPassword")
 	public Response<?> setPayPassword(@RequestHeader String userId,@RequestBody UserPhy userPhy) {
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
@@ -99,7 +105,7 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("密码验证失败");
 		}
 	}
-    
+
     /**
      * 设置密保问题
      * @param userId
@@ -107,7 +113,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("设置密保问题")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/setSecurityProblem")
 	public Response<?> setSecurityProblem(@RequestHeader String userId, @RequestBody UserPhy userPhy) {
 		if (StringUtils.isEmpty(userId)) {
@@ -132,7 +142,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("找回支付密码")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/findPayPassword")
 	public Response<?> findPayPassword(@RequestHeader String appId, @RequestHeader String userId,
 									   @RequestBody FindPayPasswordDTO findPayPasswordDTO) {
@@ -187,7 +201,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("积分兑换")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/pointsToAccount")
     public Response<?> pointsToAccount(@RequestHeader String appId, @RequestHeader String userId,
 									   @RequestBody PointsToAccountDTO pointsToAccountDTO ) {
@@ -259,9 +277,13 @@ public class OrderController {
      * @return
      */
     @ApiOperation("获取账户信息")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/getUserAccount")
-	public Response<UserAccount> getUserAccount(@RequestHeader String userId) {
+	public Response<UserAccountVO> getUserAccount(@RequestHeader String userId) {
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
@@ -270,7 +292,16 @@ public class OrderController {
 			if (!response.success() || response.getData() == null) {
 				return ResponseUtils.returnCommonException("账户不存在");
 			} else {
-				return response;
+				//转换custId为userId
+				UserAccount account = response.getData();
+				UserAccountVO userAccountVO = new UserAccountVO();
+				userAccountVO.setAccountState(account.getAccountState());
+				userAccountVO.setAccountSum(account.getAccountSum());
+				userAccountVO.setCostSum(account.getCostSum());
+				userAccountVO.setIntegralSum(account.getIntegralSum());
+				userAccountVO.setSmallNopass(account.getSmallNopass());
+				userAccountVO.setUserId(account.getCustId());
+				return ResponseUtils.returnObjectSuccess(userAccountVO);
 			}
 		} catch (Exception e) {
 			logger.error("查询用户账户未知异常", e);
@@ -285,7 +316,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("用户提现")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/getCash")
 	public Response<?> getCash(@RequestHeader String appId, @RequestHeader String userId, @RequestBody GetCashDTO getCashDTO) {
 		// return ReturnCodeUtils.getWarnResult(ActEnums.GET_CASH, "资金系统正在维护中");
@@ -330,7 +365,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("计算充值手续费")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/getServiceCharge")
 	public Response<?> getServiceCharge() {
 		List<Map<String, Object>> list = DataEnum.getPayCharge();
@@ -344,7 +383,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("绑定银行卡")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/bindBankCard")
 	public Response<UserBankDTO> bindBankCard(@RequestHeader String userId, @RequestBody BindBankCardDTO bindBankCardDTO) {
     	String bankCardNo = bindBankCardDTO.getBankCardNo();
@@ -388,7 +431,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("我的银行卡列表")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/bankCardList")
 	public Response<?> bankCardList(@RequestHeader String userId) {
 		if (StringUtils.isEmpty(userId)) {
@@ -414,7 +461,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("设置默认卡")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/setDefaultBankCard")
 	public Response<?> setDefaultBankCard(@RequestHeader String userId, @RequestBody UserBankDTO userBankDTO) {
 		if (StringUtils.isEmpty(userId)) {
@@ -445,7 +496,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("解绑银行卡")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/unbindBankCard")
 	public Response<?> unbindBankCard(@RequestHeader String userId, @RequestBody UnbindBankCardDTO unbindBankCardDTO) {
 		if (StringUtils.isEmpty(userId)) {
@@ -487,7 +542,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("设置小额免密")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/setFreePay")
 	public Response<?> setFreePay(@RequestHeader String userId, @RequestBody FreePayDTO freePayDTO) {
     	Integer type = freePayDTO.getType();
@@ -520,7 +579,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("获取最低充值金额")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/getMinChargeAmount")
 	public Response<?> getMinChargeAmount() {
 		Map<String, Object> map = DataEnum.getMinChargeAmount();
@@ -535,7 +598,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("创建充值订单")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/getNewPayFlowId")
 	public Response<PayVO> getNewPayFlowId(@RequestHeader String userId, @RequestBody PayOrderDTO payOrderDTO, HttpServletRequest request) {
 		String payWay = payOrderDTO.getPayWay();
@@ -664,7 +731,11 @@ public class OrderController {
 	 * @return
 	 */
     @ApiOperation("获取安全信息")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/getUserPhy")
 	public Response<?> getUserPhy(@RequestHeader String userId) {
 		if (StringUtils.isEmpty(userId)) {
@@ -677,17 +748,15 @@ public class OrderController {
 				return ResponseUtils.returnCommonException("当前用户数据不存在，请重试");
 			}
 			Map<String, Object> json = new HashMap<>(5);
-			json.put("custId", userPhy.getCustId());
+			json.put("userId", userPhy.getCustId());
 			json.put("phyName", replaceStr(userPhy.getPhyName(), 1));
 			json.put("phyCardNo", replaceStr(userPhy.getCustIdcardNo(), 4));
-			if (userPhy != null && StringUtils.isEmpty(userPhy.getPayPassword())) {
+			if (StringUtils.isEmpty(userPhy.getPayPassword())) {
 				json.put("isPayPassword", 0);
 			} else {
 				json.put("isPayPassword", 1);
 			}
-			if (account != null) {
-				json.put("smallNopass", account.getSmallNopass());
-			}
+			json.put("smallNopass", account.getSmallNopass());
 			return ResponseUtils.returnObjectSuccess(json);
 		} catch (Exception e) {
 			logger.error("查询用户安全信息", e);
@@ -721,7 +790,11 @@ public class OrderController {
 	 * @return
 	 */
     @ApiOperation("获取订单列表")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/getOrderList")
 	public Response<OrderListDTO> getOrderList(@RequestHeader String userId, String date, Integer productType, Integer type,
 									Long start, Long limit) {
@@ -753,7 +826,11 @@ public class OrderController {
 	 * @return
      */
     @ApiOperation("苹果内购支付")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/checkIOSPay")
     public Response<?> checkIOSPay(@RequestHeader String userId, @RequestBody CheckIOSPayDTO checkIOSPayDTO) {
 		String orderId = checkIOSPayDTO.getOrderId();
@@ -822,7 +899,11 @@ public class OrderController {
 	 * @throws Exception
 	 */
     @ApiOperation("支付宝网页支付")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
 	@GetMapping(value = "{version}/pay/toAlipay")
 	public void toAlipay(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String orderId = request.getParameter("orderId");
@@ -845,7 +926,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("执行异步订单")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/executeOrder")
     public Response<?> executeOrder(@RequestHeader String userId, @RequestBody ExecuteOrderDTO executeOrderDTO) {
 		String orderId = executeOrderDTO.getOrderId();
@@ -870,7 +955,11 @@ public class OrderController {
      * @return
      */
     @ApiOperation("查询订单状态")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
+	})
+	@UserBehaviorValidation(login = true)
     @GetMapping(value = "/{version}/pay/getOrderInfo")
 	public Response<OrderInfo> getOrderInfo(String orderId) {
 		if (StringUtils.isEmpty(orderId)) {

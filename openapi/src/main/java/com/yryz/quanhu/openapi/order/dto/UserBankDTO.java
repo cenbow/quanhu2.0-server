@@ -10,6 +10,7 @@ package com.yryz.quanhu.openapi.order.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yryz.quanhu.openapi.utils.CommonUtils;
 
 /**
@@ -27,6 +28,7 @@ public class UserBankDTO implements Serializable {
 	/**
 	 * 用户ID
 	 */
+	@JsonProperty("userId")
 	private String custId;
 	/**
 	 * 银行卡号
