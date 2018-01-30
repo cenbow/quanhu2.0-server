@@ -18,6 +18,7 @@ import java.util.SortedMap;
 
 import javax.print.attribute.standard.RequestingUserName;
 
+import com.yryz.common.constant.ExceptionEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -748,7 +749,7 @@ public class PayService {
 			}
 		}  catch (Exception e) {
 			logger.warn("executeOrder exception", e);
-			return ResponseUtils.returnCommonException("sys error");
+			return ResponseUtils.returnCommonException(ExceptionEnum.Exception.getShowMsg());
 		}
 	}
 
