@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
@@ -39,7 +40,7 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.member.event.*;
 @Service(interfaceClass=CoterieAdminAPI.class)
-public class CoterieAdminAPIImpl implements CoterieAdminAPI {
+public class CoterieAdminProvider implements CoterieAdminAPI {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	@Resource
 	private CoterieService coterieService;
@@ -162,7 +163,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 	 * @return
 	 */
 	@Override
-	public List<CoterieAdmin> getCoterieList(CoterieSearchParam param) {
+	public Response<List<CoterieAdmin>> getCoterieList(CoterieSearchParam param) {
 		logger.info("CoterieAdminAPI.getCoterieList params: param:"+param);
 		if(param.getPageNum()==null){
 			param.setPageNum(1);
@@ -195,7 +196,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 					o.setReason(auditRecordList.get(0).getRemark());
 				}
 			}
-			return list;
+			return  ResponseUtils.returnListSuccess(list);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(),e);
 			throw ServiceException.sysError();
@@ -214,14 +215,14 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 	 * @return
 	 */
 	@Override
-	public List<CoterieAuditRecordInfo> getAuditRecordList(String coterieId,Integer pageNum, Integer pageSize) {
+	public Response<List<CoterieAuditRecordInfo>> getAuditRecordList(String coterieId,Integer pageNum, Integer pageSize) {
 		logger.info("CoterieAdminAPI.disagree params: coterieId:"+coterieId+",pageNum:"+pageNum+",pageSize:"+pageSize);
 		if(StringUtils.isEmpty(coterieId) || pageNum==null || pageNum<1 || pageSize==null || pageSize<1){
 			throw ServiceException.paramsError();
 		}
 		try{
 			List<CoterieAuditRecord> list=coterieService.findAuditRecordList(coterieId,pageNum, pageSize);
-			return (List<CoterieAuditRecordInfo>)GsonUtils.parseList(list, CoterieAuditRecordInfo.class);
+			return    ResponseUtils.returnListSuccess((List<CoterieAuditRecordInfo>)GsonUtils.parseList(list, CoterieAuditRecordInfo.class));
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(),e);
 			throw ServiceException.sysError();
@@ -238,7 +239,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 	 * @return
 	 */
 	@Override
-	public List<CoterieMemberInfo> getMemberList(MemberSearchParam param) {
+	public Response<List<CoterieMemberInfo>> getMemberList(MemberSearchParam param) {
 		logger.info("CoterieAdminAPI.getMemberList params: param:"+param);
 		if(param.getPageNum()==null){
 			param.setPageNum(1);
@@ -263,7 +264,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 					o.setRegisterDate(cust.getCreateDate().toString());
 				}
 			}
-			return list;
+			return ResponseUtils.returnListSuccess(list);
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(),e);
 			throw ServiceException.sysError();
@@ -280,7 +281,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 	 * @return
 	 */
 	@Override
-	public Integer getMemberCount(MemberSearchParam param) {
+	public Response<Integer> getMemberCount(MemberSearchParam param) {
 		logger.info("CoterieAdminAPI.getMemberCount params: param:"+param);
 		if(param.getPageNum()==null){
 			param.setPageNum(1);
@@ -289,7 +290,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 			param.setPageSize(10);
 		}
 		try{
-			return coterieMemberService.findCount(param);
+			return ResponseUtils.returnObjectSuccess(coterieMemberService.findCount(param));
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(),e);
 			throw ServiceException.sysError();
@@ -306,7 +307,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 	 * @return
 	 */
 	@Override
-	public Integer getCoterieCount(CoterieSearchParam param) {
+	public Response<Integer> getCoterieCount(CoterieSearchParam param) {
 		logger.info("CoterieAdminAPI.getCoterieCount params: param:"+param);
 		if(param.getPageNum()==null){
 			param.setPageNum(1);
@@ -315,7 +316,7 @@ public class CoterieAdminAPIImpl implements CoterieAdminAPI {
 			param.setPageSize(10);
 		}
 		try{
-			return coterieService.findCountBySearchParam(param);
+			return ResponseUtils.returnObjectSuccess(coterieService.findCountBySearchParam(param));
 		} catch (DatasOptException e) {
 			logger.error(e.getMessage(),e);
 			throw ServiceException.sysError();

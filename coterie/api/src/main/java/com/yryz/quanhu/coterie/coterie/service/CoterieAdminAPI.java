@@ -2,6 +2,7 @@ package com.yryz.quanhu.coterie.coterie.service;
 
 import java.util.List;
 
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecordInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieMemberInfo;
@@ -43,14 +44,15 @@ public interface CoterieAdminAPI {
 	 * @param param
 	 * @return
 	 */
-	public List<CoterieAdmin> getCoterieList(CoterieSearchParam param);
+	public Response<List<CoterieAdmin>>
+	getCoterieList(CoterieSearchParam param);
 	
 	/**
 	 * 私圈搜索 数量
 	 * @param param
 	 * @return
 	 */
-	public Integer getCoterieCount(CoterieSearchParam param);
+	public Response<Integer> getCoterieCount(CoterieSearchParam param);
 	
 	/**
 	 * 
@@ -65,21 +67,21 @@ public interface CoterieAdminAPI {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<CoterieAuditRecordInfo> getAuditRecordList(String coterieId, Integer pageNum, Integer pageSize);
+	public Response<List<CoterieAuditRecordInfo>> getAuditRecordList(String coterieId, Integer pageNum, Integer pageSize);
 	
 	/**
 	 * 成员搜索
 	 * @param param
 	 * @return
 	 */
-	public List<CoterieMemberInfo> getMemberList(MemberSearchParam param);
+	public Response<List<CoterieMemberInfo>> getMemberList(MemberSearchParam param);
 	
 	/**
 	 * 成员搜索   总数
 	 * @param param
 	 * @return
 	 */
-	public Integer getMemberCount(MemberSearchParam param);
+	public Response<Integer> getMemberCount(MemberSearchParam param);
 	
 	/**
 	 * 推荐私圈设置
