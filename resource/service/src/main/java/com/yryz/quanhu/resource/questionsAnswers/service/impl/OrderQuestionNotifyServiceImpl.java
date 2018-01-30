@@ -48,6 +48,7 @@ public class OrderQuestionNotifyServiceImpl implements IOrderNotifyService {
          messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
          messageBusinessVo.setKid(question.getKid());
          messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+         messageBusinessVo.setFromUserId(question.getCreateUserId());
          messageBusinessVo.setTosendUserId(question.getCreateUserId());
          messageBusinessVo.setTitle(question.getContent());
          messageBusinessVo.setImgUrl("");

@@ -94,7 +94,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Question saveQuestion(Question question) {
         /**
-         *检验传递的参数是否缺失
+         * 检验传递的参数是否缺失
          */
         Long citeriaId = question.getCoterieId();
         String targetId = question.getTargetId();
@@ -174,7 +174,8 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
         messageBusinessVo.setKid(question.getKid());
         messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
-        messageBusinessVo.setTosendUserId(question.getCreateUserId());
+        messageBusinessVo.setFromUserId(question.getCreateUserId());
+        messageBusinessVo.setTosendUserId(Long.valueOf(question.getTargetId()));
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setImgUrl("");
         Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_ANSWERED);
@@ -231,6 +232,7 @@ public class QuestionServiceImpl implements QuestionService {
                 messageBusinessVo.setIsAnonymity(questionBySearch.getIsAnonymity());
                 messageBusinessVo.setKid(questionBySearch.getKid());
                 messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+                messageBusinessVo.setFromUserId(questionBySearch.getCreateUserId());
                 messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
                 messageBusinessVo.setTitle(questionBySearch.getContent());
                 messageBusinessVo.setImgUrl("");

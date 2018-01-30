@@ -91,26 +91,46 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
 
+
+
+
         //向圈主支付回答的费用
         if(null!=questionCheck.getChargeAmount()){
             if(questionCheck.getChargeAmount().longValue()>0){
               Long orderId=  orderSDK.executeOrder(OrderEnum.ANSWER_ORDER,answerdto.getCreateUserId(),questionCheck.getChargeAmount());
               if(null!=orderId){
-                  question.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
-                  question.setOrderId(String.valueOf(orderId));
-                  this.questionService.updateByPrimaryKeySelective(question);
+                  answerWithBLOBs.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
+                  answerWithBLOBs.setOrderId(String.valueOf(orderId));
+                  this.answerDao.updateByPrimaryKeySelective(answerWithBLOBs);
+                  /**
+                   * 发送获取奖励金消息
+                   */
+                  MessageBusinessVo messageBusinessVo =new MessageBusinessVo();
+                  messageBusinessVo.setCoterieId(String.valueOf(answerWithBLOBs.getCoterieId()));
+                  messageBusinessVo.setIsAnonymity(null);
+                  messageBusinessVo.setKid(answerWithBLOBs.getKid());
+                  messageBusinessVo.setModuleEnum(ResourceTypeEnum.ANSWER);
+                  messageBusinessVo.setFromUserId(questionCheck.getCreateUserId());
+                  messageBusinessVo.setTosendUserId(answerWithBLOBs.getCreateUserId());
+                  messageBusinessVo.setTitle(answerWithBLOBs.getContent());
+                  messageBusinessVo.setAmount(questionCheck.getChargeAmount());
+                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED);
               }
             }
         }
+        /**
+         * 向圈粉发送已回答消息
+         */
         MessageBusinessVo messageBusinessVo =new MessageBusinessVo();
         messageBusinessVo.setCoterieId(String.valueOf(answerWithBLOBs.getCoterieId()));
         messageBusinessVo.setIsAnonymity(null);
-        messageBusinessVo.setKid(answerWithBLOBs.getKid());
+        messageBusinessVo.setKid(questionCheck.getKid());
         messageBusinessVo.setModuleEnum(ResourceTypeEnum.ANSWER);
+        messageBusinessVo.setFromUserId(answerWithBLOBs.getCreateUserId());
         messageBusinessVo.setTosendUserId(questionCheck.getCreateUserId());
         messageBusinessVo.setTitle(answerWithBLOBs.getContent());
         messageBusinessVo.setAmount(questionCheck.getChargeAmount());
-        questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED);
+        questionMessageService.sendNotify4Question(messageBusinessVo,MessageConstant.QUESTION_HAVE_ANSWERED);
         return answerVo;
     }
 
