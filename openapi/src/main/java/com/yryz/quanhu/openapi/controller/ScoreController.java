@@ -77,17 +77,17 @@ public class ScoreController {
 	@NotLogin
     @ApiOperation("积分事件")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/order/score/commit")
+	@PostMapping(value = "/{version}/score/commit")
 	public void commit(@RequestBody EventInfo event){
 		//EventInfo eventInfo = new EventInfo();
 		eventAPI.commit(event);
 	}
 	
 	@NotLogin
-    @ApiOperation("积分流水查询")
+    @ApiOperation("积分统计查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/order/score/getScoreFlowList")
-	public Response<List<EventReportVo>> getScoreFlowList(@ApiParam("事件对象")EventInfo event){
+    @GetMapping(value = "/{version}/score/getScoreFlowList")
+	public Response<List<EventReportVo>> getScoreFlowList(EventInfo event){
 		return eventAPI.getScoreFlowList(event);
 	}
 
