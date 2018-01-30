@@ -4,7 +4,7 @@ package com.yryz.quanhu.dymaic.canal.constant;
  * @author jk
  */
 public class CommonConstant {
-    public final static int BATCH_SIZE = 2 * 1024;
+    public final static int BATCH_SIZE = 5 * 1024;
 
     public class QuanHuDb {
         public final static String DB_NAME = "quanhu";
@@ -15,6 +15,8 @@ public class CommonConstant {
         public final static String TABLE_COTERIE = "qh_coterie";
         //用户标签
         public final static String TABLE_USER_TAG = "qh_user_tag";
+        //达人信息
+        public final static String TABLE_USER_STAR_AUTH = "qh_user_star_auth";
 
 
         /**

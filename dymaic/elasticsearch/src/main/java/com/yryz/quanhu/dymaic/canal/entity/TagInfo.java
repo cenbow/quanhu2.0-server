@@ -13,6 +13,9 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * @description
  */
 public class TagInfo {
+    @Field(type=FieldType.Long)
+    private Long kid;
+
     /**
      * userId
      */
@@ -31,7 +34,27 @@ public class TagInfo {
     @Field(type=FieldType.Long)
     private Long tagId;
 
+    /**
+     * 删除字段
+     */
+    @Field(type=FieldType.Integer)
+    private Byte delFlag;
 
+    public Long getKid() {
+        return kid;
+    }
+
+    public void setKid(Long kid) {
+        this.kid = kid;
+    }
+
+    public Byte getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Byte delFlag) {
+        this.delFlag = delFlag;
+    }
 
     public Long getUserId() {
         return userId;

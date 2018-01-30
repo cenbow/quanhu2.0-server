@@ -238,12 +238,12 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void saveBatch(){
 		UserTagDTO dto = new UserTagDTO();
-		dto.setTagIds("1,2,3");
+		dto.setTagIds("111,18,19");
 		dto.setTagType(UserTagType.US_SELECT.getType());
-		dto.setUserId(729671306726400000L);
+		dto.setUserId(738422165156233216L);
 		Response<Boolean> response = tagApi.batchSaveUserTag(dto);
 		System.out.println(JsonUtils.toFastJson(response));
 	}

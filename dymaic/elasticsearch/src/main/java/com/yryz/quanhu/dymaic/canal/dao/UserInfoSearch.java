@@ -12,4 +12,14 @@ import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
  */
 public interface UserInfoSearch {
 	List<UserInfo> search(String keyWord,Integer page,Integer size);
+
+
+	/**
+	 * 达人搜索
+	 * @param tagId
+	 * @param userId
+	 *@param pageNo
+	 * @param pageSize   @return
+	 */
+	List<UserInfo> searchStarUser(Long tagId, Long userId, Integer pageNo, Integer pageSize);
 }
