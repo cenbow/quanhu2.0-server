@@ -45,7 +45,7 @@ public class TopicDiffHandler implements DiffHandler {
 	
 	@Override
 	public void handler() {
-		String yesterday=DateUtils.getNextDay();
+		String yesterday=DateUtils.getYesterDay();
     	Response<List<Long>> res=topicApi.getKidByCreatedate(yesterday+" 00:00:00", yesterday+" 23:59:59");
     	if(!res.success()){
     		logger.error("diff topic error:"+res.getErrorMsg());
