@@ -1,7 +1,6 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -31,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class ActivityCandidateController {
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     private ActivityCandidateApi activityCandidateApi;
 
     @Reference(check = false, timeout = 30000)
@@ -39,7 +38,7 @@ public class ActivityCandidateController {
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")
@@ -52,13 +51,13 @@ public class ActivityCandidateController {
             try {
                 countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId), ActivityCountConstant.ACTIVITY_RECORD_COUNT,ActivityCountConstant.ACTIVITY_COUNT);
             } catch (Exception e) {
-                logger.error("接入记数异常:"+e.getMessage());
+                logger.error("接入记数异常:", e);
             }
         }
         return response;
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("参与投票活动")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/candidate/config")
@@ -80,7 +79,7 @@ public class ActivityCandidateController {
             try {
                 countApi.commitCount(BehaviorEnum.RealRead,activityVoteDto.getCandidateId(),ActivityCountConstant.CANDIDATE_ACTIVITY_DETAIL,ActivityCountConstant.COUNT);
             } catch (Exception e) {
-                logger.error("接入记数异常:"+e.getMessage());
+                logger.error("接入记数异常:", e);
             }
         }
         return activityVoteDetailVoResponse;

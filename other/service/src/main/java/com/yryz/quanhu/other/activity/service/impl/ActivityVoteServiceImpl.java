@@ -5,23 +5,29 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageConstant;
+import com.yryz.common.message.MessageVo;
+import com.yryz.common.message.SystemBody;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.MessageUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.other.activity.constants.ActivityCandidateConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.other.activity.dao.*;
 import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
+import com.yryz.quanhu.other.activity.entity.ActivityPrizes;
 import com.yryz.quanhu.other.activity.entity.ActivityUserPrizes;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
 
-import com.yryz.quanhu.other.activity.vo.ActivityPrizesVo;
-import com.yryz.quanhu.other.activity.vo.ActivityUserPrizesVo;
-import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
-import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
+import com.yryz.quanhu.other.activity.vo.*;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserApi;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +45,11 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 
     private Logger logger = LoggerFactory.getLogger(ActivityVoteServiceImpl.class);
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     IdAPI idAPI;
+
+    @Reference(check = false, timeout = 30000)
+    UserApi userApi;
 
     @Autowired
     ActivityInfoDao activityInfoDao;
@@ -59,6 +68,9 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 
     @Autowired
     ActivityVoteRecordDao activityVoteRecordDao;
+
+    @Reference(check = false, timeout = 30000)
+    MessageAPI messageAPI;
 
     @Autowired
     RedisTemplateBuilder templateBuilder;
@@ -101,7 +113,6 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         else if(now.compareTo(activityInfoVo.getBeginTime()) == 1 && now.compareTo(activityInfoVo.getEndTime()) == -1){
             activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_PROCESSING);
         }
-        //TODO:设置浏览数
         activityInfoVo.setAmountOfAccess(0L);
 
         return activityInfoVo;
@@ -276,43 +287,47 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         //获取可领取的奖品
         List<ActivityPrizesVo> activityPrizes = activityPrizesDao.selectAvailablePrizesVo(activityInfoId);
         if (!CollectionUtils.isEmpty(activityPrizes)) {
+            List<ActivityPrizesVo> prizesList = new ArrayList<>();
             for (ActivityPrizesVo activity : activityPrizes) {
                 if (activity != null) {
-                    List<ActivityPrizesVo> prizesList = new ArrayList<>();
                     //如果减少库存成功，加入待发放列表
                     if(activityPrizesDao.updateIssueNum(activity.getKid()) > 0) {
                         prizesList.add(activity);
                     }
-                    //插入用户奖品数据
-                    if(!CollectionUtils.isEmpty(prizesList)) {
-                        for(ActivityPrizesVo prizes : prizesList) {
-                            ActivityUserPrizes userPrize = new ActivityUserPrizes();
-                            userPrize.setCreateUserId(userId);
-                            userPrize.setPrizesName(prizes.getPrizesName());
-                            userPrize.setPrizesType(prizes.getPrizesType());
-                            userPrize.setCanNum(prizes.getCanNum());
-                            userPrize.setPhone(phone);
-                            UUID id = UUID.randomUUID();
-                            String[] idd = id.toString().split("-");
-                            userPrize.setOnlyCode(idd[0]);
-                            userPrize.setPrizesNum(prizes.getPrizesNum());
-                            userPrize.setPrizesUnit(prizes.getPrizesUnit());
-                            userPrize.setBeginTime(prizes.getBeginTime());
-                            userPrize.setEndTime(prizes.getEndTime());
-                            userPrize.setRemark(prizes.getRemark());
-                            userPrize.setState(1);
-                            userPrize.setActivityInfoId(activityInfoId);
-                            //生成投票编号
-                            Response<Long> idResult = idAPI.getSnowflakeId();
-                            if(!idResult.success()) {
-                                throw new QuanhuException(ExceptionEnum.SysException);
-                            }
-                            userPrize.setKid(idResult.getData());
-                            activityUserPrizesDao.insertByPrimaryKeySelective(userPrize);
-                            resultList.add(userPrize);
-                        }
-                        //TODO:发送短信提醒中奖，需要确认是否批量发送
+                }
+            }
+            //插入用户奖品数据
+            if(!CollectionUtils.isEmpty(prizesList)) {
+                //活动信息
+                ActivityVoteInfoVo voteInfo = this.getVoteInfo(activityInfoId);
+                for(ActivityPrizesVo prizes : prizesList) {
+                    ActivityUserPrizes userPrize = new ActivityUserPrizes();
+                    userPrize.setCreateUserId(userId);
+                    userPrize.setPrizesName(prizes.getPrizesName());
+                    userPrize.setPrizesType(prizes.getPrizesType());
+                    userPrize.setCanNum(prizes.getCanNum());
+                    userPrize.setPhone(phone);
+                    UUID id = UUID.randomUUID();
+                    String[] idd = id.toString().split("-");
+                    userPrize.setOnlyCode(idd[0]);
+                    userPrize.setPrizesNum(prizes.getPrizesNum());
+                    userPrize.setPrizesUnit(prizes.getPrizesUnit());
+                    userPrize.setBeginTime(prizes.getBeginTime());
+                    userPrize.setEndTime(prizes.getEndTime());
+                    userPrize.setRemark(prizes.getRemark());
+                    userPrize.setState(1);
+                    userPrize.setActivityInfoId(activityInfoId);
+                    //生成投票编号
+                    Response<Long> idResult = idAPI.getSnowflakeId();
+                    if(!idResult.success()) {
+                        throw new QuanhuException(ExceptionEnum.SysException);
                     }
+                    userPrize.setKid(idResult.getData());
+                    //保存用户的活动列表
+                    activityUserPrizesDao.insertByPrimaryKeySelective(userPrize);
+                    resultList.add(userPrize);
+                    //发送获得奖品的消息
+                    this.sendPrizesMessage(userId.toString(), voteInfo, prizes);
                 }
             }
         }
@@ -336,6 +351,37 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         pageList.setEntities(activityUserPrizesDao.selectUserPrizesList(activityVoteDto));
         pageList.setCount(page.getTotal());
         return pageList;
+    }
+
+    private void sendPrizesMessage(String userId, ActivityVoteInfoVo voteInfo, ActivityPrizesVo activity) {
+        try {
+            MessageConstant constant = MessageConstant.PRIZES_HAVE_POST;
+            MessageVo messageVo = new MessageVo();
+            messageVo.setMessageId(UUID.randomUUID().toString());
+            messageVo.setActionCode(constant.getMessageActionCode());
+            String content = null;
+		/*if (StringUtils.isNotEmpty(activityInfoVo.getTitle())) {
+			content = constant.getContent().replaceAll("\\{count\\}", activityInfoVo.getTitle());
+		}*/
+            if (StringUtils.isNotEmpty(activity.getPrizesName())) {
+                content = constant.getContent().replaceAll("\\{count1\\}", activity.getPrizesName());
+            }
+            content = content.replaceAll("\\{count2\\}", "1");
+            messageVo.setContent(content);
+            messageVo.setCreateTime(DateUtils.getDateTime());
+            messageVo.setLabel(constant.getLabel());
+            messageVo.setType(constant.getType());
+            messageVo.setTitle(constant.getTitle());
+            messageVo.setToCust(userId);
+            messageVo.setViewCode(constant.getMessageViewCode());
+            SystemBody body = new SystemBody();
+            body.setBodyTitle(voteInfo.getTitle());
+            body.setBodyImg(voteInfo.getCoverPlan());
+            messageVo.setBody(body);
+            messageAPI.sendMessage(messageVo, true);
+        } catch (Exception e) {
+            logger.error("领取奖品 失败", e);
+        }
     }
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {

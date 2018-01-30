@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.yryz.common.annotation.UserBehaviorValidation;
+import  com.yryz.common.annotation.UserBehaviorArgs;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,10 +43,10 @@ public class TopicController {
 	@ApiOperation("查询话题列表")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/services/app/{version}/topic/list")
-	public Response<PageList<TopicVo>> queryTopicList(Integer pageNum,Integer pageSize, Byte recommend ,String orderBy,Long coteriaId ,HttpServletRequest request) {
+	public Response<PageList<TopicVo>> queryTopicList(Integer currentPage,Integer pageSize, Byte recommend ,String orderBy,Long coteriaId ,HttpServletRequest request) {
 		TopicDto dto=new TopicDto();
 		dto.setPageSize(pageSize);
-		dto.setPageNum(pageNum);
+		dto.setCurrentPage(currentPage);
 		dto.setOrderBy(orderBy);
 		dto.setCoterieId(String.valueOf(coteriaId));
 		dto.setRecommend(recommend);
@@ -52,8 +54,11 @@ public class TopicController {
 	}
 
 
-	@ApiOperation("圈主删除话题")
+	@ApiOperation("删除话题")
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@UserBehaviorValidation(event = "删除话题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
+			sourceContexts={"object.TopicDto.content","object.TopicDto.contentSource"})
 	@PostMapping(value = "/services/app/{version}/topic/single/delete")
 	public Response<Integer> deleteTopic(@RequestBody TopicDto dto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);

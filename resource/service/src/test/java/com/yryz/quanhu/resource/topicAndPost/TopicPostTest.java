@@ -63,7 +63,7 @@ public class TopicPostTest {
     @Test
     public void queryTopicList() {
         TopicDto dto = new TopicDto();
-        dto.setPageNum(1);
+        dto.setCurrentPage(1);
         dto.setPageSize(5);
         Response<PageList<TopicVo>> data = this.topicApi.queryTopicList(dto);
         Assert.assertTrue(ResponseConstant.SUCCESS.getCode().equals(data.getCode()));
@@ -107,7 +107,7 @@ public class TopicPostTest {
     public void queryListTopicPost() {
         TopicPostDto dto = new TopicPostDto();
         dto.setTopicId(180504L);
-        dto.setPageNum(1);
+        dto.setCurrentPage(1);
         dto.setPageSize(5);
         Response<PageList<TopicPostVo>> data = topicPostApi.listPost(dto);
         System.out.println("===============" + JSON.toJSONString(data.getData()));
