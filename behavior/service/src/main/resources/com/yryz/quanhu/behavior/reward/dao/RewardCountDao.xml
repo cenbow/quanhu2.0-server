@@ -89,16 +89,16 @@
 		update qh_reward_count
 		<set>
 			<if test="totalRewardCount != null">
-				total_reward_count = total_reward_count + #{record.totalRewardCount,jdbcType=INTEGER},
+				total_reward_count = total_reward_count + #{totalRewardCount,jdbcType=INTEGER},
 			</if>
 			<if test="totalRewardAmount != null">
-				total_reward_amount = total_reward_amount + #{record.totalRewardAmount,jdbcType=BIGINT},
+				total_reward_amount = total_reward_amount + #{totalRewardAmount,jdbcType=BIGINT},
 			</if>
 			<if test="totalRewardedCount != null">
-				total_rewarded_count = total_rewarded_count + #{record.totalRewardedCount,jdbcType=INTEGER},
+				total_rewarded_count = total_rewarded_count + #{totalRewardedCount,jdbcType=INTEGER},
 			</if>
 			<if test="totalRewardedAmount != null">
-				total_rewarded_amount = total_rewarded_amount + #{record.totalRewardedAmount,jdbcType=BIGINT},
+				total_rewarded_amount = total_rewarded_amount + #{totalRewardedAmount,jdbcType=BIGINT},
 			</if>
 		</set>
 		where target_id = #{targetId,jdbcType=BIGINT}
