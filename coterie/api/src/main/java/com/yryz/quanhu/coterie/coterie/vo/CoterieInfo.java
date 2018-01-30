@@ -69,6 +69,16 @@ public class CoterieInfo implements Serializable{
 
 
 	private Integer shelveFlag;
+
+	public Integer getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Integer deleted) {
+		this.deleted = deleted;
+	}
+
+	private Integer  deleted;
 	public Integer getShelveFlag() {
 		return shelveFlag;
 	}
