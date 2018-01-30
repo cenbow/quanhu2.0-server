@@ -41,5 +41,10 @@
             <artifactId>user-api</artifactId>
             <version>${user.api.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>coterie-api</artifactId>
+            <version>${user.api.version}</version>
+        </dependency>
     </dependencies>
 </project>
