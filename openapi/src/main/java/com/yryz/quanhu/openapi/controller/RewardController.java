@@ -103,6 +103,7 @@ public class RewardController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
             @ApiImplicitParam(name = "token", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "打赏明细流水", login = true)
     @GetMapping(value = "{version}/reward/flow")
     public Response<PageList<RewardFlowVo>> listFlow(HttpServletRequest request,
             @RequestHeader("userId") Long headerUserId, Integer currentPage, Integer pageSize) {

@@ -147,7 +147,7 @@
 	</insert>
 
 	<update id="updateInviterNum">
-		update qh_user_operate_info cust_reg_inviter_num = cust_reg_inviter_num +
-		1 where qh_user_inviter_code = #{userInviterCode}
+		update qh_user_operate_info set user_reg_inviter_num = user_reg_inviter_num +
+		1 where user_inviter_code = #{inviterCode}
 	</update>
 </mapper>
