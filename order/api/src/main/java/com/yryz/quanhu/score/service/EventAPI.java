@@ -31,7 +31,7 @@ public interface EventAPI {
      *查询积分流水表
      * @param list
      */
-    Response<List<EventReportVo>> getScoreFlowList(EventInfo log); 
+    Response<EventReportVo> getScoreFlowList(EventInfo log); 
 
 
 }

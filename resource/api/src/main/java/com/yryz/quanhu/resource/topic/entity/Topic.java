@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Topic  implements Serializable{
-    private Long id;
+	private static final long serialVersionUID = 1557338876734237603L;
+
+	private Long id;
 
     private Long kid;
 

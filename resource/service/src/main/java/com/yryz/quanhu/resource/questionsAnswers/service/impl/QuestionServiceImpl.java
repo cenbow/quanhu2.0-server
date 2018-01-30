@@ -12,7 +12,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
-import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
@@ -22,7 +22,6 @@ import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
@@ -36,9 +35,7 @@ import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
-import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
-import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -70,6 +67,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private AnswerService answerService;
 
+    @Reference
+    private ReadApi readApi;
 
     @Autowired
     private OrderSDK orderSDK;
@@ -164,7 +163,7 @@ public class QuestionServiceImpl implements QuestionService {
             inputOrder.setCreateUserId(question.getCreateUserId());
             inputOrder.setFromId(question.getCreateUserId());
             inputOrder.setToId(Long.valueOf(AccountEnum.SYSID));
-            inputOrder.setModuleEnum(ResourceTypeEnum.QUESTION);
+            inputOrder.setModuleEnum(ModuleContants.QUESTION);
             inputOrder.setOrderEnum(OrderEnum.QUESTION_ORDER);
             inputOrder.setResourceId(question.getKid());
             Long orderId = orderSDK.createOrder(inputOrder);
@@ -181,7 +180,7 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
         messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
         messageBusinessVo.setKid(question.getKid());
-        messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+        messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
         messageBusinessVo.setFromUserId(question.getCreateUserId());
         messageBusinessVo.setTosendUserId(Long.valueOf(question.getTargetId()));
         messageBusinessVo.setTitle(question.getContent());
@@ -205,6 +204,7 @@ public class QuestionServiceImpl implements QuestionService {
         resourceTotal.setResourceId(question.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionQuery.getCreateUserId());
+        resourceTotal.setCoterieId(String.valueOf(questionQuery.getCoterieId()));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
         return question;
     }
@@ -255,7 +255,7 @@ public class QuestionServiceImpl implements QuestionService {
                 messageBusinessVo.setCoterieId(String.valueOf(questionBySearch.getCoterieId()));
                 messageBusinessVo.setIsAnonymity(questionBySearch.getIsAnonymity());
                 messageBusinessVo.setKid(questionBySearch.getKid());
-                messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+                messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
                 messageBusinessVo.setFromUserId(questionBySearch.getCreateUserId());
                 messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
                 messageBusinessVo.setTitle(questionBySearch.getContent());
@@ -317,11 +317,11 @@ public class QuestionServiceImpl implements QuestionService {
         if (null != targetId) {
             questionVo.setTargetUser(apIservice.getUser(targetId));
         }
-        questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+        questionVo.setModuleEnum(ModuleContants.QUESTION);
 
-        //提交阅读数
-        // TODO: 2018/1/29 0029
 
+        //虚拟阅读数
+        readApi.read(kid);
         /**
          * 提交积分成长值事件
          */
@@ -382,7 +382,7 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setKid(question.getKid());
-        messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+        messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
         messageBusinessVo.setFromUserId(question.getCreateUserId());
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setTosendUserId(question.getCreateUserId());
@@ -448,7 +448,7 @@ public class QuestionServiceImpl implements QuestionService {
             if (null != question.getTargetId()) {
                 questionVo.setTargetUser(apIservice.getUser(Long.valueOf(question.getTargetId())));
             }
-            questionVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+            questionVo.setModuleEnum(ModuleContants.QUESTION);
             Response<Map<String, Long>> countData = countApi.getCount("10,11", questionVo.getKid(), null);
             if (ResponseConstant.SUCCESS.getCode().equals(countData.getCode())) {
                 Map<String, Long> count = countData.getData();
@@ -564,7 +564,7 @@ public class QuestionServiceImpl implements QuestionService {
             messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
             messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
             messageBusinessVo.setKid(question.getKid());
-            messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+            messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
             messageBusinessVo.setTosendUserId(question.getCreateUserId());
             messageBusinessVo.setTitle(question.getContent());
             messageBusinessVo.setImgUrl("");

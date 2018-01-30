@@ -46,12 +46,35 @@ public class EventReportVo implements Serializable {
     
 	/** 记录时间 */
     @ApiModelProperty(value = "记录时间")
-    private Date createTime;
+    private String createTime;
     
 	/** 更新时间 */
     @ApiModelProperty(value = "更新时间")
-    private Date updateTime;
+    private String updateTime;
+
+	/** 成长值 */
+    @ApiModelProperty(value = "成长值")
+	private Long grow = 0L;
+	
+    /** 成长级别 */
+    @ApiModelProperty(value = "成长级别")
+	private String growLevel;
     
+    public Long getGrow() {
+		return grow;
+	}
+
+	public void setGrow(Long grow) {
+		this.grow = grow;
+	}
+
+	public String getGrowLevel() {
+		return growLevel;
+	}
+
+	public void setGrowLevel(String growLevel) {
+		this.growLevel = growLevel;
+	}
 
 	public String getTenantId() {
 		return tenantId;
@@ -125,19 +148,19 @@ public class EventReportVo implements Serializable {
 		this.allScore = allScore;
 	}
 
-	public Date getCreateTime() {
+	public String getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(Date createTime) {
+	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
 
-	public Date getUpdateTime() {
+	public String getUpdateTime() {
 		return updateTime;
 	}
 
-	public void setUpdateTime(Date updateTime) {
+	public void setUpdateTime(String updateTime) {
 		this.updateTime = updateTime;
 	}
 }
