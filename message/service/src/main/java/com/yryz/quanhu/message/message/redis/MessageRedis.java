@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -96,19 +97,20 @@ public class MessageRedis {
                     redisTemplate.delete(lockKey);
                     throw new RedisOptException("++++++++++++++++++++++++addUnread exception++++++++++++++++");
                 }
-                String value = (String) redisTemplate.opsForHash().get(key, readTypeString);
+                HashOperations<String, String, String> opsForHash = redisTemplate.opsForHash();
+                String value = opsForHash.get(key, readTypeString);
                 int unreadCount = 0;
                 if (StringUtils.isNotBlank(value)) {
                     unreadCount = Integer.valueOf(value);
                 }
-                redisTemplate.opsForHash().put(key, readTypeString, ++unreadCount);
-                redisTemplate.delete(key);
+                redisTemplate.opsForHash().put(key, readTypeString, String.valueOf(++unreadCount));
+                redisTemplate.delete(lockKey);
                 return true;
             } else {
                 return false;
             }
         } catch (Exception e) {
-            redisTemplate.delete(key);
+            redisTemplate.delete(lockKey);
             LOGGER.error("添加未读失败！", e);
             throw new RedisOptException(e);
         }
