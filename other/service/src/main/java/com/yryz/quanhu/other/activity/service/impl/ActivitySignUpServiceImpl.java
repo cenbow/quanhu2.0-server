@@ -36,7 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.NumberUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -138,8 +137,14 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
             return status;
         }
         //TODO 查询订单状态
-        boolean success = orderSDK.isBuyOrderSuccess(ModuleContants.ACTIVITY_ENUM, NumberUtils.parseNumber(custId,Long.TYPE),activityRecordList.get(0).getKid());
-       if(success){
+        boolean success = false;
+        try {
+            success = orderSDK.isBuyOrderSuccess(ModuleContants.ACTIVITY_ENUM, Long.valueOf(custId),activityRecordList.get(0).getKid());
+        } catch (Exception e) {
+            logger.error("查询订单异常:",e);
+            status = ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;
+        }
+        if(success){
            status = ActivityConstant.ACTIVITY_ENROL_STATUS_EXCE_JOIN;
        }
         return status;
@@ -268,7 +273,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         InputOrder inputOrder = new InputOrder();
         inputOrder.setOrderEnum(OrderEnum.ACTIVITY_SIGNUP_ORDER);
         inputOrder.setFromId(activityRecord.getCreateUserId());
-        inputOrder.setToId(NumberUtils.parseNumber(AccountEnum.SYSID,Long.TYPE));
+        inputOrder.setToId(Long.valueOf(AccountEnum.SYSID));
         inputOrder.setModuleEnum(ModuleContants.ACTIVITY_ENUM);
         inputOrder.setBizContent(JSON.toJSONString(activityRecord));
         inputOrder.setResourceId(activityRecord.getKid());

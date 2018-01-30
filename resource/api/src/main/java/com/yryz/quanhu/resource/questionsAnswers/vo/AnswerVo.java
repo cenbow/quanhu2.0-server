@@ -1,5 +1,7 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -41,6 +43,7 @@ public class AnswerVo  implements Serializable {
 
     private String moduleEnum;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
     }
@@ -49,6 +52,7 @@ public class AnswerVo  implements Serializable {
         this.kid = kid;
     }
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public Long getQuestionId() {
         return questionId;
     }
@@ -133,6 +137,7 @@ public class AnswerVo  implements Serializable {
         return coterieId;
     }
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public void setCoterieId(String coterieId) {
         this.coterieId = coterieId;
     }

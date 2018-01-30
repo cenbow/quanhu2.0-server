@@ -95,7 +95,7 @@ public class ResourceProvider implements ResourceApi {
 		}
 		List<ResourceModel> list = resourceService.getResources(GsonUtils.parseObj(resource, ResourceModel.class), orderColumn, start, limit, startTime, endTime);
 		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
-		listVo = resourceConvertService.addUser(listVo);
+		listVo = resourceConvertService.addBatch(listVo);
 		return ResponseUtils.returnListSuccess(listVo);
 	}
 
@@ -109,6 +109,9 @@ public class ResourceProvider implements ResourceApi {
 	public Response<Map<String, ResourceVo>> getResourcesByIds(Set<String> resourceIds) {
 		Map<String, ResourceModel> modelMap = resourceService.getResources(resourceIds);
 		Map<String, ResourceVo> map = (Map<String, ResourceVo>) GsonUtils.parseMap(modelMap, ResourceVo.class);
+		map.forEach((k,v)->{
+			v = resourceConvertService.addBatch(v);
+		});
 		return ResponseUtils.returnObjectSuccess(map);
 	}
 
@@ -121,7 +124,7 @@ public class ResourceProvider implements ResourceApi {
 	@Override
 	public Response<ResourceVo> getResourcesById(String resourceId) {
 		ResourceModel resource = resourceService.getResource(resourceId);
-		ResourceVo resourceVo = resourceConvertService.addUser(GsonUtils.parseObj(resource, ResourceVo.class));
+		ResourceVo resourceVo = resourceConvertService.addBatch(GsonUtils.parseObj(resource, ResourceVo.class));
 		return ResponseUtils.returnObjectSuccess(resourceVo);
 	}
 
@@ -136,7 +139,7 @@ public class ResourceProvider implements ResourceApi {
 	public Response<List<ResourceVo>> appRecommend(int start, int limit) {
 		List<ResourceModel> list = resourceService.appRecommend(start, limit);
 		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
-		listVo = resourceConvertService.addUser(listVo);
+		listVo = resourceConvertService.addBatch(listVo);
 		return ResponseUtils.returnListSuccess(listVo);
 	}
 

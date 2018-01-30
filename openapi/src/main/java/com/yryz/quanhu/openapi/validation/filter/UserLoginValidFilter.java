@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,7 +44,8 @@ public class UserLoginValidFilter implements IBehaviorValidFilter {
         String loginUserId = (String) filterChain.getContext().get("loginUserId");
         String loginToken = (String) filterChain.getContext().get("loginToken");
 
-        HttpServletRequest request = (HttpServletRequest) behaviorArgsBuild.getObjByClass(HttpServletRequest.class,filterChain.getJoinPoint().getArgs());
+        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+//        HttpServletRequest request = (HttpServletRequest) behaviorArgsBuild.getObjByClass(HttpServletRequest.class,filterChain.getJoinPoint().getArgs());
         if(request==null){
             throw new QuanhuException("","","服务器异常，缺失参数:HttpServletRequest");
         }

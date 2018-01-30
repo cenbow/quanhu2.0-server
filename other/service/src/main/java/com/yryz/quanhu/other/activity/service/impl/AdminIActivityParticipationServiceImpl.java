@@ -1,7 +1,7 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
+
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.other.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteConfigDao;
@@ -317,31 +317,34 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 
             adminConfigObjectDto = new AdminConfigObjectDto();
 
-            AdminConfigDto adminConfigDto = JSON.parseObject(config.getConfigSources(), new TypeReference<AdminConfigDto>() {
-            });
+            AdminConfigDto adminConfigDto = JSON.parseObject(config.getConfigSources(),AdminConfigDto.class);
 
             if (adminConfigDto == null) {
                 return null;
             }
 
             if (StringUtils.isNotBlank(adminConfigDto.getCoverPlan())) {
-                AdminConfigContentDto coverPlan = JSON.parseObject(adminConfigDto.getCoverPlan(), new TypeReference<AdminConfigContentDto>() {
-                });
+                AdminConfigContentDto coverPlan = JSON.parseObject(adminConfigDto.getCoverPlan(),AdminConfigContentDto.class);
                 adminConfigObjectDto.setCoverPlan(coverPlan);
             }
-            if (StringUtils.isNotBlank(adminConfigDto.getText())) {
-                AdminConfigContentDto text = JSON.parseObject(adminConfigDto.getText(), new TypeReference<AdminConfigContentDto>() {
-                });
-                adminConfigObjectDto.setText(text);
+            if (StringUtils.isNotBlank(adminConfigDto.getContent())) {
+                AdminConfigContentDto content = JSON.parseObject(adminConfigDto.getContent(), AdminConfigContentDto.class);
+                adminConfigObjectDto.setContent(content);
+            }
+            if (StringUtils.isNotBlank(adminConfigDto.getContent1())) {
+                AdminConfigContentDto content1 = JSON.parseObject(adminConfigDto.getContent1(), AdminConfigContentDto.class);
+                adminConfigObjectDto.setContent1(content1);
+            }
+            if (StringUtils.isNotBlank(adminConfigDto.getContent2())) {
+                AdminConfigContentDto content2 = JSON.parseObject(adminConfigDto.getContent2(), AdminConfigContentDto.class);
+                adminConfigObjectDto.setContent2(content2);
             }
             if (StringUtils.isNotBlank(adminConfigDto.getImgUrl())) {
-                AdminConfigContentDto imgUrl = JSON.parseObject(adminConfigDto.getImgUrl(), new TypeReference<AdminConfigContentDto>() {
-                });
+                AdminConfigContentDto imgUrl = JSON.parseObject(adminConfigDto.getImgUrl(),AdminConfigContentDto.class);
                 adminConfigObjectDto.setImgUrl(imgUrl);
             }
             if (StringUtils.isNotBlank(adminConfigDto.getVideoUrl())) {
-                AdminConfigContentDto videoUrl = JSON.parseObject(adminConfigDto.getVideoUrl(), new TypeReference<AdminConfigContentDto>() {
-                });
+                AdminConfigContentDto videoUrl = JSON.parseObject(adminConfigDto.getVideoUrl(),AdminConfigContentDto.class);
                 adminConfigObjectDto.setVideoUrl(videoUrl);
             }
         }

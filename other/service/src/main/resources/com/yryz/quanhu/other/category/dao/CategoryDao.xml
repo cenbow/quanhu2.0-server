@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.other.category.dao.CategoryDao" >
+  <select id="selectByPid"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
+    select * from qh_category where parent_kid= #{pid}
+    <if test="limit > 0 ">
+      limit #{limit}
+    </if>
+    ;
+  </select>
+
+  <select id="selectByKid"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
+    select * from qh_category where kid= #{kid};
+  </select>
+
+  <select id="selectByRecommend"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
+    select * from qh_category where recommend = 10;
+  </select>
+</mapper>

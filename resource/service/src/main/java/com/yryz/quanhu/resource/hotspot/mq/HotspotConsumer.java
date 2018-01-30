@@ -32,7 +32,7 @@ import com.yryz.quanhu.resource.mq.AmqpConstant;
  * @author yehao
  * @version 2.0
  * @date 2018年1月29日 下午3:47:42
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 热度消费
  */
 @Service
 public class HotspotConsumer {

@@ -30,10 +30,13 @@ public class ActivityPrizes extends GenericEntity{
     private  Integer prizesType;
     
 	/**
-	 * 发放张数
+	 * 实际发放张数
 	 */	 
     private  Integer issueNum;
-    
+	/**
+	 * 配置发放张数
+	 */
+	private  Integer issueNumConfig;
 	/**
 	 * 可使用次数
 	 */	 
@@ -157,5 +160,12 @@ public class ActivityPrizes extends GenericEntity{
 	public void setSort(Integer sort) {
 		this.sort = sort;
 	}
-		
+
+	public Integer getIssueNumConfig() {
+		return issueNumConfig;
+	}
+
+	public void setIssueNumConfig(Integer issueNumConfig) {
+		this.issueNumConfig = issueNumConfig;
+	}
 }

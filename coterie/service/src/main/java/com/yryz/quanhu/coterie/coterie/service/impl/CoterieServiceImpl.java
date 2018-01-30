@@ -9,18 +9,15 @@ import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
-import com.yryz.quanhu.coterie.coterie.entity.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.coterie.entity.CoterieSearch;
 import com.yryz.quanhu.coterie.coterie.exception.MysqlOptException;
-import com.yryz.quanhu.coterie.coterie.until.IdUtils;
 import com.yryz.quanhu.coterie.coterie.until.QrUtils;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.yryz.quanhu.resource.vo.ResourceTotal;
+
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,12 +26,12 @@ import java.util.List;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.score.service.EventAPI;
-import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 //import com.yryz.service.circle.modules.coterie.dao.persistence.CoterieAuditRecordMapper;
 
 /**
  * 私圈服务实现
- * @author jk
+ * @author chengyunfei
  *
  */
 @Service

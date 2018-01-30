@@ -11,20 +11,21 @@ import com.yryz.common.message.SystemBody;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.MessageUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.other.activity.constants.ActivityCandidateConstants;
+import com.yryz.quanhu.other.activity.constants.ActivityRedisConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.other.activity.dao.*;
 import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
-import com.yryz.quanhu.other.activity.entity.ActivityPrizes;
 import com.yryz.quanhu.other.activity.entity.ActivityUserPrizes;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
-
-import com.yryz.quanhu.other.activity.vo.*;
+import com.yryz.quanhu.other.activity.vo.ActivityPrizesVo;
+import com.yryz.quanhu.other.activity.vo.ActivityUserPrizesVo;
+import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
+import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ActivityVoteServiceImpl implements ActivityVoteService {
@@ -130,6 +132,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         }
 
         stringRedisTemplate.opsForHash().putAll(ActivityVoteConstants.getKeyConfig(activityVoteConfig.getActivityInfoId()), map);
+        stringRedisTemplate.expire(ActivityVoteConstants.getKeyConfig(activityVoteConfig.getActivityInfoId()), ActivityRedisConstants.TIMEOUT_VERY_LONG, TimeUnit.SECONDS);
     }
 
     /**
@@ -163,6 +166,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
                 activityVoteInfoVo.setNoRewardContent(activityVoteConfig.getNoRewardContent());//无奖励配置文案
 
                 template.opsForValue().set(ActivityVoteConstants.getKeyInfo(activityVoteInfoVo.getKid()), activityVoteInfoVo);
+                template.expire(ActivityVoteConstants.getKeyInfo(activityVoteInfoVo.getKid()), ActivityRedisConstants.TIMEOUT_VERY_LONG, TimeUnit.SECONDS);
                 this.setVoteConfig(activityVoteInfoVo.getJoinCount() == null ? 0 : activityVoteInfoVo.getJoinCount(), activityVoteConfig);
             }
         }

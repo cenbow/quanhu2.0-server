@@ -11,7 +11,7 @@
 	<dubbo:application name="quanhu-dymaic"
 		owner="xiepeng" />
 	<!-- 定义注册中心 -->
-	<dubbo:registry address="zookeeper://192.168.30.36:2181"
+	<dubbo:registry address="zookeeper://127.0.0.1:2181"
 		file="/app/service/registry/service-dymaic.properties" />
 	<!-- 通信配置 -->
 	<dubbo:protocol name="dubbo" port="20880" />
@@ -19,7 +19,7 @@
 
 	<dubbo:reference id="dymaicService"
 		interface="com.yryz.quanhu.dymaic.service.DymaicService"
-					 check="false" url="dubbo://127.0.0.1:20880" />
+					 check="false" />
 
 	
 </beans>

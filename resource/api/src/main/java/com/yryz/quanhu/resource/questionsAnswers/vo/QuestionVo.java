@@ -1,5 +1,7 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
@@ -46,6 +48,7 @@ public class QuestionVo  implements Serializable {
 
     private  UserSimpleVO targetUser;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
     }
@@ -102,6 +105,7 @@ public class QuestionVo  implements Serializable {
         this.createDate = createDate;
     }
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public String getCoterieId() {
         return coterieId;
     }

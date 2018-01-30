@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
 
 		//删除缓存用户信息
 		baseInfoRedisDao.deleteUserInfo(baseInfo.getUserId());
-
+		
 		// 删除旧的用户手机号信息
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfoRedisDao.deleteUserPhoneInfo(user.getUserPhone(), user.getAppId());
@@ -135,8 +135,11 @@ public class UserServiceImpl implements UserService {
 
 		// 同步im
 		mqSender.userUpdate(baseInfo);
+		
+		//更新后的用户信息
+		UserBaseInfo baseInfo2 = getUser(baseInfo.getUserId());
 		// 提交资料完善事件
-		eventManager.userDataImprove(baseInfo, user);
+		eventManager.userDataImprove(baseInfo2, user);
 		
 		return result;
 	}

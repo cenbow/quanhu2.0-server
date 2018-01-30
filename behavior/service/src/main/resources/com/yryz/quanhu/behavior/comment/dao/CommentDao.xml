@@ -29,7 +29,8 @@
     <sql id="Base_Comment_Column_List_trans">
         id,kid,top_id AS topId,parent_id AS parentId,parent_user_id AS parentUserId,module_enum AS moduleEnum,coterie_id AS coterieId,
         target_user_id AS targetUserId,content_comment AS contentComment,shelve_flag AS shelveFlag,del_flag AS delFlag,recommend,create_user_id AS createUserId,
-        create_date AS createDate,last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,tenant_id AS tenantId,revision,nick_name AS nickName,user_img AS userImg,resource_id AS resourceId
+        create_date AS createDate,last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,tenant_id AS tenantId,revision,nick_name AS nickName,
+        user_img AS userImg,resource_id AS resourceId
     </sql>
 
     <insert id="accretion" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
@@ -187,7 +188,7 @@
         FROM qh_comment_info
         <where>
             1=1
-            <if test="shelveFlag != null and shelveFlag != ''">
+            <if test="shelveFlag != null and shelveFlag != 0">
                 AND shelve_flag=#{shelveFlag,jdbcType=TINYINT}
             </if>
             <if test="startTime != null and startTime != ''">
@@ -211,7 +212,7 @@
         FROM qh_comment_info
         <where>
             1=1 AND del_flag=10 AND shelve_flag=10
-            <if test="resourceId!=null and resourceId!=0">
+            <if test="resourceId!=null and resourceId != 0">
                 AND resource_id=#{resourceId,jdbcType=BIGINT}
             </if>
             <if test="topId!=null">
