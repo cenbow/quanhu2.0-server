@@ -33,5 +33,26 @@ public interface ResourceConvertService {
 	 * @return
 	 */
 	public ResourceVo addUser(ResourceVo resource);
+	
+	/**
+	 * 添加基础统计数据
+	 * @param resource
+	 * @return
+	 */
+	public ResourceVo addBatch(ResourceVo resource);
+	
+	/**
+	 * 批量获取
+	 * @param list
+	 * @return
+	 */
+	public List<ResourceVo> addBatch(List<ResourceVo> list);
+	
+	/**
+	 * 添加统计数
+	 * @param list
+	 * @return
+	 */
+	public List<ResourceVo> addCount(List<ResourceVo> list);
 
 }

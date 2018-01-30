@@ -2,6 +2,8 @@ package com.yryz.quanhu.openapi.controller;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,10 +46,12 @@ public class CoterieReleaseInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "record", paramType = "body", required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+            @ApiImplicitParam(name = "token", paramType = "header", required = true) })
     @UserBehaviorValidation(event = "私圈文章发布", login = true, mute = true)
     @PostMapping(value = "{version}/coterie/release/info/single")
-    public Response<ReleaseInfo> release(@RequestBody ReleaseInfo record, @RequestHeader("userId") Long headerUserId) {
+    public Response<ReleaseInfo> release(HttpServletRequest request, @RequestBody ReleaseInfo record,
+            @RequestHeader("userId") Long headerUserId) {
 
         record.setCreateUserId(headerUserId);
 
@@ -68,10 +72,12 @@ public class CoterieReleaseInfoController {
     @ApiOperation("文章删除")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
-    @UserBehaviorValidation(event = "私圈文章删除", login = true, mute = true)
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+            @ApiImplicitParam(name = "token", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "私圈文章删除", login = true)
     @PostMapping(value = "{version}/coterie/release/info/delete")
-    public Response<Integer> deleteBykid(Long kid, @RequestHeader("userId") Long headerUserId) {
+    public Response<Integer> deleteBykid(HttpServletRequest request, Long kid,
+            @RequestHeader("userId") Long headerUserId) {
         ReleaseInfo upInfo = new ReleaseInfo();
         upInfo.setKid(kid);
         upInfo.setLastUpdateUserId(headerUserId);
@@ -82,11 +88,13 @@ public class CoterieReleaseInfoController {
     @ApiOperation("付费阅读-订单创建")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "kid", paramType = "query", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
-            @ApiImplicitParam(name = "kid", paramType = "query", required = true) })
+            @ApiImplicitParam(name = "token", paramType = "header", required = true) })
     @UserBehaviorValidation(event = "付费阅读-订单创建", login = true)
     @PostMapping(value = "{version}/coterie/release/info/order")
-    public Response<Map<String, Object>> createOrder(Long kid, @RequestHeader("userId") Long headerUserId) {
+    public Response<Map<String, Object>> createOrder(HttpServletRequest request, Long kid,
+            @RequestHeader("userId") Long headerUserId) {
 
         return coterieReleaseInfoApi.createOrder(kid, headerUserId);
     }
