@@ -59,54 +59,54 @@ public enum BranchFeesEnum {
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getQuestionFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100, 0, OrderDescEnum.COTERIE_ASK_PAY);
-        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100, 3, OrderDescEnum.COTERIE_ASK_PAY);
+        FeeDetail detail1 = new FeeDetail("fromId", 100L, 0, OrderDescEnum.COTERIE_ASK_PAY);
+        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100L, 3, OrderDescEnum.COTERIE_ASK_PAY);
         return Lists.newArrayList(detail1, detail2);
     }
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getAnswerFee() {
-        FeeDetail detail1 = new FeeDetail("toId", 90, 3, OrderDescEnum.INTEGRA_ASK_ANSWER);
-        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100, 2, OrderDescEnum.INTEGRA_ASK_ANSWER);
-        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 10, 3, OrderDescEnum.INTEGRA_ASK_ANSWER);
+        FeeDetail detail1 = new FeeDetail("toId", 90L, 3, OrderDescEnum.INTEGRA_ASK_ANSWER);
+        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100L, 2, OrderDescEnum.INTEGRA_ASK_ANSWER);
+        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 10L, 3, OrderDescEnum.INTEGRA_ASK_ANSWER);
         return Lists.newArrayList(detail1, detail2, detail3);
     }
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getNoAnswerFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100, 1, OrderDescEnum.COTERIE_ASK_RETURN);
-        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100, 2, OrderDescEnum.COTERIE_ASK_RETURN);
+        FeeDetail detail1 = new FeeDetail("fromId", 100L, 1, OrderDescEnum.COTERIE_ASK_RETURN);
+        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100L, 2, OrderDescEnum.COTERIE_ASK_RETURN);
         return Lists.newArrayList(detail1, detail2);
     }
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getReadFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100, 0, OrderDescEnum.RESOURCE_PAY);
-        FeeDetail detail2 = new FeeDetail("toId", 90, 3, OrderDescEnum.RESOURCE_CHARGE);
-        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 10, 3, OrderDescEnum.RESOURCE_PAY);
+        FeeDetail detail1 = new FeeDetail("fromId", 100L, 0, OrderDescEnum.RESOURCE_PAY);
+        FeeDetail detail2 = new FeeDetail("toId", 90L, 3, OrderDescEnum.RESOURCE_CHARGE);
+        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 10L, 3, OrderDescEnum.RESOURCE_PAY);
         return Lists.newArrayList(detail1, detail2, detail3);
     }
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getJoinCoterieFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100, 0, OrderDescEnum.COTERIE_JOIN);
-        FeeDetail detail2 = new FeeDetail("toId", 90, 3, OrderDescEnum.MEMBER_JOIN_COTERIE_CHARGE);
-        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 10, 3, OrderDescEnum.COTERIE_JOIN);
+        FeeDetail detail1 = new FeeDetail("fromId", 100L, 0, OrderDescEnum.COTERIE_JOIN);
+        FeeDetail detail2 = new FeeDetail("toId", 90L, 3, OrderDescEnum.MEMBER_JOIN_COTERIE_CHARGE);
+        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 10L, 3, OrderDescEnum.COTERIE_JOIN);
         return Lists.newArrayList(detail1, detail2, detail3);
     }
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getActivitySignUpFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100, 0, OrderDescEnum.ACCOUNT_ACTIVITY_APPLY);
-        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100, 3, OrderDescEnum.ACCOUNT_ACTIVITY_APPLY);
+        FeeDetail detail1 = new FeeDetail("fromId", 100L, 0, OrderDescEnum.ACCOUNT_ACTIVITY_APPLY);
+        FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100L, 3, OrderDescEnum.ACCOUNT_ACTIVITY_APPLY);
         return Lists.newArrayList(detail1, detail2);
     }
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getRewardFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100, 0, OrderDescEnum.ACCOUNT_REWARD_ORIGINAL);
-        FeeDetail detail2 = new FeeDetail("toId", 80, 3, OrderDescEnum.INTEGRAL_REWARD);
-        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 20, 3, OrderDescEnum.ACCOUNT_REWARD_ORIGINAL);
+        FeeDetail detail1 = new FeeDetail("fromId", 100L, 0, OrderDescEnum.ACCOUNT_REWARD_ORIGINAL);
+        FeeDetail detail2 = new FeeDetail("toId", 80L, 3, OrderDescEnum.INTEGRAL_REWARD);
+        FeeDetail detail3 = new FeeDetail(AccountEnum.SYSID, 20L, 3, OrderDescEnum.ACCOUNT_REWARD_ORIGINAL);
         return Lists.newArrayList(detail1, detail2, detail3);
     }
 
