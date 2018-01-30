@@ -34,6 +34,11 @@ private static final String RM_STR = "0123456789abcdefghijklmnopqrstuvwxyzABCDEF
 	public static String getDesToken(String userId,String token) throws Exception{
 		return DesUtils.encrypt(token, StringUtils.substring(userId,userId.length()-8));
 	}
+
+	public static void main(String[] args) throws Exception {
+		String rr = getDesToken("738729736354512896","738729736354512896-Y6UPq6o15W6L1517305815638");
+		System.out.println(rr);
+	}
 	
 	/**
 	 * 根据userId最后8位解密前端的token得到真实的token

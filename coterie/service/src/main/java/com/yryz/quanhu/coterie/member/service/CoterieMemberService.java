@@ -5,10 +5,10 @@ import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
-import org.springframework.classify.BackToBackPatternClassifier;
-
+import com.yryz.quanhu.coterie.coterie.vo.CoterieMemberInfo;
 import java.util.List;
-
+import com.yryz.quanhu.coterie.coterie.vo.MemberSearchParam;
+import com.yryz.quanhu.coterie.coterie.vo.MemberSearch;
 /**
  * 私圈成员服务
  * @author chengyunfei
@@ -85,4 +85,18 @@ public interface CoterieMemberService {
 	 * @param coterieId
 	 */
 	public Boolean isBanSpeak(Long userId, Long coterieId);
+//	/**
+//	 * 搜索 私圈成员
+//	 * @param param
+//	 * @return
+//	 */
+//	List<CoterieMemberInfo> find(MemberSearchParam param);
+//
+//	/**
+//	 * 搜索 私圈成员数量
+//	 * @param param
+//	 * @return
+//	 */
+//	Integer findCount(MemberSearchParam param);
+
 }

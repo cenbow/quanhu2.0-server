@@ -12,6 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -37,16 +41,25 @@ public class UserMuteByCoterieValidFilter implements IBehaviorValidFilter {
     public void filter(BehaviorValidFilterChain filterChain) {
         logger.info("验证用户私圈禁言={}",filterChain.getContext());
 
-        String loginUserId = (String) filterChain.getContext().get("loginUserId");
-        String coterieId = (String) behaviorArgsBuild.getParameterValue(filterChain.getUserBehaviorArgs().coterieId(),
+        //获取用户ID
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String loginUserId = request.getHeader("userId");
+
+        //获取私圈ID
+        String coterieId = "";
+        Object objValue = behaviorArgsBuild.getParameterValue(filterChain.getUserBehaviorArgs().coterieId(),
                 filterChain.getJoinPoint().getArgs());
+        if(objValue==null){
+            throw new QuanhuException("","","缺少私圈参数ID");
+        }else{
+            coterieId = String.valueOf(objValue);
+        }
 
         if(StringUtils.isNumeric(coterieId)){
             throw new QuanhuException("","","私圈参数非法（不存在）");
         }
 
-        Response<Boolean> rpc =
-                coterieMemberAPI.isBanSpeak(Long.parseLong(loginUserId),Long.parseLong(coterieId));
+        Response<Boolean> rpc = coterieMemberAPI.isBanSpeak(Long.parseLong(loginUserId),Long.parseLong(coterieId));
 
         if(rpc.success()&&!rpc.getData()){
             //执行下一个

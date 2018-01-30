@@ -79,7 +79,7 @@ public interface CoterieMapper {
     
     List<String> selectCircleIdListByOwnerId(@Param("ownerId") String ownerId);
     
-    List<Long> selectKidByCreateDate(@Param("startDate")String startDate,@Param("endDate")String endDate);
+    List<Long> selectKidByCreateDate(@Param("startDate") String startDate, @Param("endDate") String endDate);
     
-    List<Coterie> selectByKids(@Param("kidList")List<Long> kidList);
+    List<Coterie> selectByKids(@Param("kidList") List<Long> kidList);
 }

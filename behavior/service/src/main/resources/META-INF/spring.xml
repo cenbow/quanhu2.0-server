@@ -28,5 +28,9 @@
                 class="com.yryz.quanhu.behavior.count.job.CountSyncMongoJob"
                 disabled="false" overwrite="true" registry-center-ref="regCenter"
                 cron="0 0 * * * ? *" sharding-total-count="1" description="[behavior]计数服务redis同步mongo任务"/>
-
+    <job:simple id="readCountJob"
+                class="com.yryz.quanhu.behavior.read.job.ReadCountJob"
+                registry-center-ref="regCenter" cron="0 1/6 * * * ?"
+                sharding-total-count="1" description = "[behavior]阅读数规则任务"
+                disabled="false" overwrite="true" />
 </beans>

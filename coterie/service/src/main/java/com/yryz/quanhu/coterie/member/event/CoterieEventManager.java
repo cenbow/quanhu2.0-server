@@ -32,6 +32,24 @@ public class CoterieEventManager {
 
 	@Resource
 	private CoterieMemberService coterieMemberService;
+	/**
+	 * 创建私圈 事件
+	 * @param
+	 */
+	public void createCoterieEvent(Long coterieId){
+		try{
+			CoterieInfo coterie=coterieService.find(coterieId);
+			EventInfo event=new EventInfo();
+			event.setCoterieId(coterie.getCoterieId().toString());
+			event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+			event.setUserId(coterie.getOwnerId());
+			event.setEventNum(1);
+			event.setEventCode(EventEnum.CREATE_COTERIE.getCode());
+			eventAPI.commit(event);
+		}catch (Exception e) {
+			logger.error("event Exception", e);
+		}
+	}
 
 	/**
 	 * 加入私圈 事件

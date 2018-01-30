@@ -33,7 +33,7 @@ public class HeatInfoEnum {
 	/**
 	 * 初始热度（）
 	 */
-	public static final long INIT_TALENT_HOT = 2000;
+	public static final long INIT_TALENT_HOT = 3000;
 	
 	/**
 	 * 热度公式切换的N

@@ -24,7 +24,7 @@
   	where user_id = #{userId} and tag_type = #{tagType} and del_flag = 10
   </select>
   
-  <delete id="delete" parameterType="java.lang.Long" >
+  <delete id="delete">
     update qh_user_tag set del_flag = 11 
     where user_id = #{userId} and tag_type = #{tagType}
   </delete>

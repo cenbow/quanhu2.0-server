@@ -1,13 +1,11 @@
 package com.yryz.quanhu.coterie.coterie.service;
 
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
-import com.yryz.quanhu.coterie.coterie.entity.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
-import org.apache.ibatis.annotations.Param;
-
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 import java.util.List;
 
 /**
@@ -227,7 +225,7 @@ public interface CoterieService {
 	 * @param coterieId
 	 * @return
 	 */
-	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum);
+	public int updateMemberNum(Long coterieId, Integer newMemberNum, Integer oldMemberNum);
 	
 	/**
 	 * 根据创建日期查询所有私圈ID
@@ -235,7 +233,7 @@ public interface CoterieService {
 	 * @param endDate
 	 * @return
 	 */
-	List<Long> getKidByCreateDate(String startDate,String endDate);
+	List<Long> getKidByCreateDate(String startDate, String endDate);
     
 	/**
 	 * 查询私圈

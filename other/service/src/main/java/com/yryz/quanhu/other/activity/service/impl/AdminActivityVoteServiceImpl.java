@@ -1,5 +1,6 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.other.activity.dao.*;
@@ -13,11 +14,13 @@ import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteVo;
 import com.yryz.quanhu.other.activity.util.DateUtils;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Date;
@@ -45,6 +48,9 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 
 	@Autowired
 	ActivityVoteDetailDao activityParticipationDao;
+
+	@Reference
+	IdAPI idAPI;
 
 	/*@Autowired
 	CustAPI custAPI;
@@ -103,40 +109,31 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	}
 
 	@Override
+	@Transactional
 	public Integer activityRelease(ActivityInfo activity, ActivityVoteConfig config, List<ActivityPrizes> prizes) {
 		Assert.notNull(activity, "activity 不能为空");
-		/*TODO activity.setCreateUserId(UserUtils.getUser().getId());*/
-		activity.setActivityChannelCode("");
-		activity.setModuleEnum(ACTIVITY_ENUM);
-		activityInfoDao.insert(activity);		
-		Long activityInfoId = 0L;
-		if(null==activity.getId() || activity.getId().intValue()==0){
-			logger.info("insert activity return null");
-			Integer id = activityInfoDao.selectMaxId();
-			logger.info("insert activity getMaxId:"+id);
-			activityInfoId = Long.valueOf(id);
-		}else{
-			activityInfoId = activity.getId();
-		}
-		activity.setActivityChannelCode("HD-"+activityInfoId);
-		activityInfoDao.update(activity);
 		Assert.notNull(config, "config 不能为空");
-		config.setActivityInfoId(activityInfoId);
-		/*TODO config.setCreateUserId(UserUtils.getUser().getId());*/
+		Assert.notNull(prizes, "prizes 不能为空");
+		activity.setKid(idAPI.getSnowflakeId().getData());
+		activity.setActivityChannelCode("HD-"+activity.getKid());
+		activity.setModuleEnum(ACTIVITY_ENUM);
+		activityInfoDao.insertByPrimaryKeySelective(activity);
+		config.setKid(idAPI.getSnowflakeId().getData());
+		config.setActivityInfoId(activity.getKid());
 		activityVoteConfigDao.insert(config);
 
-		Assert.notNull(prizes, "prizes 不能为空");
 		for (ActivityPrizes activityPrizes : prizes) {
-			activityPrizes.setActivityInfoId(activityInfoId);
-			/*TODO activityPrizes.setCreateUserId(UserUtils.getUser().getId());*/
-			activityPrizesDao.insert(activityPrizes);
+			activityPrizes.setKid(idAPI.getSnowflakeId().getData());
+			activityPrizes.setActivityInfoId(activity.getKid());
+			activityPrizes.setIssueNumConfig(activityPrizes.getIssueNum());
+			activityPrizesDao.insertByPrimaryKeySelective(activityPrizes);
 		}
 		return 1;
 	}
 
 	@Override
-	public AdminActivityInfoVo1 getActivityDetail(Long id) {
-		return activityVoteDao.selectByPrimaryKey(id);
+	public AdminActivityInfoVo1 getActivityDetail(Long kid) {
+		return activityInfoDao.selectByPrimaryKey(kid);
 	}
 
 	@Override
@@ -219,7 +216,6 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	public Integer updateSave(ActivityInfo activity) {
 		// TODO Auto-generated method stub
 		Assert.notNull(activity, "activity 不能为空");
-		/*activity.setLastUpdateUserId(UserUtils.getUser().getId());*/
 		return activityVoteDao.update(activity);
 	}
 

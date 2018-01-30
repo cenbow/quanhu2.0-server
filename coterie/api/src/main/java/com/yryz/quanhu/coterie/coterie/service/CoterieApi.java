@@ -8,6 +8,8 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 私圈服务
@@ -48,7 +50,14 @@ public interface CoterieApi {
 	 * @throws ServiceException
 	 */
 	public Response<CoterieInfo> queryCoterieInfo(Long coterieId) throws ServiceException;
-	
+
+	/**
+	 * 批量查询私圈信息
+	 * @param
+	 * @return
+	 * @throws ServiceException
+	 */
+	public Response<List<CoterieInfo> > getResourcesByIds(List<Long> coterieIdList);
 	/**
 	 * 设置私圈信息
 	 * @param info  coterieId必填
@@ -221,7 +230,7 @@ public interface CoterieApi {
 	 * @param endDate
 	 * @return
 	 */
-	Response<List<Long>> getKidByCreateDate(String startDate,String endDate);
+	Response<List<Long>> getKidByCreateDate(String startDate, String endDate);
     
 	/**
 	 * 查询私圈

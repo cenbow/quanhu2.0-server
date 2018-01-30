@@ -139,11 +139,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageList<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO) {
+        List<CommentVOForAdmin> commentVOForAdmins = commentDao.queryCommentForAdmin(commentDTO);
         Page<CommentVOForAdmin> page = PageHelper.startPage(commentDTO.getCurrentPage().intValue(), commentDTO.getPageSize().intValue());
         PageList pageList = new PageList();
         pageList.setCurrentPage(commentDTO.getCurrentPage());
         pageList.setPageSize(commentDTO.getPageSize());
-        List<CommentVOForAdmin> commentVOForAdmins = commentDao.queryCommentForAdmin(commentDTO);
         pageList.setEntities(commentVOForAdmins);
         pageList.setCount(Long.valueOf(commentVOForAdmins.size()));
         return pageList;
@@ -156,18 +156,26 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageList<CommentVO> querySubCommentsInfo(CommentSubDTO commentSubDTO) {
+        CommentSubDTO  commentSubDTO_=new CommentSubDTO();
+        commentSubDTO_.setKid(commentSubDTO.getKid());
+        CommentInfoVO commentInfoVO=commentDao.querySingleCommentInfo(commentSubDTO_);
         Page<Comment> page = PageHelper.startPage(commentSubDTO.getCurrentPage().intValue(), commentSubDTO.getPageSize().intValue());
         CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
         commentFrontDTO.setCurrentPage(commentSubDTO.getCurrentPage());
         commentFrontDTO.setPageSize(commentSubDTO.getPageSize());
         commentFrontDTO.setTopId(commentSubDTO.getKid());
+        if(null!=commentInfoVO){
+            commentFrontDTO.setResourceId(commentInfoVO.getResourceId());
+        }
         PageList pageList = new PageList();
         pageList.setCurrentPage(commentSubDTO.getCurrentPage());
         pageList.setPageSize(commentSubDTO.getPageSize());
         List<CommentVO> commentVOS = commentDao.queryComments(commentFrontDTO);
         for (CommentVO commentVO : commentVOS) {
             UserSimpleVO userSimpleVO = this.getUserSimple(commentVO.getTargetUserId());
-            commentVO.setTargetUserNickName(userSimpleVO.getUserNickName());
+            if(null!=userSimpleVO){
+                commentVO.setTargetUserNickName(userSimpleVO.getUserNickName());
+            }
         }
         pageList.setEntities(commentVOS);
         pageList.setCount(Long.valueOf(commentVOS.size()));

@@ -61,13 +61,26 @@ public class ResourceServiceImpl implements ResourceService {
 			for (ResourceModel resourceModel : resources) {
 				if(resourceMongo.get(resourceModel) != null){
 					resourceMongo.update(resourceModel);
+					updateCache(resourceModel.getResourceId());
 				} else {
 					resourceMongo.save(resourceModel);
 					//创建资源时候要创建对应的热度对象
 					hotspotService.saveHeat("1", resourceModel.getResourceId() , resourceModel.getTalentType());
 					resourceCanalDao.sendToCannel(resourceModel.getResourceId(), 0L);
+					updateCache(resourceModel.getResourceId());
 				}
 			}
+		}
+	}
+	
+	/**
+	 * 更新redis缓存
+	 * @param resourceId
+	 */
+	public void updateCache(String resourceId){
+		ResourceModel model = resourceMongo.get(resourceId);
+		if(model != null){
+			resourceRedis.saveResource(model);
 		}
 	}
 	
@@ -81,6 +94,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
 				resourceMongo.update(resourceModel);
+				updateCache(resourceModel.getResourceId());
 			}
 		}
 		
@@ -96,6 +110,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
 				resourceMongo.delete(resourceModel);
+				updateCache(resourceModel.getResourceId());
 			}
 		}
 	}
