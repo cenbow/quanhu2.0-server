@@ -110,7 +110,7 @@ public class ScoreAPIImpl implements ScoreAPI {
 				ea.setGrowLevel(null);
 				return eventAcountService.update(ea);
 			}
-			return 0;
+			return 0; 
 		}
 		return 0;
 	}
