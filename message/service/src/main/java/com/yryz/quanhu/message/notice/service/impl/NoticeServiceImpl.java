@@ -273,6 +273,7 @@ public class NoticeServiceImpl implements NoticeService {
                 NoticeDto noticeDto = new NoticeDto();
                 noticeDto.setKid(notice.getKid());
                 NoticeDetailVo noticeDetailVo = noticeDao.detail(noticeDto);
+                BeanUtils.copyProperties(notice, noticeDetailVo);
                 if (noticeDetailVo != null) {
                     redisTemplate.opsForValue().set(QH_NOTICE_ + notice.getKid(), noticeDetailVo, EXPIRE_DAYS, TimeUnit.DAYS);
                 }
