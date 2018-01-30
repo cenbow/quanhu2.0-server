@@ -38,14 +38,8 @@ public class UserLoginValidFilter implements IBehaviorValidFilter {
 
     @Override
     public void filter(BehaviorValidFilterChain filterChain) {
-
         logger.info("验证用户登录信息={}",filterChain.getContext());
-
-        String loginUserId = (String) filterChain.getContext().get("loginUserId");
-        String loginToken = (String) filterChain.getContext().get("loginToken");
-
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
-//        HttpServletRequest request = (HttpServletRequest) behaviorArgsBuild.getObjByClass(HttpServletRequest.class,filterChain.getJoinPoint().getArgs());
         if(request==null){
             throw new QuanhuException("","","服务器异常，缺失参数:HttpServletRequest");
         }
