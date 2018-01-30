@@ -307,7 +307,7 @@ public enum OrderEnum {
      */
     private AccountOrder getAccountOrder(Long orderId, Long fromId, Long toId, Long cost, FeeDetail feeDetail) {
         AccountOrder accountOrder = new AccountOrder();
-        accountOrder.setCost((long) (cost * feeDetail.getFee() / 100));
+        accountOrder.setCost(cost * feeDetail.getFee() / 100L);
         if (feeDetail.getCustId().equals("fromId")) {
             accountOrder.setCustId(String.valueOf(fromId));
         } else if (feeDetail.getCustId().equals("toId")) {
@@ -334,7 +334,7 @@ public enum OrderEnum {
      */
     private IntegralOrder getIntegralOrder(Long orderId, Long fromId, Long toId, Long cost, FeeDetail feeDetail) {
         IntegralOrder integralOrder = new IntegralOrder();
-        integralOrder.setCost((long) (cost * feeDetail.getFee() / 100));
+        integralOrder.setCost(cost * feeDetail.getFee() / 100L);
         if (feeDetail.getCustId().equals("fromId")) {
             integralOrder.setCustId(String.valueOf(fromId));
         } else if (feeDetail.getCustId().equals("toId")) {
