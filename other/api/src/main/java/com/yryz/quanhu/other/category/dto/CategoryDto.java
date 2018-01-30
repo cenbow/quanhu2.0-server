@@ -1,4 +1,4 @@
-package com.yryz.quanhu.support.category.dto;
+package com.yryz.quanhu.other.category.dto;
 
 import com.yryz.common.entity.BaseEntity;
 

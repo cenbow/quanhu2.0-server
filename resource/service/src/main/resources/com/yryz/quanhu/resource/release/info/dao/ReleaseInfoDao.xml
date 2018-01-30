@@ -53,9 +53,9 @@
 			<when test="orderType != null and orderType == 2">
 				order by create_date ASC, id ASC
 			</when>
-			<otherwise>
+			<when test="orderType != null and orderType == 1">
 				order by create_date DESC, id DESC
-			</otherwise>
+			</when>
 		</choose>
 	</select>
 

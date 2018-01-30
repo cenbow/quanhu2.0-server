@@ -14,10 +14,6 @@
 		create_time as createTime,
 		update_time as updateTime
 	</sql>
-	
-	
-	
-	
 
 	<!-- 新增积分流水 -->
 	<insert id="save" keyProperty="id" keyColumn="id"
@@ -42,12 +38,21 @@
 		)
 	</insert>
 
-	<!-- 获取用户积分流水列表 -->
+	<!-- 获取用户积分流水列表ALL -->
 	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventReportVo">
 		select <include refid="columns" /> from score_flow where
 		user_id = #{userId}
+		order by update_Time desc
 	</select>
 	
+	
+	<!-- 获取用户积分流水列表One -->
+	<select id="getOne" resultType="com.yryz.quanhu.score.vo.EventReportVo">
+		select <include refid="columns" /> from score_flow where
+		user_id = #{userId}
+		order by update_Time desc
+		limit 1
+	</select>
 	
 	
 		
