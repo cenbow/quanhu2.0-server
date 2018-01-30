@@ -1,17 +1,5 @@
 package com.yryz.quanhu.behavior.reward.provider;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
@@ -26,6 +14,7 @@ import com.yryz.quanhu.behavior.reward.constants.RewardConstants;
 import com.yryz.quanhu.behavior.reward.dto.RewardInfoDto;
 import com.yryz.quanhu.behavior.reward.entity.RewardInfo;
 import com.yryz.quanhu.behavior.reward.service.RewardInfoService;
+import com.yryz.quanhu.behavior.reward.vo.RewardFlowVo;
 import com.yryz.quanhu.behavior.reward.vo.RewardInfoVo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
@@ -36,11 +25,18 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
+import java.util.*;
 
 /**
-* @author wangheng
-* @date 2018年1月27日 下午12:03:30
-*/
+ * @author wangheng
+ * @date 2018年1月27日 下午12:03:30
+ */
 @Service(interfaceClass = RewardInfoApi.class)
 public class RewardInfoProvider implements RewardInfoApi {
 
@@ -210,8 +206,28 @@ public class RewardInfoProvider implements RewardInfoApi {
 
     @Override
     public Response<Integer> updateByKid(RewardInfo record) {
+        try {
+            Integer result = rewardInfoService.updateByKid(record);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("更新打赏记录异常！", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
 
-        return null;
+    @Override
+    public Response<PageList<RewardFlowVo>> selectRewardFlow(Long userId, Integer currentPage, Integer pageSize) {
+        try {
+            PageList<RewardFlowVo> result = rewardInfoService.selectRewardFlow(userId, currentPage, pageSize);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("查询打赏明细流水异常！", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
 }
