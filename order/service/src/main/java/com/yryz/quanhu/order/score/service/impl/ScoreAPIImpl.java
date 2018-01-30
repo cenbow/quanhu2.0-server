@@ -149,5 +149,7 @@ public class ScoreAPIImpl implements ScoreAPI {
 	public PageList<ScoreEventInfo> getScoreEvent() {
 		return scoreEventManageService.getAll();
 	}
+	
+
 
 }

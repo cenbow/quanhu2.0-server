@@ -302,7 +302,7 @@
         <include refid="Base_Column_List"/>
         from qh_adv
         where
-        adv_type = #{advType} AND adv_status != 30
+        adv_type = #{advType} AND adv_status != 30 AND adv_def = 20
         <![CDATA[ AND start_date_time <= #{nowDateTime} ]]>
         <![CDATA[ AND end_date_time >= #{nowDateTime} ]]>
         order by adv_sort desc, create_date desc

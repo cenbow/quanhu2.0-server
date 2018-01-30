@@ -1,7 +1,6 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -35,7 +34,7 @@ import java.util.Map;
 @RestController
 public class ActivityVoteController {
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     private ActivityVoteApi activityVoteApi;
 
     @Reference(check = false, timeout = 30000)
@@ -57,14 +56,14 @@ public class ActivityVoteController {
             try {
                 countApi.commitCount(BehaviorEnum.RealRead,activityInfoId, ActivityCountConstant.VOTE_ACTIVITY_DETAIL,ActivityCountConstant.COUNT);
             } catch (Exception e) {
-                logger.error("接入记数异常:"+e.getMessage());
+                logger.error("接入记数异常:", e);
             }
         }
 
         return activityVoteInfoVoResponse;
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("确认投票")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/vote/single")
@@ -75,7 +74,7 @@ public class ActivityVoteController {
         return activityVoteApi.single(record);
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("奖品列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/prizeslist")
@@ -83,7 +82,7 @@ public class ActivityVoteController {
         return activityVoteApi.prizeslist(activityVoteDto);
     }
 
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("领取奖品")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/vote/getPrize")
@@ -106,7 +105,7 @@ public class ActivityVoteController {
      * @param   activityVoteDto
      * @return
      * */
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation
     @ApiOperation("我的卡劵")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/activity/vote/myPrizeslist")

@@ -87,7 +87,12 @@ public enum EventEnum {
 	/** 内容被收藏达到N次 */
 	RESOURCE_COLLECTION_TIMES("34", "内容被收藏达到N次", "内容被收藏达到N次(热度)"),
 	/** 内容被打赏 */
-	RESOURCE_REWARDED_TIMES("35","内容被打赏达N次","每次（奖励付费对应的金额数字10倍的成长值）");
+	RESOURCE_REWARDED_TIMES("35","内容被打赏达N次","每次（奖励付费对应的金额数字10倍的成长值）"),
+	/** 消费积分 */
+	CONSUME_SCORE("36","消费积分","消费积分"),
+	/** 新增积分 */
+	ADD_SCORE("37","新增积分","新增积分");
+
 	
 	/** 事件编码 */
 	private String code;

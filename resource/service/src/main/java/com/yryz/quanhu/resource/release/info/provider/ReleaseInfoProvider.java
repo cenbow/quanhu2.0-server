@@ -21,6 +21,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
@@ -62,6 +63,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private ResourceDymaicApi resourceDymaicApi;
+    
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private ResourceApi resourceApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -216,8 +220,13 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isTrue(result > 0, "作者删除文章失败！");
 
             try {
-                // TODO 动态资源下线
+                // 动态资源下线
+                resourceApi.deleteResourceById(String.valueOf(upInfo.getKid()));
+            } catch (Exception e) {
+                logger.error("资源聚合、统计计数 接入异常！", e);
+            }
 
+            try {
                 // 接入统计计数
                 countApi.commitCount(BehaviorEnum.Release, upInfo.getKid(), null, -1L);
             } catch (Exception e) {

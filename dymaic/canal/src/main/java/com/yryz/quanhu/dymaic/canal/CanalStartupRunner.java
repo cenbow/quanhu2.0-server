@@ -7,22 +7,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.yryz.quanhu.dymaic.canal.service.ClusterCanalService;
-import com.yryz.quanhu.dymaic.canal.service.SimpleCanalService;
+import com.yryz.quanhu.dymaic.canal.service.CanalService;
 
 @Component
 public class CanalStartupRunner implements CommandLineRunner {
 	private static Logger logger = LoggerFactory.getLogger(CanalStartupRunner.class);
-//	@Resource
-//	private SimpleCanalService simpleCanalService;
 	@Resource
-	private ClusterCanalService clusterCanalService;
+	private CanalService canalService;
 	
 	@Override
 	public void run(String... args) throws Exception {
 		logger.info("CanalStartupRunner starting");
-//		simpleCanalService.startup();
-		clusterCanalService.startup();
+		canalService.startup();
 	}
 
 }

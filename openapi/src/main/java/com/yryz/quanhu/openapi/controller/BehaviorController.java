@@ -55,7 +55,6 @@ public class BehaviorController {
         Map<String,Object> maps=new HashMap<String, Object>();
         maps.put("userId",userId);
         maps.put("resourceId",map.get("kid"));
-        maps.put("moduleEnum",map.get("moduleEnum"));
         return  countFlagApi.getAllCountFlag(map.get("countType").toString(),Long.valueOf(map.get("kid").toString()),map.get("page").toString(),maps);
     }
 

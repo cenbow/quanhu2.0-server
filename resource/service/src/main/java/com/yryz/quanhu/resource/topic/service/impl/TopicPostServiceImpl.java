@@ -4,15 +4,22 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
+import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
+import com.yryz.quanhu.resource.questionsAnswers.service.impl.SendMessageServiceImpl;
+import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
+import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
+import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
 import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
@@ -22,6 +29,7 @@ import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
+import net.sf.jsqlparser.statement.select.Top;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +47,10 @@ public class TopicPostServiceImpl implements TopicPostService {
     private TopicPostDao topicPostDao;
 
     @Autowired
-    private APIservice apIservice;
+    private TopicDao topicDao;
 
+    @Autowired
+    private APIservice apIservice;
 
     @Autowired
     private TopicService topicService;
@@ -48,6 +58,8 @@ public class TopicPostServiceImpl implements TopicPostService {
     @Reference
     private CountApi countApi;
 
+    @Autowired
+    private SendMessageService sendMessageService;
 
     /**
      * 发布帖子
@@ -68,6 +80,10 @@ public class TopicPostServiceImpl implements TopicPostService {
         String imgUrl=topicPostDto.getImgUrl();
         String viderUrl=topicPostDto.getVideoUrl();
         String content=topicPostDto.getContent();
+        Topic topic=this.topicDao.selectByPrimaryKey(topicId);
+        if(null==topic){
+            throw QuanhuException.busiError("跟帖的话题不存在");
+        }
         if(StringUtils.isNotBlank(imgUrl) && StringUtils.isNotBlank(viderUrl)){
             throw QuanhuException.busiError("图片和视频不能同时发布");
         }
@@ -82,7 +98,22 @@ public class TopicPostServiceImpl implements TopicPostService {
         topicPost.setGps("");
         topicPost.setDelFlag(CommonConstants.DELETE_NO);
         topicPost.setShelveFlag(CommonConstants.SHELVE_YES);
-        return this.topicPostDao.insertSelective(topicPost);
+
+        Integer result= this.topicPostDao.insertSelective(topicPost);
+
+        /**
+         * 发送消息
+         */
+        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+        messageBusinessVo.setImgUrl(topicPost.getImgUrl());
+        messageBusinessVo.setTitle(topicPost.getContent());
+        messageBusinessVo.setTosendUserId(topic.getCreateUserId());
+        messageBusinessVo.setModuleEnum(ResourceTypeEnum.POSTS);
+        messageBusinessVo.setKid(topicPost.getKid());
+        messageBusinessVo.setIsAnonymity(null);
+        messageBusinessVo.setCoterieId(null);
+        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST);
+        return result;
     }
 
 
@@ -147,13 +178,13 @@ public class TopicPostServiceImpl implements TopicPostService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
         PageList<TopicPostVo> data = new PageList<>();
-        Integer pageNum = dto.getPageNum() == null ? 1 : dto.getPageNum();
+        Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
         Integer pageStartIndex = (pageNum - 1) * pageSize;
         TopicPostExample example = new TopicPostExample();
         TopicPostExample.Criteria criteria = example.createCriteria();
         criteria.andTopicIdEqualTo(topicId);
-        criteria.andShelveFlagEqualTo(CommonConstants.DELETE_NO);
+        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         example.setPageStartIndex(pageStartIndex);
         example.setPageSize(pageSize);
@@ -192,6 +223,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         return data;
     }
 
+
     @Override
     public Integer deleteTopicPost(Long kid, Long userId) {
         /**
@@ -208,6 +240,10 @@ public class TopicPostServiceImpl implements TopicPostService {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
         }
         topicPost.setDelFlag(CommonConstants.DELETE_YES);
+
+        /**
+         * 发送消息
+         */
         return this.topicPostDao.updateByPrimaryKey(topicPost);
     }
 
