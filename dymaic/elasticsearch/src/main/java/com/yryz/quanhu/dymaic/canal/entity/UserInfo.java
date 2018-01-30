@@ -29,6 +29,20 @@ public class UserInfo implements Serializable {
 	 * 用户标签信息
 	 */
 	private UserTagInfo userTagInfo;
+
+	/**
+	 * 达人信息
+	 */
+	private UserStarInfo userStarInfo;
+
+	public UserStarInfo getUserStarInfo() {
+		return userStarInfo;
+	}
+
+	public void setUserStarInfo(UserStarInfo userStarInfo) {
+		this.userStarInfo = userStarInfo;
+	}
+
 	public Long getUserId() {
 		return userId;
 	}
