@@ -249,4 +249,35 @@
 		</set>
 		where kid = #{kid,jdbcType=BIGINT}
 	</update>
+
+	<select id="selectRewardFlow" parameterType="java.lang.Long" resultType="com.yryz.quanhu.behavior.reward.vo.RewardFlowVo">
+		SELECT
+			create_date AS createDate,
+			(
+				CASE
+				WHEN create_user_id = #{userId} THEN
+					gift_price * gift_num * -1
+				ELSE
+					reward_price
+				END
+			) AS amount,
+			(
+				CASE
+				WHEN create_user_id = #{userId} THEN
+					'打赏'
+				ELSE
+					'被打赏'
+				END
+			) AS rewardDesc
+		FROM
+			qh_reward
+		WHERE
+			reward_status = 11
+		AND (
+			create_user_id = #{userId}
+			OR to_user_id = #{userId}
+		)
+		ORDER BY
+			CREATE_DATE DESC
+	</select>
 </mapper>
