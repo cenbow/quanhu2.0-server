@@ -158,12 +158,11 @@ public abstract class AbstractCanalService {
 								String.valueOf(entry.getHeader().getLogfileOffset()), entry.getHeader().getSchemaName(),
 								entry.getHeader().getTableName(), eventType,
 								String.valueOf(entry.getHeader().getExecuteTime()), String.valueOf(delayTime) });
-				CanalMsgContent canalMsgContent = new CanalMsgContent();
-	            canalMsgContent.setDbName(entry.getHeader().getSchemaName().toLowerCase());
-	            canalMsgContent.setTableName(entry.getHeader().getTableName().toLowerCase());
-	            canalMsgContent.setEventType(eventType.toString().toLowerCase());
-	            
 				for (RowData rowData : rowChage.getRowDatasList()) {
+					CanalMsgContent canalMsgContent = new CanalMsgContent();
+		            canalMsgContent.setDbName(entry.getHeader().getSchemaName().toLowerCase());
+		            canalMsgContent.setTableName(entry.getHeader().getTableName().toLowerCase());
+		            canalMsgContent.setEventType(eventType.toString().toLowerCase());
 					canalMsgContent.setDataBefore(convertToCanalChangeInfoList(rowData.getBeforeColumnsList()));
 	                canalMsgContent.setDataAfter(convertToCanalChangeInfoList(rowData.getAfterColumnsList()));
 	                msgList.add(canalMsgContent);

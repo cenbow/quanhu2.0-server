@@ -1,8 +1,11 @@
 package com.yryz.quanhu.dymaic.canal.job;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -18,8 +21,10 @@ import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.canal.dao.ResourceInfoRepository;
 import com.yryz.quanhu.dymaic.canal.entity.ResourceInfo;
 import com.yryz.quanhu.dymaic.canal.entity.TopicPostInfo;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.vo.ResourceVo;
 
 @Component
 public class TopicPostDiffHandler implements DiffHandler{
@@ -30,6 +35,8 @@ public class TopicPostDiffHandler implements DiffHandler{
 	private TopicPostApi topicPostApi;
 	@Resource
 	private DiffExecutor diffExecutor;
+	@Reference
+	private ResourceApi resourceApi;
 
 	@PostConstruct
 	public void register() {
@@ -58,6 +65,16 @@ public class TopicPostDiffHandler implements DiffHandler{
     	if(!diffList.isEmpty()){
     		Response<List<TopicPostVo>> resList=topicPostApi.getByKids(diffList);
     		if(resList.success()){
+    			//热度信息获取
+    			Set<String> resourceIds=new HashSet<>();
+    			diffList.forEach(item->resourceIds.add(item.toString()));
+    			Response<Map<String, ResourceVo>> response=resourceApi.getResourcesByIds(resourceIds);
+    			if(!response.success()){
+    				logger.error("resourceApi.getResourcesByIds 获取资源信息失败");
+    				return;
+    			}
+    			Map<String, ResourceVo> resMap=response.getData();
+    			
     			List<TopicPostVo> clist=resList.getData();
     			List<ResourceInfo> rlist=new ArrayList<>();
     			for (int i = 0; i < clist.size(); i++) {
@@ -66,6 +83,12 @@ public class TopicPostDiffHandler implements DiffHandler{
     				resource.setCreateDate(d.getCreateDate());
     				resource.setKid(d.getKid());
     				resource.setLastHeat(0L);
+    				if (resMap != null) {
+    					ResourceVo r = resMap.get(d.getKid());
+    					if (r != null && r.getHeat()!=null) {
+    						resource.setLastHeat(r.getHeat());
+    					}
+    				}
     				resource.setTopicPostInfo(d);
     				resource.setResourceType(2);
     				rlist.add(resource);

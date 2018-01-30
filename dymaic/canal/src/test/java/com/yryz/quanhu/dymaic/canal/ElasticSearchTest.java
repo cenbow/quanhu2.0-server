@@ -16,7 +16,7 @@ public class ElasticSearchTest {
 	
 	@Test
 	public void esTest(){
-		elasticsearchTemplate.deleteIndex("quanhu-v2-userinfo");
-//		elasticsearchTemplate.deleteIndex("quanhu-v2");
+//		elasticsearchTemplate.deleteIndex("quanhu-v2-userinfo");
+		elasticsearchTemplate.deleteIndex("quanhu-v2-resourceinfo");
 	}
 }
