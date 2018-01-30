@@ -48,7 +48,7 @@ public class UserMuteValidFilter implements IBehaviorValidFilter {
         logger.info("验证用户平台禁言={}",loginUserId);
 
         Response<Boolean> rpc = accountApi.checkUserDisTalk(Long.parseLong(loginUserId));
-        if(rpc.success()&&rpc.getData()){
+        if(rpc.success()&&!rpc.getData()){
             filterChain.execute();
         }else{
             throw new QuanhuException("","","您已被平台管理员禁言，不允许操作");
