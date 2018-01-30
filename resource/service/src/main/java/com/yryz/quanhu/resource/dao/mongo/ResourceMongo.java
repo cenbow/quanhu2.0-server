@@ -171,6 +171,10 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			}
 			if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
+			} else if("0".equals(resourceModel.getCoterieId())){
+				criteria = Criteria.where("coterieId").is(null).andOperator(criteria);
+			} else if("1".equals(resourceModel.getCoterieId())){
+				criteria = Criteria.where("coterieId").not().andOperator(criteria);
 			}
 			
 			//标题，正文，简介模糊匹配
