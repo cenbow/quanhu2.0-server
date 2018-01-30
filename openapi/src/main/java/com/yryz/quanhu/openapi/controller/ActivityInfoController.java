@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 public class ActivityInfoController {
     @Reference(check = false, timeout = 30000)
     private ActivityInfoApi activityInfoApi;
-    @UserBehaviorValidation(login=true)
+
+    @UserBehaviorValidation
     @ApiOperation("我参加/报名的活动列表(token)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/myList")
@@ -37,7 +38,7 @@ public class ActivityInfoController {
        return activityInfoApi.myList(currentPage,pageSize,Long.valueOf(userId));
     }
 
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation
     @ApiOperation("返回所有的上架活动列表 type:1当前活动 2:往期活动3.推荐活动列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/list")
@@ -46,7 +47,7 @@ public class ActivityInfoController {
         return activityInfoApi.appList(currentPage,pageSize,type);
     }
 
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation
     @ApiOperation("返回所有的上架活动固定列表 1当前活动(2条) 2:往期活动(5条)3.推荐活动列表(2条)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/fixedList")
@@ -55,7 +56,7 @@ public class ActivityInfoController {
         return activityInfoApi.fixedList(type);
     }
 
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation
     @ApiOperation("获取活动基本信息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/info/activityInfo")

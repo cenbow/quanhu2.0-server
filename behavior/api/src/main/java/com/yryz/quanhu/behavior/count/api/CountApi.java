@@ -25,7 +25,7 @@ public interface CountApi {
     Response<Object> commitCount(BehaviorEnum behaviorEnum, Long kid, String page, Long count);
 
     /**
-     * 查询count
+     * 查询计数count
      *
      * @param countType 行为的类型集合，例：10,11,12
      * @param kid       业务ID，可以是用户ID，也可以是资源ID
@@ -33,5 +33,17 @@ public interface CountApi {
      * @return 返回对应查询的count集合 例：如果传入countType为10,11,12，返回{commentCount:123,likeCount:123,readCount:123}
      */
     Response<Map<String, Long>> getCount(String countType, Long kid, String page);
+
+
+    /**
+     * 查询计数count及状态
+     *
+     * @param countType 行为的类型集合，例：10,11,12
+     * @param kid       业务ID，可以是用户ID，也可以是资源ID
+     * @param page      页面，非必填，给平台活动统计pv专用。
+     * @param userId    用户ID
+     * @return 返回对应查询的count集合 例：如果传入countType为10,11,12，返回{commentCount:123,likeCount:123,readCount:123}
+     */
+    Response<Map<String, Long>> getCountFlag(String countType, Long kid, String page, Long userId);
 
 }
