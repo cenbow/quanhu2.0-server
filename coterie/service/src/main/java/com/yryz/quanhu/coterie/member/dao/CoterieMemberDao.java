@@ -7,8 +7,6 @@
  */
 package com.yryz.quanhu.coterie.member.dao;
 
-import com.yryz.quanhu.coterie.coterie.vo.MemberSearch;
-import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.entity.CoterieMember;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -49,7 +47,4 @@ public interface CoterieMemberDao {
 
     int selectCountByCoterieId(Long coterieId);
     
-    List<CoterieMember> selectBySearchParam(MemberSearch param);
-    
-    int selectCountBySearchParam(MemberSearch param);
 }
