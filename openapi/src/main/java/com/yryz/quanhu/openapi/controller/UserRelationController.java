@@ -270,7 +270,7 @@ public class UserRelationController {
         Assert.notNull(userId,"userId不能为空");
         Assert.notNull(targetUserId,"targetUserId不能为空");
 
-        Response<UserRelationCountDto> rpc = userRelationApi.totalBy(targetUserId);
+        Response<UserRelationCountDto> rpc = userRelationApi.totalBy(userId,targetUserId);
         if(rpc.success()){
             UserRelationCountVo vo = new UserRelationCountVo();
             BeanUtils.copyProperties(rpc.getData(),vo);

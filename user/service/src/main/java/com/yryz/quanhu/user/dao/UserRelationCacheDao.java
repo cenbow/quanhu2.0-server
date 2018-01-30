@@ -13,6 +13,7 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.im.api.ImAPI;
 import com.yryz.quanhu.message.im.entity.ImRelation;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.dto.UserRelationDto;
@@ -55,20 +56,28 @@ import static com.yryz.quanhu.user.contants.UserRelationConstant.YES;
 public class UserRelationCacheDao {
 
     private static final Logger logger = LoggerFactory.getLogger(UserRelationCacheDao.class);
+
+    private static final String TABLE_NAME = "qh_user_relation";
     /**
      * 用户关系redis过期时间
      */
     @Value("${user.relation.expireDays}")
     private int expireDays;
 
-    @Value("${user.relation.mq.direct.exchange}")
-    private String mqDirectExchange;
+    @Value("${user.relation.redis.mapping.pefix}")
+    public String relation_prefix;
+
+    @Value("${user.relation.redis.count.pefix}")
+    public String relation_count_prefix;
 
     @Value("${user.relation.mq.queue}")
     private String mqQueue;
 
-    public static String RELATION_KEY_PREFIX = "RELATION.";
-    public static String RELATION_COUNT_KEY_PREFIX = "RELATION.COUNT.";
+    @Value("${user.relation.mq.direct.exchange}")
+    private String mqDirectExchange;
+
+
+
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -83,6 +92,9 @@ public class UserRelationCacheDao {
 
     @Reference
     private ImAPI imAPI;
+
+    @Reference
+    private IdAPI idAPI;
     /**
      * 获取唯一关系
      * @param sourceUserId
@@ -108,12 +120,12 @@ public class UserRelationCacheDao {
             if(null != entity){
                 BeanUtils.copyProperties(dto,entity);
                 dto.setNewRecord(false);
-                return dto;
+                //return dto;
             }
             /**
              * 查询数据库
              */
-            dto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
+            dto = userRelationDao.selectUser(UserRelationDto.class,sourceUserId,targetUserId);
             if(null != dto){
                 dto.setNewRecord(false);
             }
@@ -124,15 +136,15 @@ public class UserRelationCacheDao {
     }
 
 
-    public static String getCacheKey(String sourceUserId,String targetUserId){
-        return RELATION_KEY_PREFIX+sourceUserId+"/"+targetUserId;
+    public String getCacheKey(String sourceUserId,String targetUserId){
+        return relation_prefix+"."+sourceUserId+"."+targetUserId;
     }
 
-    public static String getCacheTotalCountKey(String userId){
-        return RELATION_COUNT_KEY_PREFIX+userId;
+    public String getCacheTotalCountKey(String userId){
+        return relation_count_prefix+"."+userId;
     }
 
-    public UserRelationCountDto getCacheCount(String userId){
+    public UserRelationCountDto getCacheTotalCount(String userId){
         /**
          * 查询redis中计数对象，
          */
@@ -180,14 +192,36 @@ public class UserRelationCacheDao {
         redisTemplate.opsForValue().set(sourceKey,entity,expireDays, TimeUnit.DAYS);
     }
 
+    /**
+     * 异步保存
+     * @param userDto
+     */
+    public void asyncSave(UserRelationDto userDto){
+
+        /**
+         * 第一次数据库存储，保证一致性
+         * 防止队列mq积压过多，数据未准确落地
+         */
+        if(userDto.getKid()==null){     //新增
+            userDto.setKid(idAPI.getKid(TABLE_NAME).getData());
+            userDto.setCreateUserId(Long.parseLong("0"));
+            userDto.setLastUpdateUserId(Long.parseLong("0"));
+            userDto.setVersion(0);
+            userDto.setDelFlag(10);
+            userRelationDao.insert(userDto);
+        }else{                          //保存 异步mq处理
+            this.sendMQ(userDto);
+        }
+    }
 
     /**
      * 发生到MQ异步处理
      * @param userDto
      */
-    public void sendMQ(UserRelationDto userDto){
+    private void sendMQ(UserRelationDto userDto){
         try {
             logger.info("sendMQ={}/{} start",userDto.getSourceUserId(),userDto.getTargetUserId());
+
             //转换消息
             String msg = MAPPER.writeValueAsString(userDto);
             logger.info("sendMQ.convert={}",msg);
@@ -226,22 +260,21 @@ public class UserRelationCacheDao {
             //反序列化对象
             UserRelationDto relationDto = MAPPER.readValue(data,UserRelationDto.class);
             logger.info("handleMessage.convert={}",JSON.toJSON(relationDto));
+
+
             //数据库存储
             userRelationDao.update(relationDto);
 
             //同步调用第三方建立关系
-            this.syncImRelation(relationDto);
+//            this.syncImRelation(relationDto);
 
             //统计数据
-            logger.info("handleMessage.totalCount={} start",relationDto.getSourceUserId());
-            UserRelationCountDto dto = this.forceTotalCount(relationDto.getSourceUserId());
-            logger.info("handleMessage.totalCount={} finish",JSON.toJSON(dto));
+            UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
 
             //刷新至缓存
             logger.info("handleMessage.refreshCache={} start",relationDto.getSourceUserId());
             this.refreshCacheCount(relationDto.getSourceUserId(),dto);
             logger.info("handleMessage.refreshCache={} finish",relationDto.getSourceUserId());
-
         }catch (Exception e){
             throw new RuntimeException(e);
         }finally {
@@ -249,25 +282,45 @@ public class UserRelationCacheDao {
         }
     }
 
-    public UserRelationCountDto forceTotalCount(String userId){
+    public UserRelationCountDto selectTotalCount(String targetUserId){
 
+        List<Map<String,Object>> listMaps = userRelationDao.selectTotalCount(targetUserId);
+        /**
+         * 创建对象
+         */
         UserRelationCountDto dto = new UserRelationCountDto();
-        //粉丝
-        long count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FANS.getCode());
-        dto.setFansCount(count);
-        //关注
-        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FOLLOW.getCode());
-        dto.setFollowCount(count);
-        //拉黑
-        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.TO_BLACK.getCode());
-        dto.setToBlackCount(count);
-        //被拉黑
-        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FROM_BLACK.getCode());
-        dto.setFromBlackCount(count);
-        //好友
-        count = userRelationDao.selectTotalCount(userId,UserRelationConstant.STATUS.FRIEND.getCode());
-        dto.setFriendCount(count);
+        for(int i = 0 ; i < listMaps.size() ; i++){
 
+            Map<String,Object> map = listMaps.get(i);
+            int status = (int) map.get("relationStatus");
+            long count = (long) map.get("totalCount");
+            if(status==UserRelationConstant.STATUS.FANS.getCode()){         //粉丝
+                dto.setFansCount(count);
+            }
+            if(status==UserRelationConstant.STATUS.FOLLOW.getCode()){       //关注
+                dto.setFollowCount(count);
+            }
+            if(status==UserRelationConstant.STATUS.TO_BLACK.getCode()){     //拉黑
+                dto.setToBlackCount(count);
+            }
+            if(status==UserRelationConstant.STATUS.FROM_BLACK.getCode()){   //被拉黑
+                dto.setFromBlackCount(count);
+            }
+            if(status==UserRelationConstant.STATUS.BOTH_BLACK.getCode()){    //互相拉黑
+                dto.setBothBlackCount(count);
+            }
+            if(status==UserRelationConstant.STATUS.FRIEND.getCode()){        //好友
+                dto.setFriendCount(count);
+            }
+        }
+        /**
+         * 好友数据，归并到关注，和粉丝中，互相拉黑数据，归并到拉黑，被拉黑中
+         */
+        dto.setTargetUserId(targetUserId);
+        dto.setFansCount(dto.getFansCount()+dto.getFriendCount());
+        dto.setFollowCount(dto.getFollowCount()+dto.getFriendCount());
+        dto.setToBlackCount(dto.getToBlackCount()+dto.getBothBlackCount());
+        dto.setFromBlackCount(dto.getFromBlackCount()+dto.getBothBlackCount());
         return dto;
     }
 
@@ -284,14 +337,18 @@ public class UserRelationCacheDao {
         ImRelation im = new ImRelation();
         im.setUserId(dto.getSourceUserId());
         im.setTargetUserId(dto.getTargetUserId());
+        int status = dto.getRelationStatus();
 
         //判断拉黑关系
-        if(dto.getBlackStatus()==YES){
+        if(status == UserRelationConstant.STATUS.BOTH_BLACK.getCode()
+                ||status == UserRelationConstant.STATUS.TO_BLACK.getCode()
+                ||status == UserRelationConstant.STATUS.FROM_BLACK.getCode()){
+
             im.setRelationType("1");
             im.setRelationValue("1");
             try{
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
-//                imAPI.setSpecialRelation(im);
+                //imAPI.setSpecialRelation(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"添加黑名单失败");
             }finally {
@@ -302,7 +359,7 @@ public class UserRelationCacheDao {
             im.setRelationValue("0");
             try{
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
-//                imAPI.setSpecialRelation(im);
+                imAPI.setSpecialRelation(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"取消黑名单失败");
             }finally {
@@ -311,10 +368,10 @@ public class UserRelationCacheDao {
         }
 
         //判断好友关系
-        if(dto.getFriendStatus()==YES){
+        if(status == UserRelationConstant.STATUS.FRIEND.getCode()){
             try{
                 logger.info("syncImRelation.addFriend ={} start",JSON.toJSON(im));
-//                imAPI.addFriend(im);
+                imAPI.addFriend(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"添加好友关系失败");
             }finally {
