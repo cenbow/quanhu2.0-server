@@ -69,7 +69,7 @@ public class UserRelationServiceImpl implements UserRelationService{
     @Autowired
     private UserStarService userStarService;
 
-    @Value("appId")
+    @Value("${appId}")
     private String appId;
 
     /**
