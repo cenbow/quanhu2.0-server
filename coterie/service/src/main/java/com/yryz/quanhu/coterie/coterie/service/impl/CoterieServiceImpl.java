@@ -31,7 +31,7 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 
 /**
  * 私圈服务实现
- * @author jk
+ * @author chengyunfei
  *
  */
 @Service
