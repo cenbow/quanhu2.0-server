@@ -79,7 +79,7 @@ public class RewardInfoProvider implements RewardInfoApi {
 
             // 创建订单
             InputOrder inputOrder = new InputOrder();
-            inputOrder.setBizContent(JsonUtils.toFastJson(record));
+            inputOrder.setBizContent(JsonUtils.toFastJson(record, "yyyy-MM-dd HH:mm:ss"));
             inputOrder.setCost(record.getGiftNum() * giftInfo.getGiftPrice());
             if (null != record.getCoterieId() && 0L != record.getCoterieId()) {
                 inputOrder.setCoterieId(record.getCoterieId());

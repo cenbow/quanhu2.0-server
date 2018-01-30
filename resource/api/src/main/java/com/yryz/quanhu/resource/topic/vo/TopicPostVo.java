@@ -1,9 +1,12 @@
 package com.yryz.quanhu.resource.topic.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
 import java.util.Date;
+
 
 public class TopicPostVo  implements Serializable {
 
@@ -39,6 +42,7 @@ public class TopicPostVo  implements Serializable {
 
     private BehaviorVo behaviorVo;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
     }

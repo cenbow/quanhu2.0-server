@@ -91,8 +91,10 @@ public class UserCreateConsumer {
 			operateService.save(
 					new UserOperateInfo(registerDTO.getRegLogDTO().getUserId(), registerDTO.getUserChannel(), registerDTO.getUserRegInviterCode()));
 			operateService.saveRegLog(registerDTO.getRegLogDTO());
-			//更新邀请人数
-			operateService.updateInviterNum(registerDTO.getUserRegInviterCode());
+			if(StringUtils.isNotBlank(registerDTO.getUserRegInviterCode())){
+				//更新邀请人数
+				operateService.updateInviterNum(registerDTO.getUserRegInviterCode());
+			}
 			logger.info("[user_reg_create]:params:{},result:success",JsonUtils.toFastJson(registerDTO));
 		} catch (Exception e) {
 			logger.error("[user_reg_create]",e);

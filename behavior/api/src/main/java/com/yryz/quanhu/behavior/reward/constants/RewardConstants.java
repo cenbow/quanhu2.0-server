@@ -36,4 +36,12 @@ public final class RewardConstants {
         public static final Byte reward_resource_user_list = 15;
     }
 
+    /**  
+    * @Fields : 打赏统计目标类型（10：用户）
+    */
+    public static final Byte target_type_user = 10;
+    /**  
+    * @Fields : 打赏统计目标类型（11：资源）
+    */
+    public static final Byte target_type_resource = 11;
 }

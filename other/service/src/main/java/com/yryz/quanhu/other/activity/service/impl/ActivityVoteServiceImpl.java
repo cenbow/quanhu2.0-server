@@ -39,7 +39,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 
     private Logger logger = LoggerFactory.getLogger(ActivityVoteServiceImpl.class);
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     IdAPI idAPI;
 
     @Autowired
@@ -101,7 +101,6 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         else if(now.compareTo(activityInfoVo.getBeginTime()) == 1 && now.compareTo(activityInfoVo.getEndTime()) == -1){
             activityInfoVo.setActivityStatus(ActivityVoteConstants.ACTIVITY_STATUS_PROCESSING);
         }
-        //TODO:设置浏览数
         activityInfoVo.setAmountOfAccess(0L);
 
         return activityInfoVo;

@@ -120,7 +120,7 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public PageList<TopicVo> queryTopicList(TopicDto dto) {
         PageList<TopicVo> pageList = new PageList<>();
-        Integer pageNum = dto.getPageNum() == null ? 1 : dto.getPageNum();
+        Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
         Integer pageStartIndex = (pageNum - 1) * pageSize;
         // Byte recommend =dto.getRecommend()==null?CommonConstants.recommend_YES:dto.getRecommend();
@@ -144,6 +144,7 @@ public class TopicServiceImpl implements TopicService {
             if (createUserId != null) {
                 vo.setUser(apIservice.getUser(createUserId));
             }
+            vo.setModuleEnum(ResourceTypeEnum.TOPIC);
             topicVos.add(vo);
         }
         pageList.setEntities(topicVos);

@@ -49,7 +49,7 @@ public class DymaicController {
     @ApiOperation("动态tab的所关注的全部动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/gettimeline")
-    public Response<List<DymaicVo>> getTimeLine(@RequestHeader Long userId, @RequestParam("上页最后数据的kid") Long kid, @RequestParam("列表长度") Long limit, HttpServletRequest request) {
+    public Response<List<DymaicVo>> getTimeLine(@RequestHeader Long userId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
         return dymaicService.getTimeLine(userId, kid, limit);
     }
 
@@ -57,14 +57,14 @@ public class DymaicController {
     @ApiOperation("用户个人主页")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/homepage")
-    public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam("目标用户ID") Long targetUserId, @RequestParam("上页最后数据的kid") Long kid, @RequestParam("列表长度") Long limit, HttpServletRequest request) {
+    public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam Long targetUserId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
         return dymaicService.getSendList(userId, targetUserId, kid, limit);
     }
 
     @ApiOperation("动态详情ID")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/getDymaic")
-    public Response<DymaicVo> getDymaic(@RequestParam("动态ID") Long kid) {
+    public Response<DymaicVo> getDymaic(@RequestParam Long kid) {
         if (kid == null) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }

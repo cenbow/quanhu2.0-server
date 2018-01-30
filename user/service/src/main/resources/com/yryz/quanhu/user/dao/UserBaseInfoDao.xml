@@ -431,6 +431,7 @@
       <if test="userDesc != null">
         user_desc = #{userDesc,jdbcType=LONGVARCHAR},
       </if>
+      last_update_user_id = #{userId}
     </set>
     where user_id = #{userId}
   </update>
