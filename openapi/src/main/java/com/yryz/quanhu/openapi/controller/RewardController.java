@@ -1,6 +1,5 @@
 package com.yryz.quanhu.openapi.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +13,11 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.quanhu.behavior.reward.api.RewardCountApi;
 import com.yryz.quanhu.behavior.reward.api.RewardInfoApi;
 import com.yryz.quanhu.behavior.reward.constants.RewardConstants;
 import com.yryz.quanhu.behavior.reward.dto.RewardInfoDto;
+import com.yryz.quanhu.behavior.reward.entity.RewardCount;
 import com.yryz.quanhu.behavior.reward.entity.RewardInfo;
 import com.yryz.quanhu.behavior.reward.vo.RewardInfoVo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -38,6 +39,9 @@ public class RewardController {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private RewardInfoApi rewardInfoApi;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private RewardCountApi rewardCountApi;
 
     @ApiOperation("资源打赏")
     @ApiImplicitParams({
@@ -74,13 +78,10 @@ public class RewardController {
     @ApiOperation("我打赏/收到打赏 金额")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true),
-            @ApiImplicitParam(name = "queryType", paramType = "query", allowableValues = "11,12", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @GetMapping(value = "{version}/reward/amount")
-    public Response<Map<String, Object>> amountCount(Byte queryType, @RequestHeader("userId") Long headerUserId) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("amount", 1000L);
-        // TODO
-        return ResponseUtils.returnObjectSuccess(result);
+    public Response<RewardCount> amountCount(@RequestHeader("userId") Long headerUserId) {
+        RewardCount rewardCount = ResponseUtils.getResponseData(rewardCountApi.selectByTargetId(headerUserId));
+        return ResponseUtils.returnObjectSuccess(rewardCount);
     }
 }
