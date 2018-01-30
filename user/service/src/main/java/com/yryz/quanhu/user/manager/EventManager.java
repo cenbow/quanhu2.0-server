@@ -77,7 +77,7 @@ public class EventManager {
 			if (StringUtils.isNotBlank(inviter)) {
 				String userRegId = regService.selectUserIdByInviter(inviter);
 				if (StringUtils.isNotBlank(userRegId)) {
-					inviterRegister(userId);
+					inviterRegister(userRegId);
 				}
 			}
 			logger.info("[event_regiter]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), "");
@@ -99,7 +99,7 @@ public class EventManager {
 		EventInfo eventInfo = null;
 		try {
 			eventInfo = new EventInfo();
-			eventInfo.setEventCode(EventEnum.INVITER_REGISTER.getCode());
+			eventInfo.setEventCode(EventEnum.INVITE_FRIENDS_TO_REGISTER.getCode());
 			eventInfo.setUserId(userId);
 			eventInfo.setEventNum(1);
 			commit(eventInfo);
