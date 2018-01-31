@@ -285,7 +285,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             // 提交 好友动态
             Dymaic dymaic = new Dymaic();
             BeanUtils.copyProperties(dymaic, resourceVo);
-            dymaic.setModuleEnum(NumberUtils.toInt(ModuleContants.COTERIE));
+            dymaic.setModuleEnum(ModuleContants.COTERIE);
             dymaicApi.send(dymaic);
         } catch (Exception e) {
             logger.error("资源好友动态 接入异常！", e);

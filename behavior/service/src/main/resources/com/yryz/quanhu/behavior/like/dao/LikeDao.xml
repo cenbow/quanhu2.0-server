@@ -10,10 +10,13 @@
         <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
         <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="VARCHAR"/>
         <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+
+        <result column="resource_user_id" property="resourceUserId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Like_Column_List">
-        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,user_id AS userId,create_date AS createDate,last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate
+        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,user_id AS userId,create_date AS createDate,
+        last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,resource_user_id AS resourceUserId
     </sql>
 
     <insert id="accretion" parameterType="com.yryz.quanhu.behavior.like.entity.Like">
@@ -37,6 +40,9 @@
             <if test="lastUpdateDate != null">
                 last_update_date,
             </if>
+            <if test="resourceUserId != null">
+                resource_user_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="kid != null">
@@ -56,6 +62,9 @@
             </if>
             <if test="lastUpdateDate != null">
                 #{lastUpdateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="resourceUserId != null">
+                #{resourceUserId,jdbcType=BIGINT},
             </if>
         </trim>
     </insert>

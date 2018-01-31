@@ -41,7 +41,7 @@ public class DymaicTest {
         dymaic.setTransmitNote("transmit");
         dymaic.setTransmitType(1001);
         dymaic.setExtJson(GsonUtils.parseJson(tmp));
-        dymaic.setModuleEnum(1000);
+        dymaic.setModuleEnum("1000");
 
         Response<Boolean> response = dymaicService.send(dymaic);
         print(response);
@@ -107,7 +107,7 @@ public class DymaicTest {
         Dymaic dymaic = new Dymaic();
         dymaic.setUserId(USER_DEMO);
         dymaic.setKid(107233L);
-        dymaic.setModuleEnum(1000);
+        dymaic.setModuleEnum("1000");
 
         Response<Boolean> response = dymaicService.pushTimeLine(dymaic);
         print(response);
