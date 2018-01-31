@@ -34,6 +34,7 @@ import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
+import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
@@ -47,6 +48,7 @@ import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +74,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Reference
     private UserRelationApi userRelationApi;
 
-    @Reference
+    @Autowired
     private OrderSDK orderSDK;
 
     @Resource
@@ -159,6 +161,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
                 //再入成员表
                 saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
+            } else {
+
+                throw QuanhuException.busiError("添加关注关系异常");
             }
 
             result.setStatus((byte) 20);
@@ -167,20 +172,16 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         //免费要审核
         if (coterie.getJoinFee() == 0 && coterie.getJoinCheck() == 11) {
-            try {
-                //用户是否为待审核或审核通过
-                CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
-                if (null == memberApply) {
-                    //insert member apply
-                    saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
-                    //todo msg
-                    coterieMemberMessageManager.joinMessage(userId, coterieId, reason);
-                } else {
+            //用户是否为待审核或审核通过
+            CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
+            if (null == memberApply) {
+                //insert member apply
+                saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
+                //todo msg
+                coterieMemberMessageManager.joinMessage(userId, coterieId, reason);
+            } else {
 
-                    throw QuanhuException.busiError("用户已是待审核或审核通过");
-                }
-            } catch (Exception e) {
-                throw new QuanhuException(ExceptionEnum.SysException);
+                throw QuanhuException.busiError("用户已是待审核或审核通过");
             }
             result.setStatus((byte) 30);
             return result;

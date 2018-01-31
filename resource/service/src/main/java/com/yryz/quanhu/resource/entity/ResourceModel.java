@@ -80,9 +80,14 @@ public class ResourceModel implements Serializable {
     private String talentType;
     
     /**
-     * 排序字段
+     * 排序字段（首页排序）
      */
     private Long sort;
+    
+    /**
+     * 排序字段(私圈首页排序)
+     */
+    private Long coterieSort;
     
     /**
      * 创建时间
@@ -297,6 +302,21 @@ public class ResourceModel implements Serializable {
 	 */
 	public void setSort(Long sort) {
 		this.sort = sort;
+	}
+	
+
+	/**
+	 * @return the coterieSort
+	 */
+	public Long getCoterieSort() {
+		return coterieSort;
+	}
+
+	/**
+	 * @param coterieSort the coterieSort to set
+	 */
+	public void setCoterieSort(Long coterieSort) {
+		this.coterieSort = coterieSort;
 	}
 
 	/**

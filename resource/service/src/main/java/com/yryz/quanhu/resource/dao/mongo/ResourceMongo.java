@@ -77,6 +77,15 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 		if(resourceModel.getDelFlag() == null){
 			resourceModel.setDelFlag(ResourceEnum.DEL_FLAG_FALSE);
 		}
+		if(resourceModel.getDelFlag() == null){
+			resourceModel.setDelFlag(ResourceEnum.DEL_FLAG_FALSE);
+		}
+		if(resourceModel.getSort() == null){
+			resourceModel.setSort(0L);
+		}
+		if(resourceModel.getCoterieSort() == null){
+			resourceModel.setCoterieSort(0L);
+		}
 		return super.save(resourceModel);
 	}
 	

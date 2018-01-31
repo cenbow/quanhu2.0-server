@@ -35,4 +35,6 @@ public interface CommentService {
     CommentInfoVO  querySingleCommentInfo(CommentSubDTO commentSubDTO);
 
     PageList<CommentVO> querySubCommentsInfo(CommentSubDTO commentSubDTO);
+
+    int updownSingle(Comment comment);
 }
