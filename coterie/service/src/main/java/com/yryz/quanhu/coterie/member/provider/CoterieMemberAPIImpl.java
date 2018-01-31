@@ -366,10 +366,10 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
                 throw QuanhuException.busiError("私圈审批中...");
             } else if (coterie.getStatus() == 12){
                 throw QuanhuException.busiError("私圈审批不通过");
-            } else if (coterie.getShelveFlag() == 11) {
-                throw QuanhuException.busiError("私圈已下架");
-//            } else if (coterie.getDelFlag() == 11) {
-//                throw QuanhuException.busiError("私圈已删除");
+//            } else if (coterie.getShelveFlag() == 11) {
+//                throw QuanhuException.busiError("私圈已下架");
+            } else if (coterie.getDeleted() == 11) {
+                throw QuanhuException.busiError("私圈已删除");
             }
             return true;
         } else {

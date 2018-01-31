@@ -32,7 +32,10 @@ public @interface UserBehaviorValidation {
      * 基于私圈的禁言
      * @return
      */
+    @Deprecated
     boolean muteByCoterie() default false;
 
+    boolean isCoterieMute() default false;
 
+    boolean isCoterieMember() default false;
 }
