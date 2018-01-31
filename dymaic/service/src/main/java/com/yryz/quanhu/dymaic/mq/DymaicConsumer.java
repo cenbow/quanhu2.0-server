@@ -58,9 +58,9 @@ public class DymaicConsumer {
 		//1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
 		try {
 			Dymaic dymaic = GsonUtils.json2Obj(data, Dymaic.class);
-			Integer modelEnum = dymaic.getModuleEnum();
-			if (modelEnum != null && (modelEnum.equals(1000) || modelEnum.equals(1002) || modelEnum.equals(1003)
-				|| modelEnum.equals(1004) || modelEnum.equals(1005)) ) {
+			String modelEnum = dymaic.getModuleEnum();
+			if (modelEnum != null && (modelEnum.equals("1000") || modelEnum.equals("1002") || modelEnum.equals("1003")
+				|| modelEnum.equals("1004") || modelEnum.equals("1005")) ) {
 				dymaicProvider.send(dymaic);
 			}
 		} catch (Exception e) {
