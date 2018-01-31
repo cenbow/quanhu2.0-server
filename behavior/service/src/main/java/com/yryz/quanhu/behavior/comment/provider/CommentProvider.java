@@ -50,9 +50,6 @@ public class CommentProvider implements CommentApi {
     @Reference(check = false)
     private UserApi userApi;
 
-    @Reference(check = false)
-    private PushAPI pushAPI;
-
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
@@ -75,23 +72,6 @@ public class CommentProvider implements CommentApi {
                 } catch (Exception e) {
                     logger.info("同步评论数据到redis中失败" + e);
                 }
-
-                PushReqVo pushReqVo=new PushReqVo();
-                List<String> strUserId=new ArrayList<String>();
-                strUserId.add(String.valueOf(comment.getTargetUserId()));
-                pushReqVo.setCustIds(strUserId);
-                pushReqVo.setMsg("用户"+userSimpleVO.getUserNickName()+"评论了你!");
-                pushReqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
-                List<String> registrationIds=new ArrayList<String>();
-                registrationIds.add(String.valueOf(PushReqVo.CommonPushType.BY_REGISTRATIONID));
-                pushReqVo.setRegistrationIds(registrationIds);
-
-                try{
-                    pushAPI.commonSendAlias(pushReqVo);
-                }catch (Exception e){
-                    logger.info("调用极光推送失败:" + e);
-                }
-
             } else {
                 map.put("result", 0);
             }
@@ -172,6 +152,16 @@ public class CommentProvider implements CommentApi {
             CommentInfoVO commentInfoVO = commentService.querySingleCommentInfo(commentSubDTO);
             commentInfoVO.setCommentEnties(commentService.querySubCommentsInfo(commentSubDTO));
             return ResponseUtils.returnObjectSuccess(commentInfoVO);
+        } catch (Exception e) {
+            logger.error("", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Integer> updownSingle(Comment comment) {
+        try {
+            return ResponseUtils.returnObjectSuccess(commentService.updownSingle(comment));
         } catch (Exception e) {
             logger.error("", e);
             return ResponseUtils.returnException(e);
