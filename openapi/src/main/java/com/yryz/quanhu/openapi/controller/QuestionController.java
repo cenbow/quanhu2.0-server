@@ -37,13 +37,13 @@ public class QuestionController {
 	@ApiOperation("圈粉发布问题")
 	@ApiImplicitParams(
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-			@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			@ApiImplicitParam(name = "userId", paramType = "header", required = true),
+			@ApiImplicitParam(name = "token", paramType = "header", required = true)
 	})
 	@PostMapping(value = "/services/app/{version}/coterie/question/add")
-	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
-	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
-			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
-			coterieId="object.QuestionDto.coterieId")
+	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,muteByCoterie = true)
+	@UserBehaviorArgs(sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
+			coterieId="object.QuestionDto.coterieId" ,sourceUserId ="object.QuestionDto.targetId" )
 	public Response<QuestionVo> saveQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId=header.getUserId();
@@ -59,10 +59,7 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
-	@UserBehaviorValidation(event = "圈粉删除未回答的问题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
-	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
-			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
-			coterieId="object.QuestionDto.coterieId")
+	@UserBehaviorValidation(event = "圈粉删除未回答的问题",login = true)
 	@PostMapping(value = "/services/app/{version}/coterie/question/delete")
 	public Response<Integer> deleteQueston(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
@@ -78,10 +75,7 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
-	@UserBehaviorValidation(event = "圈主拒接回答问题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
-	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
-			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
-			coterieId="object.QuestionDto.coterieId")
+	@UserBehaviorValidation(event = "圈主拒接回答问题",login = true)
 	@PostMapping(value = "/services/app/{version}/coterie/question/reject")
 	public Response<Integer> rejectQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
