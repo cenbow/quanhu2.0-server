@@ -2,6 +2,7 @@ package com.yryz.quanhu.other.activity.provider;
 
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.github.pagehelper.Page;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -13,6 +14,8 @@ import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,6 +151,18 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 			list = adminIActivityParticipationService.adminlistDetail(adminActivityVoteDetailDto);
 		} catch (Exception e) {
 			logger.error("投票用户数据异常:"+ adminActivityVoteDetailDto);
+			return ResponseUtils.returnException(e);
+		}
+		return ResponseUtils.returnObjectSuccess(list);
+	}
+
+	@Override
+	public Response<PageList<UserBaseInfoVO>> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize){
+		PageList<UserBaseInfoVO>  list = null;
+		try {
+			list = adminIActivityParticipationService.selectUser(custInfoDTO, pageNo, pageSize);
+		} catch (Exception e) {
+			logger.error("用户数据异常:"+ custInfoDTO);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);

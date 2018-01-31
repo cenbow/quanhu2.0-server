@@ -1,6 +1,7 @@
 package com.yryz.quanhu.other.activity.api;
 
 
+import com.github.pagehelper.Page;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
@@ -9,6 +10,8 @@ import com.yryz.quanhu.other.activity.dto.AdminConfigObjectDto;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 
 import java.util.List;
 
@@ -49,4 +52,6 @@ public interface AdminIActivityParticipationApi {
 	Response<PageList> adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 
 	Response<PageList> adminlistDetail(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
+
+    Response<PageList<UserBaseInfoVO>> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize);
 }
