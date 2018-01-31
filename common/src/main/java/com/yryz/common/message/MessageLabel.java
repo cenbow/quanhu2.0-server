@@ -70,14 +70,14 @@ public class MessageLabel {
 	public static final int INTERACTIVE_ANSWER = 4002;
 	
 	/**
-	 * 私圈
+	 * 转发
 	 */
-	public static final int INTERACTIVE_COTERIE = 4003;
+	public static final int INTERACTIVE_TRANSMIT = 4003;
 	
 	/**
-	 * 活动
+	 * 私圈
 	 */
-	public static final int INTERACTIVE_ACTIVITY = 4004;
+	public static final int INTERACTIVE_COTERIE = 4004;
 	
 	/**
 	 * 推荐内容

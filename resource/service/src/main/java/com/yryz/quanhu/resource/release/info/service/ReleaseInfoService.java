@@ -3,12 +3,10 @@ package com.yryz.quanhu.resource.release.info.service;
 import java.util.List;
 
 import com.yryz.common.response.PageList;
-import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
 * @author wangheng
@@ -109,13 +107,4 @@ public interface ReleaseInfoService {
     public void resourcePropertiesEmpty(ReleaseInfo record);
 
     public List<Long> getKidByCreatedate(String startDate, String endDate);
-
-    /**  
-    * @Description: 资源聚合
-    * @author wangheng
-    * @param @param releaseInfo
-    * @return void
-    * @throws  
-    */
-    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo, UserSimpleVO createUser);
 }
