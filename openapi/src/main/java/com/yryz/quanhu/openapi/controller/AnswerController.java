@@ -32,7 +32,7 @@ public class AnswerController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,isCoterieMute = false)
     @UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
             sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
             coterieId="object.QuestionDto.coterieId")
