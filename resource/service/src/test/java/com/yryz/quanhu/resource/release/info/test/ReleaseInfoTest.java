@@ -1,6 +1,8 @@
 package com.yryz.quanhu.resource.release.info.test;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +40,6 @@ public class ReleaseInfoTest {
         ReleaseInfo record = new ReleaseInfo();
         int random = new Random().nextInt();
         
-        record.setModuleEnum("0091");
         record.setContent(random + "正文哈哈哈哈");
         record.setContentSource("[{\"text\":\"" + record.getContent() + "\"}]");
         record.setCreateUserId(724011759597371392L);
@@ -89,5 +90,19 @@ public class ReleaseInfoTest {
         // dto.setCoterieId(5259149661L);
         System.out.println(new ObjectMapper()
                 .writeValueAsString(releaseInfoApi.pageByCondition(dto, 727909974996672512L, false, true)));
+    }
+
+    /**  
+    * @Description: ids 集合查询
+    * @author wangheng
+    * @param @throws JsonProcessingException
+    * @return void
+    * @throws  
+    */
+    @Test
+    public void test005() throws JsonProcessingException {
+        Set<Long> set = new HashSet<>();
+        set.add(732811597835960320L);
+        System.out.println(new ObjectMapper().writeValueAsString(releaseInfoApi.selectByKids(set)));
     }
 }

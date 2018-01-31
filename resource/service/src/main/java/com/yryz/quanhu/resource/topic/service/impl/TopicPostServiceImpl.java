@@ -113,6 +113,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
         messageBusinessVo.setImgUrl(topicPost.getImgUrl());
         messageBusinessVo.setTitle(topicPost.getContent());
+        messageBusinessVo.setFromUserId(topicPost.getCreateUserId());
         messageBusinessVo.setTosendUserId(topic.getCreateUserId());
         messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
         messageBusinessVo.setKid(topicPost.getKid());
@@ -241,7 +242,12 @@ public class TopicPostServiceImpl implements TopicPostService {
         return data;
     }
 
-
+    /**
+     *发帖人和话题人都能删除帖子
+     * @param kid
+     * @param userId
+     * @return
+     */
     @Override
     public Integer deleteTopicPost(Long kid, Long userId) {
         /**
@@ -250,10 +256,11 @@ public class TopicPostServiceImpl implements TopicPostService {
         if (null == kid || null == userId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        TopicPost topicPost = this.topicPostDao.selectByPrimaryKey(kid);
+        TopicPostWithBLOBs topicPost = this.topicPostDao.selectByPrimaryKey(kid);
         if (null == topicPost) {
             throw QuanhuException.busiError("删除的帖子不存在");
         }
+
         if (userId.compareTo(topicPost.getCreateUserId()) != 0) {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
         }
@@ -261,6 +268,15 @@ public class TopicPostServiceImpl implements TopicPostService {
 
         /**
          * 发送消息
+        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+        messageBusinessVo.setImgUrl(topicPost.getImgUrl());
+        messageBusinessVo.setTitle(topicPost.getContent());
+        messageBusinessVo.setTosendUserId(topicPost.getCreateUserId());
+        messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
+        messageBusinessVo.setKid(topicPost.getKid());
+        messageBusinessVo.setIsAnonymity(null);
+        messageBusinessVo.setCoterieId(null);
+        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST,true);
          */
         return this.topicPostDao.updateByPrimaryKey(topicPost);
     }

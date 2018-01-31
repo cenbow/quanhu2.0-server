@@ -54,7 +54,7 @@ public class UserIllegalWordsFilter implements IBehaviorValidFilter {
                 if(StringUtils.isBlank(value)){
                     continue;
                 }
-                //标题
+                //替换
                 Response<String> rpc = illegalWordsApi.replaceIllegalWords(value,"*");
                 if(rpc.success()){
                     //重新赋值
@@ -66,6 +66,5 @@ public class UserIllegalWordsFilter implements IBehaviorValidFilter {
         }finally {
             filterChain.execute();
         }
-
     }
 }

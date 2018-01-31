@@ -2,6 +2,8 @@ package com.yryz.quanhu.openapi.validation;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.beans.PropertyDescriptor;
@@ -82,13 +84,18 @@ public class BehaviorArgsBuild {
         //通过request head 获取值
         if(annotationKey.startsWith(PREFIX_REQUEST_HEAD)){
             HttpServletRequest request = (HttpServletRequest) getObjByClass(HttpServletRequest.class,joinPointArgs);
-
+            if(request==null){
+                request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            }
             return request.getHeader(key);
         }
 
         //通过request form 提交 获取值
         if(annotationKey.startsWith(PREFIX_REQUEST_FORM)){
             HttpServletRequest request = (HttpServletRequest) getObjByClass(HttpServletRequest.class,joinPointArgs);
+            if(request==null){
+                request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            }
             return request.getParameter(key);
         }
 
