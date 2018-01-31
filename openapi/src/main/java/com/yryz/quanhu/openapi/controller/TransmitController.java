@@ -33,10 +33,10 @@ public class TransmitController {
 
     private Logger logger = LoggerFactory.getLogger(ShareController.class);
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     TransmitApi transmitApi;
 
-    @Reference(check = false)
+    @Reference(check = false, timeout = 30000)
     EventAPI eventAPI;
 
     /**
