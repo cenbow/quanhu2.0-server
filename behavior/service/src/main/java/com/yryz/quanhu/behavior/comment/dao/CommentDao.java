@@ -34,4 +34,6 @@ public interface CommentDao {
 
     CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO);
 
+    int updownSingle(Comment comment);
+
 }

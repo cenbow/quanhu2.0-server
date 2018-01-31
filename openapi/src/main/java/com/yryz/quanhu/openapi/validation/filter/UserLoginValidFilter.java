@@ -31,9 +31,6 @@ public class UserLoginValidFilter implements IBehaviorValidFilter {
     private static final Logger logger = LoggerFactory.getLogger(UserLoginValidFilter.class);
 
     @Autowired
-    private BehaviorArgsBuild behaviorArgsBuild;
-
-    @Autowired
     private AuthService authService;
 
     @Override

@@ -8,9 +8,13 @@ import com.yryz.quanhu.behavior.collection.api.CollectionInfoApi;
 import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
 import com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +27,13 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class CollectionInfoController {
 
+    private Logger logger = LoggerFactory.getLogger(CollectionInfoController.class);
+
     @Reference(check = false)
     private CollectionInfoApi collectionInfoApi;
+
+    @Reference(check = false, timeout = 30000)
+    EventAPI eventAPI;
 
     /**
      * 收藏
@@ -39,6 +48,18 @@ public class CollectionInfoController {
         String userId = request.getHeader("userId");
         Assert.hasText(userId, "userId不能为空");
         collectionInfoDto.setCreateUserId(Long.valueOf(userId));
+        Response result = collectionInfoApi.single(collectionInfoDto);
+        if(result.success()) {
+            try {
+                //提交事件
+                EventInfo event = new EventInfo();
+                event.setUserId(userId);
+                event.setEventCode("23");
+                eventAPI.commit(event);
+            } catch (Exception e) {
+                logger.error("提交eventApi 失败", e);
+            }
+        }
         return collectionInfoApi.single(collectionInfoDto);
     }
 

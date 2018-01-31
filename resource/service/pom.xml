@@ -51,7 +51,11 @@
             <artifactId>coterie-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
-		
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>dymaic-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
 
         <!--公司内部库-->
         <dependency>

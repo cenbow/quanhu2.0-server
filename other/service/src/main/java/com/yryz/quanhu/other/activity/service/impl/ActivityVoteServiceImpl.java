@@ -11,6 +11,7 @@ import com.yryz.common.message.SystemBody;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.IdGen;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.other.activity.constants.ActivityCandidateConstants;
@@ -361,7 +362,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         try {
             MessageConstant constant = MessageConstant.PRIZES_HAVE_POST;
             MessageVo messageVo = new MessageVo();
-            messageVo.setMessageId(UUID.randomUUID().toString());
+            messageVo.setMessageId(IdGen.uuid());
             messageVo.setActionCode(constant.getMessageActionCode());
             String content = null;
 		/*if (StringUtils.isNotEmpty(activityInfoVo.getTitle())) {

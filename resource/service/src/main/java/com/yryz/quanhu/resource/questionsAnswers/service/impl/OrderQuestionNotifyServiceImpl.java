@@ -1,10 +1,10 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
@@ -29,7 +29,7 @@ public class OrderQuestionNotifyServiceImpl implements IOrderNotifyService {
 
     @Override
     public String getModuleEnum() {
-        return ResourceTypeEnum.QUESTION;
+        return ModuleContants.QUESTION;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class OrderQuestionNotifyServiceImpl implements IOrderNotifyService {
          messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
          messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
          messageBusinessVo.setKid(question.getKid());
-         messageBusinessVo.setModuleEnum(ResourceTypeEnum.QUESTION);
+         messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
          messageBusinessVo.setFromUserId(question.getCreateUserId());
          messageBusinessVo.setTosendUserId(question.getCreateUserId());
          messageBusinessVo.setTitle(question.getContent());
