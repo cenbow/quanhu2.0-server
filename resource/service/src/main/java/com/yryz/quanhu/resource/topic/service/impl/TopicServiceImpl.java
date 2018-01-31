@@ -196,7 +196,6 @@ public class TopicServiceImpl implements TopicService {
         topicParam.setDelFlag(CommonConstants.DELETE_YES);
         int result= this.topicDao.updateByPrimaryKeySelective(topicParam);
 
-
         /**
          * 话题下架，同时下架话题下的帖子
          */
