@@ -63,4 +63,11 @@ public interface CommentApi {
      */
     Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO);
 
+    /**
+     * 单个下架
+     * @param:comment
+     * @return:Integer
+     **/
+    Response<Integer> updownSingle(Comment comment);
+
 }

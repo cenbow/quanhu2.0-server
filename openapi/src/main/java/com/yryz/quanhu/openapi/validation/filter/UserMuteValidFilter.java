@@ -40,14 +40,12 @@ public class UserMuteValidFilter implements IBehaviorValidFilter {
         /**
          * 平台禁言，做强制性校验
          */
-
         //统一从request中获取，不在从注解中获取key进行查询
-        HttpServletRequest request = (HttpServletRequest) behaviorArgsBuild.getObjByClass(HttpServletRequest.class,filterChain.getJoinPoint().getArgs());
-        String loginUserId = request.getHeader("userId");
+        long loginUserId = filterChain.getLoginUserId();
 
         logger.info("验证用户平台禁言={}",loginUserId);
 
-        Response<Boolean> rpc = accountApi.checkUserDisTalk(Long.parseLong(loginUserId));
+        Response<Boolean> rpc = accountApi.checkUserDisTalk(loginUserId);
         if(rpc.success()&&!rpc.getData()){
             filterChain.execute();
         }else{

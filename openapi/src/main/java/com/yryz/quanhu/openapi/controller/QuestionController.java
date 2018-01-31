@@ -40,7 +40,7 @@ public class QuestionController {
 			@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 	})
 	@PostMapping(value = "/services/app/{version}/coterie/question/add")
-	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,isCoterieMute = false)
 	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
 			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
 			coterieId="object.QuestionDto.coterieId")
@@ -59,7 +59,7 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
-	@UserBehaviorValidation(event = "圈粉删除未回答的问题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorValidation(event = "圈粉删除未回答的问题", blacklist = true, illegalWords = true,login = false,isCoterieMute = false)
 	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
 			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
 			coterieId="object.QuestionDto.coterieId")
@@ -78,7 +78,7 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
-	@UserBehaviorValidation(event = "圈主拒接回答问题", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
+	@UserBehaviorValidation(event = "圈主拒接回答问题", blacklist = true, illegalWords = true,login = false,isCoterieMute = false)
 	@UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
 			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
 			coterieId="object.QuestionDto.coterieId")
