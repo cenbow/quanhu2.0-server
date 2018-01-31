@@ -1,8 +1,15 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.other.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteConfigDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteDetailDao;
@@ -11,9 +18,18 @@ import com.yryz.quanhu.other.activity.dto.*;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService;
-import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
-import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
-import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
+import com.yryz.quanhu.other.activity.vo.*;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.ScoreAPI;
+import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,9 +38,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import static org.springframework.util.Assert.isNull;
 @Service
 public class AdminIActivityParticipationServiceImpl implements AdminIActivityParticipationService {
@@ -45,22 +62,14 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 
 	@Autowired
     ActivityInfoDao activityInfoDao;
-    
-    /*@Autowired
-    CustAPI custAPI;
-
-    @Autowired
-    CircleAPI circleAPI;
-    
-	@Autowired
-	ScoreAPI scoreAPI;
-
-	@Autowired
-	CircleResourceAPI circleResourceReference;
-	
-	@Autowired
-	UidApi uidReference;*/
-	
+    @Reference(check=false)
+    UserApi userApi;
+    @Reference(check=false)
+    private IdAPI idApi;
+    @Reference(check=false)
+    ScoreAPI scoreAPI;
+    @Reference(check=false)
+    ResourceDymaicApi resourceDymaicApi;
     /**
      * 增加票数
      */
@@ -228,14 +237,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         
     	Integer pageNo = adminActivityVoteRecordDto.getPageNo();
 		Integer pageSize = adminActivityVoteRecordDto.getPageSize();
-		if(adminActivityVoteRecordDto.getPageNo()==null|| adminActivityVoteRecordDto.getPageNo()<=0){
-			adminActivityVoteRecordDto.setPageNo(0);
-		}else{
-			adminActivityVoteRecordDto.setPageNo((adminActivityVoteRecordDto.getPageNo()-1)* adminActivityVoteRecordDto.getPageSize());
-		}
-		if(adminActivityVoteRecordDto.getPageSize()==null|| adminActivityVoteRecordDto.getPageSize()<=0){
-			adminActivityVoteRecordDto.setPageSize(10);
-		}	
+        Page<AdminActivityVoteRecordVo> page = PageHelper.startPage(pageNo,pageSize);
 		String nickName=null;
     	String  beginDate=null;
     	String  endDate=null;
@@ -252,9 +254,23 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         		 beginDate=sdf.format(adminActivityVoteRecordDto.getBeginCreateDate());
             	 endDate=sdf.format(adminActivityVoteRecordDto.getEndCreateDate());
         	}
-        	
-             /*TODO custIds = custAPI.getAdminList(nickName, null, beginDate, endDate);*/
-            if (!CollectionUtils.isEmpty(custIds)) {
+
+            Response<Page<UserBaseInfoVO>> userInfoPage = null;
+            try {
+                AdminUserInfoDTO custInfoDTO = new AdminUserInfoDTO();
+                custInfoDTO.setNickName(nickName);
+                custInfoDTO.setStartDate(beginDate);
+                custInfoDTO.setEndDate(endDate);
+                userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
+            } catch (Exception e) {
+                logger.error("查询用户列表异常",e);
+            }
+            if(userInfoPage!=null&&userInfoPage.success()&&!CollectionUtils.isEmpty(userInfoPage.getData().getResult())){
+                for (UserBaseInfoVO uv:userInfoPage.getData().getResult()){
+                    custIds.add(uv.getUserId().toString());
+                }
+            }
+        	if (!CollectionUtils.isEmpty(custIds)) {
                 adminActivityVoteRecordDto.setCustIds(custIds);
             }
             if(custIds.size()>0){
@@ -265,19 +281,22 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 		 list = activityVoteRecordDao.selectPage(adminActivityVoteRecordDto);
         }
         for (AdminActivityVoteRecordVo voteRecord : list) {
-            /* TODO CustInfo custInfo = custAPI.getCustInfo(voteRecord.getCreateUserId());
-            voteRecord.setNickName(custInfo.getCustNname());
-            SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ); 
+            Set<String> userIds = new HashSet<String>();
+            userIds.add(voteRecord.getCreateUserId().toString());
+            Response<Map<String,UserBaseInfoVO>> users = null;
             try {
-				voteRecord.setCreateDate(sdf.parse(custInfo.getCreateDate().substring(0, 18)));
-			} catch (ParseException e) {
-				 
-				e.printStackTrace();
-			}
-            voteRecord.setPhone(custInfo.getCustPhone());*/
+                users = userApi.getUser(userIds);
+            } catch (Exception e) {
+                logger.error("查询用户信息异常",e);
+            }
+            if(users.success()&&users.getData().get(voteRecord.getCreateUserId().toString())!=null){
+                voteRecord.setNickName(users.getData().get(voteRecord.getCreateUserId().toString()).getUserNickName());
+                voteRecord.setCreateDate(users.getData().get(voteRecord.getCreateUserId().toString()).getCreateDate());
+                voteRecord.setPhone(users.getData().get(voteRecord.getCreateUserId().toString()).getUserPhone());
+            }
         }
+
         
-		 
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(pageNo, pageSize, list, 0L);
 		}
@@ -354,49 +373,18 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
     /**
      * 弹框选择马甲
      */
-    /*TODO@Override
-    public ListPage<CustInfo> selectUser(String type, String nickName, String circleId, Integer pageNo, Integer pageSize) {
-        ListPage<CustInfo> custInfoPage = null;
-        if ("0".equals(type)) {
-            List<String> custIdsByNickname = null;
-            if (StringUtils.isNotBlank(nickName)) {
-                custIdsByNickname = custAPI.getAdminList(nickName, null, null, null);
-            }
-
-            ListPage<CircleMember> circleVestPage = circleAPI.getAdminCircleVestList(circleId, custIdsByNickname, pageNo, pageSize);
-
-            custInfoPage = new ListPage<>();
-
-            custInfoPage.setTotalCount(circleVestPage.getTotalCount());
-            custInfoPage.setPageNo(circleVestPage.getPageNo());
-            custInfoPage.setPageSize(circleVestPage.getPageSize());
-
-            Set<String> custIds = new HashSet<>();
-
-            if (!circleVestPage.getList().isEmpty()) {
-                for (CircleMember member : circleVestPage.getList()) {
-                    custIds.add(member.getCustId());
-                }
-            }
-            List<CustInfo> custInfos = new ArrayList<>();
-
-            Map<String, CustSimpleDTO> custSimpleDTOMap = custAPI.getCustSimple(custIds);
-            if (custSimpleDTOMap != null) {
-                for (CustSimpleDTO custSimpleDTO : custSimpleDTOMap.values()) {
-                    CustInfo custInfo = new CustInfo();
-                    custInfo.setCustId(custSimpleDTO.getCustId());
-                    custInfo.setCustNname(custSimpleDTO.getCustNname());
-                    custInfo.setCustImg(custSimpleDTO.getCustImg());
-                    custInfos.add(custInfo);
-                }
-            }
-
-            custInfoPage.setList(custInfos);
-        } else {
-            custInfoPage = custAPI.getAdminCustInfoList(circleId, nickName, null, null, null, pageNo, pageSize);
+    @Override
+    public  PageList<UserBaseInfoVO> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize) {
+        Response<Page<UserBaseInfoVO>> userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
+        PageList<UserBaseInfoVO> pageList = new PageList<UserBaseInfoVO>();
+        if (userInfoPage.success()){
+            pageList.setCount(userInfoPage.getData().getTotal());
+            pageList.setEntities(userInfoPage.getData().getResult());
+            pageList.setCurrentPage(pageNo);
+            pageList.setPageSize(pageSize);
         }
-        return custInfoPage;
-    }*/
+        return pageList;
+    }
 
     public String saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto) {
 
@@ -412,58 +400,48 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         if (voteNo == null) {
             voteNo = 0;
         }
+        voteDetailDto.setKid(idApi.getSnowflakeId().getData());
         //maxId
         voteDetailDto.setVoteNo(voteNo + 1);
-//    	voteDetailDto.setVoteNo(activityVoteDetailDao.selectMaxNoByActivityId(voteDetailDto.getActivityInfoId())+1);
-  /*      voteDetailDto.setFreeVoteFlag((byte) 1);
-        voteDetailDto.setVoteCount(0);*/
-        voteDetailDto.setModuleEnum("1007");
-      /*  TODO voteDetailDto.setResourceId(uidReference.getUID() + "");*/
+        voteDetailDto.setModuleEnum(ModuleContants.ACTIVITY_WORKS_ENUM);
         AdminActivityInfoVo1 adminActivityInfoVo1 = activityInfoDao.selectByPrimaryKey(voteDetailDto.getActivityInfoId());
-        /*voteDetailDto.setObtainIntegral(adminActivityInfoVo1.getAmount());*/
+        ActivityVoteConfig config = activityVoteConfigDao.selectVoteByActivityInfoId(voteDetailDto.getActivityInfoId());
+        voteDetailDto.setObtainIntegral(config.getAmount());
         voteDetailDto.setAddVote(0);
-        activityParticipationDao.insert(voteDetailDto);
-        /*if(adminActivityInfoVo1.getAmount()!=0){
-			*//*TODO scoreAPI.addScore(voteDetailDto.getCreateUserId(), adminActivityInfoVo1.getAmount().intValue(),"-1");*//*
-		}*/
-		if(null==voteDetailDto.getId() || voteDetailDto.getId().intValue()==0){
-			logger.info("insert activity return null");
-			Integer id = activityParticipationDao.selectMaxId();
-			logger.info("insert activity getMaxId:"+id);
-			commitResource(Long.valueOf(id), adminActivityInfoVo1);
-		}else{
-			commitResource(voteDetailDto.getId(), adminActivityInfoVo1);
-		}
+        activityParticipationDao.insertByPrimaryKeySelective(voteDetailDto);
+        if(config.getAmount()!=0){
+            try {
+                scoreAPI.addScore(voteDetailDto.getCreateUserId().toString(), config.getAmount().intValue(), EventEnum.ADD_SCORE.getCode());
+            } catch (Exception e) {
+                logger.error("加积分异常",e);
+            }
+        }
+        commitResource(voteDetailDto, adminActivityInfoVo1);
 		return null;
     }
-    private void commitResource(Long id,AdminActivityInfoVo1 activityInfo) {
-		/*TODO AdminActivityVoteDetailVo activityVoteDetailVo = activityParticipationDao.selectByPrimaryKey(id);
-		List<Resource> list =  new ArrayList<Resource>();
-		Resource res = new Resource();
-		res.setResourceId(activityVoteDetailVo.getResourceId());
-		res.setCustId(activityVoteDetailVo.getCreateUserId());
-		res.setResourceType(ResourceTypeEnum.WORK);
-		res.setResourceTag("活动作品");
-		res.setTitle(activityInfo.getTitle());
-		res.setModuleEnum(activityVoteDetailVo.getModuleEnum());
-		res.setPics(activityVoteDetailVo.getImgUrl());
-		res.setVideo(activityVoteDetailVo.getVideoUrl());
-		res.setVideoPic(activityVoteDetailVo.getVideoThumbnailUrl());
-		res.setThumbnail(activityVoteDetailVo.getCoverPlan());
-		res.setCreateTime(activityVoteDetailVo.getCreateDate() == null ? new Date().getTime() :activityVoteDetailVo.getCreateDate().getTime());//发布时间
-		res.setUpdateTime(activityVoteDetailVo.getCreateDate() == null ? new Date().getTime() :activityVoteDetailVo.getCreateDate().getTime());//修改时间
-		res.setExtjson(JsonUtils.toFastJson(activityVoteDetailVo));//对象转json
-		res.setPublicState(0);
-		res.setCircleRoute("activity");
-		res.setTalentType("0");
-		res.setSummary(activityVoteDetailVo.getText());
-		res.setContent(activityVoteDetailVo.getText());
-		res.setHeat(0L);
-		res.setReadNum(0L);
-		res.setPartNum(0L);
-		res.setOrderby(0L);
-		list.add(res);
-		circleResourceReference.commitResource(list);*/
+    private void commitResource(AdminActivityVoteDetailDto voteDetail,AdminActivityInfoVo1 activityInfo) {
+        try {
+            ResourceTotal resourceTotal = new ResourceTotal();
+            resourceTotal.setContent(voteDetail.getContent());
+            resourceTotal.setCreateDate(DateUtils.getString(new Date()));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(voteDetail));
+            resourceTotal.setModuleEnum(new Integer(voteDetail.getModuleEnum()));
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+            resourceTotal.setResourceId(voteDetail.getKid());
+
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(voteDetail.getCreateUserId());
+            if(userSimple.success()
+                    && userSimple.getData() != null
+                    && userSimple.getData().getUserRole() != null) {
+                resourceTotal.setTalentType(String.valueOf(userSimple.getData().getUserRole()));
+            }
+
+            resourceTotal.setTitle(activityInfo.getTitle());
+            resourceTotal.setUserId(voteDetail.getCreateUserId());
+            resourceDymaicApi.commitResourceDymaic(resourceTotal);
+        } catch (Exception e) {
+            logger.error("资源聚合 接入异常！", e);
+        }
 	}
 
 	/*@Override

@@ -40,34 +40,29 @@ public class UserBlacklistValidFilter implements IBehaviorValidFilter{
         logger.info("验证用户关系黑名单={}",filterChain.getContext());
 
         //获取资源作者
-        String  sourceUserId = null;
         Object objValue = filterChain.getContext().get("sourceUserId");
         if(objValue==null){
             throw new QuanhuException("","","该资源作者ID参数异常");
-        }else{
-            sourceUserId = String.valueOf(objValue);
         }
 
+        String  sourceUserId = String.valueOf(objValue);
         //从上下文获取request 获取当前登录用户
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String loginUserId = request.getHeader("userId");
+        String loginUserId = String.valueOf(filterChain.getLoginUserId());
 
         //当前登录用户，和作者的关系
         Response<UserRelationDto> rpc = userRelationApi.getRelation(loginUserId,sourceUserId);
-        if(rpc.success()){
-            UserRelationDto dto = rpc.getData();
-            if(dto!=null){
-                //登录用户把作者拉黑了
-                if(dto.getRelationStatus()== UserRelationConstant.STATUS.TO_BLACK.getCode()){
-                    throw new QuanhuException("","","您已把该资源作者拉黑，不允许操作");
-                }
-                //作者把登录用户拉黑了
-                if(dto.getRelationStatus()==UserRelationConstant.STATUS.FROM_BLACK.getCode()){
-                    throw new QuanhuException("","","该资源作者已将您拉黑，不允许操作");
-                }
+        UserRelationDto dto = rpc.getData();
+        if(dto!=null){
+            int status = dto.getRelationStatus();
+            //登录用户把作者拉黑了,或者互相拉黑
+            if(status == UserRelationConstant.STATUS.TO_BLACK.getCode()||
+                    status == UserRelationConstant.STATUS.BOTH_BLACK.getCode()){
+                throw new QuanhuException("","","您已把该资源作者拉黑，不允许操作");
             }
-        }else{
-            throw new QuanhuException("","","调用验证服务异常");
+            //作者把登录用户拉黑了
+            if(status==UserRelationConstant.STATUS.FROM_BLACK.getCode()){
+                throw new QuanhuException("","","该资源作者已将您拉黑，不允许操作");
+            }
         }
         filterChain.execute();
     }

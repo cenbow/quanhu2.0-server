@@ -39,11 +39,11 @@ public class MyBehaviorController {
 
 
 
-    @UserBehaviorValidation(event = "资源发布", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
-    @UserBehaviorArgs(sourceContexts = {"map.title","map.contentSource"},sourceUserId = "map.createUserId")
+    @UserBehaviorValidation(event = "资源发布", blacklist = false, illegalWords = true,login = true,mute = false,isCoterieMute = false,isCoterieMember = false)
+    @UserBehaviorArgs(sourceContexts = {"map.title","map.contentSource"},sourceUserId = "map.createUserId",coterieId = "map.coterieId")
 
     @RequestMapping("/map")
-    public Response<String> testMap(HttpServletRequest request, @RequestBody Map<String,Object> map){
+    public Response<String> testMap(@RequestBody Map<String,Object> map){
         logger.info("map={}",map);
         return null;
     }

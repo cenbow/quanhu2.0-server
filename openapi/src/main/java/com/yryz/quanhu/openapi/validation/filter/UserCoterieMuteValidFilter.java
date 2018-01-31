@@ -27,9 +27,9 @@ import javax.servlet.http.HttpServletRequest;
  * 用户私圈 禁言校验
  */
 @Service
-public class UserMuteByCoterieValidFilter implements IBehaviorValidFilter {
+public class UserCoterieMuteValidFilter implements IBehaviorValidFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserLoginValidFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserCoterieMuteValidFilter.class);
 
     @Reference(check = false)
     private CoterieMemberAPI coterieMemberAPI;
@@ -42,25 +42,17 @@ public class UserMuteByCoterieValidFilter implements IBehaviorValidFilter {
         logger.info("验证用户私圈禁言={}",filterChain.getContext());
 
         //获取用户ID
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String loginUserId = request.getHeader("userId");
+        long loginUserId = filterChain.getLoginUserId();
 
         //获取私圈ID
-        String coterieId = "";
         Object objValue = behaviorArgsBuild.getParameterValue(filterChain.getUserBehaviorArgs().coterieId(),
                 filterChain.getJoinPoint().getArgs());
         if(objValue==null){
             throw new QuanhuException("","","缺少私圈参数ID");
-        }else{
-            coterieId = String.valueOf(objValue);
         }
 
-        if(StringUtils.isNumeric(coterieId)){
-            throw new QuanhuException("","","私圈参数非法（不存在）");
-        }
-
-        Response<Boolean> rpc = coterieMemberAPI.isBanSpeak(Long.parseLong(loginUserId),Long.parseLong(coterieId));
-
+        long coterieId = Long.valueOf(String.valueOf(objValue));
+        Response<Boolean> rpc = coterieMemberAPI.isBanSpeak(loginUserId,coterieId);
         if(rpc.success()&&!rpc.getData()){
             //执行下一个
             filterChain.execute();

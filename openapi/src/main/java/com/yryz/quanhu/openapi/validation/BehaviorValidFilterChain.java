@@ -80,4 +80,11 @@ public class BehaviorValidFilterChain implements IBehaviorValidFilter {
     }
 
 
+    public Long getLoginUserId(){
+        return Long.valueOf(String.valueOf(context.get("loginUserId")));
+    }
+
+    public String getLoginToken(){
+        return (String) context.get("loginToken");
+    }
 }

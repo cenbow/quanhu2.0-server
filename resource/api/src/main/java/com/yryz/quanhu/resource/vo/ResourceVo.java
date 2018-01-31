@@ -124,6 +124,11 @@ public class ResourceVo implements Serializable {
     private Long sort;
     
     /**
+     * 排序字段(私圈首页排序)
+     */
+    private Long coterieSort;
+    
+    /**
      * 阅读数状态
      */
     private Long readNum;
@@ -393,6 +398,20 @@ public class ResourceVo implements Serializable {
 	 */
 	public void setSort(Long sort) {
 		this.sort = sort;
+	}
+	
+	/**
+	 * @return the coterieSort
+	 */
+	public Long getCoterieSort() {
+		return coterieSort;
+	}
+
+	/**
+	 * @param coterieSort the coterieSort to set
+	 */
+	public void setCoterieSort(Long coterieSort) {
+		this.coterieSort = coterieSort;
 	}
 
 	/**

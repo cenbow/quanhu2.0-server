@@ -15,17 +15,20 @@ import java.lang.annotation.*;
 @Documented
 public @interface UserBehaviorArgs {
 
+    public static String DEFAULT_KEY_LOGIN_USER = "request.head.userId";
+    public static String DEFAULT_KEY_LOGIN_TOKEN = "request.head.token";
+
     /**
      * 当前登录ID
      * @return
      */
-    String loginUserId() default "request.head.userId";
+    String loginUserId() default DEFAULT_KEY_LOGIN_USER;
 
     /**
      * 当前登录token
      * @return
      */
-    String loginToken() default "request.head.token";
+    String loginToken() default DEFAULT_KEY_LOGIN_TOKEN;
 
     /**
      * 操作资源类型

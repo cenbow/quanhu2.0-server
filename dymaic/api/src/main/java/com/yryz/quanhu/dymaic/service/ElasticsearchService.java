@@ -16,7 +16,7 @@ public interface ElasticsearchService {
 	 * @param size
 	 * @return
 	 */
-	PageList<UserSimpleVo> searchUser(String keyWord,Integer page,Integer size);
+	Response<PageList<UserSimpleVo>> searchUser(String keyWord,Integer page,Integer size);
 	
 	/**
      * 按标签搜索(达人)用户接口
@@ -31,7 +31,7 @@ public interface ElasticsearchService {
 	 * @param size
 	 * @return
 	 */
-	PageList<ResourceInfoVo> searchTopicInfo(String keyWord,Integer page,Integer size);
+    Response<PageList<ResourceInfoVo>> searchTopicInfo(String keyWord,Integer page,Integer size);
 	
 	/**
 	 * 搜索文章信息
@@ -40,7 +40,7 @@ public interface ElasticsearchService {
 	 * @param size
 	 * @return
 	 */
-	PageList<ResourceInfoVo> searchReleaseInfo(String keyWord,Integer page,Integer size);
+    Response<PageList<ResourceInfoVo>> searchReleaseInfo(String keyWord,Integer page,Integer size);
 	
 	/**
 	 * 搜索私圈信息
@@ -49,7 +49,7 @@ public interface ElasticsearchService {
 	 * @param size
 	 * @return
 	 */
-	PageList<CoterieInfoVo> searchCoterieInfo(String keyWord,Integer page,Integer size);
+    Response<PageList<CoterieInfoVo>> searchCoterieInfo(String keyWord,Integer page,Integer size);
 	
 	/**
 	 * 全量重建用户es index

@@ -105,6 +105,19 @@ public class Comment extends GenericEntity {
      */
     private String targetUserNickName;
 
+    /**
+     * 多个kid的组合
+     */
+    private String kids;
+
+    public String getKids() {
+        return kids;
+    }
+
+    public void setKids(String kids) {
+        this.kids = kids;
+    }
+
     public String getTargetUserNickName() {
         return targetUserNickName;
     }

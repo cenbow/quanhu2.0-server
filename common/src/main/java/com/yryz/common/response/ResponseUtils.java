@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import com.yryz.common.constant.ExceptionEnum;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 
 /**
@@ -86,18 +86,18 @@ public class ResponseUtils {
     public static <T> Response<T> returnException(Exception e) {
         if (e instanceof QuanhuException) {
             QuanhuException qe = (QuanhuException) e;
-            return new Response<T>(false, qe.getCode(), qe.getMsg(), qe.getErrorMsg(), null);
+            return new Response<T>(false, qe.getCode(), qe.getMsg(), qe.getErrorMsg() + " [Exception]:" + e, null);
         } else if (e instanceof IllegalArgumentException) {
             IllegalArgumentException ll = (IllegalArgumentException) e;
             return new Response<T>(false, ResponseConstant.VALIDATE_EXCEPTION.getCode(),
-                    ResponseConstant.VALIDATE_EXCEPTION.getShowMsg(), ll.getMessage(), null);
+                    ResponseConstant.VALIDATE_EXCEPTION.getShowMsg(), ll.getMessage() + " [Exception]:" + e, null);
         } else if (e instanceof MissingServletRequestParameterException) {
             MissingServletRequestParameterException msrp = (MissingServletRequestParameterException) e;
             return new Response<T>(false, ResponseConstant.VALIDATE_EXCEPTION.getCode(),
-                    ResponseConstant.VALIDATE_EXCEPTION.getShowMsg(), msrp.getMessage(), null);
+                    ResponseConstant.VALIDATE_EXCEPTION.getShowMsg(), msrp.getMessage() + " [Exception]:" + e, null);
         } else {
             return new Response<T>(false, ResponseConstant.EXCEPTION.getCode(), ResponseConstant.EXCEPTION.getShowMsg(),
-                    ResponseConstant.EXCEPTION.getErrorMsg(), null);
+                    ResponseConstant.EXCEPTION.getErrorMsg() + " [Exception]:" + e, null);
         }
     }
 

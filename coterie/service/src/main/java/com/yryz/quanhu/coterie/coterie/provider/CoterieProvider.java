@@ -31,7 +31,6 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.common.FrontendConfig;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.coterie.exception.DatasOptException;
 import com.yryz.quanhu.coterie.coterie.exception.ServiceException;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
@@ -40,8 +39,10 @@ import com.yryz.quanhu.coterie.coterie.until.ImageUtils;
 import com.yryz.quanhu.coterie.coterie.until.ZxingHandler;
 import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.coterie.vo.User;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -723,6 +724,9 @@ public class CoterieProvider implements CoterieApi {
 			if(cust!=null){
 				o.setCustIcon(cust.getUserImg());
 				o.setOwnerName(cust.getUserNickName());
+                if (null == o.getUser()) {
+                    o.setUser(new User());
+                }
 				o.getUser().setHeadImg(cust.getUserImg());
 				o.getUser().setAuthStatus(cust.getAuthStatus().toString());
 				o.getUser().setNickName(cust.getUserNickName());
