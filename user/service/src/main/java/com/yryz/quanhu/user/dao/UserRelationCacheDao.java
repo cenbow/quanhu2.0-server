@@ -384,7 +384,7 @@ public class UserRelationCacheDao {
             im.setRelationValue("1");
             try{
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
-                //imAPI.setSpecialRelation(im);
+                imAPI.setSpecialRelation(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"添加黑名单失败");
             }finally {
@@ -395,7 +395,7 @@ public class UserRelationCacheDao {
             im.setRelationValue("0");
             try{
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
-                //imAPI.setSpecialRelation(im);
+                imAPI.setSpecialRelation(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"取消黑名单失败");
             }finally {
@@ -407,7 +407,7 @@ public class UserRelationCacheDao {
         if(status == UserRelationConstant.STATUS.FRIEND.getCode()){
             try{
                 logger.info("syncImRelation.addFriend ={} start",JSON.toJSON(im));
-                //imAPI.addFriend(im);
+                imAPI.addFriend(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"添加好友关系失败");
             }finally {
@@ -416,7 +416,7 @@ public class UserRelationCacheDao {
         }else{
             try{
                 logger.info("syncImRelation.deleteFriend ={} start",JSON.toJSON(im));
-                //imAPI.deleteFriend(im);
+                imAPI.deleteFriend(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"删除好友关系失败");
             }finally {
