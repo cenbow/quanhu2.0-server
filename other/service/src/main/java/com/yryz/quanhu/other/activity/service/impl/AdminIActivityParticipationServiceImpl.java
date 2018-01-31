@@ -4,6 +4,7 @@ package com.yryz.quanhu.other.activity.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -17,9 +18,7 @@ import com.yryz.quanhu.other.activity.dto.*;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService;
-import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
-import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
-import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
+import com.yryz.quanhu.other.activity.vo.*;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
@@ -39,10 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.springframework.util.Assert.isNull;
 @Service
@@ -239,14 +237,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         
     	Integer pageNo = adminActivityVoteRecordDto.getPageNo();
 		Integer pageSize = adminActivityVoteRecordDto.getPageSize();
-		if(adminActivityVoteRecordDto.getPageNo()==null|| adminActivityVoteRecordDto.getPageNo()<=0){
-			adminActivityVoteRecordDto.setPageNo(0);
-		}else{
-			adminActivityVoteRecordDto.setPageNo((adminActivityVoteRecordDto.getPageNo()-1)* adminActivityVoteRecordDto.getPageSize());
-		}
-		if(adminActivityVoteRecordDto.getPageSize()==null|| adminActivityVoteRecordDto.getPageSize()<=0){
-			adminActivityVoteRecordDto.setPageSize(10);
-		}	
+        Page<AdminActivityVoteRecordVo> page = PageHelper.startPage(pageNo,pageSize);
 		String nickName=null;
     	String  beginDate=null;
     	String  endDate=null;
@@ -263,9 +254,23 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         		 beginDate=sdf.format(adminActivityVoteRecordDto.getBeginCreateDate());
             	 endDate=sdf.format(adminActivityVoteRecordDto.getEndCreateDate());
         	}
-        	
-             /*TODO custIds = custAPI.getAdminList(nickName, null, beginDate, endDate);*/
-            if (!CollectionUtils.isEmpty(custIds)) {
+
+            Response<Page<UserBaseInfoVO>> userInfoPage = null;
+            try {
+                AdminUserInfoDTO custInfoDTO = new AdminUserInfoDTO();
+                custInfoDTO.setNickName(nickName);
+                custInfoDTO.setStartDate(beginDate);
+                custInfoDTO.setEndDate(endDate);
+                userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
+            } catch (Exception e) {
+                logger.error("查询用户列表异常",e);
+            }
+            if(userInfoPage!=null&&userInfoPage.success()&&!CollectionUtils.isEmpty(userInfoPage.getData().getResult())){
+                for (UserBaseInfoVO uv:userInfoPage.getData().getResult()){
+                    custIds.add(uv.getUserId().toString());
+                }
+            }
+        	if (!CollectionUtils.isEmpty(custIds)) {
                 adminActivityVoteRecordDto.setCustIds(custIds);
             }
             if(custIds.size()>0){
@@ -276,19 +281,22 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 		 list = activityVoteRecordDao.selectPage(adminActivityVoteRecordDto);
         }
         for (AdminActivityVoteRecordVo voteRecord : list) {
-            /* TODO CustInfo custInfo = custAPI.getCustInfo(voteRecord.getCreateUserId());
-            voteRecord.setNickName(custInfo.getCustNname());
-            SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ); 
+            Set<String> userIds = new HashSet<String>();
+            userIds.add(voteRecord.getCreateUserId().toString());
+            Response<Map<String,UserBaseInfoVO>> users = null;
             try {
-				voteRecord.setCreateDate(sdf.parse(custInfo.getCreateDate().substring(0, 18)));
-			} catch (ParseException e) {
-				 
-				e.printStackTrace();
-			}
-            voteRecord.setPhone(custInfo.getCustPhone());*/
+                users = userApi.getUser(userIds);
+            } catch (Exception e) {
+                logger.error("查询用户信息异常",e);
+            }
+            if(users.success()&&users.getData().get(voteRecord.getCreateUserId().toString())!=null){
+                voteRecord.setNickName(users.getData().get(voteRecord.getCreateUserId().toString()).getUserNickName());
+                voteRecord.setCreateDate(users.getData().get(voteRecord.getCreateUserId().toString()).getCreateDate());
+                voteRecord.setPhone(users.getData().get(voteRecord.getCreateUserId().toString()).getUserPhone());
+            }
         }
+
         
-		 
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(pageNo, pageSize, list, 0L);
 		}
