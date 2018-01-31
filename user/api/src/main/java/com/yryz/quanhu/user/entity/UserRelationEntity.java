@@ -18,23 +18,10 @@ public class UserRelationEntity extends GenericEntity {
      * 用户目标
      */
     private String targetUserId;
-
     /**
-     * 关注状态
-     * 10 否，11 是(source为target的粉丝)
-     *
+     * 关系状态
      */
-    private int followStatus;
-    /**
-     * 黑名单状态
-     * 10 否，11是(target在source黑名单中)
-     */
-    private int blackStatus;
-    /**
-     * 好友状态
-     * 10 否，11是(主要同步双方互粉情况下)
-     */
-    private int friendStatus;
+    private int relationStatus;
 
     /**
      * 删除标记
@@ -46,6 +33,13 @@ public class UserRelationEntity extends GenericEntity {
     private int version;
 
 
+    public int getRelationStatus() {
+        return relationStatus;
+    }
+
+    public void setRelationStatus(int relationStatus) {
+        this.relationStatus = relationStatus;
+    }
 
     public int getDelFlag() {
         return delFlag;
@@ -77,29 +71,5 @@ public class UserRelationEntity extends GenericEntity {
 
     public void setTargetUserId(String targetUserId) {
         this.targetUserId = targetUserId;
-    }
-
-    public int getFollowStatus() {
-        return followStatus;
-    }
-
-    public void setFollowStatus(int followStatus) {
-        this.followStatus = followStatus;
-    }
-
-    public int getBlackStatus() {
-        return blackStatus;
-    }
-
-    public void setBlackStatus(int blackStatus) {
-        this.blackStatus = blackStatus;
-    }
-
-    public int getFriendStatus() {
-        return friendStatus;
-    }
-
-    public void setFriendStatus(int friendStatus) {
-        this.friendStatus = friendStatus;
     }
 }

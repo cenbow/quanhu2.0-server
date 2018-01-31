@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FRIEND;
+
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
@@ -61,8 +63,8 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
             }
 
             //查询是否有关注关系
-            UserRelationDto dto = userRelationDao.selectByUser(UserRelationDto.class,sourceUserId,targetUserId);
-            if(dto==null||dto.getFriendStatus()==UserRelationConstant.NO){
+            UserRelationDto dto = userRelationDao.selectUser(UserRelationDto.class,sourceUserId,targetUserId);
+            if(dto==null||dto.getRelationStatus()!=FRIEND.getCode()){
                 throw new QuanhuException("","您和目标用户暂不是好友关系","您和目标用户暂不是好友关系");
             }
 

@@ -11,15 +11,12 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
-import com.yryz.quanhu.resource.questionsAnswers.service.impl.SendMessageServiceImpl;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
@@ -33,9 +30,7 @@ import com.yryz.quanhu.resource.topic.service.TopicService;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
-import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
-import net.sf.jsqlparser.statement.select.Top;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +114,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         messageBusinessVo.setImgUrl(topicPost.getImgUrl());
         messageBusinessVo.setTitle(topicPost.getContent());
         messageBusinessVo.setTosendUserId(topic.getCreateUserId());
-        messageBusinessVo.setModuleEnum(ResourceTypeEnum.POSTS);
+        messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
         messageBusinessVo.setKid(topicPost.getKid());
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setCoterieId(null);
@@ -178,7 +173,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         if (null != createUserId) {
             vo.setUser(apIservice.getUser(createUserId));
         }
-        vo.setModuleEnum(ResourceTypeEnum.POSTS);
+        vo.setModuleEnum(ModuleContants.TOPIC_POST);
 
         //虚拟阅读数
         readApi.read(kid);
@@ -222,7 +217,7 @@ public class TopicPostServiceImpl implements TopicPostService {
             if (null != createUserId) {
                 vo.setUser(apIservice.getUser(createUserId));
             }
-            vo.setModuleEnum(ResourceTypeEnum.POSTS);
+            vo.setModuleEnum(ModuleContants.TOPIC_POST);
             Response<Map<String,Long>> countData=countApi.getCount("10,11",vo.getKid(),null);
             if(ResponseConstant.SUCCESS.getCode().equals(countData.getCode())){
                 Map<String,Long> count=countData.getData();

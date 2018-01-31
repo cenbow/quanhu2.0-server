@@ -35,6 +35,19 @@ public class UserRelationCountDto implements Serializable{
      */
     private long friendCount;
 
+    /**
+     * 互相拉黑
+     */
+    private long bothBlackCount;
+
+    public long getBothBlackCount() {
+        return bothBlackCount;
+    }
+
+    public void setBothBlackCount(long bothBlackCount) {
+        this.bothBlackCount = bothBlackCount;
+    }
+
     public boolean isNewRecord() {
         return isNewRecord;
     }

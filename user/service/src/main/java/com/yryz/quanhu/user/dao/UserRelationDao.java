@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,22 +18,14 @@ import java.util.Set;
 @Mapper
 public interface UserRelationDao extends BaseDao{
 
-    <T> T selectByUser(Class<T> t,
-                        @Param("sourceUserId") String sourceUserId,@Param("targetUserId")String targetUserId);
+    <T> T selectUser(Class<T> t, @Param("sourceUserId") String sourceUserId,@Param("targetUserId")String targetUserId);
 
-    <T> List<T> selectByUserAll(Class<T> t,
-                       @Param("sourceUserId") String sourceUserId,@Param("targetUserIds")Set<String> targetUserIds);
+    <T> List<T> selectTargets(Class<T> t, @Param("sourceUserId") String sourceUserId,@Param("targetUserIds")Set<String> targetUserIds);
 
-    <T> List<T> selectByUserStatus(Class<T> t,
-                        @Param("userId")String userId,@Param("statusValue")int statusValue);
+    <T> List<T> selectStatus(Class<T> t, @Param("userId")String userId,@Param("relationStatus")int relationStatus);
 
-    <T> List<T> selectUserToTarget(Class<T> t,
-                        @Param("userId")String userId,@Param("targetUserIds")Set<String> targetUserIds);
+    List<Map<String,Object>> selectTotalCount(@Param("userId")String userId);
 
-    <T> List<T> selectTargetToUser(Class<T> t,
-                        @Param("targetUserIds")Set<String> targetUserIds,@Param("userId")String userId);
-
-    long selectTotalCount(
-                        @Param("userId")String userId,@Param("statusValue")int statusValue);
+    long selectCount(@Param("userId")String userId,@Param("relationStatus")int relationStatus);
 
 }

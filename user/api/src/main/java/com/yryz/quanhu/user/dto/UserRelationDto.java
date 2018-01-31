@@ -21,10 +21,7 @@ public class UserRelationDto extends UserRelationEntity{
     /**每页大小*/
     private Integer pageSize = 10;
 
-    /**
-     * 统一状态位标识
-     */
-    private int relationStatus;
+
     /**
      * 用户ID
      */
@@ -49,14 +46,6 @@ public class UserRelationDto extends UserRelationEntity{
      * 用户简介
      */
     private String userSummary;
-
-    public int getRelationStatus() {
-        return relationStatus;
-    }
-
-    public void setRelationStatus(int relationStatus) {
-        this.relationStatus = relationStatus;
-    }
 
     public String getUserRemarkName() {
         return userRemarkName;

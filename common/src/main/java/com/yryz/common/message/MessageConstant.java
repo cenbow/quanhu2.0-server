@@ -76,12 +76,12 @@ public enum MessageConstant {
     /**
      * 帖子被圈主删除
      */
-    POST_HAVE_DELETE(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COTERIE, "删除帖子通知", "{count}删除了你的帖子。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COTERIE_HOME),
+    POST_HAVE_DELETE(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COTERIE, "删除帖子通知", "{someone}删除了你的帖子。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COTERIE_HOME),
 
     /**
      * 话题有新帖子
      */
-    TOPIC_HAVE_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COMMENT, "回贴通知", "{count}在您的话题下发布了新帖。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.TOPIC_HOME),
+    TOPIC_HAVE_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COMMENT, "回贴通知", "{someone}在您的话题下发布了新帖。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.TOPIC_HOME),
 
     /**
      * 活动有新人报名

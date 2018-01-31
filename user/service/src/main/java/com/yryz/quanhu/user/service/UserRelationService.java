@@ -31,7 +31,7 @@ public interface UserRelationService{
 
     public Set<String> selectBy(String sourceUserId, UserRelationConstant.STATUS status);
 
-    public UserRelationCountDto totalBy(String userId);
+    public UserRelationCountDto totalBy(String sourceUserId,String targetUserId);
 
-
+    public long totalBy(String sourceUserId,String targetUserId,UserRelationConstant.STATUS status);
 }
