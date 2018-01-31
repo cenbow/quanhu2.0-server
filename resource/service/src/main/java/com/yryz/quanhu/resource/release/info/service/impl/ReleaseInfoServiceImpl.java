@@ -1,6 +1,5 @@
 package com.yryz.quanhu.resource.release.info.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -12,11 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.yryz.common.response.PageList;
-import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.PageUtils;
-import com.yryz.quanhu.resource.api.ResourceDymaicApi;
-import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.release.config.entity.ReleaseConfig;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -25,8 +20,6 @@ import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
-import com.yryz.quanhu.resource.vo.ResourceTotal;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
 * @author wangheng
@@ -268,39 +261,5 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
     @Override
     public List<Long> getKidByCreatedate(String startDate, String endDate) {
         return releaseInfoDao.selectKidByCreatedate(startDate, endDate);
-    }
-
-    /**  
-    * @Description: 资源聚合
-    * @author wangheng
-    * @param @param releaseInfo
-    * @param @param createUser
-    * @return void
-    * @throws  
-    */
-    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo, UserSimpleVO createUser) {
-        try {
-            ResourceTotal resourceTotal = new ResourceTotal();
-            resourceTotal.setClassifyId(releaseInfo.getClassifyId().intValue());
-            resourceTotal.setContent(releaseInfo.getContent());
-            if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
-                resourceTotal.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
-            }
-
-            resourceTotal.setCreateDate(DateUtils.getString(new Date()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(releaseInfo));
-            resourceTotal.setModuleEnum(new Integer(releaseInfo.getModuleEnum()));
-            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-            resourceTotal.setResourceId(releaseInfo.getKid());
-
-            // 设置达人标识 createUser
-            resourceTotal.setTalentType(String.valueOf(createUser.getUserRole()));
-            
-            resourceTotal.setTitle(releaseInfo.getTitle());
-            resourceTotal.setUserId(releaseInfo.getCreateUserId());
-            resourceDymaicApi.commitResourceDymaic(resourceTotal);
-        } catch (Exception e) {
-            logger.error("资源聚合 接入异常！", e);
-        }
     }
 }

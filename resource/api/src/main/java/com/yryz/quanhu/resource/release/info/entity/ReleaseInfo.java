@@ -91,11 +91,6 @@ public class ReleaseInfo extends GenericEntity {
     private Integer sort;
 
     /**
-    * 功能枚举
-    */
-    private String moduleEnum;
-
-    /**
     * 租户id
     */
     private String appId;
@@ -251,14 +246,6 @@ public class ReleaseInfo extends GenericEntity {
 
     public void setSort(Integer sort) {
         this.sort = sort;
-    }
-
-    public String getModuleEnum() {
-        return moduleEnum;
-    }
-
-    public void setModuleEnum(String moduleEnum) {
-        this.moduleEnum = moduleEnum;
     }
 
     public String getAppId() {
