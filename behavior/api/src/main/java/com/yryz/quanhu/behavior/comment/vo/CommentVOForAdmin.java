@@ -20,6 +20,66 @@ public class CommentVOForAdmin extends GenericEntity {
      */
     private byte shelveFlag;
 
+    private String nickName;
+
+    private long resourceId;
+
+    private String moduleEnum;
+
+    private String createDateStr;
+
+    private String updateDateStr;
+
+    private Long targetUserId;
+
+    public Long getTargetUserId() {
+        return targetUserId;
+    }
+
+    public void setTargetUserId(Long targetUserId) {
+        this.targetUserId = targetUserId;
+    }
+
+    public String getCreateDateStr() {
+        return createDateStr;
+    }
+
+    public void setCreateDateStr(String createDateStr) {
+        this.createDateStr = createDateStr;
+    }
+
+    public String getUpdateDateStr() {
+        return updateDateStr;
+    }
+
+    public void setUpdateDateStr(String updateDateStr) {
+        this.updateDateStr = updateDateStr;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public long getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
+    }
+
     public String getContentComment() {
         return contentComment;
     }

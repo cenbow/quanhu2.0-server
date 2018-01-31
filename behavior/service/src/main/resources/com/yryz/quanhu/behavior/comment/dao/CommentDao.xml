@@ -177,7 +177,7 @@
     <update id="delComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
         UPDATE qh_comment_info
         SET del_flag=11
-        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT} AND create_user_id=#{createUserId,jdbcType=BIGINT}
+        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT} AND create_user_id=#{createUserId,jdbcType=BIGINT} AND last_update_date=now()
     </update>
 
 
@@ -201,7 +201,7 @@
                 AND CONCAT(`content_comment`) LIKE CONCAT('%',#{keyWords,jdbcType=VARCHAR},'%')
             </if>
             ORDER BY
-            create_date DESC
+            shelve_flag ASC,create_date DESC
         </where>
     </select>
 
@@ -223,11 +223,15 @@
 
     <update id="updownBatch" parameterType="java.util.List">
         <foreach close="" collection="list" index="index" item="item" open="" separator=";">
-            UPDATE qh_comment_info SET shelve_flag=#{item.shelve_flag,jdbcType=TINYINT}
+            UPDATE qh_comment_info SET shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
             where kid=#{item.kid,jdbcType=BIGINT}
         </foreach>
     </update>
 
+    <update id="updownSingle" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
+         UPDATE qh_comment_info SET shelve_flag = #{shelveFlag,jdbcType=TINYINT},last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
+         where kid=#{kid,jdbcType=BIGINT}
+    </update>
 
     <select id="querySingleCommentInfo" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentSubDTO"
             resultType="com.yryz.quanhu.behavior.comment.vo.CommentInfoVO">
@@ -241,7 +245,6 @@
             </if>
         </where>
     </select>
-
 
 
 </mapper>
