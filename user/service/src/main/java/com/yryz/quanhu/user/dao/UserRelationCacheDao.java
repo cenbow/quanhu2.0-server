@@ -305,9 +305,9 @@ public class UserRelationCacheDao {
         info.setUserId(dto.getSourceUserId());
 
         if(countDto.getFollowCount() == 30){          //达到30人，增加50积分
-            info.setEventScore("50");
+            info.setEventGrow("50");
         }else if(countDto.getFollowCount() == 20){    //达到20人，增加30积分
-            info.setEventScore("30");
+            info.setEventGrow("30");
         }else{
             return;
         }
