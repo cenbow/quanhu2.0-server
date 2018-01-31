@@ -47,8 +47,6 @@ public class CoterieReleaseInfoTest {
     public void test001() throws JsonProcessingException {
         ReleaseInfo record = new ReleaseInfo();
         int random = new Random().nextInt();
-
-        record.setModuleEnum("0092");
         record.setCoterieId(8626948196L);
         // 设置价格
         record.setContentPrice(100L);

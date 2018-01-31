@@ -24,7 +24,6 @@
 		<result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
 		<result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
 		<result column="last_update_user_id" jdbcType="BIGINT" property="lastUpdateUserId" />
-		<result column="module_enum" jdbcType="VARCHAR" property="moduleEnum" />
 		<result column="app_id" jdbcType="VARCHAR" property="appId" />
 		<result column="revision" jdbcType="INTEGER" property="revision" />
 		<result column="content_source" jdbcType="LONGVARCHAR" property="contentSource" />
@@ -38,7 +37,7 @@
 		content_label, city_code, gps, coterie_id, content_price, shelve_flag, del_flag,
 		recommend, sort, create_date,
 		create_user_id, last_update_date, last_update_user_id,
-		module_enum, app_id, revision,
+		app_id, revision,
 		content_source, content, img_url,
 		extend
 	</sql>
@@ -109,9 +108,6 @@
 			<if test="delFlag != null">
 				and del_flag = #{delFlag,jdbcType=TINYINT}
 			</if>
-			<if test="moduleEnum != null">
-				and module_enum = #{moduleEnum,jdbcType=VARCHAR}
-			</if>
 			<if test="appId != null">
 				and app_id = #{appId,jdbcType=VARCHAR}
 			</if>
@@ -151,7 +147,7 @@
 		del_flag,
 		recommend, sort,
 		create_date, create_user_id, last_update_date,
-		last_update_user_id, module_enum, app_id,
+		last_update_user_id, app_id,
 		revision,
 		content_source, content,
 		img_url, extend)
@@ -166,7 +162,7 @@
 		#{coterieId,jdbcType=BIGINT}, #{contentPrice,jdbcType=BIGINT}, #{shelveFlag,jdbcType=TINYINT},
 		#{delFlag,jdbcType=TINYINT}, #{recommend,jdbcType=TINYINT}, #{sort,jdbcType=INTEGER},
 		#{createDate,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=BIGINT}, #{lastUpdateDate,jdbcType=TIMESTAMP},
-		#{lastUpdateUserId,jdbcType=BIGINT}, #{moduleEnum,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR},
+		#{lastUpdateUserId,jdbcType=BIGINT}, #{appId,jdbcType=VARCHAR},
 		#{revision,jdbcType=INTEGER}, #{contentSource,jdbcType=LONGVARCHAR}, #{content,jdbcType=LONGVARCHAR},
 		#{imgUrl,jdbcType=LONGVARCHAR}, #{extend,jdbcType=LONGVARCHAR})
 	</insert>
@@ -234,9 +230,6 @@
 			last_update_date,
 			<if test="lastUpdateUserId != null">
 				last_update_user_id,
-			</if>
-			<if test="moduleEnum != null">
-				module_enum,
 			</if>
 			<if test="appId != null">
 				app_id,
@@ -317,9 +310,6 @@
 			NOW(),
 			<if test="lastUpdateUserId != null">
 				#{lastUpdateUserId,jdbcType=BIGINT},
-			</if>
-			<if test="moduleEnum != null">
-				#{moduleEnum,jdbcType=VARCHAR},
 			</if>
 			<if test="appId != null">
 				#{appId,jdbcType=VARCHAR},
@@ -404,9 +394,6 @@
 			last_update_date = NOW(),
 			<if test="record.lastUpdateUserId != null">
 				last_update_user_id = #{record.lastUpdateUserId,jdbcType=BIGINT},
-			</if>
-			<if test="record.moduleEnum != null">
-				module_enum = #{record.moduleEnum,jdbcType=VARCHAR},
 			</if>
 			<if test="record.appId != null">
 				app_id = #{record.appId,jdbcType=VARCHAR},
