@@ -86,7 +86,7 @@ public enum MessageConstant {
     /**
      * 活动有新人报名
      */
-    ACTIVITY_HAVE_SIGNUP(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_ACTIVITY, "报名通知", "{count}已报名参加您发布的活动。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+    ACTIVITY_HAVE_SIGNUP(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COTERIE, "报名通知", "{count}已报名参加您发布的活动。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 私圈内容收费   奖励通知    XXX阅读了您的付费内容，您获得N奖励。（XXX=用户昵称）
@@ -132,6 +132,11 @@ public enum MessageConstant {
      *在第三方绑定手机号获得奖励券
      */
     PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE,MessageLabel.SYSTEM_NOTICE,"投票活动奖励","您已通过活动获得{count1} {count2}张",MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
+
+    /**
+     * 转发
+     * */
+    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_TRANSMIT, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 付费参加活动

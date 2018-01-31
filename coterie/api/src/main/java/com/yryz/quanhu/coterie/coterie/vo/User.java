@@ -1,9 +1,11 @@
 package com.yryz.quanhu.coterie.coterie.vo;
 
+import java.io.Serializable;
+
 /**
  * Created by KF on 2018/1/29.
  */
-public class User {
+public class User implements Serializable{
 
     private String   authStatus	;//是否认证 : 10未认证，11认证）
     private String headImg;	//头像	string
