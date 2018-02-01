@@ -1,17 +1,7 @@
 package com.yryz.quanhu.resource.coterie.release.info.service.impl;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.Calendar;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.message.SystemBody;
@@ -35,6 +25,16 @@ import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Calendar;
 
 /**
  * @author wangheng
@@ -72,7 +72,7 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         Assert.notNull(outputOrder, "outputOrder is null !");
         Assert.notNull(outputOrder.getBizContent(), "bizContent is null !");
         Assert.notNull(outputOrder.getCoterieId(), "coterieId is null !");
-        ReleaseInfo releaseInfo = JsonUtils.fromJson(outputOrder.getBizContent(), ReleaseInfo.class);
+        ReleaseInfo releaseInfo = JSON.parseObject(outputOrder.getBizContent(), ReleaseInfo.class);
 
         Assert.notNull(releaseInfo, "fromJson releaseInfo is null !");
 
@@ -104,7 +104,9 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         // 构建消息体
         SystemBody systemBody = new SystemBody();
         try {
-            systemBody.setBodyImg(StringUtils.split(releaseInfo.getImgUrl(), ",")[0]);
+            if (StringUtils.isNotBlank(releaseInfo.getImgUrl())) {
+                systemBody.setBodyImg(StringUtils.split(releaseInfo.getImgUrl(), ",")[0]);
+            }
             systemBody.setBodyTitle(releaseInfo.getTitle());
             systemBody.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
             systemBody.setCoterieName(coterieInfo.getName());
@@ -149,8 +151,8 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         }
     }
 
-    /**  
-     * 付款成功后给作者推送 奖励消息 
+    /**
+     * 付款成功后给作者推送 奖励消息
      */
     private void payMessageToAuthor(ReleaseInfo info, UserSimpleVO sponsorUser, SystemBody systemBody) {
         logger.debug("付款成功后给作者推送 奖励消息，付费资源ID:" + info.getKid());

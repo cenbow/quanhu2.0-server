@@ -12,11 +12,13 @@
         <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
 
         <result column="resource_user_id" property="resourceUserId" jdbcType="BIGINT"/>
+        <result column="coterie_id" property="coterieId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Like_Column_List">
         id, kid, module_enum AS moduleEnum,resource_id AS resourceId,user_id AS userId,create_date AS createDate,
-        last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,resource_user_id AS resourceUserId
+        last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,resource_user_id AS resourceUserId,
+        coterie_id AS coterieId
     </sql>
 
     <insert id="accretion" parameterType="com.yryz.quanhu.behavior.like.entity.Like">
@@ -43,6 +45,9 @@
             <if test="resourceUserId != null">
                 resource_user_id,
             </if>
+            <if test="coterieId != null">
+                coterie_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="kid != null">
@@ -65,6 +70,9 @@
             </if>
             <if test="resourceUserId != null">
                 #{resourceUserId,jdbcType=BIGINT},
+            </if>
+            <if test="coterieId != null">
+                #{coterieId,jdbcType=BIGINT},
             </if>
         </trim>
     </insert>
