@@ -82,4 +82,14 @@ public class DymaicController {
             throw new QuanhuException(ExceptionEnum.BusiException);
         }
     }
+
+    @ApiOperation("删除动态")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/dymaic/delete")
+    public Response<Boolean> delete(@RequestHeader Long userId, @RequestBody Dymaic dymaic) {
+        if (dymaic == null || dymaic.getKid() == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
+        }
+        return dymaicService.delete(userId, dymaic.getKid());
+    }
 }
