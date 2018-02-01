@@ -98,6 +98,7 @@ public class ResourceController {
         resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC_POST);
         //0，只查平台文章。1，只查所有私圈文章。xxxx，查具体某个私圈的数据。
         resourceVo.setCoterieId("0");
+        resourceVo.setUserId(userId);
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);
         pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
