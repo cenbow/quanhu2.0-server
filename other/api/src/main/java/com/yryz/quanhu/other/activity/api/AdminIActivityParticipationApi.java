@@ -26,13 +26,12 @@ public interface AdminIActivityParticipationApi {
 	/**
 	 * 参与活动列表
 	 */
-	Response<List<AdminActivityVoteDetailVo>> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
+	Response<PageList<AdminActivityVoteDetailVo>> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
 
 	/**
 	 * 投票用户数据
 	 */
 	Response<List<AdminActivityVoteRecordVo>> voteList(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
-
 
 	/**
 	 * 增加票数
@@ -41,17 +40,11 @@ public interface AdminIActivityParticipationApi {
 
 	Response<Integer> updateStatus(Long id, Byte status);
 
-	//public ListPage<CustInfo> selectUser(String type, String nickName, String circle, Integer pageNo, Integer pageSize);
-
 	Response<AdminConfigObjectDto> getVoteConfig(Long infoId);
 
 	Response<String> saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto);
 
-	/*List<CircleInfo> circleList();*/
-
 	Response<PageList> adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
-
-	Response<PageList> adminlistDetail(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
 
     Response<PageList<UserBaseInfoVO>> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize);
 }
