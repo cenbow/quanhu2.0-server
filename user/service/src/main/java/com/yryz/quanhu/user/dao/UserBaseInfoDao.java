@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 @Mapper
 public interface UserBaseInfoDao {
@@ -33,7 +34,7 @@ public interface UserBaseInfoDao {
     
     List<String> getDevIdByUserIds(@Param("userIds")List<String> userIds);
     
-    List<UserBaseInfo> getAdminList(Map<String,Object> params);
+    List<UserBaseInfo> getAdminList(AdminUserInfoDTO custInfoDTO);
     
     List<String> getUserIdList(Map<String,Object> params);
     

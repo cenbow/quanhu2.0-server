@@ -95,7 +95,10 @@ public class UserLoginSimpleVO implements Serializable {
      * 用户积分
      */
     private long userScore;
-    
+    /**
+     * 关系状态 {@link #UserRelationConstant.STATUS}
+     */
+    private Integer relationStatus;
     /**
      * 好友备注名
      */
@@ -215,6 +218,12 @@ public class UserLoginSimpleVO implements Serializable {
 		this.nameNotes = nameNotes == null ? "" : nameNotes.trim();
 	}
 	
+	public Integer getRelationStatus() {
+		return relationStatus;
+	}
+	public void setRelationStatus(Integer relationStatus) {
+		this.relationStatus = relationStatus;
+	}
 	public UserLoginSimpleVO() {
 		super();
 	}
