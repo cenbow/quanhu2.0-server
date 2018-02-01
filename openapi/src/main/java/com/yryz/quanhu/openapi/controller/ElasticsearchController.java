@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -44,8 +46,12 @@ public class ElasticsearchController {
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
-		PageList<UserSimpleVo> list=elasticsearchService.searchUser(keyWord, page, size);
-		return ResponseUtils.returnObjectSuccess(list);
+		try{
+			PageList<UserSimpleVo> list=ResponseUtils.getResponseData(elasticsearchService.searchUser(keyWord, page, size));
+			return ResponseUtils.returnObjectSuccess(list);
+		}catch (Exception e) {
+            throw new QuanhuException(ExceptionEnum.BusiException);
+        }
 	}
 	
 	@ApiOperation("搜索文章")
@@ -64,8 +70,12 @@ public class ElasticsearchController {
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
-		PageList<ResourceInfoVo> list=elasticsearchService.searchReleaseInfo(keyWord, page, size);
-		return ResponseUtils.returnObjectSuccess(list);
+		try{
+			PageList<ResourceInfoVo> list=ResponseUtils.getResponseData(elasticsearchService.searchReleaseInfo(keyWord, page, size));
+			return ResponseUtils.returnObjectSuccess(list);
+		}catch (Exception e) {
+            throw new QuanhuException(ExceptionEnum.BusiException);
+        }
 	}
 	
 	@ApiOperation("搜索话题")
@@ -84,8 +94,12 @@ public class ElasticsearchController {
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
-		PageList<ResourceInfoVo> list=elasticsearchService.searchTopicInfo(keyWord, page, size);
-		return ResponseUtils.returnObjectSuccess(list);
+		try{
+			PageList<ResourceInfoVo> list=ResponseUtils.getResponseData(elasticsearchService.searchTopicInfo(keyWord, page, size));
+			return ResponseUtils.returnObjectSuccess(list);
+		}catch (Exception e) {
+            throw new QuanhuException(ExceptionEnum.BusiException);
+        }
 	}
 	
 	@ApiOperation("搜索私圈")
@@ -104,7 +118,11 @@ public class ElasticsearchController {
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
-		PageList<CoterieInfoVo> list=elasticsearchService.searchCoterieInfo(keyWord, page, size);
-		return ResponseUtils.returnObjectSuccess(list);
+		try{
+			PageList<CoterieInfoVo> list=ResponseUtils.getResponseData(elasticsearchService.searchCoterieInfo(keyWord, page, size));
+			return ResponseUtils.returnObjectSuccess(list);
+		}catch (Exception e) {
+            throw new QuanhuException(ExceptionEnum.BusiException);
+        }
 	}
 }

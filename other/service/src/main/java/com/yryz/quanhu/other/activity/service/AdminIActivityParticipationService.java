@@ -1,13 +1,17 @@
 package com.yryz.quanhu.other.activity.service;
 
 
+import com.github.pagehelper.Page;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto;
 import com.yryz.quanhu.other.activity.dto.AdminConfigObjectDto;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 
 import java.util.List;
 
@@ -37,13 +41,11 @@ public interface AdminIActivityParticipationService {
 
 	Integer updateStatus(Long id, Byte status);
 
-	//public ListPage<CustInfo> selectUser(String type, String nickName, String circle, Integer pageNo, Integer pageSize);
-
 	public AdminConfigObjectDto getVoteConfig(Long infoId);
 
-    public String saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto);
+    PageList<UserBaseInfoVO> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize);
 
-	/*List<CircleInfo> circleList();*/
+    public String saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto);
 
 	PageList adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 

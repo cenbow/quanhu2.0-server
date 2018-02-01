@@ -14,6 +14,8 @@ import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
+import com.yryz.quanhu.message.push.api.PushAPI;
+import com.yryz.quanhu.message.push.entity.PushReqVo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
@@ -46,9 +48,19 @@ public class CommentServiceImpl implements CommentService {
     @Reference(check = false)
     private CountFlagApi countFlagApi;
 
+    @Reference(check = false)
+    private PushAPI pushAPI;
+
     @Override
     public int accretion(Comment comment) {
-        return commentDao.accretion(comment);
+        int count=commentDao.accretion(comment);
+        if(count>0){
+            UserSimpleVO userSimpleVO = userApi.getUserSimple(comment.getCreateUserId()).getData();
+            if (null!=userSimpleVO){
+                this.sendMessage(comment.getTargetUserId(),"用户"+userSimpleVO.getUserNickName()+"评论了你!");
+            }
+        }
+        return count;
     }
 
     @Override
@@ -134,18 +146,29 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public int updownBatch(List<Comment> comments) {
-        return commentDao.updownBatch(comments);
+        int count=commentDao.updownBatch(comments);
+        if(count>0){
+            if(comments.size()>0){
+                for(Comment comment:comments){
+                    UserSimpleVO userSimpleVO = userApi.getUserSimple(comment.getCreateUserId()).getData();
+                    if (null!=userSimpleVO){
+                        this.sendMessage(comment.getTargetUserId(),"您的评论有违纪嫌疑,已被管理员下架!");
+                    }
+                }
+            }
+        }
+        return count;
     }
 
     @Override
     public PageList<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO) {
+        PageHelper.startPage(commentDTO.getCurrentPage().intValue(), commentDTO.getPageSize().intValue());
         List<CommentVOForAdmin> commentVOForAdmins = commentDao.queryCommentForAdmin(commentDTO);
-        Page<CommentVOForAdmin> page = PageHelper.startPage(commentDTO.getCurrentPage().intValue(), commentDTO.getPageSize().intValue());
         PageList pageList = new PageList();
         pageList.setCurrentPage(commentDTO.getCurrentPage());
         pageList.setPageSize(commentDTO.getPageSize());
         pageList.setEntities(commentVOForAdmins);
-        pageList.setCount(Long.valueOf(commentVOForAdmins.size()));
+        pageList.setCount(100L);
         return pageList;
     }
 
@@ -182,6 +205,15 @@ public class CommentServiceImpl implements CommentService {
         return pageList;
     }
 
+    @Override
+    public int updownSingle(Comment comment) {
+        int count = commentDao.updownSingle(comment);
+        if(count>0){
+            this.sendMessage(comment.getTargetUserId(),"您的评论有违纪嫌疑,已被管理员下架!");
+        }
+        return count;
+    }
+
     public UserSimpleVO getUserSimple(Long userId) {
         UserSimpleVO userSimpleVO = null;
         try {
@@ -190,5 +222,23 @@ public class CommentServiceImpl implements CommentService {
             logger.info("调用用户信息失败:" + e);
         }
         return userSimpleVO;
+    }
+
+
+    public void sendMessage(Long targetUserId,String msg){
+        PushReqVo pushReqVo=new PushReqVo();
+        List<String> strUserId=new ArrayList<String>();
+        strUserId.add(String.valueOf(targetUserId));
+        pushReqVo.setCustIds(strUserId);
+        pushReqVo.setMsg(msg);
+        pushReqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
+        List<String> registrationIds=new ArrayList<String>();
+        registrationIds.add(String.valueOf(PushReqVo.CommonPushType.BY_REGISTRATIONID));
+        pushReqVo.setRegistrationIds(registrationIds);
+        try{
+            pushAPI.commonSendAlias(pushReqVo);
+        }catch (Exception e){
+            logger.info("调用极光推送失败:" + e);
+        }
     }
 }

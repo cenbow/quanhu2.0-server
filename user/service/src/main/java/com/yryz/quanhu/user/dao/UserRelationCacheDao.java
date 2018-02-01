@@ -13,6 +13,8 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.im.api.ImAPI;
 import com.yryz.quanhu.message.im.entity.ImRelation;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationCountDto;
@@ -90,11 +92,15 @@ public class UserRelationCacheDao {
     @Autowired
     private UserRelationDao userRelationDao;
 
-    @Reference
+    @Reference(check = false)
     private ImAPI imAPI;
 
-    @Reference
+    @Reference(check = false)
     private IdAPI idAPI;
+
+    @Reference(check = false)
+    private EventAPI eventAPI;
+
     /**
      * 获取唯一关系
      * @param sourceUserId
@@ -204,8 +210,8 @@ public class UserRelationCacheDao {
          */
         if(userDto.getKid()==null){     //新增
             userDto.setKid(idAPI.getKid(TABLE_NAME).getData());
-            userDto.setCreateUserId(Long.parseLong("0"));
-            userDto.setLastUpdateUserId(Long.parseLong("0"));
+            userDto.setCreateUserId(Long.parseLong(userDto.getSourceUserId()));
+            userDto.setLastUpdateUserId(Long.parseLong(userDto.getSourceUserId()));
             userDto.setVersion(0);
             userDto.setDelFlag(10);
             userRelationDao.insert(userDto);
@@ -261,25 +267,55 @@ public class UserRelationCacheDao {
             UserRelationDto relationDto = MAPPER.readValue(data,UserRelationDto.class);
             logger.info("handleMessage.convert={}",JSON.toJSON(relationDto));
 
-
             //数据库存储
             userRelationDao.update(relationDto);
 
             //同步调用第三方建立关系
-//            this.syncImRelation(relationDto);
+            this.syncImRelation(relationDto);
 
             //统计数据
             UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
+
+            //添加积分成长值
+            this.scoreEvent(relationDto,dto);
 
             //刷新至缓存
             logger.info("handleMessage.refreshCache={} start",relationDto.getSourceUserId());
             this.refreshCacheCount(relationDto.getSourceUserId(),dto);
             logger.info("handleMessage.refreshCache={} finish",relationDto.getSourceUserId());
+
+
         }catch (Exception e){
             throw new RuntimeException(e);
         }finally {
             logger.info("handleMessage={} finish",data);
         }
+    }
+
+    /**
+     * 积分事件
+     * @param dto
+     * @param countDto
+     */
+    public void scoreEvent(UserRelationDto dto,UserRelationCountDto countDto){
+
+        EventInfo info = new EventInfo();
+        info.setEventCode("31");                      //事件编号
+        info.setCreateTime(String.valueOf(System.currentTimeMillis()));
+        info.setUserId(dto.getSourceUserId());
+
+        if(countDto.getFollowCount() == 30){          //达到30人，增加50积分
+            info.setEventGrow("50");
+        }else if(countDto.getFollowCount() == 20){    //达到20人，增加30积分
+            info.setEventGrow("30");
+        }else{
+            return;
+        }
+
+        logger.info("添加积分成长值：{} start",JSON.toJSON(info));
+        eventAPI.commit(info);
+        logger.info("添加积分成长值：{} finish",JSON.toJSON(info));
+
     }
 
     public UserRelationCountDto selectTotalCount(String targetUserId){
@@ -348,7 +384,7 @@ public class UserRelationCacheDao {
             im.setRelationValue("1");
             try{
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
-                //imAPI.setSpecialRelation(im);
+                imAPI.setSpecialRelation(im);
             }catch (Exception e){
                 throw new QuanhuException("","[IM]"+e.getMessage(),"添加黑名单失败");
             }finally {

@@ -1,9 +1,13 @@
 package com.yryz.quanhu.resource.coterie.release.info.provider;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,29 +16,34 @@ import org.springframework.util.Assert;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
+import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
-import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoApi;
 import com.yryz.quanhu.resource.coterie.release.info.vo.CoterieReleaseInfoVo;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -71,7 +80,10 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
     private CoterieMemberAPI coterieMemberAPI;
 
     @Reference(lazy = true, check = false, timeout = 10000)
-    private ResourceDymaicApi resourceDymaicApi;
+    private ResourceApi resourceApi;
+    
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private DymaicService dymaicApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -80,10 +92,6 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             Assert.hasText(record.getContentSource(),"release() ContentSource is NULL !");
             Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() >= 0L,
                     "release() ContentPrice is not unsigned !");
-
-            if (StringUtils.isBlank(record.getModuleEnum())) {
-                record.setModuleEnum(ResourceTypeEnum.RELEASE + "-");
-            }
 
             // 校验用户是否存在
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
@@ -117,7 +125,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             releaseInfoService.insertSelective(record);
 
             // 资源进聚合
-            releaseInfoService.commitResource(resourceDymaicApi, record, createUser);
+            this.commitResourceAndDynamic(record, createUser);
             try {
                 // 资源计数接入
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
@@ -239,4 +247,48 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
         }
     }
 
+    /**  
+     * @Description: 资源聚合[首页聚合、好友动态聚合]
+     * @author wangheng
+     * @param @param releaseInfo
+     * @param @param createUser
+     * @return void
+     * @throws  
+     */
+    public void commitResourceAndDynamic(ReleaseInfo releaseInfo, UserSimpleVO createUser) {
+        ResourceVo resourceVo = new ResourceVo();
+        try {
+            resourceVo.setClassifyId(releaseInfo.getClassifyId().intValue());
+            resourceVo.setContent(releaseInfo.getContent());
+            if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
+                resourceVo.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
+            }
+            resourceVo.setCreateDate(DateUtils.getString(Calendar.getInstance().getTime()));
+            resourceVo.setExtJson(JsonUtils.toFastJson(releaseInfo));
+            resourceVo.setModuleEnum(ModuleContants.RELEASE);
+            resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+            resourceVo.setResourceId(String.valueOf(releaseInfo.getKid()));
+
+            // 设置达人标识 createUser
+            resourceVo.setTalentType(String.valueOf(createUser.getUserRole()));
+            resourceVo.setTitle(releaseInfo.getTitle());
+            resourceVo.setUserId(releaseInfo.getCreateUserId());
+
+            List<ResourceVo> resources = new ArrayList<>();
+            resources.add(resourceVo);
+            resourceApi.commitResource(resources);
+        } catch (Exception e) {
+            logger.error("资源聚合 接入异常！", e);
+        }
+
+        try {
+            // 提交 好友动态
+            Dymaic dymaic = new Dymaic();
+            BeanUtils.copyProperties(dymaic, resourceVo);
+            dymaic.setModuleEnum(ModuleContants.COTERIE);
+            dymaicApi.send(dymaic);
+        } catch (Exception e) {
+            logger.error("资源好友动态 接入异常！", e);
+        }
+    }
 }

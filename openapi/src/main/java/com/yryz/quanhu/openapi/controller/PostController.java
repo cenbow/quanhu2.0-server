@@ -60,9 +60,8 @@ public class PostController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
-    @UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
-            sourceContexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
+    @UserBehaviorValidation(event = "圈主发布回答", illegalWords = true,login = false)
+    @UserBehaviorArgs(sourceContexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/post/add")
     public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
@@ -80,9 +79,7 @@ public class PostController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,muteByCoterie = false)
-    @UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
-            sourceContexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
+    @UserBehaviorValidation(event = "圈主发布回答",login = false)
     @PostMapping(value = "/services/app/{version}/post/single/delete")
     public Response<Integer> deletePost(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);

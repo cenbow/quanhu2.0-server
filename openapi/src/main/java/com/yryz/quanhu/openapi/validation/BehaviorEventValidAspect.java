@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -44,11 +46,11 @@ public class BehaviorEventValidAspect {
     @Autowired
     private UserLoginValidFilter userLoginValidFilter;
     @Autowired
-    private UserMuteByCoterieValidFilter userMuteByCoterieValidFilter;
+    private UserCoterieMuteValidFilter userCoterieMuteValidFilter;
     @Autowired
     private UserMuteValidFilter userMuteValidFilter;
-
-
+    @Autowired
+    private UserCoterieMemberValidFilter userCoterieMemberValidFilter;
 
     /**
      * 定义切面 扫描注解切面
@@ -81,28 +83,15 @@ public class BehaviorEventValidAspect {
         //取值方式{注解中都用占位符标识，这需要通过切面方法参数中获取指定值}
         UserBehaviorArgs args = method.getDeclaredAnnotation(UserBehaviorArgs.class);
 
-        //如果注解中自定义实现，validClass参数，则调用之定义实现（暂不做实现）
-
-
         //获取必要参数
         Object [] joinPointArgs = joinPoint.getArgs();
 
         //装载filterChain 循环验证
         BehaviorValidFilterChain filterChain = new BehaviorValidFilterChain();
 
-        /**
-         * 获取公共参数（后续注解中有参数，则在此添加），
-         * 亦可在自定义filter中，通过如下方式获取，
-         *
-         */
-        if(args!=null){
-
-            filterChain.setContextValue("loginUserId",behaviorArgsBuild.getParameterValue(args.loginUserId(),joinPointArgs));
-            filterChain.setContextValue("loginToken",behaviorArgsBuild.getParameterValue(args.loginToken(),joinPointArgs));
-            filterChain.setContextValue("sourceType",behaviorArgsBuild.getParameterValue(args.sourceType(),joinPointArgs));
-            filterChain.setContextValue("sourceId",behaviorArgsBuild.getParameterValue(args.sourceId(),joinPointArgs));
-            filterChain.setContextValue("sourceUserId",behaviorArgsBuild.getParameterValue(args.sourceUserId(),joinPointArgs));
-        }
+        //初始化相关公共参数
+        Map<String,Object> context = this.initFilterContext(args,joinPointArgs);
+        filterChain.getContext().putAll(context);
 
         //后续相关过滤器实现可以从切面参数中获取自定义参数，
         filterChain.setJoinPoint(joinPoint);
@@ -121,9 +110,13 @@ public class BehaviorEventValidAspect {
         if(validation.blacklist()){
             filterChain.addFilter(userBlacklistValidFilter);
         }
+        //是否校验私圈成员
+        if(validation.isCoterieMember()){
+            filterChain.addFilter(userCoterieMemberValidFilter);
+        }
         //是否校验私圈禁言
-        if(validation.muteByCoterie()){
-            filterChain.addFilter(userMuteByCoterieValidFilter);
+        if(validation.isCoterieMute()){
+            filterChain.addFilter(userCoterieMuteValidFilter);
         }
         //是否校验敏感词
         if(validation.illegalWords()){
@@ -133,5 +126,24 @@ public class BehaviorEventValidAspect {
         filterChain.execute();
 
         logger.info("[用户数据权限认证]-------------★finish★-------------");
+    }
+
+
+    private Map<String,Object> initFilterContext(UserBehaviorArgs args, Object [] joinPointArgs){
+        Map<String,Object> map = new HashMap<>();
+
+        String loginUserKey = args==null?UserBehaviorArgs.DEFAULT_KEY_LOGIN_USER:args.loginUserId();
+        String loginTokenKey = args==null?UserBehaviorArgs.DEFAULT_KEY_LOGIN_TOKEN:args.loginToken();
+
+        //初始化登录信息
+        map.put("loginUserId",behaviorArgsBuild.getParameterValue(loginUserKey,joinPointArgs));
+        map.put("loginToken",behaviorArgsBuild.getParameterValue(loginTokenKey,joinPointArgs));
+
+        if(args!=null){
+            map.put("sourceUserId",behaviorArgsBuild.getParameterValue(args.sourceUserId(),joinPointArgs));
+            map.put("sourceId",behaviorArgsBuild.getParameterValue(args.sourceId(),joinPointArgs));
+            map.put("coterieId",behaviorArgsBuild.getParameterValue(args.coterieId(),joinPointArgs));
+        }
+        return map;
     }
 }

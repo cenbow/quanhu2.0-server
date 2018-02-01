@@ -1,5 +1,6 @@
 package com.yryz.quanhu.resource.coterie.release.info.vo;
 
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
@@ -22,6 +23,11 @@ public class CoterieReleaseInfoVo extends ReleaseInfo {
      */
     UserSimpleVO user;
 
+    /**
+    * 功能枚举
+    */
+    private String moduleEnum = ModuleContants.RELEASE;
+
     public Byte getCanReadFlag() {
         return canReadFlag;
     }
@@ -36,5 +42,9 @@ public class CoterieReleaseInfoVo extends ReleaseInfo {
 
     public void setUser(UserSimpleVO user) {
         this.user = user;
+    }
+
+    public String getModuleEnum() {
+        return moduleEnum;
     }
 }

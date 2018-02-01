@@ -99,8 +99,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
                  * 采用强制更新，抛出异常，不进行数据库操作
                  */
                 logger.info("im friend remark={} start", JSON.toJSON(imFriend));
-//                imAPI.addFriend(imFriend);
-
+                imAPI.addFriend(imFriend);
             }catch (Exception e){
                 throw new QuanhuException("","设置好友备注名失败","设置好友备注名失败",e);
             }finally {
