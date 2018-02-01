@@ -85,8 +85,8 @@ public class LikeProvider implements LikeApi {
     @Reference(check = false)
     private TopicPostApi topicPostApi;
 
-    @Reference(check = false)
-    private DymaicService dymaicService;
+    /*@Reference(check = false)
+    private DymaicService dymaicService;*/
 
     @Reference(check = false)
     private AnswerApi answerApi;
@@ -348,7 +348,7 @@ public class LikeProvider implements LikeApi {
     public void dynamicPush(long resourceId,String contentPushStr){
         LikeAssemble likeAssemble=new LikeAssemble();
         try{
-            Dymaic dymaic = dymaicService.get(resourceId).getData();
+         /*   Dymaic dymaic = dymaicService.get(resourceId).getData();
             if (!dymaic.getExtJson().equals("")) {
                 Map maps = (Map) JSONObject.parse(dymaic.getExtJson());
                 String title = maps.get("title").toString();
@@ -368,7 +368,7 @@ public class LikeProvider implements LikeApi {
                 likeAssemble.setContent(contentPushStr);
                 likeAssemble.setLink("");
                 this.sendMessage(likeAssemble);
-            }
+            }*/
         }catch (Exception e){
             logger.info("调用动态出现异常" + e);
         }
