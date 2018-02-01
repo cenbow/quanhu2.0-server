@@ -95,19 +95,23 @@ public class UserDiffHandler implements DiffHandler {
                     List<UserBaseInfoVO> volist = resList.getData();
                     List<UserInfo> list = new ArrayList<>();
                     for (int i = 0; i < volist.size(); i++) {
-                        UserBaseInfo baseInfo = GsonUtils.parseObj(volist.get(i), UserBaseInfo.class);
-                        UserInfo userInfo = new UserInfo();
-                        userInfo.setUserId(baseInfo.getUserId());
-                        //用户基础数据
-                        userInfo.setUserBaseInfo(baseInfo);
-                        //达人数据
-                        setStartInfo(userInfo, starResponse);
-                        //标签数据
-                        setTagInfo(userInfo, userTagInfoResponse);
-                        //积分数据
-                        setEventInfo(userInfo, eventAcountResponse);
+                        try {
+                            UserBaseInfo baseInfo = GsonUtils.parseObj(volist.get(i), UserBaseInfo.class);
+                            UserInfo userInfo = new UserInfo();
+                            userInfo.setUserId(baseInfo.getUserId());
+                            //用户基础数据
+                            userInfo.setUserBaseInfo(baseInfo);
+                            //达人数据
+                            setStartInfo(userInfo, starResponse);
+                            //标签数据
+                            setTagInfo(userInfo, userTagInfoResponse);
+                            //积分数据
+                            setEventInfo(userInfo, eventAcountResponse);
 
-                        list.add(userInfo);
+                            list.add(userInfo);
+                        } catch (Exception e) {
+                            logger.error("process userInfo error", e);
+                        }
                     }
                     userRepository.saveAll(list);
                 }
