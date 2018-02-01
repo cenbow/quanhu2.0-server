@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yryz.quanhu</groupId>
-        <artifactId>dymaic-parent</artifactId>
+        <artifactId>canal-parent</artifactId>
         <version>2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dymaic-canal</artifactId>
+    <artifactId>canal-service</artifactId>
 
 	<properties>
         <canal.version>1.0.24</canal.version>

@@ -9,11 +9,9 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dymaic-parent</artifactId>
+    <artifactId>canal-parent</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>api</module>
         <module>service</module>
-		<module>elasticsearch</module>
     </modules>
 </project>

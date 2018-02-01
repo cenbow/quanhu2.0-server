@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.framework.core.lock.DistributedLockManager;
-import com.yryz.quanhu.dymaic.canal.constant.LockConstants;
 import com.yryz.quanhu.dymaic.canal.entity.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
+import com.yryz.quanhu.dymaic.canal.constant.LockConstants;
 import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
 
 
