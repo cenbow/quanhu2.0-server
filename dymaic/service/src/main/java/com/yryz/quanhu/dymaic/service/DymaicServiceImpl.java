@@ -53,10 +53,10 @@ public class DymaicServiceImpl {
     private UserRelationApi userRelationApi;
 
     @Reference
-    private SortIdHelper sortIdHelper;
-    
-    @Reference
     private CountApi countApi;
+
+    @Autowired
+    private SortIdHelper sortIdHelper;
 
     /**
      * 发布动态
@@ -311,6 +311,8 @@ public class DymaicServiceImpl {
             dymaicCache.removeTimeLine(userId, kids);
         }
 
+        logger.info("[dymaic] shuffleTimeLine userId " + userId + ", debarUserId " + debarUserId);
+
         return true;
     }
 
@@ -393,7 +395,7 @@ public class DymaicServiceImpl {
             }
             if (!userIds.isEmpty()) {
                 Response<Map<String, UserSimpleVO>> rsp = userApi.getUserSimple(userId, userIds);
-                users = rsp.getData();
+                users = ResponseUtils.getResponseData(rsp);
             }
         }
 
