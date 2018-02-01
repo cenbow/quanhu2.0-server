@@ -21,7 +21,6 @@ public interface DymaicDao {
      */
     Dymaic get(Long kid);
 
-
     /**
      * 批量查询动态
      * @param kids
