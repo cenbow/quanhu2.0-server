@@ -256,7 +256,7 @@ public class UserRelationCacheDao {
      * 发生到MQ异步处理
      * @param userDto
      */
-    public void sendMQ(UserRelationDto userDto){
+    private void sendMQ(UserRelationDto userDto){
 
         try {
 

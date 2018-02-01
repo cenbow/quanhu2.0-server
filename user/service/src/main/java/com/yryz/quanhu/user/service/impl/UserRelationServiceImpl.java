@@ -115,8 +115,8 @@ public class UserRelationServiceImpl implements UserRelationService{
             /**
              * 异步保存
              */
-            userRelationCacheDao.sendMQ(sourceDto);
-            userRelationCacheDao.sendMQ(targetDto);
+            userRelationCacheDao.asyncSave(sourceDto);
+            userRelationCacheDao.asyncSave(targetDto);
 
         }catch (Exception e){
             throw e;
