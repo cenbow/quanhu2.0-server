@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.resource.hotspot.service;
 
+import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.entity.HotSpotEventInfo;
 
 /**
@@ -41,7 +42,7 @@ public interface HotspotService {
 	 * @param type
 	 * @param objectId
 	 */
-	void saveHeat(String type ,String objectId , String talentType);
+	HeatInfo saveHeat(String type ,String objectId , String talentType);
 	
 	/**
 	 * 保存统计对象
