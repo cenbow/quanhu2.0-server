@@ -13,6 +13,11 @@ public class CoterieMemberApply extends GenericEntity implements Serializable {
 	private static final long serialVersionUID = -2210849405370472836L;
 
 	/**
+	 * KID
+	 */
+	private Long kid;
+
+	/**
      * 私圈ID
      */
     private Long coterieId;
@@ -42,8 +47,14 @@ public class CoterieMemberApply extends GenericEntity implements Serializable {
 	 */
 	private Byte delFlag;
 
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
+	@Override
+	public Long getKid() {
+		return kid;
+	}
+
+	@Override
+	public void setKid(Long kid) {
+		this.kid = kid;
 	}
 
 	public Long getCoterieId() {
