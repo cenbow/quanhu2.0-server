@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.dymaic.dao.DymaicTopDao">
+
+    <!-- 查询置顶动态 -->
+    <select id="get" resultType="java.lang.Long">
+        SELECT
+        dymaic_kid
+        from qh_dymaic_top
+        where create_user_id = #{userId,jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <delete id="delete">
+        delete from qh_dymaic_top
+        where create_user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="update">
+        update qh_dymaic_top
+        set dymaic_id = #{kid,jdbcType=BIGINT}
+        where create_user_id = #{userId,jdbcType=BIGINT}
+    </insert>
+
+    <insert id="add">
+        insert into qh_dymaic_top (dymaic_kid, create_user_id, last_update_user_id)
+        values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},
+            #{userId,jdbcType=BIGINT})
+    </insert>
+
+</mapper>

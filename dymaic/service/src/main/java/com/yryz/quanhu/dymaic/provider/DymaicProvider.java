@@ -8,6 +8,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.dymaic.service.DymaicService;
 import com.yryz.quanhu.dymaic.service.DymaicServiceImpl;
+import com.yryz.quanhu.dymaic.service.DymaicTopServiceImpl;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.dymaic.vo.DymaicVo;
 import org.slf4j.Logger;
@@ -31,6 +32,9 @@ public class DymaicProvider implements DymaicService {
 
     @Autowired
     DymaicServiceImpl dymaicService;
+
+    @Autowired
+    DymaicTopServiceImpl dymaicTopService;
 
     @Override
     public Response<Boolean> send(Dymaic dymaic) {
@@ -90,11 +94,41 @@ public class DymaicProvider implements DymaicService {
     }
 
     @Override
+    public Response<Boolean> addTopDymaic(Long userId, Long dymaicId) {
+        try {
+            return ResponseUtils.returnObjectSuccess(dymaicTopService.add(userId, dymaicId));
+        } catch (Exception e) {
+            logger.error("addTopDymaic", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<DymaicVo> getTopDymaic(Long userId){
+        try {
+            return ResponseUtils.returnObjectSuccess(dymaicTopService.get(userId));
+        } catch (Exception e) {
+            logger.error("getTopDymaic", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Boolean> deleteTopDymaic(Long userId, Long dymaicId){
+        try {
+            return ResponseUtils.returnObjectSuccess(dymaicTopService.delete(userId, dymaicId));
+        } catch (Exception e) {
+            logger.error("deleteTopDymaic", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
     public Response<Map<Long, Dymaic>> getLastSend(Set<Long> userIds) {
         try {
             return ResponseUtils.returnObjectSuccess(dymaicService.getLastSend(userIds));
         } catch (Exception e) {
-            logger.error("get", e);
+            logger.error("getLastSend", e);
             return ResponseUtils.returnException(e);
         }
     }

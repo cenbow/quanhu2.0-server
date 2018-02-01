@@ -191,11 +191,11 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void login() {
 		LoginDTO loginDTO = new LoginDTO();
-		loginDTO.setPhone("16612345678");
-		loginDTO.setPassword("a12345");
+		loginDTO.setPhone("18500000010");
+		loginDTO.setPassword("71b596cb42ee254f7416043d184fc970");
 		RequestHeader header = new RequestHeader();
 		header.setAppId("vebff12m1762");
 		header.setAppVersion("2.0");
@@ -244,7 +244,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void saveBatch(){
 		UserTagDTO dto = new UserTagDTO();
 		dto.setTagIds("11,12");

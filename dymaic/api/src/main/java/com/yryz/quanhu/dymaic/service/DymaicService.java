@@ -60,6 +60,31 @@ public interface DymaicService {
     Response<Map<Long, Dymaic>> get(List<Long> kids);
 
     /**
+     * 添加置顶动态
+     *
+     * @param userId
+     * @param dymaicId
+     */
+    Response<Boolean> addTopDymaic(Long userId, Long dymaicId);
+
+    /**
+     * 查询置顶动态
+     *
+     * @param userId
+     * @return
+     */
+    Response<DymaicVo> getTopDymaic(Long userId);
+
+    /**
+     * 删除置顶动态
+     *
+     * @param userId
+     * @param dymaicId
+     * @return
+     */
+    Response<Boolean> deleteTopDymaic(Long userId, Long dymaicId);
+
+    /**
      * 批量查询用户最后更新动态
      *
      * @param userIds
