@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +48,7 @@ public class AnswerController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @PostMapping(value = "/services/app/{version}/coterie/answer/single")
+    @GetMapping(value = "/services/app/{version}/coterie/answer/single")
     public Response<AnswerVo> saveAnswer(Long kid, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         return answerApi.getDetail(kid);

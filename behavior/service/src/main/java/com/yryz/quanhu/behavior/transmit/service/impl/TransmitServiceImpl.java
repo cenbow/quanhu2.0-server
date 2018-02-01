@@ -83,6 +83,7 @@ public class TransmitServiceImpl implements TransmitService {
         String extJson = "";
         Response<ResourceVo> result = null;
         Long userId = null;
+        ResourceVo resourceVo = null;
         if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
             if(!coterieInfoResponse.success()) {
@@ -94,11 +95,16 @@ public class TransmitServiceImpl implements TransmitService {
             }
             extJson = JsonUtils.toFastJson(coterieInfo);
         } else {
-            result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
-            if(!result.success()) {
-                throw new QuanhuException(ExceptionEnum.SysException);
+            try {
+                result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
+                if(!result.success()) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
+            } catch (Exception e) {
+                logger.error("获取资源失败", e);
+                throw QuanhuException.busiError("资源不存在或者已删除");
             }
-            ResourceVo resourceVo = result.getData();
+            resourceVo = result.getData();
             if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
                 throw QuanhuException.busiError("资源不存在或者已删除");
             }
@@ -116,8 +122,10 @@ public class TransmitServiceImpl implements TransmitService {
         transmitInfo.setCreateDateLong(transmitInfo.getCreateDate().getTime());
         //保存转发记录
         transmitMongoDao.save(transmitInfo);
+        //发送消息
+        this.sendMessage(userId, transmitInfo, resourceVo);
         try {
-            //递增收藏数
+            //递增转发数
             countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, 1L);
         } catch (Exception e) {
             logger.error("递增转发数 失败", e);

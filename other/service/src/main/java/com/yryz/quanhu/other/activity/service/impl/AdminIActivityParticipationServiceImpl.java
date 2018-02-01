@@ -89,18 +89,33 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
      * 参与活动列表
      */
     @Override
-    public List<AdminActivityVoteDetailVo> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
+    public PageList<AdminActivityVoteDetailVo> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
+        Page page=PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
         if (null == adminActivityVoteDetailDto.getActivityInfoId()) {
             logger.debug("请通过投票活动列表进入！！！");
             isNull(adminActivityVoteDetailDto.getActivityInfoId(), "活动ID不能为空，请通过投票活动列表进入！！！");
         }
         List<AdminActivityVoteDetailVo> list = null;
-        if (StringUtils.isNotBlank(adminActivityVoteDetailDto.getNickName()) || StringUtils.isNotBlank(adminActivityVoteDetailDto.getPhone())|| adminActivityVoteDetailDto.getBeginCreateDate()!=null|| adminActivityVoteDetailDto.getEndCreateDate()!=null) {
-            /*TODO List<String> custIds = custAPI.getAdminList(adminActivityVoteDetailDto.getNickName(), adminActivityVoteDetailDto.getPhone(), null, null);
-            if(!CollectionUtils.isEmpty(custIds)){
-            	adminActivityVoteDetailDto.setCustIds(custIds);
-            	list = activityParticipationDao.select(adminActivityVoteDetailDto);
-            }*/
+        if (StringUtils.isNotBlank(adminActivityVoteDetailDto.getNickName()) || StringUtils.isNotBlank(adminActivityVoteDetailDto.getPhone())) {
+            List<String> custIds =new ArrayList<String>();
+            Response<PageList<UserBaseInfoVO>> userInfoPage = null;
+            try {
+                SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+                AdminUserInfoDTO custInfoDTO = new AdminUserInfoDTO();
+                custInfoDTO.setNickName(adminActivityVoteDetailDto.getNickName());
+                userInfoPage = userApi.listUserInfo(1,20,custInfoDTO);
+            } catch (Exception e) {
+                logger.error("查询用户列表异常",e);
+            }
+            if(userInfoPage!=null&&userInfoPage.success()&&!CollectionUtils.isEmpty(userInfoPage.getData().getEntities())){
+                for (UserBaseInfoVO uv:userInfoPage.getData().getEntities()){
+                    custIds.add(uv.getUserId().toString());
+                }
+            }
+            if (!CollectionUtils.isEmpty(custIds)) {
+                adminActivityVoteDetailDto.setCustIds(custIds);
+                list = activityParticipationDao.select(adminActivityVoteDetailDto);
+            }
            
         }
         else{
@@ -108,19 +123,27 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
        }
 
        if(CollectionUtils.isEmpty(list)){
-    	   return list;
+    	   return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list, 0L);
        }
 
         //票数占比：显示对应内容在当前活动中所获票数占总票数的比值，到小数点后4位；
         Integer sum = activityVoteRecordDao.selectCountByActivityInfoId(adminActivityVoteDetailDto.getActivityInfoId(), null);
 
         for (AdminActivityVoteDetailVo voteDetailVo : list) {
-           /* TODO CustInfo custInfo = custAPI.getCustInfo(voteDetailVo.getCreateUserId());
-            voteDetailVo.setNickName(custInfo.getCustNname());
-            voteDetailVo.setPhone(custInfo.getCustPhone());*/
-            voteDetailVo.setUrl(getUrl(voteDetailVo));
+            Set<String> userIds = new HashSet<String>();
+            userIds.add(voteDetailVo.getCreateUserId().toString());
+            Response<Map<String,UserBaseInfoVO>> users = null;
+            try {
+                users = userApi.getUser(userIds);
+            } catch (Exception e) {
+                logger.error("查询用户信息异常",e);
+            }
+            if(users.success()&&users.getData().get(voteDetailVo.getCreateUserId().toString())!=null){
+                voteDetailVo.setNickName(users.getData().get(voteDetailVo.getCreateUserId().toString()).getUserNickName());
+                voteDetailVo.setPhone(users.getData().get(voteDetailVo.getCreateUserId().toString()).getUserPhone());
+            }
 
-            Integer voteCount = activityVoteRecordDao.selectCountByActivityInfoId(adminActivityVoteDetailDto.getActivityInfoId(), voteDetailVo.getVoteNo());
+            Integer voteCount = voteDetailVo.getVoteCount();
             double data = 0.00;
             if (sum != 0 && voteCount != 0) {
                 data = (double) voteCount / (double) sum;
@@ -129,66 +152,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             voteDetailVo.setVoteProportion(voteProportion);
         }
 
-        return list;
-    }
-  
-    /**
-     * 参与活动列表分页
-     */
-    @Override
-    public PageList adminlistDetail(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
-    	Integer pageNo = adminActivityVoteDetailDto.getPageNo();
-		Integer pageSize = adminActivityVoteDetailDto.getPageSize();
-		  List<AdminActivityVoteDetailVo> list =null;
-		if(adminActivityVoteDetailDto.getPageNo()==null|| adminActivityVoteDetailDto.getPageNo()<=0){
-			adminActivityVoteDetailDto.setPageNo(0);
-		}else{
-			adminActivityVoteDetailDto.setPageNo((adminActivityVoteDetailDto.getPageNo()-1)* adminActivityVoteDetailDto.getPageSize());
-		}
-		if(adminActivityVoteDetailDto.getPageSize()==null|| adminActivityVoteDetailDto.getPageSize()<=0){
-			adminActivityVoteDetailDto.setPageSize(10);
-		}	
-        if (null == adminActivityVoteDetailDto.getActivityInfoId()) {
-            logger.debug("请通过投票活动列表进入！！！");
-            isNull(adminActivityVoteDetailDto.getActivityInfoId(), "活动ID不能为空，请通过投票活动列表进入！！！");
-        }
-        if (StringUtils.isNotBlank(adminActivityVoteDetailDto.getNickName()) || StringUtils.isNotBlank(adminActivityVoteDetailDto.getPhone())|| adminActivityVoteDetailDto.getBeginCreateDate()!=null|| adminActivityVoteDetailDto.getEndCreateDate()!=null) {
-            /*TODO List<String> custIds = custAPI.getAdminList(adminActivityVoteDetailDto.getNickName(), adminActivityVoteDetailDto.getPhone(), null, null);
-            if(!CollectionUtils.isEmpty(custIds))
-            {
-             adminActivityVoteDetailDto.setCustIds(custIds);
-             list = activityParticipationDao.selectPage(adminActivityVoteDetailDto);
-            }*/
-        }
-        else{
-        	 list = activityParticipationDao.selectPage(adminActivityVoteDetailDto);
-        }
-        
-        if (CollectionUtils.isEmpty(list)) {
-			return new PageList(pageNo, pageSize, list, 0L);
-		}
-       
-
-        //票数占比：显示对应内容在当前活动中所获票数占总票数的比值，到小数点后4位；
-        Integer sum = activityVoteRecordDao.selectCountByActivityInfoId(adminActivityVoteDetailDto.getActivityInfoId(), null);
-
-        for (AdminActivityVoteDetailVo voteDetailVo : list) {
-           /* TODO CustInfo custInfo = custAPI.getCustInfo(voteDetailVo.getCreateUserId());
-            voteDetailVo.setNickName(custInfo.getCustNname());
-            voteDetailVo.setPhone(custInfo.getCustPhone());*/
-            voteDetailVo.setUrl(getUrl(voteDetailVo));
-
-            Integer voteCount = activityVoteRecordDao.selectCountByActivityInfoId(adminActivityVoteDetailDto.getActivityInfoId(), voteDetailVo.getVoteNo());
-            double data = 0.00;
-            if (sum != 0 && voteCount != 0) {
-                data = (double) voteCount / (double) sum;
-            }
-            String voteProportion = new DecimalFormat("0.0000").format(data);
-            voteDetailVo.setVoteProportion(voteProportion);
-        }
-
-      
-		return new PageList(pageNo, pageSize, list, (long)activityParticipationDao.select(adminActivityVoteDetailDto).size());
+        return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list, page.getTotal());
     }
 
     @Override
@@ -241,7 +205,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 		String nickName=null;
     	String  beginDate=null;
     	String  endDate=null;
-    	List<String> custIds =new ArrayList<String>();;
+    	List<String> custIds =new ArrayList<String>();
     	List<AdminActivityVoteRecordVo> list = new ArrayList<AdminActivityVoteRecordVo>();
         if (StringUtils.isNotBlank(adminActivityVoteRecordDto.getNickName())|| adminActivityVoteRecordDto.getBeginCreateDate()!=null|| adminActivityVoteRecordDto.getEndCreateDate()!=null) {
         	
@@ -255,7 +219,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             	 endDate=sdf.format(adminActivityVoteRecordDto.getEndCreateDate());
         	}
 
-            Response<Page<UserBaseInfoVO>> userInfoPage = null;
+            Response<PageList<UserBaseInfoVO>> userInfoPage = null;
             try {
                 AdminUserInfoDTO custInfoDTO = new AdminUserInfoDTO();
                 custInfoDTO.setNickName(nickName);
@@ -265,8 +229,8 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             } catch (Exception e) {
                 logger.error("查询用户列表异常",e);
             }
-            if(userInfoPage!=null&&userInfoPage.success()&&!CollectionUtils.isEmpty(userInfoPage.getData().getResult())){
-                for (UserBaseInfoVO uv:userInfoPage.getData().getResult()){
+            if(userInfoPage!=null&&userInfoPage.success()&&!CollectionUtils.isEmpty(userInfoPage.getData().getEntities())){
+                for (UserBaseInfoVO uv:userInfoPage.getData().getEntities()){
                     custIds.add(uv.getUserId().toString());
                 }
             }
@@ -308,19 +272,6 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             return activityVoteService.getActivityDetail(infoId);
         }
         return null;
-    }
-
-    //平台获得前台页面规则
-    private String getUrl(AdminActivityVoteDetailVo voteDetailVo) {
-
-//  http://m-dev.quanhu365.com/activity/platform-activity/vote/93/detail/57
-
-        /*TODO String frontURL = Global.getConfig("front.server.url");
-
-        if (null != voteDetailVo.getActivityInfoId()) {
-            return frontURL + "activity/platform-activity/vote/" + voteDetailVo.getActivityInfoId() + "/detail/" + voteDetailVo.getId() + "?custId=XXX";
-        }*/
-        return "";
     }
 
     public AdminConfigObjectDto getVoteConfig(Long infoId) {
@@ -375,11 +326,11 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
      */
     @Override
     public  PageList<UserBaseInfoVO> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize) {
-        Response<Page<UserBaseInfoVO>> userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
+        Response<PageList<UserBaseInfoVO>> userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
         PageList<UserBaseInfoVO> pageList = new PageList<UserBaseInfoVO>();
         if (userInfoPage.success()){
-            pageList.setCount(userInfoPage.getData().getTotal());
-            pageList.setEntities(userInfoPage.getData().getResult());
+            pageList.setCount(userInfoPage.getData().getCount());
+            pageList.setEntities(userInfoPage.getData().getEntities());
             pageList.setCurrentPage(pageNo);
             pageList.setPageSize(pageSize);
         }

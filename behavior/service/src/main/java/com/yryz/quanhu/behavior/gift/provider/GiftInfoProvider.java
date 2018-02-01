@@ -1,9 +1,5 @@
 package com.yryz.quanhu.behavior.gift.provider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -13,12 +9,15 @@ import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
 import com.yryz.quanhu.behavior.gift.dto.GiftInfoDto;
 import com.yryz.quanhu.behavior.gift.entity.GiftInfo;
 import com.yryz.quanhu.behavior.gift.service.GiftInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
-* @Description: 礼物 API
-* @author wangheng
-* @date 2018年1月26日 下午4:43:42
-*/
+ * @author wangheng
+ * @Description: 礼物 API
+ * @date 2018年1月26日 下午4:43:42
+ */
 @Service(interfaceClass = GiftInfoApi.class)
 public class GiftInfoProvider implements GiftInfoApi {
 
@@ -35,6 +34,16 @@ public class GiftInfoProvider implements GiftInfoApi {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
             logger.error("平台发布文章异常！", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<GiftInfo> selectByKid(long kid) {
+        try {
+            return ResponseUtils.returnObjectSuccess(giftInfoService.selectByKid(kid));
+        } catch (Exception e) {
+            logger.error("根据唯一ID查询礼物详情失败！", e);
             return ResponseUtils.returnException(e);
         }
     }

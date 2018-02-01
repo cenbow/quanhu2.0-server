@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.pagehelper.Page;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
@@ -139,7 +140,7 @@ public interface UserApi {
 	 * @return
 	 * @Description 昵称需要加特殊字符转义
 	 */
-	Response<Page<UserBaseInfoVO>> listUserInfo(int pageNo,int pageSize,AdminUserInfoDTO custInfoDTO);
+	Response<PageList<UserBaseInfoVO>> listUserInfo(int pageNo,int pageSize,AdminUserInfoDTO custInfoDTO);
 
 	/**
 	 * 查询一段时间的全部用户ID，不分状态

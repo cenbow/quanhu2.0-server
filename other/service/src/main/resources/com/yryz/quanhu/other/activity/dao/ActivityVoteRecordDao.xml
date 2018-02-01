@@ -183,7 +183,7 @@
 
 	<!-- 某一活动的总票数 -->
 	<select id="selectCountByActivityInfoId" resultType="java.lang.Integer">
-		select count(*) as vote_count from qh_activity_vote_record
+		select sum(vote_count) as vote_count from qh_activity_vote_detail
 		<where>
 			activity_info_id = #{id}
 			<if test="voteNo!= null">

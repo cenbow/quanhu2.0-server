@@ -259,7 +259,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         record.setUserId(userId);
         record.setCoterieId(coterieId);
         record.setLastUpdateDate(new Date());
-        if (type == 1) {
+        if (type == 10) {
             record.setBanSpeak(MemberConstant.BanSpeak.BANSPEAK.getStatus());
         } else {
             record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());

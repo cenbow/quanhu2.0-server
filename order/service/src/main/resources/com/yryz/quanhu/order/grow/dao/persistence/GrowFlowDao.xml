@@ -33,7 +33,16 @@
 	
 	<!-- 获取用户成长值流水列表 -->
 	<select id="getAll" resultType="com.yryz.quanhu.grow.entity.GrowFlow">
-		select  <include refid="columns" />  from grow_flow where user_id = #{userId}
+		select  <include refid="columns" />  from grow_flow where user_id = #{gfq.userId}
+		<if test="gfq.eventCode != null and gfq.eventCode !=''">
+			and event_code = #{gfq.eventCode}
+		</if>
+		<if test="gfq.startTime != null and gfq.startTime !=''">
+			and create_time &gt;= #{gfq.startTime}
+		</if>
+		<if test="gfq.endTime != null and gfq.endTime !=''">
+			and create_time &lt;= #{gfq.endTime}
+		</if>
 	</select>
 	
 
@@ -44,13 +53,13 @@
 		 from (
 		select  <include refid="columns" /> 
 		 from grow_flow where user_id = #{gfq.userId} 
-		<if test="gfq.eventCode != null">
+		<if test="gfq.eventCode != null and gfq.eventCode !=''">
 			and event_code = #{gfq.eventCode}
 		</if>
-		<if test="gfq.startTime != null">
+		<if test="gfq.startTime != null and gfq.startTime !=''">
 			and create_time &gt;= #{gfq.startTime}
 		</if>
-		<if test="gfq.endTime != null">
+	    <if test="gfq.endTime != null and gfq.endTime !=''">
 			and create_time &lt;= #{gfq.endTime}
 		</if>
 		) a 
