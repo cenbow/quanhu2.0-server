@@ -35,13 +35,14 @@
 		</if>
 	</select>
 
-	<select id="selectByPhones" resultMap="BaseResultMap">
+	<select id="selectByPhones" resultType="com.yryz.quanhu.user.entity.UserAccount">
 		select
-		<include refid="Base_Column_List" />
+		kid as kid,
+		user_phone as userPhone
 		from qh_user_account
 		where del_flag = 10
 		<if test="phones != null ">
-			and kid in
+			and user_phone in
 			<foreach item="item" index="index" collection="phones" open="("
 				separator="," close=")">
 				#{item}

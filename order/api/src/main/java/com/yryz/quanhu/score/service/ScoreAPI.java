@@ -1,10 +1,11 @@
 package com.yryz.quanhu.score.service;
 
+import java.util.List;
+
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.quanhu.score.entity.ScoreEventInfo;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 /**
  * @author lsn on 2017/8/28 0028.
@@ -58,7 +59,7 @@ public interface ScoreAPI {
 	 * @return
 	 * @Description 获取积分流水记录
 	 */
-	public PageList<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq );
+	public PageList<ScoreFlowReportVo> getScoreFlowPage(ScoreFlowQuery sfq );
 	/**
 	 * 
 	 * @param userId
@@ -77,5 +78,13 @@ public interface ScoreAPI {
 	 * @Description 增加积分
 	 */
 	public int addScore(String userId , int score , String eventCode);
+	
+	/**
+	 * @param sfq
+	 * @return List<ScoreFlow>
+	 * @Description 获取全部积分明细
+	 */
+	public  List<ScoreFlowReportVo> getScoreFlowAll(ScoreFlowQuery sfq) ;
+
 	
 }

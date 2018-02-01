@@ -70,6 +70,14 @@
         AND del_flag = 10
     </select>
 
+    <!-- 查询kid最大值 -->
+    <select id="getMaxKid" resultType="java.lang.Long">
+        SELECT kid
+        from qh_dymaic
+        WHERE 1 = 1
+        ORDER BY kid DESC limit 1
+    </select>
+
     <!-- 查询好友动态id -->
     <select id="getTimeLineIds" resultType="java.lang.Long">
         SELECT kid

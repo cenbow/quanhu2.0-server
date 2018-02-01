@@ -1,5 +1,6 @@
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,9 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.order.score.manage.service.ScoreEventManageService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
@@ -20,6 +19,7 @@ import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.score.vo.EventAcount;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 @Service(interfaceClass=ScoreAPI.class)
 public class ScoreAPIImpl implements ScoreAPI {
@@ -56,9 +56,11 @@ public class ScoreAPIImpl implements ScoreAPI {
 
 
 	@Override
-	public  PageList<ScoreFlow> getScoreFlowPage(ScoreFlowQuery sfq) {
+	public  PageList<ScoreFlowReportVo> getScoreFlowPage(ScoreFlowQuery sfq) {
 		
-		   PageList<ScoreFlow> pageList = new PageList<>();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		   PageList<ScoreFlowReportVo> pageList = new PageList<>();
 	        pageList.setCurrentPage(sfq.getCurrentPage());
 	        pageList.setPageSize(sfq.getPageSize());
 
@@ -71,6 +73,22 @@ public class ScoreAPIImpl implements ScoreAPI {
 			//com.github.pagehelper.Page<ScoreFlow> pageHelp =   PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
 	        pageHelp = (com.github.pagehelper.Page<ScoreFlow>) scoreFlowService.getPage(sfq);
 			List<ScoreFlow> list =  new ArrayList<ScoreFlow>(pageHelp.getResult());
+ 
+			List<ScoreFlowReportVo> listVO =  new ArrayList<ScoreFlowReportVo>();
+			for (ScoreFlow s :list){
+				ScoreFlowReportVo vo = new ScoreFlowReportVo();
+				vo.setAllScore(s.getAllScore()); 
+				vo.setConsumeFlag(s.getConsumeFlag());
+				vo.setEventCode(s.getEventCode());
+				vo.setEventName(s.getEventName());
+				vo.setNewScore(s.getNewScore());
+				vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+				vo.setCreateTime(sdf.format(s.getCreateTime()));
+				vo.setUserId(s.getUserId());
+				listVO.add(vo);
+				
+			}
+			 
 //			List<ScoreFlow> list =   scoreFlowService.getPage(sfq);
 //			page.setResult(pageHelp.getResult());
 //			page.setTotalCount(pageHelp.getTotal());
@@ -80,12 +98,36 @@ public class ScoreAPIImpl implements ScoreAPI {
 //	        } else {
 //	            pageList.setCount(scoreFlowService.countgetPage(sfq));
 //	        }
-			pageList.setEntities(list);
+			pageList.setEntities(listVO);
 			pageList.setCount(pageHelp.getTotal());
  
 		
 	        return pageList;
 	        
+	}
+	
+	@Override
+	public  List<ScoreFlowReportVo> getScoreFlowAll(ScoreFlowQuery sfq) {
+		
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		List<ScoreFlow> list = scoreFlowService.getAll(sfq);
+		List<ScoreFlowReportVo> listVO =  new ArrayList<ScoreFlowReportVo>();
+		
+		for (ScoreFlow s :list){
+			ScoreFlowReportVo vo = new ScoreFlowReportVo();
+			vo.setAllScore(s.getAllScore()); 
+			vo.setConsumeFlag(s.getConsumeFlag());
+			vo.setEventCode(s.getEventCode());
+			vo.setEventName(s.getEventName());
+			vo.setNewScore(s.getNewScore());
+			vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+			vo.setCreateTime(sdf.format(s.getCreateTime()));
+			vo.setUserId(s.getUserId());
+			listVO.add(vo);
+			
+		}
+		return listVO;
 	}
 
 	@Override

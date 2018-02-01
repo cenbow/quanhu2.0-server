@@ -136,7 +136,7 @@ public class HotspotServiceImpl implements HotspotService {
 	 * @see com.yryz.quanhu.resource.hotspot.service.HotspotService#saveHeat(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void saveHeat(String type, String objectId , String talentType) {
+	public HeatInfo saveHeat(String type, String objectId , String talentType) {
 		HeatInfo heatInfo = new HeatInfo();
 		heatInfo.setObjectId(objectId);
 		heatInfo.setType(type);
@@ -150,7 +150,7 @@ public class HotspotServiceImpl implements HotspotService {
 		heatInfo.setCreateTime(System.currentTimeMillis());
 		heatInfo.setUpdateTime(System.currentTimeMillis());
 		heatInfo.setHeat(heatInfo.countHeat());
-		heatInfoMongo.save(heatInfo);
+		return heatInfoMongo.save(heatInfo);
 	}
 
 

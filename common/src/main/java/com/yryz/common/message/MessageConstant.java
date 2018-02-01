@@ -141,7 +141,17 @@ public enum MessageConstant {
     /**
      * 付费参加活动
      */
-    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT) ;
+    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+
+    /**
+     * 打赏消费
+     */
+    REWARD_ACCOUNT(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"支付成功","您打赏了一个%s，支付%s悠然币。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
+
+    /**
+     * 被打赏收益
+     */
+    REWARD_INTEGRAL(MessageType.ORDER_TYPE,MessageLabel.ORDER_ACCOUNT,"奖励通知","%s打赏了一个%s，您获得%s奖励。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL);
 
     private Integer type;
 

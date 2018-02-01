@@ -53,14 +53,11 @@ public class OrderNotifyListener {
     )
     public void handleMessage(String message) {
         logger.info("Receive order notify message, msg:{}", message);
-        OrderInfo orderInfo = null;
         try {
-            orderInfo = JSON.parseObject(message, OrderInfo.class);
-        } catch (Exception e) {
-            logger.error("解析订单回调消息失败", e);
-        }
-        if (null != orderInfo) {
+            OrderInfo orderInfo = JSON.parseObject(message, OrderInfo.class);
             notifyService.notify(orderInfo);
+        } catch (Exception e) {
+            logger.error("处理订单回调消息失败", e);
         }
     }
 
