@@ -27,10 +27,10 @@ public class EsTest {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-    @Resource
-    private ElasticsearchTemplate elasticsearchTemplate;
+//    @Resource
+//    private ElasticsearchTemplate elasticsearchTemplate;
 
-    @Test
+    /*@Test
     public void searchStarUserTest() {
         StarInfoDTO starInfoDTO = new StarInfoDTO();
         starInfoDTO.setTagId(12L);
@@ -39,6 +39,11 @@ public class EsTest {
         starInfoDTO.setUserId(737237750614581248L);
         Response<PageList<StarInfoVO>> pageListResponse = elasticsearchService.searchStarUser(starInfoDTO);
         System.out.println("pageListResponse: " + GsonUtils.parseJson(pageListResponse));
+    }*/
+
+    @Test
+    public void buildTest() {
+        elasticsearchService.rebuildUserInfo();
     }
 
 
