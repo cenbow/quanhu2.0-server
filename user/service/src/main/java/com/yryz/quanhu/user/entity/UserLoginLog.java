@@ -50,7 +50,12 @@ public class UserLoginLog extends GenericEntity{
      * 应用id
      */
     private String appId;
-
+    
+    private String ip;
+    
+    private String token;
+    
+    private String refreshToken;
     public Long getUserId() {
         return userId;
     }
@@ -107,8 +112,45 @@ public class UserLoginLog extends GenericEntity{
         this.appId = appId == null ? null : appId.trim();
     }
 
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
 	public UserLoginLog() {
 		super();
+	}
+
+	public UserLoginLog(Long userId, String deviceType, String deviceName, String deviceId, String appId, String ip,
+			String token, String refreshToken) {
+		super();
+		this.userId = userId;
+		this.deviceType = deviceType;
+		this.deviceName = deviceName;
+		this.deviceId = deviceId;
+		this.appId = appId;
+		this.ip = ip;
+		this.token = token;
+		this.refreshToken = refreshToken;
 	}
 
 	public UserLoginLog(Long userId, String deviceType, String deviceName, String deviceId, String appId) {

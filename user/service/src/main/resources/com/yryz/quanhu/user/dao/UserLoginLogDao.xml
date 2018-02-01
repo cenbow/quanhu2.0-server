@@ -5,6 +5,9 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="kid" property="kid" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="token" property="token" jdbcType="VARCHAR" />
+    <result column="refresh_token" property="refreshToken" jdbcType="VARCHAR" />
     <result column="device_type" property="deviceType" jdbcType="VARCHAR" />
     <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
     <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
@@ -42,6 +45,15 @@
       <if test="userId != null" >
         user_id,
       </if>
+      <if test="ip != null">
+      	ip,
+      </if>
+      <if test="token != null">
+      	token,
+      </if>
+      <if test="refreshToken != null">
+      	refresh_token,
+      </if>
       <if test="deviceType != null" >
         device_type,
       </if>
@@ -76,6 +88,15 @@
       </if>
       <if test="userId != null" >
         #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="ip != null">
+      	#{ip},
+      </if>
+      <if test="token != null">
+      	#{token},
+      </if>
+      <if test="refreshToken != null">
+      	#{refreshToken},
       </if>
       <if test="deviceType != null" >
         #{deviceType,jdbcType=VARCHAR},

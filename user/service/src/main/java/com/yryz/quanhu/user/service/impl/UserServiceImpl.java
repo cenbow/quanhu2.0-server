@@ -462,32 +462,8 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public List<String> getUserIdByParams(AdminUserInfoDTO custInfoDTO) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		// params.put("nickName", replayStr(custInfoDTO.getNickName()));
-		// params.put("phone", custInfoDTO.getPhone());
-		// params.put("startDate", custInfoDTO.getStartDate());
-		// params.put("endDate", custInfoDTO.getEndDate());
-		if (!StringUtils.isBlank(replayStr(custInfoDTO.getNickName()))) {
-			params.put("nickName", replayStr(custInfoDTO.getNickName()));
-		} else {
-			params.put("nickName", "");
-		}
-		if (!StringUtils.isBlank(custInfoDTO.getPhone())) {
-			params.put("phone", custInfoDTO.getPhone());
-		} else {
-			params.put("phone", "");
-		}
-		if (!StringUtils.isBlank(custInfoDTO.getStartDate())) {
-			params.put("startDate", custInfoDTO.getStartDate());
-		} else {
-			params.put("startDate", "");
-		}
-		if (!StringUtils.isBlank(custInfoDTO.getEndDate())) {
-			params.put("endDate", custInfoDTO.getEndDate());
-		} else {
-			params.put("endDate", "");
-		}
-		return custbaseinfoDao.getUserIdList(params);
+		custInfoDTO.setNickName(replayStr(custInfoDTO.getNickName()));
+		return custbaseinfoDao.getUserIdList(custInfoDTO);
 	}
 
 	/**
@@ -501,7 +477,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Page<UserBaseInfo> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
 		custInfoDTO.setNickName(replayStr(custInfoDTO.getNickName()));
-
 		Page<UserBaseInfo> page = PageHelper.startPage(pageNo, pageSize);
 		custbaseinfoDao.getAdminList(custInfoDTO);
 		return page;
