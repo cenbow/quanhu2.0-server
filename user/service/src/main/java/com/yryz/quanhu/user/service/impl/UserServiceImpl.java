@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
-		UserBaseInfo baseInfo = getUser(userId);
+		UserBaseInfo baseInfo = getUser(friendId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
 			simpleVO.setRelationStatus(relationDto.getRelationStatus());
 		}
 		// 依赖积分系统，获取用户等级
-		EventAcount acount = eventManager.getGrow(userId.toString());
+		EventAcount acount = eventManager.getGrow(friendId.toString());
 		if (acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1) {
 			simpleVO.setUserLevel("1");
 		} else {

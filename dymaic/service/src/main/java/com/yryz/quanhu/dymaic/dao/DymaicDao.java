@@ -68,7 +68,6 @@ public interface DymaicDao {
      */
     List<Long> getTimeLineIds(@Param("userIds") List<Long> userIds, @Param("limit") Long limit);
 
-
     /**
      * 查询kid最大值
      * @return
