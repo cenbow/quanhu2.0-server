@@ -38,25 +38,25 @@ public class DymaicServiceImpl {
     Logger logger = LoggerFactory.getLogger(DymaicServiceImpl.class);
 
     @Autowired
-    DymaicDao dymaicDao;
+    private DymaicDao dymaicDao;
 
     @Autowired
-    DymaicCache dymaicCache;
+    private DymaicCache dymaicCache;
 
     @Autowired
-    DymaicSender dymaicSender;
+    private DymaicSender dymaicSender;
 
     @Reference
-    UserApi userApi;
+    private UserApi userApi;
 
     @Reference
-    UserRelationApi userRelationApi;
+    private UserRelationApi userRelationApi;
 
     @Reference
-    SortIdHelper sortIdHelper;
+    private SortIdHelper sortIdHelper;
     
     @Reference
-    CountApi countApi;
+    private CountApi countApi;
 
     /**
      * 发布动态
@@ -190,14 +190,6 @@ public class DymaicServiceImpl {
         }
 
         return result;
-    }
-
-    public void setTopDymaic(Long userId, Long kid, boolean topStatus) {
-
-    }
-
-    public DymaicVo getTopDymaic(Long userId) {
-        return null;
     }
 
     /**
@@ -354,6 +346,32 @@ public class DymaicServiceImpl {
      * 根据动态id，聚合相应的摘要、用户、统计数据
      *
      * @param userId
+     * @param kid
+     * @return
+     */
+    public DymaicVo mergeDymaicVo(Long userId, Long kid) {
+        DymaicVo vo = new DymaicVo();
+
+        Dymaic dymaic = this.get(kid);
+        if (dymaic != null) {
+            BeanUtils.copyProperties(dymaic, vo);
+
+            //用户信息
+            Response<UserSimpleVO> response = userApi.getUserSimple(userId, dymaic.getUserId());
+            UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(response);
+            vo.setUser(userSimpleVO);
+
+            //评论数，点赞数，转发数, ignore exception
+            vo.setStatistics(getStatics(kid));
+        }
+
+        return vo;
+    }
+
+    /**
+     * 根据动态id，聚合相应的摘要、用户、统计数据
+     *
+     * @param userId
      * @param kids
      * @return
      */
@@ -406,32 +424,6 @@ public class DymaicServiceImpl {
     }
 
     /**
-     * 根据动态id，聚合相应的摘要、用户、统计数据
-     *
-     * @param userId
-     * @param kid
-     * @return
-     */
-    private DymaicVo mergeDymaicVo(Long userId, Long kid) {
-        DymaicVo vo = new DymaicVo();
-
-        Dymaic dymaic = this.get(kid);
-        if (dymaic != null) {
-            BeanUtils.copyProperties(dymaic, vo);
-
-            //用户信息
-            Response<UserSimpleVO> response = userApi.getUserSimple(userId, dymaic.getUserId());
-            UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(response);
-            vo.setUser(userSimpleVO);
-
-            //评论数，点赞数，转发数, ignore exception
-            vo.setStatistics(getStatics(kid));
-        }
-
-        return vo;
-    }
-
-    /**
      * 查询粉丝ID列表
      *
      * @param userId
@@ -470,10 +462,6 @@ public class DymaicServiceImpl {
         }
 
         statistics = (statistics == null) ? new HashMap<>() : statistics;
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("debug getStatics " + kid + ", hit " + statistics.toString());
-        }
 
         return statistics;
     }

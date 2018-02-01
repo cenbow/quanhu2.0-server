@@ -125,6 +125,29 @@ public class DymaicTest {
         print(response);
     }
 
+
+    //============  置顶动态 ==============
+    private static final Long userId = 724011759597371392L;
+    private static final Long kid = 109844L;
+
+    @Test
+    public void addTop() {
+        dymaicService.addTopDymaic(userId, kid);
+    }
+
+    @Test
+    public void getTop() {
+        Response<DymaicVo> response = dymaicService.getTopDymaic(userId);
+        print(response);
+    }
+
+    @Test
+    public void deleteTop() {
+        dymaicService.deleteTopDymaic(userId, kid);
+    }
+
+
+
     private void print(Object obj) {
         System.out.println("\n" + GsonUtils.parseJson(obj) + "\n");
     }
