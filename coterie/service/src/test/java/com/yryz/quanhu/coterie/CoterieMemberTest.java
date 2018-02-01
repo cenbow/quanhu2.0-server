@@ -23,7 +23,7 @@ public class CoterieMemberTest {
     private CoterieMemberAPI coterieMemberAPI;
 
     private static Long memberId = 730941139577331712L;
-    private static Long userId = 731154152775909376L;
+    private static Long userId = 737251236811898880L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
@@ -91,6 +91,14 @@ public class CoterieMemberTest {
     @Test
     public void test090_quit() {
         Response response = coterieMemberAPI.quit(memberId,coterieId);
+        System.out.println(JsonUtils.toFastJson(response));
+    }
+
+
+    @Test
+    public void test090_isBanSpeak() {
+//        Response response = coterieMemberAPI.isBanSpeak(memberId,coterieId);
+        Response response = coterieMemberAPI.isBanSpeak(730921949663453184L,4816176744L);
         System.out.println(JsonUtils.toFastJson(response));
     }
 }

@@ -12,6 +12,7 @@ import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.user.contants.TokenCheckEnum;
@@ -33,10 +34,18 @@ public class AuthService {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId = header.getUserId();
 		String token = header.getToken();
+		
 		if(StringUtils.isEmpty(userId)){
 			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 		}
 		if(StringUtils.isEmpty(token)){
+			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+		}
+		String tokenUserId = StringUtils.split(token, "-")[0];
+		if(StringUtils.isEmpty(tokenUserId)){
+			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+		}
+		if(!StringUtils.equals(tokenUserId,userId)){
 			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 		}
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
@@ -55,6 +64,7 @@ public class AuthService {
 			}
 		} catch (Exception e) {
 			logger.error("token校验异常",e);
+			throw QuanhuException.busiError("token校验异常");
 		}
 		
 		if(checkEnum == TokenCheckEnum.SUCCESS.getStatus()){
@@ -68,6 +78,7 @@ public class AuthService {
 			if(checkEnum == TokenCheckEnum.NO_TOKEN.getStatus()){
 				throw new QuanhuException(ExceptionEnum.NO_TOKEN);
 			}
+			logger.info("[checkToken]:header:{},checkEnum:{}",JsonUtils.toFastJson(header),checkEnum);
 			if(checkEnum == TokenCheckEnum.ERROR.getStatus()){
 				throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 			}

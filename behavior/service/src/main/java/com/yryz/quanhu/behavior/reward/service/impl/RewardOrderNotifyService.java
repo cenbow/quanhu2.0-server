@@ -3,7 +3,6 @@ package com.yryz.quanhu.behavior.reward.service.impl;
 import com.alibaba.dubbo.common.utils.Assert;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.message.MessageConstant;
@@ -11,8 +10,11 @@ import com.yryz.common.message.MessageViewCode;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.message.SystemBody;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.MessageUtils;
+import com.yryz.quanhu.behavior.common.service.RemoteResourceService;
+import com.yryz.quanhu.behavior.common.vo.RemoteResource;
 import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
 import com.yryz.quanhu.behavior.gift.entity.GiftInfo;
 import com.yryz.quanhu.behavior.reward.constants.RewardConstants;
@@ -28,11 +30,9 @@ import com.yryz.quanhu.message.push.entity.PushReqVo;
 import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
-import com.yryz.quanhu.resource.api.ResourceApi;
-import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
-import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
-import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
-import com.yryz.quanhu.resource.vo.ResourceVo;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,8 +65,8 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
     @Autowired
     private RewardCountService rewardCountService;
 
-    @Reference(check = false, lazy = true, timeout = 1000)
-    private ResourceApi resourceApi;
+    @Autowired
+    private RemoteResourceService remoteResourceService;
 
     @Reference
     private MessageAPI messageAPI;
@@ -81,6 +82,9 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
 
     @Reference
     private UserApi userApi;
+
+    @Reference
+    private EventAPI eventAPI;
 
     @Override
     public String getModuleEnum() {
@@ -127,40 +131,36 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         rewardCountService.addCountByTargetId(uCount);
 
         // 给打赏者、被打赏者 发送消息
+        sendMessage(info, rewardedPrice);
+
+        //发送打赏积分事件
+        sendEvent(info);
+    }
+
+    /**
+     * 给打赏者、被打赏者 发送消息
+     *
+     * @param info
+     * @param rewardedPrice
+     */
+    private void sendMessage(RewardInfo info, Long rewardedPrice) {
         try {
             //查询资源信息的title和img
-            ResourceVo resourceVo = ResponseUtils.getResponseData(resourceApi.getResourcesById(String.valueOf(info.getResourceId())));
             String bodyTitle = "";
             String bodyImg = "";
-            if (ModuleContants.RELEASE.equals(resourceVo.getModuleEnum())) {
-                ReleaseInfo releaseInfo = JSON.parseObject(resourceVo.getExtJson(), ReleaseInfo.class);
-                if (null != releaseInfo) {
-                    bodyTitle = releaseInfo.getTitle();
-                    String imgUrl = releaseInfo.getImgUrl();
-                    if (StringUtils.isNotBlank(imgUrl)) {
-                        bodyImg = Splitter.on(",").omitEmptyStrings().limit(1).splitToList(imgUrl).get(0);
-                    }
-                }
-            } else if (ModuleContants.TOPIC_POST.equals(resourceVo.getModuleEnum())) {
-                TopicPostVo topicPostVo = JSON.parseObject(resourceVo.getExtJson(), TopicPostVo.class);
-                if (null != topicPostVo) {
-                    if (StringUtils.isNotBlank(topicPostVo.getContent())) {
-                        bodyTitle = topicPostVo.getContent().length() > 20 ?
-                                topicPostVo.getContent().substring(0, 20) : topicPostVo.getContent();
-                    }
-                    String imgUrl = topicPostVo.getImgUrl();
-                    if (StringUtils.isNotBlank(imgUrl)) {
-                        bodyImg = Splitter.on(",").omitEmptyStrings().limit(1).splitToList(imgUrl).get(0);
-                    }
-                }
-            } else if (ModuleContants.ANSWER.equals(resourceVo.getModuleEnum())) {
-                QuestionAnswerVo questionAnswerVo = JSON.parseObject(resourceVo.getExtJson(), QuestionAnswerVo.class);
-                if (null != questionAnswerVo) {
-                    if (null != questionAnswerVo.getQuestion() && StringUtils.isNotBlank(questionAnswerVo.getQuestion().getContent())) {
-                        bodyTitle = questionAnswerVo.getQuestion().getContent().length() > 20 ?
-                                questionAnswerVo.getQuestion().getContent().substring(0, 20) :
-                                questionAnswerVo.getQuestion().getContent();
-                    }
+            RemoteResource remoteResource = remoteResourceService.get(info.getResourceId());
+            if (null != remoteResource) {
+                if (ModuleContants.RELEASE.equals(remoteResource.getModuleEnum())) {
+                    bodyTitle = remoteResource.getTitle();
+                    bodyImg = remoteResource.getFirstImgUrl();
+                } else if (ModuleContants.TOPIC_POST.equals(remoteResource.getModuleEnum())) {
+                    bodyTitle = remoteResource.getContent().length() > 20 ?
+                            remoteResource.getContent().substring(0, 20) : remoteResource.getContent();
+                    bodyImg = remoteResource.getFirstImgUrl();
+                } else if (ModuleContants.ANSWER.equals(remoteResource.getModuleEnum())) {
+                    bodyTitle = remoteResource.getQuestion().getContent().length() > 20 ?
+                            remoteResource.getQuestion().getContent().substring(0, 20) :
+                            remoteResource.getQuestion().getContent();
                 }
             }
             // 查询私圈信息
@@ -207,7 +207,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             }
             commitMessage(messageVo, false);
             logger.info("send rewarded message, data:{}", JsonUtils.toFastJson(messageVo));
-            //给打赏者推送极光消息
+            //给被打赏者推送极光消息
             reqVo = new PushReqVo();
             reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getToUserId())));
             reqVo.setMsg(JsonUtils.toFastJson(messageVo));
@@ -218,6 +218,30 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             pushAPI.commonSendAlias(reqVo);
         } catch (Exception e) {
             logger.error("打赏发送消息失败", e);
+        }
+    }
+
+    /**
+     * 发送打赏积分事件
+     *
+     * @param rewardInfo
+     */
+    private void sendEvent(RewardInfo rewardInfo) {
+        EventInfo eventInfo = new EventInfo();
+        try {
+            eventInfo.setCoterieId(String.valueOf(rewardInfo.getCoterieId()));
+            eventInfo.setAmount((double) (rewardInfo.getGiftNum() * rewardInfo.getGiftPrice()));
+            eventInfo.setUserId(String.valueOf(rewardInfo.getCreateUserId()));
+            eventInfo.setEventCode(EventEnum.COLLECTION.getCode());
+            eventInfo.setEventNum(1);
+            eventInfo.setOwnerId(String.valueOf(rewardInfo.getCreateUserId()));
+            eventInfo.setResourceId(String.valueOf(rewardInfo.getResourceId()));
+            eventInfo.setCreateTime(DateUtils.getString(new Date()));
+            eventAPI.commit(eventInfo);
+            logger.info("reward event commit success eventInfo:{}", JSON.toJSONString(eventInfo));
+        } catch (Exception e) {
+            logger.info("reward event commit error rewardInfo:{}", JSON.toJSONString(eventInfo));
+            logger.error("[reward event commit failure]", e);
         }
     }
 

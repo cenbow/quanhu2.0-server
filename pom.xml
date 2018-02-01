@@ -25,6 +25,7 @@
         <module>openapi</module>
         <module>common</module>
 		<module>demo</module>
+		<module>canal</module>
   </modules>
 
     <!--圈乎微服务依赖先放在此处 经架构组评审后移动到parent-->

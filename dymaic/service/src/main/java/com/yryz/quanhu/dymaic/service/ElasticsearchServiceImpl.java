@@ -9,15 +9,22 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Sets;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.PageModel;
-import com.yryz.quanhu.dymaic.canal.entity.UserBaseInfo;
+import com.yryz.quanhu.dymaic.canal.entity.*;
 import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
-import com.yryz.quanhu.user.vo.StarInfoVO;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
-import com.yryz.quanhu.user.vo.UserStarSimpleVo;
+import com.yryz.quanhu.score.service.EventAcountApiService;
+import com.yryz.quanhu.score.vo.EventAcount;
+import com.yryz.quanhu.user.dto.StarAuthInfo;
+import com.yryz.quanhu.user.service.UserStarApi;
+import com.yryz.quanhu.user.service.UserTagApi;
+import com.yryz.quanhu.user.vo.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,12 +41,6 @@ import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.dymaic.canal.dao.CoterieInfoRepository;
 import com.yryz.quanhu.dymaic.canal.dao.ResourceInfoRepository;
 import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
-import com.yryz.quanhu.dymaic.canal.entity.CoterieInfo;
-import com.yryz.quanhu.dymaic.canal.entity.ReleaseInfo;
-import com.yryz.quanhu.dymaic.canal.entity.ResourceInfo;
-import com.yryz.quanhu.dymaic.canal.entity.TopicInfo;
-import com.yryz.quanhu.dymaic.canal.entity.TopicPostInfo;
-import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 import com.yryz.quanhu.dymaic.vo.CoterieInfoVo;
 import com.yryz.quanhu.dymaic.vo.ResourceInfoVo;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
@@ -52,7 +53,6 @@ import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.user.service.UserApi;
-import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 
 @Service
 public class ElasticsearchServiceImpl implements ElasticsearchService {
@@ -106,12 +106,8 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	@Override
 	public Response<PageList<StarInfoVO>> searchStarUser(StarInfoDTO starInfoDTO) {
 		logger.info("searchStarUser request, starInfoDTO: {}", GsonUtils.parseJson(starInfoDTO));
-		Long tagId = starInfoDTO.getTagId();
-		Integer pageNo = starInfoDTO.getCurrentPage();
-		Integer pageSize = starInfoDTO.getPageSize();
-		Long userId = starInfoDTO.getUserId();
 
-		List<UserInfo> list = userRepository.searchStarUser(tagId, userId, pageNo, pageSize);
+		List<UserInfo> list = userRepository.searchStarUser(starInfoDTO);
 		// 数据转换UserInfo -> StarInfoVO
 		List<StarInfoVO> starInfoVOList = Lists.newArrayList();
 
@@ -267,7 +263,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			if (ulist.size() >= 100 || (i + 1) == list.size()) {
 				List<UserBaseInfoVO> resList = ResponseUtils.getResponseData(userApi.getAllByUserIds(ulist));
 				if (resList!=null) {
-					saveAllUsers(resList);
+					saveAllUsers(ulist, resList);
 				}
 				ulist.clear();
 			}
@@ -461,13 +457,46 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		resourceInfoRepository.saveAll(rlist);
 	}
 
-	private void saveAllUsers(List<UserBaseInfoVO> volist) {
+	@Reference(check = false)
+	private UserStarApi userStarApi;
+
+	@Reference(check = false)
+	private UserTagApi userTagApi;
+
+	@Reference(check = false)
+	private EventAcountApiService acountApiService;
+
+	private static final Function<Long, String> LONG_TO_STRING_FUNCTION = new Function<Long, String>() {
+		@Override
+		public String apply(Long input) {
+			return input.toString();
+		}
+	};
+
+	private void saveAllUsers(List<Long> ulist, List<UserBaseInfoVO> volist) {
+		Set<String> stringIds = Sets.newHashSet(FluentIterable.from(ulist).transform(LONG_TO_STRING_FUNCTION).toSet());
+		logger.info("saveAllUsers request ulist: {}", GsonUtils.parseJson(ulist));
+		Response<Map<String, StarAuthInfo>> starResponse = userStarApi.get(stringIds);
+		Response<Map<Long, List<UserTagVO>>> userTagInfoResponse = userTagApi.getUserTags(ulist);
+		Response<Map<Long, EventAcount>> eventAcountResponse = acountApiService.getEventAcountBatch(Sets.newHashSet(ulist));
+		logger.info("saveAllUsers starResponse: {}, userTagInfoResponse: {}, eventAcountResponse: {}",
+				GsonUtils.parseJson(starResponse), GsonUtils.parseJson(userTagInfoResponse), GsonUtils.parseJson(eventAcountResponse));
+
 		List<UserInfo> userlist = new ArrayList<>();
 		for (int j = 0; j < volist.size(); j++) {
 			UserBaseInfo baseInfo = GsonUtils.parseObj(volist.get(j), UserBaseInfo.class);
 			UserInfo userInfo = new UserInfo();
+			//用户基础数据
 			userInfo.setUserBaseInfo(baseInfo);
 			userInfo.setUserId(baseInfo.getUserId());
+
+			//达人数据
+			setStartInfo(userInfo, starResponse);
+			//标签数据
+			setTagInfo(userInfo, userTagInfoResponse);
+			//积分数据
+			setEventInfo(userInfo, eventAcountResponse);
+
 			userlist.add(userInfo);
 		}
 		userRepository.saveAll(userlist);
@@ -485,4 +514,52 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		}
 		coterieInfoRepository.saveAll(list);
 	}
+
+
+	/**
+	 * 用户相关数据
+	 */
+	private void setEventInfo(UserInfo userInfo, Response<Map<Long, EventAcount>> eventAcountResponse) {
+		if (eventAcountResponse.success() && MapUtils.isNotEmpty(eventAcountResponse.getData())) {
+			Map<Long, EventAcount> eventAcountMap = eventAcountResponse.getData();
+			EventAcount eventAcount = eventAcountMap.get(userInfo.getUserId());
+			if (eventAcount != null) {
+				EventAccountInfo eventAccountInfo = new EventAccountInfo();
+				com.yryz.common.utils.BeanUtils.copyProperties(eventAccountInfo, eventAcount);
+				userInfo.setEventAccountInfo(eventAccountInfo);
+			}
+		}
+	}
+
+	private void setTagInfo(UserInfo userInfo, Response<Map<Long, List<UserTagVO>>> userTagInfoResponse) {
+		if (userTagInfoResponse.success() && MapUtils.isNotEmpty(userTagInfoResponse.getData())) {
+			Map<Long, List<UserTagVO>> listMap = userTagInfoResponse.getData();
+			List<UserTagVO> userTagVOS = listMap.get(userInfo.getUserId());
+			if (CollectionUtils.isNotEmpty(userTagVOS)) {
+				UserTagInfo userTagInfo = new UserTagInfo();
+				List<TagInfo> tagInfoList = Lists.newArrayList();
+				for (UserTagVO userTagVO : userTagVOS) {
+					TagInfo tagInfo = new TagInfo();
+					com.yryz.common.utils.BeanUtils.copyProperties(tagInfo, userTagVO);
+					tagInfoList.add(tagInfo);
+				}
+				userTagInfo.setUserTagInfoList(tagInfoList);
+
+				userInfo.setUserTagInfo(userTagInfo);
+			}
+		}
+	}
+
+	private void setStartInfo(UserInfo userInfo, Response<Map<String, StarAuthInfo>> starResponse) {
+		if (starResponse.success() && MapUtils.isNotEmpty(starResponse.getData())) {
+			Map<String, StarAuthInfo> authInfoMap = starResponse.getData();
+			StarAuthInfo starAuthInfo = authInfoMap.get(userInfo.getUserId().toString());
+			if (starAuthInfo != null) {
+				UserStarInfo userStarInfo = new UserStarInfo();
+				com.yryz.common.utils.BeanUtils.copyProperties(userStarInfo, starAuthInfo);
+				userInfo.setUserStarInfo(userStarInfo);
+			}
+		}
+	}
+
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -58,9 +59,10 @@ public class ReleaseInfoController {
     @ApiOperation("文章详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = false) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = false),
+            @ApiImplicitParam(name = "kid", paramType = "query", required = true) })
     @GetMapping(value = "{version}/release/info/detail")
-    public Response<ReleaseInfoVo> infoByKid(Long kid,
+    public Response<ReleaseInfoVo> infoByKid(@RequestParam Long kid,
             @RequestHeader(name = "userId", required = false) Long headerUserId) {
         return releaseInfoApi.infoByKid(kid, headerUserId);
     }
@@ -69,10 +71,12 @@ public class ReleaseInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
-            @ApiImplicitParam(name = "token", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "token", paramType = "header", required = true),
+            @ApiImplicitParam(name = "kid", paramType = "query", required = true) })
     @UserBehaviorValidation(event = "文章删除", login = true)
     @PostMapping(value = "{version}/release/info/delete")
-    public Response<Integer> deleteBykid(HttpServletRequest request, Long kid, @RequestHeader("userId") Long headerUserId) {
+    public Response<Integer> deleteBykid(HttpServletRequest request, @RequestParam Long kid,
+            @RequestHeader("userId") Long headerUserId) {
         ReleaseInfo upInfo = new ReleaseInfo();
         upInfo.setKid(kid);
         upInfo.setLastUpdateUserId(headerUserId);

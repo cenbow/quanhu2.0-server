@@ -89,6 +89,12 @@
 		<where>
 			activity_type = 12
 			<include refid="conditions"></include>
+			<if test="userFlag != null ">
+				AND vote.user_flag = #{userFlag}
+			</if>
+			<if test="prizesFlag != null ">
+				AND vote.prizes_flag = #{prizesFlag}
+			</if>
 		</where>
 	</select>
 

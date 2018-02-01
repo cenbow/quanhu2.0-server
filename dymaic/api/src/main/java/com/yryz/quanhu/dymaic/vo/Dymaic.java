@@ -1,6 +1,7 @@
 package com.yryz.quanhu.dymaic.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 动态基础信息
@@ -41,7 +42,7 @@ public class Dymaic implements Serializable {
      * 转发资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer transmitType;
+    private String transmitType;
 
     /**
      * 文章、话题、私圈等标准json扩展属性
@@ -63,7 +64,7 @@ public class Dymaic implements Serializable {
     /**
      * 发布时间
      */
-    private String createDate;
+    private Date createDate;
 
 
     public Long getKid() {
@@ -106,11 +107,11 @@ public class Dymaic implements Serializable {
         this.transmitNote = transmitNote;
     }
 
-    public Integer getTransmitType() {
+    public String getTransmitType() {
         return transmitType;
     }
 
-    public void setTransmitType(Integer transmitType) {
+    public void setTransmitType(String transmitType) {
         this.transmitType = transmitType;
     }
 
@@ -138,11 +139,11 @@ public class Dymaic implements Serializable {
         this.delFlag = delFlag;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 }

@@ -2,6 +2,7 @@ package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
@@ -27,10 +28,6 @@ import java.util.*;
  * @author xiepeng
  * @version 1.0
  * @data 2018/1/19 0019 04
- * <p>
- * <p>
- * TODO
- * 对接统计查询、点赞
  */
 @Service
 public class DymaicServiceImpl {
@@ -41,25 +38,25 @@ public class DymaicServiceImpl {
     Logger logger = LoggerFactory.getLogger(DymaicServiceImpl.class);
 
     @Autowired
-    DymaicDao dymaicDao;
+    private DymaicDao dymaicDao;
 
     @Autowired
-    DymaicCache dymaicCache;
+    private DymaicCache dymaicCache;
 
     @Autowired
-    DymaicSender dymaicSender;
+    private DymaicSender dymaicSender;
 
     @Reference
-    UserApi userApi;
+    private UserApi userApi;
 
     @Reference
-    UserRelationApi userRelationApi;
+    private UserRelationApi userRelationApi;
 
     @Reference
-    IdAPI idAPI;
-    
-    @Reference
-    CountApi countApi;
+    private CountApi countApi;
+
+    @Autowired
+    private SortIdHelper sortIdHelper;
 
     /**
      * 发布动态
@@ -68,8 +65,7 @@ public class DymaicServiceImpl {
      * @return
      */
     public Boolean send(Dymaic dymaic) {
-        Response<Long> idRsp = idAPI.getKid("dymaic");
-        dymaic.setKid(idRsp.getData());
+        dymaic.setKid(sortIdHelper.getKid());
 
         //write db
         dymaicDao.insert(dymaic);
@@ -261,7 +257,7 @@ public class DymaicServiceImpl {
      */
     public List<DymaicVo> getTimeLine(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
-        logger.info("dymaicIds size " + kids.size());
+        logger.info("[dymaic] getTimeLine dymaicId " + (kids == null ? 0 : kids.size()) + ", userId " + userId);
 
         List<DymaicVo> result;
         if (kids == null || kids.isEmpty()) {
@@ -315,6 +311,8 @@ public class DymaicServiceImpl {
             dymaicCache.removeTimeLine(userId, kids);
         }
 
+        logger.info("[dymaic] shuffleTimeLine userId " + userId + ", debarUserId " + debarUserId);
+
         return true;
     }
 
@@ -349,6 +347,33 @@ public class DymaicServiceImpl {
     /**
      * 根据动态id，聚合相应的摘要、用户、统计数据
      *
+     * @param userId
+     * @param kid
+     * @return
+     */
+    public DymaicVo mergeDymaicVo(Long userId, Long kid) {
+        DymaicVo vo = new DymaicVo();
+
+        Dymaic dymaic = this.get(kid);
+        if (dymaic != null) {
+            BeanUtils.copyProperties(dymaic, vo);
+
+            //用户信息
+            Response<UserSimpleVO> response = userApi.getUserSimple(userId, dymaic.getUserId());
+            UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(response);
+            vo.setUser(userSimpleVO);
+
+            //评论数，点赞数，转发数, ignore exception
+            vo.setStatistics(getStatics(kid));
+        }
+
+        return vo;
+    }
+
+    /**
+     * 根据动态id，聚合相应的摘要、用户、统计数据
+     *
+     * @param userId
      * @param kids
      * @return
      */
@@ -370,24 +395,11 @@ public class DymaicServiceImpl {
             }
             if (!userIds.isEmpty()) {
                 Response<Map<String, UserSimpleVO>> rsp = userApi.getUserSimple(userId, userIds);
-                users = rsp.getData();
+                users = ResponseUtils.getResponseData(rsp);
             }
         }
 
-//        //3 查询统计数据 评论数，点赞数，转发数
-//        Map<String, Long> statistics = null;
-//        if (dymaicMap != null) {
-//        	String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-//        	dymaicMap.forEach((kid,dymaic)->{
-//        		Map<String, Long> map = countApi.getCount(countType , kid, null).getData();
-//        	});
-//        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("debug findusers hit " + (users == null ? 0 : users.size()));
-        }
-
-        //4, 聚合动态、用户、统计信息
+        //3, 聚合动态、用户、统计信息
         if (dymaicMap != null) {
             for (Long kid : kids) {
                 Dymaic dymaic = dymaicMap.get(kid);
@@ -403,13 +415,7 @@ public class DymaicServiceImpl {
                     }
                     
                     //评论数，点赞数，转发数, ignore exception
-                    try {
-                        String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-                        Map<String, Long> statistics = countApi.getCount(countType , kid, null).getData();
-                        vo.setStatistics(statistics);
-                    } catch (Exception e) {
-                        logger.warn("cannot get statics cause: "+  e.getMessage());
-                    }
+                    vo.setStatistics(getStatics(kid));
 
                     result.add(vo);
                 }
@@ -441,6 +447,25 @@ public class DymaicServiceImpl {
         }
 
         return result;
+    }
+
+    /**
+     * 查询统计数
+     * @param kid
+     * @return
+     */
+    private Map<String, Long> getStatics(Long kid) {
+        Map<String, Long> statistics = null;
+        try {
+            String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
+            statistics = countApi.getCount(countType , kid, null).getData();
+        } catch (Exception e) {
+            logger.warn("cannot get statics cause: "+  e.getMessage());
+        }
+
+        statistics = (statistics == null) ? new HashMap<>() : statistics;
+
+        return statistics;
     }
 
     /**

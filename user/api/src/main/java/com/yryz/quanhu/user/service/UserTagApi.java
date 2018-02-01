@@ -1,9 +1,13 @@
 package com.yryz.quanhu.user.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.dto.UserTagDTO;
+import com.yryz.quanhu.user.vo.UserTagVO;
 
 public interface UserTagApi {
 	/**
@@ -20,4 +24,12 @@ public interface UserTagApi {
 	 * @return
 	 */
 	public Response<List<String>> getTags(Long userId,Integer tagType);
+
+
+	/**
+	 * 批量获取用户标签信息
+	 * @param userIds
+	 * @return
+	 */
+	Response<Map<Long, List<UserTagVO>>> getUserTags(List<Long> userIds);
 }

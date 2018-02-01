@@ -21,7 +21,6 @@ public interface DymaicDao {
      */
     Dymaic get(Long kid);
 
-
     /**
      * 批量查询动态
      * @param kids
@@ -69,4 +68,9 @@ public interface DymaicDao {
      */
     List<Long> getTimeLineIds(@Param("userIds") List<Long> userIds, @Param("limit") Long limit);
 
+    /**
+     * 查询kid最大值
+     * @return
+     */
+    Long getMaxKid();
 }

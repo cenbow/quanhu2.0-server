@@ -1,8 +1,6 @@
 package com.yryz.quanhu.openapi.controller;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
@@ -48,6 +48,7 @@ import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import com.yryz.quanhu.user.dto.UserTagDTO.UserTagType;
+import com.yryz.quanhu.user.dto.WebThirdLoginDTO;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
 import com.yryz.quanhu.user.service.UserApi;
@@ -59,7 +60,6 @@ import com.yryz.quanhu.user.vo.MyInviterVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserRegInviterLinkVO;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -71,9 +71,6 @@ import io.swagger.annotations.ApiOperation;
 public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	private static final int CHAR_51 = 3;
-	private static final String CHAR_3F = "%3F";
-	private static final String CHAR_63 = "?";
 	@Reference(lazy = true, check = false)
 	private AccountApi accountApi;
 	@Reference(lazy = true, check = false)
@@ -128,6 +125,20 @@ public class UserController {
 		infoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(userApi.updateUserInfo(infoDTO));
 		return ResponseUtils.returnApiObjectSuccess(result);
+	}
+	
+	@ApiOperation("根据手机号查询用户账号(没有注册的userId为空)")
+	@UserBehaviorValidation(login = true)
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/user/findPhones")
+	public Response<List<Map<String,String>>> findPhones(String phones, HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		String[] phoneArray = StringUtils.split(phones, ",");
+		if(ArrayUtils.isEmpty(phoneArray)){
+			throw QuanhuException.busiError("手机号为空");
+		}
+		List<Map<String,String>> maps = ResponseUtils.getResponseData(accountApi.getUserAccountByPhone(Sets.newHashSet(phoneArray), header.getAppId()));
+		return ResponseUtils.returnApiObjectSuccess(maps);
 	}
 	
 	/**
@@ -322,7 +333,80 @@ public class UserController {
 	public void webThirdLoginNotify(HttpServletRequest request, HttpServletResponse response) {
 
 	}
-
+	
+	/**
+	 * 微信授权登录返回授权地址
+	 * @param loginDTO
+	 * @return
+	 * @throws IOException 
+	 */
+	@ApiOperation("微信授权登录返回授权地址")
+	@UserBehaviorValidation(login = false)
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@RequestMapping(value = "/{version}/user/wxOauthLogin")
+	public void wxOauthLogin(String returnUrl,String activityChannelCode,HttpServletResponse response,HttpServletRequest request) throws IOException{
+		response.setContentType("text/html;charset=UTF-8");
+		response.setCharacterEncoding("utf-8");
+		try {
+			RequestHeader header = WebUtil.getHeader(request);
+			WebThirdLoginDTO loginDTO = new WebThirdLoginDTO();
+			loginDTO.setAppId(header.getAppId());
+			loginDTO.setLoginType(RegType.WEIXIN.getText());
+			loginDTO.setReturnUrl(returnUrl);
+			loginDTO.setActivityChannelCode(activityChannelCode);
+			String oauthUrl = ResponseUtils.getResponseData(accountApi.wxOauthLogin(loginDTO));
+			response.sendRedirect(oauthUrl);
+			return;
+		} catch (QuanhuException e) {
+			response.getWriter().write("登录失败:" + e.getMsg());
+			response.getWriter().flush();
+			return;
+		} catch (Exception e) {
+			response.getWriter().write("登录失败:" + e.getMessage());
+			response.getWriter().flush();
+			return;
+		}
+	}
+	/**
+	 * 微信授权登录回调返回成功的地址
+	 * @param loginDTO
+	 * @return
+	 * @throws IOException 
+	 */
+	@ApiOperation("微信授权登录返回授权地址")
+	@UserBehaviorValidation(login = false)
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@RequestMapping(value = "/{version}/user/wxOauthLoginNotify")
+	public void wxOauthLoginNotify(HttpServletRequest request, HttpServletResponse response) throws IOException{
+		String code = request.getParameter("code");
+		String state = request.getParameter("state");
+		response.setContentType("text/html;charset=UTF-8");
+		response.setCharacterEncoding("utf-8");
+		logger.info("[wxOauthLoginNotify]:code:{},state:{}",code,state);
+		if (StringUtils.isEmpty(code) || StringUtils.isEmpty(state)) {
+			response.getWriter().write("授权失败,code or state 为空！");
+			response.getWriter().flush();
+			return;
+		}
+		try {
+			RequestHeader header = WebUtil.getHeader(request);
+			WebThirdLoginDTO loginDTO = new WebThirdLoginDTO(header.getAppId(), code, state);
+			String returnUrl = ResponseUtils.getResponseData(accountApi.wxOauthLoginNotify(loginDTO));
+			logger.info("[wxOauthLoginNotify]:code:{},state:{},returnUrl:{}",code,state,returnUrl);
+			response.sendRedirect(returnUrl);
+			response.getWriter().flush();
+			return;
+		} catch (QuanhuException e) {
+			response.getWriter().write("登录失败:" + e.getMsg());
+			response.getWriter().flush();
+			return;
+		} catch (Exception e) {
+			response.getWriter().write("登录失败:" + e.getMessage());
+			response.getWriter().flush();
+			return;
+		}
+	}
+	
 	/**
 	 * 获取登录方式
 	 * 
@@ -370,6 +454,25 @@ public class UserController {
 		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 
+	/**
+	 * 活动检查手机号，存在观察者直接生成合法用户
+	 * 
+	 * @param phoneDTO
+	 * @return
+	 */
+	@ApiOperation("活动检查手机号")
+	@UserBehaviorValidation(login = false)
+	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@PostMapping(value = "/{version}/user/activityCheckPhone")
+	public Response<Boolean> activityCheckPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		phoneDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+		phoneDTO.setAppId(header.getAppId());
+		Boolean result = ResponseUtils.getResponseData(accountApi.activityCheckPhone(phoneDTO));
+		return ResponseUtils.returnApiObjectSuccess(result);
+	}
+
+	
 	/**
 	 * 绑定 第三方账户
 	 * 
@@ -517,38 +620,6 @@ public class UserController {
 		MyInviterVO inviterVO = ResponseUtils
 				.getResponseData(operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId));
 		return ResponseUtils.returnApiObjectSuccess(inviterVO);
-	}
-
-	/**
-	 * 拼装web登录返回地址
-	 * 
-	 * @param base
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	private static String returnUrl(UserSimpleVO base, String token, String state) {
-		String[] stateArray = state.split("_");
-		String backUrl = null;
-		if (stateArray.length < CHAR_51) {
-			return null;
-		}
-		backUrl = stateArray[2];
-		StringBuffer returnUrl = new StringBuffer();
-		returnUrl.append(backUrl);
-		if (backUrl.indexOf(CHAR_63) != -1 || backUrl.indexOf(CHAR_3F) != -1) {
-			returnUrl.append("&token=");
-		} else {
-			returnUrl.append("?token=");
-		}
-		returnUrl.append(token);
-		returnUrl.append("&userId=").append(base.getUserId());
-		try {
-			returnUrl.append("&userNickname=").append(StringUtils.isNotBlank(base.getUserNickName())
-					? URLEncoder.encode(base.getUserNickName(), "utf-8") : "");
-		} catch (UnsupportedEncodingException e) {
-		}
-		returnUrl.append("&userImg=").append(base.getUserImg());
-		return returnUrl.toString();
 	}
 
 	/**

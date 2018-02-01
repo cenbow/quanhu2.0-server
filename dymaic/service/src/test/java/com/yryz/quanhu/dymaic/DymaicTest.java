@@ -23,7 +23,7 @@ import java.util.*;
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class DymaicTest {
 
-    private final static Long USER_DEMO = 729671306726400000L;
+    private final static Long USER_DEMO = 739876045945667584L;
     private final Long USER_DEBAR = 200L;
 
 
@@ -39,7 +39,7 @@ public class DymaicTest {
         Dymaic dymaic = new Dymaic();
         dymaic.setUserId(USER_DEMO);
         dymaic.setTransmitNote("transmit");
-        dymaic.setTransmitType(1001);
+        dymaic.setTransmitType("1001");
         dymaic.setExtJson(GsonUtils.parseJson(tmp));
         dymaic.setModuleEnum("1000");
 
@@ -124,6 +124,29 @@ public class DymaicTest {
         Response<Boolean> response = dymaicService.shuffleTimeLine(USER_DEBAR, USER_DEMO);
         print(response);
     }
+
+
+    //============  置顶动态 ==============
+    private static final Long userId = 724011759597371392L;
+    private static final Long kid = 109844L;
+
+    @Test
+    public void addTop() {
+        dymaicService.addTopDymaic(userId, kid);
+    }
+
+    @Test
+    public void getTop() {
+        Response<DymaicVo> response = dymaicService.getTopDymaic(userId);
+        print(response);
+    }
+
+    @Test
+    public void deleteTop() {
+        dymaicService.deleteTopDymaic(userId, kid);
+    }
+
+
 
     private void print(Object obj) {
         System.out.println("\n" + GsonUtils.parseJson(obj) + "\n");

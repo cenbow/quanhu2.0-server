@@ -128,7 +128,7 @@ public class BehaviorArgsBuild {
     public <T> Object getObjByClass(Class<T> objClass,Object[] joinPointArgs){
         for(int i = 0 ; i<joinPointArgs.length ;i++){
             Object obj = joinPointArgs[i];
-            if(objClass.isAssignableFrom(obj.getClass())){
+            if(obj!=null && objClass.isAssignableFrom(obj.getClass())){
                 return obj;
             }
         }
@@ -138,7 +138,7 @@ public class BehaviorArgsBuild {
     public <T> Object getObjByName(String className,Object[] joinPointArgs){
         for(int i = 0 ; i<joinPointArgs.length ;i++){
             Object obj = joinPointArgs[i];
-            if(obj.getClass().getName().lastIndexOf(className)!=-1){
+            if(obj!=null && obj.getClass().getName().lastIndexOf(className)!=-1){
                 return obj;
             }
         }

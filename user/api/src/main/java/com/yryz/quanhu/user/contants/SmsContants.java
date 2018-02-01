@@ -56,4 +56,8 @@ public class SmsContants {
 	 * 验证码登录
 	 */
 	public static final String CODE_LOGIN = "9";
+	/**
+	 * 活动手机号校验
+	 */
+	public static final String ACTIVITY_PHONE_CHECK = "10";
 }

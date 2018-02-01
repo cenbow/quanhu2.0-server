@@ -1,7 +1,12 @@
 package com.yryz.quanhu.user.dao;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +80,25 @@ public class UserAccountRedisDao {
 			logger.error("[getAccount]",e);
 			throw new RedisOptException(e);
 		}
+	}
+	
+	/**
+	 * 根据手机号查询用户账号
+	 * @param phones
+	 * @param appId
+	 * @return
+	 */
+	public List<UserAccount> getAccount(Set<String>phones,String appId){
+		if(CollectionUtils.isEmpty(phones) || StringUtils.isBlank(appId)){
+			return null;
+		}
+		List<UserAccount> accounts = new ArrayList<>(phones.size());
+		for(Iterator<String>iterator= phones.iterator();iterator.hasNext();){
+			String phone = iterator.next();
+			UserAccount account = getAccount(null, phone, appId);
+			accounts.add(account);
+		}
+		return accounts;
 	}
 	
 	/**

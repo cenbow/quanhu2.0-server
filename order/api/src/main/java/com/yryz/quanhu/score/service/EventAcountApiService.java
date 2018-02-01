@@ -1,6 +1,8 @@
 package com.yryz.quanhu.score.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -13,17 +15,27 @@ import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 /**
  * 事件
- * @author lsn
+ * @author syc
  *
  */
 
 public interface EventAcountApiService {
+	
 	/**
 	 * 用户积分、成长统计
-	 * @param custId
-	 * @return
+	 * @param userId
+	 * @return EventAcount
 	 */
 	EventAcount getEventAcount(String userId);
+	
+	
+	/**
+	 * 批量用户积分、成长统计
+	 * @param userIds
+	 * @return Map<Long, EventAcount>
+	 */
+	public Response<Map<Long, EventAcount>>  getEventAcountBatch(Set<Long> userIds);
+	
 	/**
 	 * 获取签到
 	 * @param custId
@@ -31,6 +43,9 @@ public interface EventAcountApiService {
 	 * @return
 	 */
 	EventSign getEventSign(String userId , String eventCode);
+	
+	
+	
 
 
 	
