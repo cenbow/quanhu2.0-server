@@ -65,11 +65,6 @@ public class ResourceModel implements Serializable {
     private Integer delFlag;
 
     /**
-     * 发布时间
-     */
-    private String createDate;
-    
-    /**
      * 热度值
      */
     private Long heat;
@@ -246,20 +241,6 @@ public class ResourceModel implements Serializable {
 	 */
 	public void setDelFlag(Integer delFlag) {
 		this.delFlag = delFlag;
-	}
-
-	/**
-	 * @return the createDate
-	 */
-	public String getCreateDate() {
-		return createDate;
-	}
-
-	/**
-	 * @param createDate the createDate to set
-	 */
-	public void setCreateDate(String createDate) {
-		this.createDate = createDate;
 	}
 
 	/**
