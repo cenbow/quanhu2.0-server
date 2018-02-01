@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
 			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
-			UserRelationDto relationDto = map.get(friendId);
+			UserRelationDto relationDto = map.get(friendId.toString());
 			simpleVO.setUserPhone(PhoneUtils.getPhone(simpleVO.getUserPhone()));
 			simpleVO.setNameNotes(relationDto.getUserRemarkName());
 			simpleVO.setRelationStatus(relationDto.getRelationStatus());
@@ -201,7 +201,7 @@ public class UserServiceImpl implements UserService {
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
 			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
-			UserRelationDto relationDto = map.get(friendId);
+			UserRelationDto relationDto = map.get(friendId.toString());
 			simpleVO.setNameNotes(relationDto.getUserRemarkName());
 			simpleVO.setRelationStatus(relationDto.getRelationStatus());
 		}
