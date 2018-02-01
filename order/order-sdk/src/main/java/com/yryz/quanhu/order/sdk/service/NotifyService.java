@@ -51,7 +51,8 @@ public class NotifyService {
         logger.info("notify method , check notify is valid .");
         // 验证平台订单状态
         Response<OrderInfo> response = orderAsynApi.getOrderInfo(orderInfo.getOrderId());
-        if (!response.success() || !OrderType.ORDER_STATE_SUCCESS.equals(response.getData().getOrderState())) {
+        if (!response.success() || null == response.getData()
+                || !OrderType.ORDER_STATE_SUCCESS.equals(response.getData().getOrderState())) {
             logger.error("notify method , check rpcOrder pay faild ! rpc data = {}",
                     response.getData() == null ? "" : JSON.toJSONString(response.getData()));
             return;
@@ -59,7 +60,7 @@ public class NotifyService {
         // 查询本地订单
         Order localOrder = orderDao.selectByKid(Long.valueOf(orderInfo.getOrderId()));
         // 对比本地订单和回调订单信息是否一致
-        if(!verify(orderInfo, localOrder)){
+        if (!verify(orderInfo, localOrder)) {
             logger.error("verify orderInfo localOrder failure");
             return;
         }

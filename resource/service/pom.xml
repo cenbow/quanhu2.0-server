@@ -51,7 +51,6 @@
             <artifactId>coterie-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
-		
 
         <!--公司内部库-->
         <dependency>

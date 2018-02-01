@@ -19,7 +19,11 @@ public enum RegType{
 	/** qq */
 	QQ(12,"QQ"),
 	/** 手机号 */
-	PHONE(13,"Phone");
+	PHONE(13,"Phone"),
+	/** 邮箱 */
+	EMAIL(14,"email"),
+	/** 微信客户端WAP授权 */
+	WEIXIN_OAUTH(15,"WeixinOauth");
 	
 	private int type;
 	private String text;
@@ -36,17 +40,20 @@ public enum RegType{
 	public static RegType getEnumByTye(int type){
 		RegType regType = RegType.PHONE;
 		switch (type) {
-		case 1:
+		case 10:
 			regType = RegType.WEIXIN;
 			break;
-		case 2:
+		case 11:
 			regType = RegType.SINA;
 			break;
-		case 3:
+		case 12:
 			regType = RegType.QQ;
 			break;
-		case 4:
+		case 13:
 			regType = RegType.PHONE;
+			break;
+		case 15:
+			regType = RegType.WEIXIN_OAUTH;
 			break;
 		default:
 			break;
@@ -66,7 +73,7 @@ public enum RegType{
 		case "weixin":	
 			regType = RegType.WEIXIN;
 			break;
-		case "Sina":
+		case "sina":
 		case "weibo":
 			regType = RegType.SINA;
 			break;
@@ -76,6 +83,9 @@ public enum RegType{
 			break;
 		case "Phone":
 			regType = RegType.PHONE;
+			break;
+		case "Weixin_Oauth":
+			regType = RegType.WEIXIN_OAUTH;
 			break;
 		default:
 			break;

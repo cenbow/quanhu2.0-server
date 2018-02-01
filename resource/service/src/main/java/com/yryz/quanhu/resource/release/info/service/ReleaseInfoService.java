@@ -3,12 +3,11 @@ package com.yryz.quanhu.resource.release.info.service;
 import java.util.List;
 
 import com.yryz.common.response.PageList;
-import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
+import com.yryz.quanhu.score.service.EventAPI;
 
 /**
 * @author wangheng
@@ -111,11 +110,12 @@ public interface ReleaseInfoService {
     public List<Long> getKidByCreatedate(String startDate, String endDate);
 
     /**  
-    * @Description: 资源聚合
+    * @Description: 每次操作触发（每日前两次发布文章正文内容超过100字时触发，每次记20分，最多记40分）  
     * @author wangheng
-    * @param @param releaseInfo
+    * @param @param eventAPI
+    * @param @param record
     * @return void
     * @throws  
     */
-    public void commitResource(ResourceDymaicApi resourceDymaicApi, ReleaseInfo releaseInfo, UserSimpleVO createUser);
+    public void commitEvent(EventAPI eventAPI, ReleaseInfo record);
 }

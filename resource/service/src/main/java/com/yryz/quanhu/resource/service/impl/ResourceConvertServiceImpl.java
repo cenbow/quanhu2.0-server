@@ -8,6 +8,7 @@
 package com.yryz.quanhu.resource.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -102,9 +103,10 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 		if(CollectionUtils.isNotEmpty(list)){
 			for (ResourceVo resourceVo : list) {
 				Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
-				if(map != null && map.containsKey(BehaviorEnum.Read.getCode())){
-					Long readNum = map.get(BehaviorEnum.Read.getCode());
-					resourceVo.setReadNum(readNum);
+				if(map != null){
+					resourceVo.setStatistics(map);
+				} else {
+					resourceVo.setStatistics(new HashMap<>());
 				}
 			}
 		}
@@ -113,9 +115,10 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	
 	public ResourceVo addCount(ResourceVo resourceVo){
 		Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
-		if(map != null && map.containsKey(BehaviorEnum.Read.getCode())){
-			Long readNum = map.get(BehaviorEnum.Read.getCode());
-			resourceVo.setReadNum(readNum);
+		if(map != null){
+			resourceVo.setStatistics(map);
+		} else {
+			resourceVo.setStatistics(new HashMap<>());
 		}
 		return resourceVo;
 	}

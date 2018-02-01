@@ -36,8 +36,10 @@ private static final String RM_STR = "0123456789abcdefghijklmnopqrstuvwxyzABCDEF
 	}
 
 	public static void main(String[] args) throws Exception {
-		String rr = getDesToken("727909974996672512","727909974996672512-NKwct0WNOmoe1517314093838");
-		System.out.println(rr);
+/*		String rr = getDesToken("727909974996672512","727909974996672512-NKwct0WNOmoe1517314093838");
+		System.out.println(rr);*/
+		String ss = "http://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJ08VPqftCwcUFb5Xdhk0GrDYXP75YI940ch6jqKrVmyj02F7znVDzDEnJEI3SibFzn1OccQ8pMGJQ/132";
+		System.out.println(ss.length());
 	}
 	
 	/**

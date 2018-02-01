@@ -86,7 +86,7 @@ public enum MessageConstant {
     /**
      * 活动有新人报名
      */
-    ACTIVITY_HAVE_SIGNUP(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_ACTIVITY, "报名通知", "{count}已报名参加您发布的活动。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+    ACTIVITY_HAVE_SIGNUP(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COTERIE, "报名通知", "{count}已报名参加您发布的活动。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 私圈内容收费   奖励通知    XXX阅读了您的付费内容，您获得N奖励。（XXX=用户昵称）
@@ -134,9 +134,24 @@ public enum MessageConstant {
     PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE,MessageLabel.SYSTEM_NOTICE,"投票活动奖励","您已通过活动获得{count1} {count2}张",MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
 
     /**
+     * 转发
+     * */
+    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_TRANSMIT, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+
+    /**
      * 付费参加活动
      */
-    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT) ;
+    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+
+    /**
+     * 打赏消费
+     */
+    REWARD_ACCOUNT(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"支付成功","您打赏了一个%s，支付%s悠然币。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
+
+    /**
+     * 被打赏收益
+     */
+    REWARD_INTEGRAL(MessageType.ORDER_TYPE,MessageLabel.ORDER_ACCOUNT,"奖励通知","%s打赏了一个%s，您获得%s奖励。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL);
 
     private Integer type;
 

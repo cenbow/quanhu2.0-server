@@ -5,9 +5,15 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.InteractiveBody;
+import com.yryz.common.message.MessageConstant;
+import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.transmit.dao.TransmitMongoDao;
@@ -17,6 +23,7 @@ import com.yryz.quanhu.behavior.transmit.service.TransmitService;
 import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
@@ -26,6 +33,7 @@ import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -64,12 +72,18 @@ public class TransmitServiceImpl implements TransmitService {
     @Reference(check = false, timeout = 30000)
     CoterieApi coterieApi;
 
+    @Reference(check = false, timeout = 30000)
+    MessageAPI messageAPI;
+
     /**
      * 转发
      * @param   transmitInfo
      * */
     public void single(TransmitInfo transmitInfo) {
         String extJson = "";
+        Response<ResourceVo> result = null;
+        Long userId = null;
+        ResourceVo resourceVo = null;
         if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
             if(!coterieInfoResponse.success()) {
@@ -81,15 +95,21 @@ public class TransmitServiceImpl implements TransmitService {
             }
             extJson = JsonUtils.toFastJson(coterieInfo);
         } else {
-            Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
-            if(!result.success()) {
-                throw new QuanhuException(ExceptionEnum.SysException);
+            try {
+                result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
+                if(!result.success()) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
+            } catch (Exception e) {
+                logger.error("获取资源失败", e);
+                throw QuanhuException.busiError("资源不存在或者已删除");
             }
-            ResourceVo resourceVo = result.getData();
+            resourceVo = result.getData();
             if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
                 throw QuanhuException.busiError("资源不存在或者已删除");
             }
             extJson = resourceVo.getExtJson();
+            userId = resourceVo.getUserId();
         }
         //发送动态
         this.sendDymaic(transmitInfo, extJson);
@@ -102,8 +122,10 @@ public class TransmitServiceImpl implements TransmitService {
         transmitInfo.setCreateDateLong(transmitInfo.getCreateDate().getTime());
         //保存转发记录
         transmitMongoDao.save(transmitInfo);
+        //发送消息
+        this.sendMessage(userId, transmitInfo, resourceVo);
         try {
-            //递增收藏数
+            //递增转发数
             countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, 1L);
         } catch (Exception e) {
             logger.error("递增转发数 失败", e);
@@ -169,6 +191,57 @@ public class TransmitServiceImpl implements TransmitService {
             list.stream()
                     .filter(transmitInfo -> transmitInfo.getCreateUserId() != null)
                     .forEach(transmitInfo -> transmitInfo.setUser(simple.get(transmitInfo.getCreateUserId().toString())));
+        }
+    }
+
+    private void sendMessage(Long userId, TransmitInfo transmitInfo, ResourceVo resourceVo) {
+        try {
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(userId);
+            if(!userSimple.success() || userSimple.getData() == null) {
+                throw new QuanhuException(ExceptionEnum.SysException);
+            }
+            UserSimpleVO user = userSimple.getData();
+            MessageConstant constant = MessageConstant.TRANSMIT_CONTENT_POST;
+            MessageVo messageVo = new MessageVo();
+            messageVo.setMessageId(IdGen.uuid());
+            messageVo.setActionCode(constant.getMessageActionCode());
+            String content = null;
+            boolean isPush = true;
+            if(ModuleContants.RELEASE.equals(transmitInfo.getModuleEnum()) ) {
+                content = user.getUserNickName()+"转发了您发布的内容。";
+            } else if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
+                content = user.getUserNickName()+"转发了您发布的帖子。";
+            } else {
+                //如果parentId与resourceId不相等，属于动态
+                if(!transmitInfo.getParentId().equals(transmitInfo.getResourceId()) ) {
+                    content = user.getUserNickName()+"转发了您的动态。";
+                    isPush = false;
+                }
+            }
+            messageVo.setContent(content);
+            messageVo.setCreateTime(DateUtils.getDateTime());
+            messageVo.setLabel(constant.getLabel());
+            messageVo.setType(constant.getType());
+            messageVo.setTitle(constant.getTitle());
+            messageVo.setToCust(userId.toString());
+            messageVo.setViewCode(constant.getMessageViewCode());
+            messageVo.setResourceId(resourceVo.getResourceId());
+            messageVo.setModuleEnum(resourceVo.getModuleEnum());
+            InteractiveBody body = new InteractiveBody();
+            if(resourceVo != null) {
+                String title = resourceVo.getTitle();
+                if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
+                    if(!StringUtils.isEmpty(title) && title.length() > 20 ) {
+                        title = title.substring(0, 20);
+                    }
+                }
+                body.setBodyTitle(title);
+                //TODO:缺少首张图获取
+            }
+            messageVo.setBody(body);
+            messageAPI.sendMessage(messageVo, isPush);
+        } catch (Exception e) {
+            logger.error("发送消息 失败", e);
         }
     }
 

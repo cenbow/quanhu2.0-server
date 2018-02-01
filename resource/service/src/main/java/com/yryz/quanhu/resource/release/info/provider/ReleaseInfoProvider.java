@@ -1,11 +1,13 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +17,18 @@ import org.springframework.util.Assert;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -32,6 +37,8 @@ import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
+import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -63,15 +70,18 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private ResourceDymaicApi resourceDymaicApi;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private ResourceApi resourceApi;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private EventAPI eventAPI;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
         try {
-            Assert.hasText(record.getContentSource(),"ContentSource is NULL !");
-            
+            Assert.hasText(record.getContentSource(), "ContentSource is NULL !");
+
             record.setClassifyId(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
             record.setDelFlag(CommonConstants.DELETE_NO);
             record.setShelveFlag(CommonConstants.SHELVE_YES);
@@ -79,10 +89,6 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isNull(record.getCoterieId(), "平台文章发布 没有：CoterieId");
             Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() == 0L,
                     "平台文章发布 不能设置付费：ContentPrice");
-
-            if (StringUtils.isBlank(record.getModuleEnum())) {
-                record.setModuleEnum(ResourceTypeEnum.RELEASE);
-            }
 
             // 校验用户是否存在
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
@@ -104,16 +110,17 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
             releaseInfoService.insertSelective(record);
 
-            // 资源进聚合
-            releaseInfoService.commitResource(resourceDymaicApi, record, createUser);
-
+            // 资源进聚合、进好友动态
+            this.commitResourceAndDynamic(record, createUser);
             try {
-
                 // 接入统计计数
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
             } catch (Exception e) {
-                logger.error("资源聚合、统计计数 接入异常！", e);
+                logger.error("统计计数 接入异常！", e);
             }
+
+            // 对接积分事件
+            releaseInfoService.commitEvent(eventAPI, record);
 
             return ResponseUtils.returnObjectSuccess(record);
 
@@ -168,6 +175,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
         try {
             // 只查询 平台文章
             dto.setCoterieId(0L);
+            dto.setOrderType(ReleaseConstants.OrderType.time_new);
             PageList<ReleaseInfoVo> pageList = releaseInfoService.pageByCondition(dto, isCount);
             if (!isGetCreateUser || null == pageList || CollectionUtils.isEmpty(pageList.getEntities())) {
                 return ResponseUtils.returnObjectSuccess(pageList);
@@ -244,11 +252,6 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     }
 
     @Override
-    public Response<Integer> shelvesByCondition(ReleaseInfo record, ReleaseInfoDto dto) {
-        return ResponseUtils.returnObjectSuccess(0);
-    }
-
-    @Override
     public Response<List<Long>> getKidByCreatedate(String startDate, String endDate) {
         try {
             List<Long> data = this.releaseInfoService.getKidByCreatedate(startDate, endDate);
@@ -265,7 +268,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<List<ReleaseInfoVo>> selectByKids(Set<Long> kids) {
         try {
             ReleaseInfoDto dto = new ReleaseInfoDto();
-            dto.setKids((Long[]) kids.toArray());
+            dto.setKids(kids.toArray(new Long[] {}));
             List<ReleaseInfoVo> list = this.releaseInfoService.selectByCondition(dto);
             return ResponseUtils.returnObjectSuccess(list);
         } catch (QuanhuException e) {
@@ -286,6 +289,40 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
         } catch (Exception e) {
             logger.error("selectByCondition 未知异常", e);
             return ResponseUtils.returnException(e);
+        }
+    }
+
+    /**  
+    * @Description: 资源聚合[首页聚合、好友动态聚合]
+    * @author wangheng
+    * @param @param releaseInfo
+    * @param @param createUser
+    * @return void
+    * @throws  
+    */
+    public void commitResourceAndDynamic(ReleaseInfo releaseInfo, UserSimpleVO createUser) {
+        try {
+            ResourceTotal resourceTotal = new ResourceTotal();
+            resourceTotal.setClassifyId(releaseInfo.getClassifyId().intValue());
+            resourceTotal.setContent(releaseInfo.getContent());
+            if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
+                resourceTotal.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
+            }
+
+            resourceTotal.setCreateDate(DateUtils.getString(Calendar.getInstance().getTime()));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(releaseInfo));
+            resourceTotal.setModuleEnum(NumberUtils.toInt(ModuleContants.RELEASE));
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+            resourceTotal.setResourceId(releaseInfo.getKid());
+
+            // 设置达人标识 createUser
+            resourceTotal.setTalentType(String.valueOf(createUser.getUserRole()));
+
+            resourceTotal.setTitle(releaseInfo.getTitle());
+            resourceTotal.setUserId(releaseInfo.getCreateUserId());
+            resourceDymaicApi.commitResourceDymaic(resourceTotal);
+        } catch (Exception e) {
+            logger.error("资源聚合 接入异常！", e);
         }
     }
 }

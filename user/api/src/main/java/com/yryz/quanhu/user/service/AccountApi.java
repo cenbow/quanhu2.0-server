@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Set;
 
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.RedisConstants;
+import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.BindThirdDTO;
@@ -21,6 +20,7 @@ import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
+import com.yryz.quanhu.user.dto.WebThirdLoginDTO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
 import com.yryz.quanhu.user.vo.RegisterLoginVO;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
@@ -101,6 +101,7 @@ public interface AccountApi {
 	 * @Description
 	 */
 	public Response<Boolean> agentResiter(AgentRegisterDTO registerDTO);
+	
 
 	/**
 	 * 手机号密码登录
@@ -154,7 +155,7 @@ public interface AccountApi {
 	 * @Description
 	 */
 	public Response<String> webLoginThird(String loginType, String returnUrl);
-
+	
 	/**
 	 * (web)第三方登录回调
 	 * 
@@ -162,8 +163,20 @@ public interface AccountApi {
 	 * @throws IOException
 	 * @Description 第三方回调成功后跳转到web端登录时传的地址
 	 */
-	public void webThirdLoginNotify(HttpServletRequest request, HttpServletResponse response) throws IOException;
+	public Response<String> webThirdLoginNotify(String code,String state,String appId);
 
+	/**
+	 * 微信授权登录返回授权地址
+	 * @param loginDTO
+	 * @return
+	 */
+	public Response<String> wxOauthLogin(WebThirdLoginDTO loginDTO);
+	/**
+	 * 微信授权登录回调返回成功的地址
+	 * @param loginDTO
+	 * @return
+	 */
+	public Response<String> wxOauthLoginNotify(WebThirdLoginDTO loginDTO);
 	/**
 	 * 获取登录方式
 	 * 
@@ -196,7 +209,15 @@ public interface AccountApi {
 	 * @return
 	 */
 	public Response<Boolean> bindPhone(BindPhoneDTO phoneDTO);
-
+	
+	/**
+	 * 活动检查手机号，存在参与者就生成正常用户，存在正常用户就只校验短信验证码
+	 * 
+	 * @param phoneDTO
+	 * @return
+	 */
+	public Response<Boolean> activityCheckPhone(BindPhoneDTO phoneDTO);
+	
 	/**
 	 * 绑定 第三方账户
 	 * 
@@ -238,4 +259,11 @@ public interface AccountApi {
 	 * @return
 	 */
 	public Response<Boolean> checkUserDisTalk(Long userId);
+	/**
+	 * 根据手机号查询用户是否注册
+	 * @param phones
+	 * @param appId
+	 * @return
+	 */
+	public Response<List<Map<String,String>>> getUserAccountByPhone(Set<String>phones,String appId);
 }

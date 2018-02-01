@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -69,11 +70,20 @@ public class RewardController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
-            @ApiImplicitParam(name = "token", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "token", paramType = "header", required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true),
+            @ApiImplicitParam(name = "queryType", paramType = "query", required = true),
+            @ApiImplicitParam(name = "resourceId", paramType = "query", required = false) })
     @UserBehaviorValidation(event = "打赏列表", login = true)
     @GetMapping(value = "{version}/reward/list")
-    public Response<PageList<RewardInfoVo>> list(HttpServletRequest request, RewardInfoDto dto,
+    public Response<PageList<RewardInfoVo>> list(HttpServletRequest request, @RequestParam Integer currentPage,
+            @RequestParam Integer pageSize, @RequestParam Byte queryType, Long resourceId,
             @RequestHeader("userId") Long headerUserId) {
+        RewardInfoDto dto = new RewardInfoDto();
+        dto.setCurrentPage(currentPage);
+        dto.setPageSize(pageSize);
+        dto.setQueryType(queryType);
 
         if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())
                 || RewardConstants.QueryType.my_reward_resource_list.equals(dto.getQueryType())) {
@@ -81,6 +91,8 @@ public class RewardController {
         } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())
                 || RewardConstants.QueryType.reward_my_resource_list.equals(dto.getQueryType())) {
             dto.setToUserId(headerUserId);
+        } else if (RewardConstants.QueryType.reward_resource_user_list.equals(dto.getQueryType())) {
+            dto.setResourceId(resourceId);
         }
 
         return rewardInfoApi.pageByCondition(dto, true);

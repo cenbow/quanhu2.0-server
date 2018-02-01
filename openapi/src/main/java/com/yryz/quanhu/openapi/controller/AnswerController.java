@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,10 +33,8 @@ public class AnswerController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答", blacklist = true, illegalWords = true,login = false,isCoterieMute = false)
-    @UserBehaviorArgs(loginUserId="request.head.userId",loginToken="request.head.token",
-            sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
-            coterieId="object.QuestionDto.coterieId")
+    @UserBehaviorValidation(event = "圈主发布回答",illegalWords = true,login = false)
+    @UserBehaviorArgs(sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/coterie/answer/add")
     public Response<AnswerVo> saveAnswer(@RequestBody AnswerDto answerDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
@@ -49,7 +48,7 @@ public class AnswerController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @PostMapping(value = "/services/app/{version}/coterie/answer/single")
+    @GetMapping(value = "/services/app/{version}/coterie/answer/single")
     public Response<AnswerVo> saveAnswer(Long kid, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         return answerApi.getDetail(kid);
