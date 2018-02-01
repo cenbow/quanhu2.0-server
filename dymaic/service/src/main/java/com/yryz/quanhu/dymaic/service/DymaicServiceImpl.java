@@ -56,7 +56,7 @@ public class DymaicServiceImpl {
     UserRelationApi userRelationApi;
 
     @Reference
-    IdAPI idAPI;
+    SortIdHelper sortIdHelper;
     
     @Reference
     CountApi countApi;
@@ -68,8 +68,7 @@ public class DymaicServiceImpl {
      * @return
      */
     public Boolean send(Dymaic dymaic) {
-        Response<Long> idRsp = idAPI.getKid("dymaic");
-        dymaic.setKid(idRsp.getData());
+        dymaic.setKid(sortIdHelper.getKid());
 
         //write db
         dymaicDao.insert(dymaic);
