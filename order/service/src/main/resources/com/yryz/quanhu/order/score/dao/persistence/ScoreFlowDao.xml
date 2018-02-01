@@ -39,9 +39,21 @@
 	</insert>
 
 	<!-- 获取用户积分流水列表ALL -->
-	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventReportVo">
+	<select id="getAll" resultType="com.yryz.quanhu.score.entity.ScoreFlow">
 		select <include refid="columns" /> from score_flow where
-		user_id = #{userId}
+		user_id = #{sfq.userId}
+		<if test="sfq.consumeFlag != null">
+			and consume_flag = #{sfq.consumeFlag}
+		</if>
+		<if test="sfq.eventCode != null">
+			and event_code = #{sfq.eventCode}
+		</if>
+		<if test="sfq.startTime != null">
+			and create_time &gt;= #{sfq.startTime}
+		</if>
+		<if test="sfq.endTime != null">
+			and create_time &lt;= #{sfq.endTime}
+		</if>
 		order by update_Time desc
 	</select>
 	
@@ -92,7 +104,7 @@
 			b.event_name  as eventName 
   	  from (
 		select <include refid="columns" /> from score_flow where user_id = #{sfq.userId}
-		<if test="sfq.consumeFlag != -1">
+		<if test="sfq.consumeFlag != null">
 			and consume_flag = #{sfq.consumeFlag}
 		</if>
 		<if test="sfq.eventCode != null">

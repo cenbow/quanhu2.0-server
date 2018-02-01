@@ -1,13 +1,15 @@
 package com.yryz.quanhu.score.service;
 
+import java.util.List;
+
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventSign;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 /**
  * 事件
@@ -29,24 +31,8 @@ public interface EventAcountApiService {
 	 * @return
 	 */
 	EventSign getEventSign(String userId , String eventCode);
-	/**
-	 * 获取积分明细
-	 * @param sfq
-	 * @param flowType
-	 * @param currentPage  页码
-	 * @param pageSize 条数
-	 * @return
-	 */
-	
-	Response<PageList<ScoreFlow>> getScoreFlow(ScoreFlowQuery sfq);
-	/**
-	 * 获取成长明细
-	 * @param gfq
-	 * @param currentPage  页码
-	 * @param pageSize  条数
-	 * @return
-	 */
-	Response<PageList<GrowFlow>> getGrowFlow(GrowFlowQuery gfq );
+
+
 	
 	/**
 	 * 
@@ -57,8 +43,6 @@ public interface EventAcountApiService {
 	 * @Description 消费积分
 	 */
 	public int consumeScore(String userId , int score , String eventCode);
-	
-	
 	/**
 	 * 
 	 * @param userId
@@ -68,4 +52,39 @@ public interface EventAcountApiService {
 	 * @Description 增加积分
 	 */
 	public int addScore(String userId , int score , String eventCode);
+	
+	/**
+	 * 获取积分明细
+	 * @param sfq
+	 * @param flowType
+	 * @param currentPage  页码
+	 * @param pageSize 条数
+	 * @return
+	 */
+	
+	Response<PageList<ScoreFlowReportVo>> getScoreFlow(ScoreFlowQuery sfq);
+	
+	/**
+	 * 获取全部积分明细
+	 * @param sfq
+	 * @return List<ScoreFlow>
+	 */
+	public Response<List<ScoreFlowReportVo>> getScoreFlowAll( ScoreFlowQuery sfq );
+	
+	/**
+	 * 获取成长明细
+	 * @param gfq
+	 * @param currentPage  页码
+	 * @param pageSize  条数
+	 * @return
+	 */
+	Response<PageList<GrowFlowReportVo>> getGrowFlow(GrowFlowQuery gfq );
+	/**
+	 * 获取全部成长明细
+	 * @param gfq
+	 * @return List<GrowFlow>
+	 */
+	public Response<List<GrowFlowReportVo>> getGrowFlowAll(GrowFlowQuery gfq );
+	
+
 }

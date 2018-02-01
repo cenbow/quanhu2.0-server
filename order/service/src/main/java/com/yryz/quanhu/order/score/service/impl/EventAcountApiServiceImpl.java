@@ -1,5 +1,7 @@
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,8 @@ import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventSign;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 
 /**
@@ -51,34 +55,9 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 		return eventAcountAPI.getEventSign(userId, eventCode);
 	}
 
-	@Override
-	public Response<PageList<ScoreFlow>> getScoreFlow(ScoreFlowQuery sfq) {
-		try {
-			// return ResponseUtils.returnObjectSuccess(pageList);
-			PageList<ScoreFlow> pageList = scoreAPI.getScoreFlowPage(sfq);
-			return ResponseUtils.returnObjectSuccess(pageList);
-		} catch (QuanhuException e) {
-			return ResponseUtils.returnException(e);
-		} catch (Exception e) {
-			logger.error("获取积分明细列表异常！", e);
-			return ResponseUtils.returnException(e);
-		}
-		// return scoreAPI.getScoreFlowPage(sfq);
-	}
-	 
+	
+ 
 
-	@Override
-	public Response<PageList<GrowFlow>> getGrowFlow(GrowFlowQuery gfq ) {
-		  try {
-			  PageList<GrowFlow> pageList =  growAPI.getGrowFlowPage(gfq);
-		      return ResponseUtils.returnObjectSuccess(pageList);
-	        } catch (QuanhuException e) {
-	            return ResponseUtils.returnException(e);
-	        } catch (Exception e) {
-	            logger.error("获取成长值明细列表异常！", e);
-	            return ResponseUtils.returnException(e);
-	        }
-	}
 
 	/**
 	 * 
@@ -119,5 +98,62 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 		}
 		return flag;
 	}
+
+	@Override
+	public Response<List<ScoreFlowReportVo>> getScoreFlowAll(ScoreFlowQuery sfq) {
+		 try {
+			  List<ScoreFlowReportVo> list =  scoreAPI.getScoreFlowAll(sfq);
+		      return ResponseUtils.returnListSuccess(list);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取积分值明细列表异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
+	@Override
+	public Response<PageList<ScoreFlowReportVo>> getScoreFlow(ScoreFlowQuery sfq) {
+		try {
+			
+			PageList<ScoreFlowReportVo> pageList = scoreAPI.getScoreFlowPage(sfq);
+			return ResponseUtils.returnObjectSuccess(pageList);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("获取积分明细列表异常！", e);
+			return ResponseUtils.returnException(e);
+		}
+		// return scoreAPI.getScoreFlowPage(sfq);
+	}
+	
+	
+	@Override
+	public Response<PageList<GrowFlowReportVo>> getGrowFlow(GrowFlowQuery gfq ) {
+		  try {
+			  PageList<GrowFlowReportVo> pageList =  growAPI.getGrowFlowPage(gfq);
+		      return ResponseUtils.returnObjectSuccess(pageList);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取成长值明细列表异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
+	
+	
+	@Override
+	public Response<List<GrowFlowReportVo>> getGrowFlowAll(GrowFlowQuery gfq) {
+		 try {
+			  List<GrowFlowReportVo> list =  growAPI.getGrowFlowAll(gfq);
+		      return ResponseUtils.returnListSuccess(list);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取成长值明细列表异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
+
+		 
 	    
 }
