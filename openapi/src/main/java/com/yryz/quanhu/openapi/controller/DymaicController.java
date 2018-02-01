@@ -70,7 +70,7 @@ public class DymaicController {
         }
         try {
             Dymaic dymaic = ResponseUtils.getResponseData(dymaicService.get(kid));
-            if (dymaic == null) {
+            if (dymaic == null || dymaic.getKid() == null) {
                 return ResponseUtils.returnSuccess();
             }
             DymaicVo dymaicVo = new DymaicVo();
