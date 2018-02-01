@@ -40,6 +40,11 @@
             <version>${quanhu.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>dymaic-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+        <dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.4.1</version>

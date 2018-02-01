@@ -28,7 +28,8 @@
   <sql id="Base_Column_List" >
     id, kid, owner_id,  owner_name, owner_intro, icon, coterie_name, intro,
     qr_url, join_fee, consulting_fee, join_check, member_num, state, create_date, last_update_date,
-    process_time, deleted,heat,is_expert,recommend,last_info_time
+    process_time, deleted,heat,is_expert,recommend,last_info_time, audit_user_id, audit_remark, sort,
+    module_enum, create_user_id, last_update_user_id, master_last_view_time, shelve_flag
   </sql>
   <insert id="insert" parameterType="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
     insert into qh_coterie (id, kid, owner_id,

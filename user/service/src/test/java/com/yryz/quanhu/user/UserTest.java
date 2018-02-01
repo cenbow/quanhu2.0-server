@@ -18,10 +18,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsContants;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.ForgotPasswordDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
@@ -191,7 +193,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void login() {
 		LoginDTO loginDTO = new LoginDTO();
 		loginDTO.setPhone("18500000010");
@@ -270,6 +272,13 @@ public class UserTest {
 	public void getUserByPhone(){
 		//Response<String> response = userApi.getUserIdByPhone("13429878385", "vebff12m1762");
 		Response<Map<String,String>> response2 = userApi.getUserIdByPhone(Sets.newHashSet("13429878385"), "vebff12m1762");
+		System.out.println(JsonUtils.toFastJson(response2));
+	}
+	
+	@Test
+	public void getAdmin(){
+		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 10, new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
+		Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
 		System.out.println(JsonUtils.toFastJson(response2));
 	}
 }

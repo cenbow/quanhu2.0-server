@@ -8,9 +8,11 @@ import javax.annotation.Resource;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.quanhu.dymaic.canal.entity.*;
 import com.yryz.quanhu.score.service.EventAcountAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.service.UserStarApi;
@@ -45,8 +47,8 @@ public class UserDiffHandler implements DiffHandler {
     @Reference(check = false)
     private UserTagApi userTagApi;
 
-    @Reference
-    private EventAcountAPI eventAcountAPI;
+    @Reference(check = false)
+    private EventAcountApiService acountApiService;
 
     @Resource
     private DiffExecutor diffExecutor;
@@ -66,7 +68,6 @@ public class UserDiffHandler implements DiffHandler {
     @Override
     public void handler() {
         try {
-
             String yesterday = DateUtils.getYesterDay();
             Response<List<Long>> res = userApi.getUserIdByCreateDate(yesterday + " 00:00:00", yesterday + " 23:59:59");
             if (!res.success()) {
@@ -86,25 +87,31 @@ public class UserDiffHandler implements DiffHandler {
 
             if (!diffList.isEmpty()) {
                 Response<List<UserBaseInfoVO>> resList = userApi.getAllByUserIds(diffList);
-                //EventAcount eventAcount = eventAcountAPI.getEventAcount(userApi);
-                Set<String> stringIds = FluentIterable.from(diffList).transform(LONG_TO_STRING_FUNCTION).toSet();
+                Set<String> stringIds = Sets.newHashSet(FluentIterable.from(diffList).transform(LONG_TO_STRING_FUNCTION).toSet());
                 Response<Map<String, StarAuthInfo>> starResponse = userStarApi.get(stringIds);
                 Response<Map<Long, List<UserTagVO>>> userTagInfoResponse = userTagApi.getUserTags(diffList);
+                Response<Map<Long, EventAcount>> eventAcountResponse = acountApiService.getEventAcountBatch(Sets.newHashSet(diffList));
                 if (resList.success()) {
                     List<UserBaseInfoVO> volist = resList.getData();
                     List<UserInfo> list = new ArrayList<>();
                     for (int i = 0; i < volist.size(); i++) {
-                        UserBaseInfo baseInfo = GsonUtils.parseObj(volist.get(i), UserBaseInfo.class);
-                        UserInfo userInfo = new UserInfo();
-                        //用户基础数据
-                        userInfo.setUserBaseInfo(baseInfo);
-                        //达人数据
-                        setStartInfo(userInfo, starResponse);
-                        //标签数据
-                        setTagInfo(userInfo, userTagInfoResponse);
-                        //积分数据
-                        userInfo.setUserId(baseInfo.getUserId());
-                        list.add(userInfo);
+                        try {
+                            UserBaseInfo baseInfo = GsonUtils.parseObj(volist.get(i), UserBaseInfo.class);
+                            UserInfo userInfo = new UserInfo();
+                            userInfo.setUserId(baseInfo.getUserId());
+                            //用户基础数据
+                            userInfo.setUserBaseInfo(baseInfo);
+                            //达人数据
+                            setStartInfo(userInfo, starResponse);
+                            //标签数据
+                            setTagInfo(userInfo, userTagInfoResponse);
+                            //积分数据
+                            setEventInfo(userInfo, eventAcountResponse);
+
+                            list.add(userInfo);
+                        } catch (Exception e) {
+                            logger.error("process userInfo error", e);
+                        }
                     }
                     userRepository.saveAll(list);
                 }
@@ -113,7 +120,19 @@ public class UserDiffHandler implements DiffHandler {
         } catch (Exception e) {
             logger.error("UserDiffHandler handle error", e);
         }
-     }
+    }
+
+    private void setEventInfo(UserInfo userInfo, Response<Map<Long, EventAcount>> eventAcountResponse) {
+        if (eventAcountResponse.success() && MapUtils.isNotEmpty(eventAcountResponse.getData())) {
+            Map<Long, EventAcount> eventAcountMap = eventAcountResponse.getData();
+            EventAcount eventAcount = eventAcountMap.get(userInfo.getUserId());
+            if (eventAcount != null) {
+                EventAccountInfo eventAccountInfo = new EventAccountInfo();
+                BeanUtils.copyProperties(eventAccountInfo, eventAcount);
+                userInfo.setEventAccountInfo(eventAccountInfo);
+            }
+        }
+    }
 
     private void setTagInfo(UserInfo userInfo, Response<Map<Long, List<UserTagVO>>> userTagInfoResponse) {
         if (userTagInfoResponse.success() && MapUtils.isNotEmpty(userTagInfoResponse.getData())) {

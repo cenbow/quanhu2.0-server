@@ -6,23 +6,12 @@
 <mapper namespace="com.yryz.quanhu.coterie.member.dao.CoterieApplyDao">
 
 
-    <!--
+    <!--sql-->
+    <sql id="all_column_list">
+        id, kid,coterie_id, user_id, member_status, reason, create_date, create_user_id, process_time, last_update_date
+    </sql>
 
-    /*  成员申请表  */
-    CREATE TABLE `service-circle`.`coterie_apply`(
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
-    `coterie_id` CHAR(12) NOT NULL COMMENT '私圈ID',
-    `cust_id` VARCHAR(64) COMMENT '用户ID',
-    `status` tinyint(3) unsigned DEFAULT 2 COMMENT '0通过，1未通过，2待审核',
-    `reason` VARCHAR(512) COMMENT '加入理由',
-    `create_date` DATETIME not null  DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
-    `process_time` DATETIME COMMENT '审批时间',
-    `last_update_date` timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-    )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='私圈申请表';
-
-    -->
-
+    <!--insert-->
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
             parameterType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
         insert into qh_coterie_apply (
@@ -48,37 +37,7 @@
         )
     </insert>
 
-
-
-    <!--<select id="selectAll" resultType="com.yryz.activeii.coterie.member.model.MemberApply">-->
-        <!--select * from coterie_apply T;-->
-    <!--</select>-->
-
-    <!--<select id="select" resultType="com.yryz.activeii.coterie.member.model.MemberApply">-->
-        <!--select * from coterie_apply T limit #{page.firstRecord},#{page.maxRecord};-->
-    <!--</select>-->
-
-
-
-    <select id="selectByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
-        select * from qh_coterie_apply WHERE coterie_id = #{coterieId} and user_id = #{userId} and del_flag != 11;
-    </select>
-
-    <select id="selectWaitingByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
-        select *
-        from qh_coterie_apply
-        WHERE coterie_id = #{coterieId} and user_id = #{userId} and member_status = 30 and del_flag != 11;
-    </select>
-
-    <!--<update id="update" parameterType="com.yryz.activeii.coterie.member.model.MemberApply" >-->
-        <!--update coterie_apply set-->
-        <!--last_update_date = NOW()-->
-        <!--<if test="status != null">-->
-            <!--,status = #{status}-->
-        <!--</if>-->
-        <!--where id = #{id}-->
-    <!--</update>-->
-
+    <!--update-->
     <update id="updateByCoterieApply" parameterType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply" >
         update qh_coterie_apply set
         last_update_date = NOW()
@@ -94,6 +53,21 @@
         where coterie_id = #{coterieId} and user_id = #{userId} and del_flag != 11;
     </update>
 
+    <!--select-->
+    <select id="selectByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
+        select
+        <include refid="all_column_list"/>
+        from qh_coterie_apply
+        WHERE coterie_id = #{coterieId} and user_id = #{userId} and del_flag != 11;
+    </select>
+
+    <select id="selectWaitingByCoterieIdAndUserId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
+        select
+        <include refid="all_column_list"/>
+        from qh_coterie_apply
+        WHERE coterie_id = #{coterieId} and user_id = #{userId} and member_status = 30 and del_flag != 11;
+    </select>
+
     <select id="selectNewMemberNum" resultType="java.lang.Integer" parameterType="java.lang.Long" >
         select count(*)
         from qh_coterie_apply
@@ -101,7 +75,8 @@
     </select>
 
     <select id="selectPageByCoterieId" resultType="com.yryz.quanhu.coterie.member.entity.CoterieMemberApply">
-        select *
+        select
+        <include refid="all_column_list"/>
         from qh_coterie_apply
         where coterie_id = #{coterieId} and del_flag = 10
         order by create_date desc

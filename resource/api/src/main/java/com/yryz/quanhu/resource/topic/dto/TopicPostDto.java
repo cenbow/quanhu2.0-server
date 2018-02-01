@@ -9,6 +9,8 @@ public class TopicPostDto  implements Serializable {
 
     private Long topicId;
 
+    private String title;
+
     private String videoUrl;
 
     private String videoThumbnailUrl;
@@ -34,6 +36,12 @@ public class TopicPostDto  implements Serializable {
     private Integer pageSize;
 
     private String orderBy;
+
+    private String nickName;
+
+    private String startTime;
+
+    private  String endTime;
 
     public Long getKid() {
         return kid;
@@ -153,5 +161,37 @@ public class TopicPostDto  implements Serializable {
 
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

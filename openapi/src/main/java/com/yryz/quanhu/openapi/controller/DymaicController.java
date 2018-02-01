@@ -92,4 +92,25 @@ public class DymaicController {
         }
         return dymaicService.delete(userId, dymaic.getKid());
     }
+
+    @ApiOperation("动态置顶")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/dymaic/addTopDymaic")
+    public Response<Boolean> addTopDymaic(@RequestHeader Long userId, @RequestBody Dymaic dymaic) {
+        if (dymaic == null || dymaic.getKid() == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
+        }
+        return dymaicService.addTopDymaic(userId, dymaic.getKid());
+    }
+
+
+    @ApiOperation("动态取消置顶")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/dymaic/deleteTopDymaic")
+    public Response<Boolean> deleteTopDymaic(@RequestHeader Long userId, @RequestBody Dymaic dymaic) {
+        if (dymaic == null || dymaic.getKid() == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
+        }
+        return dymaicService.deleteTopDymaic(userId, dymaic.getKid());
+    }
 }

@@ -132,6 +132,16 @@ public class Coterie implements Serializable {
 	 */
 	private Date lastInfoTime;
 
+
+	private Long auditUserId;
+	private String auditRemark;
+	private Integer sort;
+	private Long createUserId;
+	private Long lastUpdateUserId;
+	private Integer masterLastViewTime;
+	private String moduleEnum;
+
+
 	public Long getId() {
 		return id;
 	}
@@ -307,6 +317,63 @@ public class Coterie implements Serializable {
 
 	public void setLastInfoTime(Date lastInfoTime) {
 		this.lastInfoTime = lastInfoTime;
+	}
+
+
+	public Long getAuditUserId() {
+		return auditUserId;
+	}
+
+	public void setAuditUserId(Long auditUserId) {
+		this.auditUserId = auditUserId;
+	}
+
+	public String getAuditRemark() {
+		return auditRemark;
+	}
+
+	public void setAuditRemark(String auditRemark) {
+		this.auditRemark = auditRemark;
+	}
+
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
+
+	public Long getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(Long createUserId) {
+		this.createUserId = createUserId;
+	}
+
+	public Long getLastUpdateUserId() {
+		return lastUpdateUserId;
+	}
+
+	public void setLastUpdateUserId(Long lastUpdateUserId) {
+		this.lastUpdateUserId = lastUpdateUserId;
+	}
+
+	public Integer getMasterLastViewTime() {
+		return masterLastViewTime;
+	}
+
+	public void setMasterLastViewTime(Integer masterLastViewTime) {
+		this.masterLastViewTime = masterLastViewTime;
+	}
+
+	public String getModuleEnum() {
+		return moduleEnum;
+	}
+
+	public void setModuleEnum(String moduleEnum) {
+		this.moduleEnum = moduleEnum;
 	}
 
 	@Override
