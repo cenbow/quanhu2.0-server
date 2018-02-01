@@ -36,7 +36,7 @@ public interface UserBaseInfoDao {
     
     List<UserBaseInfo> getAdminList(AdminUserInfoDTO custInfoDTO);
     
-    List<String> getUserIdList(Map<String,Object> params);
+    List<String> getUserIdList(AdminUserInfoDTO custInfoDTO);
     
     List<String> getUserIdByExactParam(Map<String,Object> params);
     

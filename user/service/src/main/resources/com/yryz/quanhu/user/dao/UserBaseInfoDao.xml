@@ -161,12 +161,6 @@
 	<if test="endDate !=null and endDate != ''">
 		and a.create_date &lt;= #{endDate}
 	</if>
-	<if test="location != null and location != ''">
-		and a.user_location like CONCAT('%',#{location},'%')
-	</if>
-	<if test="sex != null ">
-		and a.user_sex = #{sex}
-	</if>
 	<if test="userRole != null">
 		and a.user_role = #{userRole}
 	</if>

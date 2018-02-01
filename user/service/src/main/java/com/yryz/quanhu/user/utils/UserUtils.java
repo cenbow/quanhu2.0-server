@@ -43,7 +43,11 @@ public class UserUtils {
 	 */
 	public static String getReturnOauthApiHost(String returnUrl) {
 		String[] array = returnUrl.split("/");		
-		return String.format("%s//%s",array[0], array[2].replaceAll("m", "api2"));
+		return String.format("%s//%s",array[0], array[2].replaceFirst("m", "api2"));
+	}
+	
+	public static void main(String[] args){
+		System.out.println(UserUtils.getReturnOauthApiHost("http://m-dev.quanhu365.com/activity/vote/738845872269795322/home"));
 	}
 	
 	/**

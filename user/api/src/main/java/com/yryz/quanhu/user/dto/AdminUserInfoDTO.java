@@ -40,7 +40,10 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 用户状态 0-正常 1-禁言 2-冻结 3-注销
 	 */
 	private Integer userStatus;
-	
+	/**
+	 * 用户角色 10-普通用户 11-达人 
+	 */
+	private Integer userRole;
 	private List<Long> userIds;
 	public String getNickName() {
 		return nickName;
@@ -90,8 +93,24 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setUserStatus(Integer userStatus) {
 		this.userStatus = userStatus;
 	}
+	public Integer getUserRole() {
+		return userRole;
+	}
+	public void setUserRole(Integer userRole) {
+		this.userRole = userRole;
+	}
 	public AdminUserInfoDTO() {
 		super();
+	}
+	public AdminUserInfoDTO(String nickName, String isVest, String phone, String startDate, String endDate,
+			String appId) {
+		super();
+		this.nickName = nickName;
+		this.isVest = isVest;
+		this.phone = phone;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.appId = appId;
 	}
 	public AdminUserInfoDTO(String nickName, String isVest, String phone, String startDate, String endDate,
 			List<Long> userIds) {

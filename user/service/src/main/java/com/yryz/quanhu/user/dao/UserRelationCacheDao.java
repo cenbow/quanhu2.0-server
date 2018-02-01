@@ -218,12 +218,48 @@ public class UserRelationCacheDao {
     }
 
     /**
+     * 异步存储
+     * 由于采用消息机制，异步机制，是建立在数据库有数据基础上，
+     * 所有新增数据需要采用同步机制
+     * @param userDto
+     */
+    public void asyncSave(UserRelationDto userDto){
+        try{
+            if(userDto.getKid() == null){
+
+                userDto.setKid(idAPI.getKid(TABLE_NAME).getData());
+                userDto.setCreateUserId(Long.parseLong(userDto.getSourceUserId()));
+                userDto.setLastUpdateUserId(Long.parseLong(userDto.getSourceUserId()));
+                userDto.setVersion(0);
+                userDto.setDelFlag(10);
+                logger.info("insert database start");
+                userRelationDao.insert(userDto);
+                logger.info("insert database finish");
+
+                this.syncProcess(userDto);
+
+            }else{
+                this.sendMQ(userDto);
+            }
+
+            //刷新缓存
+            this.refreshCacheRelation(userDto);
+
+        }catch (Exception e){
+            //删除缓存
+            this.removeCacheRelation(userDto);
+            //抛出异常进行回滚
+            throw e;
+        }
+    }
+    /**
      * 发生到MQ异步处理
      * @param userDto
      */
-    public void sendMQ(UserRelationDto userDto){
+    private void sendMQ(UserRelationDto userDto){
 
         try {
+
             logger.info("sendMQ={} start",JSON.toJSON(userDto));
             //转换消息
             String msg = MAPPER.writeValueAsString(userDto);
@@ -235,9 +271,6 @@ public class UserRelationCacheDao {
 
             rabbitTemplate.convertAndSend(msg);
 
-            //刷新缓存
-            this.refreshCacheRelation(userDto);
-
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }finally {
@@ -245,6 +278,24 @@ public class UserRelationCacheDao {
         }
     }
 
+    private void syncProcess(UserRelationDto relationDto){
+
+        //同步调用第三方建立关系
+        this.syncImRelation(relationDto);
+
+        //删除动态
+        this.syncDynamicTimeLine(relationDto);
+
+        //统计数据
+        UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
+
+        //添加积分成长值
+        this.syncScoreEvent(relationDto,dto);
+
+        //刷新至缓存
+        this.refreshCacheCount(relationDto.getSourceUserId(),dto);
+
+    }
     /**
      * 异步MQ处理
      * @param data
@@ -271,43 +322,17 @@ public class UserRelationCacheDao {
             logger.info("handleMessage.convert={}",JSON.toJSON(relationDto));
 
             //数据库存储
-            if(relationDto.getKid() == null){
-                relationDto.setKid(idAPI.getKid(TABLE_NAME).getData());
-                relationDto.setCreateUserId(Long.parseLong(relationDto.getSourceUserId()));
-                relationDto.setLastUpdateUserId(Long.parseLong(relationDto.getSourceUserId()));
-                relationDto.setVersion(0);
-                relationDto.setDelFlag(10);
-                logger.info("insert database start");
-                userRelationDao.insert(relationDto);
-                logger.info("insert database finish");
-            }else{
-                logger.info("update database start");
-                userRelationDao.update(relationDto);
-                logger.info("update database finish");
-            }
+            logger.info("update database start");
+            userRelationDao.update(relationDto);
+            logger.info("update database finish");
 
             /**
              * 第三方同步 (串行执行）
              */
-
-            //同步调用第三方建立关系
-            this.syncImRelation(relationDto);
-
-            //删除动态
-            this.syncDynamicTimeLine(relationDto);
-
-            //统计数据
-            UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
-
-            //添加积分成长值
-            this.syncScoreEvent(relationDto,dto);
-
-            //刷新至缓存
-            this.refreshCacheCount(relationDto.getSourceUserId(),dto);
+            this.syncProcess(relationDto);
 
         }catch (Exception e){
             logger.error(e.getMessage(),e);
-
             /**
              * 删除缓存
              */
@@ -315,8 +340,8 @@ public class UserRelationCacheDao {
             this.removeCacheRelation(relationDto);
             logger.warn("removeCacheRelation finish");
 
-            //继续抛出异常，进行数据库回滚
-            throw new RuntimeException(e);
+            //由于mq异常重发机制，不抛出异常(正确返回ack包，后续通日志处理）
+            //throw new RuntimeException(e);
         }finally {
             logger.info("handleMessage={} finish",data);
         }

@@ -15,13 +15,15 @@ import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
 import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
+import com.yryz.quanhu.user.entity.UserBaseInfo.UserAuthStatus;
+import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
 import com.yryz.quanhu.user.entity.UserStarAuth;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus;
 import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthWay;
@@ -29,8 +31,6 @@ import com.yryz.quanhu.user.entity.UserStarAuth.StarRecommendStatus;
 import com.yryz.quanhu.user.entity.UserStarAuthLog;
 import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.manager.MessageManager;
-import com.yryz.quanhu.user.entity.UserBaseInfo.UserAuthStatus;
-import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarService;
 
@@ -294,14 +294,7 @@ public class UserStarServiceImpl implements UserStarService {
 	 * @param authModel
 	 */
 	private void saveStarAuthLog(UserStarAuth authModel) {
-		UserStarAuth oldAuth = get(authModel.getUserId().toString(), null);
-		UserStarAuthLog logModel = new UserStarAuthLog();
-		if (oldAuth == null) {
-			BeanUtils.copyProperties(oldAuth, logModel);
-		} else {
-			BeanUtils.copyProperties(authModel, oldAuth, BeanUtils.getNullPropertyNames(authModel));
-			BeanUtils.copyProperties(oldAuth, logModel);
-		}
+		UserStarAuthLog logModel = GsonUtils.parseObj(authModel, UserStarAuthLog.class);
 		try {
 			logModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG)));
 			logModel.setCreateDate(new Date());

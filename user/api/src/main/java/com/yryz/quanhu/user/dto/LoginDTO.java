@@ -52,6 +52,10 @@ public class LoginDTO implements Serializable {
 	 * 活动渠道码
 	 */
 	private String activityChannelCode;
+	/**
+	 * 登录ip
+	 */
+	private String ip;
 	public String getDeviceId() {
 		return deviceId;
 	}
@@ -99,6 +103,12 @@ public class LoginDTO implements Serializable {
 	}
 	public void setActivityChannelCode(String activityChannelCode) {
 		this.activityChannelCode = activityChannelCode;
+	}
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 	@Override
 	public String toString() {

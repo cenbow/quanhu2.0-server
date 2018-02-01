@@ -16,6 +16,7 @@ import com.yryz.quanhu.other.activity.dao.ActivityVoteDetailDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.other.activity.dto.*;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
+import com.yryz.quanhu.other.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService;
 import com.yryz.quanhu.other.activity.vo.*;
@@ -30,6 +31,9 @@ import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -90,7 +94,10 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
      */
     @Override
     public PageList<AdminActivityVoteDetailVo> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
-        Page page=PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
+        Page page = new Page();
+        if(StringUtils.isEmpty(adminActivityVoteDetailDto.getType())||!adminActivityVoteDetailDto.getType().equals("1")){
+            page=PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
+        }
         if (null == adminActivityVoteDetailDto.getActivityInfoId()) {
             logger.debug("请通过投票活动列表进入！！！");
             isNull(adminActivityVoteDetailDto.getActivityInfoId(), "活动ID不能为空，请通过投票活动列表进入！！！");
@@ -171,7 +178,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         		 beginDate=sdf.format(adminActivityVoteRecordDto.getBeginCreateDate());
             	 endDate=sdf.format(adminActivityVoteRecordDto.getEndCreateDate());
         	}
-        	
+
             /*TODO List<String> custIds = custAPI.getAdminList(nickName, null, beginDate, endDate);
             if (!CollectionUtils.isEmpty(custIds)) {
                 adminActivityVoteRecordDto.setCustIds(custIds);
@@ -181,16 +188,19 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         List<AdminActivityVoteRecordVo> list = activityVoteRecordDao.select(adminActivityVoteRecordDto);
 
         for (AdminActivityVoteRecordVo voteRecord : list) {
-            /*TODO CustInfo custInfo = custAPI.getCustInfo(voteRecord.getCreateUserId());
-            voteRecord.setNickName(custInfo.getCustNname());
-            SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ); 
+            Set<String> userIds = new HashSet<String>();
+            userIds.add(voteRecord.getCreateUserId().toString());
+            Response<Map<String,UserBaseInfoVO>> users = null;
             try {
-				voteRecord.setCreateDate(sdf.parse(custInfo.getCreateDate().substring(0, 18)));
-			} catch (ParseException e) {
-				 
-				e.printStackTrace();
-			}
-            voteRecord.setPhone(custInfo.getCustPhone());*/
+                users = userApi.getUser(userIds);
+            } catch (Exception e) {
+                logger.error("查询用户信息异常",e);
+            }
+            if(users.success()&&users.getData().get(voteRecord.getCreateUserId().toString())!=null){
+                voteRecord.setNickName(users.getData().get(voteRecord.getCreateUserId().toString()).getUserNickName());
+                voteRecord.setCreateDate(users.getData().get(voteRecord.getCreateUserId().toString()).getCreateDate());
+                voteRecord.setPhone(users.getData().get(voteRecord.getCreateUserId().toString()).getUserPhone());
+            }
         }
 
         return list;
@@ -372,10 +382,13 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
     }
     private void commitResource(AdminActivityVoteDetailDto voteDetail,AdminActivityInfoVo1 activityInfo) {
         try {
+            ActivityVoteDetail activityVoteDetail = new ActivityVoteDetail();
+            BeanUtilsBean.getInstance().getConvertUtils().register(new SqlDateConverter(null), Date.class);
+            BeanUtils.copyProperties(activityVoteDetail, voteDetail);
             ResourceTotal resourceTotal = new ResourceTotal();
             resourceTotal.setContent(voteDetail.getContent());
             resourceTotal.setCreateDate(DateUtils.getString(new Date()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(voteDetail));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(activityVoteDetail));
             resourceTotal.setModuleEnum(new Integer(voteDetail.getModuleEnum()));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(voteDetail.getKid());
