@@ -278,7 +278,7 @@ public class UserRelationCacheDao {
                 relationDto.setVersion(0);
                 relationDto.setDelFlag(10);
                 logger.info("insert database start");
-                userRelationDao.insert(relationDto);
+                //userRelationDao.insert(relationDto);
                 logger.info("insert database finish");
             }else{
                 logger.info("update database start");
@@ -316,7 +316,7 @@ public class UserRelationCacheDao {
             logger.warn("removeCacheRelation finish");
 
             //继续抛出异常，进行数据库回滚
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         }finally {
             logger.info("handleMessage={} finish",data);
         }
