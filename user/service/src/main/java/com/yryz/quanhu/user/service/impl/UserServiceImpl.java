@@ -157,18 +157,19 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
-		UserBaseInfo baseInfo = getUser(userId);
+		UserBaseInfo baseInfo = getUser(friendId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
 			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
-			UserRelationDto relationDto = map.get(friendId);
+			UserRelationDto relationDto = map.get(friendId.toString());
 			simpleVO.setUserPhone(PhoneUtils.getPhone(simpleVO.getUserPhone()));
 			simpleVO.setNameNotes(relationDto.getUserRemarkName());
 			simpleVO.setRelationStatus(relationDto.getRelationStatus());
 		}
 		// 依赖积分系统，获取用户等级
-		EventAcount acount = eventManager.getGrow(userId.toString());
+		EventAcount acount = eventManager.getGrow(friendId.toString());
 		if (acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1) {
 			simpleVO.setUserLevel("1");
 		} else {
@@ -201,7 +202,7 @@ public class UserServiceImpl implements UserService {
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
 			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
-			UserRelationDto relationDto = map.get(friendId);
+			UserRelationDto relationDto = map.get(friendId.toString());
 			simpleVO.setNameNotes(relationDto.getUserRemarkName());
 			simpleVO.setRelationStatus(relationDto.getRelationStatus());
 		}

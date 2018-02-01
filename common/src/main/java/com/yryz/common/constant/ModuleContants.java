@@ -56,6 +56,11 @@ public class ModuleContants {
     public static final String ACTIVITY_WORKS_ENUM = "10081";
 
     /**
+     * 活动
+     */
+    public static final String ACTIVITY_COTERIE = "1009";
+
+    /**
      * 举报
      */
     public static final String report="1010";

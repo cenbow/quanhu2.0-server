@@ -343,14 +343,17 @@ public class UserController {
 	@ApiOperation("微信授权登录返回授权地址")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@PostMapping(value = "/{version}/user/wxOauthLogin")
-	public void wxOauthLogin(@RequestBody WebThirdLoginDTO loginDTO,HttpServletResponse response,HttpServletRequest request) throws IOException{
+	@RequestMapping(value = "/{version}/user/wxOauthLogin")
+	public void wxOauthLogin(String returnUrl,String activityChannelCode,HttpServletResponse response,HttpServletRequest request) throws IOException{
 		response.setContentType("text/html;charset=UTF-8");
 		response.setCharacterEncoding("utf-8");
 		try {
 			RequestHeader header = WebUtil.getHeader(request);
+			WebThirdLoginDTO loginDTO = new WebThirdLoginDTO();
 			loginDTO.setAppId(header.getAppId());
 			loginDTO.setLoginType(RegType.WEIXIN.getText());
+			loginDTO.setReturnUrl(returnUrl);
+			loginDTO.setActivityChannelCode(activityChannelCode);
 			String oauthUrl = ResponseUtils.getResponseData(accountApi.wxOauthLogin(loginDTO));
 			response.sendRedirect(oauthUrl);
 			return;

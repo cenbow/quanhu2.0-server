@@ -3,7 +3,6 @@ package com.yryz.quanhu.behavior.reward.service.impl;
 import com.alibaba.dubbo.common.utils.Assert;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.message.MessageConstant;
@@ -14,6 +13,8 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.MessageUtils;
+import com.yryz.quanhu.behavior.common.service.RemoteResourceService;
+import com.yryz.quanhu.behavior.common.vo.RemoteResource;
 import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
 import com.yryz.quanhu.behavior.gift.entity.GiftInfo;
 import com.yryz.quanhu.behavior.reward.constants.RewardConstants;
@@ -29,11 +30,6 @@ import com.yryz.quanhu.message.push.entity.PushReqVo;
 import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
-import com.yryz.quanhu.resource.api.ResourceApi;
-import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
-import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
-import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
-import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
@@ -69,8 +65,8 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
     @Autowired
     private RewardCountService rewardCountService;
 
-    @Reference(check = false, lazy = true, timeout = 1000)
-    private ResourceApi resourceApi;
+    @Autowired
+    private RemoteResourceService remoteResourceService;
 
     @Reference
     private MessageAPI messageAPI;
@@ -150,38 +146,21 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
     private void sendMessage(RewardInfo info, Long rewardedPrice) {
         try {
             //查询资源信息的title和img
-            ResourceVo resourceVo = ResponseUtils.getResponseData(resourceApi.getResourcesById(String.valueOf(info.getResourceId())));
             String bodyTitle = "";
             String bodyImg = "";
-            if (ModuleContants.RELEASE.equals(resourceVo.getModuleEnum())) {
-                ReleaseInfo releaseInfo = JSON.parseObject(resourceVo.getExtJson(), ReleaseInfo.class);
-                if (null != releaseInfo) {
-                    bodyTitle = releaseInfo.getTitle();
-                    String imgUrl = releaseInfo.getImgUrl();
-                    if (StringUtils.isNotBlank(imgUrl)) {
-                        bodyImg = Splitter.on(",").omitEmptyStrings().limit(1).splitToList(imgUrl).get(0);
-                    }
-                }
-            } else if (ModuleContants.TOPIC_POST.equals(resourceVo.getModuleEnum())) {
-                TopicPostVo topicPostVo = JSON.parseObject(resourceVo.getExtJson(), TopicPostVo.class);
-                if (null != topicPostVo) {
-                    if (StringUtils.isNotBlank(topicPostVo.getContent())) {
-                        bodyTitle = topicPostVo.getContent().length() > 20 ?
-                                topicPostVo.getContent().substring(0, 20) : topicPostVo.getContent();
-                    }
-                    String imgUrl = topicPostVo.getImgUrl();
-                    if (StringUtils.isNotBlank(imgUrl)) {
-                        bodyImg = Splitter.on(",").omitEmptyStrings().limit(1).splitToList(imgUrl).get(0);
-                    }
-                }
-            } else if (ModuleContants.ANSWER.equals(resourceVo.getModuleEnum())) {
-                QuestionAnswerVo questionAnswerVo = JSON.parseObject(resourceVo.getExtJson(), QuestionAnswerVo.class);
-                if (null != questionAnswerVo) {
-                    if (null != questionAnswerVo.getQuestion() && StringUtils.isNotBlank(questionAnswerVo.getQuestion().getContent())) {
-                        bodyTitle = questionAnswerVo.getQuestion().getContent().length() > 20 ?
-                                questionAnswerVo.getQuestion().getContent().substring(0, 20) :
-                                questionAnswerVo.getQuestion().getContent();
-                    }
+            RemoteResource remoteResource = remoteResourceService.get(info.getResourceId());
+            if (null != remoteResource) {
+                if (ModuleContants.RELEASE.equals(remoteResource.getModuleEnum())) {
+                    bodyTitle = remoteResource.getTitle();
+                    bodyImg = remoteResource.getFirstImgUrl();
+                } else if (ModuleContants.TOPIC_POST.equals(remoteResource.getModuleEnum())) {
+                    bodyTitle = remoteResource.getContent().length() > 20 ?
+                            remoteResource.getContent().substring(0, 20) : remoteResource.getContent();
+                    bodyImg = remoteResource.getFirstImgUrl();
+                } else if (ModuleContants.ANSWER.equals(remoteResource.getModuleEnum())) {
+                    bodyTitle = remoteResource.getQuestion().getContent().length() > 20 ?
+                            remoteResource.getQuestion().getContent().substring(0, 20) :
+                            remoteResource.getQuestion().getContent();
                 }
             }
             // 查询私圈信息

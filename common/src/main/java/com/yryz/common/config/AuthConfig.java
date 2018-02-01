@@ -27,7 +27,7 @@ public class AuthConfig implements Serializable{
 	/**
 	 * app端短期token过期时间/小时
 	 */
-	private Integer tokenExpire = 24;
+	private Integer tokenExpire = 1;
 	/**
 	 * app端长期token过期时间/天
 	 */

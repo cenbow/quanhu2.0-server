@@ -41,7 +41,7 @@ public class AuthService {
 		if(StringUtils.isEmpty(token)){
 			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 		}
-		String tokenUserId = StringUtils.split(token, "_")[0];		
+		String tokenUserId = StringUtils.split(token, "-")[0];
 		if(StringUtils.isEmpty(tokenUserId)){
 			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
 		}
