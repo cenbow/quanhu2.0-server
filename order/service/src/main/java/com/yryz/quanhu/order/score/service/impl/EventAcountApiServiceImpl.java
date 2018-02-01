@@ -1,6 +1,9 @@
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +14,8 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.grow.service.GrowAPI;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
@@ -48,6 +49,24 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	@Override
 	public EventAcount getEventAcount(String userId) {
 		return eventAcountAPI.getEventAcount(userId);
+	}
+	
+	@Override
+	public Response<Map<Long, EventAcount>>  getEventAcountBatch(Set<Long> userIds) {
+		
+		try {
+			 Map<Long, EventAcount> result = new HashMap<>();
+				for(Long userId : userIds){
+					result.put(userId,eventAcountAPI.getEventAcount(String.valueOf(userId)));
+				}
+		      return ResponseUtils.returnApiObjectSuccess(result);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取批量查询积分统计异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+
 	}
 
 	@Override

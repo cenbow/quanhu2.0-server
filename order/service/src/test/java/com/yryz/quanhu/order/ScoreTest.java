@@ -9,6 +9,8 @@ package com.yryz.quanhu.order;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,10 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.response.PageList;
-import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
@@ -118,6 +117,18 @@ public class ScoreTest {
      // System.out.println("ScoreFlow list: "+list.size());
     }
 	
+
+ 
+	@Test
+	public void getEventAcountBatch(){
+		Set<Long> userIds= new HashSet<>();
+		userIds.add(Long.valueOf("123456789"));
+		userIds.add(Long.valueOf("727061873573347328"));
+		userIds.add(Long.valueOf("729669966696603648"));
+		System.out.println(eventAcountApiService.getEventAcountBatch(userIds));
+		
+		
+	}
 	
 
 	
