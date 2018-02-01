@@ -11,6 +11,7 @@ import com.yryz.common.message.MessageViewCode;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.message.SystemBody;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.MessageUtils;
 import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
@@ -33,6 +34,9 @@ import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -81,6 +86,9 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
 
     @Reference
     private UserApi userApi;
+
+    @Reference
+    private EventAPI eventAPI;
 
     @Override
     public String getModuleEnum() {
@@ -127,6 +135,19 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         rewardCountService.addCountByTargetId(uCount);
 
         // 给打赏者、被打赏者 发送消息
+        sendMessage(info, rewardedPrice);
+
+        //发送打赏积分事件
+        sendEvent(info);
+    }
+
+    /**
+     * 给打赏者、被打赏者 发送消息
+     *
+     * @param info
+     * @param rewardedPrice
+     */
+    private void sendMessage(RewardInfo info, Long rewardedPrice) {
         try {
             //查询资源信息的title和img
             ResourceVo resourceVo = ResponseUtils.getResponseData(resourceApi.getResourcesById(String.valueOf(info.getResourceId())));
@@ -207,7 +228,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             }
             commitMessage(messageVo, false);
             logger.info("send rewarded message, data:{}", JsonUtils.toFastJson(messageVo));
-            //给打赏者推送极光消息
+            //给被打赏者推送极光消息
             reqVo = new PushReqVo();
             reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getToUserId())));
             reqVo.setMsg(JsonUtils.toFastJson(messageVo));
@@ -218,6 +239,30 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             pushAPI.commonSendAlias(reqVo);
         } catch (Exception e) {
             logger.error("打赏发送消息失败", e);
+        }
+    }
+
+    /**
+     * 发送打赏积分事件
+     *
+     * @param rewardInfo
+     */
+    private void sendEvent(RewardInfo rewardInfo) {
+        EventInfo eventInfo = new EventInfo();
+        try {
+            eventInfo.setCoterieId(String.valueOf(rewardInfo.getCoterieId()));
+            eventInfo.setAmount((double) (rewardInfo.getGiftNum() * rewardInfo.getGiftPrice()));
+            eventInfo.setUserId(String.valueOf(rewardInfo.getCreateUserId()));
+            eventInfo.setEventCode(EventEnum.COLLECTION.getCode());
+            eventInfo.setEventNum(1);
+            eventInfo.setOwnerId(String.valueOf(rewardInfo.getCreateUserId()));
+            eventInfo.setResourceId(String.valueOf(rewardInfo.getResourceId()));
+            eventInfo.setCreateTime(DateUtils.getString(new Date()));
+            eventAPI.commit(eventInfo);
+            logger.info("reward event commit success eventInfo:{}", JSON.toJSONString(eventInfo));
+        } catch (Exception e) {
+            logger.info("reward event commit error rewardInfo:{}", JSON.toJSONString(eventInfo));
+            logger.error("[reward event commit failure]", e);
         }
     }
 
