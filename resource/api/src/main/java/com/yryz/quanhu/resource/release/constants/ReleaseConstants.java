@@ -177,4 +177,9 @@ public final class ReleaseConstants {
         public static final Byte YES = 11;
 
     }
+
+    /**  
+    * @Fields : 每次操作触发（每日前两次发布文章正文内容超过100字时触发，每次记20分，最多记40分）
+    */
+    public static final int release_context_length_event = 100;
 }

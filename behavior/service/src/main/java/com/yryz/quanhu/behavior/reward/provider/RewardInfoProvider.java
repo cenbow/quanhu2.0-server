@@ -1,5 +1,17 @@
 package com.yryz.quanhu.behavior.reward.provider;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
@@ -25,13 +37,6 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-
-import java.util.*;
 
 /**
  * @author wangheng
@@ -136,13 +141,28 @@ public class RewardInfoProvider implements RewardInfoApi {
                 if (null == info) {
                     continue;
                 }
-                if (RewardConstants.QueryType.my_reward_resource_list.equals(dto.getQueryType())
-                        || RewardConstants.QueryType.reward_my_resource_list.equals(dto.getQueryType())) {
+                if (RewardConstants.QueryType.my_reward_resource_list.equals(dto.getQueryType())) {
+                    resourceIds.add(String.valueOf(info.getResourceId()));
+                } else if (RewardConstants.QueryType.reward_my_resource_list.equals(dto.getQueryType())) {
+                    userIds.add(String.valueOf(info.getCreateUserId()));
                     resourceIds.add(String.valueOf(info.getResourceId()));
                 } else if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())) {
                     userIds.add(String.valueOf(info.getToUserId()));
                 } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())) {
                     userIds.add(String.valueOf(info.getCreateUserId()));
+                }
+            }
+
+            // 礼物数据
+            for (RewardInfoVo info : entities) {
+                if (null == info) {
+                    continue;
+                }
+                // 礼物信息
+                GiftInfo giftInfo = giftInfoService.selectByKid(info.getGiftId());
+                if (null != giftInfo) {
+                    info.setGiftImage(giftInfo.getGiftImage());
+                    info.setGiftName(giftInfo.getGiftName());
                 }
             }
 
@@ -154,12 +174,6 @@ public class RewardInfoProvider implements RewardInfoApi {
                 for (RewardInfoVo info : entities) {
                     if (null == info) {
                         continue;
-                    }
-                    // 礼物信息
-                    GiftInfo giftInfo = giftInfoService.selectByKid(info.getGiftId());
-                    if (null != giftInfo) {
-                        info.setGiftImage(giftInfo.getGiftImage());
-                        info.setGiftName(giftInfo.getGiftName());
                     }
 
                     if (null != userMap) {
@@ -181,12 +195,6 @@ public class RewardInfoProvider implements RewardInfoApi {
                     for (RewardInfoVo info : entities) {
                         if (null == info) {
                             continue;
-                        }
-                        // 礼物信息
-                        GiftInfo giftInfo = giftInfoService.selectByKid(info.getGiftId());
-                        if (null != giftInfo) {
-                            info.setGiftImage(giftInfo.getGiftImage());
-                            info.setGiftName(giftInfo.getGiftName());
                         }
 
                         ResourceVo resourceVo = resourceMap.get(String.valueOf(info.getResourceId()));
