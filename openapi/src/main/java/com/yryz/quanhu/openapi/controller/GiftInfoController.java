@@ -2,10 +2,10 @@ package com.yryz.quanhu.openapi.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
@@ -31,12 +31,16 @@ public class GiftInfoController {
     @Reference(lazy = true, check = false, timeout = 10000)
     private GiftInfoApi giftInfoApi;
 
-    @NotLogin
     @ApiOperation("礼物列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true), })
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true) })
     @GetMapping(value = "{version}/gift/list")
-    public Response<PageList<GiftInfo>> list(GiftInfoDto dto) {
+    public Response<PageList<GiftInfo>> list(@RequestParam Integer currentPage, @RequestParam Integer pageSize) {
+        GiftInfoDto dto = new GiftInfoDto();
+        dto.setCurrentPage(currentPage);
+        dto.setPageSize(pageSize);
         return giftInfoApi.pageByCondition(dto, false);
     }
 }
