@@ -35,6 +35,20 @@ public class Like extends GenericEntity {
     @JsonSerialize(using = ToStringSerializer.class)
     private long resourceUserId;
 
+    /**
+     *私圈id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private long coterieId;
+
+    public long getCoterieId() {
+        return coterieId;
+    }
+
+    public void setCoterieId(long coterieId) {
+        this.coterieId = coterieId;
+    }
+
     public long getResourceUserId() {
         return resourceUserId;
     }

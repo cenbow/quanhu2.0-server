@@ -105,4 +105,9 @@ public class MessageActionCode {
 	 */
 	public static final String ACTIVITY_RESULT = "8008";
 
+	/**
+	 * 点赞
+	 */
+	public static final String LIKE="11";
+
 }

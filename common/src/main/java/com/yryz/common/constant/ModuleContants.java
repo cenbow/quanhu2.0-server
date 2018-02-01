@@ -56,6 +56,11 @@ public class ModuleContants {
     public static final String ACTIVITY_WORKS_ENUM = "10081";
 
     /**
+     * 动态
+     */
+    public static final String DYNAMIC="1010";
+
+    /**
      * 活动
      */
     public static final String ACTIVITY_COTERIE = "1009";
@@ -63,5 +68,10 @@ public class ModuleContants {
     /**
      * 举报
      */
-    public static final String report="1010";
+    public static final String REPORT="1011";
+
+    /**
+     * 评论
+     */
+    public static final String COMMENT="1012";
 }
