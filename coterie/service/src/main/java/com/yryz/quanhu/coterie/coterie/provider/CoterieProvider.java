@@ -183,8 +183,7 @@ public class CoterieProvider implements CoterieApi {
 
 				throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
 			}
-			//todo 100取模 = 0
-			if (!(info.getConsultingFee()!=null && info.getConsultingFee()<=10000 && info.getConsultingFee()>=0)) {
+			if (!(info.getConsultingFee()!=null && info.getConsultingFee()<=100 && info.getConsultingFee()>=0)) {
 				throw new QuanhuException( "2007","参数错误","私圈咨询费金额设置不正确。",null);
 			}
 			coterieService.modify(info);
