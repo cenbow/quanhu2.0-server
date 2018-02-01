@@ -88,6 +88,9 @@ public class SmsServiceImpl implements SmsService{
 			case SmsContants.CODE_OTHER:	
 				smsType = SmsType.CODE_OTHER;
 				break;
+			case SmsContants.ACTIVITY_PHONE_CHECK:	
+				smsType = SmsType.ACTIVITY_BIND_PHONE;
+				break;
 			default:
 				break;
 			}

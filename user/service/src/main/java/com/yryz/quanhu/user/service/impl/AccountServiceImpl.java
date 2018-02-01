@@ -3,8 +3,11 @@ package com.yryz.quanhu.user.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
@@ -35,6 +39,8 @@ import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
+import com.yryz.quanhu.user.dto.WebThirdLoginDTO;
+import com.yryz.quanhu.user.entity.ActivityTempUser;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
@@ -42,6 +48,7 @@ import com.yryz.quanhu.user.entity.UserThirdLogin;
 import com.yryz.quanhu.user.manager.SmsManager;
 import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.AccountService;
+import com.yryz.quanhu.user.service.ActivityTempUserService;
 import com.yryz.quanhu.user.service.OatuhWeibo;
 import com.yryz.quanhu.user.service.OatuhWeixin;
 import com.yryz.quanhu.user.service.UserService;
@@ -74,12 +81,14 @@ public class AccountServiceImpl implements AccountService {
 	@Autowired
 	protected UserService userService;
 	@Autowired
+	private ActivityTempUserService tempUserService;
+	@Autowired
 	private UserSender mqSender;
 
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
 	public Long register(RegisterDTO registerDTO) {
-		return createUser(registerDTO);
+		return createUser(registerDTO, null);
 	}
 
 	@Override
@@ -95,8 +104,42 @@ public class AccountServiceImpl implements AccountService {
 		}
 		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, regChannel);
 		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
-		createUser(
-				new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO));
+		createUser(new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO), null);
+	}
+
+	@Override
+	public void mergeActivityUser(Long userId, String phone) {
+		ActivityTempUser tempUser = null;
+		try {
+			tempUser = tempUserService.get(userId, null);
+			if (tempUser == null) {
+				logger.info("[mergeActivityUser]:msg:参与者不存在");
+				throw QuanhuException.busiError("参与者不存在");
+			}
+			RegisterDTO registerDTO = new RegisterDTO();
+			registerDTO.setUserChannel(String.format("wap_%s", RegType.WEIXIN_OAUTH.getText()));
+			registerDTO.setUserNickName(tempUser.getNickName());
+			registerDTO.setUserLocation("");
+			registerDTO.setDeviceId("");
+			registerDTO.setUserPhone(phone);
+			UserRegLogDTO logDTO = new UserRegLogDTO(userId, "WAP", "", RegType.WEIXIN_OAUTH.getText(), "WAP", "",
+					tempUser.getAppId(), tempUser.getIp(), "", tempUser.getActivivtyChannelCode(),
+					StringUtils.join(
+							new String[] { "WAP", RegType.WEIXIN_OAUTH.getText(), tempUser.getActivivtyChannelCode() },
+							" "));
+			registerDTO.setRegLogDTO(logDTO);
+			userId = createUser(registerDTO, tempUser.getKid());
+			// 创建第三方账户
+			thirdLoginService.insert(new UserThirdLogin(userId, tempUser.getThirdId(),
+					(byte) RegType.WEIXIN.getType(), tempUser.getNickName(), tempUser.getAppId()));
+			logger.info("[user_bindPhone]:userId:{},bindType:activityMergeByPhone,oldPhone:,newPhone:{}", userId,
+					phone);
+		} catch (Exception e) {
+			logger.info("[mergeActivityUser]:userId:{},phone:{},tempUser:{}", userId, phone,
+					JsonUtils.toFastJson(tempUser));
+			logger.error("[mergeActivityUser]", e);
+		}
+
 	}
 
 	@Override
@@ -129,7 +172,7 @@ public class AccountServiceImpl implements AccountService {
 					SmsType.CODE_REGISTER, appId)) {
 				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
-			return createUser(registerDTO);
+			return createUser(registerDTO, null);
 		}
 		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
 				appId)) {
@@ -173,7 +216,14 @@ public class AccountServiceImpl implements AccountService {
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
 		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
 		registerDTO.setUserPhone(loginDTO.getPhone());
-		Long userId = createUser(registerDTO);
+		// 根据第三方账户查询临时用户表生成用户
+		ActivityTempUser tempUser = tempUserService.get(null, thirdUser.getThirdId());
+		Long userId = null;
+		if (tempUser != null) {
+			userId = tempUser.getKid();
+		}
+
+		userId = createUser(registerDTO, tempUser.getKid());
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
 				thirdUser.getNickName(), loginDTO.getRegLogDTO().getAppId()));
@@ -184,10 +234,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public List<LoginMethodVO> getLoginMethod(Long userId) {
-		List<UserThirdLogin> logins = thirdLoginService.selectByUserId(userId);
-		if (CollectionUtils.isEmpty(logins)) {
-			logins = new ArrayList<>();
-		}
+		List<UserThirdLogin> logins = getViewThirdLogin(thirdLoginService.selectByUserId(userId), userId);
 		UserAccount account = selectOne(userId, null, null);
 		if (account == null) {
 			throw QuanhuException.busiError("该用户不存在");
@@ -243,12 +290,22 @@ public class AccountServiceImpl implements AccountService {
 		registerDTO.setUserChannel(String.format("web_%s", loginType));
 		registerDTO.setUserNickName(thirdUser.getNickName());
 		registerDTO.setUserLocation(thirdUser.getLocation());
-		Long userId = createUser(registerDTO);
+		Long userId = createUser(registerDTO, null);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(),
 				(byte) RegType.getEnumByText(loginType).getType(), thirdUser.getNickName(), "appId"));
 
 		return userId;
+	}
+
+	@Override
+	public String wxOauthLogin(WebThirdLoginDTO loginDTO) {
+		// 得到第三方登录回调的host
+		String apiHost = UserUtils.getReturnApiHost(loginDTO.getReturnUrl());
+		// 读取配置
+		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
+		return OatuhWeixin.getWxOauthUrl(configVO.getWxOauthAppKey(), apiHost, loginDTO.getReturnUrl(),
+				loginDTO.getActivityChannelCode(), configVO.getWxOauthNotifyUrl());
 	}
 
 	@Override
@@ -279,7 +336,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public void unbindThird(Long userId, String thirdId, Integer type, String appId) {
-		UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdId, appId,type);
+		UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdId, appId, type);
 		if (thirdLogin == null) {
 			throw QuanhuException.busiError("第三方账户不存在");
 		}
@@ -300,7 +357,7 @@ public class AccountServiceImpl implements AccountService {
 		if (account == null) {
 			throw QuanhuException.busiError("用户不存在");
 		}
-		if(!StringUtils.equals(oldPassword, account.getUserPwd())){
+		if (!StringUtils.equals(oldPassword, account.getUserPwd())) {
 			throw QuanhuException.busiError("旧密码不正确");
 		}
 		account.setDelFlag(null);
@@ -394,16 +451,16 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	private UserAccount selectOne(Long userId, String custPhone, String appId) {
 		UserAccount account = accountRedisDao.getAccount(userId, custPhone, appId);
-		if(account != null){
+		if (account != null) {
 			return account;
 		}
-		try {			
+		try {
 			account = mysqlDao.selectOne(userId, custPhone, appId);
 		} catch (Exception e) {
 			logger.error("[accountDao.selectOne]", e);
 			throw new MysqlOptException(e);
 		}
-		if(account != null){
+		if (account != null) {
 			accountRedisDao.saveAccount(account);
 		}
 		return account;
@@ -455,8 +512,10 @@ public class AccountServiceImpl implements AccountService {
 	 * @param custPwd
 	 */
 	@Transactional(rollbackFor = RuntimeException.class)
-	protected Long createUser(RegisterDTO registerDTO) {
-		Long userId = NumberUtils.toLong(ResponseUtils.getResponseData(idApi.getUserId()));
+	protected Long createUser(RegisterDTO registerDTO, Long userId) {
+		if (userId == null) {
+			userId = NumberUtils.toLong(ResponseUtils.getResponseData(idApi.getUserId()));
+		}
 		UserAccount account = new UserAccount(null, registerDTO.getUserPhone(), registerDTO.getUserPwd());
 		account.setKid(userId);
 		account.setAppId(registerDTO.getRegLogDTO().getAppId());
@@ -481,4 +540,93 @@ public class AccountServiceImpl implements AccountService {
 		return selectOne(userId, null, null);
 	}
 
+	@Override
+	public List<Map<String, String>> getUserAccountByPhone(Set<String> phones, String appId) {
+		List<UserAccount> accounts = getUserAccount(phones, appId);
+		List<Map<String, String>> maps = new ArrayList<>(phones.size());
+		for (Iterator<String> iterator = phones.iterator(); iterator.hasNext();) {
+			String phone = iterator.next();
+			boolean nullFlag = true;
+			Map<String, String> map = new HashMap<>();
+			for (UserAccount account : accounts) {
+				if (account != null) {
+					map.put("phone", phone);
+					map.put("userId", account.getKid().toString());
+					nullFlag = false;
+				}
+			}
+			if (nullFlag) {
+				map.put("phone", phone);
+				map.put("userId", "");
+			}
+			maps.add(map);
+		}
+		return maps;
+	}
+
+	/**
+	 * 根据手机号查询缓存以及mysql中的用户账户
+	 * 
+	 * @param phones
+	 * @param appId
+	 * @return
+	 */
+	private List<UserAccount> getUserAccount(Set<String> phones, String appId) {
+		List<UserAccount> accounts = accountRedisDao.getAccount(phones, appId);
+		Set<String> nullPhone = new HashSet<>();
+		// 收集缓存不存在的手机号
+		for (Iterator<String> iterator = phones.iterator(); iterator.hasNext();) {
+			String phone = iterator.next();
+			boolean nullFlag = true;
+			for (UserAccount account : accounts) {
+				if (account != null) {
+					nullFlag = false;
+				}
+			}
+			if (nullFlag) {
+				nullPhone.add(phone);
+			}
+		}
+		if (CollectionUtils.isEmpty(nullPhone)) {
+			return accounts;
+		}
+		// 查询mysql
+		List<UserAccount> myAccounts = mysqlDao.selectByPhones(Lists.newArrayList(phones), appId);
+		// 合并缓存的账户
+		if (CollectionUtils.isNotEmpty(accounts)) {
+			myAccounts.addAll(accounts);
+		}
+		return myAccounts;
+	}
+
+	/**
+	 * 把查询得到的登录方式转换成前端需要的
+	 * 
+	 * @param logins
+	 * @param userId
+	 * @return
+	 */
+	private List<UserThirdLogin> getViewThirdLogin(List<UserThirdLogin> logins, Long userId) {
+		if (CollectionUtils.isEmpty(logins)) {
+			logins = new ArrayList<>(3);
+		}
+		for (int i = 10; i < 13; i++) {
+			RegType regType = RegType.getEnumByTye(i);
+			boolean nullType = true;
+			for (UserThirdLogin login : logins) {
+				if (regType.getType() == (int) login.getLoginType()) {
+					nullType = false;
+				}
+			}
+			if (nullType) {
+				UserThirdLogin login = new UserThirdLogin();
+				login.setThirdId("");
+				login.setLoginType((byte) regType.getType());
+				login.setUserId(userId);
+				login.setNickName("");
+				logins.add(login);
+			}
+		}
+		return logins;
+	}
 }

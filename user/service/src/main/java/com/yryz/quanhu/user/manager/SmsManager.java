@@ -30,9 +30,8 @@ import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 @Component
 public class SmsManager {
 	private static final Logger logger = LoggerFactory.getLogger(SmsManager.class);
-	private static final Logger smsLogger = LoggerFactory.getLogger("sms.Logger");
 
-	@Reference
+	@Reference(retries=1,cluster="failfast")
 	private CommonSafeApi commonSafeApi;
 
 	/**
@@ -51,12 +50,12 @@ public class SmsManager {
 			return new SmsVerifyCodeVO(String.valueOf(smsType.getType()), phone, String.valueOf(codeVO.getExpireAt()));
 		} catch (QuanhuException e) {
 			logger.error("[SmsAPI.sendCode]", e);
-			smsLogger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null,
+			logger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null,
 					smsType.getType());
 			throw QuanhuException.busiError("验证码发送失败");
 		} catch (Exception e) {
 			logger.error("[SmsAPI.sendCode]", e);
-			smsLogger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null,
+			logger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null,
 					smsType.getType());
 			throw QuanhuException.busiError("验证码发送失败");
 		}
@@ -74,7 +73,7 @@ public class SmsManager {
 	 */
 	public boolean checkVerifyCode(String phone, String code, String type, String appId, boolean needDelete) {
 		try {
-			smsLogger.info("[check_verifyCode]:phone->{},code->{},type->{},status->success", phone, code, type);
+			logger.info("[check_verifyCode]:phone->{},code->{},type->{},status->success", phone, code, type);
 			int result = ResponseUtils.getResponseData(commonSafeApi
 					.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(type),
 							CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId, code, needDelete))
@@ -85,11 +84,11 @@ public class SmsManager {
 			return true;
 		} catch (QuanhuException e) {
 			logger.error("[SmsAPI.checkVerifyCode]", e);
-			smsLogger.info("[check_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null, type);
+			logger.info("[check_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null, type);
 			throw QuanhuException.busiError("验证码验证失败");
 		} catch (Exception e) {
 			logger.error("[SmsAPI.checkVerifyCode]", e);
-			smsLogger.info("[check_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null, type);
+			logger.info("[check_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null, type);
 			throw QuanhuException.busiError("验证码验证失败");
 		}
 	}

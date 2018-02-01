@@ -37,6 +37,37 @@ public class ThirdLoginConfigVO implements Serializable {
 	 * 回调地址
 	 */
 	private String notifyUrl;
+	
+	/**
+	 * 微信授权 app key
+	 */
+	private String wxOauthAppKey = "wx8b0aed844739ffbe";
+	/**
+	 * 微信授权app secret
+	 */
+	private String wxOauthAppSecret = "b80e24c23c211808fa4b03aad628dc06";
+	/**
+	 * 微信授权回调地址
+	 */
+	private String wxOauthNotifyUrl ="/openapi/services/app/v2/user/wxOauthLoginNotify";
+	public String getWxOauthAppKey() {
+		return wxOauthAppKey;
+	}
+	public void setWxOauthAppKey(String wxOauthAppKey) {
+		this.wxOauthAppKey = wxOauthAppKey;
+	}
+	public String getWxOauthAppSecret() {
+		return wxOauthAppSecret;
+	}
+	public void setWxOauthAppSecret(String wxOauthAppSecret) {
+		this.wxOauthAppSecret = wxOauthAppSecret;
+	}
+	public String getWxOauthNotifyUrl() {
+		return wxOauthNotifyUrl;
+	}
+	public void setWxOauthNotifyUrl(String wxOauthNotifyUrl) {
+		this.wxOauthNotifyUrl = wxOauthNotifyUrl;
+	}
 	/**
 	 * 
 	 * @exception 
