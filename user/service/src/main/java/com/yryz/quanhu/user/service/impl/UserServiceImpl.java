@@ -159,6 +159,7 @@ public class UserServiceImpl implements UserService {
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
 		UserBaseInfo baseInfo = getUser(friendId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
 			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
