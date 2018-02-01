@@ -385,7 +385,6 @@ public class DymaicServiceImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug("debug findusers hit " + (users == null ? 0 : users.size()));
-//            logger.debug("debug findstatics hit " + (statistics == null ? 0 : statistics.size()));
         }
 
         //4, 聚合动态、用户、统计信息
@@ -403,10 +402,14 @@ public class DymaicServiceImpl {
                         vo.setUser(new UserSimpleVO());
                     }
                     
-                    //添加统计数  评论数，点赞数，转发数
-                    String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-                    Map<String, Long> statistics = countApi.getCount(countType , kid, null).getData();
-                    vo.setStatistics(statistics);
+                    //评论数，点赞数，转发数, ignore exception
+                    try {
+                        String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
+                        Map<String, Long> statistics = countApi.getCount(countType , kid, null).getData();
+                        vo.setStatistics(statistics);
+                    } catch (Exception e) {
+                        logger.warn("cannot get statics cause: "+  e.getMessage());
+                    }
 
                     result.add(vo);
                 }
