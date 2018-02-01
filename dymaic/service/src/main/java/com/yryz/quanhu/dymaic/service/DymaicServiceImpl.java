@@ -2,6 +2,7 @@ package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
@@ -27,10 +28,6 @@ import java.util.*;
  * @author xiepeng
  * @version 1.0
  * @data 2018/1/19 0019 04
- * <p>
- * <p>
- * TODO
- * 对接统计查询、点赞
  */
 @Service
 public class DymaicServiceImpl {
@@ -56,7 +53,7 @@ public class DymaicServiceImpl {
     UserRelationApi userRelationApi;
 
     @Reference
-    IdAPI idAPI;
+    SortIdHelper sortIdHelper;
     
     @Reference
     CountApi countApi;
@@ -68,8 +65,7 @@ public class DymaicServiceImpl {
      * @return
      */
     public Boolean send(Dymaic dymaic) {
-        Response<Long> idRsp = idAPI.getKid("dymaic");
-        dymaic.setKid(idRsp.getData());
+        dymaic.setKid(sortIdHelper.getKid());
 
         //write db
         dymaicDao.insert(dymaic);
@@ -196,6 +192,14 @@ public class DymaicServiceImpl {
         return result;
     }
 
+    public void setTopDymaic(Long userId, Long kid, boolean topStatus) {
+
+    }
+
+    public DymaicVo getTopDymaic(Long userId) {
+        return null;
+    }
+
     /**
      * 批量查询个人最后一条动态
      * @param userIds
@@ -261,7 +265,7 @@ public class DymaicServiceImpl {
      */
     public List<DymaicVo> getTimeLine(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
-        logger.info("dymaicIds size " + kids.size());
+        logger.info("[dymaic] getTimeLine dymaicId " + (kids == null ? 0 : kids.size()) + ", userId " + userId);
 
         List<DymaicVo> result;
         if (kids == null || kids.isEmpty()) {
@@ -349,6 +353,7 @@ public class DymaicServiceImpl {
     /**
      * 根据动态id，聚合相应的摘要、用户、统计数据
      *
+     * @param userId
      * @param kids
      * @return
      */
@@ -374,21 +379,7 @@ public class DymaicServiceImpl {
             }
         }
 
-//        //3 查询统计数据 评论数，点赞数，转发数
-//        Map<String, Long> statistics = null;
-//        if (dymaicMap != null) {
-//        	String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-//        	dymaicMap.forEach((kid,dymaic)->{
-//        		Map<String, Long> map = countApi.getCount(countType , kid, null).getData();
-//        	});
-//        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("debug findusers hit " + (users == null ? 0 : users.size()));
-//            logger.debug("debug findstatics hit " + (statistics == null ? 0 : statistics.size()));
-        }
-
-        //4, 聚合动态、用户、统计信息
+        //3, 聚合动态、用户、统计信息
         if (dymaicMap != null) {
             for (Long kid : kids) {
                 Dymaic dymaic = dymaicMap.get(kid);
@@ -403,10 +394,8 @@ public class DymaicServiceImpl {
                         vo.setUser(new UserSimpleVO());
                     }
                     
-                    //添加统计数  评论数，点赞数，转发数
-                    String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-                    Map<String, Long> statistics = countApi.getCount(countType , kid, null).getData();
-                    vo.setStatistics(statistics);
+                    //评论数，点赞数，转发数, ignore exception
+                    vo.setStatistics(getStatics(kid));
 
                     result.add(vo);
                 }
@@ -414,6 +403,32 @@ public class DymaicServiceImpl {
         }
 
         return result;
+    }
+
+    /**
+     * 根据动态id，聚合相应的摘要、用户、统计数据
+     *
+     * @param userId
+     * @param kid
+     * @return
+     */
+    private DymaicVo mergeDymaicVo(Long userId, Long kid) {
+        DymaicVo vo = new DymaicVo();
+
+        Dymaic dymaic = this.get(kid);
+        if (dymaic != null) {
+            BeanUtils.copyProperties(dymaic, vo);
+
+            //用户信息
+            Response<UserSimpleVO> response = userApi.getUserSimple(userId, dymaic.getUserId());
+            UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(response);
+            vo.setUser(userSimpleVO);
+
+            //评论数，点赞数，转发数, ignore exception
+            vo.setStatistics(getStatics(kid));
+        }
+
+        return vo;
     }
 
     /**
@@ -438,6 +453,29 @@ public class DymaicServiceImpl {
         }
 
         return result;
+    }
+
+    /**
+     * 查询统计数
+     * @param kid
+     * @return
+     */
+    private Map<String, Long> getStatics(Long kid) {
+        Map<String, Long> statistics = null;
+        try {
+            String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
+            statistics = countApi.getCount(countType , kid, null).getData();
+        } catch (Exception e) {
+            logger.warn("cannot get statics cause: "+  e.getMessage());
+        }
+
+        statistics = (statistics == null) ? new HashMap<>() : statistics;
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("debug getStatics " + kid + ", hit " + statistics.toString());
+        }
+
+        return statistics;
     }
 
     /**

@@ -2,6 +2,7 @@ package com.yryz.quanhu.resource.coterie.release.info.service.impl;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Calendar;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import com.yryz.common.message.MessageConstant;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.message.SystemBody;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.MessageUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
@@ -28,6 +30,9 @@ import com.yryz.quanhu.resource.release.buyrecord.constants.BuyTypeEnum;
 import com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord;
 import com.yryz.quanhu.resource.release.buyrecord.service.ReleaseBuyRecordService;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
@@ -49,6 +54,9 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private UserApi userApi;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private EventAPI eventAPI;
 
     @Autowired
     private ReleaseBuyRecordService releaseBuyRecordService;
@@ -121,6 +129,23 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
             messageAPI.sendMessage(messageVo, true);
         } catch (Exception e) {
             logger.error("payMessageToSponsor ==>> , 付费阅读成功 给文章阅读者发送消息失败 !", e);
+        }
+
+        // 积分、事件 触发[资源付费    每次操作触发]
+        try {
+            EventInfo event = new EventInfo();
+            if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
+                event.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
+            }
+            event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
+            event.setEventCode(EventEnum.RESOURCE_PAY.getCode());
+            event.setOwnerId(String.valueOf(releaseInfo.getCreateUserId()));
+            event.setResourceId(String.valueOf(releaseInfo.getKid()));
+            event.setUserId(String.valueOf(outputOrder.getCreateUserId()));
+            eventAPI.commit(event);
+
+        } catch (Exception e) {
+            logger.error("发布资源文章，对接 积分事件异常！", e);
         }
     }
 

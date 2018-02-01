@@ -10,6 +10,7 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.utils.HTTPWeb;
 import com.yryz.quanhu.user.vo.ThirdUser;
@@ -27,7 +28,6 @@ import com.yryz.quanhu.user.vo.WeiboUser;
  */
 public class OatuhWeibo {
 	private static final Logger logger = LoggerFactory.getLogger(OatuhWeibo.class);
-	private static final Logger thirdLogger = LoggerFactory.getLogger("third.logger");
 	/**
 	 * 获取微博用户信息
 	 * 
@@ -48,7 +48,7 @@ public class OatuhWeibo {
 		WeiboUser wbUser = null;
 		try {
 			String result = HTTPWeb.get(url, map);
-			thirdLogger.info("[weibo_getUser]-->params:{},result:{}",map.toString(),result);
+			logger.info("[weibo_getUser]-->params:{},result:{}",map.toString(),result);
 			if (result != null) {
 				wbUser = JsonUtils.fromJson(result, WeiboUser.class);
 			}
@@ -67,7 +67,7 @@ public class OatuhWeibo {
 				user.setToken(token);
 			}
 		} catch (Exception e) {
-			thirdLogger.info("[weibo_getUser]-->params:{},result:{}",map.toString(),e.getMessage());
+			logger.info("[weibo_getUser]-->params:{},result:{}",map.toString(),e.getMessage());
 			logger.error("[oauth weibo]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), ExceptionEnum.BusiException.getShowMsg(), "AuthWeibo Error :" + e.getLocalizedMessage());
 		}
@@ -97,7 +97,7 @@ public class OatuhWeibo {
 		buffer.append("?client_id=").append(appKey);
 		buffer.append("&redirect_uri=").append(returnHost).append(notifyUrl);
 		buffer.append("&scope=").append("all");
-		buffer.append("&state=").append("test").append("_weibo");
+		buffer.append("&state=").append(RegType.SINA.getText());
 		buffer.append("_").append(returnUrl);
 		return buffer.toString();
 	}
@@ -125,12 +125,12 @@ public class OatuhWeibo {
 
 		try {
 			String result = HTTPWeb.post(url, params);
-			thirdLogger.info("[weibo_getToken]-->params:{},result:{}",params.toString(),result);
+			logger.info("[weibo_getToken]-->params:{},result:{}",params.toString(),result);
 			if (result != null) {
 				token = JsonUtils.fromJson(result, WeiboToken.class);
 			}
 		} catch (Exception e) {
-			thirdLogger.info("[weibo_getToken]-->params:{},result:{}",params.toString(),e.getMessage());
+			logger.info("[weibo_getToken]-->params:{},result:{}",params.toString(),e.getMessage());
 			logger.error("[oauth weibo]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), ExceptionEnum.BusiException.getShowMsg(), "AuthWeibo Error :" + e.getLocalizedMessage());
 		}

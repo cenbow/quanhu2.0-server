@@ -44,17 +44,7 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Override
 	public TokenCheckEnum checkToken(AuthTokenDTO tokenDTO) {
-		String token = null;
-		// token解析
-		try {
-			token = TokenUtils.getTokenByDesToken(tokenDTO.getToken(), tokenDTO.getUserId().toString());
-		} catch (IOException e) {
-			logger.error("[des decrypt token]", e);
-			return TokenCheckEnum.INVALID;
-		} catch (Exception e) {
-			logger.error("[des decrypt token]", e);
-			return TokenCheckEnum.INVALID;
-		}
+		String token = tokenDTO.getToken();
 
 		// 比对redis token
 		AuthTokenVO tokenVO = redisDao.getToken(tokenDTO);
@@ -75,19 +65,9 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public TokenCheckEnum checkToken(AuthRefreshDTO tokenDTO) {
-		String token = null;
-		String refreshToken = null;
-		// token解析
-		try {
-			token = TokenUtils.getTokenByDesToken(tokenDTO.getToken(), tokenDTO.getUserId().toString());
-			refreshToken = TokenUtils.getTokenByDesToken(tokenDTO.getRefreshToken(), tokenDTO.getUserId().toString());
-		} catch (IOException e) {
-			logger.error("[des decrypt token]", e);
-			return TokenCheckEnum.INVALID;
-		} catch (Exception e) {
-			logger.error("[des decrypt token]", e);
-			return TokenCheckEnum.INVALID;
-		}
+		String token = tokenDTO.getToken();
+		String refreshToken = tokenDTO.getRefreshToken();
+
 
 		// 比对redis token
 		AuthTokenVO tokenVO = redisDao.getToken(tokenDTO);
@@ -134,8 +114,7 @@ public class AuthServiceImpl implements AuthService {
 			token = tokenVO.getToken();
 		}
 		try {
-			tokenVO = new AuthTokenVO(tokenDTO.getUserId(), TokenUtils.getDesToken(tokenDTO.getUserId().toString(), token),
-					expireAt);
+			tokenVO = new AuthTokenVO(tokenDTO.getUserId(), token,expireAt);
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException);
@@ -180,8 +159,7 @@ public class AuthServiceImpl implements AuthService {
 			refreshToken = tokenVO.getRefreshToken();
 		}
 		try {
-			tokenVO = new AuthTokenVO(refreshDTO.getUserId(), TokenUtils.getDesToken(refreshDTO.getUserId().toString(), token),
-					expireAt, TokenUtils.getDesToken(refreshDTO.getUserId().toString(),refreshToken), refreshExpireAt);
+			tokenVO = new AuthTokenVO(refreshDTO.getUserId(), token, expireAt, refreshToken, refreshExpireAt);
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException);

@@ -56,16 +56,6 @@ public interface ReleaseInfoApi {
     * @throws  
     */
     public Response<Integer> deleteBykid(ReleaseInfo upInfo);
-
-    /**  
-    * @Description: 批量下架
-    * @author wangheng
-    * @param record
-    * @param dto
-    * @return int
-    * @throws  
-    */
-    public Response<Integer> shelvesByCondition(ReleaseInfo record, ReleaseInfoDto dto);
     
     public Response<List<Long>> getKidByCreatedate(String startDate,String endDate);
     

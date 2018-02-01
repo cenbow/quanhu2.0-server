@@ -1,5 +1,6 @@
 package com.yryz.quanhu.resource.release.info.service.impl;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.resource.release.config.entity.ReleaseConfig;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
@@ -20,6 +22,9 @@ import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.score.enums.EventEnum;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 
 /**
 * @author wangheng
@@ -261,5 +266,28 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
     @Override
     public List<Long> getKidByCreatedate(String startDate, String endDate) {
         return releaseInfoDao.selectKidByCreatedate(startDate, endDate);
+    }
+
+    @Override
+    public void commitEvent(EventAPI eventAPI, ReleaseInfo record) {
+        if (StringUtils.length(record.getContent()) < ReleaseConstants.release_context_length_event) {
+            logger.debug("当前发布文章内容字数小于" + ReleaseConstants.release_context_length_event + "字，不提交事件！");
+            return;
+        }
+        try {
+            EventInfo event = new EventInfo();
+            if (null != record.getCoterieId() && 0L != record.getCoterieId()) {
+                event.setCoterieId(String.valueOf(record.getCoterieId()));
+            }
+            event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
+            event.setEventCode(EventEnum.CREATE_RESOURCE.getCode());
+            event.setOwnerId(String.valueOf(record.getCreateUserId()));
+            event.setResourceId(String.valueOf(record.getKid()));
+            event.setUserId(String.valueOf(record.getCreateUserId()));
+            eventAPI.commit(event);
+
+        } catch (Exception e) {
+            logger.error("发布资源文章，对接 积分事件异常！", e);
+        }
     }
 }

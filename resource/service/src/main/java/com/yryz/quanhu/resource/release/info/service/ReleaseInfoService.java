@@ -7,6 +7,7 @@ import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.score.service.EventAPI;
 
 /**
 * @author wangheng
@@ -107,4 +108,14 @@ public interface ReleaseInfoService {
     public void resourcePropertiesEmpty(ReleaseInfo record);
 
     public List<Long> getKidByCreatedate(String startDate, String endDate);
+
+    /**  
+    * @Description: 每次操作触发（每日前两次发布文章正文内容超过100字时触发，每次记20分，最多记40分）  
+    * @author wangheng
+    * @param @param eventAPI
+    * @param @param record
+    * @return void
+    * @throws  
+    */
+    public void commitEvent(EventAPI eventAPI, ReleaseInfo record);
 }

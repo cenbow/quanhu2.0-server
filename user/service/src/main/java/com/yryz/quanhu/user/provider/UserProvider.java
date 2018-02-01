@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -57,11 +58,7 @@ public class UserProvider implements UserApi{
 			if(friendId == null){
 				throw QuanhuException.busiError("friendId不能为空");
 			}
-			UserSimpleVO simpleVO = userService.getUserSimple(friendId);
-			
-			if(userId == null){
-				// TODO:聚合关系数据
-			}
+			UserSimpleVO simpleVO = userService.getUserSimple(userId,friendId);
 			
 			return ResponseUtils.returnObjectSuccess(simpleVO);
 		} catch (QuanhuException e) {
@@ -95,10 +92,7 @@ public class UserProvider implements UserApi{
 			if(CollectionUtils.isEmpty(firendIds)){
 				throw QuanhuException.busiError("userIds不能为空");
 			}
-			Map<String, UserSimpleVO> map = userService.getUserSimple(firendIds);
-			if(userId == null){
-				// TODO:聚合关系数据
-			}
+			Map<String, UserSimpleVO> map = userService.getUserSimple(userId,firendIds);
 			return ResponseUtils.returnObjectSuccess(map);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -114,7 +108,7 @@ public class UserProvider implements UserApi{
 			if(userId == null){
 				throw QuanhuException.busiError("userId不能为空");
 			}
-			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId);
+			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId,null);
 			return ResponseUtils.returnObjectSuccess(loginSimpleVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -130,10 +124,7 @@ public class UserProvider implements UserApi{
 			if(friendId == null){
 				throw QuanhuException.busiError("friendId不能为空");
 			}
-			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(friendId);
-			if(userId == null){
-				// TODO:聚合关系数据
-			}
+			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId,friendId);
 			return ResponseUtils.returnObjectSuccess(loginSimpleVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -237,9 +228,19 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
-	public Response<Page<UserBaseInfoVO>> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response<PageList<UserBaseInfoVO>> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
+		try {
+			Page<UserBaseInfo> list = userService.listUserInfo(pageNo, pageSize, custInfoDTO);
+
+			List<UserBaseInfoVO> baseInfos = GsonUtils.parseList(list, UserBaseInfoVO.class);
+
+			PageList<UserBaseInfoVO> pageList = new PageList<>(pageNo, pageSize,
+					baseInfos);
+			return ResponseUtils.returnObjectSuccess(pageList);
+		} catch (Exception e) {
+			logger.error("listUserInfo error", e);
+			return ResponseUtils.returnException(e);
+		}
 	}
 
 	@Override

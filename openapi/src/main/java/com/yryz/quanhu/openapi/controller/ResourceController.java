@@ -8,8 +8,10 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Lists;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -100,5 +102,37 @@ public class ResourceController {
         pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
         pageList.setPageSize(pageSize);
         return ResponseUtils.returnObjectSuccess(pageList);
+    }
+
+    @ApiOperation("置顶")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/resource/top")
+    public Response<Object> top(@RequestHeader Long userId, @RequestParam ResourceVo resourceVo) {
+        ResourceVo resource = ResponseUtils.getResponseData(resourceApi.getResourcesById(resourceVo.getResourceId()));
+        if (resource == null || resource.getResourceId() == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("资源ID不存在"));
+        }
+        if (userId == null || !userId.equals(resource.getUserId())) {
+            return ResponseUtils.returnException(QuanhuException.busiError("没有权限置顶此文章"));
+        }
+        resource.setSort(99999L);
+        resourceApi.updateResource(Lists.newArrayList(resource));
+        return ResponseUtils.returnSuccess();
+    }
+
+    @ApiOperation("取消置顶")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/resource/canceltop")
+    public Response<Object> canceltop(@RequestHeader Long userId, @RequestParam ResourceVo resourceVo) {
+        ResourceVo resource = ResponseUtils.getResponseData(resourceApi.getResourcesById(resourceVo.getResourceId()));
+        if (resource == null || resource.getResourceId() == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("资源ID不存在"));
+        }
+        if (userId == null || !userId.equals(resource.getUserId())) {
+            return ResponseUtils.returnException(QuanhuException.busiError("没有权限置顶此文章"));
+        }
+        resource.setSort(0L);
+        resourceApi.updateResource(Lists.newArrayList(resource));
+        return ResponseUtils.returnSuccess();
     }
 }

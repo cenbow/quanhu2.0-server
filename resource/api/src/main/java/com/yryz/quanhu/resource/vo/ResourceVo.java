@@ -8,6 +8,7 @@
 package com.yryz.quanhu.resource.vo;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
@@ -131,7 +132,7 @@ public class ResourceVo implements Serializable {
     /**
      * 阅读数状态
      */
-    private Long readNum;
+    private Map<String, Long> statistics;
 	
     /**
      * 用户基础信息
@@ -413,19 +414,19 @@ public class ResourceVo implements Serializable {
 	public void setCoterieSort(Long coterieSort) {
 		this.coterieSort = coterieSort;
 	}
-
+	
 	/**
-	 * @return the readNum
+	 * @return the statistics
 	 */
-	public Long getReadNum() {
-		return readNum;
+	public Map<String, Long> getStatistics() {
+		return statistics;
 	}
 
 	/**
-	 * @param readNum the readNum to set
+	 * @param statistics the statistics to set
 	 */
-	public void setReadNum(Long readNum) {
-		this.readNum = readNum;
+	public void setStatistics(Map<String, Long> statistics) {
+		this.statistics = statistics;
 	}
 
 	/**

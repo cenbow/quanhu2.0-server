@@ -2,6 +2,7 @@ package com.yryz.quanhu.behavior.like.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -13,6 +14,7 @@ import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeService;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
+import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -51,6 +53,8 @@ public class LikeProvider implements LikeApi {
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
+    @Reference(check = false)
+    private EventAPI eventAPI;
 
     @Override
     @Transactional
@@ -84,6 +88,12 @@ public class LikeProvider implements LikeApi {
                     }catch (Exception e){
                         logger.info("同步点赞数据到redis出现异常:"+e);
                     }
+                    //对接积分系统
+                    like.getModuleEnum();
+
+
+
+
 
                 }
             } else {
@@ -177,6 +187,5 @@ public class LikeProvider implements LikeApi {
         }
 
     }
-
 
 }

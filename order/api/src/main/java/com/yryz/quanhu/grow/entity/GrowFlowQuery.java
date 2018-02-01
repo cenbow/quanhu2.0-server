@@ -1,7 +1,6 @@
 package com.yryz.quanhu.grow.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 /**
  * 
  * @author lsn
@@ -16,6 +15,34 @@ public class GrowFlowQuery implements Serializable{
 	
 	/**页码*/
     private Integer currentPage = 1;
+
+
+	/**每页大小*/
+    private Integer pageSize = 10;
+    
+	/**用户ID*/
+	private String userId;
+	
+	/**积分增减标志（0-增加，1-减少）*/
+	private String  consumeFlag;
+
+	/**事件ID*/
+	private String eventCode;
+	
+	/**开始时间*/
+	private String startTime;
+	
+	/**结束时间*/
+	private String endTime;
+	
+	/**开始*/
+	private int start;
+	
+	/**条数*/
+	private int limit;
+	
+	
+	
     public Integer getCurrentPage() {
 		return currentPage;
 	}
@@ -31,14 +58,6 @@ public class GrowFlowQuery implements Serializable{
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
 	}
-
-	/**每页大小*/
-    private Integer pageSize = 10;
-    
-	
-	private String userId;
-	
-	private String  consumeFlag;
 	
 	public String getConsumeFlag() {
 		return consumeFlag;
@@ -47,16 +66,6 @@ public class GrowFlowQuery implements Serializable{
 	public void setConsumeFlag(String consumeFlag) {
 		this.consumeFlag = consumeFlag;
 	}
-
-	private String eventCode;
-	
-	private Date startTime;
-	
-	private Date endTime;
-	
-	private int start;
-	
-	private int limit;
 
 	public String getUserId() {
 		return userId;
@@ -74,19 +83,19 @@ public class GrowFlowQuery implements Serializable{
 		this.eventCode = eventCode;
 	}
 
-	public Date getStartTime() {
+	public String getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Date startTime) {
+	public void setStartTime(String startTime) {
 		this.startTime = startTime;
 	}
 
-	public Date getEndTime() {
+	public String getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Date endTime) {
+	public void setEndTime(String endTime) {
 		this.endTime = endTime;
 	}
 

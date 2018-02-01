@@ -27,12 +27,9 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
-import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
-import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -42,11 +39,12 @@ import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
 import com.yryz.quanhu.score.vo.EventSign;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 /**
  * @author syc
@@ -148,28 +146,40 @@ public class ScoreController {
 	@GetMapping(value = "/{version}/score/flow")
 //	@RequestMapping(path="/score/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
 //	@ResponseBody
-	public Response<PageList<ScoreFlow>> getScoreFlow( ScoreFlowQuery sfq ){
+	public Response<PageList<ScoreFlowReportVo>> getScoreFlow( ScoreFlowQuery sfq ){
 		//PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
 		//return ReturnModel.listToString(sfs);
 		return eventAcountApiService.getScoreFlow(sfq);
 		 //  return ResponseUtils.returnObjectSuccess(sfslist);
 	}
 	
+	
+	@NotLogin
+    @ApiOperation("获取全部积分明细")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/score/flow/list")
+	public Response<List<ScoreFlowReportVo>> getScoreFlowALL( ScoreFlowQuery sfq ){
+		return eventAcountApiService.getScoreFlowAll( sfq );
+	}
+	
+	
 	@NotLogin
     @ApiOperation("获取成长明细")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/grow/flow")
-//	@RequestMapping(path="/grow/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
-//	@ResponseBody
-	public Response<PageList<GrowFlow>> getGrowFlow( GrowFlowQuery gfq){
-		//PageList<GrowFlow> growflowList = 
+	public Response<PageList<GrowFlowReportVo>> getGrowFlow( GrowFlowQuery gfq){
 		return eventAcountApiService.getGrowFlow(gfq);
-		//return ReturnModel.listToString(gfs);
-		// return ResponseUtils.returnObjectSuccess(growflowList);
 	}
 	
 	
+	@NotLogin
+    @ApiOperation("获取全部成长明细")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+	@GetMapping(value = "/{version}/grow/flow/list")
+	public Response<List<GrowFlowReportVo>> getGrowFlowALL( GrowFlowQuery gfq){
+		return eventAcountApiService.getGrowFlowAll(gfq);
+	}
+	
 
 
-    
 }

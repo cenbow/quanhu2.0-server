@@ -24,6 +24,7 @@ import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.dao.redis.ResourceRedis;
 import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.service.HotspotService;
 import com.yryz.quanhu.resource.service.ResourceService;
 
@@ -63,9 +64,12 @@ public class ResourceServiceImpl implements ResourceService {
 					resourceMongo.update(resourceModel);
 					updateCache(resourceModel.getResourceId());
 				} else {
-					resourceMongo.save(resourceModel);
 					//创建资源时候要创建对应的热度对象
-					hotspotService.saveHeat("1", resourceModel.getResourceId() , resourceModel.getTalentType());
+					HeatInfo heatInfo = hotspotService.saveHeat("1", resourceModel.getResourceId() , resourceModel.getTalentType());
+					if(heatInfo != null) {
+						resourceModel.setHeat(heatInfo.getHeat());
+					}
+					resourceMongo.save(resourceModel);
 					resourceCanalDao.sendToCannel(resourceModel.getResourceId(), 0L);
 					updateCache(resourceModel.getResourceId());
 				}

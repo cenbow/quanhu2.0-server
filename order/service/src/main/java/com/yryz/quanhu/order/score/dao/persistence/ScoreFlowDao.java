@@ -26,5 +26,7 @@ public interface ScoreFlowDao {
 	List<ScoreFlow> getPage(@Param("sfq") ScoreFlowQuery sfq);
 	
 	long countgetPage(@Param("sfq") ScoreFlowQuery sfq);
+	
+	List<ScoreFlow> getAll(@Param("sfq") ScoreFlowQuery sfq);
 
 }

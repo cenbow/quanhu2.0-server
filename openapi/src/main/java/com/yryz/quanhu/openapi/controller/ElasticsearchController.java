@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -26,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(description = "全局搜索接口")
 @RestController
+@RequestMapping(value = "/services/app")
 public class ElasticsearchController {
 	@Reference
 	private ElasticsearchService elasticsearchService;

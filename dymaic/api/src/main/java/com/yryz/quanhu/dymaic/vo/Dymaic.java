@@ -25,7 +25,7 @@ public class Dymaic implements Serializable {
      * 资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     /**
      * 资源ID
@@ -41,7 +41,7 @@ public class Dymaic implements Serializable {
      * 转发资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer transmitType;
+    private String transmitType;
 
     /**
      * 文章、话题、私圈等标准json扩展属性
@@ -82,11 +82,11 @@ public class Dymaic implements Serializable {
         this.userId = userId;
     }
 
-    public Integer getModuleEnum() {
+    public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public void setModuleEnum(Integer moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
     }
 
@@ -106,11 +106,11 @@ public class Dymaic implements Serializable {
         this.transmitNote = transmitNote;
     }
 
-    public Integer getTransmitType() {
+    public String getTransmitType() {
         return transmitType;
     }
 
-    public void setTransmitType(Integer transmitType) {
+    public void setTransmitType(String transmitType) {
         this.transmitType = transmitType;
     }
 
