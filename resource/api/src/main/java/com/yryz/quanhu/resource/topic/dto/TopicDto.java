@@ -30,6 +30,12 @@ public class TopicDto implements Serializable {
 
     private String orderBy;
 
+    private String nickName;
+
+    private String startTime;
+
+    private  String endTime;
+
     public Long getKid() {
         return kid;
     }
@@ -132,5 +138,29 @@ public class TopicDto implements Serializable {
 
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
     }
 }

@@ -110,5 +110,10 @@ public class QuestionProvider implements QuestionApi {
             return ResponseUtils.returnException(e);
         }
     }
+
+    @Override
+    public Response<Question> queryDetail(Long kid) {
+        return this.queryDetail(kid);
+    }
 }
 

@@ -26,6 +26,7 @@ import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import org.springframework.beans.BeanUtils;
@@ -43,6 +44,10 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Autowired
     private QuestionService questionService;
+
+
+    @Autowired
+    private AnswerService answerService;
 
     @Autowired
     private APIservice apIservice;
@@ -147,7 +152,11 @@ public class AnswerServiceImpl implements AnswerService {
          */
         ResourceTotal resourceTotal=new ResourceTotal();
         resourceTotal.setCreateDate(DateUtils.getDate());
-        QuestionVo questionAnswerVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
+        QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
+        QuestionVo questionVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
+        AnswerVo answerVo1=this.answerService.queryAnswerVoByquestionId(questionId);
+        questionAnswerVo.setQuestion(questionVo);
+        questionAnswerVo.setAnswer(answerVo1);
         if(questionAnswerVo!=null) {
             resourceTotal.setExtJson(JSON.toJSONString(questionAnswerVo));
         }

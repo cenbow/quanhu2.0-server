@@ -301,7 +301,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public String wxOauthLogin(WebThirdLoginDTO loginDTO) {
 		// 得到第三方登录回调的host
-		String apiHost = UserUtils.getReturnApiHost(loginDTO.getReturnUrl());
+		String apiHost = UserUtils.getReturnOauthApiHost(loginDTO.getReturnUrl());
 		// 读取配置
 		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
 		return OatuhWeixin.getWxOauthUrl(configVO.getWxOauthAppKey(), apiHost, loginDTO.getReturnUrl(),

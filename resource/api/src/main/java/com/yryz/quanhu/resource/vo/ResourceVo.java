@@ -8,6 +8,7 @@
 package com.yryz.quanhu.resource.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import com.yryz.quanhu.coterie.coterie.vo.Coterie;
@@ -82,7 +83,7 @@ public class ResourceVo implements Serializable {
     /**
      * 发布时间
      */
-    private String createDate;
+    private Date createDate;
     
     /**
      * 热度值
@@ -278,14 +279,14 @@ public class ResourceVo implements Serializable {
 	/**
 	 * @return the createDate
 	 */
-	public String getCreateDate() {
+	public Date getCreateDate() {
 		return createDate;
 	}
 
 	/**
 	 * @param createDate the createDate to set
 	 */
-	public void setCreateDate(String createDate) {
+	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
 

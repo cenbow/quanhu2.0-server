@@ -43,7 +43,7 @@ public class DymaicProvider implements DymaicService {
         }
 
         try {
-            dymaic.setCreateDate(DateUtils.getDateTime());
+            dymaic.setCreateDate(new Date());
             dymaic.setShelveFlag(DymaicServiceImpl.STATUS_ON);
             dymaic.setDelFlag(DymaicServiceImpl.STATUS_ON);
             return ResponseUtils.returnObjectSuccess(dymaicService.send(dymaic));

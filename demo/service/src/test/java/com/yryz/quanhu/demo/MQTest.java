@@ -59,7 +59,7 @@ public class MQTest {
 		resourceTotal.setExtJson("{\"resourceId\":1000211}");
 		resourceTotal.setModuleEnum(1003);
 		resourceTotal.setPublicState("10");
-		resourceTotal.setResourceId(1000211L);
+		resourceTotal.setResourceId(10002122L);
 		resourceTotal.setTalentType("1");
 		resourceTotal.setTitle("resource title test");
 		resourceTotal.setUserId(10000L);
