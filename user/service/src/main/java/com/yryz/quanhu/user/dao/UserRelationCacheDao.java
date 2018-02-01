@@ -280,7 +280,7 @@ public class UserRelationCacheDao {
             this.scoreEvent(relationDto,dto);
 
             //刷新至缓存
-            logger.info("handleMessage.refreshCache={} start",relationDto.getSourceUserId());
+            logger.info("handleMessage.refreshCache={}/{} start",relationDto.getSourceUserId(),JSON.toJSON(dto));
             this.refreshCacheCount(relationDto.getSourceUserId(),dto);
             logger.info("handleMessage.refreshCache={} finish",relationDto.getSourceUserId());
 
@@ -292,6 +292,8 @@ public class UserRelationCacheDao {
         }
     }
 
+
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     /**
      * 积分事件
      * @param dto
@@ -301,7 +303,7 @@ public class UserRelationCacheDao {
 
         EventInfo info = new EventInfo();
         info.setEventCode("31");                      //事件编号
-        info.setCreateTime(String.valueOf(System.currentTimeMillis()));
+        info.setCreateTime(simpleDateFormat.format(new Date()));
         info.setUserId(dto.getSourceUserId());
 
         if(countDto.getFollowCount() == 30){          //达到30人，增加50积分

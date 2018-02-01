@@ -108,7 +108,7 @@ public class UserProvider implements UserApi{
 			if(userId == null){
 				throw QuanhuException.busiError("userId不能为空");
 			}
-			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId,null);
+			UserLoginSimpleVO loginSimpleVO = userService.getUserLoginSimpleVO(userId);
 			return ResponseUtils.returnObjectSuccess(loginSimpleVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);

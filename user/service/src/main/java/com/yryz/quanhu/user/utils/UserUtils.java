@@ -34,6 +34,19 @@ public class UserUtils {
 	}
 	
 	/**
+	 * 
+	 * 根据web应用host得到第三方登录回调的api host<br/>
+	 * 因为微博认证时只能取应用下面域的地址才有效，所以需要根据访问域得到回调域，需要运维映射该域到我们平台
+	 * 
+	 * @param returnUrl
+	 * @return
+	 */
+	public static String getReturnOauthApiHost(String returnUrl) {
+		String[] array = returnUrl.split("/");		
+		return String.format("%s//%s",array[0], array[2].replaceAll("m", "api2"));
+	}
+	
+	/**
 	 * 获取第三方应用appKey
 	 * @param appId
 	 * @param regType
