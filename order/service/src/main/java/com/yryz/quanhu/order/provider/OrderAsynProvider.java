@@ -8,12 +8,14 @@
 package com.yryz.quanhu.order.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.order.api.OrderAsynApi;
 import com.yryz.quanhu.order.entity.RrzOrderInfo;
 import com.yryz.quanhu.order.entity.RrzOrderVO;
+import com.yryz.quanhu.order.exception.CommonException;
 import com.yryz.quanhu.order.service.OrderService;
 import com.yryz.quanhu.order.vo.OrderInfo;
 import com.yryz.quanhu.order.vo.PreOrderVo;
@@ -57,7 +59,11 @@ public class OrderAsynProvider implements OrderAsynApi {
      */
     @Override
     public Response<?> executeOrder(String orderId, String custId, String password) {
-        return orderService.executeOrder(orderId, custId, password);
+        try {
+            return orderService.executeOrder(orderId, custId, password);
+        }catch (QuanhuException e){
+            return ResponseUtils.returnException(e);
+        }
     }
 
     /**

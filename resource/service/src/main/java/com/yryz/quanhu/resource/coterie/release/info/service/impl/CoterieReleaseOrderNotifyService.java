@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         Assert.notNull(outputOrder, "outputOrder is null !");
         Assert.notNull(outputOrder.getBizContent(), "bizContent is null !");
         Assert.notNull(outputOrder.getCoterieId(), "coterieId is null !");
-        ReleaseInfo releaseInfo = JsonUtils.fromJson(outputOrder.getBizContent(), ReleaseInfo.class);
+        ReleaseInfo releaseInfo = JSON.parseObject(outputOrder.getBizContent(), ReleaseInfo.class);
 
         Assert.notNull(releaseInfo, "fromJson releaseInfo is null !");
 
