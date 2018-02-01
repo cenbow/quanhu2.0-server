@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.user.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,9 +49,11 @@ import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
 import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.mq.UserSender;
+import com.yryz.quanhu.user.service.ActivityTempUserService;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserRelationService;
 import com.yryz.quanhu.user.service.UserService;
+import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
@@ -79,6 +82,8 @@ public class UserServiceImpl implements UserService {
 	UserImgAuditService userImgAuditService;
 	@Autowired
 	private UserRelationService relationService;
+	@Autowired
+	private ActivityTempUserService tempUserService;
 	@Autowired
 	private UserSender mqSender;
 	@Autowired
@@ -143,13 +148,27 @@ public class UserServiceImpl implements UserService {
 		
 		return result;
 	}
-
+	
+	
 	@Override
-	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId) {
-		UserBaseInfo baseInfo = getUser(userId);
+	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId){
+		return getUserLoginSimpleVO(null, userId);
+	}
+	
+	@Override
+	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
+		UserBaseInfo baseInfo = getUser(friendId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		// 聚合关系数据
+		if (userId != null && userId != 0L) {
+			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
+			UserRelationDto relationDto = map.get(friendId);
+			simpleVO.setUserPhone(PhoneUtils.getPhone(simpleVO.getUserPhone()));
+			simpleVO.setNameNotes(relationDto.getUserRemarkName());
+			simpleVO.setRelationStatus(relationDto.getRelationStatus());
+		}
 		// 依赖积分系统，获取用户等级
-		EventAcount acount = eventManager.getGrow(userId.toString());
+		EventAcount acount = eventManager.getGrow(friendId.toString());
 		if (acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1) {
 			simpleVO.setUserLevel("1");
 		} else {
@@ -302,7 +321,45 @@ public class UserServiceImpl implements UserService {
 		}
 		return map;
 	}
-
+	
+	@Override
+	public Map<String,UserBaseInfoVO> getActivityUser(Set<String> userIds){
+		if (CollectionUtils.isEmpty(userIds)) {
+			return new HashMap<>();
+		}
+		List<UserBaseInfo> list = getUserInfo(userIds);
+		List<String> tempUserIds = new ArrayList<>();
+		// 收集观察者id
+		for (Iterator<String> iterator = userIds.iterator(); iterator.hasNext();) {
+			Long userId = NumberUtils.createLong(iterator.next());
+			boolean tempUserFlag = true;
+			for (UserBaseInfo baseInfo : list) {
+				if (userId == baseInfo.getUserId()) {
+					tempUserFlag = false;
+				}
+			}
+			if (tempUserFlag) {
+				tempUserIds.add(userId.toString());
+			}
+		}
+		if(CollectionUtils.isEmpty(list)){
+			list = new ArrayList<>(userIds.size());
+		}
+		//查询观察者
+		List<UserBaseInfo> tempUsers = tempUserService.getUserBaseInfoByTempUser(tempUserIds);
+		if(CollectionUtils.isNotEmpty(tempUsers)){
+			list.addAll(tempUsers);
+		}
+		Map<String, UserBaseInfoVO> map = new HashMap<>(list.size());
+		if (list != null) {
+			for (UserBaseInfo vo : list) {
+				UserBaseInfoVO infoVO = UserBaseInfo.getUserBaseInfoVO(vo);
+				map.put(vo.getUserId().toString(), infoVO);
+			}
+		}
+		return map;
+	}
+	
 	/**
 	 * 根据昵称获取用户信息
 	 * 
@@ -336,6 +393,9 @@ public class UserServiceImpl implements UserService {
 				nullUserId.add(userId.toString());
 			}
 		}
+		if(CollectionUtils.isEmpty(infos)){
+			infos = new ArrayList<>(userIds.size());
+		}
 		if (CollectionUtils.isEmpty(nullUserId)) {
 			return infos;
 		}
@@ -345,8 +405,8 @@ public class UserServiceImpl implements UserService {
 			baseInfoRedisDao.saveUserInfo(mysqlInfos);
 		}
 		// 合并缓存的用户
-		if (CollectionUtils.isNotEmpty(infos)) {
-			mysqlInfos.addAll(infos);
+		if (CollectionUtils.isNotEmpty(mysqlInfos)) {
+			infos.addAll(mysqlInfos);
 		}
 		return mysqlInfos;
 	}
@@ -374,6 +434,9 @@ public class UserServiceImpl implements UserService {
 				nullPhone.add(phone);
 			}
 		}
+		if(CollectionUtils.isEmpty(infos)){
+			infos = new ArrayList<>(phones.size());
+		}
 		if (CollectionUtils.isEmpty(nullPhone)) {
 			return infos;
 		}
@@ -384,8 +447,8 @@ public class UserServiceImpl implements UserService {
 			baseInfoRedisDao.saveUserPhoneInfo(mysqlInfos);
 		}
 		// 合并缓存的用户
-		if (CollectionUtils.isNotEmpty(infos)) {
-			mysqlInfos.addAll(infos);
+		if (CollectionUtils.isNotEmpty(mysqlInfos)) {
+			infos.addAll(mysqlInfos);
 		}
 		return mysqlInfos;
 	}
@@ -438,15 +501,8 @@ public class UserServiceImpl implements UserService {
 	public Page<UserBaseInfo> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
 		custInfoDTO.setNickName(replayStr(custInfoDTO.getNickName()));
 
-		com.github.pagehelper.Page<UserBaseInfo> page = null;
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("nickName", replayStr(custInfoDTO.getNickName()));
-		params.put("phone", custInfoDTO.getPhone());
-		params.put("startDate", custInfoDTO.getStartDate());
-		params.put("endDate", custInfoDTO.getEndDate());
-		// 使用pagehelper 查询实现count 分页
-		page = PageHelper.startPage(pageNo, pageSize);
-		custbaseinfoDao.getAdminList(params);
+		Page<UserBaseInfo> page = PageHelper.startPage(pageNo, pageSize);
+		custbaseinfoDao.getAdminList(custInfoDTO);
 		return page;
 	}
 

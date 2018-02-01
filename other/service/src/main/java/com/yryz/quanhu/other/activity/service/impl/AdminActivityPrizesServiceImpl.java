@@ -1,29 +1,41 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
 import com.alibaba.dubbo.common.utils.CollectionUtils;
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.other.activity.dao.ActivityUserPrizesDao;
 import com.yryz.quanhu.other.activity.service.AdminActivityPrizesService;
+import com.yryz.quanhu.other.activity.vo.ActivityInfoAppListVo;
 import com.yryz.quanhu.other.activity.vo.AdminInActivityUserPrizes;
 import com.yryz.quanhu.other.activity.vo.AdminOutActivityUsrePrizes;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Service
 public class AdminActivityPrizesServiceImpl implements AdminActivityPrizesService {
 
+	private Logger logger = LoggerFactory.getLogger(AdminActivityPrizesServiceImpl.class);
+
 	@Autowired
 	ActivityUserPrizesDao	ActivityUserPrizesDao;
-	/*@Autowired
-	CustAPI custAPI;
-	@Autowired
- 	UserSearchAPI	userSearchAPI;*/
+	@Reference(check=false)
+	UserApi userApi;
 	
 	/**
 	 * 奖品列表
@@ -33,22 +45,27 @@ public class AdminActivityPrizesServiceImpl implements AdminActivityPrizesServic
 	@Override
 	public PageList<AdminOutActivityUsrePrizes> listPrizes(AdminInActivityUserPrizes dto) {
 		
-//		PageHelper.startPage(dto.getPageNo(), dto.getPageSize());
-//		Logger.println("奖品列表入参:--------");
 		if(true==dto.getPage()){
-			Integer	pageNo=(dto.getPageNo()-1)*dto.getPageSize();
-			dto.setPageNo(NumberUtils.toInt(pageNo.toString()));
+			Page<AdminOutActivityUsrePrizes> page = PageHelper.startPage(dto.getPageNo(),dto.getPageNo());
 		}
 		List<AdminOutActivityUsrePrizes> list=ActivityUserPrizesDao.listPrizesByConditionAndPage(dto);
 		if(CollectionUtils.isEmpty(list)){
 			return new PageList(dto.getPageNo(), dto.getPageSize(), list, 0L);
 		}
 		for (AdminOutActivityUsrePrizes outActivityPrizes : list) {
-			/*TODO CustInfo custInfo = custAPI.getCustInfo(outActivityPrizes.getCreateUserId());
-			if(null!=custInfo){
-				outActivityPrizes.setCustName(custInfo.getCustNname()!=null?custInfo.getCustNname():"");
-				outActivityPrizes.setCustPhone(custInfo.getCustPhone()!=null?custInfo.getCustPhone():"");
-			}*/
+			Set<String> userIds = new HashSet<String>();
+			userIds.add(outActivityPrizes.getCreateUserId().toString());
+			Response<Map<String,UserBaseInfoVO>> users = null;
+			try {
+				users = userApi.getUser(userIds);
+			} catch (Exception e) {
+				logger.error("查询用户信息异常",e);
+			}
+			if(users.success()&&users.getData().get(outActivityPrizes.getCreateUserId().toString())!=null){
+				outActivityPrizes.setCustName(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getUserNickName());
+				outActivityPrizes.setCreateDate(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getCreateDate());
+				outActivityPrizes.setCustPhone(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getUserPhone());
+			}
 		}
 		Integer count = ActivityUserPrizesDao.listPrizesByConditionAndPageCount(dto);
 		return new PageList(dto.getPageNo(), dto.getPageSize(), list, (long)count);
@@ -69,58 +86,4 @@ public class AdminActivityPrizesServiceImpl implements AdminActivityPrizesServic
 		}
 		return ActivityUserPrizesDao.updateBatchUsed(ids, (byte) 2);//2已使用
 	}
-
-	
-	 /**
-	   * 读取Excel里面唯一编码
-	   * @param wb
-	   * @return
-	   */
-	/*@Override
-	public List<String> readExcelValue(Workbook wb){
-	      //得到第一个shell  
-	       Sheet sheet=wb.getSheetAt(0);
-
-	      //得到Excel的行数
-	       int	totalRows=sheet.getPhysicalNumberOfRows();
-	       
-	      //得到Excel的列数(前提是有行数)
-	       int	totalCells=0;
-	       if(totalRows>=1 && sheet.getRow(0) != null){
-	            totalCells=sheet.getRow(0).getPhysicalNumberOfCells();
-	       }
-	       
-	       List<String> onlyCodeList=new ArrayList<String>();
-	       String onlyCode;            
-	      //循环Excel行数,从第二行开始。标题不入库
-	       for(int r=1;r<totalRows;r++){
-	           Row row = sheet.getRow(r);
-	           if (row == null) continue;
-	           onlyCode = new String();
-	           
-	           //循环Excel的列
-	           for(int c = 0; c <totalCells; c++){    
-	               Cell cell = row.getCell(c);
-	               if (null != cell){
-	                   if(c==0){//第一列不读
-	                   }else if(c==1){//客户名称
-//	                       customer.setcName(cell.getStringCellValue());
-	                   }else if(c==2){
-//	                       onlyCode=cell.getStringCellValue()+"2";//唯一编码
-	                   }else if(c==3){
-	                       onlyCode=StringUtils.isNotBlank(cell.getStringCellValue())?cell.getStringCellValue():"";//唯一编码
-	                   }else if(c==4){
-//	                       customer.setSource(cell.getStringCellValue());//客户来源
-	                   }else if(c==5){
-//	                	   onlyCode=cell.getStringCellValue();//唯一编码
-	                   }
-	               }
-	           }
-	           //添加客户
-	           onlyCodeList.add(onlyCode);
-	       }
-	       return onlyCodeList;
-	  }
-*/
-
 }

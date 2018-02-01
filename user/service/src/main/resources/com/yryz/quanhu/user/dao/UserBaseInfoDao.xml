@@ -108,16 +108,21 @@
 	select
 	<include refid="Base_Column_List" />	
 	from qh_user_baseinfo
-	where (user_status =
-	10 and (ban_post_time is
-	null or ban_post_time
-	&lt; now()) )
-	and app_id = #{appId}  and del_flag = 10 and user_status != 12
+	where app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
 		and user_nick_nname like CONCAT('%',#{nickName},'%')
 	</if>
 	<if test="phone !=null and phone != ''">
 		and user_phone like CONCAT('%',#{phone},'%')
+	</if>
+	<if test="isVest != null">
+		and user_vest = 11
+	</if>
+	<if test="userStatus != null and userStatus == 0">
+		and (user_status =
+		10 and (ban_post_time is
+		null or ban_post_time
+		&lt; now()) )
 	</if>
 	<if test="startDate !=null and startDate != ''">
 		and create_date &gt;= #{startDate}
@@ -128,6 +133,7 @@
 	<if test="userRole != null">
 		and user_role = #{userRole}
 	</if>
+	
 	<if test="userIds != null">
 		and user_id in
 		<foreach item="item" index="index" collection="userIds" open="("

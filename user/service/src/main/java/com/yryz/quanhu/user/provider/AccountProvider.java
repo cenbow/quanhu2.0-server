@@ -36,6 +36,7 @@ import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
+import com.yryz.quanhu.user.contants.UserIdentity;
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
@@ -400,18 +401,22 @@ public class AccountProvider implements AccountApi {
 
 	@Override
 	public Response<String> wxOauthLoginNotify(WebThirdLoginDTO loginDTO) {
+		Long userId = null;
+		ActivityTempUser tempUser = null;
+		UserIdentity identity = UserIdentity.ACTIVITY_VIEW;
+		RequestHeader header = new RequestHeader();
+		header.setAppId(loginDTO.getAppId());
+		header.setDevType(DevType.WAP.getType());
 		try {
 			checkWebThirdLoginDTONotify(loginDTO);
+			
 			ThirdUser thirdUser = getThirdUser(loginDTO.getCode(), loginDTO.getState(), loginDTO.getAppId());
 			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), loginDTO.getAppId(),
 					RegType.WEIXIN.getType());
-			Long userId = null;
-			ActivityTempUser tempUser = null;
-			RequestHeader header = new RequestHeader();
-			header.setAppId(loginDTO.getAppId());
-			header.setDevType(DevType.WAP.getType());
+						
 			if (thirdLogin != null) {
 				userId = thirdLogin.getUserId();
+				identity = UserIdentity.NORMAL;
 				// 判断用户状态
 				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
@@ -430,7 +435,7 @@ public class AccountProvider implements AccountApi {
 			}
 			RegisterLoginVO loginVO = returnRegisterLoginVO(userId, header, tempUser);
 
-			return ResponseUtils.returnObjectSuccess(returnUrl(loginVO, loginDTO.getState()));
+			return ResponseUtils.returnObjectSuccess(returnUrl(loginVO, loginDTO.getState(),identity));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -1131,7 +1136,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	private static String returnUrl(RegisterLoginVO loginVO, String state) {
+	private static String returnUrl(RegisterLoginVO loginVO, String state,UserIdentity identity) {
 		String backUrl = UserUtils.getThirdLoginReturnUrl(state);
 		if (StringUtils.isBlank(backUrl)) {
 			throw QuanhuException.busiError("第三方登录失败");
@@ -1151,6 +1156,7 @@ public class AccountProvider implements AccountApi {
 		} catch (UnsupportedEncodingException e) {
 		}
 		returnUrl.append("&userImg=").append(loginVO.getUser().getUserImg());
+		returnUrl.append("&userIdentity=").append(identity.getStatus());
 		return returnUrl.toString();
 	}
 

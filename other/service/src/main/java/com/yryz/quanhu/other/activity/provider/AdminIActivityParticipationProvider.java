@@ -50,8 +50,8 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 	 * 参与活动列表
 	 */
 	@Override
-	public Response<List<AdminActivityVoteDetailVo>> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto){
-		List<AdminActivityVoteDetailVo> list = null;
+	public Response<PageList<AdminActivityVoteDetailVo>> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto){
+		PageList<AdminActivityVoteDetailVo> list = null;
 		try {
 			list = adminIActivityParticipationService.list(adminActivityVoteDetailDto);
 		} catch (Exception e) {
@@ -139,18 +139,6 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 			list = adminIActivityParticipationService.adminlist(adminActivityVoteRecordDto);
 		} catch (Exception e) {
 			logger.error("投票用户数据异常:"+ adminActivityVoteRecordDto);
-			return ResponseUtils.returnException(e);
-		}
-		return ResponseUtils.returnObjectSuccess(list);
-	}
-
-	@Override
-	public Response<PageList> adminlistDetail(AdminActivityVoteDetailDto adminActivityVoteDetailDto){
-		PageList<AdminActivityVoteRecordVo> list = null;
-		try {
-			list = adminIActivityParticipationService.adminlistDetail(adminActivityVoteDetailDto);
-		} catch (Exception e) {
-			logger.error("投票用户数据异常:"+ adminActivityVoteDetailDto);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);

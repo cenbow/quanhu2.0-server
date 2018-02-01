@@ -506,4 +506,30 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         return beginOfDate;
     }
+
+    /**
+     * 获取两个日期之间的毫秒值
+     *
+     * @param beforeDate
+     * @param afterDate
+     * @return
+     */
+    public static Long getMillisecond(String beforeDate, String afterDate) {
+        try {
+            SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            long before = spf.parse(beforeDate).getTime();
+            long after = spf.parse(afterDate).getTime();
+            return after - before;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public static void main(String[] args){
+        String beforeDate = "2018-1-31 16:52:30";
+        String afterDate = "2018-1-31 16:52:31";
+        Long millisecond = getMillisecond(beforeDate, afterDate);
+        System.out.println(millisecond);
+    }
 }
