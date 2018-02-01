@@ -6,19 +6,27 @@ import com.yryz.quanhu.behavior.gift.dto.GiftInfoDto;
 import com.yryz.quanhu.behavior.gift.entity.GiftInfo;
 
 /**
-* @Description: 礼物
-* @author wangheng
-* @date 2018年1月26日 下午1:41:28
-*/
+ * @author wangheng
+ * @Description: 礼物
+ * @date 2018年1月26日 下午1:41:28
+ */
 public interface GiftInfoApi {
 
-    /**  
-    * @Description: 分页条件查询
-    * @author wangheng
-    * @param @param dto
-    * @param isCount 是否算 总数
-    * @return Response<PageList<GiftInfo>>
-    * @throws  
-    */
+    /**
+     * @param @param  dto
+     * @param isCount 是否算 总数
+     * @return Response<PageList<GiftInfo>>
+     * @throws
+     * @Description: 分页条件查询
+     * @author wangheng
+     */
     Response<PageList<GiftInfo>> pageByCondition(GiftInfoDto dto, boolean isCount);
+
+    /**
+     * 根据唯一ID查询礼物详情
+     *
+     * @param kid
+     * @return
+     */
+    Response<GiftInfo> selectByKid(long kid);
 }

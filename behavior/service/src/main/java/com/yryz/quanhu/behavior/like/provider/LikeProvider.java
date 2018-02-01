@@ -53,7 +53,7 @@ public class LikeProvider implements LikeApi {
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
-    @Autowired
+    @Reference(check = false)
     private EventAPI eventAPI;
 
     @Override
