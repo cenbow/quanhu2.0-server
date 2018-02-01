@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
-		UserBaseInfo baseInfo = getUser(userId);
+		UserBaseInfo baseInfo = getUser(friendId);
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
