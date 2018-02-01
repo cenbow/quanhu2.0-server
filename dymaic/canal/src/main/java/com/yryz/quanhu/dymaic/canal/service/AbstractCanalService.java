@@ -23,14 +23,11 @@ import org.apache.commons.lang.SystemUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.yryz.common.entity.CanalChangeInfo;
 import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.rabbitmq.MessageSender;
 
-@Component
 public abstract class AbstractCanalService {
 	protected final static Logger logger = LoggerFactory.getLogger(AbstractCanalService.class);
 	protected volatile boolean running = false;

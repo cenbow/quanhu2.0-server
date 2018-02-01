@@ -2,6 +2,7 @@ package com.yryz.quanhu.dymaic.canal.config;
 
 import java.net.InetSocketAddress;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
+import com.yryz.quanhu.dymaic.canal.service.CanalService;
 
 @Configuration
 @ConditionalOnClass({ CanalConnector.class, CanalConnectors.class })
@@ -33,5 +35,12 @@ public class CanalConnectorConfig {
 	public CanalConnector clusterConnector(){
 		CanalConnector connector = CanalConnectors.newClusterConnector(properties.getZookeeperHost()+":"+properties.getZookeeperPort(), properties.getInstance(), "", "");
 		return connector;
+	}
+	
+	@Bean
+	@ConditionalOnBean(CanalConnector.class)
+	public CanalService canalService(){
+		CanalService canalService=new CanalService();
+		return canalService;
 	}
 }
