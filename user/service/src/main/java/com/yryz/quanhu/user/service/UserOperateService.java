@@ -8,7 +8,9 @@
 package com.yryz.quanhu.user.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.yryz.quanhu.user.vo.UserRegLogVO;
 import org.apache.ibatis.annotations.Param;
 
 import com.github.pagehelper.Page;
@@ -93,5 +95,5 @@ public interface UserOperateService {
 	 * @param userIds
 	 * @return
 	 */
-	List<UserRegLog> listByUserId(List<Long> userIds);
+	Map<Long, UserRegLogVO> listByUserId(List<Long> userIds);
 }
