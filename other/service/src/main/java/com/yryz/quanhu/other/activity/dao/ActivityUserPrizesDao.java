@@ -45,7 +45,7 @@ public interface ActivityUserPrizesDao {
 
     Integer	listPrizesByConditionAndPageCount(@Param("dto") AdminInActivityUserPrizes dto);
 
-    int updateBatchUsed(@Param("ids") Long[] ids, @Param("status") Byte status)	throws	Exception;
+    int updateBatchUsed(@Param("ids") Long[] ids, @Param("state") Byte state)	throws	Exception;
 
     List<ActivityUserPrizes> selectUserPrizesList();
 

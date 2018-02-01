@@ -9,10 +9,13 @@ import javax.annotation.Resource;
 import com.google.common.collect.Lists;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.framework.core.lock.DistributedLockManager;
+import com.yryz.quanhu.dymaic.canal.constant.LockConstants;
 import com.yryz.quanhu.dymaic.canal.entity.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,7 @@ import com.yryz.common.entity.CanalMsgContent;
 import com.yryz.common.utils.CanalEntityParser;
 import com.yryz.quanhu.dymaic.canal.constant.CommonConstant;
 import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
+
 
 /**
  * 利用MQ处理canal消息处理
@@ -38,6 +42,9 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
     @Resource
     private ElasticsearchTemplate elasticsearchTemplate;
 
+//    @Resource
+//    private DistributedLockManager distbutedLockManager;
+
     @PostConstruct
     private void register() {
         syncExecutor.register(this);
@@ -45,10 +52,11 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
     @Override
     public Boolean watch(CanalMsgContent msg) {
-        if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
+        if ((CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
                 && (CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())
                 || (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName()))
-                || (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName())))) {
+                || (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName()))))
+                || (CommonConstant.QUANHU_ACCOUNT.equals(msg.getDbName()) && CommonConstant.EVENT_ACOUNT.equals(msg.getTableName()))) {
             return true;
         }
         return false;
@@ -61,23 +69,61 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 //			elasticsearchTemplate.createIndex(UserInfo.class);
 //		}
 
-        if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
-                && CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())) {
-            doUserBaseInfo(msg);
+        if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())) {
+            if (CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())) {
+                doUserBaseInfo(msg);
+            }
+            if (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName())) {
+                logger.info("user tag table get change: {}", GsonUtils.parseJson(msg));
+                doUserTagInfo(msg);
+            }
+            if (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName())) {
+                logger.info("star table get change: {}", GsonUtils.parseJson(msg));
+                doStarInfo(msg);
+            }
         }
-        if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
-                && CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName())) {
-            logger.info("user tag table get change: {}", GsonUtils.parseJson(msg));
-            doUserTagInfo(msg);
+        if (CommonConstant.QUANHU_ACCOUNT.equals(msg.getDbName())) {
+            if (CommonConstant.EVENT_ACOUNT.equals(msg.getTableName())) {
+                logger.info("event account table get change: {}", GsonUtils.parseJson(msg));
+                //用户积分数据
+                doEventAccount(msg);
+            }
         }
 
-        if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
-                && CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName())) {
-            logger.info("star table get change: {}", GsonUtils.parseJson(msg));
-            doStarInfo(msg);
+
+    }
+
+    private void doEventAccount(CanalMsgContent msg) {
+        EventAccountInfo eventBefore = CanalEntityParser.parse(msg.getDataBefore(), EventAccountInfo.class);
+        EventAccountInfo eventAfter = CanalEntityParser.parse(msg.getDataAfter(), EventAccountInfo.class);
+
+        if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
+            Optional<UserInfo> uinfo = userRepository.findById(eventBefore.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                userInfo.setEventAccountInfo(eventAfter);
+                userRepository.save(userInfo);
+            }
+        } else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
+            //删除
+            Optional<UserInfo> uinfo = userRepository.findById(eventBefore.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                userInfo.setEventAccountInfo(null);
+                userRepository.save(userInfo);
+            }
+
+        } else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
+            // 新增
+            Optional<UserInfo> uinfo = userRepository.findById(eventAfter.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                if (userInfo != null) {
+                    userInfo.setEventAccountInfo(eventAfter);
+                    userRepository.save(userInfo);
+                }
+            }
         }
-
-
     }
 
     private void doStarInfo(CanalMsgContent msg) {
@@ -123,40 +169,56 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
     private void doUserTagInfo(CanalMsgContent msg) {
         TagInfo tagInfoBefore = CanalEntityParser.parse(msg.getDataBefore(), TagInfo.class);
         TagInfo tagInfoAfter = CanalEntityParser.parse(msg.getDataAfter(), TagInfo.class);
+        Long userId = getUserId(tagInfoBefore, tagInfoAfter);
+        try {
+//            distbutedLockManager.lock(LockConstants.ES_AGGREGATION_USER_INFO, userId.toString());
 
-        if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
-            Optional<UserInfo> uinfo = userRepository.findById(tagInfoBefore.getUserId());
-            if (uinfo.isPresent()) {
-                UserInfo userInfo = uinfo.get();
-                UserTagInfo userTagInfo = userInfo.getUserTagInfo();
-                if (userTagInfo != null) {
-                    updateUserTagInfo(userTagInfo, tagInfoAfter);
+            if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
+                Optional<UserInfo> uinfo = userRepository.findById(tagInfoBefore.getUserId());
+                if (uinfo.isPresent()) {
+                    UserInfo userInfo = uinfo.get();
+                    UserTagInfo userTagInfo = userInfo.getUserTagInfo();
+                    if (userTagInfo != null) {
+                        updateUserTagInfo(userTagInfo, tagInfoAfter);
+                    }
+                    userRepository.save(userInfo);
                 }
-                userRepository.save(userInfo);
-            }
-        } else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
-            //删除标签
-            Optional<UserInfo> uinfo = userRepository.findById(tagInfoBefore.getUserId());
-            if (uinfo.isPresent()) {
-                UserInfo userInfo = uinfo.get();
-                UserTagInfo userTagInfo = userInfo.getUserTagInfo();
-                if (userTagInfo != null) {
-                    deleteUserTagInfo(userTagInfo, tagInfoBefore);
+            } else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
+                //删除标签
+                Optional<UserInfo> uinfo = userRepository.findById(tagInfoBefore.getUserId());
+                if (uinfo.isPresent()) {
+                    UserInfo userInfo = uinfo.get();
+                    UserTagInfo userTagInfo = userInfo.getUserTagInfo();
+                    if (userTagInfo != null) {
+                        deleteUserTagInfo(userTagInfo, tagInfoBefore);
+                    }
+                    userRepository.save(userInfo);
                 }
-                userRepository.save(userInfo);
+
+            } else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
+                // 新增标签
+                Optional<UserInfo> uinfo = userRepository.findById(tagInfoAfter.getUserId());
+                logger.info("user tag tables insert ops");
+                if (uinfo.isPresent()) {
+                    UserInfo userInfo = uinfo.get();
+                    addUserTagInfo(userInfo, tagInfoAfter);
+                    userRepository.save(userInfo);
+                }
             }
 
-        } else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
-            // 新增标签
-            Optional<UserInfo> uinfo = userRepository.findById(tagInfoAfter.getUserId());
-            logger.info("user tag tables insert ops");
-            if (uinfo.isPresent()) {
-                UserInfo userInfo = uinfo.get();
-                addUserTagInfo(userInfo, tagInfoAfter);
-                userRepository.save(userInfo);
-            }
+        } catch (Exception e) {
+            logger.error("doUserTagInfo error", e);
+        } finally {
+//            distbutedLockManager.unlock(LockConstants.ES_AGGREGATION_USER_INFO, userId.toString());
         }
 
+    }
+
+    private Long getUserId(TagInfo tagInfoBefore, TagInfo tagInfoAfter) {
+        if (tagInfoBefore != null && tagInfoBefore.getUserId() != null) {
+            return tagInfoBefore.getUserId();
+        }
+        return tagInfoAfter.getUserId();
     }
 
     private void addUserTagInfo(UserInfo userInfo, TagInfo tagInfo) {

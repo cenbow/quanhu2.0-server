@@ -102,4 +102,17 @@
 			#{item.tagType},#{item.createDate},#{item.lastUpdateUserId})
 		</foreach>
 	</insert>
+
+
+  <select id="getUserTags" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from qh_user_tag
+    where user_id in
+    <foreach item="item" index="index" collection="userIds" open="("
+             separator="," close=")">
+      #{item}
+    </foreach>
+    and del_flag = 10
+  </select>
 </mapper>

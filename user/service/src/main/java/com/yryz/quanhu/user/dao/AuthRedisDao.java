@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.user.dao;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -47,6 +49,7 @@ public class AuthRedisDao {
 			AuthTokenVO tokenVO = new AuthTokenVO(tokenDTO.getUserId(), tokenDTO.getToken(), expireAt);
 			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			redisTemplate.opsForValue().set(key, tokenVO);
+			redisTemplate.expireAt(key, new Date(expireAt));
 		} catch (Exception e) {
 			logger.error("TokenRedis.addToken", e);
 			throw new RedisOptException("[TokenRedis.addToken]", e.getCause());

@@ -543,12 +543,18 @@ public class UserBaseInfo extends GenericEntity {
 	 * @return
 	 */
 	public static UserSimpleVO getUserSimpleVo(UserBaseInfo baseInfo) {
+		if(baseInfo == null){
+			return new UserSimpleVO();
+		}
 		UserSimpleVO simpleVO = new UserSimpleVO(baseInfo.getUserId(), baseInfo.getUserNickName(),
 				baseInfo.getUserImg(), baseInfo.getUserDesc(), baseInfo.getUserRole());
 		return simpleVO;
 	}
 
 	public static UserLoginSimpleVO getUserLoginSimpleVO(UserBaseInfo baseInfo) {
+		if(baseInfo == null){
+			return new UserLoginSimpleVO();
+		}
 		UserLoginSimpleVO loginSimpleVO = new UserLoginSimpleVO(baseInfo.getUserId(),
 				baseInfo.getUserNickName(), baseInfo.getUserImg(), baseInfo.getUserSignature(), baseInfo.getUserPhone(),
 				baseInfo.getUserQr(), baseInfo.getUserAge(), baseInfo.getUserGenders(), baseInfo.getUserBirthday(),
@@ -558,6 +564,9 @@ public class UserBaseInfo extends GenericEntity {
 	}
 
 	public static UserBaseInfoVO getUserBaseInfoVO(UserBaseInfo baseInfo) {
+		if(baseInfo == null){
+			return new UserBaseInfoVO();
+		}
 		UserBaseInfoVO baseInfoVO = new UserBaseInfoVO(baseInfo.getUserId(), baseInfo.getAppId(),
 				baseInfo.getUserNickName(), baseInfo.getUserImg(), baseInfo.getUserSignature(), baseInfo.getUserPhone(),
 				baseInfo.getUserAge(), baseInfo.getUserQr(), baseInfo.getUserGenders(), baseInfo.getUserBirthday(),

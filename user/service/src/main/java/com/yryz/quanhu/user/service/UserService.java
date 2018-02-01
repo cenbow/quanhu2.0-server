@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
@@ -52,12 +50,22 @@ public interface UserService {
 	 * @return
 	 */
 	Map<String,UserSimpleVO> getUserSimple(Set<String> userIds);
+	
 	/**
 	 * 用户登录返回的用户信息
 	 * @param userId
+	 * @param friend
 	 * @return
 	 */
 	UserLoginSimpleVO getUserLoginSimpleVO(Long userId);
+	
+	/**
+	 * 用户登录返回的用户信息
+	 * @param userId
+	 * @param friend
+	 * @return
+	 */
+	UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId);
 	
 	/**
 	 * 根据电话检索用户
@@ -92,6 +100,12 @@ public interface UserService {
 	 * @return
 	 */
 	Map<String,UserBaseInfoVO> getUser(Set<String> userIds);
+	/**
+	 * 获取活动用户信息(包含观察者信息)
+	 * @param userIds
+	 * @return
+	 */
+	Map<String,UserBaseInfoVO> getActivityUser(Set<String>userIds);
 	
 	/**
 	 * 根据手机号、昵称、注册时间模糊查询用户id

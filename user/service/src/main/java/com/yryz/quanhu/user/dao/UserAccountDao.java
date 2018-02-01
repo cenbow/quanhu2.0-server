@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,7 +38,14 @@ public interface UserAccountDao {
 	 */
 	UserAccount selectOne(@Param("userId") Long userId, @Param("userPhone") String userPhone,
 			@Param("appId")String appId);
-
+	/**
+	 * 根据手机号查询用户账户
+	 * @param phones
+	 * @param appId
+	 * @return
+	 */
+	List<UserAccount> selectByPhones(@Param("phones")List<String>phones,@Param("appId")String appId);
+	
 	/**
 	 * 更新账户信息
 	 * 

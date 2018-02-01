@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yryz.quanhu.user.dao.ActivityTempUserDao" >
+  <resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.ActivityTempUser" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="kid" property="kid" jdbcType="BIGINT" />
+    <result column="third_id" property="thirdId" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="head_img" property="headImg" jdbcType="VARCHAR" />
+    <result column="third_type" property="thirdType" jdbcType="TINYINT" />
+    <result column="activivty_channel_code" property="activivtyChannelCode" jdbcType="VARCHAR" />
+    <result column="app_id" property="appId" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, kid, third_id, nick_name, head_img, third_type, activivty_channel_code, app_id, 
+    ip, create_date, last_update_date, last_update_user_id, del_flag
+  </sql>
+  
+  <select id="selectOne" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from qh_activity_temp_user
+    where 1=1
+    <if test="kid != null">
+    	and kid = #{kid}
+    </if>
+    <if test="thirdId != null and thirdId != '' ">
+    	and third_id = #{thirdId}
+    </if>
+  </select>
+  
+  <select id="getByUserIds" resultMap="BaseResultMap">
+	select
+	<include refid="Base_Column_List" />
+	from qh_activity_temp_user
+	where del_flag = 10 
+	and kid in		
+	<foreach item="item" index="index" collection="userIds"
+		open="(" separator="," close=")">
+		#{item}
+	</foreach>
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from qh_activity_temp_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  
+  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.ActivityTempUser" >
+    insert into qh_activity_temp_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kid != null" >
+        kid,
+      </if>
+      <if test="thirdId != null" >
+        third_id,
+      </if>
+      <if test="nickName != null" >
+        nick_name,
+      </if>
+      <if test="headImg != null" >
+        head_img,
+      </if>
+      <if test="thirdType != null" >
+        third_type,
+      </if>
+      <if test="activivtyChannelCode != null" >
+        activivty_channel_code,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date,
+      </if>
+      <if test="lastUpdateUserId != null" >
+        last_update_user_id,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="kid != null" >
+        #{kid,jdbcType=BIGINT},
+      </if>
+      <if test="thirdId != null" >
+        #{thirdId,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null" >
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="headImg != null" >
+        #{headImg,jdbcType=VARCHAR},
+      </if>
+      <if test="thirdType != null" >
+        #{thirdType,jdbcType=TINYINT},
+      </if>
+      <if test="activivtyChannelCode != null" >
+        #{activivtyChannelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateUserId != null" >
+        #{lastUpdateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.yryz.quanhu.user.entity.ActivityTempUser" >
+    update qh_activity_temp_user
+    <set >
+      <if test="thirdId != null" >
+        third_id = #{thirdId,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null" >
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="headImg != null" >
+        head_img = #{headImg,jdbcType=VARCHAR},
+      </if>
+      <if test="thirdType != null" >
+        third_type = #{thirdType,jdbcType=TINYINT},
+      </if>
+      <if test="activivtyChannelCode != null" >
+        activivty_channel_code = #{activivtyChannelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appId != null" >
+        app_id = #{appId,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=TINYINT},
+      </if>
+    </set>
+    where kid = #{kid}
+  </update>
+</mapper>

@@ -53,6 +53,11 @@ public class ScoreFlowServiceImpl implements ScoreFlowService {
 		return scoreFlowDao.getPage(sfq);
 	}
 	
+	@Override
+	public List<ScoreFlow> getAll(ScoreFlowQuery sfq){
+		return scoreFlowDao.getAll(sfq);
+	}
+	
 	
     @Override
     public long countgetPage(ScoreFlowQuery gfq) {

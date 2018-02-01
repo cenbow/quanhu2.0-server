@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.utils.HTTPWeb;
 import com.yryz.quanhu.user.vo.ThirdUser;
@@ -27,7 +28,6 @@ import com.yryz.quanhu.user.vo.WxUser;
  */
 public class OatuhWeixin {
 	private static final Logger logger = LoggerFactory.getLogger(OatuhWeixin.class);
-	private static final Logger thirdLogger = LoggerFactory.getLogger("third.logger");
 	/**
 	 * 获取微信用户信息
 	 * 
@@ -48,7 +48,7 @@ public class OatuhWeixin {
 		WxUser wxUser = null;
 		try {
 			String result = HTTPWeb.get(url, map);
-			thirdLogger.info("[weixin_getUser]-->params:{},result:{}",map.toString(),result);
+			logger.info("[weixin_getUser]-->params:{},result:{}",map.toString(),result);
 
 			if (result != null) {
 				wxUser = JsonUtils.fromJson(result, WxUser.class);
@@ -69,7 +69,7 @@ public class OatuhWeixin {
 				user.setToken(token);
 			}
 		} catch (Exception e) {
-			thirdLogger.info("[weixin_getUser]-->params:{},result:{}",map.toString(),e.getMessage());
+			logger.info("[weixin_getUser]-->params:{},result:{}",map.toString(),e.getMessage());
 			logger.error("[oauth weix]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), ExceptionEnum.BusiException.getShowMsg(), "AuthWeixin Error :" + e.getLocalizedMessage());
 		}
@@ -99,12 +99,38 @@ public class OatuhWeixin {
 		buffer.append("&redirect_uri=").append(returnHost).append(notifyUrl);
 		buffer.append("&response_type=code");
 		buffer.append("&scope=snsapi_login");
-		buffer.append("&state=").append("quanhu").append("_weixin");
+		buffer.append("&state=").append(RegType.WEIXIN.getText());
 		buffer.append("_").append(returnUrl);
 
 		return buffer.toString();
 	}
+	
+	/**
+	 * 获取微信授权地址
+	 * @param apiUrl
+	 * @param returnUrl
+	 * @param appId
+	 * @param activityChannelCode
+	 * @return
+	 */
+	public static String getWxOauthUrl(String wxOauthAppKey,String returnHost,String returnUrl,String activityChannelCode,String notifyUrl) {
 
+		String url = ThirdConstants.WX_OPEN_OAUTH_URL;
+
+		// state 过长 微信会报 长度超长
+		
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(url);
+		buffer.append("?appid=").append(wxOauthAppKey);
+		buffer.append("&redirect_uri=").append(returnHost).append(notifyUrl);
+		buffer.append("&response_type=code");
+		buffer.append("&scope=snsapi_userinfo");
+		buffer.append("&state=").append(RegType.WEIXIN_OAUTH.getText());
+		buffer.append("_").append(returnUrl);
+		buffer.append("_").append(activityChannelCode);
+
+		return buffer.toString();
+	}
 	/**
 	 * 获取微信token
 	 * 
@@ -124,12 +150,12 @@ public class OatuhWeixin {
 		WxToken token = null;
 		try {
 			String result = HTTPWeb.get(url, map);
-			thirdLogger.info("[weixin_getToken]-->params:{},result:{}",map.toString(),result);
+			logger.info("[weixin_getToken]-->params:{},result:{}",map.toString(),result);
 			if (result != null) {
 				token = JsonUtils.fromJson(result, WxToken.class);
 			}
 		} catch (Exception e) {
-			thirdLogger.info("[weixin_getToken]-->params:{},result:{}",map.toString(),e.getMessage());
+			logger.info("[weixin_getToken]-->params:{},result:{}",map.toString(),e.getMessage());
 			logger.error("[oauth weix]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), ExceptionEnum.BusiException.getShowMsg(), "AuthWeixin Error :" + e.getLocalizedMessage());
 		}

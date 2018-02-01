@@ -22,8 +22,7 @@ import com.yryz.quanhu.user.vo.ThirdUser;
  * @version 2016-08-25
  */
 public class OatuhQq {
-	private static Logger logger = LoggerFactory.getLogger(OatuhQq.class);
-	private static final Logger thirdLogger = LoggerFactory.getLogger("third.logger");
+	private static final Logger logger = LoggerFactory.getLogger(OatuhQq.class);
 
 	/**
 	 * 根据qq openid和token获取qq用户信息
@@ -48,7 +47,7 @@ public class OatuhQq {
 		QqUser qqUser = null;
 		try {
 			String result = HTTPWeb.get(url, map);
-			thirdLogger.info("[qq_getUser]-->params:{},result:{}", map.toString(), result);
+			logger.info("[qq_getUser]-->params:{},result:{}", map.toString(), result);
 			if (result != null) {
 				qqUser = JsonUtils.fromJson(result, QqUser.class);
 			}
@@ -68,7 +67,7 @@ public class OatuhQq {
 			}
 		} catch (Exception e) {
 			logger.error("[oauth qq]", e);
-			thirdLogger.info("[qq_getUser]-->params:{},result:{}", map.toString(), e.getMessage());
+			logger.info("[qq_getUser]-->params:{},result:{}", map.toString(), e.getMessage());
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), ExceptionEnum.BusiException.getShowMsg(),
 					"AuthQQ Error :" + e.getLocalizedMessage());
 		}

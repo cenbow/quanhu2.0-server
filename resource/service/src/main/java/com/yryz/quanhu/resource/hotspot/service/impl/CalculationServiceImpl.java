@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.resource.hotspot.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import com.yryz.quanhu.resource.hotspot.dao.HotMongoConstant;
 import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.enums.HeatInfoEnum;
 import com.yryz.quanhu.resource.hotspot.service.CalculationService;
+import com.yryz.quanhu.resource.service.ResourceService;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.service.UserApi;
 
@@ -47,7 +49,7 @@ public class CalculationServiceImpl implements CalculationService {
 	private HeatInfoMongo heatInfoMongo;
 	
 	@Autowired
-	private ResourceMongo resourceMongo;
+	private ResourceService resourceService;
 	
 	@Reference
 	private UserApi userApi;
@@ -157,7 +159,9 @@ public class CalculationServiceImpl implements CalculationService {
 								ResourceModel resourceModel = new ResourceModel();
 								resourceModel.setResourceId(resourceId);
 								resourceModel.setHeat(heatInfo.getHeat());
-								resourceMongo.update(resourceModel);
+								List<ResourceModel> list = new ArrayList<>();
+								list.add(resourceModel);
+								resourceService.updateResource(list);
 								resourceCanalDao.sendToCannel(resourceId, heatInfo.getHeat());
 							} catch (Exception e) {
 								logger.info("更新资源热度失败：resourceId:" + resourceId);

@@ -288,8 +288,13 @@
 			<if test="record.voteNo!= null">
 				and vote_no = #{record.voteNo}
 			</if>
-			<if test="record.beginCreateDate != null and record.endCreateDate != null and record.beginCreateDate != '' and record.endCreateDate != ''">
-				and  create_date BETWEEN #{record.beginCreateDate} AND #{record.endCreateDate}
+			<if test="record.beginCreateDate != null">
+				and  create_date >= #{record.beginCreateDate,jdbcType=TIMESTAMP}
+			</if>
+			<if test="record.endCreateDate != null">
+				<![CDATA[
+				and  create_date <= #{record.endCreateDate,jdbcType=TIMESTAMP}
+				]]>
 			</if>
 			<if test="record.custIds != null">
 				and create_user_id in
@@ -298,8 +303,13 @@
 				</foreach>
 			</if>
 
-			<if test='record.startVote!=null or record.endVote!=null '>
-				and add_vote between #{record.startVote} and #{record.endVote}
+			<if test='record.startVote!=null '>
+				and add_vote >= #{record.startVote}
+			</if>
+			<if test='record.endVote!=null '>
+				<![CDATA[
+				and add_vote <= #{record.endVote}
+				]]>
 			</if>
 		</where>
 		ORDER BY vote_count

@@ -3,6 +3,7 @@ package com.yryz.quanhu.dymaic.canal.dao;
 import java.util.List;
 
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
+import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
 
 /**
  * 复杂的查询  用ElasticsearchTemplate
@@ -16,10 +17,6 @@ public interface UserInfoSearch {
 
 	/**
 	 * 达人搜索
-	 * @param tagId
-	 * @param userId
-	 *@param pageNo
-	 * @param pageSize   @return
 	 */
-	List<UserInfo> searchStarUser(Long tagId, Long userId, Integer pageNo, Integer pageSize);
+	List<UserInfo> searchStarUser(StarInfoDTO starInfoDTO);
 }

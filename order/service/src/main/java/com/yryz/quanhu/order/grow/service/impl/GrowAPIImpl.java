@@ -1,5 +1,6 @@
 package com.yryz.quanhu.order.grow.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
 import com.yryz.quanhu.grow.entity.GrowFlow;
@@ -22,8 +21,9 @@ import com.yryz.quanhu.order.grow.manage.service.GrowLevelManageService;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.utils.Page;
-import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.vo.EventAcount;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 @Service(interfaceClass=GrowAPI.class)
 public class GrowAPIImpl implements GrowAPI {
@@ -61,9 +61,11 @@ public class GrowAPIImpl implements GrowAPI {
 	}
 
 	@Override
-	public PageList<GrowFlow> getGrowFlowPage(GrowFlowQuery gfq) {
-
-		   PageList<GrowFlow> pageList = new PageList<>();
+	public PageList<GrowFlowReportVo> getGrowFlowPage(GrowFlowQuery gfq) {
+		
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		   PageList<GrowFlowReportVo> pageList = new PageList<>();
 	        pageList.setCurrentPage(gfq.getCurrentPage());
 	        pageList.setPageSize(gfq.getPageSize());
 
@@ -75,19 +77,34 @@ public class GrowAPIImpl implements GrowAPI {
 com.github.pagehelper.Page<GrowFlow> pageHelpGrow = PageUtils.startPage(gfq.getCurrentPage(), gfq.getPageSize(),true);
 pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gfq);
 			List<GrowFlow> list =  new ArrayList<GrowFlow>(pageHelpGrow.getResult());
+	
+			List<GrowFlowReportVo> listVO =  new ArrayList<GrowFlowReportVo>();
+			
+			for (GrowFlow s :list){
+				GrowFlowReportVo vo = new GrowFlowReportVo();
+				vo.setAllGrow(s.getAllGrow()); 
+				vo.setEventCode(s.getEventCode());
+				vo.setEventName(s.getEventName());
+				vo.setNewGrow(s.getNewGrow());
+				vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+				vo.setCreateTime(sdf.format(s.getCreateTime()));
+				vo.setUserId(s.getUserId());
+				listVO.add(vo);
+				
+			}
+			
+			
+			
 //			page.setResult(list);
 //			page.setTotalCount(pageHelpGrow.getTotal());
 			
 			//page.setTotalCount(((com.github.pagehelper.Page<GrowFlow>) list).getTotal());
 
 
-			pageList.setEntities(list);
+			pageList.setEntities(listVO);
 			pageList.setCount(pageHelpGrow.getTotal());
 			
-			
-
-	        
-			 return pageList;
+			return pageList;
 
 	}
 
@@ -145,6 +162,33 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 		String a = "L1"; 
 		String b = "L2";
 		System.out.println(a.compareTo(b));
+	}
+
+
+	@Override
+	public List<GrowFlowReportVo> getGrowFlowAll(GrowFlowQuery gfq) {
+//		return growFlowService.getAll(gfq);
+		
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		List<GrowFlow> list = growFlowService.getAll(gfq);
+		List<GrowFlowReportVo> listVO =  new ArrayList<GrowFlowReportVo>();
+		
+		for (GrowFlow s :list){
+			GrowFlowReportVo vo = new GrowFlowReportVo();
+			vo.setAllGrow(s.getAllGrow()); 
+			vo.setEventCode(s.getEventCode());
+			vo.setEventName(s.getEventName());
+			vo.setNewGrow(s.getNewGrow());
+			vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+			vo.setCreateTime(sdf.format(s.getCreateTime()));
+			vo.setUserId(s.getUserId());
+			listVO.add(vo);
+			
+		}
+		return listVO;
+		
+	 
 	}
 
 }

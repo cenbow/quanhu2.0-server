@@ -10,10 +10,13 @@ package com.yryz.quanhu.user.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
+import com.yryz.quanhu.user.dto.WebThirdLoginDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserLoginLog;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
@@ -43,6 +46,14 @@ public interface AccountService {
 	 */
 	void agentRegister(AgentRegisterDTO registerDTO);
 
+	/**
+	 * 根据活动参与者信息生成正常用户
+	 * 
+	 * @param userId
+	 * @param phone
+	 */
+	void mergeActivityUser(Long userId, String phone);
+	
 	/**
 	 * 手机号密码登录
 	 * 
@@ -123,7 +134,14 @@ public interface AccountService {
 	 * @return
 	 */
 	Long webThirdLoginNotify(ThirdUser thirdUser, String loginType);
-
+	
+	/**
+	 * 微信授权登录 
+	 * @param loginDTO
+	 * @return
+	 */
+	String wxOauthLogin(WebThirdLoginDTO loginDTO);
+	
 	/**
 	 * 绑定手机号
 	 * 
@@ -133,7 +151,9 @@ public interface AccountService {
 	 *            登录密码
 	 */
 	void bindPhone(Long userId, String phone, String password);
+	
 
+	
 	/**
 	 * 绑定第三方
 	 * 
@@ -189,4 +209,9 @@ public interface AccountService {
 	 * @return
 	 */
 	UserAccount getUserAccountByUserId(Long userId);
+	/**
+	 * 根据手机号查询用户账号,查不到的用户id返回空字符串
+	 * @return
+	 */
+	List<Map<String,String>> getUserAccountByPhone(Set<String>phones,String appId);
 }
