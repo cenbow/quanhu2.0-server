@@ -93,11 +93,11 @@
 
     <insert id="insert" parameterType="com.yryz.quanhu.dymaic.vo.Dymaic">
         insert into qh_dymaic (kid, create_user_id, module_enum, target_id,
-          transmit_note, transmit_type, ext_json, create_date)
+          transmit_note, transmit_type, ext_json)
         values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},
             #{moduleEnum,jdbcType=VARCHAR},#{resourceId,jdbcType=BIGINT},
             #{transmitNote,jdbcType=VARCHAR},#{transmitType,jdbcType=VARCHAR},
-            #{extJson,jdbcType=LONGVARCHAR}, #{createDate,jdbcType=TIMESTAMP})
+            #{extJson,jdbcType=LONGVARCHAR})
     </insert>
 
 </mapper>

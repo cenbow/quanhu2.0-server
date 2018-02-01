@@ -1,6 +1,7 @@
 package com.yryz.quanhu.dymaic.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 动态基础信息
@@ -63,7 +64,7 @@ public class Dymaic implements Serializable {
     /**
      * 发布时间
      */
-    private String createDate;
+    private Date createDate;
 
 
     public Long getKid() {
@@ -138,11 +139,11 @@ public class Dymaic implements Serializable {
         this.delFlag = delFlag;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 }
