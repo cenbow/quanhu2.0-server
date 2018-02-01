@@ -33,9 +33,9 @@ public class UserUpdateConsumer {
 	 * @param data
 	 */
 	@RabbitListener(bindings = @QueueBinding(
-			value= @Queue(value=MqConstants.USER_UPDATE_QUEUE,durable="true"),
+			value= @Queue(value="${user.user.mq.update.queue}",durable="true"),
 			exchange=@Exchange(value=MqConstants.USER_DIRECT_EXCHANGE,ignoreDeclarationExceptions="true",type=ExchangeTypes.DIRECT),
-			key=MqConstants.USER_UPDATE_QUEUE)
+			key="${user.user.mq.update.queue}")
 	)
 	public void handleMessage(String data){
 		if(logger.isDebugEnabled()){

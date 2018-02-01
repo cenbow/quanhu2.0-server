@@ -190,6 +190,9 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<List<String>> getUserIdByParams(AdminUserInfoDTO custInfoDTO) {
 		try {
+			if(custInfoDTO == null || StringUtils.isBlank(custInfoDTO.getAppId())){
+				throw QuanhuException.busiError("appId不能为空");
+			}
 			logger.info("getUserIdByParams custInfoDTO: {}", GsonUtils.parseJson(custInfoDTO));
 			List<String> list = userService.getUserIdByParams(custInfoDTO);
 			return ResponseUtils.returnObjectSuccess(list);
@@ -230,10 +233,11 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<PageList<UserBaseInfoVO>> listUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
 		try {
+			if(custInfoDTO == null || StringUtils.isBlank(custInfoDTO.getAppId())){
+				throw QuanhuException.busiError("appId不能为空");
+			}
 			Page<UserBaseInfo> list = userService.listUserInfo(pageNo, pageSize, custInfoDTO);
-
 			List<UserBaseInfoVO> baseInfos = GsonUtils.parseList(list, UserBaseInfoVO.class);
-
 			PageList<UserBaseInfoVO> pageList = new PageList<>(pageNo, pageSize,
 					baseInfos);
 			return ResponseUtils.returnObjectSuccess(pageList);

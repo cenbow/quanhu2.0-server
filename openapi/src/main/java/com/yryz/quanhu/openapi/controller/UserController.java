@@ -204,6 +204,8 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/login")
 	public Response<RegisterLoginVO> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
+		String ip = WebUtil.getClientIP(request);
+		loginDTO.setIp(ip);
 		RegisterLoginVO loginVO = ResponseUtils.getResponseData(accountApi.login(loginDTO, header));
 		return ResponseUtils.returnApiObjectSuccess(loginVO);
 	}

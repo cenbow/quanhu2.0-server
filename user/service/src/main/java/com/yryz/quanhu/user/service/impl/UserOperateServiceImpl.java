@@ -202,4 +202,14 @@ public class UserOperateServiceImpl implements UserOperateService {
 		return new MyInviterVO(total, detailVOs);
 	}
 
+	@Override
+	public List<Long> getUserIdByCreateDate(String startDate, String endDate) {
+		return regLogDao.getUserIdByCreateDate(startDate, endDate);
+	}
+
+	@Override
+	public List<UserRegLog> listByUserId(List<Long> userIds) {
+		return regLogDao.listByUserId(userIds);
+	}
+
 }

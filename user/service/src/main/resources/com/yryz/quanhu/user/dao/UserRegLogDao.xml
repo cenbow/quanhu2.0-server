@@ -23,14 +23,11 @@
     ip, location, activity_channel_code, channel_code, create_date, last_update_date
   </sql>
   
-<!--   <select id="selectByParams" resultMap="BaseResultMap" >
+  <select id="listByUserId" resultMap="BaseResultMap" >
     select 
     <include refid="Base_Column_List" />
     from qh_user_reg_log
     where 1=1
-    <if test="channelCode ! = null">
-    	and channel_code like CONCAT('%',#{channelCode},'%')
-    </if>
     <if test="userIds != null">
     	and user_id in
 		<foreach item="item" index="index" collection="userIds" open="("
@@ -38,13 +35,15 @@
 			#{item}
 		</foreach>
     </if>
-    <if test="startDate != null">
-    	and create_date &gt; #{createDate}
-    </if>
-     <if test="endDate != null">
-    	and end_date &lt; #{endDate}
-    </if>
-  </select> -->
+  </select>
+  
+  <select id="getUserIdByCreateDate" resultType="java.lang.Long">
+    select 
+    user_id
+    from qh_user_reg_log
+    where create_date &gt;= #{startDate}
+		and create_date &lt;= #{endDate}
+  </select>
   
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserRegLog" >
     insert into qh_user_reg_log

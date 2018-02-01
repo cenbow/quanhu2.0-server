@@ -41,7 +41,7 @@ public class UserLoginValidFilter implements IBehaviorValidFilter {
             throw new QuanhuException("","","服务器异常，缺失参数:HttpServletRequest");
         }
         //执行验证
-        authService.checkToken(request);
+        //authService.checkToken(request);
         //下个filter
         filterChain.execute();
     }

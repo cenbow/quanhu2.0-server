@@ -7,10 +7,15 @@
  */
 package com.yryz.quanhu.user.service;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserRegQueryDTO;
 import com.yryz.quanhu.user.entity.UserOperateInfo;
+import com.yryz.quanhu.user.entity.UserRegLog;
 import com.yryz.quanhu.user.vo.MyInviterVO;
 
 /**
@@ -75,4 +80,18 @@ public interface UserOperateService {
 	 * @Description 根据邀请码更新邀请人数
 	 */
 	void updateInviterNum(String inviterCode);
+	
+	/**
+	 * 根据创建时间查询用户id
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	List<Long> getUserIdByCreateDate(String startDate,String endDate);
+	/**
+	 * 根据用户id查询
+	 * @param userIds
+	 * @return
+	 */
+	List<UserRegLog> listByUserId(List<Long> userIds);
 }

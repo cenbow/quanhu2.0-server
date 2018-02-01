@@ -3,6 +3,9 @@
  */
 package com.yryz.quanhu.user.provider;
 
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +15,13 @@ import com.yryz.common.context.Context;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserOperateService;
 import com.yryz.quanhu.user.vo.MyInviterVO;
 import com.yryz.quanhu.user.vo.UserRegInviterLinkVO;
+import com.yryz.quanhu.user.vo.UserRegLogVO;
 
 @Service(interfaceClass=UserOperateApi.class)
 public class UserOperateProvider implements UserOperateApi {
@@ -52,6 +58,37 @@ public class UserOperateProvider implements UserOperateApi {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
 			logger.error("获取我的邀请详情未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<List<Long>> getUserIdByCreateDate(String startDate, String endDate) {
+		try {
+			if(StringUtils.isBlank(startDate) || StringUtils.isBlank(endDate)){
+				throw QuanhuException.busiError("参数不合法");
+			}
+			return ResponseUtils.returnObjectSuccess(operateService.getUserIdByCreateDate(startDate, endDate));
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("getUserIdByCreateDate未知异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<List<UserRegLogVO>> listByUserId(List<Long> userIds) {
+		try {
+			if(CollectionUtils.isEmpty(userIds)){
+				throw QuanhuException.busiError("参数不合法");
+			}
+			List<UserRegLogVO> logVOs = GsonUtils.parseList(operateService.listByUserId(userIds), UserRegLogVO.class);
+			return ResponseUtils.returnObjectSuccess(logVOs);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("listByUserId未知异常", e);
 			return ResponseUtils.returnException(e);
 		}
 	}

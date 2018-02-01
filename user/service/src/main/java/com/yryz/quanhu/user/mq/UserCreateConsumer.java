@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -42,6 +43,10 @@ public class UserCreateConsumer {
 	private MessageManager messageManager;
 	@Reference
 	private HotSpotApi hotApi;
+	
+    @Value("${user.user.mq.create.queue}")
+    private String mqQueue;
+    
 	/**
 	 * QueueBinding: exchange和queue的绑定
 	 * Queue:队列声明
@@ -50,9 +55,9 @@ public class UserCreateConsumer {
 	 * @param data
 	 */
 	@RabbitListener(bindings = @QueueBinding(
-			value= @Queue(value=MqConstants.USER_CREATE_QUEUE,durable="true"),
+			value= @Queue(value="${user.user.mq.create.queue}",durable="true"),
 			exchange=@Exchange(value=MqConstants.USER_DIRECT_EXCHANGE,ignoreDeclarationExceptions="true",type=ExchangeTypes.DIRECT),
-			key=MqConstants.USER_CREATE_QUEUE)
+			key="${user.user.mq.create.queue}")
 	)
 	public void handleMessage(String data){
 		if(logger.isDebugEnabled()){
