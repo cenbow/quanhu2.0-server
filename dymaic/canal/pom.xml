@@ -20,6 +20,10 @@
     	<!--公司内部库-->
         <dependency>
             <groupId>com.yryz.framework</groupId>
+            <artifactId>service-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.framework</groupId>
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
@@ -44,6 +48,11 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>resource-api</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
+            <artifactId>order-api</artifactId>
             <version>${quanhu.version}</version>
         </dependency>
 

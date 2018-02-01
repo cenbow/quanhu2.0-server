@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
@@ -44,7 +45,12 @@ public class UserInfoSearchImpl implements UserInfoSearch {
     }
 
     @Override
-    public List<UserInfo> searchStarUser(Long tagId, Long userId, Integer pageNo, Integer pageSize) {
+    public List<UserInfo> searchStarUser(StarInfoDTO starInfoDTO) {
+        Long tagId = starInfoDTO.getTagId();
+        Integer pageNo = starInfoDTO.getCurrentPage();
+        Integer pageSize = starInfoDTO.getPageSize();
+        Long userId = starInfoDTO.getUserId();
+
         QueryBuilder queryTagId = QueryBuilders.termQuery("userTagInfo.userTagInfoList.tagId", tagId);
         QueryBuilder queryUserRole = QueryBuilders.termQuery("userBaseInfo.userRole", 11);
         SearchQuery query = null;

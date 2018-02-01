@@ -47,7 +47,7 @@ public class ElasticsearchSyncConsumer {
 	 */
 	@RabbitListener(bindings = @QueueBinding(value = @Queue(value = AmqpConstant.CANAL_TO_ES_QUEUE, durable = "true"), exchange = @Exchange(value = AmqpConstant.CANAL_FANOUT_EXCHANGE, ignoreDeclarationExceptions = "true", type = ExchangeTypes.FANOUT)))
 	public void handleMessage(String data) {
-		poolTaskExecutor.execute(new Runnable() {
+		/*poolTaskExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
 				logger.info("canal Message:" + data);
@@ -64,7 +64,20 @@ public class ElasticsearchSyncConsumer {
 					syncExecutor.process(canalMsg);
 				}
 			}
-		});
+		});*/
+		logger.info("canal Message:" + data);
+		CanalMsgContent canalMsg = null;
+		try {
+			// 解析不了的垃圾信息忽略
+			canalMsg = MAPPER.readValue(data, CanalMsgContent.class);
+		} catch (IOException e) {
+			canalMsg = null;
+			e.printStackTrace();
+		}
+
+		if (canalMsg != null) {
+			syncExecutor.process(canalMsg);
+		}
 	}
 
 }
