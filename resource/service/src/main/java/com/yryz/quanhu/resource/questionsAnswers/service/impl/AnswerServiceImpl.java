@@ -208,8 +208,11 @@ public class AnswerServiceImpl implements AnswerService {
         criteria.andQuestionIdEqualTo(kid);
        // criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
       //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
-        AnswerWithBLOBs answerWithBLOBs = this.answerDao.selectByPrimaryKey(kid);
-
+        List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
+        if(answerWithBLOBsList==null || answerWithBLOBsList.isEmpty()){
+            return null;
+        }
+        AnswerWithBLOBs answerWithBLOBs=answerWithBLOBsList.get(0);
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);
         Long createUserId = answerWithBLOBs.getCreateUserId();
@@ -217,7 +220,6 @@ public class AnswerServiceImpl implements AnswerService {
             answerVo.setUser(apIservice.getUser(createUserId));
         }
         answerVo.setModuleEnum(ModuleContants.ANSWER);
-
 
         //虚拟阅读数
         readApi.read(kid);
@@ -249,6 +251,5 @@ public class AnswerServiceImpl implements AnswerService {
         }
         return null;
     }
-
 
 }

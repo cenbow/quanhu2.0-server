@@ -3,10 +3,9 @@ package com.yryz.quanhu.grow.service;
 import java.util.List;
 
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
-import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
 
 /**
  * @author lsn 
@@ -58,7 +57,7 @@ public interface GrowAPI {
 	 * @return
 	 * @Description 获取成长流水记录
 	 */
-	public PageList<GrowFlow> getGrowFlowPage(GrowFlowQuery gfq);
+	public PageList<GrowFlowReportVo> getGrowFlowPage(GrowFlowQuery gfq);
 	
 	/**
 	 * 手动提升用户成长等级
@@ -68,4 +67,13 @@ public interface GrowAPI {
 	 * @return
 	 */
 	public int promoteGrowLevel(String userId , String growLevel,String eventCode);
+	
+	
+	/**
+	 * 
+	 * @param gfq
+	 * @return List
+	 * @Description 全部成长值明细
+	 */
+	public  List<GrowFlowReportVo> getGrowFlowAll(GrowFlowQuery gfq);
 }

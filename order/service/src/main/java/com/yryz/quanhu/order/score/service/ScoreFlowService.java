@@ -24,6 +24,8 @@ public interface ScoreFlowService {
 	List<EventReportVo> getOne(@Param("userId")String userId);
 
 	List<ScoreFlow> getPage(ScoreFlowQuery sfq);
+	
+	List<ScoreFlow> getAll(ScoreFlowQuery sfq);
  
 	long countgetPage(ScoreFlowQuery gfq) ;
 
