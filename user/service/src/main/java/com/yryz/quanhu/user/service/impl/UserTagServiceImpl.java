@@ -1,10 +1,18 @@
 package com.yryz.quanhu.user.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.user.vo.UserTagVO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +111,26 @@ public class UserTagServiceImpl implements UserTagService {
 			logger.error("[userTag.batch]",e);
 			throw new MysqlOptException(e);
 		}
+	}
+
+	@Override
+	public Map<Long, List<UserTagVO>> getUserTags(@Param("userIds") List<Long> userIds) {
+		Map<Long, List<UserTagVO>> result = Maps.newHashMap();
+		Multimap<Long, UserTagVO> userTagMultiMap = ArrayListMultimap.create();
+		List<UserTag> userTags = mysqlDao.getUserTags(userIds);
+		if (CollectionUtils.isNotEmpty(userTags)) {
+			for (UserTag userTag : userTags) {
+				UserTagVO userTagVO = new UserTagVO();
+				BeanUtils.copyProperties(userTagVO, userTag);
+				userTagMultiMap.put(userTag.getUserId(), userTagVO);
+			}
+		}
+		if (MapUtils.isNotEmpty(userTagMultiMap.asMap())) {
+			for (Map.Entry<Long, Collection<UserTagVO>> multiEntry : userTagMultiMap.asMap().entrySet()) {
+				result.put(multiEntry.getKey(), Lists.newArrayList(multiEntry.getValue()));
+			}
+		}
+		return result;
 	}
 
 }

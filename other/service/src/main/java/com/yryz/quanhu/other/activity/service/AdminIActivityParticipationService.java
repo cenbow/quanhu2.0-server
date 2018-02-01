@@ -26,7 +26,7 @@ public interface AdminIActivityParticipationService {
 	/**
 	 * 参与活动列表
 	 */
-	List<AdminActivityVoteDetailVo> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
+	PageList<AdminActivityVoteDetailVo> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
 
 	/**
 	 * 投票用户数据
@@ -49,5 +49,4 @@ public interface AdminIActivityParticipationService {
 
 	PageList adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 
-	PageList adminlistDetail(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
 }

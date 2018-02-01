@@ -25,6 +25,15 @@ public class CommonConstant {
         public final static String TABLE_MONGODB_RESOURCE_HEAT = "mongodb_resource_heat";
     }
 
+    /**
+     * 用户积分数据
+     */
+    public static final String QUANHU_ACCOUNT = "quanhu_account";
+    /**
+     * 用户事件账户表
+     */
+    public static final String EVENT_ACOUNT = "event_acount";
+
 
     public class EventType {
         public final static String OPT_UPDATE = "update";

@@ -1,9 +1,12 @@
 package com.yryz.quanhu.user;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.user.vo.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +37,6 @@ import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserTagApi;
-import com.yryz.quanhu.user.vo.LoginMethodVO;
-import com.yryz.quanhu.user.vo.MyInviterVO;
-import com.yryz.quanhu.user.vo.RegisterLoginVO;
-import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
-import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
-import com.yryz.quanhu.user.vo.UserRegInviterLinkVO;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -60,6 +56,16 @@ public class UserTest {
 	private UserSender sender;
 	@Reference
 	private UserOperateApi opApi;
+
+	@Test
+	public void getUserTagsTest() {
+		List<Long> ids = Lists.newArrayList();
+		ids.add(738943471107031040L);
+		ids.add(738931462378192897L);
+
+		Response<Map<Long, List<UserTagVO>>> userTags = tagApi.getUserTags(ids);
+		System.out.println("getUserTagsTest: " + GsonUtils.parseJson(userTags));
+	}
 /*	@Test
 	public void sendMq(){
 		sender.userCreate("dsdsfdfdfdf");
@@ -241,9 +247,9 @@ public class UserTest {
 	@Test
 	public void saveBatch(){
 		UserTagDTO dto = new UserTagDTO();
-		dto.setTagIds("111,18,19");
+		dto.setTagIds("11,12");
 		dto.setTagType(UserTagType.US_SELECT.getType());
-		dto.setUserId(738422165156233216L);
+		dto.setUserId(730922963275735040L);
 		Response<Boolean> response = tagApi.batchSaveUserTag(dto);
 		System.out.println(JsonUtils.toFastJson(response));
 	}

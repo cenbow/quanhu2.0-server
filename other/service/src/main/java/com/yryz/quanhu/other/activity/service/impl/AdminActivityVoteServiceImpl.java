@@ -3,6 +3,7 @@ package com.yryz.quanhu.other.activity.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.other.activity.dao.*;
 import com.yryz.quanhu.other.activity.dto.AdminActivityInfoVoteDto;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
@@ -15,6 +16,8 @@ import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteVo;
 import com.yryz.quanhu.other.activity.util.DateUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.yryz.common.constant.ModuleContants.ACTIVITY_ENUM;
 
@@ -52,14 +54,8 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	@Reference
 	IdAPI idAPI;
 
-	/*@Autowired
-	CustAPI custAPI;
-
-	@Autowired
-	MessageUtils messageUtils;*/
-	
-/*	@Autowired
-	EventReportDao eventReportDao;*/
+	@Reference(check=false)
+	UserApi userApi;
 
 	/**
 	 * 活动列表
@@ -148,20 +144,10 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 
 	@Override
 	public PageList<AdminActivityVoteDetailVo> selectRankList(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
-//		PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
-		Integer pageNo = adminActivityVoteDetailDto.getPageNo();
-		Integer pageSize = adminActivityVoteDetailDto.getPageSize();
-		if(adminActivityVoteDetailDto.getPageNo()==null|| adminActivityVoteDetailDto.getPageNo()<=0){
-			adminActivityVoteDetailDto.setPageNo(0);
-		}else{
-			adminActivityVoteDetailDto.setPageNo((adminActivityVoteDetailDto.getPageNo()-1)* adminActivityVoteDetailDto.getPageSize());
-		}
-		if(adminActivityVoteDetailDto.getPageSize()==null|| adminActivityVoteDetailDto.getPageSize()<=0){
-			adminActivityVoteDetailDto.setPageSize(10);
-		}
+		PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
 		List<AdminActivityVoteDetailVo> list = activityParticipationDao.selectRankList(adminActivityVoteDetailDto.getActivityInfoId());
 		if (CollectionUtils.isEmpty(list)) {
-			return new PageList(pageNo, pageSize, list, 0L);
+			return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list, 0L);
 		}
 		for (AdminActivityVoteDetailVo detailVo : list) {
 			if(detailVo.getAddVote()!=null){
@@ -169,16 +155,19 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 			}else{
 				detailVo.setTotalCount(detailVo.getVoteCount());
 			}
-			// TODO 获取平台用户数据
-			/*CustInfo custInfo = custAPI.getCustInfo(detailVo.getCreateUserId());
-			if (custInfo != null) {
-				detailVo.setUserName(custInfo.getCustName());
-				detailVo.setNickName(custInfo.getCustNname());
-				detailVo.setUserImg(custInfo.getCustImg());
-			}*/
-
+			Set<String> userIds = new HashSet<String>();
+			userIds.add(detailVo.getCreateUserId().toString());
+			Response<Map<String,UserBaseInfoVO>> users = null;
+			try {
+				users = userApi.getUser(userIds);
+			} catch (Exception e) {
+				logger.error("查询用户信息异常",e);
+			}
+			if(users.success()&&users.getData().get(detailVo.getCreateUserId().toString())!=null){
+				detailVo.setNickName(users.getData().get(detailVo.getCreateUserId().toString()).getUserNickName());
+			}
 		}
-		return new PageList(pageNo, pageSize, list,
+		return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list,
 				activityParticipationDao.adminRanklistCount(adminActivityVoteDetailDto));
 	}
 

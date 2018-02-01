@@ -40,4 +40,11 @@ public interface UserTagDao {
      * @return
      */
     List<String> selectTagByUserId(@Param("userId")Long userId,@Param("tagType")Integer tagType);
+
+    /**
+     * 批量查询
+     * @param userIds
+     * @return
+     */
+    List<UserTag> getUserTags(@Param("userIds") List<Long> userIds);
 }

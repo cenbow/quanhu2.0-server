@@ -1,7 +1,11 @@
 package com.yryz.quanhu.user.provider;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.user.vo.UserTagVO;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,5 +71,17 @@ public class UserTagProvider implements UserTagApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
+	@Override
+	public Response<Map<Long, List<UserTagVO>>> getUserTags(List<Long> userIds) {
+		try {
+			Map<Long, List<UserTagVO>> userTags = tagService.getUserTags(userIds);
+			logger.info("getUserTags result: {}", GsonUtils.parseJson(userTags));
+			return ResponseUtils.returnObjectSuccess(userTags);
+		} catch (Exception e) {
+			logger.error("getUserTags error", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
 }

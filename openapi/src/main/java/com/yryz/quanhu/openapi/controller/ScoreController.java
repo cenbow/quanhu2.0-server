@@ -7,7 +7,11 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -97,6 +101,22 @@ public class ScoreController {
 		EventAcount ea = eventAcountApiService.getEventAcount(userId);
 		return ResponseUtils.returnObjectSuccess(ea);
 	}
+    
+//    @ApiOperation("批量获取用户事件账户记录")
+//    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+//    @PostMapping(value = "/{version}/score/acount/batch")
+//	public Response<Map<Long, EventAcount>> getEventAcount(@RequestBody Map<String,String> map){
+//    	  Set<String> keySet = map.keySet();
+//    	  Set<Long> set =  new HashSet<>();
+//    	     Iterator<String> it = keySet.iterator();
+//    	     while(it.hasNext()) {
+//    	        Object key = it.next();
+//    	        Object value = map.get(key);
+//    	        set.add(Long.valueOf(value.toString()));
+//    	     }
+//    	return eventAcountApiService.getEventAcountBatch(set);
+//		
+//	}
 	
 	@NotLogin
     @ApiOperation("签到")

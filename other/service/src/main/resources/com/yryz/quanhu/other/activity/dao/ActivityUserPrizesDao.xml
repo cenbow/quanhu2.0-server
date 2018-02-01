@@ -252,8 +252,8 @@
 			<if test="dto.createUserId != null	and	dto.createUserId !=''" >
 				and create_user_id =#{dto.createUserId}
 			</if>
-			<if test="dto.status != null" >
-				and status = #{dto.status,jdbcType=VARCHAR}
+			<if test="dto.state != null" >
+				and state = #{dto.state,jdbcType=VARCHAR}
 			</if>
 			<if test="dto.onlyCode != null	and	dto.onlyCode!=''" >
 				and only_code = #{dto.onlyCode,jdbcType=VARCHAR}
@@ -294,8 +294,8 @@
 			<if test="dto.createUserId != null	and	dto.createUserId !=''" >
 				and create_user_id =#{dto.createUserId}
 			</if>
-			<if test="dto.status != null" >
-				and status = #{dto.status,jdbcType=VARCHAR}
+			<if test="dto.state != null" >
+				and state = #{dto.state,jdbcType=VARCHAR}
 			</if>
 			<if test="dto.onlyCode != null	and	dto.onlyCode!=''" >
 				and only_code = #{dto.onlyCode,jdbcType=VARCHAR}
@@ -324,7 +324,7 @@
 	<!-- 批量修改已使用 -->
 	<update id="updateBatchUsed"  >
 		update qh_activity_user_prizes
-		set	status=#{status}	 where kid in
+		set	state=#{state}	 where kid in
 		<foreach collection="ids"	open="("	separator=","	close=")" item="kid">
 			#{kid}
 		</foreach>

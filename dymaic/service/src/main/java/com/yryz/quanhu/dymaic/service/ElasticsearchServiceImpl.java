@@ -106,12 +106,8 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	@Override
 	public Response<PageList<StarInfoVO>> searchStarUser(StarInfoDTO starInfoDTO) {
 		logger.info("searchStarUser request, starInfoDTO: {}", GsonUtils.parseJson(starInfoDTO));
-		Long tagId = starInfoDTO.getTagId();
-		Integer pageNo = starInfoDTO.getCurrentPage();
-		Integer pageSize = starInfoDTO.getPageSize();
-		Long userId = starInfoDTO.getUserId();
 
-		List<UserInfo> list = userRepository.searchStarUser(tagId, userId, pageNo, pageSize);
+		List<UserInfo> list = userRepository.searchStarUser(starInfoDTO);
 		// 数据转换UserInfo -> StarInfoVO
 		List<StarInfoVO> starInfoVOList = Lists.newArrayList();
 

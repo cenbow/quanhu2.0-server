@@ -35,6 +35,19 @@ public class UserInfo implements Serializable {
 	 */
 	private UserStarInfo userStarInfo;
 
+	/**
+	 * 积分事件信息
+	 */
+	private EventAccountInfo eventAccountInfo;
+
+	public EventAccountInfo getEventAccountInfo() {
+		return eventAccountInfo;
+	}
+
+	public void setEventAccountInfo(EventAccountInfo eventAccountInfo) {
+		this.eventAccountInfo = eventAccountInfo;
+	}
+
 	public UserStarInfo getUserStarInfo() {
 		return userStarInfo;
 	}
