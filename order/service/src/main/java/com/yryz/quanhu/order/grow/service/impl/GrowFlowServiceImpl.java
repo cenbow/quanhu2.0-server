@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.order.grow.dao.persistence.GrowFlowDao;
@@ -50,6 +49,12 @@ public class GrowFlowServiceImpl implements GrowFlowService{
     public long countgetPage(GrowFlowQuery gfq) {
         return growFlowDao.countgetPage(gfq);
     }
+
+
+	@Override
+	public List<GrowFlow> getAll(GrowFlowQuery gfq) {
+		return growFlowDao.getAll(gfq);
+	}
 
 
 
