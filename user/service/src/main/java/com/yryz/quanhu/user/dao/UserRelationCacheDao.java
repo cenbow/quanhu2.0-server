@@ -8,9 +8,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.quanhu.dymaic.service.DymaicService;
 import com.yryz.quanhu.message.im.api.ImAPI;
 import com.yryz.quanhu.message.im.entity.ImRelation;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -101,6 +103,9 @@ public class UserRelationCacheDao {
     @Reference(check = false)
     private EventAPI eventAPI;
 
+    @Reference(check = false)
+    private DymaicService dymaicService;
+
     /**
      * 获取唯一关系
      * @param sourceUserId
@@ -126,7 +131,7 @@ public class UserRelationCacheDao {
             if(null != entity){
                 BeanUtils.copyProperties(dto,entity);
                 dto.setNewRecord(false);
-                //return dto;
+                return dto;
             }
             /**
              * 查询数据库
@@ -175,10 +180,21 @@ public class UserRelationCacheDao {
                 redisTemplateBuilder.buildRedisTemplate(UserRelationCountDto.class);
 
         String key = getCacheTotalCountKey(sourceUserId);
-
+        logger.info("refreshCacheCount={}/{} start",key,JSON.toJSON(dto));
         redisTemplate.opsForValue().set(key,dto,expireDays,TimeUnit.DAYS);
+        logger.info("refreshCacheCount={} finish",sourceUserId);
+
     }
 
+    public void removeCacheRelation(UserRelationDto dto){
+
+        String key = getCacheKey(dto.getSourceUserId(),dto.getTargetUserId());
+        RedisTemplate<String,UserRelationEntity> redisTemplate =
+                redisTemplateBuilder.buildRedisTemplate(UserRelationEntity.class);
+
+        redisTemplate.delete(key);
+
+    }
     public void refreshCacheRelation(UserRelationDto dto){
 
         RedisTemplate<String,UserRelationEntity> redisTemplate =
@@ -195,51 +211,37 @@ public class UserRelationCacheDao {
         UserRelationEntity entity = new UserRelationEntity();
         BeanUtils.copyProperties(entity,dto);
 
+        logger.info("refreshCacheRelation={}/{} start",sourceKey,JSON.toJSON(dto));
         redisTemplate.opsForValue().set(sourceKey,entity,expireDays, TimeUnit.DAYS);
-    }
+        logger.info("refreshCacheRelation={}/{} finish",sourceKey);
 
-    /**
-     * 异步保存
-     * @param userDto
-     */
-    public void asyncSave(UserRelationDto userDto){
-
-        /**
-         * 第一次数据库存储，保证一致性
-         * 防止队列mq积压过多，数据未准确落地
-         */
-        if(userDto.getKid()==null){     //新增
-            userDto.setKid(idAPI.getKid(TABLE_NAME).getData());
-            userDto.setCreateUserId(Long.parseLong(userDto.getSourceUserId()));
-            userDto.setLastUpdateUserId(Long.parseLong(userDto.getSourceUserId()));
-            userDto.setVersion(0);
-            userDto.setDelFlag(10);
-            userRelationDao.insert(userDto);
-        }else{                          //保存 异步mq处理
-            this.sendMQ(userDto);
-        }
     }
 
     /**
      * 发生到MQ异步处理
      * @param userDto
      */
-    private void sendMQ(UserRelationDto userDto){
-        try {
-            logger.info("sendMQ={}/{} start",userDto.getSourceUserId(),userDto.getTargetUserId());
+    public void sendMQ(UserRelationDto userDto){
 
+        try {
+            logger.info("sendMQ={} start",JSON.toJSON(userDto));
             //转换消息
             String msg = MAPPER.writeValueAsString(userDto);
             logger.info("sendMQ.convert={}",msg);
+
             //发送消息
             rabbitTemplate.setExchange(mqDirectExchange);
             rabbitTemplate.setRoutingKey(mqQueue);
 
             rabbitTemplate.convertAndSend(msg);
+
+            //刷新缓存
+            this.refreshCacheRelation(userDto);
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }finally {
-            logger.info("sendMQ={}/{} finish",userDto.getSourceUserId(),userDto.getTargetUserId());
+            logger.info("sendMQ={} finish",JSON.toJSON(userDto));
         }
     }
 
@@ -262,30 +264,58 @@ public class UserRelationCacheDao {
     )
     public void handleMessage(String data){
         logger.info("handleMessage={} start",data);
+        UserRelationDto relationDto = null;
         try{
             //反序列化对象
-            UserRelationDto relationDto = MAPPER.readValue(data,UserRelationDto.class);
+            relationDto = MAPPER.readValue(data,UserRelationDto.class);
             logger.info("handleMessage.convert={}",JSON.toJSON(relationDto));
 
             //数据库存储
-            userRelationDao.update(relationDto);
+            if(relationDto.getKid() == null){
+                relationDto.setKid(idAPI.getKid(TABLE_NAME).getData());
+                relationDto.setCreateUserId(Long.parseLong(relationDto.getSourceUserId()));
+                relationDto.setLastUpdateUserId(Long.parseLong(relationDto.getSourceUserId()));
+                relationDto.setVersion(0);
+                relationDto.setDelFlag(10);
+                logger.info("insert database start");
+                userRelationDao.insert(relationDto);
+                logger.info("insert database finish");
+            }else{
+                logger.info("update database start");
+                userRelationDao.update(relationDto);
+                logger.info("update database finish");
+            }
+
+            /**
+             * 第三方同步 (串行执行）
+             */
 
             //同步调用第三方建立关系
             this.syncImRelation(relationDto);
+
+            //删除动态
+            this.syncDynamicTimeLine(relationDto);
 
             //统计数据
             UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
 
             //添加积分成长值
-            this.scoreEvent(relationDto,dto);
+            this.syncScoreEvent(relationDto,dto);
 
             //刷新至缓存
-            logger.info("handleMessage.refreshCache={}/{} start",relationDto.getSourceUserId(),JSON.toJSON(dto));
             this.refreshCacheCount(relationDto.getSourceUserId(),dto);
-            logger.info("handleMessage.refreshCache={} finish",relationDto.getSourceUserId());
-
 
         }catch (Exception e){
+            logger.error(e.getMessage(),e);
+
+            /**
+             * 删除缓存
+             */
+            logger.warn("removeCacheRelation start");
+            this.removeCacheRelation(relationDto);
+            logger.warn("removeCacheRelation finish");
+
+            //继续抛出异常，进行数据库回滚
             throw new RuntimeException(e);
         }finally {
             logger.info("handleMessage={} finish",data);
@@ -293,30 +323,51 @@ public class UserRelationCacheDao {
     }
 
 
+    /**
+     * 动态时间线
+     * @param dto
+     */
+    public void syncDynamicTimeLine(UserRelationDto dto){
+
+        int status = dto.getRelationStatus();
+        /**
+         * 非关注，和好友时，删除自己动态的内容
+         */
+        if(status != UserRelationConstant.STATUS.FOLLOW.getCode()
+                && status != UserRelationConstant.STATUS.FRIEND.getCode()){
+
+            logger.info("syncDynamicTimeLine {}/{} start",dto.getSourceUserId(),dto.getTargetUserId());
+
+            Response<Boolean> rpc = dymaicService.shuffleTimeLine(
+                    Long.parseLong(dto.getSourceUserId()),Long.parseLong(dto.getTargetUserId()));
+            logger.info("syncDynamicTimeLine rpc={}",JSON.toJSON(rpc));
+            logger.info("syncDynamicTimeLine {}/{} finish",dto.getSourceUserId(),dto.getTargetUserId());
+        }
+    }
+
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     /**
      * 积分事件
      * @param dto
      * @param countDto
      */
-    public void scoreEvent(UserRelationDto dto,UserRelationCountDto countDto){
+    public void syncScoreEvent(UserRelationDto dto,UserRelationCountDto countDto){
 
         EventInfo info = new EventInfo();
-        info.setEventCode("31");                      //事件编号
+
         info.setCreateTime(simpleDateFormat.format(new Date()));
         info.setUserId(dto.getSourceUserId());
-
         if(countDto.getFollowCount() == 30){          //达到30人，增加50积分
-            info.setEventGrow("50");
+            info.setEventCode("38");                      //事件编号
         }else if(countDto.getFollowCount() == 20){    //达到20人，增加30积分
-            info.setEventGrow("30");
+            info.setEventCode("31");                      //事件编号
         }else{
             return;
         }
 
-        logger.info("添加积分成长值：{} start",JSON.toJSON(info));
+        logger.info("syncScoreEvent：{} start",JSON.toJSON(info));
         eventAPI.commit(info);
-        logger.info("添加积分成长值：{} finish",JSON.toJSON(info));
+        logger.info("syncScoreEvent：{} finish",JSON.toJSON(info));
 
     }
 
@@ -388,7 +439,7 @@ public class UserRelationCacheDao {
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
                 imAPI.setSpecialRelation(im);
             }catch (Exception e){
-                throw new QuanhuException("","[IM]"+e.getMessage(),"添加黑名单失败");
+                throw new QuanhuException("","[IM]"+e.getMessage(),"添加黑名单失败",e);
             }finally {
                 logger.info("syncImRelation.setSpecialRelation ={} finish",JSON.toJSON(im));
             }
@@ -399,7 +450,7 @@ public class UserRelationCacheDao {
                 logger.info("syncImRelation.setSpecialRelation ={} start",JSON.toJSON(im));
                 imAPI.setSpecialRelation(im);
             }catch (Exception e){
-                throw new QuanhuException("","[IM]"+e.getMessage(),"取消黑名单失败");
+                logger.warn("取消黑名单失败",e);
             }finally {
                 logger.info("syncImRelation.setSpecialRelation ={} finish",JSON.toJSON(im));
             }
@@ -411,7 +462,7 @@ public class UserRelationCacheDao {
                 logger.info("syncImRelation.addFriend ={} start",JSON.toJSON(im));
                 imAPI.addFriend(im);
             }catch (Exception e){
-                throw new QuanhuException("","[IM]"+e.getMessage(),"添加好友关系失败");
+                throw new QuanhuException("","[IM]"+e.getMessage(),"添加好友关系失败",e);
             }finally {
                 logger.info("syncImRelation.addFriend ={} finish",JSON.toJSON(im));
             }
@@ -420,7 +471,7 @@ public class UserRelationCacheDao {
                 logger.info("syncImRelation.deleteFriend ={} start",JSON.toJSON(im));
                 imAPI.deleteFriend(im);
             }catch (Exception e){
-                throw new QuanhuException("","[IM]"+e.getMessage(),"删除好友关系失败");
+                logger.warn("删除好友关系失败",e);
             }finally {
                 logger.info("syncImRelation.deleteFriend ={} finish",JSON.toJSON(im));
             }
