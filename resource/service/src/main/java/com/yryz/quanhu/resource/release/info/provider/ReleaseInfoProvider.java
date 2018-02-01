@@ -38,6 +38,7 @@ import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.release.info.service.ReleaseInfoService;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
+import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -69,9 +70,12 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private ResourceDymaicApi resourceDymaicApi;
-    
+
     @Reference(lazy = true, check = false, timeout = 10000)
     private ResourceApi resourceApi;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private EventAPI eventAPI;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -112,10 +116,11 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
                 // 接入统计计数
                 countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
             } catch (Exception e) {
-                logger.error("资源聚合、统计计数 接入异常！", e);
+                logger.error("统计计数 接入异常！", e);
             }
 
-            // TODO 对接积分事件
+            // 对接积分事件
+            releaseInfoService.commitEvent(eventAPI, record);
 
             return ResponseUtils.returnObjectSuccess(record);
 
@@ -247,11 +252,6 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     }
 
     @Override
-    public Response<Integer> shelvesByCondition(ReleaseInfo record, ReleaseInfoDto dto) {
-        return ResponseUtils.returnObjectSuccess(0);
-    }
-
-    @Override
     public Response<List<Long>> getKidByCreatedate(String startDate, String endDate) {
         try {
             List<Long> data = this.releaseInfoService.getKidByCreatedate(startDate, endDate);
@@ -268,7 +268,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<List<ReleaseInfoVo>> selectByKids(Set<Long> kids) {
         try {
             ReleaseInfoDto dto = new ReleaseInfoDto();
-            dto.setKids(kids.toArray(new Long []{}));
+            dto.setKids(kids.toArray(new Long[] {}));
             List<ReleaseInfoVo> list = this.releaseInfoService.selectByCondition(dto);
             return ResponseUtils.returnObjectSuccess(list);
         } catch (QuanhuException e) {
