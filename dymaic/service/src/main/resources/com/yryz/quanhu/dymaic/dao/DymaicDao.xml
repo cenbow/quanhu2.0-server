@@ -10,7 +10,7 @@
         <result column="target_id" property="resourceId" jdbcType="BIGINT"/>
 
         <result column="transmit_note" property="transmitNote" jdbcType="VARCHAR"/>
-        <result column="transmit_type" property="transmitType" jdbcType="TINYINT"/>
+        <result column="transmit_type" property="transmitType" jdbcType="VARCHAR"/>
         <result column="ext_json" property="extJson" jdbcType="LONGVARCHAR"/>
 
         <result column="shelve_flag" property="shelveFlag" jdbcType="TINYINT"/>
