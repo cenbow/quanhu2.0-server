@@ -30,6 +30,17 @@ public class ScoreFlowReportVo implements Serializable{
 
     private String updateTime;
 
+    /**
+     * 积分事件类型：分三大类：1：一次性触发  2：每次触发  3：条件日期循环触发 
+     */
+    private String eventType;
+
+	private Integer eventLoopUnit;
+
+    private Integer eventLimit;
+
+    private Integer eventScore;
+
 	/**
      * 昵称
      */
@@ -40,8 +51,55 @@ public class ScoreFlowReportVo implements Serializable{
      */
     private String userPhone;
     
+    /**
+     * 积分倍数，按交易计算积分时需要用倍数
+     */
+    private int amountPower;
     
     
+
+    public int getAmountPower() {
+		return amountPower;
+	}
+
+	public void setAmountPower(int amountPower) {
+		this.amountPower = amountPower;
+	}
+
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+
+	public Integer getEventLoopUnit() {
+		return eventLoopUnit;
+	}
+
+	public void setEventLoopUnit(Integer eventLoopUnit) {
+		this.eventLoopUnit = eventLoopUnit;
+	}
+
+	public Integer getEventLimit() {
+		return eventLimit;
+	}
+
+	public void setEventLimit(Integer eventLimit) {
+		this.eventLimit = eventLimit;
+	}
+
+	public Integer getEventScore() {
+		return eventScore;
+	}
+
+	public void setEventScore(Integer eventScore) {
+		this.eventScore = eventScore;
+	}
+
+    
+
     public String getUserNickName() {
 		return userNickName;
 	}

@@ -115,7 +115,7 @@
 		<if test="sfq.userId != null and sfq.userId !=''">
 			and user_id = #{sfq.userId}
 		</if>
-		<if test="sfq.consumeFlag != null and sfq.consumeFlag !=''">
+		<if test="sfq.consumeFlag != null">
 			and consume_flag = #{sfq.consumeFlag}
 		</if>
 		<if test="sfq.eventCode != null and sfq.eventCode !=''">

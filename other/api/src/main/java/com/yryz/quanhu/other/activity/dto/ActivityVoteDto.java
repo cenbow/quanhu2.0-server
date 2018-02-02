@@ -8,6 +8,8 @@ public class ActivityVoteDto implements Serializable {
     private Integer currentPage = 1;
     /**每页大小*/
     private Integer pageSize = 10;
+    /** kid */
+    private Long kid;
     /** 活动id */
     private Long activityInfoId;
     /** 参与者id */
@@ -53,6 +55,14 @@ public class ActivityVoteDto implements Serializable {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public Long getKid() {
+        return kid;
+    }
+
+    public void setKid(Long kid) {
+        this.kid = kid;
     }
 
     public Long getActivityInfoId() {

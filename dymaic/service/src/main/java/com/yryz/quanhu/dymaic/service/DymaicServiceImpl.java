@@ -83,6 +83,10 @@ public class DymaicServiceImpl {
         //mq
         dymaicSender.directSend(dymaic);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("send " + dymaic.getKid());
+        }
+
         return true;
     }
 
@@ -109,6 +113,9 @@ public class DymaicServiceImpl {
         dymaicCache.removeSendList(userId, kid);
         dymaicCache.removeTimeLine(userId, kid);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("delete " + kid);
+        }
         return true;
     }
 
@@ -131,6 +138,10 @@ public class DymaicServiceImpl {
 
         //update cache
         dymaicCache.addDynamic(dymaic);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("shelve " + kid);
+        }
         return true;
     }
 

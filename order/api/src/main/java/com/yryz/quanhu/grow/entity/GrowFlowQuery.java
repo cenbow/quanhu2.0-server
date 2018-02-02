@@ -40,9 +40,31 @@ public class GrowFlowQuery implements Serializable{
 	
 	/**条数*/
 	private int limit;
+
+	/** 手机号 */
+	private String userPhone;
+	
+    /** 事件名称 */
+	private String eventName;
 	
 	
 	
+	public String getUserPhone() {
+		return userPhone;
+	}
+
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone;
+	}
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
     public Integer getCurrentPage() {
 		return currentPage;
 	}
