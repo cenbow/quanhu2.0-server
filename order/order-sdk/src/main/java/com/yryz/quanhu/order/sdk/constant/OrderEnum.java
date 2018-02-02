@@ -39,12 +39,12 @@ public enum OrderEnum {
     /**
      * 付费阅读:"付费阅读文章,金额:{cost}"
      */
-    READ_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.RESOURCE_PAY, BranchFeesEnum.READ, "付费阅读"),
+    READ_ORDER(OrderType.ORDER_TYPE_MINUS, ProductEnum.RESOURCE_PAY, BranchFeesEnum.READ, "付费阅读"),
 
     /**
      * 付费加入私圈:"付费加入私圈,金额:{cost}"
      */
-    JOIN_COTERIE_ORDER(OrderType.ORDER_TYPE_PLUS, ProductEnum.COTERIE_JOIN, BranchFeesEnum.JOIN_COTERIE, "付费加入私圈"),
+    JOIN_COTERIE_ORDER(OrderType.ORDER_TYPE_MINUS, ProductEnum.COTERIE_JOIN, BranchFeesEnum.JOIN_COTERIE, "付费加入私圈"),
 
     /**
      * 付费活动报名
