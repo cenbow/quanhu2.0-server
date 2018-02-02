@@ -93,7 +93,7 @@ public class ScoreTest {
 		String consumeFlag = "";
 		ScoreFlowQuery sfq =new ScoreFlowQuery();
 		sfq.setUserId(userId);
-		sfq.setConsumeFlag(consumeFlag);
+//		sfq.setConsumeFlag(consumeFlag);
 //		PageList<ScoreFlow> sfslist = eventAcountApiService.getScoreFlow(sfq);
 //		
 //		System.out.println("sfslist size(): "+sfslist.getCount());
