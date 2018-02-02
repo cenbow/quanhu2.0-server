@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @Api(description = "投票活动")
 @RestController
@@ -42,11 +43,11 @@ public class ActivityCandidateController {
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")
-    public Response join(@RequestBody ActivityVoteDto activityVoteDto, HttpServletRequest request) {
+    public Response<Map<String, Object>> join(@RequestBody ActivityVoteDto activityVoteDto, HttpServletRequest request) {
         String userId = request.getHeader("userId");
         Assert.hasText(userId, "userId不能为空");
         activityVoteDto.setCreateUserId(Long.valueOf(userId));
-        Response response = activityCandidateApi.join(activityVoteDto);
+        Response<Map<String, Object>> response = activityCandidateApi.join(activityVoteDto);
         if(response.success()){
             try {
                 countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId), ActivityCountConstant.ACTIVITY_RECORD_COUNT,ActivityCountConstant.ACTIVITY_COUNT);

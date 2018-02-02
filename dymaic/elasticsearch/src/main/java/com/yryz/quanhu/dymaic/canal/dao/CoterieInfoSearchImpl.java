@@ -32,7 +32,7 @@ public class CoterieInfoSearchImpl implements CoterieInfoSearch {
 		QueryBuilder query5 = QueryBuilders.termQuery("state", 11);
 		
 		List<Order> orders=new ArrayList<>();
-		orders.add(Order.desc("sort"));
+		orders.add(Order.desc("recommend"));
 		orders.add(Order.desc("memberNum"));
 		orders.add(Order.desc("createDate"));
 		Pageable pageable = PageRequest.of(page, size, Sort.by(orders));

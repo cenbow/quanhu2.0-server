@@ -9,6 +9,7 @@
         <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
         <result column="target_id" property="resourceId" jdbcType="BIGINT"/>
 
+        <result column="transmit_id" property="transmitId" jdbcType="BIGINT"/>
         <result column="transmit_note" property="transmitNote" jdbcType="VARCHAR"/>
         <result column="transmit_type" property="transmitType" jdbcType="VARCHAR"/>
         <result column="ext_json" property="extJson" jdbcType="LONGVARCHAR"/>
@@ -24,7 +25,7 @@
 
     <sql id="Base_Column_List">
         kid, create_user_id, module_enum, target_id,
-        transmit_note, transmit_type, ext_json,
+        transmit_id, transmit_note, transmit_type, ext_json,
         shelve_flag, del_flag, create_date, last_update_user_id, last_update_date
     </sql>
 
@@ -100,10 +101,10 @@
     <!-- 新增动态 -->
     <insert id="insert" parameterType="com.yryz.quanhu.dymaic.vo.Dymaic">
         insert into qh_dymaic (kid, create_user_id, module_enum, target_id,
-          transmit_note, transmit_type, ext_json)
+          transmit_id, transmit_note, transmit_type, ext_json)
         values (#{kid,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},
             #{moduleEnum,jdbcType=VARCHAR},#{resourceId,jdbcType=BIGINT},
-            #{transmitNote,jdbcType=VARCHAR},#{transmitType,jdbcType=VARCHAR},
+            #{transmitId,jdbcType=BIGINT},#{transmitNote,jdbcType=VARCHAR},#{transmitType,jdbcType=VARCHAR},
             #{extJson,jdbcType=LONGVARCHAR})
     </insert>
 
@@ -112,7 +113,7 @@
         SELECT
         <include refid="Base_Column_List"/>
         from qh_dymaic
-        WHERE 1=1
+        WHERE transmit_note IS NOT NULL
         <if test="delFlag != null">
             and del_flag = #{delFlag}
         </if>
