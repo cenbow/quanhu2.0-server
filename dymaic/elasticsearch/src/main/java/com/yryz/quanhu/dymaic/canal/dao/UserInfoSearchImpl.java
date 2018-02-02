@@ -1,12 +1,20 @@
 package com.yryz.quanhu.dymaic.canal.dao;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
 
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +27,8 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Repository;
 
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
+
+import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
 
 @Repository
 public class UserInfoSearchImpl implements UserInfoSearch {
@@ -52,19 +62,22 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Long userId = starInfoDTO.getUserId();
 
         QueryBuilder queryTagId = QueryBuilders.termQuery("userTagInfo.userTagInfoList.tagId", tagId);
+        QueryBuilder queryTagOnLine = QueryBuilders.termQuery("userTagInfo.userTagInfoList.delFlag", 10);
         QueryBuilder queryUserRole = QueryBuilders.termQuery("userBaseInfo.userRole", 11);
         SearchQuery query = null;
 
         //分页信息
-        Pageable pageable = PageRequest.of(pageNo, pageSize,
-                Sort.by(Direction.DESC,
-                        "userStarInfo.recommendHeight", "userStarInfo.recommendTime", "userBaseInfo.lastHeat"));
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize,
+                Sort.by(Direction.DESC, "userStarInfo.recommendHeight", "userStarInfo.recommendTime",
+                "userStarInfo.authTime", "userBaseInfo.lastHeat"));
         if (userId != null) {
             //当前用户
             QueryBuilder queryMyself = QueryBuilders.termQuery("userId", userId.toString());
             query = new NativeSearchQueryBuilder()
+                    //.withSort(SortBuilders.fieldSort("userStarInfo.recommendTime").unmappedType("integer").order(SortOrder.DESC))
                     .withFilter(QueryBuilders.boolQuery()
                             .must(queryTagId)
+                            .must(queryTagOnLine)
                             .must(queryUserRole)
                             .mustNot(queryMyself))
                     .withPageable(pageable)
@@ -80,6 +93,61 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         logger.debug("searchStarUser query: {}", GsonUtils.parseJson(query));
         return elasticsearchTemplate.queryForList(query, UserInfo.class);
+    }
+
+    @Override
+    public List<UserInfo> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
+        Integer pageNo = adminUserDTO.getPageNo();
+        Integer pageSize = adminUserDTO.getPageSize();
+
+        String startDateStr = adminUserDTO.getStartDate();
+        String endDateStr = adminUserDTO.getEndDate();
+        long startDate = DateUtils.parseDate(startDateStr).getTime();
+        long endDate = DateUtils.parseDate(endDateStr).getTime();
+        //用户
+        String nickName = adminUserDTO.getNickName();
+        String phone = adminUserDTO.getPhone();
+
+        //注册渠道
+        String channelCode = adminUserDTO.getActivityChannelCode();
+        //达人认证信息
+        Byte auditStatus = adminUserDTO.getAuditStatus();
+        Byte authType = adminUserDTO.getAuthType();
+        Byte authWay = adminUserDTO.getAuthWay();
+
+        String growLevel = adminUserDTO.getGrowLevel();
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if (StringUtils.isNoneBlank(nickName)) {
+            boolQueryBuilder.must(QueryBuilders.matchQuery(ESConstants.USER_NICKNAME, nickName));
+        }
+        if (StringUtils.isNoneBlank(phone)) {
+            boolQueryBuilder.must(QueryBuilders.matchQuery(ESConstants.USER_PHONE, phone));
+        }
+
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        queryBuilder
+                .withFilter(boolQueryBuilder)
+                .withFilter(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate))
+                .withPageable(pageable);
+
+        List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
+        for (FieldSortBuilder sortBuilder : sortBuilders) {
+            queryBuilder.withSort(sortBuilder);
+        }
+
+        SearchQuery query = queryBuilder.build();
+
+        return elasticsearchTemplate.queryForList(query, UserInfo.class);
+    }
+
+    private List<FieldSortBuilder> getAdminUserSortBuilder() {
+        List<FieldSortBuilder> sortBuilders = new ArrayList<>();
+        FieldSortBuilder sort = SortBuilders.fieldSort(USER_CREATEDATE).order(SortOrder.DESC);
+        sortBuilders.add(sort);
+        return sortBuilders;
     }
 
 

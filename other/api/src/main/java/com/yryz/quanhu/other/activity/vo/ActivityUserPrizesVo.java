@@ -14,6 +14,10 @@ public class ActivityUserPrizesVo implements Serializable{
     @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
+    private Integer receiveFlag;
+
+    private Integer remainingFlag;
+
     public List<ActivityUserPrizes> getPrizes() {
         return prizes;
     }
@@ -28,5 +32,21 @@ public class ActivityUserPrizesVo implements Serializable{
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Integer getReceiveFlag() {
+        return receiveFlag;
+    }
+
+    public void setReceiveFlag(Integer receiveFlag) {
+        this.receiveFlag = receiveFlag;
+    }
+
+    public Integer getRemainingFlag() {
+        return remainingFlag;
+    }
+
+    public void setRemainingFlag(Integer remainingFlag) {
+        this.remainingFlag = remainingFlag;
     }
 }

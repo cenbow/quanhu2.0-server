@@ -10,6 +10,8 @@ import java.util.Date;
 
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
+    public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
+
     private static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static String getString(Date date) {

@@ -286,8 +286,12 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         activityVoteDto.setActivityInfoId(activityInfoId);
         activityVoteDto.setCreateUserId(userId);
         List<ActivityUserPrizes> activityUserPrizes = activityUserPrizesDao.selectUserPrizesList(activityVoteDto);
+        //您已经领取过该奖品
         if (!CollectionUtils.isEmpty(activityUserPrizes)) {
-            throw QuanhuException.busiError("您已经领取过该奖品");
+            result.setReceiveFlag(11);
+            return result;
+        } else {
+            result.setReceiveFlag(10);
         }
         //获取可领取的奖品
         List<ActivityPrizesVo> activityPrizes = activityPrizesDao.selectAvailablePrizesVo(activityInfoId);
@@ -336,8 +340,11 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
                 }
             }
         }
+        //奖品已经领完
         if(CollectionUtils.isEmpty(resultList)) {
-            throw QuanhuException.busiError("奖品已经领完");
+            result.setRemainingFlag(11);
+        } else {
+            result.setRemainingFlag(10);
         }
 
         return result;

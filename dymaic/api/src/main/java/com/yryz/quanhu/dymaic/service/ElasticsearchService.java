@@ -2,11 +2,13 @@ package com.yryz.quanhu.dymaic.service;
 
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.dymaic.vo.CoterieInfoVo;
 import com.yryz.quanhu.dymaic.vo.ResourceInfoVo;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.vo.StarInfoVO;
+import com.yryz.quanhu.user.vo.UserInfoVO;
 
 public interface ElasticsearchService {
 	/**
@@ -68,4 +70,14 @@ public interface ElasticsearchService {
 	 * 不能随便调用
 	 */
 	void rebuildResourceInfo();
+
+
+
+
+	/**
+	 * 管理后台搜索用户
+	 * @param
+	 * @return
+	 */
+	Response<PageList<UserInfoVO>> adminSearchUser(AdminUserInfoDTO userInfoDTO);
 }
