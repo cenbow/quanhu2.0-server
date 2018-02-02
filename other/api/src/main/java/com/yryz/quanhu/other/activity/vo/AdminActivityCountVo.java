@@ -1,6 +1,8 @@
 package com.yryz.quanhu.other.activity.vo;
 
-public class AdminActivityCountVo {
+import java.io.Serializable;
+
+public class AdminActivityCountVo implements Serializable {
 
     private String date;
 
