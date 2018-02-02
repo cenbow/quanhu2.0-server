@@ -36,7 +36,7 @@ public class CommentController {
     @ApiOperation("用户评论")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/accretion")
-    public Response<Map<String, Integer>> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
+    public Response<Comment> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
         comment.setCreateUserId(userId);
         return commentApi.accretion(comment);
     }
