@@ -53,7 +53,7 @@ public class BehaviorController {
     @NotLogin
     @ApiOperation("查询统计以及状态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/behavior/getCountFlag")
+    @GetMapping(value = "/services/app/{version}/behavior/getCountFlag")
     Response<Map<String, Long>> getCountFlag(@RequestHeader Long userId, @RequestParam String countType, @RequestParam Long kid, HttpServletRequest request) {
         if (userId == null) {
             return ResponseUtils.returnException(QuanhuException.busiError("用户ID为空"));
