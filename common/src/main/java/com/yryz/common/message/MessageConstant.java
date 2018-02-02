@@ -151,7 +151,13 @@ public enum MessageConstant {
     /**
      * 被打赏收益
      */
-    REWARD_INTEGRAL(MessageType.ORDER_TYPE,MessageLabel.ORDER_ACCOUNT,"奖励通知","%s打赏了一个%s，您获得%s奖励。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL);
+    REWARD_INTEGRAL(MessageType.ORDER_TYPE,MessageLabel.ORDER_ACCOUNT,"奖励通知","%s打赏了一个%s，您获得%s奖励。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
+
+    /**
+     * 内容下架
+     */
+    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE),
+    ;
 
     private Integer type;
 
