@@ -298,7 +298,7 @@
         <![CDATA[  AND end_date > #{nowDate}  ]]>
         OR
         adv_type = #{advType} AND adv_status != 30
-        <![CDATA[  start_date <= #{nowDate} ]]>
+        <![CDATA[  AND start_date <= #{nowDate} ]]>
         <![CDATA[  AND end_date >= #{nowDate} ]]>
         <![CDATA[  AND start_time > #{nowTime} ]]>
         order by adv_sort desc, create_date desc
