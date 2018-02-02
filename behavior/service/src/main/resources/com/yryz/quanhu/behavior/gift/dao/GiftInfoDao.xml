@@ -66,9 +66,6 @@
 	<update id="updateByKid" parameterType="com.yryz.quanhu.behavior.gift.entity.GiftInfo">
 		update qh_gift_info
 		<set>
-			<if test="kid != null">
-				kid = #{kid,jdbcType=BIGINT},
-			</if>
 			<if test="giftName != null">
 				gift_name = #{giftName,jdbcType=VARCHAR},
 			</if>

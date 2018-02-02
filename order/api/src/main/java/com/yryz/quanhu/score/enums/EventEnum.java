@@ -72,8 +72,8 @@ public enum EventEnum {
 	/** 用户发布问题  */
 	CREATE_QUESTION("23","收藏","收藏"),
 	
-	/** 用户问题被回答  */
-	QUESTION_ANSWER("24","阅读","阅读"),
+	/** 阅读  */
+	READ("24","阅读","阅读"),
 		
 	/** 邀请好友注册 */
 	INVITE_FRIENDS_TO_REGISTER("25","邀请好友注册","邀请好友注册奖励500积分"),

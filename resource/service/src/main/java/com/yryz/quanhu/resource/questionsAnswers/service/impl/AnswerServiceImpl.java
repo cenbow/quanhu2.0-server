@@ -45,7 +45,6 @@ public class AnswerServiceImpl implements AnswerService {
     @Autowired
     private QuestionService questionService;
 
-
     @Autowired
     private AnswerService answerService;
 
@@ -231,7 +230,7 @@ public class AnswerServiceImpl implements AnswerService {
         answerVo.setModuleEnum(ModuleContants.ANSWER);
 
         //虚拟阅读数
-        readApi.read(kid);
+        readApi.read(kid,answerWithBLOBs.getCreateUserId());
         return answerVo;
     }
 

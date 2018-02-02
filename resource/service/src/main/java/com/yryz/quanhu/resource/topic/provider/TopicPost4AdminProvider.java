@@ -6,23 +6,19 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.resource.topic.api.TopicPost4AdminApi;
-import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
-import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
-import com.yryz.quanhu.resource.topic.service.TopicPostService;
+import com.yryz.quanhu.resource.topic.service.TopicPost4AdminService;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 @Service(interfaceClass = TopicPost4AdminApi.class)
 public class TopicPost4AdminProvider implements TopicPost4AdminApi {
     private static final Logger logger = LoggerFactory.getLogger(TopicPost4AdminProvider.class);
 
     @Autowired
-    private TopicPostService topicPostService;
+    private TopicPost4AdminService topicPostService;
 
     @Override
     public Response<TopicPostVo> quetyDetail(Long kid, Long userId) {

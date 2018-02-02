@@ -13,7 +13,6 @@ import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
-import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
@@ -22,10 +21,9 @@ import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicPostDto;
 import com.yryz.quanhu.resource.topic.entity.Topic;
-import com.yryz.quanhu.resource.topic.entity.TopicPost;
 import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
-import com.yryz.quanhu.resource.topic.service.TopicPostService;
+import com.yryz.quanhu.resource.topic.service.TopicPost4AdminService;
 import com.yryz.quanhu.resource.topic.service.TopicService;
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.resource.topic.vo.TopicAndPostVo;
@@ -42,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TopicPostServiceImpl implements TopicPostService {
+public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     @Autowired
     private TopicPostDao topicPostDao;
