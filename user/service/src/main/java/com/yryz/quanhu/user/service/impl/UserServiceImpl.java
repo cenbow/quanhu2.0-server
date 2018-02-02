@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService {
 		String starTradeField = "";
 		//聚合达人行业数据
 		if(baseInfo.getUserRole() == UserRole.STAR.getRole()){
-			UserStarAuth starAuth = starService.get(userId.toString(), null);
+			UserStarAuth starAuth = starService.get(friendId.toString(), null);
 			starTradeField = starAuth != null ? starAuth.getTradeField() : "";
 		}
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
