@@ -36,7 +36,7 @@ public class Topic  implements Serializable{
 
     private Integer revision;
 
-    private Integer coterieId;
+    private Long coterieId;
 
     private String cityCode;
 
@@ -164,11 +164,11 @@ public class Topic  implements Serializable{
         this.revision = revision;
     }
 
-    public Integer getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(Integer coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 
