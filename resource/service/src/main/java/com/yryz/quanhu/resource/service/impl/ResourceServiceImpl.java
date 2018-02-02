@@ -62,12 +62,18 @@ public class ResourceServiceImpl implements ResourceService {
 			for (ResourceModel resourceModel : resources) {
 				if(resourceMongo.get(resourceModel) != null){
 					resourceMongo.update(resourceModel);
+					if(ResourceEnum.RECOMMEND_TYPE_TRUE.equals(resourceModel.getRecommend())){
+						resourceModel.setRecommendTime(System.currentTimeMillis());
+					}
 					updateCache(resourceModel.getResourceId());
 				} else {
 					//创建资源时候要创建对应的热度对象
 					HeatInfo heatInfo = hotspotService.saveHeat("1", resourceModel.getResourceId() , resourceModel.getTalentType());
 					if(heatInfo != null) {
 						resourceModel.setHeat(heatInfo.getHeat());
+					}
+					if(ResourceEnum.RECOMMEND_TYPE_TRUE.equals(resourceModel.getRecommend())){
+						resourceModel.setRecommendTime(System.currentTimeMillis());
 					}
 					resourceMongo.save(resourceModel);
 					resourceCanalDao.sendToCannel(resourceModel.getResourceId(), 0L);
@@ -345,7 +351,7 @@ public class ResourceServiceImpl implements ResourceService {
 		ResourceModel resourceModel = new ResourceModel();
 		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_TRUE);
 //		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
-		List<ResourceModel> list = resourceMongo.getList(resourceModel, "sort", null, null, start, limit);
+		List<ResourceModel> list = resourceMongo.getList(resourceModel, "sort,recommendTime", null, null, start, limit);
 		return list;
 	}
 	
