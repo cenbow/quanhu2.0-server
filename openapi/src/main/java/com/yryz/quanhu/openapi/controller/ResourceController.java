@@ -72,7 +72,7 @@ public class ResourceController {
         }
         ResourceVo resourceVo = new ResourceVo();
         resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + "," + ModuleContants.ANSWER + "," + ModuleContants.ACTIVITY_COTERIE);
-        resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
+        resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceVo.setCoterieId(coterieId);
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);

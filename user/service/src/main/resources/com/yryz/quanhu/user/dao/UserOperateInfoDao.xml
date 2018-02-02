@@ -36,7 +36,7 @@
 	
 	<!-- 查询本人邀请人数 -->
 	<select id="getInviterNum" resultType="java.lang.Integer">
-		select cust_reg_inviter_num
+		select user_reg_inviter_num
 		from qh_user_operate_info
 		where user_id = #{userId}
 	</select>
@@ -99,6 +99,9 @@
 			<if test="userRegChannel != null">
 				user_reg_channel,
 			</if>
+			<if test="userInviterId != null">
+				user_inviter_id,
+			</if>
 			<if test="userRegInviterCode != null">
 				user_reg_inviter_code,
 			</if>
@@ -127,6 +130,9 @@
 			</if>
 			<if test="userRegChannel != null">
 				#{userRegChannel,jdbcType=VARCHAR},
+			</if>
+			<if test="userInviterId != null">
+				#{userInviterId},
 			</if>
 			<if test="userRegInviterCode != null">
 				#{userRegInviterCode,jdbcType=VARCHAR},

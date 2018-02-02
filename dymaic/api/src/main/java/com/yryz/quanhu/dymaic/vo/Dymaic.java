@@ -67,6 +67,10 @@ public class Dymaic implements Serializable {
     private Date createDate;
 
 
+    private Long lastUpdateUserId;
+    private Date lastUpdateDate;
+
+
     public Long getKid() {
         return kid;
     }
@@ -145,5 +149,21 @@ public class Dymaic implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Long getLastUpdateUserId() {
+        return lastUpdateUserId;
+    }
+
+    public void setLastUpdateUserId(Long lastUpdateUserId) {
+        this.lastUpdateUserId = lastUpdateUserId;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

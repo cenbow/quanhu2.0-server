@@ -207,6 +207,9 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<String> getDeviceIdByUserId(Long userId) {
 		try {
+			if(userId == null || userId == 0l){
+				throw QuanhuException.busiError("userId不能为空");
+			}
 			String devId = userService.getDeviceIdByUserId(userId);
 			return ResponseUtils.returnObjectSuccess(devId);
 		} catch (QuanhuException e) {
@@ -220,6 +223,9 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<List<String>> getDeviceIdByUserId(List<String> userIds) {
 		try {
+			if(CollectionUtils.isEmpty(userIds)){
+				throw QuanhuException.busiError("userIds不能为空");
+			}
 			List<String> devIds = userService.getDeviceIdByUserId(userIds);
 			return ResponseUtils.returnObjectSuccess(devIds);
 		} catch (QuanhuException e) {
@@ -239,7 +245,7 @@ public class UserProvider implements UserApi{
 			Page<UserBaseInfo> list = userService.listUserInfo(pageNo, pageSize, custInfoDTO);
 			List<UserBaseInfoVO> baseInfos = GsonUtils.parseList(list, UserBaseInfoVO.class);
 			PageList<UserBaseInfoVO> pageList = new PageList<>(pageNo, pageSize,
-					baseInfos);
+					baseInfos,list.getTotal());
 			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (Exception e) {
 			logger.error("listUserInfo error", e);
