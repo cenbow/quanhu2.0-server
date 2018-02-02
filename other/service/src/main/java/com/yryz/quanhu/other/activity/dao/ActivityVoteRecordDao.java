@@ -3,6 +3,8 @@ package com.yryz.quanhu.other.activity.dao;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteRecord;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteRecordVo;
+import com.yryz.quanhu.other.activity.vo.AdminActivityCountVo;
+import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -41,5 +43,8 @@ public interface ActivityVoteRecordDao  {
 
     Integer selectCountByActivityInfoId(@Param("id") Long id, @Param("voteNo") Integer voteNo);
 
+    List<AdminActivityCountVo> selectTotalCount(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
+
+    int selectRecordVoteCount(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 
 }

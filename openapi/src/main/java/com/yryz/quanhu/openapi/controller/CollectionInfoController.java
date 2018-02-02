@@ -60,7 +60,8 @@ public class CollectionInfoController {
                 logger.error("提交eventApi 失败", e);
             }
         }
-        return collectionInfoApi.single(collectionInfoDto);
+
+        return result;
     }
 
     @UserBehaviorValidation(login = true)
