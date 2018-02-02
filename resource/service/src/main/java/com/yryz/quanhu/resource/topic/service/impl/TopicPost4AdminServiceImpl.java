@@ -125,7 +125,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
             criteria.andShelveFlagEqualTo(dto.getShelveFlag());
         }
         if (com.yryz.common.utils.StringUtils.isNotBlank(dto.getContent())) {
-            criteria.andContentLike("%" + dto.getTitle() + "%");
+            criteria.andContentLike("%" + dto.getContent() + "%");
         }
 
         List<TopicPostWithBLOBs> topicPosts = this.topicPostDao.selectByExampleWithBLOBs(example);

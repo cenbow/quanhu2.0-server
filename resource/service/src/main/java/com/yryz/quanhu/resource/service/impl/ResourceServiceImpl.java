@@ -403,5 +403,18 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 		return resourceModel;
 	}
+
+	/**
+	 * 资源解决
+	 * @param resource
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceService#count(com.yryz.quanhu.resource.entity.ResourceModel, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public Long count(ResourceModel resource, String startTime, String endTime) {
+		return resourceMongo.count(resource, startTime, endTime);
+	}
 	
 }
