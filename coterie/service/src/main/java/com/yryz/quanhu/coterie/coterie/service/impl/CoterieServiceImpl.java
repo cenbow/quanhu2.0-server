@@ -2,8 +2,12 @@ package com.yryz.quanhu.coterie.coterie.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
@@ -16,13 +20,14 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -48,7 +53,7 @@ public class CoterieServiceImpl implements CoterieService {
 	@Override
 	public CoterieInfo save(CoterieBasicInfo info) {
 		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
-		coterie.setCoterieId(idapi.getKid(IdConstants.QUANHU_COTERIE).getData());
+		coterie.setCoterieId(idapi.getSnowflakeId().getData());
 //		ResourceTotal resourceTotal=new ResourceTotal();
 //		 resourceTotal.setExtJson(GsonUtils.parseJson(info));
 //		resourceTotal.setKid(coterie.getCoterieId());
@@ -464,4 +469,27 @@ public class CoterieServiceImpl implements CoterieService {
 			throw new MysqlOptException("getByKids kidList:"+kidList,e);
 		}
 	}
+
+
+	/************************/
+
+
+
+	@Override
+	public PageList<CoterieInfo> queryCoterieByPage(CoterieSearchParam param) {
+		List<Coterie> list = Lists.newArrayList();
+		try {
+			int start = (param.getPageNum() - 1) * param.getPageSize();
+			list = coterieMapper.findPageByStatus(param.getPageNum(), param.getPageSize(),param.getStatus());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new QuanhuException(ExceptionEnum.SysException);
+		}
+
+		PageList<CoterieInfo> pageList = new PageList<>(param.getPageNum(), param.getPageSize(), GsonUtils.parseList(list, CoterieInfo.class));
+
+		return pageList;
+	}
+
+
 }
