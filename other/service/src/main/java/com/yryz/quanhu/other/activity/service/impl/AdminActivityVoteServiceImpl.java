@@ -1,6 +1,7 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -62,7 +63,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	 */
 	@Override
 	public PageList adminlist(AdminActivityInfoVoteDto param) {
-		PageHelper.startPage(param.getPageNo(), param.getPageSize());
+		Page page = PageHelper.startPage(param.getPageNo(), param.getPageSize());
 		List<AdminActivityVoteVo> list = activityVoteDao.adminlist(param);
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(param.getPageNo(), param.getPageSize(), list, 0L);
@@ -101,7 +102,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 				logger.info("获取报名列表失败");
 			}
 		}
-		return new PageList(param.getPageNo(), param.getPageSize(), list, activityVoteDao.adminlistCount(param));
+		return new PageList(param.getPageNo(), param.getPageSize(), list, page.getTotal());
 	}
 
 	@Override
@@ -144,7 +145,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 
 	@Override
 	public PageList<AdminActivityVoteDetailVo> selectRankList(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
-		PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
+		Page page = PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
 		List<AdminActivityVoteDetailVo> list = activityParticipationDao.selectRankList(adminActivityVoteDetailDto.getActivityInfoId());
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list, 0L);
@@ -168,7 +169,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 			}
 		}
 		return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list,
-				activityParticipationDao.adminRanklistCount(adminActivityVoteDetailDto));
+				page.getTotal());
 	}
 
 	// TODO 恭喜！您在YYYY中获得了第X名，奖励将由工作人员联系您后进行发放，先去看看获得的奖励吧！

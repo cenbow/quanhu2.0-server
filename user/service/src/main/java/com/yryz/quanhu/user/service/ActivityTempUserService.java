@@ -18,12 +18,19 @@ public interface ActivityTempUserService {
 	 */
 	Long save(ActivityTempUser tempUser);
 	/**
+	 * 删除获取参与者
+	 * @param kid
+	 * @return
+	 */
+	int delete(Long kid);
+	
+	/**
 	 * 获取临时用户信息
 	 * @param userId
 	 * @param thirdId
 	 * @return
 	 */
-	ActivityTempUser get(Long userId,String thirdId);
+	ActivityTempUser get(Long userId,String thirdId,String appId);
 	
 	/**
 	 * 根据临时用户信息组装用户基础信息

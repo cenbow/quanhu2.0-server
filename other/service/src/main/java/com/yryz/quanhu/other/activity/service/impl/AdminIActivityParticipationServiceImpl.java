@@ -162,57 +162,19 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 
         return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list, page.getTotal());
     }
-
-    @Override
-    public List<AdminActivityVoteRecordVo> voteList(AdminActivityVoteRecordDto adminActivityVoteRecordDto) {
-
-        if (StringUtils.isNotBlank(adminActivityVoteRecordDto.getNickName())|| adminActivityVoteRecordDto.getBeginCreateDate()!=null|| adminActivityVoteRecordDto.getEndCreateDate()!=null) {
-        	String nickName=null;
-        	String  beginDate=null;
-        	String  endDate=null;
-        	SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd HH:mm:ss " ); 
-        	if(StringUtils.isNotBlank(adminActivityVoteRecordDto.getNickName())){
-        		nickName= adminActivityVoteRecordDto.getNickName();
-        	}
-        	if(adminActivityVoteRecordDto.getBeginCreateDate()!=null|| adminActivityVoteRecordDto.getEndCreateDate()!=null)
-        	{
-        		 beginDate=sdf.format(adminActivityVoteRecordDto.getBeginCreateDate());
-            	 endDate=sdf.format(adminActivityVoteRecordDto.getEndCreateDate());
-        	}
-
-            /*TODO List<String> custIds = custAPI.getAdminList(nickName, null, beginDate, endDate);
-            if (!CollectionUtils.isEmpty(custIds)) {
-                adminActivityVoteRecordDto.setCustIds(custIds);
-            }*/
-        }
-
-        List<AdminActivityVoteRecordVo> list = activityVoteRecordDao.select(adminActivityVoteRecordDto);
-
-        for (AdminActivityVoteRecordVo voteRecord : list) {
-            Set<String> userIds = new HashSet<String>();
-            userIds.add(voteRecord.getCreateUserId().toString());
-            Response<Map<String,UserBaseInfoVO>> users = null;
-            try {
-                users = userApi.getUser(userIds);
-            } catch (Exception e) {
-                logger.error("查询用户信息异常",e);
-            }
-            if(users.success()&&users.getData().get(voteRecord.getCreateUserId().toString())!=null){
-                voteRecord.setNickName(users.getData().get(voteRecord.getCreateUserId().toString()).getUserNickName());
-                voteRecord.setCreateDate(users.getData().get(voteRecord.getCreateUserId().toString()).getCreateDate());
-                voteRecord.setPhone(users.getData().get(voteRecord.getCreateUserId().toString()).getUserPhone());
-            }
-        }
-
-        return list;
-    }
-    
+    /**
+     * 投票用户数据
+     */
     @Override
     public  PageList adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto) {
-        
-    	Integer pageNo = adminActivityVoteRecordDto.getPageNo();
-		Integer pageSize = adminActivityVoteRecordDto.getPageSize();
-        Page<AdminActivityVoteRecordVo> page = PageHelper.startPage(pageNo,pageSize);
+        Integer pageNo = 1;
+        Integer pageSize = 10;
+        Page<AdminActivityVoteRecordVo> page = new Page<AdminActivityVoteRecordVo>();
+        if(adminActivityVoteRecordDto.getType()==null||!adminActivityVoteRecordDto.getType().equals(1)){
+            pageNo = adminActivityVoteRecordDto.getPageNo();
+            pageSize = adminActivityVoteRecordDto.getPageSize();
+            page = PageHelper.startPage(pageNo,pageSize);
+        }
 		String nickName=null;
     	String  beginDate=null;
     	String  endDate=null;
@@ -270,13 +232,21 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
                 voteRecord.setCreateDate(users.getData().get(voteRecord.getCreateUserId().toString()).getCreateDate());
                 voteRecord.setPhone(users.getData().get(voteRecord.getCreateUserId().toString()).getUserPhone());
             }
+            //查询用户是否参加
+            AdminActivityVoteDetailDto voteDetailDto = new AdminActivityVoteDetailDto();
+            voteDetailDto.setActivityInfoId(adminActivityVoteRecordDto.getActivityInfoId());
+            voteDetailDto.setCreateUserId(voteRecord.getCreateUserId());
+            List<AdminActivityVoteDetailVo> voteDetailVos = activityParticipationDao.selectByParam(voteDetailDto);
+            if ( ! CollectionUtils.isEmpty(voteDetailVos)) {
+                voteRecord.setOtherFlag(1);
+            }else{
+                voteRecord.setOtherFlag(0);
+            }
         }
-
-        
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(pageNo, pageSize, list, 0L);
 		}
-		return new PageList(pageNo, pageSize, list, (long)activityVoteRecordDao.select(adminActivityVoteRecordDto).size());
+		return new PageList(pageNo, pageSize, list, page.getTotal());
     }
 
     public AdminActivityInfoVo1 detail(Long infoId) {

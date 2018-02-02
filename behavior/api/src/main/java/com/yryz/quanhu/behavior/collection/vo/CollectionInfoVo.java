@@ -35,6 +35,11 @@ public class CollectionInfoVo implements Serializable {
     private  Long coterieId;
 
     /**
+     * 私圈名字
+     * */
+    private String coterieName;
+
+    /**
      * 发布用户id
      */
     private  Long userId;
@@ -99,6 +104,14 @@ public class CollectionInfoVo implements Serializable {
 
     public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
+    }
+
+    public String getCoterieName() {
+        return coterieName;
+    }
+
+    public void setCoterieName(String coterieName) {
+        this.coterieName = coterieName;
     }
 
     public Long getUserId() {

@@ -62,22 +62,6 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 	}
 
 	/**
-	 * 投票用户数据
-	 */
-	@Override
-	public Response<List<AdminActivityVoteRecordVo>> voteList(AdminActivityVoteRecordDto adminActivityVoteRecordDto){
-		List<AdminActivityVoteRecordVo> list = null;
-		try {
-			list = adminIActivityParticipationService.voteList(adminActivityVoteRecordDto);
-		} catch (Exception e) {
-			logger.error("投票用户数据异常:"+ adminActivityVoteRecordDto);
-			return ResponseUtils.returnException(e);
-		}
-		return ResponseUtils.returnObjectSuccess(list);
-	}
-
-
-	/**
 	 * 增加票数
 	 */
 	@Override
@@ -130,8 +114,9 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		return ResponseUtils.returnObjectSuccess(str);
 	}
 
-	/*List<CircleInfo> circleList();*/
-
+	/**
+	 * 投票用户数据
+	 */
 	@Override
 	public Response<PageList> adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto){
 		PageList<AdminActivityVoteRecordVo> list = null;
