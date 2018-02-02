@@ -163,9 +163,13 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
 		UserBaseInfo baseInfo = getUser(friendId);
+		if(baseInfo == null){
+			return new UserLoginSimpleVO();
+		}
 		String starTradeField = "";
 		
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		
 		//聚合达人行业数据
 		if(simpleVO.getUserRole() == UserRole.STAR.getRole()){
 			UserStarAuth starAuth = starService.get(friendId.toString(), null);
@@ -208,7 +212,7 @@ public class UserServiceImpl implements UserService {
 		// 查询单个用户基础信息
 		List<UserBaseInfo> baseInfos = getUserInfo(Sets.newHashSet(friendId.toString()));
 		if (CollectionUtils.isEmpty(baseInfos)) {
-			return null;
+			return new UserSimpleVO();
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
 		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
