@@ -100,6 +100,8 @@ public class CommentProvider implements CommentApi {
                 comment.setNickName(userSimpleVO.getUserNickName());
                 comment.setUserImg(userSimpleVO.getUserImg());
             }
+            comment.setShelveFlag((byte) 10);
+            comment.setDelFlag((byte) 10);
             int count = commentService.accretion(comment);
             if (count > 0) {
                 map.put("result", 1);
@@ -216,6 +218,7 @@ public class CommentProvider implements CommentApi {
         if (null != userSimpleVO) {
             nickName = userSimpleVO.getUserNickName();
         }
+        String pingContent = "";
         if (comment.getModuleEnum().equals(ModuleContants.RELEASE)) {
             String contentStr = "";
             long contentType = 0;
@@ -225,8 +228,9 @@ public class CommentProvider implements CommentApi {
             } else {
                 contentType = 1;
                 contentStr = nickName + "回复了您的评论。";
+                pingContent=this.getBePingComment(comment.getParentId());
             }
-            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType);
+            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent);
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
@@ -238,8 +242,9 @@ public class CommentProvider implements CommentApi {
             } else {
                 contentType = 1;
                 contentStr = nickName + "回复了您的评论。";
+                pingContent=this.getBePingComment(comment.getParentId());
             }
-            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType);
+            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType,pingContent);
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
@@ -251,8 +256,9 @@ public class CommentProvider implements CommentApi {
             } else {
                 contentType = 1;
                 contentStr = nickName + "回复了您的评论。";
+                pingContent=this.getBePingComment(comment.getParentId());
             }
-            this.dynamicPush(comment.getResourceId(), contentStr, contentType);
+            this.dynamicPush(comment.getResourceId(), contentStr, contentType,pingContent);
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
@@ -275,7 +281,23 @@ public class CommentProvider implements CommentApi {
 
     }
 
-    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType) {
+    public String getBePingComment(Long kid) {
+        Comment comentSub = new Comment();
+        comentSub.setKid(kid);
+        Comment commentSingle = commentService.querySingleComment(comentSub);
+        String pingContent = "";
+        if (null != commentSingle) {
+            if (commentSingle.getContentComment().length() > 20) {
+                pingContent = commentSingle.getContentComment().substring(0, 20);
+            } else {
+                pingContent = commentSingle.getContentComment();
+            }
+
+        }
+        return pingContent;
+    }
+
+    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
             TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
@@ -289,7 +311,7 @@ public class CommentProvider implements CommentApi {
             if (contentType != 0) {
                 commentAssemble.setViewCode((byte) 1);
                 //截取被回复的评论内容
-                commentAssemble.setTitle("");
+                commentAssemble.setTitle(bePingContent);
             }
             commentAssemble.setContent(contentStr);
             commentAssemble.setLink("");
@@ -299,7 +321,7 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType) {
+    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
             ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
@@ -315,7 +337,7 @@ public class CommentProvider implements CommentApi {
             if (contentType != 0) {
                 commentAssemble.setViewCode((byte) 1);
                 //截取被回复的评论内容
-                commentAssemble.setTitle("");
+                commentAssemble.setTitle(bePingContent);
             }
             commentAssemble.setContent(contentStr);
             commentAssemble.setLink("");
@@ -325,7 +347,7 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    public void dynamicPush(long resourceId, String contentPushStr, long contentType) {
+    public void dynamicPush(long resourceId, String contentPushStr, long contentType, String bePingContent) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
            /* Dymaic dymaic = dymaicService.get(resourceId).getData();
@@ -351,7 +373,7 @@ public class CommentProvider implements CommentApi {
                 if (contentType != 0) {
                     commentAssemble.setViewCode((byte) 1);
                     //截取被回复的评论内容
-                    commentAssemble.setTitle("");
+                    commentAssemble.setTitle(bePingContent);
                 }
                 commentAssemble.setContent(contentPushStr);
                 commentAssemble.setLink("");

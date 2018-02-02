@@ -77,5 +77,14 @@ public interface ResourceService {
 	 * @return
 	 */
 	public List<ResourceModel> appRecommend(int start , int limit);
+	
+	/**
+	 * 统计用户信息
+	 * @param resource
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	public Long count(ResourceModel resource ,String startTime ,String endTime);
 
 }
