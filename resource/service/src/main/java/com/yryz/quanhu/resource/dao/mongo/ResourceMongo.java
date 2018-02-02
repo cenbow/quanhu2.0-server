@@ -173,17 +173,17 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				criteria = Criteria.where("resourceId").is(resourceModel.getResourceId()).andOperator(criteria);
 			}
 			if(resourceModel.getUserId() != null){
-				criteria = Criteria.where("custId").is(resourceModel.getUserId()).andOperator(criteria);
+				criteria = Criteria.where("userId").is(resourceModel.getUserId()).andOperator(criteria);
 			}
 			if(StringUtils.isNotEmpty(resourceModel.getTalentType())){
 				criteria = Criteria.where("talentType").is(resourceModel.getTalentType()).andOperator(criteria);
 			}
-			if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
-				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
-			} else if("0".equals(resourceModel.getCoterieId())){
+			if("0".equals(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").is(null).andOperator(criteria);
 			} else if("1".equals(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").not().andOperator(criteria);
+			} else {
+				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
 			}
 			
 			//标题，正文，简介模糊匹配

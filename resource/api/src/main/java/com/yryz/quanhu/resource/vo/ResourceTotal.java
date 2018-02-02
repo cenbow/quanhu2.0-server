@@ -90,6 +90,11 @@ public class ResourceTotal implements Serializable {
     private Integer transmitType;
 
 	/**
+	 * 转发记录ID
+	 */
+	private Long transmitId;
+
+	/**
 	 * 
 	 * @exception 
 	 */
@@ -293,5 +298,12 @@ public class ResourceTotal implements Serializable {
 	public void setTransmitType(Integer transmitType) {
 		this.transmitType = transmitType;
 	}
-    
+
+	public Long getTransmitId() {
+		return transmitId;
+	}
+
+	public void setTransmitId(Long transmitId) {
+		this.transmitId = transmitId;
+	}
 }
