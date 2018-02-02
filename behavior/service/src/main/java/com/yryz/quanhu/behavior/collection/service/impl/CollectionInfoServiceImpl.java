@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class CollectionInfoServiceImpl implements CollectionInfoService {
@@ -196,6 +195,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
                                 detailVo.setExtJson(resourceVo.getExtJson());
                             }
                         });
+
             }
         } catch (Exception e) {
             logger.error("获取资源信息 失败", e);
