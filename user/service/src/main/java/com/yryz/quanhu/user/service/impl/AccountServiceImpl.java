@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
@@ -109,10 +108,11 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
+	@Transactional
 	public void mergeActivityUser(Long userId, String phone) {
 		ActivityTempUser tempUser = null;
 		try {
-			tempUser = tempUserService.get(userId, null);
+			tempUser = tempUserService.get(userId, null,null);
 			if (tempUser == null) {
 				logger.info("[mergeActivityUser]:msg:参与者不存在");
 				throw QuanhuException.busiError("参与者不存在");
@@ -130,6 +130,8 @@ public class AccountServiceImpl implements AccountService {
 							" "));
 			registerDTO.setRegLogDTO(logDTO);
 			userId = createUser(registerDTO, tempUser.getKid());
+			//删除活动参与者信息
+			tempUserService.delete(userId);
 			// 创建第三方账户
 			thirdLoginService.insert(new UserThirdLogin(userId, tempUser.getThirdId(),
 					(byte) RegType.WEIXIN.getType(), tempUser.getNickName(), tempUser.getAppId()));
@@ -212,19 +214,27 @@ public class AccountServiceImpl implements AccountService {
 	public Long loginThirdBindPhone(ThirdLoginDTO loginDTO, ThirdUser thirdUser) {
 		RegisterDTO registerDTO = new RegisterDTO();
 		registerDTO.setUserChannel(String.format("app_%s", RegType.getEnumByTye(loginDTO.getType()).getText()));
-		registerDTO.setUserNickName(thirdUser.getNickName());
+		registerDTO.setUserNickName(getThirdNickName(loginDTO.getRegLogDTO().getAppId(),thirdUser.getNickName()));
 		registerDTO.setUserLocation(thirdUser.getLocation());
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
 		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
 		registerDTO.setUserPhone(loginDTO.getPhone());
 		// 根据第三方账户查询临时用户表生成用户
-		ActivityTempUser tempUser = tempUserService.get(null, thirdUser.getThirdId());
+		ActivityTempUser tempUser = tempUserService.get(null, thirdUser.getThirdId(),loginDTO.getRegLogDTO().getAppId());
 		Long userId = null;
 		if (tempUser != null) {
 			userId = tempUser.getKid();
+			registerDTO.setActivityChannelCode(tempUser.getActivivtyChannelCode());
+			if (StringUtils.isBlank(registerDTO.getRegLogDTO().getActivityChannelCode())){
+				registerDTO.getRegLogDTO().setActivityChannelCode(tempUser.getActivivtyChannelCode());
+				String channelCode = StringUtils.join(new String[]{"WeixinOauth",tempUser.getActivivtyChannelCode()}, " ");
+				registerDTO.getRegLogDTO().setChannelCode(channelCode);
+			}
+			//删除活动参与者用户
+			tempUserService.delete(userId);
 		}
 
-		userId = createUser(registerDTO, tempUser.getKid());
+		userId = createUser(registerDTO, userId);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
 				thirdUser.getNickName(), loginDTO.getRegLogDTO().getAppId()));
@@ -523,7 +533,7 @@ public class AccountServiceImpl implements AccountService {
 		// 创建用户基础信息
 		userService
 				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
-						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode()));
+						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode(),registerDTO.getUserNickName()));
 		registerDTO.getRegLogDTO().setUserId(userId);
 
 		// 异步处理
@@ -627,5 +637,26 @@ public class AccountServiceImpl implements AccountService {
 			}
 		}
 		return logins;
+	}
+	
+	/**
+	 * 第三方昵称获取
+	 * @param thirdNickName
+	 * @return
+	 * @Description 初始化昵称，截取过长的昵称，处理重复的昵称
+	 */
+	private String getThirdNickName(String appId,String thirdNickName){
+		int nickNameLength = StringUtils.length(thirdNickName);
+		if(nickNameLength == 0){
+			thirdNickName = String.format("qh%s1", UserUtils.randomappId());
+		}
+		if(StringUtils.length(thirdNickName) >= Constants.NICK_NAME_MAX_LENGTH){
+			thirdNickName = StringUtils.substring(thirdNickName, 0, 9);
+		}
+		UserBaseInfo baseInfo = userService.getUserByNickName(appId,thirdNickName);
+		if(baseInfo != null){
+			thirdNickName = String.format("%s%s",StringUtils.substring(thirdNickName, 0, 5),UserUtils.randomappId());
+		}
+		return thirdNickName;
 	}
 }

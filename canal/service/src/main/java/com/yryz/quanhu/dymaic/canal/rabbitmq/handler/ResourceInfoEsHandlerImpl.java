@@ -219,7 +219,7 @@ public class ResourceInfoEsHandlerImpl implements SyncHandler{
 		Optional<ResourceInfo> uinfo = resourceInfoRepository.findById(infoAfter.getKid());
 		if(uinfo.isPresent()){
 			ResourceInfo resource=uinfo.get();
-			resource.setLastHeat(infoAfter.getKid());
+			resource.setLastHeat(infoAfter.getLastHeat());
 			resourceInfoRepository.save(resource);
 		}
 	}

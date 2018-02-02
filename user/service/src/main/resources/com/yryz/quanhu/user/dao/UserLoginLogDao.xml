@@ -31,6 +31,7 @@
 			separator="," close=")">
 			#{item}
 		</foreach>
+		group by user_id
   </select>
 
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserLoginLog" >

@@ -17,7 +17,8 @@ public interface Topic4AdminService {
 
     public Integer deleteTopic(Long kid, Long userId);
 
-    public List<Long> getKidByCreatedate(String startDate, String endDate);
-    
-    public List<Topic> getByKids(List<Long> kidList);
+    public Integer shalve(Long kid ,Byte shalveFlag);
+
+    public Integer recommond(Long kid ,Byte recommondFlag);
+
 }

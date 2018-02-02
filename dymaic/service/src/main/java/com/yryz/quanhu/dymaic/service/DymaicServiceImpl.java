@@ -366,7 +366,6 @@ public class DymaicServiceImpl {
 
         //分页检索
         Page<Dymaic> page = PageHelper.startPage(queryDymaicDTO.getCurrentPage(), queryDymaicDTO.getPageSize());
-        page.setCount(false);
         dymaicDao.queryAll(queryDymaicDTO);
 
         List<DymaicVo> listVo = new ArrayList<>();
@@ -382,6 +381,7 @@ public class DymaicServiceImpl {
 
                 listVo.add(vo);
             }
+            result.setCount(page.getTotal());
         }
 
         result.setEntities(listVo);

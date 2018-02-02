@@ -5,15 +5,17 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.response.PageList;
+import com.yryz.common.response.ResponseConstant;
+import com.yryz.quanhu.coterie.coterie.vo.*;
+import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
+import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,12 +39,6 @@ import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.until.ImageUtils;
 import com.yryz.quanhu.coterie.coterie.until.ZxingHandler;
-import com.yryz.quanhu.coterie.coterie.vo.Coterie;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditInfo;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditRecord;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.coterie.vo.User;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -179,11 +175,11 @@ public class CoterieProvider implements CoterieApi {
 			}
 			//费用单位错误防范
 			//todo 100取模 = 0
-			if (!(info.getJoinFee()!=null && info.getJoinFee()<=50000 && info.getJoinFee()>=0)) {
+			if (info.getJoinFee() != null && (info.getJoinFee() > 50000 || info.getJoinFee() < 0)) {
 
 				throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
 			}
-			if (!(info.getConsultingFee()!=null && info.getConsultingFee()<=100 && info.getConsultingFee()>=0)) {
+			if (info.getConsultingFee()!=null && (info.getConsultingFee() > 10000 || info.getConsultingFee() < 0)) {
 				throw new QuanhuException( "2007","参数错误","私圈咨询费金额设置不正确。",null);
 			}
 			coterieService.modify(info);
@@ -919,6 +915,19 @@ public class CoterieProvider implements CoterieApi {
 		try {
 			List<CoterieInfo> CoterieInfos = coterieService.findList(coterieIdList);
 			return ResponseUtils.returnListSuccess(CoterieInfos);
+		} catch (QuanhuException e) {
+			logger.error(e.getMessage(), e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	/*************************************/
+
+	@Override
+	public Response<PageList<CoterieInfo>> getCoterieByPage(CoterieSearchParam param) {
+		try {
+			PageList<CoterieInfo> coterieInfos = coterieService.queryCoterieByPage(param);
+			return ResponseUtils.returnObjectSuccess(coterieInfos);
 		} catch (QuanhuException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseUtils.returnException(e);

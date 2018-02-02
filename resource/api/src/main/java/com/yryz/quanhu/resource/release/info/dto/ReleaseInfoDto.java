@@ -1,6 +1,5 @@
 package com.yryz.quanhu.resource.release.info.dto;
 
-import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 
 /**
@@ -29,7 +28,7 @@ public class ReleaseInfoDto extends ReleaseInfo {
     /**  
     * @Fields orderType : 排序类型 
     */
-    private Byte orderType = ReleaseConstants.OrderType.time_new;
+    private Byte orderType;
 
     /**  
     * @Fields payFlag : 付费标识（0：免费，1：付费）

@@ -426,7 +426,7 @@ public class UserBaseInfo extends GenericEntity {
 	 * @param cityCode
 	 */
 	public UserBaseInfo(Long userId, String appId, String userPhone, String userLocation, String userDeviceId,
-			String cityCode) {
+			String cityCode,String userNickName) {
 		super();
 		this.userId = userId;
 		this.appId = appId;
@@ -434,6 +434,7 @@ public class UserBaseInfo extends GenericEntity {
 		this.userLocation = userLocation;
 		this.userDeviceId = userDeviceId;
 		this.cityCode = cityCode;
+		this.userNickName = userNickName;
 	}
 
 	/**

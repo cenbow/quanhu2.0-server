@@ -60,4 +60,8 @@ public class SmsContants {
 	 * 活动手机号校验
 	 */
 	public static final String ACTIVITY_PHONE_CHECK = "10";
+	/**
+	 * 第三方登录绑定手机号
+	 */
+	public static final String CODE_THIRD_PHONE = "11";
 }

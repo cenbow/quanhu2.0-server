@@ -47,12 +47,15 @@ import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
+import com.yryz.quanhu.user.entity.UserStarAuth;
+import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
 import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.ActivityTempUserService;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserRelationService;
 import com.yryz.quanhu.user.service.UserService;
+import com.yryz.quanhu.user.service.UserStarService;
 import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -84,6 +87,8 @@ public class UserServiceImpl implements UserService {
 	private UserRelationService relationService;
 	@Autowired
 	private ActivityTempUserService tempUserService;
+	@Autowired
+	private UserStarService starService;
 	@Autowired
 	private UserSender mqSender;
 	@Autowired
@@ -158,7 +163,19 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
 		UserBaseInfo baseInfo = getUser(friendId);
+		if(baseInfo == null){
+			return new UserLoginSimpleVO();
+		}
+		String starTradeField = "";
+		
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		
+		//聚合达人行业数据
+		if(simpleVO.getUserRole() == UserRole.STAR.getRole()){
+			UserStarAuth starAuth = starService.get(friendId.toString(), null);
+			starTradeField = starAuth != null ? starAuth.getTradeField() : "";
+		}
+		simpleVO.setStarTradeField(starTradeField);
 		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
@@ -195,7 +212,7 @@ public class UserServiceImpl implements UserService {
 		// 查询单个用户基础信息
 		List<UserBaseInfo> baseInfos = getUserInfo(Sets.newHashSet(friendId.toString()));
 		if (CollectionUtils.isEmpty(baseInfos)) {
-			return null;
+			return new UserSimpleVO();
 		}
 		UserBaseInfo baseInfo = baseInfos.get(0);
 		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
@@ -368,7 +385,7 @@ public class UserServiceImpl implements UserService {
 	 * @param nickName
 	 * @return
 	 */
-	private UserBaseInfo getUserByNickName(String appId, String nickName) {
+	public  UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
 
@@ -492,7 +509,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void createUser(UserBaseInfo baseInfo) {
-		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
+		if (StringUtils.isNotBlank(baseInfo.getUserPhone()) && StringUtils.isBlank(baseInfo.getUserNickName())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
 		baseInfo.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO)));

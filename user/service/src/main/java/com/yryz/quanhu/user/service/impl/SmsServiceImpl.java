@@ -65,6 +65,10 @@ public class SmsServiceImpl implements SmsService{
 				smsType = SmsType.CODE_CHANGE_PHONE;
 				msg = !accountFlag ? null : "该手机号已注册";
 				break;
+			case SmsContants.CODE_THIRD_PHONE:
+				smsType = SmsType.CODE_THIRD_PHONE;
+				msg = !accountFlag ? null : "该手机号已注册";
+				break;	
 			case SmsContants.CODE_FIND_PWD:
 				smsType = SmsType.CODE_FIND_PWD;
 				msg = !accountFlag ? "该手机用户不存在" : null;

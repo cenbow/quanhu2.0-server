@@ -2,10 +2,16 @@ package com.yryz.quanhu.behavior.comment.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSONObject;
+import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.message.*;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.IdGen;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.quanhu.behavior.comment.dto.CommentAssemble;
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
@@ -17,6 +23,18 @@ import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.behavior.like.dto.LikeAssemble;
+import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.vo.Dymaic;
+import com.yryz.quanhu.message.message.api.MessageAPI;
+import com.yryz.quanhu.resource.questionsAnswers.api.AnswerApi;
+import com.yryz.quanhu.resource.questionsAnswers.api.QuestionApi;
+import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
+import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
+import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
+import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
+import com.yryz.quanhu.resource.topic.api.TopicPostApi;
+import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -50,11 +68,29 @@ public class CommentProvider implements CommentApi {
     @Reference(check = false)
     private CountApi countApi;
 
+    @Reference(check = false)
+    private MessageAPI messageAPI;
+
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
+    @Reference(check = false)
+    private ReleaseInfoApi releaseInfoApi;
+
+    @Reference(check = false)
+    private TopicPostApi topicPostApi;
+
+  /*  @Reference(check = false)
+    private DymaicService dymaicService;*/
+
+    @Reference(check = false)
+    private AnswerApi answerApi;
+
+    @Reference(check = false)
+    private QuestionApi questionApi;
+
     @Override
-    public Response<Map<String, Integer>> accretion(Comment comment) {
+    public Response<Comment> accretion(Comment comment) {
         RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
         try {
             comment.setKid(idAPI.getSnowflakeId().getData());
@@ -72,10 +108,10 @@ public class CommentProvider implements CommentApi {
                 } catch (Exception e) {
                     logger.info("同步评论数据到redis中失败" + e);
                 }
-                if(comment.getTopId()==0){
-                    try{
-                        countApi.commitCount(BehaviorEnum.Comment,comment.getResourceId(),"",1L);
-                    }catch (Exception e){
+                if (comment.getTopId() == 0) {
+                    try {
+                        countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", 1L);
+                    } catch (Exception e) {
                         logger.info("进入统计系统失败" + e);
                     }
                 }
@@ -83,7 +119,7 @@ public class CommentProvider implements CommentApi {
                 map.put("result", 0);
             }
 
-            return ResponseUtils.returnObjectSuccess(map);
+            return ResponseUtils.returnObjectSuccess(comment);
         } catch (Exception e) {
             logger.error("", e);
             return ResponseUtils.returnException(e);
@@ -101,9 +137,9 @@ public class CommentProvider implements CommentApi {
                 Comment comments = new Comment();
                 comments.setKid(comment.getKid());
                 Comment commentStr = commentService.querySingleComment(comments);
-                try{
+                try {
                     redisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.info("从redis中移除评论数据失败" + e);
                 }
 
@@ -133,8 +169,6 @@ public class CommentProvider implements CommentApi {
             int count = commentService.updownBatch(comments);
 
             //待定 审核成功后同步到Redis
-
-
 
             return ResponseUtils.returnObjectSuccess(count);
         } catch (Exception e) {
@@ -173,6 +207,188 @@ public class CommentProvider implements CommentApi {
             logger.error("", e);
             return ResponseUtils.returnException(e);
         }
+    }
+
+
+    public void switchSend(Comment comment) {
+        UserSimpleVO userSimpleVO = userApi.getUserSimple(comment.getCreateUserId()).getData();
+        String nickName = "";
+        if (null != userSimpleVO) {
+            nickName = userSimpleVO.getUserNickName();
+        }
+        if (comment.getModuleEnum().equals(ModuleContants.RELEASE)) {
+            String contentStr = "";
+            long contentType = 0;
+            if (comment.getTopId() == 0) {
+                contentType = 0;
+                contentStr = nickName + "评论了您发布的内容。";
+            } else {
+                contentType = 1;
+                contentStr = nickName + "回复了您的评论。";
+            }
+            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType);
+        }
+
+        if (comment.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
+            String contentStr = "";
+            long contentType = 0;
+            if (comment.getTopId() == 0) {
+                contentType = 0;
+                contentStr = nickName + "评论了您发布的帖子。";
+            } else {
+                contentType = 1;
+                contentStr = nickName + "回复了您的评论。";
+            }
+            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType);
+        }
+
+        if (comment.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
+            String contentStr = "";
+            long contentType = 0;
+            if (comment.getTopId() == 0) {
+                contentType = 0;
+                contentStr = nickName + "评论了您的动态。";
+            } else {
+                contentType = 1;
+                contentStr = nickName + "回复了您的评论。";
+            }
+            this.dynamicPush(comment.getResourceId(), contentStr, contentType);
+        }
+
+        if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
+            AnswerVo answerVo = answerApi.getDetail(comment.getResourceId()).getData();
+            CommentAssemble commentAssembleAnswer = new CommentAssemble();
+            commentAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
+            commentAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
+            commentAssembleAnswer.setLink("");
+            commentAssembleAnswer.setContent(nickName + "评论了您的问题。");
+            this.sendMessage(commentAssembleAnswer);
+            Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
+            CommentAssemble commentAssembleQuestion = new CommentAssemble();
+            commentAssembleQuestion.setTargetUserId(question.getCreateUserId());
+            commentAssembleQuestion.setContent(nickName + "评论了您的问题。");
+            commentAssembleQuestion.setTitle(question.getTitle());
+            commentAssembleQuestion.setLink("");
+            this.sendMessage(commentAssembleQuestion);
+        }
+
+
+    }
+
+    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType) {
+        CommentAssemble commentAssemble = new CommentAssemble();
+        try {
+            TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
+            if (contentType == 0) {
+                if (!topicPostVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(topicPostVo.getImgUrl());
+                    commentAssemble.setImg(img);
+                }
+                commentAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
+            }
+            if (contentType != 0) {
+                commentAssemble.setViewCode((byte) 1);
+                //截取被回复的评论内容
+                commentAssemble.setTitle("");
+            }
+            commentAssemble.setContent(contentStr);
+            commentAssemble.setLink("");
+            this.sendMessage(commentAssemble);
+        } catch (Exception e) {
+            logger.error("调用文章出现异常", e);
+        }
+    }
+
+    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType) {
+        CommentAssemble commentAssemble = new CommentAssemble();
+        try {
+            ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
+            commentAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
+            if (contentType == 0) {
+                if (!releaseInfoVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
+                    commentAssemble.setImg(img);
+                }
+                commentAssemble.setTitle(releaseInfoVo.getTitle());
+                commentAssemble.setViewCode((byte) 2);
+            }
+            if (contentType != 0) {
+                commentAssemble.setViewCode((byte) 1);
+                //截取被回复的评论内容
+                commentAssemble.setTitle("");
+            }
+            commentAssemble.setContent(contentStr);
+            commentAssemble.setLink("");
+            this.sendMessage(commentAssemble);
+        } catch (Exception e) {
+            logger.error("调用文章出现异常", e);
+        }
+    }
+
+    public void dynamicPush(long resourceId, String contentPushStr, long contentType) {
+        CommentAssemble commentAssemble = new CommentAssemble();
+        try {
+           /* Dymaic dymaic = dymaicService.get(resourceId).getData();
+            if (!dymaic.getExtJson().equals("")) {
+                Map maps = (Map) JSONObject.parse(dymaic.getExtJson());
+                String title = maps.get("title").toString();
+                String image = maps.get("imgUrl").toString();
+                if (contentType == 0) {
+                    String imgUrl = "";
+                    if (!image.equals("")) {
+                        imgUrl = getImgFirstUrl(image);
+                        commentAssemble.setImg(imgUrl);
+                    }
+                    if (!title.equals("")) {
+                        commentAssemble.setTitle(title);
+                    }
+                    String content = maps.get("content").toString();
+                    if (title.equals("") && !content.equals("")) {
+                        commentAssemble.setTitle(content.substring(0, 20));
+                    }
+                    commentAssemble.setViewCode((byte) 2);
+                }
+                if (contentType != 0) {
+                    commentAssemble.setViewCode((byte) 1);
+                    //截取被回复的评论内容
+                    commentAssemble.setTitle("");
+                }
+                commentAssemble.setContent(contentPushStr);
+                commentAssemble.setLink("");
+                this.sendMessage(commentAssemble);
+            }*/
+        } catch (Exception e) {
+            logger.info("调用动态出现异常" + e);
+        }
+    }
+
+    public void sendMessage(CommentAssemble commentAssemble) {
+        MessageVo messageVo = new MessageVo();
+        messageVo.setContent(commentAssemble.getContent());
+        messageVo.setMessageId(IdGen.uuid());
+        messageVo.setImg(commentAssemble.getImg());
+        messageVo.setTitle(commentAssemble.getTitle());
+        messageVo.setLink(commentAssemble.getLink());
+        messageVo.setActionCode(MessageActionCode.COMMON_DETAIL);
+        messageVo.setLabel(MessageLabel.INTERACTIVE_COMMENT);
+        messageVo.setToCust(String.valueOf(commentAssemble.getTargetUserId()));
+        messageVo.setType(MessageType.SYSTEM_TYPE);
+        messageVo.setCreateTime(DateUtils.getDateTime());
+        if (commentAssemble.getViewCode() == 2) {
+            messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_2);
+        } else {
+            messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_1);
+        }
+        try {
+            messageAPI.sendMessage(messageVo, true);
+        } catch (Exception e) {
+            logger.info("持久化消息失败:" + e);
+        }
+    }
+
+    public static String getImgFirstUrl(String imgs) {
+        String[] arries = imgs.split(",");
+        return arries[0];
     }
 
 }
