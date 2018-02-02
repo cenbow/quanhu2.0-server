@@ -227,7 +227,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             } catch (Exception e) {
                 logger.error("查询用户信息异常",e);
             }
-            if(users.success()&&users.getData().get(voteRecord.getCreateUserId().toString())!=null){
+            if(null!=users && users.success()&&users.getData().get(voteRecord.getCreateUserId().toString())!=null){
                 voteRecord.setNickName(users.getData().get(voteRecord.getCreateUserId().toString()).getUserNickName());
                 voteRecord.setCreateDate(users.getData().get(voteRecord.getCreateUserId().toString()).getCreateDate());
                 voteRecord.setPhone(users.getData().get(voteRecord.getCreateUserId().toString()).getUserPhone());

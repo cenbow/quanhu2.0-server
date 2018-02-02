@@ -3,6 +3,8 @@ package com.yryz.quanhu.openapi.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.transmit.api.TransmitApi;
@@ -18,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,6 +56,9 @@ public class TransmitController {
         Assert.hasText(userId, "userId不能为空");
         transmitInfo.setCreateUserId(Long.valueOf(userId));
         Assert.isTrue(this.matcher(transmitInfo.getModuleEnum(), "1003|1004|1005|1000"), "moduleEnum格式有误");
+        if(!StringUtils.isEmpty(transmitInfo.getContent()) && transmitInfo.getContent().length() > 140) {
+            throw new QuanhuException(ExceptionEnum.TRANSMIT_CONTENT_ERROR);
+        }
         Response result = transmitApi.single(transmitInfo);
         if(result.success()) {
             try {

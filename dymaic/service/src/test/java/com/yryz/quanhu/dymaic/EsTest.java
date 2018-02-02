@@ -48,8 +48,10 @@ public class EsTest {
         AdminUserInfoDTO dto = new AdminUserInfoDTO();
         dto.setStartDate("2018-01-01");
         dto.setEndDate("2018-03-01");
-        dto.setPhone("13");
-        dto.setNickName("q");
+//        dto.setPhone("13");
+//        dto.setNickName("q");
+        dto.setAuditStatus((byte) 11);
+        dto.setGrowLevel("5");
         Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
         System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }
