@@ -540,6 +540,8 @@ public class AccountProvider implements AccountApi {
 			// 用户不存在就根据参与者信息创建正常用户
 			if (!accountFlag) {
 				accountService.mergeActivityUser(phoneDTO.getUserId(), phoneDTO.getPhone());
+			}else{
+				throw QuanhuException.busiError("该用户已存在");
 			}
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {

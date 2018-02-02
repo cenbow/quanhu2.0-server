@@ -277,18 +277,18 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         if(count == 0) {
             throw QuanhuException.busiError("未在当前活动中投票，不能领取奖品");
         }
-        ActivityVoteDto activityVoteDto = new ActivityVoteDto();
-        activityVoteDto.setActivityInfoId(activityInfoId);
-        activityVoteDto.setCreateUserId(userId);
-        //获取用户是否领取过该活动
-        List<ActivityUserPrizes> activityUserPrizes = activityUserPrizesDao.selectUserPrizesList(activityVoteDto);
-        if (!CollectionUtils.isEmpty(activityUserPrizes)) {
-            throw QuanhuException.busiError("您已经领取过该奖品");
-        }
         ActivityUserPrizesVo result = new ActivityUserPrizesVo();
         List<ActivityUserPrizes> resultList = new ArrayList<>();
         result.setPrizes(resultList);
         result.setUserId(userId);
+        //获取用户是否领取过该活动
+        ActivityVoteDto activityVoteDto = new ActivityVoteDto();
+        activityVoteDto.setActivityInfoId(activityInfoId);
+        activityVoteDto.setCreateUserId(userId);
+        List<ActivityUserPrizes> activityUserPrizes = activityUserPrizesDao.selectUserPrizesList(activityVoteDto);
+        if (!CollectionUtils.isEmpty(activityUserPrizes)) {
+            throw QuanhuException.busiError("您已经领取过该奖品");
+        }
         //获取可领取的奖品
         List<ActivityPrizesVo> activityPrizes = activityPrizesDao.selectAvailablePrizesVo(activityInfoId);
         if (!CollectionUtils.isEmpty(activityPrizes)) {
