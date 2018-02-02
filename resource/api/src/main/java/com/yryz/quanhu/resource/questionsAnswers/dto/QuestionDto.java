@@ -34,6 +34,18 @@ public class QuestionDto implements Serializable {
 
     private  Integer pageSize;
 
+    private String beginDate;
+
+    private String EndDate;
+
+    private String LastAnswerDateBegin;
+
+    private String LastAnswerDateEnd;
+
+    private String  refundFlag;
+
+    private Byte answerdFlag;
+
     public Long getKid() {
         return kid;
     }
@@ -144,5 +156,53 @@ public class QuestionDto implements Serializable {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public String getBeginDate() {
+        return beginDate;
+    }
+
+    public void setBeginDate(String beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public String getEndDate() {
+        return EndDate;
+    }
+
+    public void setEndDate(String endDate) {
+        EndDate = endDate;
+    }
+
+    public String getLastAnswerDateBegin() {
+        return LastAnswerDateBegin;
+    }
+
+    public void setLastAnswerDateBegin(String lastAnswerDateBegin) {
+        LastAnswerDateBegin = lastAnswerDateBegin;
+    }
+
+    public String getLastAnswerDateEnd() {
+        return LastAnswerDateEnd;
+    }
+
+    public void setLastAnswerDateEnd(String lastAnswerDateEnd) {
+        LastAnswerDateEnd = lastAnswerDateEnd;
+    }
+
+    public String getRefundFlag() {
+        return refundFlag;
+    }
+
+    public void setRefundFlag(String refundFlag) {
+        this.refundFlag = refundFlag;
+    }
+
+    public Byte getAnswerdFlag() {
+        return answerdFlag;
+    }
+
+    public void setAnswerdFlag(Byte answerdFlag) {
+        this.answerdFlag = answerdFlag;
     }
 }
