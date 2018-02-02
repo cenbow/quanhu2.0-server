@@ -47,12 +47,15 @@ import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
+import com.yryz.quanhu.user.entity.UserStarAuth;
+import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
 import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.ActivityTempUserService;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserRelationService;
 import com.yryz.quanhu.user.service.UserService;
+import com.yryz.quanhu.user.service.UserStarService;
 import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -84,6 +87,8 @@ public class UserServiceImpl implements UserService {
 	private UserRelationService relationService;
 	@Autowired
 	private ActivityTempUserService tempUserService;
+	@Autowired
+	private UserStarService starService;
 	@Autowired
 	private UserSender mqSender;
 	@Autowired
@@ -158,7 +163,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
 		UserBaseInfo baseInfo = getUser(friendId);
+		String starTradeField = "";
+		//聚合达人行业数据
+		if(baseInfo.getUserRole() == UserRole.STAR.getRole()){
+			UserStarAuth starAuth = starService.get(userId.toString(), null);
+			starTradeField = starAuth != null ? starAuth.getTradeField() : "";
+		}
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
+		simpleVO.setStarTradeField(starTradeField);
 		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {

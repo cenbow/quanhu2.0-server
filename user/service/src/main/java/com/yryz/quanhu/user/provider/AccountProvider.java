@@ -291,7 +291,7 @@ public class AccountProvider implements AccountApi {
 				throw QuanhuException.busiError("该用户已存在");
 			} else {
 				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
-						SmsType.CODE_CHANGE_PHONE, header.getAppId())) {
+						SmsType.CODE_THIRD_PHONE, header.getAppId())) {
 					throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 				}
 				// 手机号加锁
