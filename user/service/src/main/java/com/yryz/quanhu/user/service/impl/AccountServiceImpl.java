@@ -224,7 +224,7 @@ public class AccountServiceImpl implements AccountService {
 			userId = tempUser.getKid();
 		}
 
-		userId = createUser(registerDTO, tempUser.getKid());
+		userId = createUser(registerDTO, userId);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
 				thirdUser.getNickName(), loginDTO.getRegLogDTO().getAppId()));
