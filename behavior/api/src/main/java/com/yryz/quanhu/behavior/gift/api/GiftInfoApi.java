@@ -29,4 +29,14 @@ public interface GiftInfoApi {
      * @return
      */
     Response<GiftInfo> selectByKid(long kid);
+
+    /**  
+    * @Description: 礼物更新
+    * @author wangheng
+    * @param @param record
+    * @param @return
+    * @return Response<Integer>
+    * @throws  
+    */
+    Response<Integer> updateByKid(GiftInfo record);
 }
