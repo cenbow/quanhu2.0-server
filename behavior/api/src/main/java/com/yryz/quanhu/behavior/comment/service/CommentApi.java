@@ -26,7 +26,7 @@ public interface CommentApi {
      * @param comment
      * @return
      */
-    Response<Map<String,Integer>> accretion(Comment comment);
+    Response<Comment> accretion(Comment comment);
 
     /**
      * 删除评论
