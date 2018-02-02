@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.context.Context;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
@@ -22,7 +23,6 @@ import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService
 import com.yryz.quanhu.other.activity.vo.*;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.ScoreAPI;
@@ -42,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -110,6 +109,8 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
                 SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
                 AdminUserInfoDTO custInfoDTO = new AdminUserInfoDTO();
                 custInfoDTO.setNickName(adminActivityVoteDetailDto.getNickName());
+                custInfoDTO.setPhone(adminActivityVoteDetailDto.getPhone());
+                custInfoDTO.setAppId(Context.getProperty("appId"));
                 userInfoPage = userApi.listUserInfo(1,20,custInfoDTO);
             } catch (Exception e) {
                 logger.error("查询用户列表异常",e);
@@ -235,6 +236,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
                 custInfoDTO.setNickName(nickName);
                 custInfoDTO.setStartDate(beginDate);
                 custInfoDTO.setEndDate(endDate);
+                custInfoDTO.setAppId(Context.getProperty("appId"));
                 userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
             } catch (Exception e) {
                 logger.error("查询用户列表异常",e);
@@ -336,6 +338,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
      */
     @Override
     public  PageList<UserBaseInfoVO> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize) {
+        custInfoDTO.setAppId(Context.getProperty("appId"));
         Response<PageList<UserBaseInfoVO>> userInfoPage = userApi.listUserInfo(pageNo,pageSize,custInfoDTO);
         PageList<UserBaseInfoVO> pageList = new PageList<UserBaseInfoVO>();
         if (userInfoPage.success()){
