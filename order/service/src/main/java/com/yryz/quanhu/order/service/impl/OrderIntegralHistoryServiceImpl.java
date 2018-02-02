@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2018-2019 Wuhan Yryz Network Company LTD.
  * All rights reserved.
- * 
+ *
  * Created on 2018年1月18日
  * Id: OrderIntegralHistoryServiceImpl.java, 2018年1月18日 下午2:22:53 yehao
  */
@@ -10,6 +10,7 @@ package com.yryz.quanhu.order.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import com.yryz.quanhu.order.dao.redis.RrzOrderIntegralHistoryRedis;
 import com.yryz.quanhu.order.entity.RrzOrderIntegralHistory;
 import com.yryz.quanhu.order.service.OrderIntegralHistoryService;
 import com.yryz.quanhu.order.utils.Page;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author yehao
@@ -37,7 +39,7 @@ public class OrderIntegralHistoryServiceImpl implements OrderIntegralHistoryServ
 
 	@Autowired
 	private RrzOrderIntegralHistoryDao rrzOrderIntegralHistoryDao;
-	
+
 	@Autowired
 	RrzOrderIntegralHistoryRedis rrzOrderIntegralHistoryRedis;
 
@@ -129,7 +131,7 @@ public class OrderIntegralHistoryServiceImpl implements OrderIntegralHistoryServ
 		List<Map<String, Object>> list = userSum(startTime, nowTime, null);
 		rrzOrderIntegralHistoryRedis.integralSum(list);
 		rrzOrderIntegralHistoryRedis.setStartTime(nowTime);
-		
+
 	}
 
 	/**
@@ -166,7 +168,7 @@ public class OrderIntegralHistoryServiceImpl implements OrderIntegralHistoryServ
 		rrzOrderIntegralHistoryRedis.cleanUserSum(custId);
 		List<Map<String, Object>> list = userSum(null, nowTime, custId);
 		rrzOrderIntegralHistoryRedis.integralSum(list);
-		
+
 	}
 
 	/**
@@ -208,5 +210,18 @@ public class OrderIntegralHistoryServiceImpl implements OrderIntegralHistoryServ
 			map.put("endDate", endDate);
 		}
 		return rrzOrderIntegralHistoryDao.sumCostByDate(map);
+	}
+
+	@Override
+	public Map<Long, Long> getUserTotalIntegral(List<Long> userIdList) {
+		Map<Long,Long> map = new HashMap<>();
+		if(!CollectionUtils.isEmpty(userIdList)){
+			List<String> idList = userIdList.stream().map(String::valueOf).collect(Collectors.toList());
+			List<Map<String, Object>> list =rrzOrderIntegralHistoryDao.getUserTotalIntegral(idList);
+            if(!CollectionUtils.isEmpty(list)){
+                list.forEach(o -> map.put(Long.valueOf(String.valueOf(o.get("userId"))), Long.valueOf(String.valueOf(o.get("amount")))));
+            }
+		}
+		return map;
 	}
 }

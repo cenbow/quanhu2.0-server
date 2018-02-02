@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2018-2019 Wuhan Yryz Network Company LTD.
  * All rights reserved.
- * 
+ *
  * Created on 2018年1月18日
  * Id: OrderProvider.java, 2018年1月18日 上午9:36:29 yehao
  */
@@ -55,21 +55,21 @@ import com.yryz.quanhu.order.vo.UserPhy;
  */
 @Service(interfaceClass=OrderApi.class)
 public class OrderProvider implements OrderApi {
-	
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private OrderService orderService;
-	
+
 	@Autowired
 	private UserAccountService userAccountService;
-	
+
 	@Autowired
 	private UserPhyService userPhyService;
-	
+
 	@Autowired
 	private OrderIntegralHistoryService orderIntegralHistoryService;
-	
+
 	@Autowired
 	private OrderAccountHistoryService orderAccountHistoryService;
 
@@ -575,6 +575,15 @@ public class OrderProvider implements OrderApi {
 	public Response<OrderInfo> getOrderInfo(String orderId) {
 		RrzOrderInfo rrzOrderInfo = orderService.getOrderInfo(orderId);
 		return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(rrzOrderInfo, OrderInfo.class));
+	}
+
+	@Override
+	public Response<Map<Long, Long>> getUserTotalIntegral(List<Long> userIdList) {
+		try {
+		    return ResponseUtils.returnObjectSuccess(orderIntegralHistoryService.getUserTotalIntegral(userIdList));
+		}catch (Exception e){
+			return ResponseUtils.returnException(e);
+		}
 	}
 
 }

@@ -70,4 +70,11 @@ public interface RrzOrderIntegralHistoryDao {
 	 */
 	public Long sumCostByDate(Map<String, Object> map);
 
+	/**
+	 * 批量查询用户总收益
+	 * @param userIdList
+	 * @return
+	 */
+	List<Map<String, Object>> getUserTotalIntegral(List<String> userIdList);
+
 }

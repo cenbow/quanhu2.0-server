@@ -9,7 +9,10 @@ package com.yryz.quanhu.order;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -178,6 +181,14 @@ public class OrderTest {
 	@Test
 	public void getPayinfoWeb(){
 		System.out.println(GsonUtils.parseJson(orderAPI.getPayInfoWeb("yehao-test", null, null, 0, 0))); 
+	}
+
+	@Test
+	public void testUserTotalIntegral(){
+		Response<Map<Long, Long>> response = orderAPI.getUserTotalIntegral(Lists.newArrayList(1000L));
+		if(response.success()){
+			System.out.println(JSON.toJSONString(response.getData()));
+		}
 	}
 
 }
