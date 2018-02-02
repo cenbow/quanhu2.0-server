@@ -27,7 +27,7 @@ public class TopicVo implements Serializable {
 
     private Long replyCount;
 
-    private Integer coterieId;
+    private Long coterieId;
 
     private String contentSource;
 
@@ -112,11 +112,11 @@ public class TopicVo implements Serializable {
     }
 
     @JsonSerialize(using = ToStringSerializer.class)
-    public Integer getCoterieId() {
+    public Long  getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(Integer coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 

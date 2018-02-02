@@ -1,9 +1,6 @@
 package com.yryz.quanhu.score.entity;
 
 import java.io.Serializable;
-import java.util.Date;
-
-import io.swagger.annotations.ApiModelProperty;
 /**
  * 
  * @author syc  
@@ -39,22 +36,47 @@ public class ScoreFlowQuery implements Serializable{
     /** 条数 */
 	private int limit;
 	
+	/** 手机号 */
+	private String userPhone;
 	
-	private String  consumeFlag;
-
-
-	public String getConsumeFlag() {
-		return consumeFlag;
-	}
-
-	public void setConsumeFlag(String consumeFlag) {
-		this.consumeFlag = consumeFlag;
-	}
+    /** 事件名称 */
+	private String eventName;
 
 	/**页码*/
     private Integer currentPage = 1;
     /**每页大小*/
     private Integer pageSize = 10;
+	
+	
+	
+    /** 积分增减标志（0-增加，1-减少）*/
+	private Integer consumeFlag = 0;
+
+
+	public Integer getConsumeFlag() {
+		return consumeFlag;
+	}
+
+	public void setConsumeFlag(Integer consumeFlag) {
+		this.consumeFlag = consumeFlag;
+	}
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
+	public String getUserPhone() {
+		return userPhone;
+	}
+
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone;
+	}
+
     
     
     public Integer getCurrentPage() {

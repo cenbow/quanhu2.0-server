@@ -36,11 +36,13 @@ public class TopicPostVo  implements Serializable {
 
     private UserSimpleVO user;
 
-    private Integer coterieId;
+    private Long coterieId;
 
     private String moduleEnum;
 
     private BehaviorVo behaviorVo;
+
+    private String title;
 
     @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
@@ -148,11 +150,11 @@ public class TopicPostVo  implements Serializable {
         this.createDate = createDate;
     }
 
-    public Integer getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(Integer coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 
@@ -170,5 +172,13 @@ public class TopicPostVo  implements Serializable {
 
     public void setBehaviorVo(BehaviorVo behaviorVo) {
         this.behaviorVo = behaviorVo;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

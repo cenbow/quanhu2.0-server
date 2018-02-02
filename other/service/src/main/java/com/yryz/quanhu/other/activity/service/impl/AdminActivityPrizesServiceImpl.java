@@ -44,9 +44,9 @@ public class AdminActivityPrizesServiceImpl implements AdminActivityPrizesServic
 	 */
 	@Override
 	public PageList<AdminOutActivityUsrePrizes> listPrizes(AdminInActivityUserPrizes dto) {
-		
+		Page<AdminOutActivityUsrePrizes> page = new Page<AdminOutActivityUsrePrizes>();
 		if(true==dto.getPage()){
-			Page<AdminOutActivityUsrePrizes> page = PageHelper.startPage(dto.getPageNo(),dto.getPageNo());
+			page = PageHelper.startPage(dto.getPageNo(),dto.getPageNo());
 		}
 		List<AdminOutActivityUsrePrizes> list=ActivityUserPrizesDao.listPrizesByConditionAndPage(dto);
 		if(CollectionUtils.isEmpty(list)){
@@ -67,8 +67,7 @@ public class AdminActivityPrizesServiceImpl implements AdminActivityPrizesServic
 				outActivityPrizes.setCustPhone(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getUserPhone());
 			}
 		}
-		Integer count = ActivityUserPrizesDao.listPrizesByConditionAndPageCount(dto);
-		return new PageList(dto.getPageNo(), dto.getPageSize(), list, (long)count);
+		return new PageList(dto.getPageNo(), dto.getPageSize(), list, page.getTotal());
 	}
 	
 	/**

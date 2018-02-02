@@ -29,11 +29,6 @@ public interface AdminIActivityParticipationApi {
 	Response<PageList<AdminActivityVoteDetailVo>> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
 
 	/**
-	 * 投票用户数据
-	 */
-	Response<List<AdminActivityVoteRecordVo>> voteList(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
-
-	/**
 	 * 增加票数
 	 */
 	Response<Integer> addVote(Long id, Integer count);
@@ -43,7 +38,9 @@ public interface AdminIActivityParticipationApi {
 	Response<AdminConfigObjectDto> getVoteConfig(Long infoId);
 
 	Response<String> saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto);
-
+	/**
+	 * 投票用户数据
+	 */
 	Response<PageList> adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 
     Response<PageList<UserBaseInfoVO>> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize);
