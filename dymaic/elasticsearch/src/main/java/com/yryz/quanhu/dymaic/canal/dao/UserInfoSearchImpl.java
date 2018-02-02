@@ -99,11 +99,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
     public List<UserInfo> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
         Integer pageNo = adminUserDTO.getPageNo();
         Integer pageSize = adminUserDTO.getPageSize();
-
         String startDateStr = adminUserDTO.getStartDate();
         String endDateStr = adminUserDTO.getEndDate();
-        long startDate = DateUtils.parseDate(startDateStr).getTime();
-        long endDate = DateUtils.parseDate(endDateStr).getTime();
+
         //用户
         String nickName = adminUserDTO.getNickName();
         String phone = adminUserDTO.getPhone();
@@ -114,7 +112,6 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte auditStatus = adminUserDTO.getAuditStatus();
         Byte authType = adminUserDTO.getAuthType();
         Byte authWay = adminUserDTO.getAuthWay();
-
         String growLevel = adminUserDTO.getGrowLevel();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -137,14 +134,18 @@ public class UserInfoSearchImpl implements UserInfoSearch {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHWAY, authWay));
         }
         if (growLevel != null) {
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ACTIVITYCHANNELCODE, growLevel));
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
+        }
+        if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
+            long startDate = DateUtils.parseDate(startDateStr).getTime();
+            long endDate = DateUtils.parseDate(endDateStr).getTime();
+            boolQueryBuilder.must(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate));
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
-        queryBuilder
-                .withFilter(boolQueryBuilder.must(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate)))
+        queryBuilder.withFilter(boolQueryBuilder)
                 .withPageable(pageable);
 
         List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
