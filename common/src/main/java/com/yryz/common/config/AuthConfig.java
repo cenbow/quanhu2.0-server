@@ -32,6 +32,11 @@ public class AuthConfig implements Serializable{
 	 * app端长期token过期时间/天
 	 */
 	private Integer refreshExpire = 30;
+	
+	/**
+	 * refreshToken
+	 */
+	private Integer refreshTokenDelayExpireTime = 1;
 	public Integer getWebTokenExpire() {
 		return webTokenExpire;
 	}

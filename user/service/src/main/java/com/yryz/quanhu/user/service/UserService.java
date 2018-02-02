@@ -167,4 +167,12 @@ public interface UserService {
 	 * @return
 	 */
     List<UserBaseInfo> getAllByUserIds(List<Long> userIds);
+    
+    /**
+     * 根据昵称查询用户
+     * @param appId
+     * @param nickName
+     * @return
+     */
+    public  UserBaseInfo getUserByNickName(String appId, String nickName);
 }

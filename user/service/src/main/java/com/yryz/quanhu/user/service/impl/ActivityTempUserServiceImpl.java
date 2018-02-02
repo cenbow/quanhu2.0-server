@@ -43,9 +43,9 @@ public class ActivityTempUserServiceImpl implements ActivityTempUserService {
 	}
 
 	@Override
-	public ActivityTempUser get(Long userId, String thirdId) {
+	public ActivityTempUser get(Long userId, String thirdId, String appId) {
 		try {
-			return mysqlDao.selectOne(userId, thirdId);
+			return mysqlDao.selectOne(userId, thirdId, appId);
 		} catch (Exception e) {
 			logger.error("[ActivityTempUserDao.selectOne]", e);
 			throw new MysqlOptException(e);
@@ -76,6 +76,16 @@ public class ActivityTempUserServiceImpl implements ActivityTempUserService {
 			}
 		}
 		return infos;
+	}
+
+	@Override
+	public int delete(Long kid) {
+		try {
+			return mysqlDao.delete(kid);
+		} catch (Exception e) {
+			logger.error("[ActivityTempUserDao.delete]", e);
+			throw new MysqlOptException(e);
+		}
 	}
 
 }

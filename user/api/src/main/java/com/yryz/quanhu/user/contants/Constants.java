@@ -17,6 +17,10 @@ public class Constants {
 	public static final String DISABLE_MSG = "";
 	
 	/**
+	 * 昵称最大长度
+	 */
+	public static final int NICK_NAME_MAX_LENGTH = 10;
+	/**
 	 * 强制绑定手机号标识
 	 */
 	public static final String BIND_PHONE = "BIND_PHONE";
