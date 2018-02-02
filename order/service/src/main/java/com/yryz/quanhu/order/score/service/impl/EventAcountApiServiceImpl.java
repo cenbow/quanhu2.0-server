@@ -16,6 +16,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.grow.service.GrowAPI;
+import com.yryz.quanhu.score.entity.ScoreEventInfo;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
@@ -169,6 +170,49 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	            return ResponseUtils.returnException(e);
 	        } catch (Exception e) {
 	            logger.error("获取成长值明细列表异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
+
+	@Override
+	public Response<PageList<ScoreFlowReportVo>> geteventScore(ScoreFlowQuery sfq) {
+
+		 try {
+			 PageList<ScoreFlowReportVo> list =  scoreAPI.getScoreEvent(sfq);
+		      return ResponseUtils.returnObjectSuccess(list);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取积分配置异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
+
+	@Override
+	public Response<ScoreFlowReportVo> geteventScoreOne(ScoreFlowQuery sfq) {
+		 try {
+			 ScoreFlowReportVo vo =  scoreAPI.getScoreEventOne(sfq);
+		      return ResponseUtils.returnObjectSuccess(vo);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取积分配置异常！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
+
+
+	@Override
+	public Response<String> updateEventScoreOne(ScoreEventInfo scoreEventInfo) {
+		 try {
+//			 ScoreEventInfo  sf =  new  ScoreEventInfo();
+//				sf.setId(Long.valueOf(sfq.getId()));	 
+			 String flag =  String.valueOf( scoreAPI.updateScoreEvent(scoreEventInfo));
+		      return ResponseUtils.returnObjectSuccess(flag);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取积分配置异常！", e);
 	            return ResponseUtils.returnException(e);
 	        }
 	}

@@ -33,20 +33,7 @@ public interface ScoreAPI {
 	 * @Description 删除积分事件
 	 */
 	public int delScoreEvent(Long id);
-	/**
-	 * 
-	 * @param start
-	 * @param limit
-	 * @return
-	 * @Description 分页查询积分明细
-	 */
-	public PageList<ScoreEventInfo> getScoreEventPage( );
-	/**
-	 * 
-	 * @return
-	 * @Description 查询全部积分明细
-	 */
-	public PageList<ScoreEventInfo> getScoreEvent();
+
 	
 	//用户积分操作API
 	/**
@@ -85,6 +72,25 @@ public interface ScoreAPI {
 	 * @Description 获取全部积分明细
 	 */
 	public  List<ScoreFlowReportVo> getScoreFlowAll(ScoreFlowQuery sfq) ;
-
 	
+	/**
+	 * 
+	 * @param start
+	 * @param limit
+	 * @return
+	 * @Description 分页查询积分明细
+	 */
+	public PageList<ScoreFlowReportVo> getScoreEvent(ScoreFlowQuery sfq);
+	
+	
+	/**
+	 * 
+	 * @param start
+	 * @param limit
+	 * @return
+	 * @Description 分页查询积分明细
+	 */
+	public ScoreFlowReportVo getScoreEventOne(ScoreFlowQuery sfq);
+	
+
 }

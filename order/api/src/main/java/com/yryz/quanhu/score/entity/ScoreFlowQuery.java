@@ -15,8 +15,14 @@ public class ScoreFlowQuery implements Serializable{
 	 */
 	private static final long serialVersionUID = 3438993563315960305L;
 	
-    /** 用户id */
+    /** id */
+	private String id;
+	
+
+
+	/** 用户id */
 	private String userId;
+	
 	
     /** 事件ID */
 	private String eventCode;
@@ -47,8 +53,7 @@ public class ScoreFlowQuery implements Serializable{
     /**每页大小*/
     private Integer pageSize = 10;
 	
-	
-	
+ 
     /** 积分增减标志（0-增加，1-减少）*/
 	private Integer consumeFlag = 0;
 
@@ -151,6 +156,13 @@ public class ScoreFlowQuery implements Serializable{
 
 	public void setLimit(int limit) {
 		this.limit = limit;
+	}
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

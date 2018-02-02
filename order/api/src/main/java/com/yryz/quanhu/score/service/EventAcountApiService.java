@@ -7,6 +7,7 @@ import java.util.Set;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
+import com.yryz.quanhu.score.entity.ScoreEventInfo;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventSign;
@@ -101,5 +102,27 @@ public interface EventAcountApiService {
 	 */
 	public Response<List<GrowFlowReportVo>> getGrowFlowAll(GrowFlowQuery gfq );
 	
+	
+	/**
+	 * 获取积分配置
+	 * @return
+	 */
+	Response<PageList<ScoreFlowReportVo>> geteventScore(ScoreFlowQuery sfq);
+	
+	
+	/**
+	 * 获取积分配置
+	 * @return
+	 */
+	Response<ScoreFlowReportVo> geteventScoreOne(ScoreFlowQuery sfq);
+	
+	
+	
+	/**
+	 * 获取积分配置
+	 * @return
+	 */
+	Response<String> updateEventScoreOne(ScoreEventInfo scoreEventInfo);
+
 
 }
