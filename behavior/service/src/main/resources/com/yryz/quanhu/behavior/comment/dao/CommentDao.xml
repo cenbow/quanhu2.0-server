@@ -162,7 +162,7 @@
     </insert>
 
     <select id="querySingleComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment"
-            resultMap="BaseCommentResultMap">
+            resultType="com.yryz.quanhu.behavior.comment.entity.Comment">
         SELECT
         <include refid="Base_Comment_Column_List_trans"/>
         FROM qh_comment_info

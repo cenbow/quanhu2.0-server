@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -141,6 +142,19 @@ public class ResourceProvider implements ResourceApi {
 		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
 		listVo = resourceConvertService.addBatch(listVo);
 		return ResponseUtils.returnListSuccess(listVo);
+	}
+
+	/**
+	 * 统计用户信息
+	 * @param resource
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 * @see com.yryz.quanhu.resource.api.ResourceApi#count(com.yryz.quanhu.resource.vo.ResourceVo, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public Response<Long> count(ResourceVo resource, String startTime, String endTime) {
+		return ResponseUtils.returnObjectSuccess(resourceService.count(GsonUtils.parseObj(resource, ResourceModel.class), startTime, endTime));
 	}
 
 }

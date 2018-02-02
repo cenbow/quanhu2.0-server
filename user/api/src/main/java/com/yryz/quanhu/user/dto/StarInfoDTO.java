@@ -1,4 +1,4 @@
-package com.yryz.quanhu.dymaic.dto;
+package com.yryz.quanhu.user.dto;
 
 import java.io.Serializable;
 

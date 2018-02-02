@@ -390,4 +390,5 @@
 	<select id="maxId" resultType="java.lang.Integer">
 		select max(vote_no) from qh_activity_vote_detail where activity_info_id = #{id}
 	</select>
+
 </mapper>

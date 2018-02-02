@@ -106,6 +106,8 @@ public class AccountProvider implements AccountApi {
 	@Autowired
 	private UserService userService;
 	@Autowired
+	private ActivityTempUserService tempService;
+	@Autowired
 	private ActivityTempUserService tempUserService;
 
 	/**
@@ -134,7 +136,8 @@ public class AccountProvider implements AccountApi {
 
 			Long userId = accountService.register(registerDTO);
 
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header, null,registerDTO.getRegLogDTO().getIp()));
+			return ResponseUtils.returnObjectSuccess(
+					returnRegisterLoginVO(userId, header, null, registerDTO.getRegLogDTO().getIp()));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -189,7 +192,7 @@ public class AccountProvider implements AccountApi {
 				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 			}
 
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header, null,loginDTO.getIp()));
+			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header, null, loginDTO.getIp()));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -220,7 +223,8 @@ public class AccountProvider implements AccountApi {
 			if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 			}
-			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header, null,registerDTO.getRegLogDTO().getIp()));
+			return ResponseUtils.returnObjectSuccess(
+					returnRegisterLoginVO(userId, header, null, registerDTO.getRegLogDTO().getIp()));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -256,7 +260,8 @@ public class AccountProvider implements AccountApi {
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			}
-			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId, header, null,loginDTO.getRegLogDTO().getIp());
+			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId, header, null,
+					loginDTO.getRegLogDTO().getIp());
 			return ResponseUtils.returnObjectSuccess(registerLoginVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -290,8 +295,8 @@ public class AccountProvider implements AccountApi {
 			if (login != null) {
 				throw QuanhuException.busiError("该用户已存在");
 			} else {
-				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
-						SmsType.CODE_THIRD_PHONE, header.getAppId())) {
+				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(), SmsType.CODE_THIRD_PHONE,
+						header.getAppId())) {
 					throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 				}
 				// 手机号加锁
@@ -302,7 +307,8 @@ public class AccountProvider implements AccountApi {
 					throw QuanhuException.busiError("该手机号已存在");
 				} else {
 					Long userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
-					return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header, null,loginDTO.getRegLogDTO().getIp()));
+					return ResponseUtils.returnObjectSuccess(
+							returnRegisterLoginVO(userId, header, null, loginDTO.getRegLogDTO().getIp()));
 				}
 			}
 		} catch (QuanhuException e) {
@@ -409,11 +415,11 @@ public class AccountProvider implements AccountApi {
 		header.setDevType(DevType.WAP.getType());
 		try {
 			checkWebThirdLoginDTONotify(loginDTO);
-			
+
 			ThirdUser thirdUser = getThirdUser(loginDTO.getCode(), loginDTO.getState(), loginDTO.getAppId());
 			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), loginDTO.getAppId(),
 					RegType.WEIXIN.getType());
-						
+
 			if (thirdLogin != null) {
 				userId = thirdLogin.getUserId();
 				identity = UserIdentity.NORMAL;
@@ -422,20 +428,20 @@ public class AccountProvider implements AccountApi {
 					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 				}
 			} else {
-				tempUser = tempUserService.get(null, thirdUser.getThirdId());
+				tempUser = tempUserService.get(null, thirdUser.getThirdId(), loginDTO.getAppId());
 				if (tempUser != null) {
 					userId = tempUser.getKid();
 				} else {
 					tempUser = new ActivityTempUser(thirdUser.getThirdId(), thirdUser.getNickName(),
-							thirdUser.getHeadImg(), (byte) RegType.WEIXIN.getType(), UserUtils.getActivityChannelCode(loginDTO.getState()),
-							loginDTO.getAppId(), null);
+							thirdUser.getHeadImg(), (byte) RegType.WEIXIN.getType(),
+							UserUtils.getActivityChannelCode(loginDTO.getState()), loginDTO.getAppId(), null);
 					userId = tempUserService.save(tempUser);
 					tempUser.setKid(userId);
 				}
 			}
-			RegisterLoginVO loginVO = returnRegisterLoginVO(userId, header, tempUser,null);
+			RegisterLoginVO loginVO = returnRegisterLoginVO(userId, header, tempUser, null);
 
-			return ResponseUtils.returnObjectSuccess(returnUrl(loginVO, loginDTO.getState(),identity));
+			return ResponseUtils.returnObjectSuccess(returnUrl(loginVO, loginDTO.getState(), identity));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -534,6 +540,8 @@ public class AccountProvider implements AccountApi {
 			// 用户不存在就根据参与者信息创建正常用户
 			if (!accountFlag) {
 				accountService.mergeActivityUser(phoneDTO.getUserId(), phoneDTO.getPhone());
+			}else{
+				throw QuanhuException.busiError("该用户已存在");
 			}
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
@@ -568,6 +576,10 @@ public class AccountProvider implements AccountApi {
 			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), thirdDTO.getAppId(),
 					thirdDTO.getThirdType());
 			if (thirdLogin != null) {
+				throw QuanhuException.busiError("第三方账户已存在");
+			}
+			ActivityTempUser tempUser = tempService.get(null, thirdUser.getThirdId(), thirdDTO.getAppId());
+			if (tempUser != null) {
 				throw QuanhuException.busiError("第三方账户已存在");
 			}
 			accountService.bindThird(thirdDTO.getUserId(), thirdUser, thirdDTO.getThirdType(), thirdDTO.getAppId());
@@ -762,14 +774,14 @@ public class AccountProvider implements AccountApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	@Override
 	public Response<List<Map<String, String>>> getUserAccountByPhone(Set<String> phones, String appId) {
 		try {
-			if(CollectionUtils.isEmpty(phones)){
+			if (CollectionUtils.isEmpty(phones)) {
 				throw QuanhuException.busiError("手机号为空");
 			}
-			if(StringUtils.isBlank(appId)){
+			if (StringUtils.isBlank(appId)) {
 				throw QuanhuException.busiError("appId为空");
 			}
 			return ResponseUtils.returnObjectSuccess(accountService.getUserAccountByPhone(phones, appId));
@@ -780,7 +792,7 @@ public class AccountProvider implements AccountApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
 	/*	*//**
 			 * 邀请码补录
 			 * 
@@ -833,7 +845,7 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isBlank(registerDTO.getVeriCode())) {
 			throw QuanhuException.busiError("验证码不能为空");
 		}
-		if(registerDTO.getRegLogDTO() == null){
+		if (registerDTO.getRegLogDTO() == null) {
 			throw QuanhuException.busiError("注册日志信息为空");
 		}
 	}
@@ -845,7 +857,8 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isEmpty(registerDTO.getUserPhone())) {
 			throw QuanhuException.busiError("手机号为空");
 		}
-		if (StringUtils.isEmpty(registerDTO.getUserNickName()) || StringUtils.length(registerDTO.getUserNickName()) > 10) {
+		if (StringUtils.isEmpty(registerDTO.getUserNickName())
+				|| StringUtils.length(registerDTO.getUserNickName()) > 10) {
 			throw QuanhuException.busiError("昵称不合法");
 		}
 		if (StringUtils.isEmpty(registerDTO.getUserImg())) {
@@ -959,7 +972,7 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isNotBlank(loginDTO.getPhone()) && StringUtils.isBlank(loginDTO.getVerifyCode())) {
 			throw QuanhuException.busiError("验证码为空");
 		}
-		if(loginDTO.getRegLogDTO() == null){
+		if (loginDTO.getRegLogDTO() == null) {
 			throw QuanhuException.busiError("注册日志信息为空");
 		}
 		if (StringUtils.isBlank(loginDTO.getPhone()) && StringUtils.isNotBlank(loginDTO.getVerifyCode())) {
@@ -977,7 +990,8 @@ public class AccountProvider implements AccountApi {
 		if (StringUtils.isBlank(loginDTO.getReturnUrl())) {
 			throw QuanhuException.busiError("returnUrl为空");
 		}
-		if (!StringUtils.startsWith(loginDTO.getReturnUrl(),"http://") && !StringUtils.startsWith(loginDTO.getReturnUrl(),"https://")) {
+		if (!StringUtils.startsWith(loginDTO.getReturnUrl(), "http://")
+				&& !StringUtils.startsWith(loginDTO.getReturnUrl(), "https://")) {
 			throw QuanhuException.busiError("returnUrl不合法");
 		}
 	}
@@ -1103,7 +1117,8 @@ public class AccountProvider implements AccountApi {
 	 * @param tokenType
 	 * @return
 	 */
-	private RegisterLoginVO returnRegisterLoginVO(Long userId, RequestHeader header, ActivityTempUser tempUser,String ip) {
+	private RegisterLoginVO returnRegisterLoginVO(Long userId, RequestHeader header, ActivityTempUser tempUser,
+			String ip) {
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
 		// web登陆，不刷新token
 		boolean refreshToken = (devType != DevType.ANDROID && devType != DevType.IOS) ? false : true;
@@ -1134,7 +1149,7 @@ public class AccountProvider implements AccountApi {
 		}
 		try {
 			accountService.saveLoginLog(new UserLoginLog(userId, devType.getType(), header.getDevName(),
-					header.getDevId(), header.getAppId(),ip,tokenVO.getToken(),tokenVO.getRefreshToken()));
+					header.getDevId(), header.getAppId(), ip, tokenVO.getToken(), tokenVO.getRefreshToken()));
 		} catch (Exception e) {
 			logger.error("登录日志保存异常", e);
 		}
@@ -1151,7 +1166,7 @@ public class AccountProvider implements AccountApi {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	private static String returnUrl(RegisterLoginVO loginVO, String state,UserIdentity identity) {
+	private static String returnUrl(RegisterLoginVO loginVO, String state, UserIdentity identity) {
 		String backUrl = UserUtils.getThirdLoginReturnUrl(state);
 		if (StringUtils.isBlank(backUrl)) {
 			throw QuanhuException.busiError("第三方登录失败");
@@ -1191,7 +1206,5 @@ public class AccountProvider implements AccountApi {
 			throw QuanhuException.busiError("应用id不能为空");
 		}
 	}
-
-
 
 }
