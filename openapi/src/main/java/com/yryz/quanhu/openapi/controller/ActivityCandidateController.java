@@ -7,7 +7,7 @@ import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
-import com.yryz.quanhu.openapi.constants.ActivityCountConstant;
+import com.yryz.quanhu.other.activity.constants.ActivityCountConstant;
 import com.yryz.quanhu.other.activity.api.ActivityCandidateApi;
 import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteConfigVo;

@@ -1,4 +1,4 @@
-package com.yryz.quanhu.openapi.constants;
+package com.yryz.quanhu.other.activity.constants;
 
 /**
  * Created by dell on 2018/1/27.
