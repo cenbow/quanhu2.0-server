@@ -28,5 +28,5 @@ public interface UserRegLogDao {
 	 * @param userIds
 	 * @return
 	 */
-	List<UserRegLog> listByUserId(List<Long> userIds);
+	List<UserRegLog> listByUserId(@Param("userIds") List<Long> userIds);
 }

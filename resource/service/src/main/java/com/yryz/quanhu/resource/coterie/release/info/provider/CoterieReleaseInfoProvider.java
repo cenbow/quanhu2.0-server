@@ -185,7 +185,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
                     canReadFlag = ReleaseConstants.CanReadType.YES;
                 }
                 // 付费文章,圈粉查询购买记录
-                else if (MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)) {
+                else if (MemberConstant.Permission.MEMBER.getStatus().equals(headerUserRole)) {
                     // 查询 购买记录
                     if (orderSDK.isBuyOrderSuccess(BranchFeesEnum.READ.toString(), headerUserId, kid)) {
                         canReadFlag = ReleaseConstants.CanReadType.YES;
@@ -229,8 +229,14 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             // 创建订单者 不能是作者
             Assert.isTrue(!headerUserId.equals(info.getCreateUserId()), "阅读资源文章，创建订单者 不能是作者");
 
+            // 判断 是否为圈粉，只有圈粉 可以付费阅读
+            Integer headerUserRole = ResponseUtils
+                    .getResponseData(coterieMemberAPI.permission(headerUserId, info.getCoterieId()));
+            Assert.isTrue(MemberConstant.Permission.MEMBER.getStatus().equals(headerUserRole),
+                    "当前用户不是圈粉，不能付费阅读文章！headerUserRole：" + headerUserRole);
+
             InputOrder inputOrder = new InputOrder();
-            inputOrder.setBizContent(JsonUtils.toFastJson(info, "yyyy-MM-dd HH:mm:ss"));
+            inputOrder.setBizContent(JSON.toJSONString(info));
             inputOrder.setCost(info.getContentPrice());
             if (null != info.getCoterieId() && 0L != info.getCoterieId()) {
                 inputOrder.setCoterieId(info.getCoterieId());

@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.vo.MyInviterVO;
@@ -43,5 +44,5 @@ public interface UserOperateApi {
 	 * @param userIds
 	 * @return
 	 */
-	Response<List<UserRegLogVO>> listByUserId(List<Long> userIds);
+	Response<Map<Long, UserRegLogVO>> listByUserId(List<Long> userIds);
 }

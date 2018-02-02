@@ -4,6 +4,7 @@
 package com.yryz.quanhu.user.provider;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -78,13 +79,14 @@ public class UserOperateProvider implements UserOperateApi {
 	}
 
 	@Override
-	public Response<List<UserRegLogVO>> listByUserId(List<Long> userIds) {
+	public Response<Map<Long, UserRegLogVO>> listByUserId(List<Long> userIds) {
 		try {
 			if(CollectionUtils.isEmpty(userIds)){
 				throw QuanhuException.busiError("参数不合法");
 			}
-			List<UserRegLogVO> logVOs = GsonUtils.parseList(operateService.listByUserId(userIds), UserRegLogVO.class);
-			return ResponseUtils.returnObjectSuccess(logVOs);
+			Map<Long, UserRegLogVO> regLogVOMap = operateService.listByUserId(userIds);
+			logger.info("listByUserId regLogVOMap: {}", GsonUtils.parseJson(regLogVOMap));
+			return ResponseUtils.returnObjectSuccess(regLogVOMap);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {

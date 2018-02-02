@@ -16,6 +16,9 @@ import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
+import com.yryz.quanhu.resource.hotspot.api.HotSpotApi;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
@@ -23,10 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author:sun
@@ -51,6 +51,12 @@ public class CommentServiceImpl implements CommentService {
     @Reference(check = false)
     private PushAPI pushAPI;
 
+    @Reference(check = false)
+    private EventAPI eventAPI;
+
+    @Reference(check = false)
+    private HotSpotApi hotSpotApi;
+
     @Override
     public int accretion(Comment comment) {
         int count=commentDao.accretion(comment);
@@ -59,6 +65,44 @@ public class CommentServiceImpl implements CommentService {
             if (null!=userSimpleVO){
                 this.sendMessage(comment.getTargetUserId(),"用户"+userSimpleVO.getUserNickName()+"评论了你!");
             }
+        }
+        try{
+            List<EventInfo> eventInfos=new ArrayList<EventInfo>();
+            //被评论者得成长值
+            EventInfo eventInfo=new EventInfo();
+            eventInfo.setOwnerId(comment.getCreateUserId().toString());
+            eventInfo.setUserId(String.valueOf(comment.getTargetUserId()));
+            eventInfo.setEventGrow(String.valueOf(2));
+            eventInfo.setCreateTime(String.valueOf(new Date()));
+            eventInfo.setResourceId(String.valueOf(comment.getResourceId()));
+            eventInfo.setEventCode(String.valueOf(14));
+            eventInfo.setEventNum(1);
+            eventInfo.setAmount(0.0);
+            eventInfo.setCoterieId(String.valueOf(comment.getCoterieId()));
+            eventInfo.setCircleId("");
+            eventInfos.add(eventInfo);
+            //评论者
+            EventInfo eventInfo_=new EventInfo();
+            eventInfo_.setOwnerId(String.valueOf(comment.getTargetUserId()));
+            eventInfo_.setUserId(comment.getCreateUserId().toString());
+            eventInfo_.setEventGrow(String.valueOf(5));
+            eventInfo_.setCreateTime(String.valueOf(new Date()));
+            eventInfo_.setResourceId(String.valueOf(comment.getResourceId()));
+            eventInfo_.setEventCode(String.valueOf(5));
+            eventInfo_.setEventNum(1);
+            eventInfo_.setAmount(0.0);
+            eventInfo_.setCoterieId(String.valueOf(comment.getCoterieId()));
+            eventInfo_.setCircleId("");
+            eventInfos.add(eventInfo_);
+            try{
+                hotSpotApi.saveHeat("1",String.valueOf(comment.getResourceId()));
+                hotSpotApi.saveHeat("2",String.valueOf(comment.getCreateUserId()));
+            }catch (Exception e){
+                logger.info("评论接入热度值出现异常:"+e);
+            }
+            eventAPI.commit(eventInfos);
+        }catch (Exception e){
+            logger.info("评论接入积分系统出现异常:"+e);
         }
         return count;
     }

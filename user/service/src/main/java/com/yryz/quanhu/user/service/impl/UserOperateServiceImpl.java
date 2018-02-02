@@ -15,7 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.quanhu.user.vo.UserRegLogVO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,8 +212,17 @@ public class UserOperateServiceImpl implements UserOperateService {
 	}
 
 	@Override
-	public List<UserRegLog> listByUserId(List<Long> userIds) {
-		return regLogDao.listByUserId(userIds);
+	public Map<Long, UserRegLogVO> listByUserId(List<Long> userIds) {
+		Map<Long, UserRegLogVO> map = Maps.newHashMap();
+		List<UserRegLog> logList = regLogDao.listByUserId(userIds);
+		if (CollectionUtils.isNotEmpty(logList)) {
+			for (UserRegLog regLog : logList) {
+				UserRegLogVO regLogVO = new UserRegLogVO();
+				BeanUtils.copyProperties(regLogVO, regLog);
+				map.put(regLog.getUserId(), regLogVO);
+			}
+		}
+		return map;
 	}
 
 }

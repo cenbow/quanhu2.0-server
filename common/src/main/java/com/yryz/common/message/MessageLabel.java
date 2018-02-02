@@ -89,4 +89,10 @@ public class MessageLabel {
 	 */
 	public static final int RECOMMEND_ACTIVITY = 5002;
 
+	/**
+	 * 点赞
+	 */
+	public static final int LIKE=6001;
+
+
 }

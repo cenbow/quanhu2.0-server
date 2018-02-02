@@ -228,7 +228,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Assert.isTrue(result > 0, "作者删除文章失败！");
 
             try {
-                // 动态资源下线
+                // 聚合资源下线
                 resourceApi.deleteResourceById(String.valueOf(upInfo.getKid()));
             } catch (Exception e) {
                 logger.error("资源聚合、统计计数 接入异常！", e);
