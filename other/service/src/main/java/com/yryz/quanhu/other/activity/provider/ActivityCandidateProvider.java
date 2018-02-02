@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service(interfaceClass=ActivityCandidateApi.class)
 public class ActivityCandidateProvider implements ActivityCandidateApi {
 
@@ -33,11 +36,13 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
      * @param activityVoteDto
      * @return
      * */
-    public Response join(ActivityVoteDto activityVoteDto) {
+    public Response<Map<String, Object>> join(ActivityVoteDto activityVoteDto) {
         try {
             Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
             activityCandidateService.join(activityVoteDto);
-            return ResponseUtils.returnObjectSuccess(null);
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("kid", activityVoteDto.getKid());
+            return ResponseUtils.returnObjectSuccess(resultMap);
         } catch (Exception e) {
             logger.error("增加参与者 失败", e);
             return ResponseUtils.returnException(e);

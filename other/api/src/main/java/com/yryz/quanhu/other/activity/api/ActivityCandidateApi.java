@@ -7,6 +7,8 @@ import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteConfigVo;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 
+import java.util.Map;
+
 public interface ActivityCandidateApi {
 
     /**
@@ -14,7 +16,7 @@ public interface ActivityCandidateApi {
      * @param activityVoteDto
      * @return
      * */
-    Response join(ActivityVoteDto activityVoteDto);
+    Response<Map<String, Object>> join(ActivityVoteDto activityVoteDto);
 
     /**
      * 参与投票活动
