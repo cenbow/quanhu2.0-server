@@ -171,8 +171,8 @@ public class LikeProvider implements LikeApi {
                 }
             } else {
                 int count = likeService.cleanLike(like);
-                tongCount = -1;
                 if (count > 0) {
+                    tongCount = -1;
                     map.put("result", 1);
                     try {
                         redisTemplate.delete("LIKE:" + like.getResourceId() + "_" + like.getUserId());
@@ -348,7 +348,7 @@ public class LikeProvider implements LikeApi {
     public void dynamicPush(long resourceId,String contentPushStr){
         LikeAssemble likeAssemble=new LikeAssemble();
         try{
-         /*   Dymaic dymaic = dymaicService.get(resourceId).getData();
+          /*  Dymaic dymaic = dymaicService.get(resourceId).getData();
             if (!dymaic.getExtJson().equals("")) {
                 Map maps = (Map) JSONObject.parse(dymaic.getExtJson());
                 String title = maps.get("title").toString();
