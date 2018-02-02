@@ -1,7 +1,9 @@
 package com.yryz.quanhu.dymaic;
 
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.dymaic.dto.QueryDymaicDTO;
 import com.yryz.quanhu.dymaic.service.DymaicService;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.dymaic.vo.DymaicVo;
@@ -23,7 +25,7 @@ import java.util.*;
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class DymaicTest {
 
-    private final static Long USER_DEMO = 739876045945667584L;
+    private final static Long USER_DEMO = 739855842419507200L;
     private final Long USER_DEBAR = 200L;
 
 
@@ -147,6 +149,19 @@ public class DymaicTest {
     }
 
 
+    //============  管理动态 ==============
+    @Test
+    public void queryAll() {
+        QueryDymaicDTO queryDymaicDTO = new QueryDymaicDTO();
+        for (int i = 1; i < 5; i ++) {
+            queryDymaicDTO.setCurrentPage(i);
+            queryDymaicDTO.setPageSize(1);
+            queryDymaicDTO.setDelFlag(10);
+            queryDymaicDTO.setEndDate("2018-02-02");
+            Response<PageList<DymaicVo>> response = dymaicService.queryAllDymaic(queryDymaicDTO);
+            print(response);
+        }
+    }
 
     private void print(Object obj) {
         System.out.println("\n" + GsonUtils.parseJson(obj) + "\n");

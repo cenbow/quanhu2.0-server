@@ -16,13 +16,16 @@
         <result column="shelve_flag" property="shelveFlag" jdbcType="TINYINT"/>
         <result column="del_flag" property="delFlag" jdbcType="TINYINT"/>
         <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+
+        <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="BIGINT"/>
+        <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
     </resultMap>
 
 
     <sql id="Base_Column_List">
         kid, create_user_id, module_enum, target_id,
         transmit_note, transmit_type, ext_json,
-        shelve_flag, del_flag, create_date
+        shelve_flag, del_flag, create_date, last_update_user_id, last_update_date
     </sql>
 
     <!-- 查询动态信息 -->
@@ -52,6 +55,9 @@
             </if>
             <if test="shelveFlag != null">
                 shelve_flag = #{shelveFlag,jdbcType=TINYINT},
+            </if>
+            <if test="lastUpdateUserId != null">
+                last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
             </if>
         </set>
         where kid = #{kid,jdbcType=BIGINT}
@@ -91,6 +97,7 @@
         LIMIT #{limit}
     </select>
 
+    <!-- 新增动态 -->
     <insert id="insert" parameterType="com.yryz.quanhu.dymaic.vo.Dymaic">
         insert into qh_dymaic (kid, create_user_id, module_enum, target_id,
           transmit_note, transmit_type, ext_json)
@@ -99,5 +106,27 @@
             #{transmitNote,jdbcType=VARCHAR},#{transmitType,jdbcType=VARCHAR},
             #{extJson,jdbcType=LONGVARCHAR})
     </insert>
+
+    <!-- 管理后台列表 -->
+    <select id="queryAll" parameterType="com.yryz.quanhu.dymaic.dto.QueryDymaicDTO" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from qh_dymaic
+        WHERE 1=1
+        <if test="delFlag != null">
+            and del_flag = #{delFlag}
+        </if>
+        <if test="startDate !=null and startDate != ''">
+            and create_date &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null and endDate != ''">
+            and create_date &lt;= #{endDate}
+        </if>
+        <!--
+        <if test="nickName !=null and nickName != ''">
+            and user_nick_nname like CONCAT('%',#{nickName},'%')
+        </if> -->
+        ORDER BY create_date DESC
+    </select>
 
 </mapper>

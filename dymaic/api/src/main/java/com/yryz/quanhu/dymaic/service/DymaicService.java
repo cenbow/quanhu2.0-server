@@ -1,8 +1,11 @@
 package com.yryz.quanhu.dymaic.service;
 
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.dymaic.dto.QueryDymaicDTO;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.dymaic.vo.DymaicVo;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -25,9 +28,11 @@ public interface DymaicService {
      */
     Response<Boolean> send(Dymaic dymaic);
 
+
     /**
      * 删除动态信息
      *
+     * @param userId
      * @param kid
      * @return
      */
@@ -145,4 +150,14 @@ public interface DymaicService {
      * @return
      */
     Response<Boolean> rebuildTimeLine(Long userId, Long limit);
+
+
+    /**
+     * 管理后台查询动态列表
+     * @param queryDymaicDTO
+     * @return
+     */
+    Response<PageList<DymaicVo>> queryAllDymaic(QueryDymaicDTO queryDymaicDTO);
+
+
 }
