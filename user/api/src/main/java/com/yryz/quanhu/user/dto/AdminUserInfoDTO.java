@@ -122,6 +122,8 @@ public class AdminUserInfoDTO implements Serializable{
 		this.endDate = endDate;
 		this.userIds = userIds;
 	}
+	
+	
 	@Override
 	public String toString() {
 		return "AdminUserInfoDTO [nickName=" + nickName + ", phone=" + phone + ", startDate=" + startDate + ", endDate="

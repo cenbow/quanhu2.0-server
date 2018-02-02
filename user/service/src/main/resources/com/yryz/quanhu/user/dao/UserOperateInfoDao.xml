@@ -99,6 +99,9 @@
 			<if test="userRegChannel != null">
 				user_reg_channel,
 			</if>
+			<if test="userInviterId != null">
+				user_inviter_id,
+			</if>
 			<if test="userRegInviterCode != null">
 				user_reg_inviter_code,
 			</if>
@@ -127,6 +130,9 @@
 			</if>
 			<if test="userRegChannel != null">
 				#{userRegChannel,jdbcType=VARCHAR},
+			</if>
+			<if test="userInviterId != null">
+				#{userInviterId},
 			</if>
 			<if test="userRegInviterCode != null">
 				#{userRegInviterCode,jdbcType=VARCHAR},

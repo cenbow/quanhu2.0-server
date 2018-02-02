@@ -76,10 +76,13 @@ public class UserCreateConsumer {
 		
 		//圈乎用户才加积分和发消息
 		if(StringUtils.isNotBlank(appId) && StringUtils.equals(appId, Context.getProperty(AppConstants.APP_ID))){
-			//注册加积分，邀请好友加积分
-			eventManager.register(registerDTO.getRegLogDTO().getUserId().toString(), registerDTO.getUserPhone(), registerDTO.getRegLogDTO().getRegType(), registerDTO.getUserRegInviterCode());
-			//注册消息发送
-			messageManager.register(registerDTO.getRegLogDTO().getUserId().toString(),registerDTO.getRegLogDTO().getAppId());
+			//非管理后台用户才加积分和发送消息
+			if(!StringUtils.inString(registerDTO.getRegLogDTO().getRegType(), "admin")){
+				//注册加积分，邀请好友加积分
+				eventManager.register(registerDTO.getRegLogDTO().getUserId().toString(), registerDTO.getUserPhone(), registerDTO.getRegLogDTO().getRegType(), registerDTO.getUserRegInviterCode());
+				//注册消息发送
+				messageManager.register(registerDTO.getRegLogDTO().getUserId().toString(),registerDTO.getRegLogDTO().getAppId());
+			}
 			//初始化用户热度
 			initHot(registerDTO.getRegLogDTO().getUserId());
 		}

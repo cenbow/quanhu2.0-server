@@ -37,6 +37,8 @@ public class TopicVo implements Serializable {
 
     private String moduleEnum;
 
+    private Long createUserId;
+
     @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
@@ -149,5 +151,13 @@ public class TopicVo implements Serializable {
 
     public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
+    }
+
+    public Long getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(Long createUserId) {
+        this.createUserId = createUserId;
     }
 }

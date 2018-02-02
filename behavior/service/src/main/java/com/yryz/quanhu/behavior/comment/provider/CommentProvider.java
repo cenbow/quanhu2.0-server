@@ -6,7 +6,6 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
-import com.yryz.quanhu.behavior.comment.contants.CommentConstatns;
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
@@ -16,13 +15,11 @@ import com.yryz.quanhu.behavior.comment.service.CommentService;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
-import com.yryz.quanhu.message.push.api.PushAPI;
-import com.yryz.quanhu.message.push.entity.PushReqVo;
-import com.yryz.quanhu.support.config.api.BasicConfigApi;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +30,7 @@ import java.util.*;
 /**
  * @Author:sun
  * @version:2.0
- * @Description:举报
+ * @Description:评论
  * @Date:Created in 19:13 2018/1/23
  */
 @Service(interfaceClass = CommentApi.class)
@@ -49,6 +46,9 @@ public class CommentProvider implements CommentApi {
 
     @Reference(check = false)
     private UserApi userApi;
+
+    @Reference(check = false)
+    private CountApi countApi;
 
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
@@ -71,6 +71,13 @@ public class CommentProvider implements CommentApi {
                     redisTemplate.opsForValue().set("COMMENT:" + comment.getModuleEnum() + ":" + comment.getKid() + "_" + comment.getTopId() + "_" + comment.getResourceId(), comment);
                 } catch (Exception e) {
                     logger.info("同步评论数据到redis中失败" + e);
+                }
+                if(comment.getTopId()==0){
+                    try{
+                        countApi.commitCount(BehaviorEnum.Comment,comment.getResourceId(),"",1L);
+                    }catch (Exception e){
+                        logger.info("进入统计系统失败" + e);
+                    }
                 }
             } else {
                 map.put("result", 0);

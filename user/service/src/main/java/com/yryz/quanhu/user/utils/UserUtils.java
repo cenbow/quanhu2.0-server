@@ -1,5 +1,9 @@
 package com.yryz.quanhu.user.utils;
 
+import java.lang.reflect.Field;
+
+import org.springframework.util.ObjectUtils;
+
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.RegType;
@@ -97,5 +101,26 @@ public class UserUtils {
 			return "";
 		}
 		return stateArray[2];
+	}
+	
+	/**
+	 * 检查bean私有属性是否都是空
+	 * @param o
+	 * @return
+	 */
+	public static boolean checkDeckaredFieldIsNull(Object o){
+		try {
+			for(Field field : o.getClass().getDeclaredFields()){
+				field.setAccessible(true);
+				Object object = field.get(o);
+				if(!ObjectUtils.isEmpty(object)){
+					return false;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return true;
+		}
+		return true;
 	}
 }
