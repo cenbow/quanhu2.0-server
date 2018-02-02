@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.dymaic.mq;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.provider.DymaicProvider;
 import com.yryz.quanhu.dymaic.service.DymaicService;
@@ -41,6 +42,8 @@ public class DymaicConsumer {
 	@Autowired
 	private DymaicProvider dymaicProvider;
 
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	/**
 	 * 动态发布队列

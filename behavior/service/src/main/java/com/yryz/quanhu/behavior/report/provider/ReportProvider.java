@@ -2,11 +2,11 @@ package com.yryz.quanhu.behavior.report.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.quanhu.behavior.report.contants.ReportConstatns;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.report.dto.ReportDTO;
 import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.behavior.report.service.ReportService;
@@ -41,6 +41,9 @@ public class ReportProvider implements ReportApi {
     @Reference(check = false)
     private BasicConfigApi basicConfigApi;
 
+    @Reference(check = false)
+    private CountApi countApi;
+
     @Override
     public Response<Map<String, Integer>> accretion(Report report) {
         try {
@@ -49,6 +52,11 @@ public class ReportProvider implements ReportApi {
             int count = reportService.accretion(report);
             if(count>0){
                 map.put("result",1);
+                try{
+                    countApi.commitCount(BehaviorEnum.Report,report.getResourceId(),"",1L);
+                }catch (Exception e){
+                    logger.info("进入统计系统失败:"+e);
+                }
             }else{
                 map.put("result",0);
             }

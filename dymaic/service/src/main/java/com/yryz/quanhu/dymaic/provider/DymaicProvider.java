@@ -1,11 +1,14 @@
 package com.yryz.quanhu.dymaic.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.github.pagehelper.Page;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.quanhu.dymaic.dto.QueryDymaicDTO;
 import com.yryz.quanhu.dymaic.service.DymaicService;
 import com.yryz.quanhu.dymaic.service.DymaicServiceImpl;
 import com.yryz.quanhu.dymaic.service.DymaicTopServiceImpl;
@@ -189,6 +192,18 @@ public class DymaicProvider implements DymaicService {
             return ResponseUtils.returnObjectSuccess(dymaicService.rebuildTimeLine(userId, limit));
         } catch (Exception e) {
             logger.error("rebuildTimeLine", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<PageList<DymaicVo>> queryAllDymaic(QueryDymaicDTO queryDymaicDTO) {
+        try {
+            PageList<DymaicVo> pageList = dymaicService.queryAll(queryDymaicDTO);
+
+            return ResponseUtils.returnObjectSuccess(pageList);
+        } catch (Exception e) {
+            logger.error("listAllDymaic", e);
             return ResponseUtils.returnException(e);
         }
     }

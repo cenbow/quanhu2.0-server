@@ -1,17 +1,22 @@
 package com.yryz.quanhu.dymaic.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import com.yryz.quanhu.dymaic.dao.redis.DymaicCache;
+import com.yryz.quanhu.dymaic.dto.QueryDymaicDTO;
 import com.yryz.quanhu.dymaic.mq.DymaicSender;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.dymaic.vo.DymaicVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -93,6 +98,7 @@ public class DymaicServiceImpl {
         if (dymaic == null) {
             return true;
         }
+
         dymaic.setDelFlag(STATUS_OFF);
 
         //write db
@@ -108,6 +114,7 @@ public class DymaicServiceImpl {
 
     /**
      * 上下架动态
+     *
      * @param userId
      * @param kid
      * @param shelve
@@ -194,6 +201,7 @@ public class DymaicServiceImpl {
 
     /**
      * 批量查询个人最后一条动态
+     *
      * @param userIds
      * @return
      */
@@ -285,7 +293,7 @@ public class DymaicServiceImpl {
         Long kid = dymaic.getKid();
 
         //获取粉丝列表
-        List<Long> followers = getFans(userId);
+        List<Long> followers = invokeFans(userId);
 
         //push
         for (Long followerId : followers) {
@@ -326,7 +334,7 @@ public class DymaicServiceImpl {
     public Boolean rebuildTimeLine(Long userId, Long limit) {
         Long startTime = System.currentTimeMillis();
         //获取粉丝列表
-        List<Long> followers = getFans(userId);
+        List<Long> followers = invokeFans(userId);
         followers.add(userId);
 
         //从mysql中取limit条好友动态
@@ -342,6 +350,42 @@ public class DymaicServiceImpl {
         logger.info("[dymaic] rebuildTimeLine userId " + userId + ", followers " + followers.size() + ", find dymaic " + idsSize + ", take timeMillis " + (System.currentTimeMillis() - startTime));
 
         return true;
+    }
+
+    /**
+     * 管理后台条件查询列表数据
+     *
+     * @param queryDymaicDTO
+     * @return
+     */
+    public PageList<DymaicVo> queryAll(QueryDymaicDTO queryDymaicDTO) {
+
+        PageList<DymaicVo> result = new PageList<>();
+        result.setCurrentPage(queryDymaicDTO.getCurrentPage());
+        result.setPageSize(queryDymaicDTO.getPageSize());
+
+        //分页检索
+        Page<Dymaic> page = PageHelper.startPage(queryDymaicDTO.getCurrentPage(), queryDymaicDTO.getPageSize());
+        page.setCount(false);
+        dymaicDao.queryAll(queryDymaicDTO);
+
+        List<DymaicVo> listVo = new ArrayList<>();
+        if (page != null && page.size() > 0) {
+            for (Dymaic dymaic : page.getResult()) {
+                DymaicVo vo = new DymaicVo();
+                BeanUtils.copyProperties(dymaic, vo);
+
+                //用户信息
+                Response<UserSimpleVO> response = userApi.getUserSimple(null, dymaic.getUserId());
+                UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(response);
+                vo.setUser(userSimpleVO);
+
+                listVo.add(vo);
+            }
+        }
+
+        result.setEntities(listVo);
+        return result;
     }
 
     /**
@@ -364,7 +408,7 @@ public class DymaicServiceImpl {
             vo.setUser(userSimpleVO);
 
             //评论数，点赞数，转发数, ignore exception
-            vo.setStatistics(getStatics(kid));
+            vo.setStatistics(invokeStatics(kid));
         }
 
         return vo;
@@ -413,9 +457,9 @@ public class DymaicServiceImpl {
                     } else {
                         vo.setUser(new UserSimpleVO());
                     }
-                    
+
                     //评论数，点赞数，转发数, ignore exception
-                    vo.setStatistics(getStatics(kid));
+                    vo.setStatistics(invokeStatics(kid));
 
                     result.add(vo);
                 }
@@ -431,7 +475,7 @@ public class DymaicServiceImpl {
      * @param userId
      * @return
      */
-    private List<Long> getFans(Long userId) {
+    private List<Long> invokeFans(Long userId) {
         List<Long> result = new ArrayList<>();
 
         Response<Set<String>> fansRsp = userRelationApi.selectBy(userId.toString(), UserRelationConstant.STATUS.FANS);
@@ -451,16 +495,17 @@ public class DymaicServiceImpl {
 
     /**
      * 查询统计数
+     *
      * @param kid
      * @return
      */
-    private Map<String, Long> getStatics(Long kid) {
+    private Map<String, Long> invokeStatics(Long kid) {
         Map<String, Long> statistics = null;
         try {
             String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-            statistics = countApi.getCount(countType , kid, null).getData();
+            statistics = countApi.getCount(countType, kid, null).getData();
         } catch (Exception e) {
-            logger.warn("cannot get statics cause: "+  e.getMessage());
+            logger.warn("cannot get statics cause: " + e.getMessage());
         }
 
         statistics = (statistics == null) ? new HashMap<>() : statistics;
@@ -470,6 +515,7 @@ public class DymaicServiceImpl {
 
     /**
      * 裁剪删除或下架状态的Dymaic
+     *
      * @param dymaic
      * @return
      */
