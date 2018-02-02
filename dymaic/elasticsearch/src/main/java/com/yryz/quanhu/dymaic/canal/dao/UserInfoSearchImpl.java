@@ -69,7 +69,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         //分页信息
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize,
                 Sort.by(Direction.DESC, "userStarInfo.recommendHeight", "userStarInfo.recommendTime",
-                "userStarInfo.authTime", "userBaseInfo.lastHeat"));
+                        "userStarInfo.authTime", "userBaseInfo.lastHeat"));
         if (userId != null) {
             //当前用户
             QueryBuilder queryMyself = QueryBuilders.termQuery("userId", userId.toString());
@@ -119,18 +119,32 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNoneBlank(nickName)) {
-            boolQueryBuilder.must(QueryBuilders.matchQuery(ESConstants.USER_NICKNAME, nickName));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
         }
         if (StringUtils.isNoneBlank(phone)) {
-            boolQueryBuilder.must(QueryBuilders.matchQuery(ESConstants.USER_PHONE, phone));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_PHONE, "*" + phone + "*"));
+        }
+        if (StringUtils.isNoneBlank(channelCode)) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_ACTIVITYCHANNELCODE, "*" + channelCode + "*"));
+        }
+        if (auditStatus != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUDITSTATUS, auditStatus));
+        }
+        if (authType != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHTYPE, authType));
+        }
+        if (authWay != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHWAY, authWay));
+        }
+        if (growLevel != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ACTIVITYCHANNELCODE, growLevel));
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         queryBuilder
-                .withFilter(boolQueryBuilder)
-                .withFilter(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate))
+                .withFilter(boolQueryBuilder.must(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate)))
                 .withPageable(pageable);
 
         List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
@@ -139,7 +153,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
 
         SearchQuery query = queryBuilder.build();
-
+        logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
         return elasticsearchTemplate.queryForList(query, UserInfo.class);
     }
 
