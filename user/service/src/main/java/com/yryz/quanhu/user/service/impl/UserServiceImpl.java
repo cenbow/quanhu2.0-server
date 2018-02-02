@@ -164,12 +164,13 @@ public class UserServiceImpl implements UserService {
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
 		UserBaseInfo baseInfo = getUser(friendId);
 		String starTradeField = "";
+		
+		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		//聚合达人行业数据
-		if(baseInfo.getUserRole() == UserRole.STAR.getRole()){
+		if(simpleVO.getUserRole() == UserRole.STAR.getRole()){
 			UserStarAuth starAuth = starService.get(friendId.toString(), null);
 			starTradeField = starAuth != null ? starAuth.getTradeField() : "";
 		}
-		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
 		simpleVO.setStarTradeField(starTradeField);
 		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
 		// 聚合关系数据
@@ -380,7 +381,7 @@ public class UserServiceImpl implements UserService {
 	 * @param nickName
 	 * @return
 	 */
-	private UserBaseInfo getUserByNickName(String appId, String nickName) {
+	public  UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
 
@@ -504,7 +505,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void createUser(UserBaseInfo baseInfo) {
-		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
+		if (StringUtils.isNotBlank(baseInfo.getUserPhone()) && StringUtils.isBlank(baseInfo.getUserNickName())) {
 			baseInfo.setUserNickName(parsePhone2Name(baseInfo.getUserPhone(), baseInfo.getUserNickName()));
 		}
 		baseInfo.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUNAHU_USER_BASEINFO)));
