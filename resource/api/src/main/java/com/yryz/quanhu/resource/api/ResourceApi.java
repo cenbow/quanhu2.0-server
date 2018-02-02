@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 
@@ -80,5 +81,17 @@ public interface ResourceApi {
 	 * @return
 	 */
 	public Response<List<ResourceVo>> appRecommend(int start , int limit);
+	
+	/**
+	 * 获取分页对象
+	 * @param resource
+	 * @param orderColumn
+	 * @param start
+	 * @param limit
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	public Response<Long> count(ResourceVo resource, String startTime, String endTime);
 
 }
