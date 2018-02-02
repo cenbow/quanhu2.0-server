@@ -18,7 +18,8 @@ public enum BehaviorEnum {
     Release("18", "releaseCount", false, "发布数"),
     Coterie("19", "coterieCount", false, "私圈数"),
     Activity("20", "activityCount", false, "活动数"),
-    RealRead("21", "realReadCount", true, "真实浏览数");
+    RealRead("21", "realReadCount", true, "真实浏览数"),
+    TALK("22", "talkCount", false, "话题讨论数");
 
     private String code;
 

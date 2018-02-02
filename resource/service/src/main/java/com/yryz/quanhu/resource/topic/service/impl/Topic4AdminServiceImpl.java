@@ -161,10 +161,10 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         example.setPageSize(pageSize);
         example.setOrderByClause(orderBy);
 
-        TopicExample.Criteria orC=example.or();
+
         TopicExample.Criteria criteria=example.createCriteria();
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        if(dto.getStartTime()!=null && dto.getEndTime()!=null){
+        if(StringUtils.isNotBlank(dto.getStartTime()) && StringUtils.isNotBlank(dto.getEndTime())){
             criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
         }
         if(dto.getRecommend()!=null){
@@ -173,10 +173,8 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         if(dto.getShelveFlag()!=null){
             criteria.andShelveFlagEqualTo(dto.getShelveFlag());
         }
-       if(dto.getTitle()!=null){
-           criteria.andTitleLike(dto.getTitle());
-           orC.andContentLike(dto.getTitle());
-           example.or(orC);
+       if(StringUtils.isNotBlank(dto.getTitle())){
+           criteria.andTitleLike("%"+dto.getTitle()+"%");
        }
 
         Long count=this.topicDao.countByExample(example);
@@ -238,13 +236,21 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         return  result;
     }
 
-	@Override
-	public List<Long> getKidByCreatedate(String startDate, String endDate) {
-		return topicDao.selectKidByCreatedate(startDate, endDate);
-	}
+    @Override
+    public Integer shalve(Long kid, Byte shalveFlag) {
+        Topic topic=new Topic();
+        topic.setKid(kid);
+        topic.setShelveFlag(shalveFlag);
+        return this.topicDao.updateByPrimaryKeySelective(topic);
+    }
 
-	@Override
-	public List<Topic> getByKids(List<Long> kidList) {
-		return topicDao.selectByKids(kidList);
-	}
+    @Override
+    public Integer recommond(Long kid, Byte recommondFlag) {
+        Topic topic=new Topic();
+        topic.setKid(kid);
+        topic.setRecommend(recommondFlag);
+        return this.topicDao.updateByPrimaryKeySelective(topic);
+    }
+
+
 }

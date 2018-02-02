@@ -33,7 +33,11 @@
 	
 	<!-- 获取用户成长值流水列表 -->
 	<select id="getAll" resultType="com.yryz.quanhu.grow.entity.GrowFlow">
-		select  <include refid="columns" />  from grow_flow where user_id = #{gfq.userId}
+		select  <include refid="columns" />  from grow_flow where  
+		1=1 
+		<if test="gfq.userId != null and gfq.userId !=''">
+			and user_id = #{gfq.userId}
+		</if>
 		<if test="gfq.eventCode != null and gfq.eventCode !=''">
 			and event_code = #{gfq.eventCode}
 		</if>
@@ -52,7 +56,11 @@
 		select  count(1)  
 		 from (
 		select  <include refid="columns" /> 
-		 from grow_flow where user_id = #{gfq.userId} 
+		 from grow_flow where 
+		1=1 
+		<if test="gfq.userId != null and gfq.userId !=''">
+			and user_id = #{gfq.userId}
+		</if>
 		<if test="gfq.eventCode != null and gfq.eventCode !=''">
 			and event_code = #{gfq.eventCode}
 		</if>
@@ -78,14 +86,18 @@
 				a.updateTime ,
 				b.event_name AS eventName
 		 from (
-		select  <include refid="columns" />  from grow_flow where user_id = #{gfq.userId} 
-		<if test="gfq.eventCode != null">
+		select  <include refid="columns" />  from grow_flow where 
+		1=1 
+		<if test="gfq.userId != null and gfq.userId !=''">
+			and user_id = #{gfq.userId} 
+		</if>
+		<if test="gfq.eventCode != null and gfq.eventCode !=''">
 			and event_code = #{gfq.eventCode}
 		</if>
-		<if test="gfq.startTime != null">
+		<if test="gfq.startTime != null and gfq.startTime !=''">
 			and create_time &gt;= #{gfq.startTime}
 		</if>
-		<if test="gfq.endTime != null">
+		<if test="gfq.endTime != null and gfq.endTime !=''">
 			and create_time &lt;= #{gfq.endTime}
 		</if>
 		) a 

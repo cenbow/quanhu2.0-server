@@ -126,6 +126,12 @@
 			<if test="recommend != null">
 				and recommend = #{recommend,jdbcType=TINYINT}
 			</if>
+			<if test="searchKey != null and searchKey != ''">
+				and (
+				title LIKE CONCAT('%',#{searchKey},'%')
+				OR content LIKE CONCAT('%',#{searchKey},'%')
+				)
+			</if>
 		</where>
 	</sql>
 
@@ -448,7 +454,7 @@
 				coterie_id = #{record.coterieId,jdbcType=BIGINT},
 			</if>
 			<if test="record.contentPrice != null">
-				content_price = #{contentPrice,jdbcType=BIGINT},
+				content_price = #{record.contentPrice,jdbcType=BIGINT},
 			</if>
 		</set>
 		<include refid="update_condition_where" />
@@ -459,6 +465,12 @@
 			1=1
 			<if test="dto.kid != null">
 				and kid = #{dto.kid,jdbcType=BIGINT}
+			</if>
+			<if test="dto.kids != null">
+				and kid in
+				<foreach item="item" index="index" collection="dto.kids" open="(" separator="," close=")">
+					#{item}
+				</foreach>
 			</if>
 			<if test="dto.coterieId != null">
 				and coterie_id = #{dto.coterieId,jdbcType=BIGINT}
@@ -475,8 +487,14 @@
 			<if test="dto.shelveFlag != null">
 				and shelve_flag = #{dto.shelveFlag,jdbcType=TINYINT}
 			</if>
+			<if test="record.shelveFlag != null">
+				and shelve_flag != #{record.shelveFlag,jdbcType=TINYINT}
+			</if>
 			<if test="dto.delFlag != null">
 				and del_flag = #{dto.delFlag,jdbcType=TINYINT}
+			</if>
+			<if test="record.delFlag != null">
+				and del_flag != #{record.delFlag,jdbcType=TINYINT}
 			</if>
 			<if test="dto.contentLabel != null">
 				and content_label = #{dto.contentLabel,jdbcType=VARCHAR}

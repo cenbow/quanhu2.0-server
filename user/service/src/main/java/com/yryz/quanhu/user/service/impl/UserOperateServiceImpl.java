@@ -197,7 +197,7 @@ public class UserOperateServiceImpl implements UserOperateService {
 		List<MyInviterDetailVO> detailVOs = new ArrayList<>(regLength);
 		for (int i = 0; i < regLength; i++) {
 			UserOperateInfo model = list.get(i);
-			UserSimpleVO simpleVo = userMap.get(model.getUserId());
+			UserSimpleVO simpleVo = userMap.get(model.getUserId().toString());
 			if (simpleVo != null) {
 				detailVOs.add(new MyInviterDetailVO(model.getKid(), simpleVo.getUserNickName(),
 						model.getCreateDate().getTime()));

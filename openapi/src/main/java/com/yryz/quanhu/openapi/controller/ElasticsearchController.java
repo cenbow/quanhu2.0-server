@@ -42,12 +42,13 @@ public class ElasticsearchController {
 			list.setEntities(new ArrayList<>());
 			return ResponseUtils.returnObjectSuccess(list);
 		}
-		if(page==null ||page<0 ||page>5000){
-			page=0;
+		if(page==null ||page<1 ||page>5000){
+			page=1;
 		}
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
+		page=page-1;
 		try{
 			PageList<UserSimpleVo> list=ResponseUtils.getResponseData(elasticsearchService.searchUser(keyWord, page, size));
 			return ResponseUtils.returnObjectSuccess(list);
@@ -67,11 +68,12 @@ public class ElasticsearchController {
 			return ResponseUtils.returnObjectSuccess(list);
 		}
 		if(page==null ||page<0 ||page>5000){
-			page=0;
+			page=1;
 		}
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
+		page=page-1;
 		try{
 			PageList<ResourceInfoVo> list=ResponseUtils.getResponseData(elasticsearchService.searchReleaseInfo(keyWord, page, size));
 			return ResponseUtils.returnObjectSuccess(list);
@@ -91,11 +93,12 @@ public class ElasticsearchController {
 			return ResponseUtils.returnObjectSuccess(list);
 		}
 		if(page==null ||page<0 ||page>5000){
-			page=0;
+			page=1;
 		}
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
+		page=page-1;
 		try{
 			PageList<ResourceInfoVo> list=ResponseUtils.getResponseData(elasticsearchService.searchTopicInfo(keyWord, page, size));
 			return ResponseUtils.returnObjectSuccess(list);
@@ -115,11 +118,12 @@ public class ElasticsearchController {
 			return ResponseUtils.returnObjectSuccess(list);
 		}
 		if(page==null ||page<0 ||page>5000){
-			page=0;
+			page=1;
 		}
 		if(size==null || size<1 ||size>100){
 			size=10;
 		}
+		page=page-1;
 		try{
 			PageList<CoterieInfoVo> list=ResponseUtils.getResponseData(elasticsearchService.searchCoterieInfo(keyWord, page, size));
 			return ResponseUtils.returnObjectSuccess(list);

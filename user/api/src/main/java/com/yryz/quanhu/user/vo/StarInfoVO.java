@@ -47,7 +47,7 @@ public class StarInfoVO implements Serializable {
 	
 	public void parseStar(Long userId, Map<String, StarAuthInfo> starMap) {
 		if (starMap != null) {
-			StarAuthInfo info = starMap.get(userId);
+			StarAuthInfo info = starMap.get(userId.toString());
 			if (info != null) {
 				this.starInfo = (UserStarSimpleVo) GsonUtils.parseObj(info, UserStarSimpleVo.class);
 				this.starInfo.setUserId(userId);

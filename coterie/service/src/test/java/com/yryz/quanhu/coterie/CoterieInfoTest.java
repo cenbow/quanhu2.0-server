@@ -31,10 +31,16 @@ public class CoterieInfoTest {
     private static Long coterieId = 9382818189L;
 
     @Test
-    public void test010_Join() {
+    public void test010_getByKids() {
         List list = new ArrayList();
         list.add(coterieId);
         Response response = coterieApi.getByKids(list);
+        System.out.println(JsonUtils.toFastJson(response));
+    }
+
+    @Test
+    public void test020_queryPage() {
+        Response response = coterieApi.queryPage(1,10);
         System.out.println(JsonUtils.toFastJson(response));
     }
 

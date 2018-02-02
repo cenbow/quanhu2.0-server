@@ -29,12 +29,6 @@ public interface AdminIActivityParticipationService {
 	PageList<AdminActivityVoteDetailVo> list(AdminActivityVoteDetailDto adminActivityVoteDetailDto);
 
 	/**
-	 * 投票用户数据
-	 */
-	List<AdminActivityVoteRecordVo> voteList(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
-
-
-	/**
 	 * 增加票数
 	 */
 	Integer addVote(Long id, Integer count);
@@ -46,7 +40,9 @@ public interface AdminIActivityParticipationService {
     PageList<UserBaseInfoVO> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize);
 
     public String saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto);
-
+	/**
+	 * 投票用户数据
+	 */
 	PageList adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 
 }

@@ -106,6 +106,11 @@ public class ResourceVo implements Serializable {
     private Long updateTime;
     
     /**
+     * 推荐时间
+     */
+    private Long recommendTime;
+    
+    /**
      * 公开状态：10不公开，11公开
      */
     private String publicState;
@@ -344,6 +349,20 @@ public class ResourceVo implements Serializable {
 	 */
 	public void setUpdateTime(Long updateTime) {
 		this.updateTime = updateTime;
+	}
+	
+	/**
+	 * @return the recommendTime
+	 */
+	public Long getRecommendTime() {
+		return recommendTime;
+	}
+
+	/**
+	 * @param recommendTime the recommendTime to set
+	 */
+	public void setRecommendTime(Long recommendTime) {
+		this.recommendTime = recommendTime;
 	}
 
 	/**

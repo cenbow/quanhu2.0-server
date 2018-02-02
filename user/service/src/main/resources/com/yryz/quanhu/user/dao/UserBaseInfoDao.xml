@@ -71,7 +71,7 @@
 	from qh_user_baseinfo 
 	where app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName != null and nickNname != '' ">
-		and user_nick_nname = #{nickName}
+		and user_nick_name = #{nickName}
 	</if>
 	<if test="userPhone != null and userPhone != '' ">
 		and user_phone = #{userPhone}
@@ -110,7 +110,7 @@
 	from qh_user_baseinfo
 	where app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
-		and user_nick_nname like CONCAT('%',#{nickName},'%')
+		and user_nick_name like CONCAT('%',#{nickName},'%')
 	</if>
 	<if test="phone !=null and phone != ''">
 		and user_phone like CONCAT('%',#{phone},'%')
@@ -165,7 +165,7 @@
 	from qh_user_baseinfo 
 	where app_id = #{appId} and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
-		and user_nick_nname like CONCAT('%',#{nickName},'%')
+		and user_nick_name like CONCAT('%',#{nickName},'%')
 	</if>
 	<if test="phone !=null and phone != ''">
 		and user_phone like CONCAT('%',#{phone},'%')
@@ -188,7 +188,7 @@
 		where app_id = #{appId} and del_flag = 10 and user_status != 12
 
 		<if test="nickName !=null and nickName != ''">
-			and user_nick_nname = #{nickName}
+			and user_nick_name = #{nickName}
 		</if>
 		<if test="phone !=null and phone != ''">
 			and user_phone = #{phone}
