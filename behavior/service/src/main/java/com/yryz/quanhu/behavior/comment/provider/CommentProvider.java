@@ -100,6 +100,8 @@ public class CommentProvider implements CommentApi {
                 comment.setNickName(userSimpleVO.getUserNickName());
                 comment.setUserImg(userSimpleVO.getUserImg());
             }
+            comment.setShelveFlag((byte) 10);
+            comment.setDelFlag((byte)10);
             int count = commentService.accretion(comment);
             if (count > 0) {
                 map.put("result", 1);
