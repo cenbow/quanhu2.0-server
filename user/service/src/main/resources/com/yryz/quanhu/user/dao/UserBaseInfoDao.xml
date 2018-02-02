@@ -71,10 +71,10 @@
 	from qh_user_baseinfo 
 	where app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName != null and nickNname != '' ">
-		and a.user_nick_nname = #{nickName}
+		and user_nick_name = #{nickName}
 	</if>
 	<if test="userPhone != null and userPhone != '' ">
-		and a.user_phone = #{userPhone}
+		and user_phone = #{userPhone}
 	</if>	
   </select>
   
@@ -110,7 +110,7 @@
 	from qh_user_baseinfo
 	where app_id = #{appId}  and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
-		and user_nick_nname like CONCAT('%',#{nickName},'%')
+		and user_nick_name like CONCAT('%',#{nickName},'%')
 	</if>
 	<if test="phone !=null and phone != ''">
 		and user_phone like CONCAT('%',#{phone},'%')
@@ -165,39 +165,39 @@
 	from qh_user_baseinfo 
 	where app_id = #{appId} and del_flag = 10 and user_status != 12
 	<if test="nickName !=null and nickName != ''">
-		and a.user_nick_nname like CONCAT('%',#{nickName},'%')
+		and user_nick_name like CONCAT('%',#{nickName},'%')
 	</if>
 	<if test="phone !=null and phone != ''">
-		and a.user_phone like CONCAT('%',#{phone},'%')
+		and user_phone like CONCAT('%',#{phone},'%')
 	</if>
 	<if test="startDate !=null and startDate != ''">
-		and a.create_date &gt;= #{startDate}
+		and create_date &gt;= #{startDate}
 	</if>
 	<if test="endDate !=null and endDate != ''">
-		and a.create_date &lt;= #{endDate}
+		and create_date &lt;= #{endDate}
 	</if>
 	<if test="userRole != null">
-		and a.user_role = #{userRole}
+		and user_role = #{userRole}
 	</if>
   </select>  
   
   <select id="getUserIdByExactParam" resultType="java.lang.String">
 		select
 		a.user_id as userId
-		from qh_user_baseinfo a
+		from qh_user_baseinfo 
 		where app_id = #{appId} and del_flag = 10 and user_status != 12
 
 		<if test="nickName !=null and nickName != ''">
-			and a.user_nick_nname = #{nickName}
+			and user_nick_name = #{nickName}
 		</if>
 		<if test="phone !=null and phone != ''">
-			and a.user_phone = #{phone}
+			and user_phone = #{phone}
 		</if>
 		<if test="startDate !=null and startDate != ''">
-			and a.create_date &gt;= #{startDate}
+			and create_date &gt;= #{startDate}
 		</if>
 		<if test="endDate !=null and endDate != ''">
-			and a.create_date &lt;= #{endDate}
+			and create_date &lt;= #{endDate}
 		</if>
 	</select>
   

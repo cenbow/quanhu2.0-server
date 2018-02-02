@@ -35,7 +35,9 @@ public enum SmsType {
 	/** 验证码登录 */
 	CODE_LOGIN(9),
 	/** 活动绑定手机号 */
-	ACTIVITY_BIND_PHONE(10);
+	ACTIVITY_BIND_PHONE(10),
+	/** 第三方绑定手机号 */
+	CODE_THIRD_PHONE(11);
 	
 	private int type;
 	

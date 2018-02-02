@@ -48,7 +48,7 @@ public class LoginMethodVO implements Serializable {
         this.loginType = loginType;
     }
 
-	public boolean isHavePwd() {
+	public Boolean isHavePwd() {
 		return havePwd;
 	}
 	public void setHavePwd(Boolean havePwd) {

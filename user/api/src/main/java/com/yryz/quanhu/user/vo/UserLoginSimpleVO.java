@@ -103,6 +103,10 @@ public class UserLoginSimpleVO implements Serializable {
      * 好友备注名
      */
     private String nameNotes;
+    /**
+     * 达人行业
+     */
+    private String starTradeField;
 	public Long getUserId() {
 		return userId;
 	}
@@ -223,6 +227,12 @@ public class UserLoginSimpleVO implements Serializable {
 	}
 	public void setRelationStatus(Integer relationStatus) {
 		this.relationStatus = relationStatus;
+	}
+	public String getStarTradeField() {
+		return starTradeField;
+	}
+	public void setStarTradeField(String starTradeField) {
+		this.starTradeField = starTradeField;
 	}
 	public UserLoginSimpleVO() {
 		super();

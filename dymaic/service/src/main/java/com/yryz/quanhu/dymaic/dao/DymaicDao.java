@@ -1,5 +1,6 @@
 package com.yryz.quanhu.dymaic.dao;
 
+import com.yryz.quanhu.dymaic.dto.QueryDymaicDTO;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -73,4 +74,12 @@ public interface DymaicDao {
      * @return
      */
     Long getMaxKid();
+
+
+    /**
+     * 管理后台条件查询动态列表
+     * @param queryDymaicDTO
+     * @return
+     */
+    List<Dymaic> queryAll(QueryDymaicDTO queryDymaicDTO);
 }

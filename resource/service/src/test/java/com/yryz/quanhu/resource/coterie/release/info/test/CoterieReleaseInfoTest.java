@@ -146,4 +146,17 @@ public class CoterieReleaseInfoTest {
         outputOrder.setPayType(10);
         coterieReleaseOrderNotifyService.notify(outputOrder);
     }
+    
+    /**  
+     * @Description: 付费阅读-查看详情
+     * @author wangheng
+     * @param @throws JsonProcessingException
+     * @return void
+     * @throws  
+     */
+     @Test
+     public void test007() throws JsonProcessingException {
+         System.out.println(new ObjectMapper()
+                 .writeValueAsString(coterieReleaseInfoApi.infoByKid(741723242660724736L, 730921949663453184L)));
+     }
 }

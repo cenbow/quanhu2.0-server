@@ -76,12 +76,28 @@ public class Topic4AdminProvider implements Topic4AdminApi {
 
     @Override
     public Response<Integer> shelve(Long id, Byte shelveFlag) {
-        return null;
+        try {
+            Integer  result=this.topic4AdminService.shalve(id,shelveFlag);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
     @Override
     public Response<Integer> recommend(Long id, Byte recommend) {
-        return null;
+        try {
+            Integer   result=this.topic4AdminService.recommond(id,recommend);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 
 

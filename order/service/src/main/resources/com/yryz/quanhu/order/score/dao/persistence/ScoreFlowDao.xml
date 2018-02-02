@@ -40,8 +40,11 @@
 
 	<!-- 获取用户积分流水列表ALL -->
 	<select id="getAll" resultType="com.yryz.quanhu.score.entity.ScoreFlow">
-		select <include refid="columns" /> from score_flow where
-		user_id = #{sfq.userId}
+		select <include refid="columns" /> from score_flow where 
+		1=1 
+		<if test="sfq.userId != null and sfq.userId !=''">
+			and user_id = #{sfq.userId}
+		</if>
 		<if test="sfq.consumeFlag != null and sfq.consumeFlag !=''">
 			and consume_flag = #{sfq.consumeFlag}
 		</if>
@@ -73,7 +76,11 @@
 		select   
 			 count(1)
   	    from (
-		select <include refid="columns" /> from score_flow where user_id = #{sfq.userId}
+		select <include refid="columns" /> from score_flow where 
+		1=1 
+		<if test="sfq.userId != null and sfq.userId !=''">
+			and user_id = #{sfq.userId}
+		</if>
 		<if test="sfq.consumeFlag != null and sfq.consumeFlag !=''">
 			and consume_flag = #{sfq.consumeFlag}
 		</if>
@@ -103,7 +110,11 @@
 			a.updateTime  ,
 			b.event_name  as eventName 
   	  from (
-		select <include refid="columns" /> from score_flow where user_id = #{sfq.userId}
+		select <include refid="columns" /> from score_flow where 
+		1=1 
+		<if test="sfq.userId != null and sfq.userId !=''">
+			and user_id = #{sfq.userId}
+		</if>
 		<if test="sfq.consumeFlag != null and sfq.consumeFlag !=''">
 			and consume_flag = #{sfq.consumeFlag}
 		</if>
@@ -117,6 +128,9 @@
 			and create_time &lt;= #{sfq.endTime}
 		</if>
 		) a left join event_sys b on a.eventCode = b.event_code
+	    <if test="sfq.eventName != null and sfq.eventName !=''">
+			where b.event_name = #{sfq.eventName}
+		</if>
 		order by id desc  
 	</select>
 

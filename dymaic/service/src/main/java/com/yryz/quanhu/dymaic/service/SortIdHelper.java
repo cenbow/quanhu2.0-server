@@ -1,7 +1,6 @@
 package com.yryz.quanhu.dymaic.service;
 
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
-import com.yryz.framework.core.lock.RedisDistributedLock;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

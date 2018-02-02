@@ -24,6 +24,7 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
@@ -87,6 +88,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private EventAPI eventAPI;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private ReadApi readApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -201,10 +205,10 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             }
 
             try {
-                // 资源计数接入
-                countApi.commitCount(BehaviorEnum.Read, infoVo.getKid(), null, 1L);
+                // 接入阅读统计计数
+                readApi.read(infoVo.getKid(), infoVo.getCreateUserId());
             } catch (Exception e) {
-                logger.error("资源聚合、统计计数 接入异常！", e);
+                logger.error("阅读统计计数 接入异常！", e);
             }
 
             return ResponseUtils.returnObjectSuccess(infoVo);

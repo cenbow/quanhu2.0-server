@@ -44,9 +44,9 @@ import io.swagger.annotations.ApiOperation;
 public class ComponentController {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentController.class);
 	
-	@Reference(lazy=true,check=false)
+	@Reference(lazy=true,check=false,cluster="failfast")
 	private AccountApi accountApi;
-	@Reference(lazy=true,check=false)
+	@Reference(lazy=true,check=false,cluster="failfast")
 	private CommonSafeApi commonSafeApi;
 	@Autowired
 	private AuthService authService;

@@ -30,6 +30,34 @@ public class ScoreFlowReportVo implements Serializable{
 
     private String updateTime;
 
+	/**
+     * 昵称
+     */
+    private String userNickName;
+
+    /**
+     * 用户手机号码
+     */
+    private String userPhone;
+    
+    
+    
+    public String getUserNickName() {
+		return userNickName;
+	}
+
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName;
+	}
+
+	public String getUserPhone() {
+		return userPhone;
+	}
+
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone;
+	}
+
 
     public Long getId() {
         return id;

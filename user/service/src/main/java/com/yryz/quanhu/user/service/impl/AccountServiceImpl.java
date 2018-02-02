@@ -25,6 +25,7 @@ import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -223,7 +224,7 @@ public class AccountServiceImpl implements AccountService {
 			userId = tempUser.getKid();
 		}
 
-		userId = createUser(registerDTO, tempUser.getKid());
+		userId = createUser(registerDTO, userId);
 		// 创建第三方账户
 		thirdLoginService.insert(new UserThirdLogin(userId, thirdUser.getThirdId(), loginDTO.getType().byteValue(),
 				thirdUser.getNickName(), loginDTO.getRegLogDTO().getAppId()));
@@ -239,9 +240,7 @@ public class AccountServiceImpl implements AccountService {
 		if (account == null) {
 			throw QuanhuException.busiError("该用户不存在");
 		}
-		List<LoginMethodVO> list = JsonUtils.fromJson(JsonUtils.toFastJson(logins),
-				new TypeReference<List<LoginMethodVO>>() {
-				});
+		List<LoginMethodVO> list = GsonUtils.parseList(logins, LoginMethodVO.class);
 
 		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
