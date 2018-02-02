@@ -1,9 +1,12 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.other.activity.dao.*;
 import com.yryz.quanhu.other.activity.dto.AdminActivityInfoVoteDto;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
@@ -57,12 +60,15 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	@Reference(check=false)
 	UserApi userApi;
 
+	@Reference(check=false)
+	CountApi countApi;
+
 	/**
 	 * 活动列表
 	 */
 	@Override
 	public PageList adminlist(AdminActivityInfoVoteDto param) {
-		PageHelper.startPage(param.getPageNo(), param.getPageSize());
+		Page page = PageHelper.startPage(param.getPageNo(), param.getPageSize());
 		List<AdminActivityVoteVo> list = activityVoteDao.adminlist(param);
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(param.getPageNo(), param.getPageSize(), list, 0L);
@@ -71,13 +77,17 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 		for (AdminActivityVoteVo activity : list) {
 			try {
 				//设置分享数
-				/*Integer count = eventReportDao.getShareCount(activity.getId().toString(),"1006");
-				System.out.println();
-				if(count!=null && count>0){
-					activity.setShareCount(count.longValue());
-				}else{
-					activity.setShareCount(0l);
-				}*/
+				Long count = 0L;
+				Response<Map<String, Long>> mapResponse = null;
+				try {
+					mapResponse = countApi.getCount(BehaviorEnum.Share.getCode(),activity.getKid(),null);
+				} catch (Exception e) {
+					logger.error("查询分享数异常:",e);
+				}
+				if (null!=mapResponse && mapResponse.success()){
+					count = mapResponse.getData().get(BehaviorEnum.Share.getKey());
+				}
+				activity.setShareCount(count);
 				//设置总投票数
 				Integer voteTotalCount = activityVoteDao.getVoteTotalCount(activity.getKid());
 				if(voteTotalCount!=null && voteTotalCount>0){
@@ -101,7 +111,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 				logger.info("获取报名列表失败");
 			}
 		}
-		return new PageList(param.getPageNo(), param.getPageSize(), list, activityVoteDao.adminlistCount(param));
+		return new PageList(param.getPageNo(), param.getPageSize(), list, page.getTotal());
 	}
 
 	@Override
@@ -144,7 +154,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 
 	@Override
 	public PageList<AdminActivityVoteDetailVo> selectRankList(AdminActivityVoteDetailDto adminActivityVoteDetailDto) {
-		PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
+		Page page = PageHelper.startPage(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize());
 		List<AdminActivityVoteDetailVo> list = activityParticipationDao.selectRankList(adminActivityVoteDetailDto.getActivityInfoId());
 		if (CollectionUtils.isEmpty(list)) {
 			return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list, 0L);
@@ -163,15 +173,15 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 			} catch (Exception e) {
 				logger.error("查询用户信息异常",e);
 			}
-			if(users.success()&&users.getData().get(detailVo.getCreateUserId().toString())!=null){
+			if(null!=users && users.success()&&users.getData().get(detailVo.getCreateUserId().toString())!=null){
 				detailVo.setNickName(users.getData().get(detailVo.getCreateUserId().toString()).getUserNickName());
 			}
 		}
 		return new PageList(adminActivityVoteDetailDto.getPageNo(), adminActivityVoteDetailDto.getPageSize(), list,
-				activityParticipationDao.adminRanklistCount(adminActivityVoteDetailDto));
+				page.getTotal());
 	}
 
-	// TODO 恭喜！您在YYYY中获得了第X名，奖励将由工作人员联系您后进行发放，先去看看获得的奖励吧！
+	// 恭喜！您在YYYY中获得了第X名，奖励将由工作人员联系您后进行发放，先去看看获得的奖励吧！
 	public Integer sendMessageVote(ActivityInfo activityInfo) {
 		try {
 			/*CustInfo custInfo = new CustInfo();
@@ -203,7 +213,6 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 
 	@Override
 	public Integer updateSave(ActivityInfo activity) {
-		// TODO Auto-generated method stub
 		Assert.notNull(activity, "activity 不能为空");
 		return activityVoteDao.update(activity);
 	}

@@ -16,9 +16,17 @@ public class AdminActivityVoteRecordDto extends ActivityVoteRecord {
   	private Date endCreateDate;		// 结束  参与时间
   	private List<String> custIds;
 	private Integer pageNo = 1;
-	
 	private Integer pageSize = 10;
-	
+    private Integer type;
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     public Integer getPageNo() {
 		return pageNo;
 	}

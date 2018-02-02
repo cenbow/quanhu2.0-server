@@ -88,12 +88,20 @@ public interface OrderIntegralHistoryService {
 	/**
 	 * 统计用户收益
 	 * @param custId
+	 * @param productType
+	 * @param orderType
 	 * @param startTime
 	 * @param endTime
-	 * @param type
 	 * @return
 	 */
 	public Long sumCost(String custId, Integer productType ,Integer orderType,String startTime ,String endTime);
 
 
+	/**
+	 * 批量查询用户总收益
+	 *
+	 * @param userIdList
+	 * @return
+	 */
+	Map<Long, Long> getUserTotalIntegral(List<Long> userIdList);
 }

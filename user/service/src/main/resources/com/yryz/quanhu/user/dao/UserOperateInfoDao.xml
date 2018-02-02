@@ -23,7 +23,7 @@
 	</resultMap>
 	<sql id="Base_Column_List">
 		a.kid, a.user_id,a.user_inviter_id, a.user_reg_channel,
-		a.user_reg_inviter_code, a.qh_user_inviter_code, a.user_reg_inviter_num,
+		a.user_reg_inviter_code, a.user_inviter_code, a.user_reg_inviter_num,
 		a.create_date, a.last_update_date
 	</sql>
 	
@@ -156,4 +156,69 @@
 		update qh_user_operate_info set user_reg_inviter_num = user_reg_inviter_num +
 		1 where user_inviter_code = #{inviterCode}
 	</update>
+
+
+
+	<select id="getUserByUserIds" parameterType="com.yryz.quanhu.user.dto.UserInvitationDto"
+			resultType="com.yryz.quanhu.user.dto.UserInvitationDto">
+
+		SELECT bs.user_id,bs.user_phone,bs.user_nick_name,bs.create_date,opt.user_reg_inviter_num,opt.user_inviter_id
+		FROM qh_user_operate_info opt
+		LEFT JOIN qh_user_baseinfo bs on opt.user_id = bs.user_id
+		WHERE bs.user_id IS NOT NULL
+		<choose>
+			<when test="userIds != null and userIds.size > 0">
+				AND bs.user_id IN
+				<foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+					#{userId,jdbcType=VARCHAR}
+				</foreach>
+			</when>
+			<otherwise>
+				AND FALSE
+			</otherwise>
+		</choose>
+
+	</select>
+
+
+	<select id="getUserByInviterIds" parameterType="com.yryz.quanhu.user.dto.UserInvitationDto"
+			resultType="com.yryz.quanhu.user.dto.UserInvitationDto">
+		SELECT bs.user_id,bs.user_phone,bs.user_nick_name,bs.create_date,opt.user_reg_inviter_num,opt.user_inviter_id
+		FROM qh_user_operate_info opt
+		LEFT JOIN qh_user_baseinfo bs on opt.user_id = bs.user_id
+		WHERE bs.user_id IS NOT NULL
+		<choose>
+			<when test="userIds != null and userIds.size > 0">
+				AND opt.user_inviter_id IN
+				<foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+					#{userId,jdbcType=VARCHAR}
+				</foreach>
+			</when>
+			<otherwise>
+				AND FALSE
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="getUserByParam" parameterType="com.yryz.quanhu.user.dto.UserInvitationDto"
+			resultType="com.yryz.quanhu.user.dto.UserInvitationDto">
+		SELECT bs.user_id,bs.user_phone,bs.user_nick_name,bs.create_date,opt.user_reg_inviter_num,opt.user_inviter_id
+		FROM qh_user_operate_info opt
+		LEFT JOIN qh_user_baseinfo bs on opt.user_id = bs.user_id
+		WHERE bs.user_id IS NOT NULL
+		<if test="userPhone != null and userPhone != '' ">
+			AND bs.user_phone = #{userPhone,jdbcType=VARCHAR}
+		</if>
+		<if test="userNickName != null and userNickName != ''">
+			AND bs.user_nick_name = #{userNickName,jdbcType=VARCHAR}
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND bs.create_date &gt;= #{startDate}
+		</if>
+		<if test="endDate !=null and endDate != ''">
+			AND bs.create_date &lt;= #{endDate}
+		</if>
+		ORDER BY bs.create_date
+	</select>
 </mapper>

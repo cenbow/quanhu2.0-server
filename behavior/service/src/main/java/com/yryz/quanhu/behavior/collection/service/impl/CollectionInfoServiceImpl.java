@@ -15,6 +15,8 @@ import com.yryz.quanhu.behavior.collection.service.CollectionInfoService;
 import com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceVo;
@@ -27,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CollectionInfoServiceImpl implements CollectionInfoService {
@@ -52,16 +51,25 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
     @Reference
     CountApi countApi;
 
+    @Reference
+    CoterieApi coterieApi;
+
     /**
      * 收藏
      * @param   collectionInfoDto
      * @return
      * */
     public void single(CollectionInfoDto collectionInfoDto) {
-        //获取资源实体
-        Response<ResourceVo> result = resourceApi.getResourcesById(collectionInfoDto.getResourceId().toString());
-        if(!result.success()) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+        Response<ResourceVo> result = null;
+        try {
+            //获取资源实体
+            result = resourceApi.getResourcesById(collectionInfoDto.getResourceId().toString());
+            if(!result.success()) {
+                throw new QuanhuException(ExceptionEnum.SysException);
+            }
+        } catch (Exception e) {
+            logger.error("获取资源失败", e);
+            throw QuanhuException.busiError("资源不存在或者已删除");
         }
         ResourceVo resourceVo = result.getData();
         if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
@@ -116,6 +124,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         if(!CollectionUtils.isEmpty(list)) {
             Set<String> userSet = new HashSet<>();
             Set<String> resourceSet = new HashSet<>();
+            List<Long> coterieIdList = new ArrayList<>();
             for(CollectionInfoVo collectionInfoVo : list) {
                 if(collectionInfoVo.getUserId() != null) {
                     userSet.add(collectionInfoVo.getUserId().toString());
@@ -123,12 +132,19 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
                 if(collectionInfoVo.getResourceId() != null) {
                     resourceSet.add(collectionInfoVo.getResourceId().toString());
                 }
+                if(collectionInfoVo.getCoterieId() != null) {
+                    coterieIdList.add(collectionInfoVo.getCoterieId());
+                }
                 collectionInfoVo.setDelFlag(ResourceEnum.DEL_FLAG_TRUE);
             }
             //设置用户
             this.setUserInfo(list, userSet);
             //设置资源
             this.setResourceInfo(list, resourceSet);
+            //设置私圈名字
+            if(!CollectionUtils.isEmpty(coterieIdList)) {
+                this.setCoterieInfo(list, coterieIdList);
+            }
         }
         PageList<CollectionInfoVo> pageList = new PageList<>();
         pageList.setCurrentPage(collectionInfoDto.getCurrentPage());
@@ -150,30 +166,60 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
     }
 
     private void setUserInfo(List<CollectionInfoVo> list, Set<String> set) {
-        Response<Map<String, UserSimpleVO>> result = userApi.getUserSimple(set);
-        if(result.success()) {
-            Map<String, UserSimpleVO> simple = result.getData();
-            list.stream()
-                    .filter(detailVo -> detailVo.getUserId() != null)
-                    .forEach(detailVo -> detailVo.setUser(simple.get(detailVo.getUserId().toString())));
+        try {
+            Response<Map<String, UserSimpleVO>> result = userApi.getUserSimple(set);
+            if(result.success()) {
+                Map<String, UserSimpleVO> simple = result.getData();
+                list.stream()
+                        .filter(detailVo -> detailVo.getUserId() != null)
+                        .forEach(detailVo -> detailVo.setUser(simple.get(detailVo.getUserId().toString())));
+            }
+        } catch (Exception e) {
+            logger.error("获取用户信息 失败", e);
         }
     }
 
     private void setResourceInfo(List<CollectionInfoVo> list, Set<String> set) {
-        Response<Map<String, ResourceVo>> result = resourceApi.getResourcesByIds(set);
-        if(result.success()) {
-            Map<String, ResourceVo> resourceVoMap = result.getData();
-            list.stream()
-                    .filter(detailVo -> detailVo.getResourceId() != null)
-                    .forEach(detailVo -> {
-                        ResourceVo resourceVo = resourceVoMap.get(detailVo.getResourceId().toString());
-                        if(resourceVo != null) {
-                            detailVo.setDelFlag(resourceVo.getDelFlag());
-                            detailVo.setTitle(resourceVo.getTitle());
-                            detailVo.setContent(resourceVo.getContent());
-                            detailVo.setExtJson(resourceVo.getExtJson());
-                        }
-                    });
+        try {
+            Response<Map<String, ResourceVo>> result = resourceApi.getResourcesByIds(set);
+            if(result.success()) {
+                Map<String, ResourceVo> resourceVoMap = result.getData();
+                list.stream()
+                        .filter(detailVo -> detailVo.getResourceId() != null)
+                        .forEach(detailVo -> {
+                            ResourceVo resourceVo = resourceVoMap.get(detailVo.getResourceId().toString());
+                            if(resourceVo != null) {
+                                detailVo.setDelFlag(resourceVo.getDelFlag());
+                                detailVo.setTitle(resourceVo.getTitle());
+                                detailVo.setContent(resourceVo.getContent());
+                                detailVo.setExtJson(resourceVo.getExtJson());
+                            }
+                        });
+
+            }
+        } catch (Exception e) {
+            logger.error("获取资源信息 失败", e);
+        }
+    }
+
+    private void setCoterieInfo(List<CollectionInfoVo> list, List<Long> coterieList) {
+        try {
+            Response<List<Coterie>> result = coterieApi.getByKids(coterieList);
+            if(result.success() && result.getData() != null) {
+                Map<Long, Coterie> resourceVoMap = new HashMap<>();
+                List<Coterie> data = result.getData();
+                data.stream().forEach(coterie -> resourceVoMap.put(coterie.getCoterieId(), coterie));
+                list.stream()
+                        .filter(collectionInfoVo -> collectionInfoVo.getCoterieId() != null)
+                        .forEach(collectionInfoVo -> {
+                            Coterie coterie = resourceVoMap.get(collectionInfoVo.getCoterieId());
+                            if(coterie != null) {
+                                collectionInfoVo.setCoterieName(coterie.getName());
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            logger.error("获取私圈信息 失败", e);
         }
     }
 

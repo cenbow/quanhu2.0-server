@@ -1,5 +1,7 @@
 package com.yryz.quanhu.order.score.manage.dao.persistence;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.yryz.common.response.PageList;
@@ -22,5 +24,5 @@ public interface ScoreEventManageDao {
 
     PageList<ScoreEventInfo> getAll();
     
-    PageList<ScoreEventInfo> getPage();
+    List<ScoreEventInfo> getPage(ScoreEventInfo se);
 }

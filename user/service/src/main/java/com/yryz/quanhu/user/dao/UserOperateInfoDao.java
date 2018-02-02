@@ -8,7 +8,10 @@
 package com.yryz.quanhu.user.dao;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.yryz.quanhu.user.dto.UserInvitationDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -74,4 +77,12 @@ public interface UserOperateInfoDao {
 	 * @Description 查询用户邀请人数
 	 */
 	int getInviterNum(@Param("userId") Long userId);
+
+
+	List<UserInvitationDto> getUserByParam(UserInvitationDto dto);
+
+	List<UserInvitationDto> getUserByUserIds(@Param("userIds")Set<Long> userIds);
+
+	List<UserInvitationDto> getUserByInviterIds(@Param("userIds")Set<Long> userIds);
+
 }

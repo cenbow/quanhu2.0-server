@@ -32,6 +32,9 @@
     <if test="thirdId != null and thirdId != '' ">
     	and third_id = #{thirdId}
     </if>
+    <if test="appId != null and appId !=''">
+    	and app_id = #{appId}
+    </if>
   </select>
   
   <select id="getByUserIds" resultMap="BaseResultMap">
@@ -46,9 +49,9 @@
 	</foreach>
   </select>
   
-  <delete id="delete" parameterType="java.lang.Long" >
-    delete from qh_activity_temp_user
-    where id = #{id,jdbcType=BIGINT}
+  <delete id="delete" >
+    update qh_activity_temp_user set del_flag = 11
+    where kid = #{kid}
   </delete>
   
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.ActivityTempUser" >

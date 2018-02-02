@@ -34,6 +34,11 @@ public class Dymaic implements Serializable {
     private Long resourceId;
 
     /**
+     * 转发ID
+     */
+    private Long transmitId;
+
+    /**
      * 转发理由
      */
     private String transmitNote;
@@ -101,6 +106,14 @@ public class Dymaic implements Serializable {
 
     public void setResourceId(Long resourceId) {
         this.resourceId = resourceId;
+    }
+
+    public Long getTransmitId() {
+        return transmitId;
+    }
+
+    public void setTransmitId(Long transmitId) {
+        this.transmitId = transmitId;
     }
 
     public String getTransmitNote() {

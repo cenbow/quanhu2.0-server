@@ -83,6 +83,10 @@ public class DymaicServiceImpl {
         //mq
         dymaicSender.directSend(dymaic);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("send " + dymaic.getKid());
+        }
+
         return true;
     }
 
@@ -109,6 +113,9 @@ public class DymaicServiceImpl {
         dymaicCache.removeSendList(userId, kid);
         dymaicCache.removeTimeLine(userId, kid);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("delete " + kid);
+        }
         return true;
     }
 
@@ -131,6 +138,10 @@ public class DymaicServiceImpl {
 
         //update cache
         dymaicCache.addDynamic(dymaic);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("shelve " + kid);
+        }
         return true;
     }
 
@@ -366,7 +377,6 @@ public class DymaicServiceImpl {
 
         //分页检索
         Page<Dymaic> page = PageHelper.startPage(queryDymaicDTO.getCurrentPage(), queryDymaicDTO.getPageSize());
-        page.setCount(false);
         dymaicDao.queryAll(queryDymaicDTO);
 
         List<DymaicVo> listVo = new ArrayList<>();
@@ -382,6 +392,7 @@ public class DymaicServiceImpl {
 
                 listVo.add(vo);
             }
+            result.setCount(page.getTotal());
         }
 
         result.setEntities(listVo);

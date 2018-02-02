@@ -1,11 +1,9 @@
 package com.yryz.quanhu.coterie.coterie.service;
 
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.coterie.exception.ServiceException;
-import com.yryz.quanhu.coterie.coterie.vo.Coterie;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieAuditInfo;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.coterie.vo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -238,4 +236,10 @@ public interface CoterieApi {
 	 * @return
 	 */
 	Response<List<Coterie>> getByKids(List<Long> kidList);
+
+
+	Response<PageList<CoterieInfo>> getCoterieByPage(CoterieSearchParam param);
+
+
+
 }

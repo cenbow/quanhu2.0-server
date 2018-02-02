@@ -14,6 +14,7 @@ import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.count.service.CountService;
+import com.yryz.quanhu.behavior.count.service.CountStatisticsService;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

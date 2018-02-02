@@ -1,5 +1,6 @@
 package com.yryz.quanhu.coterie.coterie.service;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
@@ -241,4 +242,7 @@ public interface CoterieService {
 	 * @return
 	 */
     List<Coterie> getByKids(List<Long> kidList);
+
+
+	PageList<CoterieInfo> queryCoterieByPage(CoterieSearchParam param);
 }

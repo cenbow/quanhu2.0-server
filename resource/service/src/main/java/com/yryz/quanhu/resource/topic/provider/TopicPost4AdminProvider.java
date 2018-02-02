@@ -46,10 +46,11 @@ public class TopicPost4AdminProvider implements TopicPost4AdminApi {
         }
     }
 
+
     @Override
-    public Response<Integer> deleteTopicPost(Long kid, Long userId) {
+    public Response<Integer> shelve(Long kid, Byte shelveFlag) {
         try {
-            Integer data = this.topicPostService.deleteTopicPost(kid, userId);
+            Integer data = this.topicPostService.shelve(kid,shelveFlag);
             return ResponseUtils.returnObjectSuccess(data);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
@@ -57,11 +58,6 @@ public class TopicPost4AdminProvider implements TopicPost4AdminApi {
             logger.error("注册未知异常", e);
             return ResponseUtils.returnException(e);
         }
-    }
-
-    @Override
-    public Response<Integer> shelve(Long kid, Byte shelveFlag) {
-        return null;
     }
 
 

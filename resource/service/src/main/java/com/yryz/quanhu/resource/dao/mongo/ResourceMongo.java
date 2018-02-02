@@ -173,17 +173,17 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				criteria = Criteria.where("resourceId").is(resourceModel.getResourceId()).andOperator(criteria);
 			}
 			if(resourceModel.getUserId() != null){
-				criteria = Criteria.where("custId").is(resourceModel.getUserId()).andOperator(criteria);
+				criteria = Criteria.where("userId").is(resourceModel.getUserId()).andOperator(criteria);
 			}
 			if(StringUtils.isNotEmpty(resourceModel.getTalentType())){
 				criteria = Criteria.where("talentType").is(resourceModel.getTalentType()).andOperator(criteria);
 			}
-			if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
-				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
-			} else if("0".equals(resourceModel.getCoterieId())){
+			if("0".equals(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").is(null).andOperator(criteria);
 			} else if("1".equals(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").not().andOperator(criteria);
+			} else {
+				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
 			}
 			
 			//标题，正文，简介模糊匹配
@@ -256,5 +256,90 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 		query.limit(limit);
 		return find(query);
 	}
+	
+	public long count(ResourceModel resourceModel ,String startTime , String endTime){
+		Query query = new Query();
+		Criteria criteria = new Criteria();
+		if(resourceModel != null){
+			
+			criteria = Criteria.where("delFlag").is(ResourceEnum.DEL_FLAG_FALSE);
+			
+			//资源ID，用户ID，是否达人，私圈ID
+			if(resourceModel.getResourceId() != null){
+				criteria = Criteria.where("resourceId").is(resourceModel.getResourceId()).andOperator(criteria);
+			}
+			if(resourceModel.getUserId() != null){
+				criteria = Criteria.where("custId").is(resourceModel.getUserId()).andOperator(criteria);
+			}
+			if(StringUtils.isNotEmpty(resourceModel.getTalentType())){
+				criteria = Criteria.where("talentType").is(resourceModel.getTalentType()).andOperator(criteria);
+			}
+			if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
+				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
+			} else if("0".equals(resourceModel.getCoterieId())){
+				criteria = Criteria.where("coterieId").is(null).andOperator(criteria);
+			} else if("1".equals(resourceModel.getCoterieId())){
+				criteria = Criteria.where("coterieId").not().andOperator(criteria);
+			}
+			
+			//标题，正文，简介模糊匹配
+			if(StringUtils.isNotEmpty(resourceModel.getTitle())){
+				criteria = Criteria.where("title").regex(resourceModel.getTitle()).andOperator(criteria);
+			}
+			if(StringUtils.isNotEmpty(resourceModel.getContent())){
+				criteria = Criteria.where("content").regex(resourceModel.getContent()).andOperator(criteria);
+			}
+			
+			//公开状态
+			if(resourceModel.getPublicState() != null){
+				criteria = Criteria.where("publicState").is(resourceModel.getPublicState()).andOperator(criteria);
+			}
+			
+			//资源类型,多条件查询，resourceType支持多类型的枚举值，以,分隔
+			if(StringUtils.isNotEmpty(resourceModel.getModuleEnum())){
+				Criteria resouceTypeCriteria = Criteria.where("moduleEnum");
+				String[] resourceTypes = resourceModel.getModuleEnum().split(",");
+				if(resourceTypes != null && resourceTypes.length == 1){
+					resouceTypeCriteria = resouceTypeCriteria.is(resourceTypes[0]);
+				} else {
+					List<String> resourceList = new ArrayList<>();
+					for (int i = 0; i < resourceTypes.length; i++) {
+						String resourceType = resourceTypes[i];
+						resourceList.add(resourceType);
+					}
+					resouceTypeCriteria.in(resourceList);
+				}
+				criteria = resouceTypeCriteria.andOperator(criteria);
+			}
+			if(StringUtils.isNotEmpty(resourceModel.getRecommend())){
+				criteria = Criteria.where("recommend").is(resourceModel.getRecommend()).andOperator(criteria);
+			}
+			
+			if(StringUtils.isNotEmpty(startTime) || StringUtils.isNotEmpty(endTime)){
+				Criteria createTimeCriteria = Criteria.where("createTime");
+				if(startTime != null){
+					Date dstartTime = DateUtils.parseDate(startTime);
+					if(dstartTime != null){
+						//大于等于开始时间
+						createTimeCriteria = createTimeCriteria.gte(dstartTime.getTime());
+					}
+				}
+				if(endTime != null){
+					Date dendTime = DateUtils.parseDate(endTime);
+					if(dendTime != null){
+						//大于等于结束时间
+						createTimeCriteria = createTimeCriteria.lt(dendTime.getTime());
+					}
+				}
+				criteria = createTimeCriteria.andOperator(criteria);
+			}
+			
+		}
+		
+		query.addCriteria(criteria);
+		
+		return mongoTemplate.count(query, ResourceModel.class);
+	}
+
 
 }

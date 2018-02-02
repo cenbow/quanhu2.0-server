@@ -36,7 +36,7 @@ public class TopicPost implements Serializable {
 
     private String gps;
 
-    private Integer coterieId;
+    private Long coterieId;
 
     public Long getId() {
         return id;
@@ -166,11 +166,11 @@ public class TopicPost implements Serializable {
         this.gps = gps == null ? null : gps.trim();
     }
 
-    public Integer getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(Integer coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 }

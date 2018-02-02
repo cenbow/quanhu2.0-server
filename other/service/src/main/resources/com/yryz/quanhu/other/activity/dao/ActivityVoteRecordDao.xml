@@ -192,4 +192,35 @@
 		</where>
 	</select>
 
+	<select id="selectTotalCount" parameterType="com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto"
+			resultType="com.yryz.quanhu.other.activity.vo.AdminActivityCountVo">
+		select DATE_FORMAT(create_date, '%Y%m%d') date, sum(vote_no) totalNo
+		from qh_activity_vote_record
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+		<if test="beginCreateDate != null">
+			and  create_date >= #{beginCreateDate, jdbcType=TIMESTAMP}
+		</if>
+		<if test="endCreateDate != null">
+			<![CDATA[
+				and  create_date <= #{endCreateDate, jdbcType=TIMESTAMP}
+				]]>
+		</if>
+		group by date(create_date)
+	</select>
+
+	<select id="selectRecordVoteCount" parameterType="com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto"
+			resultType="int">
+		select count(1)
+		from qh_activity_vote_record
+		where activity_info_id = #{activityInfoId, jdbcType=BIGINT}
+		<if test="beginCreateDate != null">
+			and  create_date >= #{beginCreateDate, jdbcType=TIMESTAMP}
+		</if>
+		<if test="endCreateDate != null">
+			<![CDATA[
+				and  create_date <= #{endCreateDate, jdbcType=TIMESTAMP}
+				]]>
+		</if>
+	</select>
+
 </mapper>

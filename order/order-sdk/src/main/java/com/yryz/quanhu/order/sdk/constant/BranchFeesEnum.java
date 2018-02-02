@@ -74,7 +74,7 @@ public enum BranchFeesEnum {
 
     // 0消费减费，1消费加费，2积分减费，3积分加费
     private List<FeeDetail> getNoAnswerFee() {
-        FeeDetail detail1 = new FeeDetail("fromId", 100L, 1, OrderDescEnum.COTERIE_ASK_RETURN);
+        FeeDetail detail1 = new FeeDetail("toId", 100L, 1, OrderDescEnum.COTERIE_ASK_RETURN);
         FeeDetail detail2 = new FeeDetail(AccountEnum.SYSID, 100L, 2, OrderDescEnum.COTERIE_ASK_RETURN);
         return Lists.newArrayList(detail1, detail2);
     }

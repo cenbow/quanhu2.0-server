@@ -142,7 +142,7 @@ public class CoterieController {
 
         //todo 加入方式与是否审核互斥
 
-        if (config.getJoinFee() != 0) {
+        if (null != config.getJoinFee() && config.getJoinFee() != 0) {
             record.setJoinCheck(10);
         }
 

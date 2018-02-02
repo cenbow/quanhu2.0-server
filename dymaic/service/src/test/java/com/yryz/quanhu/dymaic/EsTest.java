@@ -1,18 +1,16 @@
 package com.yryz.quanhu.dymaic;
 
-import javax.annotation.Resource;
-
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
 import com.yryz.quanhu.dymaic.service.ElasticsearchService;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.vo.StarInfoVO;
+import com.yryz.quanhu.user.vo.UserInfoVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -30,20 +28,32 @@ public class EsTest {
 //    @Resource
 //    private ElasticsearchTemplate elasticsearchTemplate;
 
-    /*@Test
+    @Test
     public void searchStarUserTest() {
         StarInfoDTO starInfoDTO = new StarInfoDTO();
         starInfoDTO.setTagId(12L);
-        starInfoDTO.setCurrentPage(0);
+        starInfoDTO.setCurrentPage(1);
         starInfoDTO.setPageSize(5);
-        starInfoDTO.setUserId(737237750614581248L);
         Response<PageList<StarInfoVO>> pageListResponse = elasticsearchService.searchStarUser(starInfoDTO);
         System.out.println("pageListResponse: " + GsonUtils.parseJson(pageListResponse));
-    }*/
+    }
 
     @Test
     public void buildTest() {
         elasticsearchService.rebuildUserInfo();
+    }
+
+    @Test
+    public void adminTest() {
+        AdminUserInfoDTO dto = new AdminUserInfoDTO();
+        dto.setStartDate("2018-01-01");
+        dto.setEndDate("2018-03-01");
+//        dto.setPhone("13");
+//        dto.setNickName("q");
+        dto.setAuditStatus((byte) 11);
+        dto.setGrowLevel("5");
+        Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
+        System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }
 
 

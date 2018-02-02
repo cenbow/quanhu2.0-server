@@ -1,9 +1,12 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.other.activity.dao.ActivityEnrolConfigDao;
 import com.yryz.quanhu.other.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.other.activity.dao.ActivityRecordDao;
@@ -50,10 +53,8 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	private IdAPI idApi;
 	@Reference(check=false)
 	UserApi userApi;
-	/*@Autowired
-	EventReportDao eventReportDao;*/
-	/*@Autowired
-	CustAPI custAPI;*/
+	@Reference(check=false)
+	CountApi countApi;
 	private Logger logger = LoggerFactory.getLogger(AdminActivitySignUpServiceImpl.class);
 	
 	/**
@@ -106,16 +107,24 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	@Override
 	public PageList<AdminActivityInfoSignUpVo> adminlist(Integer pageNo, Integer pageSize,
 														 AdminActivityInfoSignUpDto adminActivityInfoSignUpDto) {
-		PageHelper.startPage(pageNo, pageSize);
+		Page page = PageHelper.startPage(pageNo, pageSize);
 		List<AdminActivityInfoSignUpVo> list = activityInfoDao.selectSignAdminlist((pageNo-1)*pageSize, pageSize, adminActivityInfoSignUpDto);
 		if(CollectionUtils.isEmpty(list)){
 			return new PageList<AdminActivityInfoSignUpVo>(pageNo,pageSize,list,0L);
 		}
 		Date date = new Date();
 		for(AdminActivityInfoSignUpVo adminActivityInfoSignUpVo :list){
-			//TODO 设置分享数
-			Integer count = null;
-			//Integer count = eventReportDao.getShareCount(adminActivityInfoSignUpVo.getId().toString(),"1006");
+			//设置分享数
+			Integer count = 0;
+			Response<Map<String, Long>> mapResponse = null;
+			try {
+				mapResponse = countApi.getCount(BehaviorEnum.Share.getCode(),adminActivityInfoSignUpVo.getKid(),null);
+			} catch (Exception e) {
+				logger.error("查询分享数异常:",e);
+			}
+			if (null!=mapResponse && mapResponse.success()){
+				count = mapResponse.getData().get(BehaviorEnum.Share.getKey()).intValue();
+			}
 			if(count!=null && count>0){
 				adminActivityInfoSignUpVo.setShareCount(count);
 			}else{
@@ -150,7 +159,7 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			}
 			
 		}
-		return new PageList<AdminActivityInfoSignUpVo>(pageNo,pageSize,list,activityInfoDao.selectSignAdminlistCount(adminActivityInfoSignUpDto));
+		return new PageList<AdminActivityInfoSignUpVo>(pageNo,pageSize,list,page.getTotal());
 	}
 	
 	/**
@@ -226,7 +235,7 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	@Override
 	public PageList<AdminActivityRecordVo> attendlist(Integer pageNo, Integer pageSize,
 													  AdminActivityRecordVo adminActivityRecordVo) {
-		PageHelper.startPage(pageNo, pageSize);
+		Page page = PageHelper.startPage(pageNo, pageSize);
 		List<AdminActivityRecordVo> list = activityRecordDao.attendlist(pageNo, pageSize, adminActivityRecordVo);
 		if(CollectionUtils.isEmpty(list)){
 			return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,0L);
@@ -243,14 +252,14 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			vo.setNickName(users.getData().get(vo.getCreateUserId().toString()).getUserNickName());
 			vo.setCustPhone(users.getData().get(vo.getCreateUserId().toString()).getUserPhone());
 		}
-		return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,activityRecordDao.attendlistCount(adminActivityRecordVo));
+		return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,page.getTotal());
 	}
 	/**
 	 * (后台)所有上线的活动列表
 	 * */
 	@Override
 	public PageList<AdminActivityInfoVo> adminAllSharelist(Integer pageNo, Integer pageSize, AdminActivityInfoDto adminActivityInfoDto) {
-		PageHelper.startPage(pageNo, pageSize);
+		Page page = PageHelper.startPage(pageNo, pageSize);
 		List<AdminActivityInfoVo> list = activityInfoDao.adminAllSharelist(pageNo, pageSize, adminActivityInfoDto);
 		if(CollectionUtils.isEmpty(list)){
 			return new PageList<AdminActivityInfoVo>(pageNo,pageSize,list,0L);
@@ -271,7 +280,7 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			}
 
 		}
-		return new PageList<AdminActivityInfoVo>(pageNo,pageSize,list,activityInfoDao.adminAllSharelistCount(adminActivityInfoDto));
+		return new PageList<AdminActivityInfoVo>(pageNo,pageSize,list,page.getTotal());
 	}
 	
 	/**

@@ -131,6 +131,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         voteDetail.setShelveFlag(10);
         //保存参与信息
         activityVoteDetailDao.insertByPrimaryKeySelective(voteDetail);
+        activityVoteDto.setKid(voteDetail.getKid());
         //进入资源库
         this.setResource(voteDetail, activityVoteInfoVo);
         //递增参与人数

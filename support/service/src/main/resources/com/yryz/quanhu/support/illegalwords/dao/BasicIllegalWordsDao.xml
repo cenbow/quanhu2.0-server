@@ -28,6 +28,10 @@
     from qh_illegal_words order by id asc
   </select>
   
+  <select id="selectMaxLastUpdateTime" resultType="java.lang.String" >
+    SELECT  MAX(last_update_date) last_update_date FROM `qh_illegal_words` w
+  </select>
+  
   <delete id="delete" >
     delete from qh_illegal_words
     where id = #{id}

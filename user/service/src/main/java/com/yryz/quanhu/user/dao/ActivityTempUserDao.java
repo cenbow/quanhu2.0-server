@@ -25,7 +25,7 @@ public interface ActivityTempUserDao {
 
     int insert(ActivityTempUser record);
 
-    ActivityTempUser selectOne(@Param("kid")Long kid,@Param("thirdId")String thirdId);
+    ActivityTempUser selectOne(@Param("kid")Long kid,@Param("thirdId")String thirdId,@Param("appId")String appId);
     
     List<ActivityTempUser> getByUserIds(List<String> userIds);
 

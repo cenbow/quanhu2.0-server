@@ -71,6 +71,15 @@ public class CoterieInfo implements Serializable{
 	private Integer shelveFlag;
 	private Integer  deleted;
 
+
+
+	private Long auditUserId;
+	private String auditRemark;
+	private Long lastUpdateUserId;
+	private Date processTime;
+	private Date lastUpdateDate;
+
+
 	public Integer getDeleted() {
 		return deleted;
 	}
@@ -365,5 +374,45 @@ public class CoterieInfo implements Serializable{
 		
 		return true;
 	}
-	
+
+	public Long getAuditUserId() {
+		return auditUserId;
+	}
+
+	public void setAuditUserId(Long auditUserId) {
+		this.auditUserId = auditUserId;
+	}
+
+	public String getAuditRemark() {
+		return auditRemark;
+	}
+
+	public void setAuditRemark(String auditRemark) {
+		this.auditRemark = auditRemark;
+	}
+
+	public Long getLastUpdateUserId() {
+		return lastUpdateUserId;
+	}
+
+	public void setLastUpdateUserId(Long lastUpdateUserId) {
+		this.lastUpdateUserId = lastUpdateUserId;
+	}
+
+	public Date getProcessTime() {
+		return processTime;
+	}
+
+	public void setProcessTime(Date processTime) {
+		this.processTime = processTime;
+	}
+
+	public Date getLastUpdateDate() {
+		return lastUpdateDate;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+		this.lastUpdateDate = lastUpdateDate;
+	}
 }
+
