@@ -12,13 +12,15 @@ import javax.annotation.Resource;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Sets;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.PageModel;
 import com.yryz.quanhu.dymaic.canal.entity.*;
-import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventAcount;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserStarApi;
@@ -326,6 +328,29 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		rebuildTopicPostInfo();
 	}
 
+	@Override
+	public Response<PageList<UserInfoVO>> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
+		try {
+			logger.info("adminSearchUser request, adminUserDTO: {}", GsonUtils.parseJson(adminUserDTO));
+			checkAdminParam(adminUserDTO);
+			List<UserInfo> userInfoList = userRepository.adminSearchUser(adminUserDTO);
+			List<UserInfoVO> userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
+			PageList<UserInfoVO> pageList = new PageModel<UserInfoVO>().getPageList(userInfoVOS);
+			return ResponseUtils.returnObjectSuccess(pageList);
+		} catch (Exception e) {
+			logger.error("adminSearchUser error", e);
+			return ResponseUtils.returnException(e);
+		}
+
+	}
+
+	private void checkAdminParam(AdminUserInfoDTO adminUserDTO) {
+		if (adminUserDTO == null) {
+			throw QuanhuException.busiError("adminUserDTO null");
+		}
+	}
+
+
 	private void rebuildReleaseInfo() {
 		String currentDate = DateUtils.getDate();
 		Response<List<Long>> rst = releaseInfoApi.getKidByCreatedate("2010-01-01 00:00:00", currentDate + " 23:59:59");
@@ -535,7 +560,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			UserRegLogVO regLogVO = regLogVOMap.get(userInfo.getUserId());
 			if (regLogVO != null) {
 				UserRegLog userRegLog = new UserRegLog();
-				BeanUtils.copyProperties(userRegLog, regLogVO);
+				com.yryz.common.utils.BeanUtils.copyProperties(userRegLog, regLogVO);
 				userInfo.setUserRegLog(userRegLog);
 
 			}

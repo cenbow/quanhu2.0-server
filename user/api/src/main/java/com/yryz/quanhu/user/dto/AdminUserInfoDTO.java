@@ -12,6 +12,20 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class AdminUserInfoDTO implements Serializable{
+
+	private Integer pageNo = 1;
+
+	private Integer pageSize = 10;
+
+	private String keyword;
+
+
+
+	//用户信息
+	/**
+	 * 用户id
+	 */
+	private Long userId;
 	/**
 	 * 昵称
 	 */
@@ -44,7 +58,109 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 用户角色 10-普通用户 11-达人 
 	 */
 	private Integer userRole;
-	private List<Long> userIds;
+
+
+	//达人信息
+	/**
+	 * 认证类型 10:个人认证 11:企业/机构认证
+	 */
+	private Byte authType;
+
+	/**
+	 * 认证方式 10:用户申请 11:平台设置
+	 */
+	private Byte authWay;
+
+	/**
+	 * 审核状态 10:待审核 11:审核通过 12:审核失败 13:取消认证
+	 */
+	private Byte auditStatus;
+
+
+	//注册信息
+	/**
+	 * 渠道号
+	 */
+	private String activityChannelCode;
+
+	//积分信息
+	/**
+	 * 成长级别
+	 */
+	private String growLevel;
+
+	public String getGrowLevel() {
+		return growLevel;
+	}
+
+	public void setGrowLevel(String growLevel) {
+		this.growLevel = growLevel;
+	}
+
+	public Byte getAuthType() {
+		return authType;
+	}
+
+	public void setAuthType(Byte authType) {
+		this.authType = authType;
+	}
+
+	public Byte getAuthWay() {
+		return authWay;
+	}
+
+	public void setAuthWay(Byte authWay) {
+		this.authWay = authWay;
+	}
+
+	public Byte getAuditStatus() {
+		return auditStatus;
+	}
+
+	public void setAuditStatus(Byte auditStatus) {
+		this.auditStatus = auditStatus;
+	}
+
+	public String getActivityChannelCode() {
+		return activityChannelCode;
+	}
+
+	public void setActivityChannelCode(String activityChannelCode) {
+		this.activityChannelCode = activityChannelCode;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Integer getPageNo() {
+		return pageNo;
+	}
+
+	public void setPageNo(Integer pageNo) {
+		this.pageNo = pageNo;
+	}
+
+	public Integer getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(Integer pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
 	public String getNickName() {
 		return nickName;
 	}
@@ -69,12 +185,7 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-	public List<Long> getUserIds() {
-		return userIds;
-	}
-	public void setUserIds(List<Long> userIds) {
-		this.userIds = userIds;
-	}
+
 	public String getIsVest() {
 		return isVest;
 	}
@@ -102,8 +213,10 @@ public class AdminUserInfoDTO implements Serializable{
 	public AdminUserInfoDTO() {
 		super();
 	}
+
+
 	public AdminUserInfoDTO(String nickName, String isVest, String phone, String startDate, String endDate,
-			String appId) {
+							String appId) {
 		super();
 		this.nickName = nickName;
 		this.isVest = isVest;
@@ -120,7 +233,6 @@ public class AdminUserInfoDTO implements Serializable{
 		this.phone = phone;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.userIds = userIds;
 	}
 	
 	

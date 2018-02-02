@@ -35,26 +35,20 @@ public class IllegalWordsServiceImpl implements IllegalWordsService {
 	private static final Logger logger = LoggerFactory.getLogger(IllegalWordsServiceImpl.class);
 	
 	@Autowired
-	private IllegalWordsInitialize illegalWordsInitialize;
-	
-	@Autowired
 	private BasicIllegalWordsDao persistenceDao;
 	
 	@Override
 	public Set<String> getIllegalWords(String text) {
-		illegalWordsInitialize.initWords();
 		return Sets.newHashSet(SensitiveUtil.getFindedAllSensitive(text));
 	}
 
 	@Override
 	public boolean checkIllegalWords(String text) {
-		illegalWordsInitialize.initWords();
 		return SensitiveUtil.containsSensitive(text);
 	}
 	
 	@Override
 	public String relpaceIllegalWord(String text, String replaceWord) {
-		illegalWordsInitialize.initWords();
 		return SensitiveUtil.replaceFindedSensitive(text, replaceWord);
 	}
 	

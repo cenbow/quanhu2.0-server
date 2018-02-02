@@ -68,4 +68,6 @@ public interface BasicIllegalWordsDao {
 	 * @Description 更新敏感词
 	 */
 	int update(BasicIllegalWords record);
+	
+	String selectMaxLastUpdateTime();
 }
