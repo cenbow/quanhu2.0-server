@@ -20,6 +20,7 @@ import com.yryz.quanhu.dymaic.dto.StarInfoDTO;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
+import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.service.UserTagApi;
 import com.yryz.quanhu.user.vo.*;
@@ -67,6 +68,25 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	private CoterieInfoRepository coterieInfoRepository;
 	@Reference
 	private UserApi userApi;
+
+	@Reference(check = false)
+	private UserStarApi userStarApi;
+
+	@Reference(check = false)
+	private UserTagApi userTagApi;
+	@Reference(check = false)
+	private UserOperateApi userOperateApi;
+
+	@Reference(check = false)
+	private EventAcountApiService acountApiService;
+
+	private static final Function<Long, String> LONG_TO_STRING_FUNCTION = new Function<Long, String>() {
+		@Override
+		public String apply(Long input) {
+			return input.toString();
+		}
+	};
+
 	@Reference
 	private CoterieApi coterieApi;
 	@Reference
@@ -457,21 +477,6 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		resourceInfoRepository.saveAll(rlist);
 	}
 
-	@Reference(check = false)
-	private UserStarApi userStarApi;
-
-	@Reference(check = false)
-	private UserTagApi userTagApi;
-
-	@Reference(check = false)
-	private EventAcountApiService acountApiService;
-
-	private static final Function<Long, String> LONG_TO_STRING_FUNCTION = new Function<Long, String>() {
-		@Override
-		public String apply(Long input) {
-			return input.toString();
-		}
-	};
 
 	private void saveAllUsers(List<Long> ulist, List<UserBaseInfoVO> volist) {
 		Set<String> stringIds = Sets.newHashSet(FluentIterable.from(ulist).transform(LONG_TO_STRING_FUNCTION).toSet());
@@ -479,8 +484,10 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		Response<Map<String, StarAuthInfo>> starResponse = userStarApi.get(stringIds);
 		Response<Map<Long, List<UserTagVO>>> userTagInfoResponse = userTagApi.getUserTags(ulist);
 		Response<Map<Long, EventAcount>> eventAcountResponse = acountApiService.getEventAcountBatch(Sets.newHashSet(ulist));
-		logger.info("saveAllUsers starResponse: {}, userTagInfoResponse: {}, eventAcountResponse: {}",
-				GsonUtils.parseJson(starResponse), GsonUtils.parseJson(userTagInfoResponse), GsonUtils.parseJson(eventAcountResponse));
+		Response<Map<Long, UserRegLogVO>> regLogResponse = userOperateApi.listByUserId(ulist);
+		logger.info("saveAllUsers starResponse: {}, userTagInfoResponse: {}, eventAcountResponse: {}, regLogResponse: {}",
+				GsonUtils.parseJson(starResponse), GsonUtils.parseJson(userTagInfoResponse),
+				GsonUtils.parseJson(eventAcountResponse), GsonUtils.parseJson(regLogResponse));
 
 		List<UserInfo> userlist = new ArrayList<>();
 		for (int j = 0; j < volist.size(); j++) {
@@ -496,6 +503,8 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			setTagInfo(userInfo, userTagInfoResponse);
 			//积分数据
 			setEventInfo(userInfo, eventAcountResponse);
+			//注册记录数据
+			setRegLogInfo(userInfo, regLogResponse);
 
 			userlist.add(userInfo);
 		}
@@ -519,6 +528,20 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	/**
 	 * 用户相关数据
 	 */
+
+	private void setRegLogInfo(UserInfo userInfo, Response<Map<Long, UserRegLogVO>> regLogResponse) {
+		if (regLogResponse.success() && MapUtils.isNotEmpty(regLogResponse.getData())) {
+			Map<Long, UserRegLogVO> regLogVOMap = regLogResponse.getData();
+			UserRegLogVO regLogVO = regLogVOMap.get(userInfo.getUserId());
+			if (regLogVO != null) {
+				UserRegLog userRegLog = new UserRegLog();
+				BeanUtils.copyProperties(userRegLog, regLogVO);
+				userInfo.setUserRegLog(userRegLog);
+
+			}
+		}
+	}
+
 	private void setEventInfo(UserInfo userInfo, Response<Map<Long, EventAcount>> eventAcountResponse) {
 		if (eventAcountResponse.success() && MapUtils.isNotEmpty(eventAcountResponse.getData())) {
 			Map<Long, EventAcount> eventAcountMap = eventAcountResponse.getData();

@@ -18,6 +18,11 @@ public class CommonConstant {
         //达人信息
         public final static String TABLE_USER_STAR_AUTH = "qh_user_star_auth";
 
+        //注册记录日志表
+        public final static String TABLE_USER_REG_LOG = "qh_user_reg_log";
+
+
+
 
         /**
          * MongoDB 热度数据变更直接发送的mq消息

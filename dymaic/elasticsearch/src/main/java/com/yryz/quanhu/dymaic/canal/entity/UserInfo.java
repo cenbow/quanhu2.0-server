@@ -40,6 +40,16 @@ public class UserInfo implements Serializable {
 	 */
 	private EventAccountInfo eventAccountInfo;
 
+	private UserRegLog userRegLog;
+
+	public UserRegLog getUserRegLog() {
+		return userRegLog;
+	}
+
+	public void setUserRegLog(UserRegLog userRegLog) {
+		this.userRegLog = userRegLog;
+	}
+
 	public EventAccountInfo getEventAccountInfo() {
 		return eventAccountInfo;
 	}

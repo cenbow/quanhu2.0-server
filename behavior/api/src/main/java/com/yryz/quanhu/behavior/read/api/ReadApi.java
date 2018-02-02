@@ -10,6 +10,13 @@ import com.yryz.common.response.Response;
  */
 public interface ReadApi {
 
-    public Response<Object> read(Long kid);
+    /**
+     * 增加阅读数
+     *
+     * @param kid    资源ID
+     * @param userId 资源作者ID
+     * @return
+     */
+    public Response<Object> read(Long kid, Long userId);
 
 }

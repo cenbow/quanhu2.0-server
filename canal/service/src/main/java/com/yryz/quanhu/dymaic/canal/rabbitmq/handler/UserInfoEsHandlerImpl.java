@@ -55,7 +55,8 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
         if ((CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())
                 && (CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())
                 || (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName()))
-                || (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName()))))
+                || (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName()))
+                || (CommonConstant.QuanHuDb.TABLE_USER_REG_LOG.equals(msg.getTableName()))))
                 || (CommonConstant.QUANHU_ACCOUNT.equals(msg.getDbName()) && CommonConstant.EVENT_ACOUNT.equals(msg.getTableName()))) {
             return true;
         }
@@ -74,22 +75,59 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
                 doUserBaseInfo(msg);
             }
             if (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName())) {
-                logger.info("user tag table get change: {}", GsonUtils.parseJson(msg));
+                logger.info("user tag table get change");
                 doUserTagInfo(msg);
             }
             if (CommonConstant.QuanHuDb.TABLE_USER_STAR_AUTH.equals(msg.getTableName())) {
-                logger.info("star table get change: {}", GsonUtils.parseJson(msg));
+                logger.info("star table get change");
                 doStarInfo(msg);
+            }
+            if (CommonConstant.QuanHuDb.TABLE_USER_REG_LOG.equals(msg.getTableName())) {
+                logger.info("reg log table get change");
+                doUserRegLog(msg);
             }
         }
         if (CommonConstant.QUANHU_ACCOUNT.equals(msg.getDbName())) {
             if (CommonConstant.EVENT_ACOUNT.equals(msg.getTableName())) {
-                logger.info("event account table get change: {}", GsonUtils.parseJson(msg));
+                logger.info("event account table get change");
                 //用户积分数据
                 doEventAccount(msg);
             }
         }
 
+    }
+
+    private void doUserRegLog(CanalMsgContent msg) {
+        UserRegLog regLogBefore = CanalEntityParser.parse(msg.getDataBefore(), UserRegLog.class);
+        UserRegLog regLogAfter = CanalEntityParser.parse(msg.getDataAfter(), UserRegLog.class);
+
+        if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
+            Optional<UserInfo> uinfo = userRepository.findById(regLogBefore.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                userInfo.setUserRegLog(regLogAfter);
+                userRepository.save(userInfo);
+            }
+        } else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
+            //删除
+            Optional<UserInfo> uinfo = userRepository.findById(regLogBefore.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                userInfo.setUserRegLog(null);
+                userRepository.save(userInfo);
+            }
+
+        } else if (CommonConstant.EventType.OPT_INSERT.equals(msg.getEventType())) {
+            // 新增
+            Optional<UserInfo> uinfo = userRepository.findById(regLogAfter.getUserId());
+            if (uinfo.isPresent()) {
+                UserInfo userInfo = uinfo.get();
+                if (userInfo != null) {
+                    userInfo.setUserRegLog(regLogAfter);
+                    userRepository.save(userInfo);
+                }
+            }
+        }
 
     }
 

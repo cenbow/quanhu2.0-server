@@ -1,13 +1,16 @@
 package com.yryz.quanhu.resource.topic.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
@@ -16,19 +19,21 @@ import com.yryz.quanhu.resource.topic.entity.Topic;
 import com.yryz.quanhu.resource.topic.entity.TopicExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPost;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
+import com.yryz.quanhu.resource.topic.service.Topic4AdminService;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
-import com.yryz.quanhu.resource.topic.service.TopicService;
+import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
+import com.yryz.quanhu.resource.vo.ResourceTotal;
+import org.assertj.core.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
-public class TopicServiceImpl implements TopicService {
+public class Topic4AdminServiceImpl implements Topic4AdminService {
 
 
     @Autowired
@@ -45,6 +50,9 @@ public class TopicServiceImpl implements TopicService {
 
     @Autowired
     private TopicPostService topicPostService;
+
+    @Reference
+    private ResourceDymaicApi resourceDymaicApi;
 
     /**
      * 发布话题
@@ -75,6 +83,16 @@ public class TopicServiceImpl implements TopicService {
         if (result > 0) {
             TopicVo vo = new TopicVo();
             BeanUtils.copyProperties(topic, vo);
+            /**
+             * 资源聚合
+             */
+            ResourceTotal resourceTotal=new ResourceTotal();
+            resourceTotal.setCreateDate(DateUtils.getDate());
+            resourceTotal.setExtJson(JSON.toJSONString(vo));
+            resourceTotal.setResourceId(vo.getKid());
+            resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC));
+            resourceTotal.setUserId(vo.getCreateUserId());
+            resourceDymaicApi.commitResourceDymaic(resourceTotal);
             return vo;
         }
         return null;
@@ -119,7 +137,7 @@ public class TopicServiceImpl implements TopicService {
         topicVo.setModuleEnum(ModuleContants.TOPIC);
 
         //虚拟阅读数
-        readApi.read(kid,topic.getCreateUserId());
+        readApi.read(kid,topicVo.getCreateUserId());
 
         return topicVo;
     }
@@ -136,18 +154,32 @@ public class TopicServiceImpl implements TopicService {
         Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
         Integer pageStartIndex = (pageNum - 1) * pageSize;
-        // Byte recommend =dto.getRecommend()==null?CommonConstants.recommend_YES:dto.getRecommend();
-        String orderBy = StringUtils.isBlank(dto.getOrderBy()) ? "recommend desc ,create_date desc " : dto.getOrderBy();
+        String orderBy = StringUtils.isBlank(dto.getOrderBy()) ? "create_date desc " : dto.getOrderBy();
         TopicExample example = new TopicExample();
-        TopicExample.Criteria criteria=example.createCriteria();
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
-        if(dto.getRecommend()!=null){
-            criteria.andRecommendEqualTo(dto.getRecommend());
-        }
+
         example.setPageStartIndex(pageStartIndex);
         example.setPageSize(pageSize);
         example.setOrderByClause(orderBy);
+
+        TopicExample.Criteria orC=example.or();
+        TopicExample.Criteria criteria=example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        if(dto.getStartTime()!=null && dto.getEndTime()!=null){
+            criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
+        }
+        if(dto.getRecommend()!=null){
+            criteria.andRecommendEqualTo(dto.getRecommend());
+        }
+        if(dto.getShelveFlag()!=null){
+            criteria.andShelveFlagEqualTo(dto.getShelveFlag());
+        }
+       if(dto.getTitle()!=null){
+           criteria.andTitleLike(dto.getTitle());
+           orC.andContentLike(dto.getTitle());
+           example.or(orC);
+       }
+
+        Long count=this.topicDao.countByExample(example);
         List<Topic> list = this.topicDao.selectByExampleWithBLOBs(example);
         List<TopicVo> topicVos = new ArrayList<>();
         for (Topic topic : list) {
@@ -163,7 +195,7 @@ public class TopicServiceImpl implements TopicService {
         pageList.setEntities(topicVos);
         pageList.setPageSize(pageSize);
         pageList.setCurrentPage(pageNum);
-        pageList.setCount(0L);
+        pageList.setCount(count);
         return pageList;
     }
 

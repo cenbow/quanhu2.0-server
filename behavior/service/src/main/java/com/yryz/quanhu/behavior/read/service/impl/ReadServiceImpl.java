@@ -85,6 +85,7 @@ public class ReadServiceImpl implements ReadService {
         releaseInfoDto.setDelFlag(CommonConstants.DELETE_NO);
         releaseInfoDto.setOrderType(null);
         List<ReleaseInfoVo> list = ResponseUtils.getResponseData(releaseInfoApi.selectByCondition(releaseInfoDto));
+        logger.info("excuteViewCountJob select realease list size:" + list.size());
         //循环文章list
         for (ReleaseInfoVo res : list) {
             //计算给文章增加多少阅读数
@@ -96,6 +97,7 @@ public class ReadServiceImpl implements ReadService {
                 e.printStackTrace();
                 logger.error("resourceId:" + res.getKid() + " 的文章增加阅读数失败!" + e.getMessage(), e.getCause());
             }
+            logger.info("excuteViewCountJob realease kid :" + res.getKid()+".count:"+readCount);
         }
     }
 

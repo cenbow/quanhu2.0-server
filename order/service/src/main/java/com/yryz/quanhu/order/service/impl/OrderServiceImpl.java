@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,11 +196,11 @@ public class OrderServiceImpl implements OrderService {
 					} else {
 						int orderState = orderInfo2.getOrderState() == null ? 0 : orderInfo2.getOrderState().intValue();
 						if(orderState == RrzOrderInfo.ORDER_STATE_ON){
-							return ResponseUtils.returnException(new CommonException("该订单已经处理"));
+							throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"该订单已经处理","该订单已经处理");
 						}
 						if(!StringUtils.equals(orderInfo2.getCustId(), orderInfo.getCustId()) ||  
 								!StringUtils.equals(orderInfo2.getOrderId(), orderInfo.getOrderId())){
-							return ResponseUtils.returnException(new CommonException("新旧订单信息不一致"));
+							throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"新旧订单信息不一致","新旧订单信息不一致");
 						}
 						orderInfo2.setOrderState(RrzOrderInfo.ORDER_STATE_ON);
 					}

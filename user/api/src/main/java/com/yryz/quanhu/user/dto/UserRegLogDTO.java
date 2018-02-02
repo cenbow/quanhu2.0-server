@@ -168,8 +168,9 @@ public class UserRegLogDTO implements Serializable {
 		super();
 	}
 
-	public UserRegLogDTO(String appChannel, String appId, String channelCode) {
+	public UserRegLogDTO(String regType,String appChannel, String appId, String channelCode) {
 		super();
+		this.regType = regType;
 		this.appChannel = appChannel;
 		this.appId = appId;
 		this.channelCode = channelCode;

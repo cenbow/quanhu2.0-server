@@ -15,8 +15,10 @@ import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
+import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.service.UserTagApi;
+import com.yryz.quanhu.user.vo.UserRegLogVO;
 import com.yryz.quanhu.user.vo.UserTagVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -49,6 +51,8 @@ public class UserDiffHandler implements DiffHandler {
 
     @Reference(check = false)
     private EventAcountApiService acountApiService;
+    @Reference(check = false)
+    private UserOperateApi userOperateApi;
 
     @Resource
     private DiffExecutor diffExecutor;
@@ -91,6 +95,7 @@ public class UserDiffHandler implements DiffHandler {
                 Response<Map<String, StarAuthInfo>> starResponse = userStarApi.get(stringIds);
                 Response<Map<Long, List<UserTagVO>>> userTagInfoResponse = userTagApi.getUserTags(diffList);
                 Response<Map<Long, EventAcount>> eventAcountResponse = acountApiService.getEventAcountBatch(Sets.newHashSet(diffList));
+                Response<Map<Long, UserRegLogVO>> regLogResponse = userOperateApi.listByUserId(diffList);
                 if (resList.success()) {
                     List<UserBaseInfoVO> volist = resList.getData();
                     List<UserInfo> list = new ArrayList<>();
@@ -107,6 +112,8 @@ public class UserDiffHandler implements DiffHandler {
                             setTagInfo(userInfo, userTagInfoResponse);
                             //积分数据
                             setEventInfo(userInfo, eventAcountResponse);
+                            //注册记录数据
+                            setRegLogInfo(userInfo, regLogResponse);
 
                             list.add(userInfo);
                         } catch (Exception e) {
@@ -119,6 +126,18 @@ public class UserDiffHandler implements DiffHandler {
 
         } catch (Exception e) {
             logger.error("UserDiffHandler handle error", e);
+        }
+    }
+
+    private void setRegLogInfo(UserInfo userInfo, Response<Map<Long, UserRegLogVO>> regLogResponse) {
+        if (regLogResponse.success() && MapUtils.isNotEmpty(regLogResponse.getData())) {
+            Map<Long, UserRegLogVO> regLogVOMap = regLogResponse.getData();
+            UserRegLogVO regLogVO = regLogVOMap.get(userInfo.getUserId());
+            if (regLogVO != null) {
+                UserRegLog userRegLog = new UserRegLog();
+                BeanUtils.copyProperties(userRegLog, regLogVO);
+                userInfo.setUserRegLog(userRegLog);
+            }
         }
     }
 

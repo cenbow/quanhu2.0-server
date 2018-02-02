@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,5 +43,24 @@ public class GiftInfoController {
         dto.setCurrentPage(currentPage);
         dto.setPageSize(pageSize);
         return giftInfoApi.pageByCondition(dto, false);
+    }
+
+    @ApiOperation("礼物更新")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "kid", paramType = "query", required = true),
+            @ApiImplicitParam(name = "giftName", paramType = "query", required = true),
+            @ApiImplicitParam(name = "giftImage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "giftPrice", paramType = "query", required = true) })
+    @PostMapping(value = "{version}/gift/info")
+    public Response<Integer> update(@RequestParam Long kid, @RequestParam String giftName,
+            @RequestParam String giftImage, @RequestParam Long giftPrice) {
+
+        GiftInfo record = new GiftInfo();
+        record.setGiftImage(giftImage);
+        record.setGiftName(giftName);
+        record.setGiftPrice(giftPrice);
+        record.setKid(kid);
+        return giftInfoApi.updateByKid(record);
     }
 }

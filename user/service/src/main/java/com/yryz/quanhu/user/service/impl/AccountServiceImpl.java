@@ -102,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
 		if (registerDTO.getIsVest() == 11) {
 			regChannel = Constants.ADMIN_REG_VEST_CHANNEL;
 		}
-		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, regChannel);
+		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel,regChannel, registerDTO.getAppId(), regChannel);
 		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
 		createUser(new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO), null);
 	}
