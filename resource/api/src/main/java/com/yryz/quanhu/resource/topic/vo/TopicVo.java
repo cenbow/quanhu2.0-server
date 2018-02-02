@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class TopicVo implements Serializable {
-
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     private String title;
@@ -39,7 +39,6 @@ public class TopicVo implements Serializable {
 
     private Long createUserId;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
     }

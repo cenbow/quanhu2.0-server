@@ -13,6 +13,7 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.AnswerDto;
@@ -159,6 +160,7 @@ public class AnswerServiceImpl implements AnswerService {
         if(questionAnswerVo!=null) {
             resourceTotal.setExtJson(JSON.toJSONString(questionAnswerVo));
         }
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(questionCheck.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionCheck.getCreateUserId());
