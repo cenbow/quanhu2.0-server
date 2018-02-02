@@ -46,7 +46,7 @@ public class ResourceRedis {
 		if(CollectionUtils.isEmpty(resourceIds)){
 			return ;
 		}
-		redisTemplate.opsForList().leftPushAll(RedisConstant.APP_RECOMMEND, resourceIds);
+		redisTemplate.opsForList().rightPushAll(RedisConstant.APP_RECOMMEND, resourceIds);
 	}
 	
 	/**

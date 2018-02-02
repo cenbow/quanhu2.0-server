@@ -321,7 +321,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 
         //虚拟阅读数
-        readApi.read(kid);
+        readApi.read(kid,questionBysearch.getCreateUserId());
         /**
          * 提交积分成长值事件
          */

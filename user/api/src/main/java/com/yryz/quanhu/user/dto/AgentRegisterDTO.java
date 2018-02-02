@@ -24,9 +24,17 @@ public class AgentRegisterDTO implements Serializable{
 	 */
 	private String userPhone;
 	/**
-	 * 邮箱
+	 * 用户签名（备注名）
 	 */
-	private String userEmail;
+	private String userSignature;
+	/**
+	 * 用户简介
+	 */
+	private String userDesc;
+	/**
+	 * 用户头像
+	 */
+	private String userImg;
 	/**
 	 * 登录密码
 	 */
@@ -57,11 +65,23 @@ public class AgentRegisterDTO implements Serializable{
 	public void setUserPhone(String userPhone) {
 		this.userPhone = userPhone;
 	}
-	public String getUserEmail() {
-		return userEmail;
+	public String getUserSignature() {
+		return userSignature;
 	}
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
+	public void setUserSignature(String userSignature) {
+		this.userSignature = userSignature;
+	}
+	public String getUserDesc() {
+		return userDesc;
+	}
+	public void setUserDesc(String userDesc) {
+		this.userDesc = userDesc;
+	}
+	public String getUserImg() {
+		return userImg;
+	}
+	public void setUserImg(String userImg) {
+		this.userImg = userImg;
 	}
 	public String getUserPwd() {
 		return userPwd;
@@ -88,47 +108,29 @@ public class AgentRegisterDTO implements Serializable{
 		super();
 	}
 	/**
-	 * @param userNickName
-	 * @param userPhone
-	 * @param userEmail
-	 * @param userPwd
-	 */
-	public AgentRegisterDTO(String userNickName, String userPhone, String userEmail, String userPwd) {
-		super();
-		this.userNickName = userNickName;
-		this.userPhone = userPhone;
-		this.userEmail = userEmail;
-		this.userPwd = userPwd;
-	}
-	/**
-	 * @param userNickName
-	 * @param userPhone
-	 * @param userPwd
-	 */
-	public AgentRegisterDTO(String userNickName, String userPhone, String userPwd) {
-		super();
-		this.userNickName = userNickName;
-		this.userPhone = userPhone;
-		this.userPwd = userPwd;
-	}
-	/**
 	 * 马甲注册
 	 * @param userLocation
 	 * @param userNickName
 	 * @param userPhone
-	 * @param userEmail
+	 * @param userSignature
+	 * @param userDesc
+	 * @param userImg
 	 * @param userPwd
 	 * @param isVest
+	 * @param appId
 	 */
-	public AgentRegisterDTO(String userLocation, String userNickName, String userPhone, String userEmail,
-			String userPwd, Integer isVest) {
+	public AgentRegisterDTO(String userLocation, String userNickName, String userPhone, String userSignature,
+			String userDesc, String userImg, String userPwd, Integer isVest, String appId) {
 		super();
 		this.userLocation = userLocation;
 		this.userNickName = userNickName;
 		this.userPhone = userPhone;
-		this.userEmail = userEmail;
+		this.userSignature = userSignature;
+		this.userDesc = userDesc;
+		this.userImg = userImg;
 		this.userPwd = userPwd;
 		this.isVest = isVest;
+		this.appId = appId;
 	}
 	/**
 	 * 
@@ -152,6 +154,7 @@ public class AgentRegisterDTO implements Serializable{
 	@Override
 	public String toString() {
 		return "AgentRegisterDTO [userLocation=" + userLocation + ", userNickName=" + userNickName + ", userPhone="
-				+ userPhone + ", userEmail=" + userEmail + ", userPwd=" + userPwd + "]";
+				+ userPhone + ", userSignature=" + userSignature + ", userDesc=" + userDesc + ", userImg=" + userImg
+				+ ", userPwd=" + userPwd + ", isVest=" + isVest + ", appId=" + appId + "]";
 	}
 }

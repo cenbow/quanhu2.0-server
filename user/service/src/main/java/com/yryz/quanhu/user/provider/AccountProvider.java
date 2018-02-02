@@ -291,7 +291,7 @@ public class AccountProvider implements AccountApi {
 				throw QuanhuException.busiError("该用户已存在");
 			} else {
 				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(),
-						SmsType.CODE_CHANGE_PHONE, header.getAppId())) {
+						SmsType.CODE_THIRD_PHONE, header.getAppId())) {
 					throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 				}
 				// 手机号加锁
@@ -844,6 +844,15 @@ public class AccountProvider implements AccountApi {
 		}
 		if (StringUtils.isEmpty(registerDTO.getUserPhone())) {
 			throw QuanhuException.busiError("手机号为空");
+		}
+		if (StringUtils.isEmpty(registerDTO.getUserNickName()) || StringUtils.length(registerDTO.getUserNickName()) > 10) {
+			throw QuanhuException.busiError("昵称不合法");
+		}
+		if (StringUtils.isEmpty(registerDTO.getUserImg())) {
+			throw QuanhuException.busiError("头像为空");
+		}
+		if (StringUtils.isEmpty(registerDTO.getUserPwd())) {
+			throw QuanhuException.busiError("密码为空");
 		}
 		if (StringUtils.isBlank(registerDTO.getAppId())) {
 			throw QuanhuException.busiError("应用id不能为空");
