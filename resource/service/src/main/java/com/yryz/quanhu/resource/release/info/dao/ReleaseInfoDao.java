@@ -12,8 +12,6 @@ import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 @Mapper
 public interface ReleaseInfoDao {
 
-    // int insert(ReleaseInfo record);
-
     int insertSelective(ReleaseInfo record);
 
     List<ReleaseInfoVo> selectByCondition(ReleaseInfoDto dto);
@@ -25,6 +23,6 @@ public interface ReleaseInfoDao {
     int updateByUkSelective(@Param("record") ReleaseInfo record);
 
     int updateByCondition(@Param("record") ReleaseInfo record, @Param("dto") ReleaseInfoDto dto);
-    
-    List<Long> selectKidByCreatedate(@Param("startDate")String startDate,@Param("endDate")String endDate);
+
+    List<Long> selectKidByCondition(ReleaseInfoDto dto);
 }

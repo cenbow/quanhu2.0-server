@@ -258,12 +258,15 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     @Override
     public Response<List<Long>> getKidByCreatedate(String startDate, String endDate) {
         try {
-            List<Long> data = this.releaseInfoService.getKidByCreatedate(startDate, endDate);
+            ReleaseInfoDto dto = new ReleaseInfoDto();
+            dto.setBeginDate(startDate);
+            dto.setEndDate(endDate);
+            List<Long> data = this.releaseInfoService.selectKidByCondition(dto);
             return ResponseUtils.returnObjectSuccess(data);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
-            logger.error("未知异常", e);
+            logger.error("getKidByCreatedate未知异常", e);
             return ResponseUtils.returnException(e);
         }
     }
