@@ -15,8 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.quanhu.order.vo.NopassPayConfig;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,11 +112,25 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private RrzOrderInfoRedis rrzOrderInfoRedis;
+
+	@Reference
+	private BasicConfigApi basicConfigApi;
 	
-	@Autowired
-	private NotifyQueue notifyQueue;
+//	@Autowired
+//	private NotifyQueue notifyQueue;
 	
 	private static final int SAVE_LIMIT = 5;
+
+	private NopassPayConfig getNopassPayConfig(){
+		NopassPayConfig nopassPayConfig = new NopassPayConfig();
+		try {
+			String value = ResponseUtils.getResponseData(basicConfigApi.getValue("account.nopass.pay"));
+			nopassPayConfig = JSON.parseObject(value,NopassPayConfig.class);
+		}catch (Exception e){
+			logger.error("获取资金-免密支付配置失败", e);
+		}
+		return nopassPayConfig;
+	}
 
 	/**
 	 * 执行订单。
@@ -123,7 +141,6 @@ public class OrderServiceImpl implements OrderService {
 	 * @param payPassword 支付密码,选填，不填则不校验
 	 * @param remark
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#executeOrder(com.yryz.service.order.modules.order.entity.RrzOrderInfo, java.util.List, java.util.List, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Response<?> executeOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts,
@@ -133,13 +150,19 @@ public class OrderServiceImpl implements OrderService {
 			if (account == null){
 				return ResponseUtils.returnException(new CommonException("账户不存在或者系统异常"));
 			}
-			if (account.getAccountState().intValue() == 0){
+			if (account.getAccountState() == 0){
 				return ResponseUtils.returnException(new CommonException("账户被冻结"));
 			}
-			if ((account.getSmallNopass().intValue() == 0
-					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 50000)
+			NopassPayConfig nopassPayConfig = getNopassPayConfig();
+			if ((account.getSmallNopass() == 0
+					|| account.getSmallNopass() == 1 && orderInfo.getCost() > nopassPayConfig.getMaxAmount())
 					&& StringUtils.isEmpty(payPassword)){
-				return ResponseUtils.returnException(new CommonException("支付密码为空"));
+				if(orderInfo.getCost() > nopassPayConfig.getMaxAmount()){
+					return ResponseUtils.returnException(new CommonException(nopassPayConfig.getMsg()));
+				}
+				else{
+					return ResponseUtils.returnException(new CommonException("支付密码为空"));
+				}
 			}
 			Response<?> return1 = userPhyService.checkPayPassword(custId, payPassword);
 			if (!return1.success()) {

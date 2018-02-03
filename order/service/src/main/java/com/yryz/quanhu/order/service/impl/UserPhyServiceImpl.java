@@ -138,11 +138,12 @@ public class UserPhyServiceImpl implements UserPhyService{
 					// 重置支付密码，关闭小额免密
 					RrzOrderUserAccount userAccount = new RrzOrderUserAccount();
 					userAccount.setCustId(rrzOrderUserPhy.getCustId());
-					userAccount.setSmallNopass(0);
+					//TODO 新版本，默认小额免密
+					userAccount.setSmallNopass(1);
 					userAccount.setAccountState(1);
 					userAccountService.executeRrzOrderUserAccount(userAccount);
-
-					userPhy.setSmallNopass(0);
+					//TODO 新版本，默认小额免密
+					userPhy.setSmallNopass(1);
 					userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
 					reSetPayWord = true;
 				} else {
@@ -198,7 +199,8 @@ public class UserPhyServiceImpl implements UserPhyService{
 			userPhy = new RrzOrderUserPhy();
 			userPhy.setCreateTime(new Date());
 			userPhy.setCustId(custId);
-			userPhy.setSmallNopass(0);
+			//TODO 新版本，默认小额免密
+			userPhy.setSmallNopass(1);
 			saveUserPhy(userPhy);
 		}
 		return userPhy;

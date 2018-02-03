@@ -38,8 +38,10 @@ public class UserInfoVO implements Serializable {
      * 注册渠道信息
      */
     private UserRegLogVO userRegLog;
-
-
+    /**
+     * 用户收入
+     */
+    private String userOrderIntegralTotal;
     public UserBaseInfoVO getUserBaseInfo() {
         return userBaseInfo;
     }
@@ -79,4 +81,12 @@ public class UserInfoVO implements Serializable {
     public void setUserRegLog(UserRegLogVO userRegLog) {
         this.userRegLog = userRegLog;
     }
+
+	public String getUserOrderIntegralTotal() {
+		return userOrderIntegralTotal;
+	}
+
+	public void setUserOrderIntegralTotal(String userOrderIntegralTotal) {
+		this.userOrderIntegralTotal = userOrderIntegralTotal;
+	}
 }

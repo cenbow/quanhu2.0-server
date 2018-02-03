@@ -21,6 +21,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.MessageUtils;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.resource.api.ResourceApi;
+import com.yryz.quanhu.resource.coterie.release.info.provider.CoterieReleaseInfoProvider;
 import com.yryz.quanhu.resource.release.info.api.ReleaseInfoAdminApi;
 import com.yryz.quanhu.resource.release.info.dto.ReleaseInfoDto;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
@@ -30,7 +31,7 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
-* @Description: 平台文章 管理后台
+* @Description: 文章 管理后台
 * @author wangheng
 * @date 2018年2月2日 上午11:34:31
 */
@@ -44,6 +45,9 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
 
     @Autowired
     private ReleaseInfoProvider releaseInfoProvider;
+    
+    @Autowired
+    private CoterieReleaseInfoProvider coterieReleaseInfoProvider;
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private UserApi userApi;
@@ -72,8 +76,6 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
             Assert.notNull(kid, "kid is null !");
             ReleaseInfoVo infoVo = releaseInfoService.selectByKid(kid);
             Assert.notNull(infoVo, "文章不存在！kid:" + kid);
-
-            Assert.isTrue(0L == infoVo.getCoterieId(), "非平台文章禁止访问！");
 
             // 创建者用户信息
             UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(infoVo.getCreateUserId()));
@@ -110,7 +112,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
             Assert.isTrue(CommonConstants.SHELVE_NO.equals(shelveFlag) || CommonConstants.SHELVE_YES.equals(shelveFlag),
                     "shelveFlag not is (10,11) !");
             Assert.notNull(lastUpdateUserId, "lastUpdateUserId is null !");
-            logger.debug("平台文章，批量上下架操作。源kids：" + kids + ", shelveFlag :" + shelveFlag);
+            logger.debug("文章，批量上下架操作。源kids：" + kids + ", shelveFlag :" + shelveFlag);
 
             // 查询 kids 中已经是shelveFlag 状态的记录 从kids 集合中剔除
             ReleaseInfoDto dto = new ReleaseInfoDto();
@@ -129,7 +131,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
             kidList.removeAll(delKids);
 
             Long[] targetKids = kidList.toArray(new Long[] {});
-            logger.debug("平台文章，批量上下架操作。处理后kids：" + targetKids + ", shelveFlag :" + shelveFlag);
+            logger.debug("平文章，批量上下架操作。处理后kids：" + targetKids + ", shelveFlag :" + shelveFlag);
 
             if (targetKids.length < 1) {
                 return ResponseUtils.returnObjectSuccess(0);
@@ -156,7 +158,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
 
                 ReleaseInfoVo releaseInfoVo = releaseInfoService.selectByKid(kid);
                 if (null == releaseInfoVo) {
-                    logger.debug("平台文章，批量下架操作资源不存在。kid：" + kid);
+                    logger.debug("文章，批量下架操作资源不存在。kid：" + kid);
                     continue;
                 }
 
@@ -179,8 +181,13 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
                         continue;
                     }
                     try {
-                        // 聚合资源上线
-                        this.releaseInfoProvider.commitResourceAndDynamic(releaseInfoVo, createUser);
+                        // 私圈文章 聚合资源、好友动态 上线
+                        if (null != releaseInfoVo.getCoterieId() && 0L != releaseInfoVo.getCoterieId()) {
+                            this.coterieReleaseInfoProvider.commitResourceAndDynamic(releaseInfoVo, createUser);
+                        } else {
+                            // 平台文章 聚合资源上线
+                            this.releaseInfoProvider.commitResourceAndDynamic(releaseInfoVo, createUser);
+                        }
                     } catch (Exception e) {
                         logger.error("资源聚合上架接入异常！", e);
                     }
