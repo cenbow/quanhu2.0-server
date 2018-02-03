@@ -383,7 +383,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                             score = detail.getId().doubleValue();
                         } else {
                             value = detail.getKid();
-                            score = detail.getVoteCount() == null ? 0 : detail.getVoteCount().doubleValue();
+                            int voteCount = detail.getVoteCount() == null ? 0 : detail.getVoteCount();
+                            int addVote = detail.getAddVote() == null ? 0 : detail.getAddVote();
+                            score = (voteCount + addVote);
                         }
 
                         ZSetOperations.TypedTuple tuple = new DefaultTypedTuple<>(value, score);
