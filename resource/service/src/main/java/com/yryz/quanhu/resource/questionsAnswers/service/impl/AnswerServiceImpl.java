@@ -161,8 +161,8 @@ public class AnswerServiceImpl implements AnswerService {
             resourceTotal.setExtJson(JSON.toJSONString(questionAnswerVo));
         }
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-        resourceTotal.setResourceId(questionCheck.getKid());
-        resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
+        resourceTotal.setResourceId(answerVo1.getKid());
+        resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.ANSWER));
         resourceTotal.setUserId(questionCheck.getCreateUserId());
         resourceTotal.setCoterieId(String.valueOf(coterieId));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);

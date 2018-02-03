@@ -21,4 +21,6 @@ public interface QuestionApi {
     Response<QuestionVo> queryQuestionDetail(Long kid,Long userId);
 
     Response<Question> queryDetail(Long kid);
+
+    Response<Integer> executeInValidQuestionRefund();
 }

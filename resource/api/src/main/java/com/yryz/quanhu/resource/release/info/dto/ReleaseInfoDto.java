@@ -26,7 +26,7 @@ public class ReleaseInfoDto extends ReleaseInfo {
     private String searchKey;
 
     /**  
-    * @Fields orderType : 排序类型 
+    * @Fields orderType : 排序类型 (1:时间最新,2:时间最早)
     */
     private Byte orderType;
 
@@ -35,9 +35,9 @@ public class ReleaseInfoDto extends ReleaseInfo {
     */
     private Byte payFlag;
 
-    private int currentPage = 1;
+    private Integer currentPage = 1;
 
-    private int pageSize = 30;
+    private Integer pageSize = 20;
 
     private Long[] kids;
     
@@ -86,19 +86,19 @@ public class ReleaseInfoDto extends ReleaseInfo {
         this.payFlag = payFlag;
     }
 
-    public int getCurrentPage() {
+    public Integer getCurrentPage() {
         return currentPage;
     }
 
-    public void setCurrentPage(int currentPage) {
+    public void setCurrentPage(Integer currentPage) {
         this.currentPage = currentPage;
     }
 
-    public int getPageSize() {
+    public Integer getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(int pageSize) {
+    public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
 

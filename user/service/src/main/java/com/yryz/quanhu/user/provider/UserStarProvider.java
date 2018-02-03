@@ -22,15 +22,14 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.PageModel;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.user.contants.UserStarContants.StarAuditStatus;
+import com.yryz.quanhu.user.contants.UserStarContants.StarAuthType;
+import com.yryz.quanhu.user.contants.UserStarContants.StarAuthWay;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.dto.StarAuthQueryDTO;
 import com.yryz.quanhu.user.dto.StarRecommendQueryDTO;
-import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserStarAuth;
-import com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus;
-import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthType;
-import com.yryz.quanhu.user.entity.UserStarAuth.StarAuthWay;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.service.UserStarService;
@@ -72,7 +71,7 @@ public class UserStarProvider implements UserStarApi {
 					authModel.setRealName(null);
 					authModel.setIdCard(null);
 				} else {
-					if (info.getAuthType() == StarAuthType.USER_APLLY.getType()
+					if (info.getAuthType() == StarAuthType.PERSON.getType()
 							&& StringUtils.isNotBlank(info.getIdCard())) {
 						UserStarAuth authModel2 = userStarService.get(null, info.getIdCard());
 						if (authModel2 != null && !info.getUserId().equals(authModel2.getUserId())
@@ -84,7 +83,7 @@ public class UserStarProvider implements UserStarApi {
 				userStarService.update(model);
 			} else {
 				checkParam(info);
-				if (info.getAuthType().intValue() == StarAuthType.USER_APLLY.getType()
+				if (info.getAuthType().intValue() == StarAuthType.PERSON.getType()
 						&& StringUtils.isNotBlank(info.getIdCard())) {
 					UserStarAuth authModel2 = userStarService.get(null, info.getIdCard());
 					if (authModel2 != null && authModel2.getAuditStatus() < StarAuditStatus.AUDIT_FAIL.getStatus()) {
@@ -168,7 +167,7 @@ public class UserStarProvider implements UserStarApi {
 				authModel.setRealName(null);
 				authModel.setIdCard(null);
 			} else {
-				if (info.getAuthType() == StarAuthType.USER_APLLY.getType()
+				if (info.getAuthType() == StarAuthType.PERSON.getType()
 						&& StringUtils.isNotBlank(info.getIdCard())) {
 					UserStarAuth authModel2 = userStarService.get(null, info.getIdCard());
 					if (authModel2 != null && !info.getUserId().equals(authModel2.getUserId())
@@ -473,8 +472,8 @@ public class UserStarProvider implements UserStarApi {
 		if (StringUtils.isEmpty(authInfo.getUserId())) {
 			throw QuanhuException.busiError("用户id不能为空");
 		}
-		if (authInfo.getAuthType() == null || authInfo.getAuthType().intValue() < StarAuthType.USER_APLLY.getType()
-				|| authInfo.getAuthType() > StarAuthType.ADMIN_SET.getType()) {
+		if (authInfo.getAuthType() == null || authInfo.getAuthType().intValue() < StarAuthType.PERSON.getType()
+				|| authInfo.getAuthType() > StarAuthType.PERSON.getType()) {
 			throw QuanhuException.busiError("认证类型不合法");
 		}
 		if (StringUtils.isBlank(authInfo.getTradeField()) || authInfo.getTradeField().length() < 1
@@ -495,23 +494,23 @@ public class UserStarProvider implements UserStarApi {
 		if (StringUtils.isBlank(authInfo.getContactCall())) {
 			throw QuanhuException.busiError("联系方式为空");
 		}
-		if (authInfo.getAuthType() == StarAuthType.USER_APLLY.getType()
+		if (authInfo.getAuthType() == StarAuthType.PERSON.getType()
 				&& !PhoneUtils.checkPhone(authInfo.getContactCall())) {
 			throw QuanhuException.busiError("请填写正确的手机号");
 		}
-		if (authInfo.getAuthType() == StarAuthType.USER_APLLY.getType() && StringUtils.isBlank(authInfo.getIdCard())) {
+		if (authInfo.getAuthType() == StarAuthType.PERSON.getType() && StringUtils.isBlank(authInfo.getIdCard())) {
 			throw QuanhuException.busiError("个人申请需填写身份证号");
 		}
 		if (StringUtils.isEmpty(authInfo.getRealName()) || authInfo.getRealName().length() < 2
 				|| authInfo.getRealName().length() > 10) {
 			throw QuanhuException.busiError("姓名为2~10个以内的汉字");
 		}
-		if (authInfo.getAuthType() == StarAuthType.ADMIN_SET.getType()
+		if (authInfo.getAuthType() == StarAuthType.BUSSIESS.getType()
 				&& (StringUtils.isBlank(authInfo.getOrganizationName()) || authInfo.getOrganizationName().length() < 2
 						|| authInfo.getOrganizationName().length() > 10)) {
 			throw QuanhuException.busiError("机构名称为2~10个以内的汉字");
 		}
-		if (authInfo.getAuthType() == StarAuthType.ADMIN_SET.getType()
+		if (authInfo.getAuthType() == StarAuthType.BUSSIESS.getType()
 				&& StringUtils.isBlank(authInfo.getOrganizationPaper())) {
 			throw QuanhuException.busiError("企业/机构申请需上传证件");
 		}

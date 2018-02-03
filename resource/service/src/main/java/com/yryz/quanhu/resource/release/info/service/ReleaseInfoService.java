@@ -107,7 +107,15 @@ public interface ReleaseInfoService {
     */
     public void resourcePropertiesEmpty(ReleaseInfo record);
 
-    public List<Long> getKidByCreatedate(String startDate, String endDate);
+    /**  
+    * @Description: 条件检索 kid 集合
+    * @author wangheng
+    * @param @param dto
+    * @param @return
+    * @return List<Long>
+    * @throws  
+    */
+    public List<Long> selectKidByCondition(ReleaseInfoDto dto);
 
     /**  
     * @Description: 每次操作触发（每日前两次发布文章正文内容超过100字时触发，每次记20分，最多记40分）  

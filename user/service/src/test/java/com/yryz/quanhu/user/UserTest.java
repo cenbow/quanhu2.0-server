@@ -282,11 +282,11 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response2));
 	}
 	
-	//@Test
+	@Test
 	public void getAdmin(){
-		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 10, new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
-		Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
-		System.out.println(JsonUtils.toFastJson(response2));
+		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 10, new AdminUserInfoDTO("sss", "ss", null, null, null, "vebff12m1762"));
+		//Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
+		System.out.println(JsonUtils.toFastJson(response));
 	}
 
 	@Autowired

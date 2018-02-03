@@ -117,6 +117,13 @@ public class AuthProvider implements AuthApi {
 			if (checkEnum != TokenCheckEnum.EXPIRE && checkEnum != TokenCheckEnum.SUCCESS) {
 				throw QuanhuException.busiError("登录状态不合法不允许刷新token");
 			}
+			
+			//刷新不通过直接返回
+			boolean refreshFlag = authService.checkRefreshFlag(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
+			if(!refreshFlag){
+				return ResponseUtils.returnObjectSuccess(new AuthTokenVO(false));
+			}
+			
 			refreshDTO.setRefreshTokenFlag(true);
 			return ResponseUtils.returnObjectSuccess(authService.getToken(refreshDTO));
 		} catch (RedisOptException e) {

@@ -164,5 +164,16 @@
 		</if>
 		GROUP BY cust_id , product_type
 	</select>
+
+	<select id="getUserTotalIntegral" parameterType="java.util.ArrayList" resultType="java.util.HashMap">
+		SELECT cust_id as userId, sum(cost) as amount
+		FROM rrz_order_integral_history a
+		WHERE order_type = 1
+		AND cust_id IN
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		GROUP BY cust_id
+	</select>
 	
 </mapper>

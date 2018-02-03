@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.yryz.common.constant.DevType;
 import com.yryz.common.exception.RedisOptException;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
@@ -69,6 +70,7 @@ public class AuthRedisDao {
 					refreshDTO.getRefreshToken(), refreshExpireAt);
 			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			redisTemplate.opsForValue().set(key, tokenVO);
+			redisTemplate.expireAt(key, new Date(refreshExpireAt));
 		} catch (Exception e) {
 			logger.error("TokenRedis.addToken", e);
 			throw new RedisOptException("[TokenRedis.addToken]", e.getCause());
@@ -92,7 +94,42 @@ public class AuthRedisDao {
 			throw new RedisOptException("[TokenRedis.getToken]", e.getCause());
 		}
 	}
-
+	
+	/**
+	 * 获取刷新标识，失败返回1，表示允许刷新
+	 * @param userId
+	 * @param appId
+	 * @param devType
+	 * @return
+	 */
+	public long getRefreshFlag(Long userId,String appId,DevType devType){
+		String key = AuthApi.refreshFlagKey(userId, appId, devType);
+		try {
+			RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+			return redisTemplate.opsForValue().increment(key, 1);		
+		} catch (Exception e) {
+			logger.error("TokenRedis.getRefreshFlag", e);
+			return 1;
+		}
+	}
+	
+	/**
+	 * 删除刷新标识
+	 * @param userId
+	 * @param appId
+	 * @param devType
+	 */
+	public void deleteRefreshFlag(Long userId,String appId,DevType devType){
+		String key = AuthApi.refreshFlagKey(userId, appId, devType);
+		try {
+			RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+			redisTemplate.delete(key);		
+		} catch (Exception e) {
+			logger.error("TokenRedis.getRefreshFlag", e);
+			throw new RedisOptException("[TokenRedis.getRefreshFlag]", e.getCause());
+		}
+	}
+	
 	/**
 	 * 删除token
 	 * 

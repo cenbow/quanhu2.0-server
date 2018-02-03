@@ -21,6 +21,7 @@ import com.yryz.quanhu.behavior.like.service.LikeService;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 import com.yryz.quanhu.dymaic.service.DymaicService;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
+import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.resource.hotspot.api.HotSpotApi;
 import com.yryz.quanhu.resource.questionsAnswers.api.AnswerApi;
@@ -32,7 +33,9 @@ import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
 import com.yryz.quanhu.resource.topic.api.TopicPostApi;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -42,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -94,6 +98,9 @@ public class LikeProvider implements LikeApi {
     @Reference(check = false)
     private QuestionApi questionApi;
 
+    @Reference(check = false)
+    private EventAcountApiService eventAcountApiService;
+
     @Override
     @Transactional
     public Response<Map<String, Object>> dian(Like like) {
@@ -128,6 +135,11 @@ public class LikeProvider implements LikeApi {
                     }
 
                     try {
+
+                        GrowFlowQuery gfq=new GrowFlowQuery();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        gfq.setStartTime(sdf.format(startOfTodDay()));
+                        gfq.setEndTime(sdf.format(endOfTodDay()));
                         //对接积分系统
                         List<EventInfo> eventInfos = new ArrayList<EventInfo>();
                         //点赞
@@ -142,7 +154,16 @@ public class LikeProvider implements LikeApi {
                         eventInfo.setAmount(0.0);
                         eventInfo.setCoterieId(String.valueOf(""));
                         eventInfo.setCircleId("");
-                        eventInfos.add(eventInfo);
+                        gfq.setEventCode("13");
+                        gfq.setUserId(String.valueOf(like.getUserId()));
+                        List<GrowFlowReportVo> growFlowQueries=eventAcountApiService.getGrowFlowAll(gfq).getData();
+                        int currentCount=0;
+                        for(GrowFlowReportVo growFlowReportVo:growFlowQueries){
+                            currentCount+=growFlowReportVo.getNewGrow();
+                        }
+                        if(currentCount<10){
+                            eventInfos.add(eventInfo);
+                        }
                         //被点赞
                         EventInfo eventInfo_ = new EventInfo();
                         eventInfo_.setOwnerId(String.valueOf(like.getResourceUserId()));
@@ -155,7 +176,17 @@ public class LikeProvider implements LikeApi {
                         eventInfo_.setAmount(0.0);
                         eventInfo_.setCoterieId(String.valueOf(""));
                         eventInfo_.setCircleId("");
-                        eventInfos.add(eventInfo_);
+                        gfq.setEventCode("10");
+                        gfq.setUserId(String.valueOf(like.getResourceUserId()));
+                        List<GrowFlowReportVo> growFlowQueries_=eventAcountApiService.getGrowFlowAll(gfq).getData();
+                        int currentCount_=0;
+                        for(GrowFlowReportVo growFlowReportVo:growFlowQueries_){
+                            currentCount_+=growFlowReportVo.getNewGrow();
+                        }
+                        if(currentCount_<10){
+                            eventInfos.add(eventInfo_);
+                        }
+
                         try {
                             hotSpotApi.saveHeat("1", String.valueOf(like.getResourceId()));
                             hotSpotApi.saveHeat("2", String.valueOf(like.getUserId()));
@@ -199,6 +230,33 @@ public class LikeProvider implements LikeApi {
             logger.error("", e);
             return ResponseUtils.returnException(e);
         }
+    }
+
+    /**
+     * 当天的开始时间
+     * @return
+     */
+    public static long startOfTodDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date date=calendar.getTime();
+        return date.getTime();
+    }
+    /**
+     * 当天的结束时间
+     * @return
+     */
+    public static long endOfTodDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Date date=calendar.getTime();
+        return date.getTime();
     }
 
     @Override

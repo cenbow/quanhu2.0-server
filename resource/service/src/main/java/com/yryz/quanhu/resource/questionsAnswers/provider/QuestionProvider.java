@@ -115,5 +115,18 @@ public class QuestionProvider implements QuestionApi {
     public Response<Question> queryDetail(Long kid) {
         return this.queryDetail(kid);
     }
+
+    @Override
+    public Response<Integer> executeInValidQuestionRefund() {
+        try {
+            this.questionService.updateInValidQuestionRefund();
+            return ResponseUtils.returnObjectSuccess(1);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
 }
 

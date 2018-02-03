@@ -44,4 +44,13 @@ public class Constants {
 	 * 警告禁言次数
 	 */
 	public static final int WARN_TIMES = 3;
+	
+	/**
+	 * 第三方登录信息配置
+	 */
+	public static final String THIRD_LOGIN_CONFIG_NAME = "thirdLoginConfig";
+	/**
+	 * 登录认证配置
+	 */
+	public static final String AUTH_CONFIG_NAME = "userAuthConfig";
 }

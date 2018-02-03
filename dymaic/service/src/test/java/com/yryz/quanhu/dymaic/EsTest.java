@@ -33,9 +33,9 @@ public class EsTest {
         StarInfoDTO starInfoDTO = new StarInfoDTO();
         starInfoDTO.setTagId(12L);
         starInfoDTO.setCurrentPage(1);
-        starInfoDTO.setPageSize(5);
+        starInfoDTO.setPageSize(200);
         Response<PageList<StarInfoVO>> pageListResponse = elasticsearchService.searchStarUser(starInfoDTO);
-        System.out.println("pageListResponse: " + GsonUtils.parseJson(pageListResponse));
+        System.out.println("searchStarUser pageListResponse: " + GsonUtils.parseJson(pageListResponse));
     }
 
     @Test

@@ -23,12 +23,12 @@ public class VerifyCodeConfigVO implements Serializable {
 	/**
 	 * 普通验证码过期时间 /秒
 	 */
-	private Integer normalCodeExpireTime = 300;
+	private Integer normalCodeExpireTime = 600;
 	
 	/**
 	 * 普通验证码获取间隔时间 /秒
 	 */
-	private Integer normalCodeDelayTime = 300;
+	private Integer normalCodeDelayTime = 60;
 	/**
 	 * 普通验证码每天获取总量限制
 	 */

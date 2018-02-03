@@ -264,8 +264,8 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
     }
 
     @Override
-    public List<Long> getKidByCreatedate(String startDate, String endDate) {
-        return releaseInfoDao.selectKidByCreatedate(startDate, endDate);
+    public List<Long> selectKidByCondition(ReleaseInfoDto dto) {
+        return releaseInfoDao.selectKidByCondition(dto);
     }
 
     @Override
