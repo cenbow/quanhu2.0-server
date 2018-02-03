@@ -48,10 +48,6 @@ public class ScoreAPIImpl implements ScoreAPI {
 		return scoreEventManageService.delById(id);
 	}
 
-	@Override
-	public PageList<ScoreEventInfo> getScoreEventPage() {
-		return scoreEventManageService.getPage();
-	}
 	
 
 
@@ -188,10 +184,69 @@ public class ScoreAPIImpl implements ScoreAPI {
 	}
 
 	@Override
-	public PageList<ScoreEventInfo> getScoreEvent() {
-		return scoreEventManageService.getAll();
+	public PageList<ScoreFlowReportVo> getScoreEvent(ScoreFlowQuery sfq) {
+
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		   PageList<ScoreFlowReportVo> pageList = new PageList<>();
+	        pageList.setCurrentPage(sfq.getCurrentPage());
+	        pageList.setPageSize(sfq.getPageSize());
+
+			Page<ScoreEventInfo> page = new Page<ScoreEventInfo>();
+			page.setPageNo(sfq.getCurrentPage());
+			page.setPageSize(sfq.getPageSize());
+			//PageHelper.startPage(sfq.getCurrentPage(), sfq.getPageSize());
+	        @SuppressWarnings("unchecked")
+			com.github.pagehelper.Page<ScoreEventInfo> pageHelp = PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
+			//com.github.pagehelper.Page<ScoreFlow> pageHelp =   PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
+	        ScoreEventInfo sfvo  = new ScoreEventInfo();  
+	        pageHelp = (com.github.pagehelper.Page<ScoreEventInfo>) scoreEventManageService.getPage(sfvo);
+			List<ScoreEventInfo> list =  new ArrayList<ScoreEventInfo>(pageHelp.getResult());
+ 
+			List<ScoreFlowReportVo> listVO =  new ArrayList<ScoreFlowReportVo>();
+			for (ScoreEventInfo s :list){
+				ScoreFlowReportVo vo = new ScoreFlowReportVo();
+				vo.setId(s.getId());
+				vo.setEventCode(s.getEventCode());
+				vo.setEventScore(s.getEventScore());
+				vo.setEventName(s.getEventName());
+			    vo.setEventLimit(s.getEventLimit());
+			    vo.setEventLoopUnit(s.getEventLoopUnit());
+			    vo.setEventType(s.getEventType());
+			    vo.setAmountPower(s.getAmountPower());
+				vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+				vo.setCreateTime(sdf.format(s.getCreateTime()));
+				listVO.add(vo);
+				
+			}
+
+			pageList.setEntities(listVO);
+			pageList.setCount(pageHelp.getTotal());
+		
+	        return pageList;
+	}
+
+
+	@Override
+	public  ScoreFlowReportVo getScoreEventOne(ScoreFlowQuery sfq) {
+
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		ScoreEventInfo s = scoreEventManageService.getByCode(sfq.getId());
+		ScoreFlowReportVo vo = new ScoreFlowReportVo();
+		
+		vo.setId(s.getId());
+		vo.setEventCode(s.getEventCode());
+		vo.setEventScore(s.getEventScore());
+		vo.setEventName(s.getEventName());
+	    vo.setEventLimit(s.getEventLimit());
+	    vo.setEventLoopUnit(s.getEventLoopUnit());
+	    vo.setEventType(s.getEventType());
+	    vo.setAmountPower(s.getAmountPower());
+		vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+		vo.setCreateTime(sdf.format(s.getCreateTime()));
+		
+		return  vo;
 	}
 	
-
 
 }

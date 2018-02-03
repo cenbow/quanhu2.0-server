@@ -111,8 +111,6 @@ public class TransmitServiceImpl implements TransmitService {
             extJson = resourceVo.getExtJson();
             userId = resourceVo.getUserId();
         }
-        //发送动态
-        this.sendDymaic(transmitInfo, extJson);
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -122,6 +120,8 @@ public class TransmitServiceImpl implements TransmitService {
         transmitInfo.setCreateDateLong(transmitInfo.getCreateDate().getTime());
         //保存转发记录
         transmitMongoDao.save(transmitInfo);
+        //发送动态
+        this.sendDymaic(transmitInfo, extJson);
         //发送消息
         this.sendMessage(userId, transmitInfo, resourceVo);
         try {
@@ -172,6 +172,7 @@ public class TransmitServiceImpl implements TransmitService {
         resourceTotal.setExtJson(extJson);
         resourceTotal.setTransmitNote(transmitInfo.getContent());
         resourceTotal.setTransmitType(transmitInfo.getModuleEnum());
+        resourceTotal.setTransmitId(transmitInfo.getKid());
 
         try {
             resourceDymaicApi.commitResourceDymaic(resourceTotal);

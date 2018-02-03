@@ -69,7 +69,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         //分页信息
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize,
                 Sort.by(Direction.DESC, "userStarInfo.recommendHeight", "userStarInfo.recommendTime",
-                "userStarInfo.authTime", "userBaseInfo.lastHeat"));
+                        "userStarInfo.authTime", "userBaseInfo.lastHeat"));
         if (userId != null) {
             //当前用户
             QueryBuilder queryMyself = QueryBuilders.termQuery("userId", userId.toString());
@@ -99,11 +99,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
     public List<UserInfo> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
         Integer pageNo = adminUserDTO.getPageNo();
         Integer pageSize = adminUserDTO.getPageSize();
-
         String startDateStr = adminUserDTO.getStartDate();
         String endDateStr = adminUserDTO.getEndDate();
-        long startDate = DateUtils.parseDate(startDateStr).getTime();
-        long endDate = DateUtils.parseDate(endDateStr).getTime();
+
         //用户
         String nickName = adminUserDTO.getNickName();
         String phone = adminUserDTO.getPhone();
@@ -114,23 +112,40 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte auditStatus = adminUserDTO.getAuditStatus();
         Byte authType = adminUserDTO.getAuthType();
         Byte authWay = adminUserDTO.getAuthWay();
-
         String growLevel = adminUserDTO.getGrowLevel();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNoneBlank(nickName)) {
-            boolQueryBuilder.must(QueryBuilders.matchQuery(ESConstants.USER_NICKNAME, nickName));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
         }
         if (StringUtils.isNoneBlank(phone)) {
-            boolQueryBuilder.must(QueryBuilders.matchQuery(ESConstants.USER_PHONE, phone));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_PHONE, "*" + phone + "*"));
+        }
+        if (StringUtils.isNoneBlank(channelCode)) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_ACTIVITYCHANNELCODE, "*" + channelCode + "*"));
+        }
+        if (auditStatus != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUDITSTATUS, auditStatus));
+        }
+        if (authType != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHTYPE, authType));
+        }
+        if (authWay != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHWAY, authWay));
+        }
+        if (growLevel != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
+        }
+        if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
+            long startDate = DateUtils.parseDate(startDateStr).getTime();
+            long endDate = DateUtils.parseDate(endDateStr).getTime();
+            boolQueryBuilder.must(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate));
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
 
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
-        queryBuilder
-                .withFilter(boolQueryBuilder)
-                .withFilter(QueryBuilders.rangeQuery(USER_CREATEDATE).gte(startDate).lte(endDate))
+        queryBuilder.withFilter(boolQueryBuilder)
                 .withPageable(pageable);
 
         List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
@@ -139,7 +154,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
 
         SearchQuery query = queryBuilder.build();
-
+        logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
         return elasticsearchTemplate.queryForList(query, UserInfo.class);
     }
 

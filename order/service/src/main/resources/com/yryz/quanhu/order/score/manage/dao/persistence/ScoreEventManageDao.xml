@@ -85,7 +85,6 @@
 		 a.amount_power as  amountPower , b.event_name as eventName
 		FROM event_score a inner join event_sys b on
 		a.event_code = b.event_code
-		limit #{limit} offset #{start}
 	</select>
 
 	<!-- 更新积分事件信息 -->

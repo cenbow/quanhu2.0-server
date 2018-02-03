@@ -6,7 +6,9 @@ import com.google.common.collect.Sets;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.service.ElasticsearchService;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.vo.UserDynamicVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -52,8 +54,11 @@ public class UserStarController {
     @Reference(check = false)
     private UserStarApi starApi;
 
-    @Reference
-    private DymaicService dymaicService;
+//    @Reference
+//    private DymaicService dymaicService;
+
+    @Reference(check = false)
+    private ElasticsearchService elasticsearchService;
 
     /**
      * 达人申请
@@ -62,7 +67,7 @@ public class UserStarController {
      * @return
      */
     @ResponseBody
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation(login = true)
     @ApiOperation("达人申请")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/{version}/star/starApply")
@@ -82,7 +87,7 @@ public class UserStarController {
      * @return
      */
     @ApiOperation(" 达人信息编辑")
-    @UserBehaviorValidation(login=true)
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/{version}/star/editStarAuth")
     public Response<Boolean> update(@RequestBody StarAuthInfo info, HttpServletRequest request) {
@@ -101,21 +106,21 @@ public class UserStarController {
      * @return
      */
     @ApiOperation("达人信息获取")
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/getStarAuth")
     public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         StarAuthInfo authInfo = null;
         if (StringUtils.isNotBlank(userId)) {
-        	authInfo = ResponseUtils.getResponseData(starApi.get(userId));
-        	if(authInfo != null){
-        		authInfo.setContactCall(CommonUtils.getPhone(authInfo.getContactCall()));
-        		authInfo.setIdCard(CommonUtils.getIdCardNo(authInfo.getIdCard()));
-        		authInfo.setRealName(CommonUtils.getRealName(authInfo.getRealName()));
-        	}
+            authInfo = ResponseUtils.getResponseData(starApi.get(userId));
+            if (authInfo != null) {
+                authInfo.setContactCall(CommonUtils.getPhone(authInfo.getContactCall()));
+                authInfo.setIdCard(CommonUtils.getIdCardNo(authInfo.getIdCard()));
+                authInfo.setRealName(CommonUtils.getRealName(authInfo.getRealName()));
+            }
         } else {
-        	authInfo = ResponseUtils.getResponseData(starApi.get(header.getUserId()));
+            authInfo = ResponseUtils.getResponseData(starApi.get(header.getUserId()));
         }
         return ResponseUtils.returnApiObjectSuccess(authInfo);
     }
@@ -127,7 +132,7 @@ public class UserStarController {
      * @return
      */
     @ApiOperation("达人推荐列表")
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/starCommend")
     public Response<PageList<StarInfoVO>> recommendList(Integer pageSize, Integer currentPage, HttpServletRequest request) {
@@ -147,12 +152,12 @@ public class UserStarController {
      * @return
      */
     @ApiOperation("某一标签下的达人列表")
-    @UserBehaviorValidation(login=false)
+    @UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/star/label/list")
     public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
-        StarAuthParamDTO paramDTO = new StarAuthParamDTO();
+        /*StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 
         paramDTO.setCategoryId(categoryId);
@@ -161,11 +166,20 @@ public class UserStarController {
         Response<PageList<StarInfoVO>> labelStarList = starApi.labelStarList(paramDTO);
 
         PageList<StarInfoVO> pageList = labelStarList.getData();
-        getStarDynamic(pageList);
+        getStarDynamic(pageList);*/
+
+        StarInfoDTO starInfoDTO = new StarInfoDTO();
+        starInfoDTO.setTagId(categoryId);
+        starInfoDTO.setCurrentPage(currentPage);
+        starInfoDTO.setPageSize(pageSize);
+        starInfoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+
+        PageList<StarInfoVO> pageList = ResponseUtils.getResponseData(elasticsearchService.searchStarUser(starInfoDTO));
+        logger.info("labelStarList result: {}", GsonUtils.parseJson(pageList));
         return ResponseUtils.returnApiObjectSuccess(pageList);
     }
 
-    private void getStarDynamic(PageList<StarInfoVO> pageList) {
+    /*private void getStarDynamic(PageList<StarInfoVO> pageList) {
         try {
             if (pageList != null) {
                 List<StarInfoVO> entities = pageList.getEntities();
@@ -200,6 +214,6 @@ public class UserStarController {
         } catch (Exception e) {
             logger.error("getStarDynamic error", e);
         }
-    }
+    }*/
 
 }

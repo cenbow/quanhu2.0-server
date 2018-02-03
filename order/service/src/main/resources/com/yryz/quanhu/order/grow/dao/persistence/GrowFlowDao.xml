@@ -102,6 +102,9 @@
 		</if>
 		) a 
 		left join event_sys b on a.eventCode = b.event_code 
+		 <if test="gfq.eventName != null and gfq.eventName !=''">
+			where b.event_name = #{gfq.eventName}
+		</if>
 		order by id desc
 	</select>
 

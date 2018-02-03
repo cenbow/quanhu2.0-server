@@ -317,8 +317,9 @@ public class UserController {
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/webLoginThird")
-	public Response<String> webLoginThird(String loginType, String returnUrl) {
-		return accountApi.webLoginThird(loginType, returnUrl);
+	public Response<String> webLoginThird(String loginType, String returnUrl,HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		return accountApi.webLoginThird(loginType, returnUrl,header.getAppId());
 	}
 
 	/**
@@ -487,6 +488,7 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/bindThird")
 	public Response<Boolean> bindThird(@RequestBody BindThirdDTO thirdDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
+		thirdDTO.setAppId(header.getAppId());
 		thirdDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(accountApi.bindThird(thirdDTO));
 		return ResponseUtils.returnApiObjectSuccess(result);
@@ -504,6 +506,7 @@ public class UserController {
 	@PostMapping(value = "/{version}/user/unbindThird")
 	public Response<Boolean> unbindThird(@RequestBody UnBindThirdDTO thirdDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
+		thirdDTO.setAppId(header.getAppId());
 		thirdDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		Boolean result = ResponseUtils.getResponseData(accountApi.unbindThird(thirdDTO));
 		return ResponseUtils.returnApiObjectSuccess(result);

@@ -1,8 +1,9 @@
 package com.yryz.quanhu.other.activity.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AdminActivityCountDto {
+public class AdminActivityCountDto implements Serializable {
 
     /**页码*/
     private Integer currentPage = 1;

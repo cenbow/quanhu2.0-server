@@ -27,6 +27,8 @@ public class AnswerDto implements Serializable {
 
     private String contentSource;
 
+
+
     public Long getKid() {
         return kid;
     }

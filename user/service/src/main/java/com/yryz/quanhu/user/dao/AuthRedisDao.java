@@ -69,6 +69,7 @@ public class AuthRedisDao {
 					refreshDTO.getRefreshToken(), refreshExpireAt);
 			RedisTemplate<String, AuthTokenVO> redisTemplate = redisTemplateBuilder.buildRedisTemplate(AuthTokenVO.class);
 			redisTemplate.opsForValue().set(key, tokenVO);
+			redisTemplate.expireAt(key, new Date(refreshExpireAt));
 		} catch (Exception e) {
 			logger.error("TokenRedis.addToken", e);
 			throw new RedisOptException("[TokenRedis.addToken]", e.getCause());

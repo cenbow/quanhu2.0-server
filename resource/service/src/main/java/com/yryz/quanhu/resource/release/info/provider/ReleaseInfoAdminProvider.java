@@ -1,5 +1,9 @@
 package com.yryz.quanhu.resource.release.info.provider;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +69,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
     @Override
     public Response<ReleaseInfoVo> infoByKid(Long kid) {
         try {
+            Assert.notNull(kid, "kid is null !");
             ReleaseInfoVo infoVo = releaseInfoService.selectByKid(kid);
             Assert.notNull(infoVo, "文章不存在！kid:" + kid);
 
@@ -100,19 +105,43 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
     public Response<Integer> batchShelve(Long[] kids, Byte shelveFlag, Long lastUpdateUserId) {
         try {
             Assert.notNull(kids, "kids is null !");
+            Assert.isTrue(kids.length > 0, "kids.length is 0 !");
             Assert.notNull(shelveFlag, "shelveFlag is null !");
             Assert.isTrue(CommonConstants.SHELVE_NO.equals(shelveFlag) || CommonConstants.SHELVE_YES.equals(shelveFlag),
                     "shelveFlag not is (10,11) !");
             Assert.notNull(lastUpdateUserId, "lastUpdateUserId is null !");
-            logger.debug("平台文章，批量上下架操作。kids：" + kids + ", shelveFlag :" + shelveFlag);
+            logger.debug("平台文章，批量上下架操作。源kids：" + kids + ", shelveFlag :" + shelveFlag);
 
+            // 查询 kids 中已经是shelveFlag 状态的记录 从kids 集合中剔除
             ReleaseInfoDto dto = new ReleaseInfoDto();
             dto.setKids(kids);
+            dto.setShelveFlag(shelveFlag);
+            List<Long> sheKids = releaseInfoService.selectKidByCondition(dto);
+
+            // 查询kids 中已经是【删除】状态的 记录 从kids 集合中剔除
+            ReleaseInfoDto delDto = new ReleaseInfoDto();
+            delDto.setKids(kids);
+            delDto.setDelFlag(CommonConstants.DELETE_YES);
+            List<Long> delKids = releaseInfoService.selectKidByCondition(delDto);
+
+            List<Long> kidList = new ArrayList<>(Arrays.asList(kids));
+            kidList.removeAll(sheKids);
+            kidList.removeAll(delKids);
+
+            Long[] targetKids = kidList.toArray(new Long[] {});
+            logger.debug("平台文章，批量上下架操作。处理后kids：" + targetKids + ", shelveFlag :" + shelveFlag);
+
+            if (targetKids.length < 1) {
+                return ResponseUtils.returnObjectSuccess(0);
+            }
+
+            ReleaseInfoDto rd = new ReleaseInfoDto();
+            rd.setKids(targetKids);
 
             ReleaseInfo up = new ReleaseInfo();
             up.setShelveFlag(shelveFlag);
             up.setLastUpdateUserId(lastUpdateUserId);
-            int upCount = releaseInfoService.updateByCondition(up, dto);
+            int upCount = releaseInfoService.updateByCondition(up, rd);
             Response<Integer> result = ResponseUtils.returnObjectSuccess(upCount);
 
             // 没有未更新的记录
@@ -120,7 +149,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
                 return result;
             }
 
-            for (Long kid : kids) {
+            for (Long kid : targetKids) {
                 if (null == kid) {
                     continue;
                 }

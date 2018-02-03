@@ -1,11 +1,13 @@
 package com.yryz.quanhu.coterie.member.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberNotify;
 import com.yryz.quanhu.coterie.member.event.CoterieMemberMessageManager;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
+import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.sdk.IOrderNotifyService;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
 import org.slf4j.Logger;
@@ -31,7 +33,7 @@ public class CoterieMemberOrderNotifyServiceImpl implements IOrderNotifyService 
 
     @Override
     public String getModuleEnum() {
-        return null;
+        return ModuleContants.COTERIE;
     }
 
     @Override
