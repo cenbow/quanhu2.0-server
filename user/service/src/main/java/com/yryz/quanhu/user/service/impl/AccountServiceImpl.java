@@ -255,7 +255,7 @@ public class AccountServiceImpl implements AccountService {
 		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
 			LoginMethodVO methodVO = new LoginMethodVO(account.getKid(), account.getUserPhone(),
-					RegType.PHONE.getType(), havePwd);
+					"",RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
 

@@ -14,7 +14,6 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.api.MessageAPI;
-import com.yryz.quanhu.other.activity.constants.ActivityCandidateConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityRedisConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.other.activity.dao.*;
@@ -22,6 +21,7 @@ import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.other.activity.entity.ActivityUserPrizes;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteRecord;
+import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.ActivityPrizesVo;
 import com.yryz.quanhu.other.activity.vo.ActivityUserPrizesVo;
@@ -71,6 +71,9 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 
     @Autowired
     ActivityVoteRecordDao activityVoteRecordDao;
+
+    @Autowired
+    ActivityVoteRedisService activityVoteRedisService;
 
     @Reference(check = false, timeout = 30000)
     MessageAPI messageAPI;
@@ -229,11 +232,8 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         record.setKid(result.getData());
         //插入投票记录
         activityVoteRecordDao.insertByPrimaryKeySelective(record);
-        //累计排行榜中的票数
-        RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
-        template.opsForZSet().incrementScore(ActivityCandidateConstants.getKeyRank(record.getActivityInfoId()),
-                record.getCandidateId(),
-                1d);
+        //递增投票数
+        activityVoteRedisService.vote(record.getActivityInfoId(), record.getCandidateId(), 1d);
 
         return count;
     }

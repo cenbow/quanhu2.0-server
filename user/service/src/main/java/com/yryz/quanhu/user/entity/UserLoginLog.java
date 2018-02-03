@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.user.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.entity.GenericEntity;
 
 /**
@@ -19,6 +21,7 @@ import com.yryz.common.entity.GenericEntity;
 @SuppressWarnings("serial")
 public class UserLoginLog extends GenericEntity{
 
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**

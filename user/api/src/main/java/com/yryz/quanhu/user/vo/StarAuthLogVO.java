@@ -10,6 +10,9 @@ package com.yryz.quanhu.user.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * 达人申请以及审核日志
  * @author danshiyu
@@ -27,6 +30,7 @@ public class StarAuthLogVO implements Serializable{
     /**
      * 用户id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**

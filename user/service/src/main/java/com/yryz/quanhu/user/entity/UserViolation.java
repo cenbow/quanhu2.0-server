@@ -9,6 +9,8 @@ package com.yryz.quanhu.user.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.entity.GenericEntity;
 
 /**
@@ -24,6 +26,7 @@ public class UserViolation extends GenericEntity{
     /**
      * 用户id
      */
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**

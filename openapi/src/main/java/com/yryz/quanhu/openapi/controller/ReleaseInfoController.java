@@ -91,6 +91,8 @@ public class ReleaseInfoController {
     @UserBehaviorValidation(event = "文章列表", login = true)
     @GetMapping(value = "{version}/release/info/list")
     public Response<PageList<ReleaseInfoVo>> list(ReleaseInfoDto dto, @RequestHeader("userId") Long headerUserId) {
+        // 只查询 平台文章
+        dto.setCoterieId(0L);
         return releaseInfoApi.pageByCondition(dto, headerUserId, false, true);
     }
 }
