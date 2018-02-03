@@ -72,6 +72,7 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
 
         if (CommonConstant.QuanHuDb.DB_NAME.equals(msg.getDbName())) {
             if (CommonConstant.QuanHuDb.TABLE_USER.equals(msg.getTableName())) {
+                logger.info("user baseinfo table get change");
                 doUserBaseInfo(msg);
             }
             if (CommonConstant.QuanHuDb.TABLE_USER_TAG.equals(msg.getTableName())) {
@@ -303,11 +304,13 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
         if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
             Optional<UserInfo> uinfo = userRepository.findById(uinfoBefore.getUserId());
             if (uinfo.isPresent()) {
+                logger.info("doUserBaseInfo present");
                 UserInfo userInfo = uinfo.get();
                 UserBaseInfo userBaseInfo = CanalEntityParser.parse(userInfo.getUserBaseInfo(), msg.getDataAfter(), UserBaseInfo.class);
                 userInfo.setUserBaseInfo(userBaseInfo);
                 userRepository.save(userInfo);
             } else {
+                logger.info("doUserBaseInfo update not exist, add");
                 UserInfo userInfo = new UserInfo();
                 userInfo.setUserBaseInfo(uinfoAfter);
                 userInfo.setUserId(uinfoAfter.getUserId());
