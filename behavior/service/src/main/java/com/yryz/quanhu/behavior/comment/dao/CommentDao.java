@@ -36,4 +36,6 @@ public interface CommentDao {
 
     int updownSingle(Comment comment);
 
+    Long queryCommentForAdminCount(CommentDTO commentDTO);
+
 }

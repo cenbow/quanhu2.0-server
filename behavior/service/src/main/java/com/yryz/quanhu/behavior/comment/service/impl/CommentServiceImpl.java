@@ -270,7 +270,7 @@ public class CommentServiceImpl implements CommentService {
         pageList.setCurrentPage(commentDTO.getCurrentPage());
         pageList.setPageSize(commentDTO.getPageSize());
         pageList.setEntities(commentVOForAdmins);
-        pageList.setCount(100L);
+        pageList.setCount(commentDao.queryCommentForAdminCount(commentDTO));//需要做个统计计数查询
         return pageList;
     }
 

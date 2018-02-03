@@ -205,6 +205,27 @@
         </where>
     </select>
 
+    <select id="queryCommentForAdminCount" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentDTO" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM qh_comment_info
+        <where>
+            1=1
+            <if test="shelveFlag != null and shelveFlag != 0">
+                AND shelve_flag=#{shelveFlag,jdbcType=TINYINT}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND create_date >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_date &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="keyWords != null and keyWords != ''">
+                AND CONCAT(`content_comment`) LIKE CONCAT('%',#{keyWords,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+    </select>
+
     <select id="queryComments" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO"
             resultType="com.yryz.quanhu.behavior.comment.vo.CommentVO">
         SELECT
@@ -223,7 +244,8 @@
 
     <update id="updownBatch" parameterType="java.util.List">
         <foreach close="" collection="list" index="index" item="item" open="" separator=";">
-            UPDATE qh_comment_info SET shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
+            UPDATE qh_comment_info SET
+            shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
             where kid=#{item.kid,jdbcType=BIGINT}
         </foreach>
     </update>
