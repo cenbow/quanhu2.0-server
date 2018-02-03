@@ -3,11 +3,15 @@ package com.yryz.quanhu.user.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 @SuppressWarnings("serial")
 public class UserRegLogVO implements Serializable {
 	/**
      * 用户id
      */
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**

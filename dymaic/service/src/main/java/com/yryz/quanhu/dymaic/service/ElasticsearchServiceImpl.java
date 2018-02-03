@@ -142,11 +142,30 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
         List<StarInfoVO> starInfoVOList = Lists.newArrayList();
 
         if (CollectionUtils.isNotEmpty(list)) {
+            //关系数据
+            Long userId = starInfoDTO.getUserId();
+            Set<String> targetIds = Sets.newHashSet();
+            for (UserInfo userInfo : list) {
+                if (userInfo != null) {
+                    targetIds.add(userInfo.getUserId().toString());
+                }
+            }
+
+            Map<String, UserSimpleVO> userSimpleMap = null;
+            try {
+                Response<Map<String, UserSimpleVO>> userApiUserSimple = userApi.getUserSimple(userId, targetIds);
+                userSimpleMap = userApiUserSimple.getData();
+            } catch (Exception e) {
+                logger.error("searchStarUser error", e);
+            }
+
+            //动态数据
             Set<Long> dynamicUserIds = getNeedDynamicUserIds(list);
             Map<Long, Dymaic> dymaicMap = null;
             if (CollectionUtils.isNotEmpty(dynamicUserIds)) {
                 try {
                     dymaicMap = dymaicService.getLastSend(dynamicUserIds);
+                    logger.info("dymaicService.getLastSend result: {}", GsonUtils.parseJson(dymaicMap));
                 } catch (Exception e) {
                     logger.error("dymaicService getLastSend error", e);
                 }
@@ -154,13 +173,9 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 
             for (UserInfo userInfo : list) {
                 StarInfoVO starInfoVO = new StarInfoVO();
+                // 用户数据
+                starInfoVO.parseUser(userInfo.getUserId().toString(), userSimpleMap);
 
-                if (userInfo.getUserBaseInfo() != null) {
-                    // 用户数据
-                    UserSimpleVO simpleVO = new UserSimpleVO();
-                    BeanUtils.copyProperties(userInfo.getUserBaseInfo(), simpleVO);
-                    starInfoVO.setUserInfo(simpleVO);
-                }
                 if (userInfo.getUserStarInfo() != null) {
                     // 达人数据
                     UserStarSimpleVo starSimpleVo = new UserStarSimpleVo();

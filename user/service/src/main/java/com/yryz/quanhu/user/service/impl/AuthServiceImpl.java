@@ -146,7 +146,7 @@ public class AuthServiceImpl implements AuthService {
 		AuthTokenVO tokenVO;
 		
 		tokenVO = redisDao.getToken(refreshDTO);
-		logger.info("[getToken]:refreshDTO:{},tokenVO:{}",JsonUtils.toFastJson(refreshDTO),JsonUtils.toFastJson(tokenVO));
+		logger.info("[getToken_begin]:refreshDTO:{},tokenVO:{}",JsonUtils.toFastJson(refreshDTO),JsonUtils.toFastJson(tokenVO));
 		// 长期token过期或者设置登录刷新token都重新获取新token
 		if (tokenVO == null
 				|| (tokenVO.getRefreshExpireAt() != null && tokenVO.getRefreshExpireAt() < System.currentTimeMillis())
@@ -184,6 +184,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		try {
 			tokenVO = new AuthTokenVO(refreshDTO.getUserId(), token, expireAt, refreshToken, refreshExpireAt);
+			logger.info("[getToken_return]:refreshDTO:{},tokenVO:{}",JsonUtils.toFastJson(refreshDTO),JsonUtils.toFastJson(tokenVO));
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException);
@@ -193,7 +194,9 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Override
 	public boolean checkRefreshFlag(Long userId, String appId, DevType devType) {
-		return redisDao.getRefreshFlag(userId, appId, devType) <= 1;
+		AuthConfig rangeConfig = getAuthConfig(appId);
+		long expireAt = rangeConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
+		return redisDao.getRefreshFlag(userId, appId, devType,expireAt) <= 1;
 	}
 	
 	@Override
