@@ -17,6 +17,15 @@ public class ReportDTO extends PageList implements Serializable {
     private byte informStatus;
     private String startTime;
     private String endTime;
+    private String informDesc;
+
+    public String getInformDesc() {
+        return informDesc;
+    }
+
+    public void setInformDesc(String informDesc) {
+        this.informDesc = informDesc;
+    }
 
     public String getInformTypeName() {
         return informTypeName;

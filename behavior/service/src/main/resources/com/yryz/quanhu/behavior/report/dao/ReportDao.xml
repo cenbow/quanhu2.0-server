@@ -6,7 +6,7 @@
         <result column="kid" property="kid" jdbcType="BIGINT"/>
         <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
         <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
-        <result column="inform_type_Name" property="informTypeName" jdbcType="VARCHAR"/>
+        <result column="inform_type_name" property="informTypeName" jdbcType="VARCHAR"/>
         <result column="inform_desc" property="informDesc" jdbcType="VARCHAR"/>
         <result column="inform_status" property="informStatus" jdbcType="TINYINT"/>
         <result column="report_user_id" property="reportUserId" jdbcType="BIGINT"/>
@@ -18,13 +18,13 @@
     </resultMap>
 
     <sql id="Base_Report_Column_List">
-        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,inform_type_Name AS informTypeName,inform_desc AS informDesc,inform_status AS informStatus,
+        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,inform_type_name AS informTypeName,inform_desc AS informDesc,inform_status AS informStatus,
         report_user_id AS reportUserId,be_report_user_id AS beReportUserId,dispose_time AS disposeTime,create_date AS createDate,last_update_user_id AS lastUpdateUserId,
         last_update_date AS lastUpdateDate
     </sql>
 
     <select id="queryReportForAdmin" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO"
-            resultMap="BaseReportResultMap">
+            resultType="com.yryz.quanhu.behavior.report.vo.ReportVoForAdmin">
         SELECT
         <include refid="Base_Report_Column_List"/>
         FROM qh_inform
@@ -34,7 +34,7 @@
                 AND inform_status=#{informStatus,jdbcType=TINYINT}
             </if>
             <if test="informTypeName != null and informTypeName != ''">
-                AND inform_type_Name=#{informTypeName,jdbcType=VARCHAR}
+                AND inform_type_name=#{informTypeName,jdbcType=VARCHAR}
             </if>
             <if test="moduleEnum != null and moduleEnum != ''">
                 AND module_enum=#{moduleEnum,jdbcType=VARCHAR}
@@ -47,6 +47,30 @@
             </if>
             ORDER BY
             create_date DESC
+        </where>
+    </select>
+
+    <select id="queryReportForAdminCount" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO" resultType="java.lang.Long">
+        SELECT
+        COUNT(1)
+        FROM qh_inform
+        <where>
+            1=1
+            <if test="informStatus != null and informStatus != ''">
+                AND inform_status=#{informStatus,jdbcType=TINYINT}
+            </if>
+            <if test="informTypeName != null and informTypeName != ''">
+                AND inform_type_name=#{informTypeName,jdbcType=VARCHAR}
+            </if>
+            <if test="moduleEnum != null and moduleEnum != ''">
+                AND module_enum=#{moduleEnum,jdbcType=VARCHAR}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND create_date &gt;= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_date &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
         </where>
     </select>
 
@@ -63,7 +87,7 @@
                 resource_id,
             </if>
             <if test="informTypeName != null">
-                inform_type_Name,
+                inform_type_name,
             </if>
             <if test="informDesc != null and informDesc != ''">
                 inform_desc,
@@ -82,6 +106,9 @@
             </if>
             <if test="lastUpdateUserId != null and lastUpdateUserId != ''">
                 last_update_user_id,
+            </if>
+            <if test="lastUpdateDate != null">
+                last_update_date,
             </if>
             <if test="lastUpdateDate != null">
                 last_update_date,
@@ -125,7 +152,7 @@
     </insert>
 
     <select id="querySingleReport" parameterType="com.yryz.quanhu.behavior.report.entity.Report"
-            resultMap="BaseReportResultMap">
+            resultType="com.yryz.quanhu.behavior.report.entity.Report">
         SELECT
         <include refid="Base_Report_Column_List"/>
         FROM qh_inform

@@ -12,6 +12,7 @@ import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.behavior.report.service.ReportService;
 import com.yryz.quanhu.behavior.report.service.ReportApi;
 import com.yryz.quanhu.behavior.report.vo.ReportVo;
+import com.yryz.quanhu.behavior.report.vo.ReportVoForAdmin;
 import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public class ReportProvider implements ReportApi {
         try {
             report.setKid(idAPI.getSnowflakeId().getData());
             Map<String,Integer> map=new HashMap<String,Integer>();
+            report.setInformStatus((byte) 10);
             int count = reportService.accretion(report);
             if(count>0){
                 map.put("result",1);
@@ -69,7 +71,7 @@ public class ReportProvider implements ReportApi {
     }
 
     @Override
-    public Response<PageList<Report>> queryReportForAdmin(ReportDTO reportDTO) {
+    public Response<PageList<ReportVoForAdmin>> queryReportForAdmin(ReportDTO reportDTO) {
         try{
             return ResponseUtils.returnObjectSuccess(reportService.queryReportForAdmin(reportDTO));
         }catch (Exception e){
