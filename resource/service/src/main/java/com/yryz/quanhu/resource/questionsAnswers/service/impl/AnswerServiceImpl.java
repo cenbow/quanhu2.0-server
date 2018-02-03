@@ -246,7 +246,7 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerExample example = new AnswerExample();
         AnswerExample.Criteria criteria = example.createCriteria();
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+     //   criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andQuestionIdEqualTo(kid);
         List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
         if (!answerWithBLOBsList.isEmpty()) {

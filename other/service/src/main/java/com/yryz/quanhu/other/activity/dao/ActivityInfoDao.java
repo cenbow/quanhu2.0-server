@@ -60,4 +60,6 @@ public interface ActivityInfoDao {
     long adminAllSharelistCount(@Param("activityInfoDto") AdminActivityInfoDto adminActivityInfoDto);
 
     List<AdminActivityInfoVo> adminAllSharelistNoPage();
+
+    int updateJoinCountDiff(@Param("kid") Long activityInfoId);
 }

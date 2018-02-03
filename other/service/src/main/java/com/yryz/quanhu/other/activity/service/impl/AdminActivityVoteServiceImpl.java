@@ -13,11 +13,12 @@ import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.other.activity.entity.ActivityInfo;
 import com.yryz.quanhu.other.activity.entity.ActivityPrizes;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
+import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
+import com.yryz.quanhu.other.activity.util.DateUtils;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteVo;
-import com.yryz.quanhu.other.activity.util.DateUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -62,7 +63,8 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 
 	@Reference(check=false)
 	CountApi countApi;
-
+	@Autowired
+	ActivityVoteRedisService activityVoteRedisService;
 	/**
 	 * 活动列表
 	 */
@@ -214,7 +216,11 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	@Override
 	public Integer updateSave(ActivityInfo activity) {
 		Assert.notNull(activity, "activity 不能为空");
-		return activityVoteDao.update(activity);
+		Integer count = activityVoteDao.update(activity);
+		if (count==1){
+			activityVoteRedisService.delVoteInfo(activity.getKid());
+		}
+		return count;
 	}
 
 }
