@@ -227,7 +227,7 @@ public class AccountServiceImpl implements AccountService {
 			registerDTO.setActivityChannelCode(tempUser.getActivivtyChannelCode());
 			if (StringUtils.isBlank(registerDTO.getRegLogDTO().getActivityChannelCode())){
 				registerDTO.getRegLogDTO().setActivityChannelCode(tempUser.getActivivtyChannelCode());
-				String channelCode = StringUtils.join(new String[]{"WeixinOauth",tempUser.getActivivtyChannelCode()}, " ");
+				String channelCode = StringUtils.join(new String[]{RegType.WEIXIN_OAUTH.getText(),tempUser.getActivivtyChannelCode()}, " ");
 				registerDTO.getRegLogDTO().setChannelCode(channelCode);
 			}
 			//删除活动参与者用户
@@ -281,11 +281,9 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public String webLoginThird(String loginType, String returnUrl) {
+	public String webLoginThird(String loginType, String returnUrl,ThirdLoginConfigVO configVO) {
 		// 得到第三方登录回调的host
 		String apiHost = UserUtils.getReturnApiHost(returnUrl);
-		// 读取配置
-		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
 		if (RegType.SINA.getText().equals(loginType)) {
 			return OatuhWeibo.getAuthUrl(configVO.getWeiboAppKey(), returnUrl, apiHost, configVO.getNotifyUrl());
 		}
@@ -308,11 +306,9 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public String wxOauthLogin(WebThirdLoginDTO loginDTO) {
+	public String wxOauthLogin(WebThirdLoginDTO loginDTO,ThirdLoginConfigVO configVO) {
 		// 得到第三方登录回调的host
 		String apiHost = UserUtils.getReturnOauthApiHost(loginDTO.getReturnUrl());
-		// 读取配置
-		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
 		return OatuhWeixin.getWxOauthUrl(configVO.getWxOauthAppKey(), apiHost, loginDTO.getReturnUrl(),
 				loginDTO.getActivityChannelCode(), configVO.getWxOauthNotifyUrl());
 	}

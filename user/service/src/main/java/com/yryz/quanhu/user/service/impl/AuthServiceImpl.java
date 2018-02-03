@@ -7,18 +7,22 @@
  */
 package com.yryz.quanhu.user.service.impl;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.config.AuthConfig;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
+import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.TokenCheckEnum;
 import com.yryz.quanhu.user.dao.AuthRedisDao;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
@@ -41,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
 	private AuthRedisDao redisDao;
 	@Autowired
 	private AuthConfig authConfig;
+	@Reference
+	private BasicConfigApi configApi;
 	
 	@Override
 	public TokenCheckEnum checkToken(AuthTokenDTO tokenDTO) {
@@ -100,7 +106,9 @@ public class AuthServiceImpl implements AuthService {
 	public AuthTokenVO getToken(AuthTokenDTO tokenDTO) {
 		String token = null;
 		// 拿配置
-		Long expireAt = authConfig.getWebTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
+		AuthConfig rangeConfig = getAuthConfig(tokenDTO.getAppId());
+		
+		Long expireAt = rangeConfig.getWebTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
 		AuthTokenVO tokenVO;
 		tokenVO = redisDao.getToken(tokenDTO);
 
@@ -127,9 +135,10 @@ public class AuthServiceImpl implements AuthService {
 		String token = null;
 		String refreshToken = null;
 		// 拿配置
+		AuthConfig rangeConfig = getAuthConfig(refreshDTO.getAppId());
 		
-		Long expireAt = authConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
-		Long refreshExpireAt = authConfig.getRefreshExpire().longValue() * 3600 * 24 * 1000 + System.currentTimeMillis();
+		Long expireAt = rangeConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
+		Long refreshExpireAt = rangeConfig.getRefreshExpire().longValue() * 3600 * 24 * 1000 + System.currentTimeMillis();
 		System.out.println("expireAt="+expireAt);
 		System.out.println("refreshExpireAt="+refreshExpireAt);
 		AuthTokenVO tokenVO;
@@ -173,5 +182,20 @@ public class AuthServiceImpl implements AuthService {
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WAP, appId));
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WEB, appId));
 	}
-
+	
+	/**
+	 * 获取用户认证配置
+	 * @param appId
+	 * @return
+	 */
+	private AuthConfig getAuthConfig(String appId){
+		String configName = String.format("%s.%s", Constants.AUTH_CONFIG_NAME,appId);
+		String configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		logger.info("[getAuthConfig]:configName:{},configValue:{}",configName,configValue);
+		AuthConfig config = JSON.parseObject(configValue, new TypeReference<AuthConfig>(){});
+		if(config == null){
+			config = authConfig;
+		}
+		return config;
+	}
 }

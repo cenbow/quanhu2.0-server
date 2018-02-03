@@ -20,6 +20,7 @@ import com.yryz.quanhu.user.dto.WebThirdLoginDTO;
 import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserLoginLog;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
+import com.yryz.quanhu.user.vo.ThirdLoginConfigVO;
 import com.yryz.quanhu.user.vo.ThirdUser;
 
 /**
@@ -122,7 +123,7 @@ public interface AccountService {
 	 *            web端登录成功返回地址
 	 * @return
 	 */
-	String webLoginThird(String loginType, String returnUrl);
+	String webLoginThird(String loginType, String returnUrl,ThirdLoginConfigVO configVO);
 
 	/**
 	 * (web)第三方登录回调
@@ -140,7 +141,7 @@ public interface AccountService {
 	 * @param loginDTO
 	 * @return
 	 */
-	String wxOauthLogin(WebThirdLoginDTO loginDTO);
+	String wxOauthLogin(WebThirdLoginDTO loginD,ThirdLoginConfigVO configVO);
 	
 	/**
 	 * 绑定手机号

@@ -20,7 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
@@ -30,6 +33,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.lock.DistributedLockManager;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.LoginType;
 import com.yryz.quanhu.user.contants.RegType;
@@ -81,9 +85,7 @@ import com.yryz.quanhu.user.vo.WxToken;
  * 
  * @author danshiyu
  * @version 1.0
- * @date 2017年11月9日 下午2:19:48
- * @Description 考虑到不必要的事务回滚，注册、登录业务大部分校验、获取token、用户信息放到了controller里面，如果你的系统还有上一层
- *              ，可以把这些业务放到上一层处理
+ * @date 2017年11月9日 下午2:19:48 @
  */
 @Service(interfaceClass = AccountApi.class)
 public class AccountProvider implements AccountApi {
@@ -107,8 +109,8 @@ public class AccountProvider implements AccountApi {
 	private UserService userService;
 	@Autowired
 	private ActivityTempUserService tempService;
-	@Autowired
-	private ActivityTempUserService tempUserService;
+	@Reference
+	BasicConfigApi configApi;
 
 	/**
 	 * 手机号注册
@@ -332,7 +334,7 @@ public class AccountProvider implements AccountApi {
 	 * @Description
 	 */
 	@Override
-	public Response<String> webLoginThird(String loginType, String returnUrl) {
+	public Response<String> webLoginThird(String loginType, String returnUrl, String appId) {
 		try {
 			if (StringUtils.isEmpty(loginType) || StringUtils.isEmpty(returnUrl)) {
 				throw QuanhuException.busiError("longin returnUrl不能为空");
@@ -340,7 +342,8 @@ public class AccountProvider implements AccountApi {
 			if (!RegType.SINA.getText().equals(loginType) && !RegType.WEIXIN.getText().equals(loginType)) {
 				throw QuanhuException.busiError("loginType不支持");
 			}
-			return ResponseUtils.returnObjectSuccess(accountService.webLoginThird(loginType, returnUrl));
+			ThirdLoginConfigVO configVO = getThirdLoginConfig(appId);
+			return ResponseUtils.returnObjectSuccess(accountService.webLoginThird(loginType, returnUrl, configVO));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -396,7 +399,8 @@ public class AccountProvider implements AccountApi {
 	public Response<String> wxOauthLogin(WebThirdLoginDTO loginDTO) {
 		try {
 			checkWebThirdLoginDTO(loginDTO);
-			return ResponseUtils.returnObjectSuccess(accountService.wxOauthLogin(loginDTO));
+			return ResponseUtils.returnObjectSuccess(
+					accountService.wxOauthLogin(loginDTO, getThirdLoginConfig(loginDTO.getAppId())));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -417,9 +421,11 @@ public class AccountProvider implements AccountApi {
 			checkWebThirdLoginDTONotify(loginDTO);
 
 			ThirdUser thirdUser = getThirdUser(loginDTO.getCode(), loginDTO.getState(), loginDTO.getAppId());
+
 			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), loginDTO.getAppId(),
 					RegType.WEIXIN.getType());
 
+			// 普通用户走正常登录流程
 			if (thirdLogin != null) {
 				userId = thirdLogin.getUserId();
 				identity = UserIdentity.NORMAL;
@@ -427,15 +433,16 @@ public class AccountProvider implements AccountApi {
 				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
 				}
-			} else {
-				tempUser = tempUserService.get(null, thirdUser.getThirdId(), loginDTO.getAppId());
+			} // 观察者存在就用观察者信息登录，否则创建观察者信息
+			else {
+				tempUser = tempService.get(null, thirdUser.getThirdId(), loginDTO.getAppId());
 				if (tempUser != null) {
 					userId = tempUser.getKid();
 				} else {
 					tempUser = new ActivityTempUser(thirdUser.getThirdId(), thirdUser.getNickName(),
 							thirdUser.getHeadImg(), (byte) RegType.WEIXIN.getType(),
 							UserUtils.getActivityChannelCode(loginDTO.getState()), loginDTO.getAppId(), null);
-					userId = tempUserService.save(tempUser);
+					userId = tempService.save(tempUser);
 					tempUser.setKid(userId);
 				}
 			}
@@ -540,7 +547,7 @@ public class AccountProvider implements AccountApi {
 			// 用户不存在就根据参与者信息创建正常用户
 			if (!accountFlag) {
 				accountService.mergeActivityUser(phoneDTO.getUserId(), phoneDTO.getPhone());
-			}else{
+			} else {
 				throw QuanhuException.busiError("该用户已存在");
 			}
 			return ResponseUtils.returnObjectSuccess(true);
@@ -1100,14 +1107,22 @@ public class AccountProvider implements AccountApi {
 	}
 
 	/**
-	 * 获取第三方应用配置
+	 * 获取第三方登录配置
 	 * 
 	 * @param appId
 	 * @return
 	 */
 	private ThirdLoginConfigVO getThirdLoginConfig(String appId) {
-		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
-		return configVO;
+		String configName = String.format("%s.%s", Constants.THIRD_LOGIN_CONFIG_NAME, appId);
+		logger.info("[thirdLogin getConfig]:configName:{},appId:{}", configName, appId);
+		String configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		logger.info("[thirdLogin getConfig]:configName:{},appId:{},configValue:{}", configName, appId, configValue);
+		ThirdLoginConfigVO rangeConfig = JSON.parseObject(configValue, new TypeReference<ThirdLoginConfigVO>() {
+		});
+		if (rangeConfig == null) {
+			rangeConfig = new ThirdLoginConfigVO();
+		}
+		return rangeConfig;
 	}
 
 	/**
