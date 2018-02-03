@@ -75,7 +75,7 @@ public class StarAuthInfo implements Serializable {
     private Byte authWay;
 
     /**
-     * 审核状态 10:待审核 11:审核通过 12:审核失败 13:取消认证
+     * 审核状态 10:待审核 11:审核通过 12:审核失败 13:取消认证 14:没有提交过认证资料
      */
     private Byte auditStatus;
 
