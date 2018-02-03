@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.yryz.quanhu.user.contants.UserRelationConstant.STATUS;
 /**
  * 用户登录以及我的页面返回vo
  * @author danshiyu
@@ -102,11 +103,11 @@ public class UserLoginSimpleVO implements Serializable {
     /**
      * 关系状态 {@link #UserRelationConstant.STATUS}
      */
-    private Integer relationStatus;
+    private Integer relationStatus = STATUS.NONE.getCode();
     /**
      * 好友备注名
      */
-    private String nameNotes;
+    private String nameNotes = "";
     /**
      * 达人行业
      */

@@ -99,6 +99,14 @@ public class LoginMethodVO implements Serializable {
 		this.loginType = loginType;
 		this.havePwd = havePwd;
 	}
+	public LoginMethodVO(Long userId, String thirdId, String nickName, Integer loginType, Boolean havePwd) {
+		super();
+		this.userId = userId;
+		this.thirdId = thirdId;
+		this.nickName = nickName;
+		this.loginType = loginType;
+		this.havePwd = havePwd;
+	}
 	/**
 	 * 
 	 * @exception 

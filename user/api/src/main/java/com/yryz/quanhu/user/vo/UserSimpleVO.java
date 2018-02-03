@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.yryz.quanhu.user.contants.UserRelationConstant.STATUS;
 
 /**
  * @author danshiyu
@@ -49,11 +50,11 @@ public class UserSimpleVO implements Serializable {
     /**
      * 好友备注名
      */
-    private String nameNotes;
+    private String nameNotes = "";
     /**
      * 关系状态 0-陌生人 1-关注 2-粉丝 3-相互关注 4-拉黑 5-被拉黑 6-相互拉黑 7-自己
      */
-    private Integer relationStatus;
+    private Integer relationStatus = STATUS.NONE.getCode();
 	public String getNameNotes() {
 		return nameNotes == null ? "" : nameNotes.trim();
 	}
