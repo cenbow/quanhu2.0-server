@@ -149,13 +149,6 @@
 		and user_role = #{userRole}
 	</if>
 	
-	<if test="userIds != null">
-		and user_id in
-		<foreach item="item" index="index" collection="userIds" open="("
-			separator="," close=")">
-			#{item}
-		</foreach>
-	</if>
 	order by create_date desc
   </select>
   

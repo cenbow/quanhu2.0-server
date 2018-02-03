@@ -8,10 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.config.SmsConfigVO;
+import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.message.common.constant.ConfigConstants;
+import com.yryz.quanhu.message.common.remote.MessageCommonConfigRemote;
 import com.yryz.quanhu.message.sms.dao.SmsLogDao;
 import com.yryz.quanhu.message.sms.dto.SmsDTO;
 import com.yryz.quanhu.message.sms.dto.SmsDTO.SmsType;
@@ -35,12 +40,21 @@ public class SmsServiceImpl implements SmsService {
 	@Reference
 	private IdAPI idApi;
 	@Autowired
+	private MessageCommonConfigRemote configService;
+	@Autowired
 	private SmsTemplateService smsTemplateService;
 	@Autowired
 	private SmsConfigVO configVO;
 
 	@Override
 	public boolean sendSms(SmsDTO smsDTO) {
+		SmsConfigVO rangeConfigVO = JSON.parseObject(
+				configService.getConfig(ConfigConstants.VERIFY_CODE_CONFIG_NAME, smsDTO.getAppId()),
+				new TypeReference<SmsConfigVO>() {
+				});
+		if(rangeConfigVO == null){
+			rangeConfigVO = configVO;
+		}
 		SmsSign sign = smsChannelService.getSign(configVO.getSmsSignId());
 		SmsChannel channel = smsChannelService.get(sign.getSmsChannelId());
 		SmsTemplate template = smsTemplateService.get(configVO.getVerifyTemplateId());
