@@ -419,7 +419,7 @@ public class DymaicServiceImpl {
             vo.setUser(userSimpleVO);
 
             //评论数，点赞数，转发数, ignore exception
-            vo.setStatistics(invokeStatics(kid));
+            vo.setStatistics(invokeStatics(kid,userId));
         }
 
         return vo;
@@ -470,7 +470,7 @@ public class DymaicServiceImpl {
                     }
 
                     //评论数，点赞数，转发数, ignore exception
-                    vo.setStatistics(invokeStatics(kid));
+                    vo.setStatistics(invokeStatics(kid, userId));
 
                     result.add(vo);
                 }
@@ -510,11 +510,11 @@ public class DymaicServiceImpl {
      * @param kid
      * @return
      */
-    private Map<String, Long> invokeStatics(Long kid) {
+    private Map<String, Long> invokeStatics(Long kid, Long userId) {
         Map<String, Long> statistics = null;
         try {
             String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-            statistics = countApi.getCount(countType, kid, null).getData();
+            statistics = countApi.getCountFlag(countType, kid, null, userId).getData();
         } catch (Exception e) {
             logger.warn("cannot get statics cause: " + e.getMessage());
         }
