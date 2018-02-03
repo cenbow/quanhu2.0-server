@@ -52,9 +52,6 @@ public class ActivityVoteRedisServiceImpl implements ActivityVoteRedisService {
                 detailId);
         //增加排行榜列表
         String keyRank = ActivityCandidateConstants.getKeyRank(activityInfoId);
-        if(!template.hasKey(keyRank)) {
-            activityCandidateService.setRank(activityInfoId);
-        }
         template.opsForZSet().add(keyRank,
                 detailKid,
                 totalCount);
@@ -68,9 +65,8 @@ public class ActivityVoteRedisServiceImpl implements ActivityVoteRedisService {
     public void remCandidate(Long activityInfoId, Long detailKid) {
         RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
         //递减参与人数
-        template.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityInfoId),
-                "joinCount",
-                -1L);
+        stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityInfoId),
+                "joinCount", -1d);
         //增加首页列表
         String keyId = ActivityCandidateConstants.getKeyId(activityInfoId);
         if(!template.hasKey(keyId)) {
@@ -79,9 +75,6 @@ public class ActivityVoteRedisServiceImpl implements ActivityVoteRedisService {
         template.opsForZSet().remove(keyId, detailKid);
         //增加排行榜列表
         String keyRank = ActivityCandidateConstants.getKeyRank(activityInfoId);
-        if(!template.hasKey(keyRank)) {
-            activityCandidateService.setRank(activityInfoId);
-        }
         template.opsForZSet().remove(keyRank, detailKid);
     }
 
