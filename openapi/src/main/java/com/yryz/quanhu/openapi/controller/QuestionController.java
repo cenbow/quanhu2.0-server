@@ -7,6 +7,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -120,6 +121,22 @@ public class QuestionController {
 		dto.setCurrentPage(currentPage);
 		dto.setPageSize(pageSize);
 		return questionApi.queryQuestionAnswerVoList(dto);
+	}
+
+
+	@ApiOperation("48小时检查失效，并执行退款")
+	@ApiImplicitParams(
+			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+			})
+	@PostMapping(value = "/services/app/{version}/coterie/question/inValidt")
+	public Response<Integer> executeInValidQuestionRefund( HttpServletRequest request) {
+		RequestHeader header = WebUtil.getHeader(request);
+		String userId=header.getUserId();
+		if(StringUtils.isBlank(userId) && "48".equals(userId)){
+			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
+		}
+		return questionApi.executeInValidQuestionRefund();
 	}
 
 

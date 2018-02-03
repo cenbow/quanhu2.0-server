@@ -36,9 +36,9 @@ public class AuthConfig implements Serializable{
 	private Integer refreshExpire = 30;
 	
 	/**
-	 * refreshToken过期时间后延条件的时间点，即距离refreshExpire过期前的时间范围/天
+	 * refreshToken过期时间后延条件的时间点，即距离refreshExpire过期前的时间范围/小时
 	 */
-	private Integer refreshTokenDelayExpireTime = 1;
+	private Integer refreshTokenDelayExpireTime = 24;
 	public Integer getWebTokenExpire() {
 		return webTokenExpire;
 	}
