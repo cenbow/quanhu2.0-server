@@ -58,8 +58,16 @@ public class Question4AdminProvider implements Question4AdminApi {
 
 
     @Override
-    public Response<Question> queryDetail(Long kid) {
-        return this.queryDetail(kid);
+    public Response<QuestionAnswerVo> queryDetail(Long kid) {
+        try {
+            QuestionAnswerVo result= this.questionService.queryAvailableQuestionByKid(kid);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
     }
 }
 

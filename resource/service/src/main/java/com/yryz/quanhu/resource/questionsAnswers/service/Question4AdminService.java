@@ -4,6 +4,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAdminVo;
+import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 
 public interface Question4AdminService {
 
@@ -21,7 +22,7 @@ public interface Question4AdminService {
      * @param kid
      * @return
      */
-    public Question queryAvailableQuestionByKid(Long kid);
+    public QuestionAnswerVo queryAvailableQuestionByKid(Long kid);
 
 
     public Integer shalveDown(Long kid);
