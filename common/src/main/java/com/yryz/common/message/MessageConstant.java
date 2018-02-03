@@ -23,17 +23,17 @@ public enum MessageConstant {
     /**
      * 充值
      */
-    RECHARGE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RECHARGE, "充值成功", "您充值成功，到账消费账户。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    RECHARGE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RECHARGE, "充值成功", "您充值成功，消费账户已到账。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 提现
      */
-    CASH(MessageType.ORDER_TYPE, MessageLabel.ORDER_CASH, "提现成功", "提现成功，提现金额{count}元/点。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
+    CASH(MessageType.ORDER_TYPE, MessageLabel.ORDER_CASH, "提现申请成功", "提现申请成功，申请提现金额{count}元。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
      * 提现退款
      */
-    CASH_REFUND(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "提现退款通知", "由于提现不成功，您的提现金额被退回，退回{count}元。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
+    CASH_REFUND(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "系统退款", "提现失败，您的提现金额被退回，退回{count}元。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
      * 问题待回答
