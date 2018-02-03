@@ -24,7 +24,7 @@ public class LoginMethodVO implements Serializable {
     /**
      * 用户账户id
      */
-	@JsonSerialize(using = ToStringSerializer.class)
+	@JsonSerialize(using=ToStringSerializer.class)
     private Long userId;
     /**
      * 第三方id 或者手机号、邮箱
@@ -43,10 +43,10 @@ public class LoginMethodVO implements Serializable {
      */
     private Boolean havePwd;
     
-    public Long getuserId() {
+    public Long getUserId() {
         return userId;
     }
-    public void setuserId(Long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
     public Integer getLoginType() {
@@ -67,12 +67,6 @@ public class LoginMethodVO implements Serializable {
 	}
 	public void setThirdId(String thirdId) {
 		this.thirdId = thirdId;
-	}
-	public Long getUserId() {
-		return userId;
-	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 	public String getNickName() {
 		return nickName;
