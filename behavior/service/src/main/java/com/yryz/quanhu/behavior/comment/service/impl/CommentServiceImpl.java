@@ -14,11 +14,14 @@ import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
+import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 import com.yryz.quanhu.resource.hotspot.api.HotSpotApi;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.GrowFlowReportVo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
@@ -26,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -57,6 +61,9 @@ public class CommentServiceImpl implements CommentService {
     @Reference(check = false)
     private HotSpotApi hotSpotApi;
 
+    @Reference(check = false)
+    private EventAcountApiService eventAcountApiService;
+
     @Override
     public int accretion(Comment comment) {
         int count=commentDao.accretion(comment);
@@ -67,6 +74,11 @@ public class CommentServiceImpl implements CommentService {
             }
         }
         try{
+            GrowFlowQuery gfq=new GrowFlowQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            gfq.setStartTime(sdf.format(startOfTodDay()));
+            gfq.setEndTime(sdf.format(endOfTodDay()));
+
             List<EventInfo> eventInfos=new ArrayList<EventInfo>();
             //被评论者得成长值
             EventInfo eventInfo=new EventInfo();
@@ -80,7 +92,16 @@ public class CommentServiceImpl implements CommentService {
             eventInfo.setAmount(0.0);
             eventInfo.setCoterieId(String.valueOf(comment.getCoterieId()));
             eventInfo.setCircleId("");
-            eventInfos.add(eventInfo);
+            gfq.setEventCode("14");
+            gfq.setUserId(String.valueOf(comment.getTargetUserId()));
+            List<GrowFlowReportVo> growFlowQueries=eventAcountApiService.getGrowFlowAll(gfq).getData();
+            int currentCount=0;
+            for(GrowFlowReportVo growFlowReportVo:growFlowQueries){
+                currentCount+=growFlowReportVo.getNewGrow();
+            }
+            if(currentCount<10) {
+                eventInfos.add(eventInfo);
+            }
             //评论者
             EventInfo eventInfo_=new EventInfo();
             eventInfo_.setOwnerId(String.valueOf(comment.getTargetUserId()));
@@ -93,7 +114,17 @@ public class CommentServiceImpl implements CommentService {
             eventInfo_.setAmount(0.0);
             eventInfo_.setCoterieId(String.valueOf(comment.getCoterieId()));
             eventInfo_.setCircleId("");
-            eventInfos.add(eventInfo_);
+
+            gfq.setEventCode("5");
+            gfq.setUserId(String.valueOf(comment.getCreateUserId()));
+            List<GrowFlowReportVo> growFlowQueries_=eventAcountApiService.getGrowFlowAll(gfq).getData();
+            int currentCount_=0;
+            for(GrowFlowReportVo growFlowReportVo:growFlowQueries_){
+                currentCount_+=growFlowReportVo.getNewGrow();
+            }
+            if(currentCount_<10){
+                eventInfos.add(eventInfo_);
+            }
             try{
                 hotSpotApi.saveHeat("1",String.valueOf(comment.getResourceId()));
                 hotSpotApi.saveHeat("2",String.valueOf(comment.getCreateUserId()));
@@ -105,6 +136,33 @@ public class CommentServiceImpl implements CommentService {
             logger.info("评论接入积分系统出现异常:"+e);
         }
         return count;
+    }
+
+    /**
+     * 当天的开始时间
+     * @return
+     */
+    public static long startOfTodDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date date=calendar.getTime();
+        return date.getTime();
+    }
+    /**
+     * 当天的结束时间
+     * @return
+     */
+    public static long endOfTodDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Date date=calendar.getTime();
+        return date.getTime();
     }
 
     @Override
@@ -171,7 +229,7 @@ public class CommentServiceImpl implements CommentService {
                     break;
                 }
             }
-            //需要接统计
+
             Map<String,Long> maps=null;
             try{
                 maps= countFlagApi.getAllCountFlag("11",commentVO.getResourceId(),"",map).getData();
