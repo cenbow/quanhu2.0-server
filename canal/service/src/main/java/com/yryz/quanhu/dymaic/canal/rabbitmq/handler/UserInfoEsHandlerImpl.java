@@ -287,14 +287,19 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
     }
 
     private void updateUserTagInfo(UserTagInfo userTagInfo, TagInfo after) {
-        if (CollectionUtils.isNotEmpty(userTagInfo.getUserTagInfoList()) && after != null) {
-            for (TagInfo tagInfo : userTagInfo.getUserTagInfoList()) {
-                if (after.getKid().equals(tagInfo.getKid())) {
-                    tagInfo.setTagType(after.getTagType());
-                    tagInfo.setTagId(after.getTagId());
-                    tagInfo.setDelFlag(after.getDelFlag());
+        if (after != null) {
+            if (CollectionUtils.isNotEmpty(userTagInfo.getUserTagInfoList())) {
+                for (TagInfo tagInfo : userTagInfo.getUserTagInfoList()) {
+                    if (after.getKid().equals(tagInfo.getKid())) {
+                        tagInfo.setTagType(after.getTagType());
+                        tagInfo.setTagId(after.getTagId());
+                        tagInfo.setDelFlag(after.getDelFlag());
+                    }
                 }
+            } else {
+                userTagInfo.setUserTagInfoList(Lists.newArrayList(after));
             }
+
         }
     }
 
