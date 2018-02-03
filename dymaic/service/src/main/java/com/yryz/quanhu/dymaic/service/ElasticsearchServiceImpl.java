@@ -49,6 +49,7 @@ import com.yryz.quanhu.dymaic.canal.dao.UserRepository;
 import com.yryz.quanhu.dymaic.vo.CoterieInfoVo;
 import com.yryz.quanhu.dymaic.vo.ResourceInfoVo;
 import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
+import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
 import com.yryz.quanhu.resource.release.info.vo.ReleaseInfoVo;
@@ -80,7 +81,8 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
     private UserTagApi userTagApi;
     @Reference(check = false)
     private UserOperateApi userOperateApi;
-
+    @Reference
+    private OrderApi orderApi;  
     @Reference(check = false)
     private EventAcountApiService acountApiService;
 
@@ -670,5 +672,19 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
             }
         }
     }
-
+    
+    private void setUserOrderIntegeral(List<UserInfoVO> userInfoVOS){
+    	if(CollectionUtils.isEmpty(userInfoVOS)){
+    		return;
+    	}
+    	int userLength = userInfoVOS.size();
+    	List<Long> userIds = new ArrayList<>(userLength);
+    	for(int i = 0 ; i < userLength;i++){
+    		UserInfoVO infoVO = userInfoVOS.get(i);
+    		if(infoVO != null && infoVO.getUserBaseInfo().getUserId() != null && infoVO.getUserBaseInfo().getUserId() != 0l){
+    			userIds.add(infoVO.getUserBaseInfo().getUserId());
+    		}
+    	}
+    	orderApi.getUserTotalIntegral(userIds);
+    }
 }

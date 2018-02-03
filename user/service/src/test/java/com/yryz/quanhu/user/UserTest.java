@@ -110,7 +110,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(loginVO));
 	}
 
-	//@Test
+	@Test
 	public void getLoginMethod() {
 		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -282,7 +282,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response2));
 	}
 	
-	@Test
+	//@Test
 	public void getAdmin(){
 		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 20, new AdminUserInfoDTO("1", null, null, null, null, "vebff12m1762"));
 		//Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
