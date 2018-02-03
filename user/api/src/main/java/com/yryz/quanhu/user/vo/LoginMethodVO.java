@@ -9,6 +9,9 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * @author danshiyu
  * @version 1.0
@@ -21,13 +24,18 @@ public class LoginMethodVO implements Serializable {
     /**
      * 用户账户id
      */
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
     /**
      * 第三方id 或者手机号、邮箱
      */
     private String thirdId;
     /**
-     * 登录类型1,wx  2,wb  3,qq 4,手机号 5,邮箱
+     * 第三方昵称
+     */
+    private String nickName;
+    /**
+     * 登录类型10,wx  11,wb  12,qq 13,手机号 14,邮箱
      */
     private Integer loginType;
     /**
@@ -59,6 +67,21 @@ public class LoginMethodVO implements Serializable {
 	}
 	public void setThirdId(String thirdId) {
 		this.thirdId = thirdId;
+	}
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+	public Boolean getHavePwd() {
+		return havePwd;
 	}
 	/**
 	 * @param id

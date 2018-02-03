@@ -9,6 +9,9 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * @author danshiyu
  * @version 1.0
@@ -20,6 +23,7 @@ public class UserSimpleVO implements Serializable {
     /**
      * 用户账户id
      */
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
     /**
      * 昵称

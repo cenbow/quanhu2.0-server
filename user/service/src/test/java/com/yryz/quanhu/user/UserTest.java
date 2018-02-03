@@ -60,7 +60,7 @@ public class UserTest {
 	@Reference
 	private UserOperateApi opApi;
 
-	@Test
+	//@Test
 	public void getUserTagsTest() {
 		List<Long> ids = Lists.newArrayList();
 		ids.add(738943471107031040L);
@@ -110,7 +110,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(loginVO));
 	}
 
-	@Test
+	//@Test
 	public void getLoginMethod() {
 		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -284,7 +284,7 @@ public class UserTest {
 	
 	@Test
 	public void getAdmin(){
-		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 10, new AdminUserInfoDTO("sss", "ss", null, null, null, "vebff12m1762"));
+		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 20, new AdminUserInfoDTO("1", null, null, null, null, "vebff12m1762"));
 		//Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
 		System.out.println(JsonUtils.toFastJson(response));
 	}
