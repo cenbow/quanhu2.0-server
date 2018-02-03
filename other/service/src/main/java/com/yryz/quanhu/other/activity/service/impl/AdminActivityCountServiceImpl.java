@@ -120,6 +120,16 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
      * @return
      * */
     public AdminActivityCountVo activityTotalCount(AdminActivityCountDto adminActivityCountDto) {
+        if(adminActivityCountDto.getStartDate() == null) {
+            AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
+            if(activityDetail == null) {
+                adminActivityCountDto.setStartDate(new Date());
+            }
+            adminActivityCountDto.setStartDate(activityDetail.getBeginTime());
+        }
+        if(adminActivityCountDto.getEndDate() == null) {
+            adminActivityCountDto.setEndDate(new Date());
+        }
         AdminActivityCountVo adminActivityCountVo = new AdminActivityCountVo();
         //获取活动投票数
         AdminActivityVoteRecordDto adminActivityVoteRecordDto = new AdminActivityVoteRecordDto();
