@@ -28,6 +28,11 @@ public class CoterieReleaseInfoVo extends ReleaseInfo {
     */
     private String moduleEnum = ModuleContants.RELEASE;
 
+    /**  
+    * @Fields : 私圈名称
+    */
+    private String coterieName;
+    
     public Byte getCanReadFlag() {
         return canReadFlag;
     }
@@ -46,5 +51,13 @@ public class CoterieReleaseInfoVo extends ReleaseInfo {
 
     public String getModuleEnum() {
         return moduleEnum;
+    }
+
+    public String getCoterieName() {
+        return coterieName;
+    }
+
+    public void setCoterieName(String coterieName) {
+        this.coterieName = coterieName;
     }
 }
