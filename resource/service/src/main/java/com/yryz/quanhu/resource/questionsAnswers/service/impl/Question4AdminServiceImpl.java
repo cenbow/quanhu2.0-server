@@ -34,6 +34,7 @@ import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,18 +169,33 @@ public class Question4AdminServiceImpl implements Question4AdminService {
      * @return
      */
     @Override
-    public Question queryAvailableQuestionByKid(Long kid) {
+    public QuestionAnswerVo queryAvailableQuestionByKid(Long kid) {
+        QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
         QuestionExample example = new QuestionExample();
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
         List<Question> questions = this.questionDao.selectByExample(example);
         if (null != questions && !questions.isEmpty()) {
-            return questions.get(0);
+            Question question=questions.get(0);
+            QuestionVo questionVo=new QuestionVo();
+            BeanUtils.copyProperties(question,questionVo);
+            if(question.getCreateUserId()!=null){
+              UserSimpleVO userSimpleVO= apIservice.getUser(question.getCreateUserId());
+              questionVo.setUser(userSimpleVO);
+            }
+            if(question.getTargetId()!=null){
+                UserSimpleVO userSimpleVO= apIservice.getUser(question.getCreateUserId());
+                questionVo.setTargetUser(userSimpleVO);
+            }
+            questionAnswerVo.setQuestion(questionVo);
+
+            if(QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag())==0){
+                AnswerVo answerVo=this.answerService.queryAnswerVoByquestionId(question.getKid());
+                questionAnswerVo.setAnswer(answerVo);
+            }
         }
-        return null;
+        return questionAnswerVo;
     }
 
 
