@@ -12,6 +12,7 @@ import com.yryz.common.constant.DevType;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
@@ -36,31 +37,31 @@ public class AuthService {
 		String token = header.getToken();
 		
 		if(StringUtils.isEmpty(userId)){
-			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+			throw QuanhuException.busiError(ExceptionEnum.NEEDTOKEN);
 		}
 		if(StringUtils.isEmpty(token)){
-			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+			throw QuanhuException.busiError(ExceptionEnum.NEEDTOKEN);
 		}
 		String tokenUserId = StringUtils.split(token, "-")[0];
 		if(StringUtils.isEmpty(tokenUserId)){
-			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+			throw QuanhuException.busiError(ExceptionEnum.NEEDTOKEN);
 		}
 		if(!StringUtils.equals(tokenUserId,userId)){
-			throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+			throw QuanhuException.busiError(ExceptionEnum.NEEDTOKEN);
 		}
 		DevType devType = DevType.getEnumByType(header.getDevType(), header.getUserAgent());
 		Integer checkEnum = TokenCheckEnum.SUCCESS.getStatus();
 		try {
 			if (devType != DevType.ANDROID && devType != DevType.IOS) {
 				AuthTokenDTO tokenDTO = new AuthTokenDTO(NumberUtils.toLong(userId), devType, header.getAppId(),header.getToken());
-				checkEnum = authAPi.checkToken(tokenDTO).getData();
+				checkEnum = ResponseUtils.getResponseData(authAPi.checkToken(tokenDTO));
 			} else {
 				AuthRefreshDTO refreshDTO = new AuthRefreshDTO(null, false);
 				refreshDTO.setAppId(header.getAppId());
-				refreshDTO.setUserId(NumberUtils.toLong(userId));
+				refreshDTO.setUserId(NumberUtils.createLong(userId));
 				refreshDTO.setType(devType);
 				refreshDTO.setToken(header.getToken());
-				checkEnum = authAPi.checkToken(refreshDTO).getData();
+				checkEnum = ResponseUtils.getResponseData(authAPi.checkToken(refreshDTO));
 			}
 		} catch (Exception e) {
 			logger.error("token校验异常",e);
@@ -70,17 +71,17 @@ public class AuthService {
 		if(checkEnum == TokenCheckEnum.SUCCESS.getStatus()){
 		}else{
 			if(checkEnum == TokenCheckEnum.INVALID.getStatus()){
-				throw new QuanhuException(ExceptionEnum.TOKEN_INVALID);
+				throw QuanhuException.busiError(ExceptionEnum.TOKEN_INVALID);
 			}
 			if(checkEnum == TokenCheckEnum.EXPIRE.getStatus()){
-				throw new QuanhuException(ExceptionEnum.TOKEN_EXPIRE);
+				throw QuanhuException.busiError(ExceptionEnum.TOKEN_EXPIRE);
 			}
 			if(checkEnum == TokenCheckEnum.NO_TOKEN.getStatus()){
-				throw new QuanhuException(ExceptionEnum.NO_TOKEN);
+				throw QuanhuException.busiError(ExceptionEnum.NO_TOKEN);
 			}
 			logger.info("[checkToken]:header:{},checkEnum:{}",JsonUtils.toFastJson(header),checkEnum);
 			if(checkEnum == TokenCheckEnum.ERROR.getStatus()){
-				throw new QuanhuException(ExceptionEnum.NEEDTOKEN);
+				throw QuanhuException.busiError(ExceptionEnum.NEEDTOKEN);
 			}
 		}
 	}

@@ -18,6 +18,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.entity.RequestHeader;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -32,7 +33,9 @@ import com.yryz.quanhu.openapi.service.AuthService;
 import com.yryz.quanhu.openapi.utils.ComponentUtils;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.service.AccountApi;
+import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -48,6 +51,8 @@ public class ComponentController {
 	private AccountApi accountApi;
 	@Reference(lazy=true,check=false,cluster="failfast")
 	private CommonSafeApi commonSafeApi;
+	@Reference
+	private UserApi userApi;
 	@Autowired
 	private AuthService authService;
 	
@@ -60,7 +65,7 @@ public class ComponentController {
 		codeDTO.setAppId(header.getAppId());
 		if(StringUtils.isBlank(codeDTO.getPhone())){
 			authService.checkToken(request);
-			codeDTO.setUserId(NumberUtils.toLong(header.getUserId()));
+			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		}
 		SmsVerifyCodeVO codeVO = ResponseUtils.getResponseData(accountApi.sendVerifyCode(codeDTO));
 		return ResponseUtils.returnApiObjectSuccess(codeVO);
@@ -73,6 +78,21 @@ public class ComponentController {
 	public Response<Map<String,Integer>> checkVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
+		String phone = null;
+		
+		//手机号不存在需要校验token
+		if(StringUtils.isBlank(codeDTO.getPhone())){
+			authService.checkToken(request);
+			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+			UserLoginSimpleVO simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(codeDTO.getUserId()));
+			if(simpleVO != null){
+				phone = simpleVO.getUserPhone();
+				if(StringUtils.isBlank(phone)){
+					throw QuanhuException.busiError("手机号不存在");
+				}
+				codeDTO.setPhone(phone);
+			}
+		}
 		Integer result = ResponseUtils.getResponseData(commonSafeApi.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
 				codeDTO.getVeriCode(), false)));

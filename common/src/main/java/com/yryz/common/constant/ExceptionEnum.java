@@ -64,7 +64,7 @@ public enum ExceptionEnum {
         return showmsg;
     }
 
-    public static final Map<String, ExceptionEnum> exceptionEnumMap = new HashMap<>();
+/*    public static final Map<String, ExceptionEnum> exceptionEnumMap = new HashMap<>();
 
     static {
         if (ExceptionEnum.values() != null && ExceptionEnum.values().length > 0) {
@@ -72,6 +72,6 @@ public enum ExceptionEnum {
                 exceptionEnumMap.put(e.getCode(), e);
             }
         }
-    }
+    }*/
 
 }

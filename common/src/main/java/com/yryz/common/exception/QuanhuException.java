@@ -32,6 +32,10 @@ public class QuanhuException extends IllegalArgumentException {
         this.errorMsg = errorMsg;
     }
     
+    public static QuanhuException busiError(ExceptionEnum exceptionEnum){
+    	return busiError(exceptionEnum.getCode(), exceptionEnum.getShowMsg(), exceptionEnum.getErrorMsg());
+    }
+    
     public static QuanhuException busiError(String errorMsg) {
         return busiError(null, errorMsg);
     }
