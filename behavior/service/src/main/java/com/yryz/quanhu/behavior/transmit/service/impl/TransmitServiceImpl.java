@@ -14,6 +14,8 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.common.util.RemoteResourceUtils;
+import com.yryz.quanhu.behavior.common.vo.RemoteResource;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.transmit.dao.TransmitMongoDao;
@@ -82,7 +84,6 @@ public class TransmitServiceImpl implements TransmitService {
     public void single(TransmitInfo transmitInfo) {
         String extJson = "";
         Response<ResourceVo> result = null;
-        Long userId = null;
         ResourceVo resourceVo = null;
         if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
@@ -109,7 +110,6 @@ public class TransmitServiceImpl implements TransmitService {
                 throw QuanhuException.busiError("资源不存在或者已删除");
             }
             extJson = resourceVo.getExtJson();
-            userId = resourceVo.getUserId();
         }
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
@@ -123,7 +123,7 @@ public class TransmitServiceImpl implements TransmitService {
         //发送动态
         this.sendDymaic(transmitInfo, extJson);
         //发送消息
-        this.sendMessage(userId, transmitInfo, resourceVo);
+        this.sendMessage(transmitInfo.getTargetUserId(), transmitInfo, resourceVo);
         try {
             //递增转发数
             countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, 1L);
@@ -237,7 +237,8 @@ public class TransmitServiceImpl implements TransmitService {
                     }
                 }
                 body.setBodyTitle(title);
-                //TODO:缺少首张图获取
+                RemoteResource convert = RemoteResourceUtils.convert(resourceVo);
+                body.setBodyImg(convert != null ? convert.getImgUrl() : null);
             }
             messageVo.setBody(body);
             messageAPI.sendMessage(messageVo, isPush);

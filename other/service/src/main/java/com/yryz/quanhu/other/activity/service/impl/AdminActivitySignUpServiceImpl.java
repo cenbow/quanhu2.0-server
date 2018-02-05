@@ -3,6 +3,7 @@ package com.yryz.quanhu.other.activity.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.count.api.CountApi;
@@ -93,7 +94,7 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			BeanUtils.copyProperties(activityEnrolConfig, activityInfoAndEnrolConfig);
 			activityInfo.setKid(idApi.getSnowflakeId().getData());
 			activityInfo.setActivityChannelCode("HD-"+activityInfo.getKid());
-			activityInfo.setModuleEnum(ACTIVITY_ENUM);
+			activityInfo.setModuleEnum(ModuleContants.ACTIVITY_SIGNUP_ENUM);
 			activityInfoDao.insertByPrimaryKeySelective(activityInfo);
 			activityEnrolConfig.setActivityInfoId(activityInfo.getKid());
 			activityEnrolConfig.setKid(idApi.getSnowflakeId().getData());

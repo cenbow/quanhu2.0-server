@@ -46,7 +46,7 @@ public class ModuleContants {
     public static final String ANSWER = "1007";
 
     /**
-     * 活动
+     * 平台投票类活动
      */
     public static final String ACTIVITY_ENUM = "1008";
 
@@ -61,17 +61,21 @@ public class ModuleContants {
     public static final String DYNAMIC="1010";
 
     /**
-     * 活动
+     * 平台报名类活动
      */
-    public static final String ACTIVITY_COTERIE = "1009";
+    public static final String ACTIVITY_SIGNUP_ENUM  = "1009";
+    /**
+     * 私圈活动
+     */
+    public static final String ACTIVITY_COTERIE  = "1012";
 
     /**
      * 举报
      */
-    public static final String REPORT="1011";
+    public static final String REPORT="1013";
 
     /**
      * 评论
      */
-    public static final String COMMENT="1012";
+    public static final String COMMENT="1011";
 }
