@@ -24,7 +24,6 @@ import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.dao.canal.ResourceCanalDao;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.hotspot.service.CalculationService;
 import com.yryz.quanhu.resource.service.ResourceService;
 import com.yryz.quanhu.resource.vo.ResourceVo;

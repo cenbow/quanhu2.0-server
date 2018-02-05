@@ -24,6 +24,7 @@ import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.dao.redis.ResourceRedis;
 import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.enums.ResourceModuleEnum;
 import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.service.HotspotService;
 import com.yryz.quanhu.resource.service.ResourceService;
@@ -366,6 +367,7 @@ public class ResourceServiceImpl implements ResourceService {
 	 */
 	public List<ResourceModel> getNoneRecommendResource(int start , int limit){
 		ResourceModel resourceModel = new ResourceModel();
+		resourceModel.setModuleEnum(ResourceModuleEnum.RELEASE);
 		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_FALSE);
 		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
 		resourceModel.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
