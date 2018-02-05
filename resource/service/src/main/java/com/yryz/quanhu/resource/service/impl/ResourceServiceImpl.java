@@ -61,10 +61,10 @@ public class ResourceServiceImpl implements ResourceService {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
 				if(resourceMongo.get(resourceModel) != null){
-					resourceMongo.update(resourceModel);
 					if(ResourceEnum.RECOMMEND_TYPE_TRUE.equals(resourceModel.getRecommend())){
 						resourceModel.setRecommendTime(System.currentTimeMillis());
 					}
+					resourceMongo.update(resourceModel);
 					updateCache(resourceModel.getResourceId());
 				} else {
 					//创建资源时候要创建对应的热度对象
@@ -103,6 +103,9 @@ public class ResourceServiceImpl implements ResourceService {
 	public void updateResource(List<ResourceModel> resources) {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
+				if(ResourceEnum.RECOMMEND_TYPE_TRUE.equals(resourceModel.getRecommend())){
+					resourceModel.setRecommendTime(System.currentTimeMillis());
+				}
 				resourceMongo.update(resourceModel);
 				updateCache(resourceModel.getResourceId());
 			}
