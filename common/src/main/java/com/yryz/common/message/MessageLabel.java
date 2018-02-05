@@ -78,7 +78,17 @@ public class MessageLabel {
 	 * 私圈
 	 */
 	public static final int INTERACTIVE_COTERIE = 4004;
-	
+
+	/**
+	 * 点赞
+	 */
+	public static final int INTERACTIVE_LIKE = 4005;
+
+	/**
+	 * 转发
+	 */
+	public static final int INTERACTIVE_FORWARD = 4006;
+
 	/**
 	 * 推荐内容
 	 */
