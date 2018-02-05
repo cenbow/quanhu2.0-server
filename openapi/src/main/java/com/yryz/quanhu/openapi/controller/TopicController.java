@@ -49,7 +49,9 @@ public class TopicController {
 		dto.setPageSize(pageSize);
 		dto.setCurrentPage(currentPage);
 		dto.setOrderBy(orderBy);
-		dto.setCoterieId(String.valueOf(coteriaId));
+		if(null!=coteriaId) {
+			dto.setCoterieId(String.valueOf(coteriaId));
+		}
 		dto.setRecommend(recommend);
 		return topicApi.queryTopicList(dto);
 	}
