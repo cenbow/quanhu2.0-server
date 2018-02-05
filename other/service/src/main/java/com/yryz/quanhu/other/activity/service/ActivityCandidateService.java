@@ -34,4 +34,16 @@ public interface ActivityCandidateService {
      * */
     PageList<ActivityVoteDetailVo> rank(ActivityVoteDto activityVoteDto);
 
+    /**
+     * 设置参与者列表
+     * @param   activityInfoId
+     * */
+    void setList(Long activityInfoId);
+
+    /**
+     * 设置参与者排名
+     * @param   activityInfoId
+     * */
+    void setRank(Long activityInfoId);
+
 }

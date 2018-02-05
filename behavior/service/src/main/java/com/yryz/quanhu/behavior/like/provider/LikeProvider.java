@@ -336,7 +336,11 @@ public class LikeProvider implements LikeApi {
             if (like.getModuleEnum().equals(ModuleContants.ANSWER)) {
                 AnswerVo answerVo = answerApi.getDetail(like.getResourceId()).getData();
                 LikeAssemble likeAssembleAnswer = new LikeAssemble();
-                likeAssembleAnswer.setTitle(answerVo.getContent().substring(0,20));
+                if(null!=likeAssembleAnswer&&likeAssembleAnswer.getContent().length()>20){
+                    likeAssembleAnswer.setTitle(answerVo.getContent().substring(0,20));
+                }else{
+                    likeAssembleAnswer.setTitle(answerVo.getContent());
+                }
                 likeAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
                 likeAssembleAnswer.setLink("");
                 likeAssembleAnswer.setContent(nickName+"点赞了您的问答");
@@ -388,8 +392,10 @@ public class LikeProvider implements LikeApi {
         try {
             TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
             likeAssemble.setTargetUserId(topicPostVo.getUser().getUserId());
-            if (!topicPostVo.getContent().equals("")) {
+            if (!topicPostVo.getContent().equals("")&&topicPostVo.getContent().length()>20) {
                 likeAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
+            }else{
+                likeAssemble.setTitle(topicPostVo.getContent());
             }
             if (!topicPostVo.getImgUrl().equals("")) {
                 String img = getImgFirstUrl(topicPostVo.getImgUrl());

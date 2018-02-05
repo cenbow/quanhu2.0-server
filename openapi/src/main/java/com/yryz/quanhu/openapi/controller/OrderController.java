@@ -8,6 +8,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.rongzhong.component.pay.api.YryzPaySDK;
 import com.rongzhong.component.pay.entity.PayResponse;
 import com.rongzhong.component.pay.iospay.IosVerify;
@@ -30,6 +31,7 @@ import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.*;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import com.yryz.quanhu.user.service.UserApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -70,6 +72,9 @@ public class OrderController {
 
 	@Autowired
 	private PayService payService;
+
+	@Reference
+	private BasicConfigApi basicConfigApi;
 
 	/**
 	 * 设置支付密码
@@ -308,6 +313,17 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("账户不存在");
 		}
 	}
+
+	private WithdrawCashConfig getWithdrawCashConfig(){
+		WithdrawCashConfig withdrawCashConfig = new WithdrawCashConfig();
+		try {
+			String value = ResponseUtils.getResponseData(basicConfigApi.getValue("account.nopass.pay"));
+			withdrawCashConfig = JSON.parseObject(value,WithdrawCashConfig.class);
+		}catch (Exception e){
+			logger.error("获取资金-提现配置失败", e);
+		}
+		return withdrawCashConfig;
+	}
     
     /**
      * 用户提现
@@ -349,7 +365,11 @@ public class OrderController {
 		if (DateUtils.checkBetween(new Date(), "23:00", "9:00")) {
 			return ResponseUtils.returnCommonException("提现系统维护中，23:00-9:00 是系统维护时间");
 		}
-
+		//添加提现控制开关
+		WithdrawCashConfig withdrawCashConfig = getWithdrawCashConfig();
+		if(WithdrawCashConfig.NOT_ALLOWED == withdrawCashConfig.getAllowFlag()){
+			return ResponseUtils.returnCommonException(withdrawCashConfig.getMsg());
+		}
 		try {
 			return payService.getCash(appId , userId, cost, cust2BankId, payPassword);
 		} catch (RpcOptException e) {

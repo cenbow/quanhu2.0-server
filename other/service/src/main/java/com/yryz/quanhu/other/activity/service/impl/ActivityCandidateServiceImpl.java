@@ -22,6 +22,7 @@ import com.yryz.quanhu.other.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.other.activity.service.ActivityCandidateService;
+import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
@@ -76,6 +77,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
     UserApi userApi;
 
     @Autowired
+    ActivityVoteRedisService activityVoteRedisService;
+
+    @Autowired
     RedisTemplateBuilder templateBuilder;
 
     @Autowired
@@ -115,7 +119,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         }
         voteDetail.setKid(result.getData());
         voteDetail.setActivityInfoId(activityVoteDto.getActivityInfoId());
-        voteDetail.setVoteNo(this.getMaxVoteNo(activityVoteDto.getActivityInfoId()).intValue());
+        voteDetail.setVoteNo(activityVoteRedisService.getMaxVoteNo(activityVoteDto.getActivityInfoId()).intValue());
         voteDetail.setObtainIntegral(activityVoteInfoVo.getAmount());
         voteDetail.setContent(activityVoteDto.getContent());
         voteDetail.setContent1(activityVoteDto.getContent1());
@@ -134,14 +138,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         activityVoteDto.setKid(voteDetail.getKid());
         //进入资源库
         this.setResource(voteDetail, activityVoteInfoVo);
-        //递增参与人数
-        stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityVoteDto.getActivityInfoId()),
-                "joinCount",
-                1L);
-        //删除首页列表
-        stringRedisTemplate.delete(ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId()));
-        //删除排行榜
-        stringRedisTemplate.delete(ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId()));
+        //增加参与者
+        activityVoteRedisService.addCandidate(activityVoteDto.getActivityInfoId(),
+                voteDetail.getKid(), voteDetail.getId(), voteDetail.getVoteCount().longValue());
         //设置平台积分
         if(activityVoteInfoVo.getAmount() != null && activityVoteInfoVo.getAmount() != 0) {
             try {
@@ -150,20 +149,6 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                 logger.error("增加活动积分 失败", e);
             }
         }
-        //增加首页列表
-//        String keyId = ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId());
-//        if(!stringRedisTemplate.hasKey(keyId)) {
-//            this.setList(activityVoteDto.getActivityInfoId());
-//        }
-//        template.opsForZSet().add(keyId, voteDetail.getKid(), voteDetail.getId());
-        //增加排行榜列表
-//        String keyRank = ActivityCandidateConstants.getKeyRank(activityVoteDto.getActivityInfoId());
-//        if(!stringRedisTemplate.hasKey(keyRank)) {
-//            this.setRank(activityVoteDto.getActivityInfoId());
-//        }
-//        template.opsForZSet().add(keyRank,
-//                voteDetail.getKid(),
-//                voteDetail.getVoteCount());
     }
 
     /**
@@ -348,13 +333,21 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         return null;
     }
 
-    private void setList(Long activityInfoId) {
+    /**
+     * 设置参与者列表
+     * @param   activityInfoId
+     * */
+    public void setList(Long activityInfoId) {
         List<ActivityVoteDetailVo> activityList = this.getCandidateInfo(activityInfoId);
         this.setCandidateInfo(ActivityCandidateConstants.getKeyId(activityInfoId), "kid", activityList);
         this.setCandidateInfo(ActivityCandidateConstants.getKeyRank(activityInfoId),  "voteCount", activityList);
     }
 
-    private void setRank(Long activityInfoId) {
+    /**
+     * 设置参与者排名
+     * @param   activityInfoId
+     * */
+    public void setRank(Long activityInfoId) {
         List<ActivityVoteDetailVo> activityList = this.getCandidateInfo(activityInfoId);
         this.setCandidateInfo(ActivityCandidateConstants.getKeyRank(activityInfoId),  "voteCount", activityList);
     }
@@ -390,7 +383,9 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                             score = detail.getId().doubleValue();
                         } else {
                             value = detail.getKid();
-                            score = detail.getVoteCount() == null ? 0 : detail.getVoteCount().doubleValue();
+                            int voteCount = detail.getVoteCount() == null ? 0 : detail.getVoteCount();
+                            int addVote = detail.getAddVote() == null ? 0 : detail.getAddVote();
+                            score = (voteCount + addVote);
                         }
 
                         ZSetOperations.TypedTuple tuple = new DefaultTypedTuple<>(value, score);
@@ -440,24 +435,6 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         if(now.compareTo(activityVoteInfoVo.getActivityJoinEnd()) == 1 ) {
             throw QuanhuException.busiError("该活动参与阶段已结束");
         }
-    }
-
-    private Long getMaxVoteNo(Long activityInfoId) {
-        if(!stringRedisTemplate.opsForHash().hasKey(ActivityVoteConstants.ACTIVITY_VOTE_NO, activityInfoId.toString())) {
-            Integer maxVoteNo = activityVoteDetailDao.selectMaxVoteNo(activityInfoId);
-            stringRedisTemplate.opsForHash().putIfAbsent(ActivityVoteConstants.ACTIVITY_VOTE_NO,
-                    activityInfoId.toString(),
-                    maxVoteNo == null ? "0" : String.valueOf(maxVoteNo));
-            stringRedisTemplate.expire(ActivityVoteConstants.ACTIVITY_VOTE_NO,
-                    ActivityRedisConstants.TIMEOUT_VERY_LONG, TimeUnit.SECONDS);
-        }
-
-        Long voteNo = stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.ACTIVITY_VOTE_NO, activityInfoId.toString(), 1);
-        if(voteNo == null) {
-            throw QuanhuException.busiError("生成参与者编号失败");
-        }
-
-        return voteNo;
     }
 
     private void setVoteDiffer(Long activityInfoId, Long candidateId ,ActivityVoteDetailVo detail, RedisTemplate<String, Long> template) {

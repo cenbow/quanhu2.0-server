@@ -102,11 +102,15 @@ public class AuthRedisDao {
 	 * @param devType
 	 * @return
 	 */
-	public long getRefreshFlag(Long userId,String appId,DevType devType){
+	public long getRefreshFlag(Long userId,String appId,DevType devType,long expireAt){
 		String key = AuthApi.refreshFlagKey(userId, appId, devType);
 		try {
 			RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
-			return redisTemplate.opsForValue().increment(key, 1);		
+			long flag = redisTemplate.opsForValue().increment(key, 1);
+			if(redisTemplate.getExpire(key) < 0){
+				redisTemplate.expireAt(key, new Date(expireAt));
+			}
+			return flag;
 		} catch (Exception e) {
 			logger.error("TokenRedis.getRefreshFlag", e);
 			return 1;

@@ -49,7 +49,9 @@ public class UserStarContants {
     	/** 审核失败 */
     	AUDIT_FAIL((byte)12),
     	/** 取消认证 */
-    	CANCEL_AUTH((byte)13);
+    	CANCEL_AUTH((byte)13),
+    	/** 没有申请过 */
+    	NO_APPLY((byte)14);
     	private byte status;
     	StarAuditStatus(byte status) {
 			this.status = status;

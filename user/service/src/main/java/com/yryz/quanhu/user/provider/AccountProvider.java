@@ -126,7 +126,7 @@ public class AccountProvider implements AccountApi {
 			checkHeader(header);
 			if (!smsManager.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, header.getAppId())) {
-				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+				throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, registerDTO.getUserPhone());
@@ -191,7 +191,7 @@ public class AccountProvider implements AccountApi {
 
 			// 判断用户状态
 			if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
-				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+				throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
 			}
 
 			return ResponseUtils.returnObjectSuccess(returnRegisterLoginVO(userId, header, null, loginDTO.getIp()));
@@ -223,7 +223,7 @@ public class AccountProvider implements AccountApi {
 
 			// 判断用户状态
 			if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
-				throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+				throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
 			}
 			return ResponseUtils.returnObjectSuccess(
 					returnRegisterLoginVO(userId, header, null, registerDTO.getRegLogDTO().getIp()));
@@ -257,7 +257,7 @@ public class AccountProvider implements AccountApi {
 				userId = login.getUserId();
 				// 判断用户状态
 				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
-					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+					throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
 				}
 			} else {
 				userId = accountService.loginThird(loginDTO, thirdUser, userId);
@@ -299,7 +299,7 @@ public class AccountProvider implements AccountApi {
 			} else {
 				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(), SmsType.CODE_THIRD_PHONE,
 						header.getAppId())) {
-					throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+					throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 				}
 				// 手机号加锁
 				lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());
@@ -431,7 +431,7 @@ public class AccountProvider implements AccountApi {
 				identity = UserIdentity.NORMAL;
 				// 判断用户状态
 				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
-					throw new QuanhuException(ExceptionEnum.USER_FREEZE);
+					throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
 				}
 			} // 观察者存在就用观察者信息登录，否则创建观察者信息
 			else {

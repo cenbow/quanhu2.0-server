@@ -173,13 +173,13 @@ public class AccountServiceImpl implements AccountService {
 		if (account == null) {
 			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, appId)) {
-				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+				throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			return createUser(registerDTO, null);
 		}
 		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
 				appId)) {
-			throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+			throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
@@ -195,12 +195,12 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId) {
 		if (userId == null) {
-			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 兼容未绑定手机号的老用户
 		UserAccount account = getUserAccountByUserId(userId);
 		if (StringUtils.isBlank(account.getUserPhone())) {
-			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
@@ -255,7 +255,7 @@ public class AccountServiceImpl implements AccountService {
 		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
 			LoginMethodVO methodVO = new LoginMethodVO(account.getKid(), account.getUserPhone(),
-					RegType.PHONE.getType(), havePwd);
+					"",RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
 

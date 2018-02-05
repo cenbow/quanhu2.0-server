@@ -6,13 +6,13 @@ import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.count.api.CountStatisticsApi;
 import com.yryz.quanhu.behavior.count.dto.CountStatisticsDto;
-import com.yryz.quanhu.behavior.count.vo.CountStatisticsVo;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.other.activity.dto.AdminActivityCountDto;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto;
 import com.yryz.quanhu.other.activity.service.AdminActivityCountService;
+import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.AdminActivityCountVo;
-import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
+import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,9 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
     CountStatisticsApi countStatisticsApi;
 
     @Autowired
+    AdminActivityVoteService adminActivityVoteService;
+
+    @Autowired
     ActivityVoteRecordDao activityVoteRecordDao;
 
     /**
@@ -35,7 +38,16 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
      * @return
      * */
     public PageList<AdminActivityCountVo> activityCount(AdminActivityCountDto adminActivityCountDto) {
-
+        if(adminActivityCountDto.getStartDate() == null) {
+            AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
+            if(activityDetail == null) {
+                adminActivityCountDto.setStartDate(new Date());
+            }
+            adminActivityCountDto.setStartDate(activityDetail.getBeginTime());
+        }
+        if(adminActivityCountDto.getEndDate() == null) {
+            adminActivityCountDto.setEndDate(new Date());
+        }
         Map<String, Long> recordMap = new HashMap<>();
         //获取活动投票数
         AdminActivityVoteRecordDto adminActivityVoteRecordDto = new AdminActivityVoteRecordDto();
@@ -106,6 +118,16 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
      * @return
      * */
     public AdminActivityCountVo activityTotalCount(AdminActivityCountDto adminActivityCountDto) {
+        if(adminActivityCountDto.getStartDate() == null) {
+            AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
+            if(activityDetail == null) {
+                adminActivityCountDto.setStartDate(new Date());
+            }
+            adminActivityCountDto.setStartDate(activityDetail.getBeginTime());
+        }
+        if(adminActivityCountDto.getEndDate() == null) {
+            adminActivityCountDto.setEndDate(new Date());
+        }
         AdminActivityCountVo adminActivityCountVo = new AdminActivityCountVo();
         //获取活动投票数
         AdminActivityVoteRecordDto adminActivityVoteRecordDto = new AdminActivityVoteRecordDto();

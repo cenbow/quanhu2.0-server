@@ -9,6 +9,8 @@ package com.yryz.quanhu.user.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.entity.GenericEntity;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
@@ -27,6 +29,7 @@ public class UserBaseInfo extends GenericEntity {
 	/**
 	 * 用户id
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long userId;
 
 	/**

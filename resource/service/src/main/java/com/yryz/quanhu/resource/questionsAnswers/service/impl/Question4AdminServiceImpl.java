@@ -34,6 +34,7 @@ import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,8 +93,6 @@ public class Question4AdminServiceImpl implements Question4AdminService {
     @Override
     public PageList<QuestionAdminVo> queryQuestionAnswerList(QuestionDto dto) {
         PageList<QuestionAdminVo> questionAdminVoList = new PageList<>();
-
-
         Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
         Integer pageStartIndex = (pageNum - 1) * pageSize;
@@ -102,15 +101,32 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         example.setPageSize(pageSize);
 
         QuestionExample.Criteria criteria = example.createCriteria();
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         Long coteriaId = dto.getCoterieId();
         if(coteriaId!=null) {
             criteria.andCoterieIdEqualTo(coteriaId);
         }
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-
         Long createUserId = dto.getCreateUserId();
         if(null!=createUserId) {
             criteria.andCreateUserIdEqualTo(createUserId);
+        }
+
+        if(StringUtils.isNotBlank(dto.getContent())){
+            criteria.andContentLike("%"+dto.getContent()+"%");
+        }
+
+        if(dto.getShelveFlag()!=null){
+            criteria.andShelveFlagEqualTo(dto.getShelveFlag());
+        }
+        if(dto.getIsOnlyShowMe()!=null){
+            criteria.andIsOnlyShowMeEqualTo(dto.getIsOnlyShowMe());
+        }
+
+        if(dto.getAnswerdFlag()!=null){
+            criteria.andAnswerdFlagEqualTo(dto.getAnswerdFlag());
+        }
+        if(StringUtils.isNotBlank(dto.getBeginDate()) && StringUtils.isNotBlank(dto.getEndDate())){
+            criteria.andCreateDateBetween(DateUtils.parseDate(dto.getBeginDate()),DateUtils.parseDate(dto.getEndDate()));
         }
         example.setOrderByClause("create_date desc");
         Long count=this.questionDao.countByExample(example);
@@ -133,7 +149,7 @@ public class Question4AdminServiceImpl implements Question4AdminService {
                 questionAdminVo.setAnswerDate(answerVo.getCreateDate());
             }
             CoterieInfo coterieInfo= apIservice.getCoterieinfo(question.getCoterieId());
-            if(null!=null){
+            if(null!=coterieInfo){
                 questionAdminVo.setCoterieName(coterieInfo.getName());
             }
             questionAdminVos.add(questionAdminVo);
@@ -153,18 +169,33 @@ public class Question4AdminServiceImpl implements Question4AdminService {
      * @return
      */
     @Override
-    public Question queryAvailableQuestionByKid(Long kid) {
+    public QuestionAnswerVo queryAvailableQuestionByKid(Long kid) {
+        QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
         QuestionExample example = new QuestionExample();
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
-        criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
         List<Question> questions = this.questionDao.selectByExample(example);
         if (null != questions && !questions.isEmpty()) {
-            return questions.get(0);
+            Question question=questions.get(0);
+            QuestionVo questionVo=new QuestionVo();
+            BeanUtils.copyProperties(question,questionVo);
+            if(question.getCreateUserId()!=null){
+              UserSimpleVO userSimpleVO= apIservice.getUser(question.getCreateUserId());
+              questionVo.setUser(userSimpleVO);
+            }
+            if(question.getTargetId()!=null){
+                UserSimpleVO userSimpleVO= apIservice.getUser(question.getCreateUserId());
+                questionVo.setTargetUser(userSimpleVO);
+            }
+            questionAnswerVo.setQuestion(questionVo);
+
+            if(QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag())==0){
+                AnswerVo answerVo=this.answerService.queryAnswerVoByquestionId(question.getKid());
+                questionAnswerVo.setAnswer(answerVo);
+            }
         }
-        return null;
+        return questionAnswerVo;
     }
 
 
