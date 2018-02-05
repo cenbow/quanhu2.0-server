@@ -51,7 +51,7 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String appId;
 	/**
-	 * 用户状态 0-正常 1-禁言 2-冻结 3-注销
+	 * 用户状态 0-正常 1-违规 2-禁言 3-冻结 4-注销
 	 */
 	private Integer userStatus;
 	/**

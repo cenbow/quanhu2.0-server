@@ -125,18 +125,23 @@
 		null or ban_post_time
 		&lt; now()) )
 	</if>
+	<!-- 违规用户 -->
+	<if test="userStatus != null and userStatus == 0">
+		and (user_status &gt;10
+		 or (user_status == 10 and ban_post_time &gt; now()) )
+	</if>	
 	<!-- 禁言用户 -->
-	<if test="userStatus != null and userStatus == 1">
+	<if test="userStatus != null and userStatus == 2">
 		and (user_status =
 		10 and (ban_post_time
 		&gt; now()))
 	</if>
 	<!-- 冻结用户 -->
-	<if test="userStatus != null and userStatus == 2">
+	<if test="userStatus != null and userStatus == 3">
 		and user_status = 11
 	</if>
 	<!-- 冻结用户 -->
-	<if test="userStatus != null and userStatus == 3">
+	<if test="userStatus != null and userStatus == 4">
 		and user_status = 12
 	</if>	
 	<if test="startDate !=null and startDate != ''">
