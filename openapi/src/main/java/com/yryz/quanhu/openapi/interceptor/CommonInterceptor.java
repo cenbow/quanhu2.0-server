@@ -35,7 +35,7 @@ public class CommonInterceptor extends HandlerInterceptorAdapter implements Hand
 		response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Encoding ,Accept, X-Requested-With, "
 				+ "Content-Type, X-Forwarded-For , Proxy-Client-IP , WL-Proxy-Client-IP , HTTP_CLIENT_IP , "
 				+ "HTTP_X_FORWARDED_FOR , sign, token ,appVersion, v , devType ,devName , devId ,ip ,net ,userId,appId,appSecret,clientVersion,ditchCode,"
-				+ "appversion,appid,devtype,devname,devid,userid,language");
+				+ "appversion,appid,devtype,devname,devid,userid,language,clientversion,ditchcode,appsecret");
 		response.setContentType("text/json;charset=utf-8"); 
 		System.out.println("hello CommonInterceptor ..." + request.getRequestURI());
 		String httpMethod=request.getMethod();

@@ -1,15 +1,17 @@
 package com.yryz.quanhu.coterie;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
-import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -18,95 +20,68 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+//@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CoterieInfoTest {
-    @Reference
+    @Autowired
     private CoterieApi coterieApi;
 
-    private static Long memberId = 730941139577331712L;
-    private static Long userId = 737251236811898880L;
-    private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
-    private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
-
-    private static Long coterieId = 9382818189L;
-
     @Test
-    public void test010_getByKids() {
-        List list = new ArrayList();
-        list.add(coterieId);
-        Response response = coterieApi.getByKids(list);
-        System.out.println(JsonUtils.toFastJson(response));
+    public void applyCreate() {
+    	CoterieBasicInfo info=new CoterieBasicInfo();
+    	info.setIcon("http://icon");
+    	info.setIntro("jk 的私圈2");
+    	info.setJoinCheck(0);
+    	info.setJoinFee(0);
+    	info.setName("功守道2");
+    	info.setOwnerId("729669966696603648");
+    	coterieApi.applyCreate(info);
     }
 
     @Test
-    public void test020_queryPage() {
-        Response response = coterieApi.queryPage(1,10);
-        System.out.println(JsonUtils.toFastJson(response));
+    public void modifyCoterieInfo() {
+    	CoterieInfo info=new CoterieInfo();
+    	info.setIntro("jk 的私圈3");
+    	info.setJoinFee(100);
+    	info.setName("功守道3");
+    	info.setOwnerId("729669966696603648");
+    	info.setCoterieId(747457453497794560L);
+    	coterieApi.modifyCoterieInfo(info);
     }
-
-//    @Test
-//    public void test020_audit() {
-//
-//        try {
-//            Response response = coterieMemberAPI.audit(userId,memberId,coterieId,null);
-//            System.out.println(JsonUtils.toFastJson(response));
-//        } catch (QuanhuException e) {
-//            e.getMsg();
-//            e.getErrorMsg();
-//            System.out.println(JsonUtils.toFastJson(e));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-//
-//    @Test
-//    public void test030_banSpeak() {
-//        Response response = coterieMemberAPI.banSpeak(userId,memberId,coterieId, 1);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//    @Test
-//    public void test040_permission() {
-//        Response response = coterieMemberAPI.permission(userId,coterieId);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//    @Test
-//    public void test050_newMemberNum() {
-//        Response response = coterieMemberAPI.queryNewMemberNum(coterieId);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//    @Test
-//    public void test060_memberApplyList() {
-//        Response response = coterieMemberAPI.queryMemberApplyList(coterieId,1,10);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//    @Test
-//    public void test070_memberList() {
-//        Response response = coterieMemberAPI.queryMemberList(coterieId,1,10);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//    @Test
-//    public void test080_kick() {
-//        Response response = coterieMemberAPI.kick(userId,memberId,coterieId,"就要踢你");
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//    @Test
-//    public void test090_quit() {
-//        Response response = coterieMemberAPI.quit(memberId,coterieId);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
-//
-//
-//    @Test
-//    public void test090_isBanSpeak() {
-////        Response response = coterieMemberAPI.isBanSpeak(memberId,coterieId);
-//        Response response = coterieMemberAPI.isBanSpeak(730921949663453184L,4816176744L);
-//        System.out.println(JsonUtils.toFastJson(response));
-//    }
+    
+    @Test
+    public void getMyCreateCoterie() {
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getMyCreateCoterie("729669966696603648"));
+    	System.out.println(list);
+    }
+    
+    @Test
+    public void getMyJoinCoterie() {
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getMyJoinCoterie("729669966696603648", 1, 10));
+    	System.out.println(list);
+    }
+    
+    @Test
+    public void queryCoterieInfo() {
+    	CoterieInfo list=ResponseUtils.getResponseData(coterieApi.queryCoterieInfo(747587986143854592L));
+    	System.out.println(list);
+    }
+    
+    @Test
+    public void getMyCoterieCount() {
+    	Integer list=ResponseUtils.getResponseData(coterieApi.getMyCoterieCount("729669966696603648"));
+    	System.out.println(list);
+    }
+    
+    @Test
+    public void queryHotCoterieList() {
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.queryHotCoterieList(1,10));
+    	System.out.println(list);
+    }
+    
+    @Test
+    public void regroupQr() {
+    	String list=ResponseUtils.getResponseData(coterieApi.regroupQr(8764485668L));
+    	System.out.println(list);
+    }
+    
 }

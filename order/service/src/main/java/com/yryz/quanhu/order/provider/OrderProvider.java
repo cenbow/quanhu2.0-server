@@ -287,11 +287,11 @@ public class OrderProvider implements OrderApi {
 			if (StringUtils.isEmpty(userPhy.getCustId())){
 				return ResponseUtils.returnCommonException("客户ID不能为空");
 			}
-			RrzOrderUserPhy rrzOrderUserPhy = (RrzOrderUserPhy) GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
+			RrzOrderUserPhy rrzOrderUserPhy = GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
 			return userPhyService.dealUserPhy(rrzOrderUserPhy, userPhy.getOldPassword());
 		} catch (Exception e) {
-			logger.warn("unknown Exception", e);
-			return ResponseUtils.returnCommonException("未知错误");
+			logger.warn("dealUserPhy Exception", e);
+			return ResponseUtils.returnException(e);
 		}
 	}
 

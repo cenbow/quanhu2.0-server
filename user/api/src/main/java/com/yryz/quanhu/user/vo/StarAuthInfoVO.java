@@ -10,6 +10,9 @@ import java.util.Date;
  */
 @SuppressWarnings("serial")
 public class StarAuthInfoVO implements Serializable {
+
+
+    private String kid;
     /**
      * 应用id
      */
@@ -136,6 +139,14 @@ public class StarAuthInfoVO implements Serializable {
      * 达人推荐语
      */
     private String recommendDesc;
+
+    public String getKid() {
+        return kid;
+    }
+
+    public void setKid(String kid) {
+        this.kid = kid;
+    }
 
     public String getOrganizationName() {
         return organizationName;

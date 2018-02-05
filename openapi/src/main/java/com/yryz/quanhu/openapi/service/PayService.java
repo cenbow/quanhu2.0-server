@@ -701,7 +701,6 @@ public class PayService {
 	 * 获取订单详情
 	 * @param orderId
 	 * @return
-	 * @see com.yryz.app.openapi.modules.pay.service.IPayServcie#getOrderInfo(java.lang.String)
 	 */
 	public OrderInfo getOrderInfo(String orderId) {
 		try {

@@ -31,31 +31,14 @@ public class Coterie implements Serializable {
 	private Long coterieId;
 
 	/**
-	 * 用户ID
+	 * 私圈名称
 	 */
-	private String ownerId;
-
-
-
-	/**
-	 * 圈主姓名
-	 */
-	private String ownerName;
-
-	/**
-	 * 个人简介
-	 */
-	private String ownerIntro;
-
+	private String name;
+	
 	/**
 	 * 封面图
 	 */
 	private String icon;
-
-	/**
-	 * 圈子名称
-	 */
-	private String name;
 
 	/**
 	 * 圈子简介
@@ -63,9 +46,9 @@ public class Coterie implements Serializable {
 	private String intro;
 
 	/**
-	 * 私圈名片(二维码)
+	 * 用户ID
 	 */
-	private String qrUrl;
+	private String ownerId;
 
 	/**
 	 * 加入私圈金额(悠然币)，0表示免费
@@ -88,10 +71,30 @@ public class Coterie implements Serializable {
 	private Integer memberNum;
 
 	/**
-	 * 状态：10待审核，11审批通过，12审批未通过，13上架，14下架
+	 * 状态：10待审核，11审批通过，12审批未通过
 	 */
 	private Byte status;
-
+	
+	/**
+	 * 审批时间
+	 */
+	private Date processTime;
+	
+	/**
+	 * 热度值
+	 */
+	private Long heat;
+	
+	/**
+	 * 上下架
+	 */
+	private Integer shelveFlag;
+	
+	/**
+	 * 0:未删除，1：删除
+	 */
+	private Byte deleted;
+	
 	/**
 	 * 创建时间
 	 */
@@ -101,21 +104,11 @@ public class Coterie implements Serializable {
 	 * 更新时间
 	 */
 	private Date lastUpdateDate;
-
+	
 	/**
-	 * 审批时间
+	 * 版本号
 	 */
-	private Date processTime;
-
-	/**
-	 * 0:未删除，1：删除
-	 */
-	private Byte deleted;
-
-	/**
-	 * 热度值
-	 */
-	private Long heat;
+	private Integer revision;
 
 	/**
 	 * 是否达人
@@ -128,34 +121,16 @@ public class Coterie implements Serializable {
 	private Byte recommend;
 
 	/**
-	 * 最后更新文章时间
+	 * 圈主最后访问时间
 	 */
-	private Date lastInfoTime;
-	private Integer shelveFlag;
-
-
-
-	private Long auditUserId;
+	private Date masterLastViewTime;
+	
+	private Integer auditUserId;
 	private String auditRemark;
-	private Integer sort;
-	private Long createUserId;
-	private Long lastUpdateUserId;
-	private Integer masterLastViewTime;
-	private String moduleEnum;
-
-
-
-
-
-
-
-	public Integer getShelveFlag() {
-		return shelveFlag;
-	}
-	public void setShelveFlag(Integer shelveFlag) {
-		this.shelveFlag = shelveFlag;
-	}
-
+	/**
+	 * 10:显示，11:不显示
+	 */
+	private Integer redDot;
 
 	public Long getId() {
 		return id;
@@ -170,40 +145,7 @@ public class Coterie implements Serializable {
 	}
 
 	public void setCoterieId(Long coterieId) {
-		this.coterieId = coterieId == null ? null : coterieId ;
-	}
-
-	public String getOwnerId() {
-		return ownerId;
-	}
-
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId == null ? null : ownerId.trim();
-	}
-
-
-	public String getOwnerName() {
-		return ownerName;
-	}
-
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName == null ? null : ownerName.trim();
-	}
-
-	public String getOwnerIntro() {
-		return ownerIntro;
-	}
-
-	public void setOwnerIntro(String ownerIntro) {
-		this.ownerIntro = ownerIntro == null ? null : ownerIntro.trim();
-	}
-
-	public String getIcon() {
-		return icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon == null ? null : icon.trim();
+		this.coterieId = coterieId;
 	}
 
 	public String getName() {
@@ -211,7 +153,15 @@ public class Coterie implements Serializable {
 	}
 
 	public void setName(String name) {
-		this.name = name == null ? null : name.trim();
+		this.name = name;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 
 	public String getIntro() {
@@ -219,15 +169,15 @@ public class Coterie implements Serializable {
 	}
 
 	public void setIntro(String intro) {
-		this.intro = intro == null ? null : intro.trim();
+		this.intro = intro;
 	}
 
-	public String getQrUrl() {
-		return qrUrl;
+	public String getOwnerId() {
+		return ownerId;
 	}
 
-	public void setQrUrl(String qrUrl) {
-		this.qrUrl = qrUrl == null ? null : qrUrl.trim();
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public Integer getJoinFee() {
@@ -270,6 +220,38 @@ public class Coterie implements Serializable {
 		this.status = status;
 	}
 
+	public Date getProcessTime() {
+		return processTime;
+	}
+
+	public void setProcessTime(Date processTime) {
+		this.processTime = processTime;
+	}
+
+	public Long getHeat() {
+		return heat;
+	}
+
+	public void setHeat(Long heat) {
+		this.heat = heat;
+	}
+
+	public Integer getShelveFlag() {
+		return shelveFlag;
+	}
+
+	public void setShelveFlag(Integer shelveFlag) {
+		this.shelveFlag = shelveFlag;
+	}
+
+	public Byte getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Byte deleted) {
+		this.deleted = deleted;
+	}
+
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -286,28 +268,12 @@ public class Coterie implements Serializable {
 		this.lastUpdateDate = lastUpdateDate;
 	}
 
-	public Date getProcessTime() {
-		return processTime;
+	public Integer getRevision() {
+		return revision;
 	}
 
-	public void setProcessTime(Date processTime) {
-		this.processTime = processTime;
-	}
-
-	public Byte getDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(Byte deleted) {
-		this.deleted = deleted;
-	}
-
-	public Long getHeat() {
-		return heat;
-	}
-
-	public void setHeat(Long heat) {
-		this.heat = heat;
+	public void setRevision(Integer revision) {
+		this.revision = revision;
 	}
 
 	public Byte getIsExpert() {
@@ -326,19 +292,19 @@ public class Coterie implements Serializable {
 		this.recommend = recommend;
 	}
 
-	public Date getLastInfoTime() {
-		return lastInfoTime;
+	public Date getMasterLastViewTime() {
+		return masterLastViewTime;
 	}
 
-	public void setLastInfoTime(Date lastInfoTime) {
-		this.lastInfoTime = lastInfoTime;
+	public void setMasterLastViewTime(Date masterLastViewTime) {
+		this.masterLastViewTime = masterLastViewTime;
 	}
 
-	public Long getAuditUserId() {
+	public Integer getAuditUserId() {
 		return auditUserId;
 	}
 
-	public void setAuditUserId(Long auditUserId) {
+	public void setAuditUserId(Integer auditUserId) {
 		this.auditUserId = auditUserId;
 	}
 
@@ -350,44 +316,12 @@ public class Coterie implements Serializable {
 		this.auditRemark = auditRemark;
 	}
 
-	public Integer getSort() {
-		return sort;
+	public Integer getRedDot() {
+		return redDot;
 	}
 
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
-
-	public Long getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(Long createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Long getLastUpdateUserId() {
-		return lastUpdateUserId;
-	}
-
-	public void setLastUpdateUserId(Long lastUpdateUserId) {
-		this.lastUpdateUserId = lastUpdateUserId;
-	}
-
-	public Integer getMasterLastViewTime() {
-		return masterLastViewTime;
-	}
-
-	public void setMasterLastViewTime(Integer masterLastViewTime) {
-		this.masterLastViewTime = masterLastViewTime;
-	}
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
+	public void setRedDot(Integer redDot) {
+		this.redDot = redDot;
 	}
 
 	@Override
@@ -414,11 +348,12 @@ public class Coterie implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Coterie [id=" + id + ", coterieId=" + coterieId + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro + ", icon=" + icon + ", name=" + name
-				+ ", intro=" + intro + ", qrUrl=" + qrUrl + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee
-				+ ", joinCheck=" + joinCheck + ", memberNum=" + memberNum + ", status=" + status + ", createDate="
-				+ createDate + ", lastUpdateDate=" + lastUpdateDate + ", processTime=" + processTime + ", deleted="
-				+ deleted + ", heat=" + heat + ", isExpert=" + isExpert + ", recommend=" + recommend + ", lastInfoTime="
-				+ lastInfoTime + "]";
+		return "Coterie [id=" + id + ", coterieId=" + coterieId + ", name=" + name + ", icon=" + icon + ", intro="
+				+ intro + ", ownerId=" + ownerId + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee
+				+ ", joinCheck=" + joinCheck + ", memberNum=" + memberNum + ", status=" + status + ", processTime="
+				+ processTime + ", heat=" + heat + ", shelveFlag=" + shelveFlag + ", deleted=" + deleted
+				+ ", createDate=" + createDate + ", lastUpdateDate=" + lastUpdateDate + ", revision=" + revision
+				+ ", isExpert=" + isExpert + ", recommend=" + recommend + ", masterLastViewTime=" + masterLastViewTime
+				+ ", auditUserId=" + auditUserId + ", auditRemark=" + auditRemark + ", redDot=" + redDot + "]";
 	}
 }

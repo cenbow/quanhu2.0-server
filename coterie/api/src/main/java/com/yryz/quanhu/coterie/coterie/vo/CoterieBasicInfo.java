@@ -9,11 +9,14 @@ import java.io.Serializable;
  * @date 2017年10月18日 上午9:50:23
  * @Description TODO (这里用一句话描述这个方法的作用)
  */
-
-@SuppressWarnings("serial")
 public class CoterieBasicInfo implements Serializable{
 	private static final long serialVersionUID = 2264458786258618711L;
-    /**
+	/**
+     * 私圈id,设置私圈信息的时候传
+     */
+    private Long coterieId;
+    
+	/**
      * 用户ID
      */
     private String ownerId;
@@ -42,7 +45,12 @@ public class CoterieBasicInfo implements Serializable{
      * 加入私圈 收费需要审核 0不审核，1审核
      */
     private Integer joinCheck;
-
+    
+    /**
+     * 咨询费，0表示免费
+     */
+    private Integer consultingFee;
+    
 	public String getOwnerId() {
 		return ownerId;
 	}
@@ -91,9 +99,26 @@ public class CoterieBasicInfo implements Serializable{
 		this.joinCheck = joinCheck;
 	}
 
+	public Long getCoterieId() {
+		return coterieId;
+	}
+
+	public void setCoterieId(Long coterieId) {
+		this.coterieId = coterieId;
+	}
+
+	public Integer getConsultingFee() {
+		return consultingFee;
+	}
+
+	public void setConsultingFee(Integer consultingFee) {
+		this.consultingFee = consultingFee;
+	}
+
 	@Override
 	public String toString() {
-		return "CoterieBasicInfo [ownerId=" + ownerId   + ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", joinFee="
-				+ joinFee + ", joinCheck=" + joinCheck + "]";
+		return "CoterieBasicInfo [coterieId=" + coterieId + ", ownerId=" + ownerId + ", icon=" + icon + ", name=" + name
+				+ ", intro=" + intro + ", joinFee=" + joinFee + ", joinCheck=" + joinCheck + ", consultingFee="
+				+ consultingFee + "]";
 	}
 }
