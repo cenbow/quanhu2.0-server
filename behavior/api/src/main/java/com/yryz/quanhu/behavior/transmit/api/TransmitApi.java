@@ -30,7 +30,7 @@ public interface TransmitApi {
 
     /**
      * 删除转发记录
-     * @param   transmitId
+     * @param   transmitId      transmitInfo.kid
      * */
     Response<Integer> removeTransmit(Long transmitId);
 
