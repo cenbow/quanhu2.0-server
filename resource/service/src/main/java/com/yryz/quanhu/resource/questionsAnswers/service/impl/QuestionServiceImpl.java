@@ -169,6 +169,11 @@ public class QuestionServiceImpl implements QuestionService {
         question.setIsValid(QuestionAnswerConstants.validType.YES);
         question.setDelFlag(CommonConstants.DELETE_NO);
         question.setShelveFlag(CommonConstants.SHELVE_YES);
+        if(consultingFee > 0){
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
+        }else{
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
+        }
 
         questionDao.insertSelective(question);
         if (consultingFee > 0) {
@@ -440,6 +445,7 @@ public class QuestionServiceImpl implements QuestionService {
         criteria.andCoterieIdEqualTo(coteriaId);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
         /**
          *检查用户是否是圈主
          */
@@ -469,7 +475,7 @@ public class QuestionServiceImpl implements QuestionService {
                 questionVo.setTargetUser(apIservice.getUser(Long.valueOf(question.getTargetId())));
             }
             questionVo.setModuleEnum(ModuleContants.QUESTION);
-            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getKey()+","+BehaviorEnum.Like.getKey(),
+            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getCode()+","+BehaviorEnum.Like.getCode(),
                     questionVo.getKid(), null);
             if (ResponseConstant.SUCCESS.getCode().equals(countData.getCode())) {
                 Map<String, Long> count = countData.getData();

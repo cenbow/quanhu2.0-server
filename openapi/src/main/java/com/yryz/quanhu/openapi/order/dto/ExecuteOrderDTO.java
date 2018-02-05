@@ -36,7 +36,7 @@ public class ExecuteOrderDTO implements Serializable {
      * 支付密码
      */
     @ApiModelProperty("支付密码")
-    private String payPassord;
+    private String payPassword;
 
     /**
      * @return the orderId
@@ -66,18 +66,11 @@ public class ExecuteOrderDTO implements Serializable {
         this.custId = custId;
     }
 
-    /**
-     * @return the payPassord
-     */
-    public String getPayPassord() {
-        return payPassord;
+    public String getPayPassword() {
+        return payPassword;
     }
 
-    /**
-     * @param payPassord the payPassord to set
-     */
-    public void setPayPassord(String payPassord) {
-        this.payPassord = payPassord;
+    public void setPayPassword(String payPassword) {
+        this.payPassword = payPassword;
     }
-
 }
