@@ -194,7 +194,6 @@ public class TransmitServiceImpl implements TransmitService {
      * @param   transmitId
      * */
     public Integer removeTransmit(Long transmitId) {
-        Assert.notNull(transmitId, "transmitId不能为空");
         Query query = new Query();
         query.addCriteria(Criteria.where("kid").is(transmitId));
 
