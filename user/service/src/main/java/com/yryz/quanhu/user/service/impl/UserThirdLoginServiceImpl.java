@@ -61,7 +61,9 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 		record.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN)));
 		record.setLastUpdateDate(record.getCreateDate());
 		try {
-			return mysqlDao.insert(record);
+			int result = mysqlDao.insert(record);
+			accountRedisDao.deleteLoginMethod(record.getUserId());
+			return result;
 		} catch (Exception e) {
 			logger.error("[CustThirdLoginDao.insert]",e);
 			throw new MysqlOptException(e);
