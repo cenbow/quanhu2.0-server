@@ -83,6 +83,10 @@ public class AnswerServiceImpl implements AnswerService {
         if(null !=questionCheck.getAnswerdFlag() && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionCheck.getAnswerdFlag())==-1){
             throw  QuanhuException.busiError("圈主已处理过该问题，不能再回答");
         }
+
+        if(questionCheck.getChargeAmount().longValue()>0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionCheck.getOrderFlag())!=0){
+            throw  QuanhuException.busiError("该付费问题订单未完成，无法回答");
+        }
         AnswerWithBLOBs answerWithBLOBs = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answerWithBLOBs);
         answerWithBLOBs.setKid(apIservice.getKid());
