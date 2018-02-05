@@ -17,9 +17,9 @@ import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 * @date 2018年1月22日 下午3:06:46
 */
 @Service(interfaceClass = ReleaseConfigApi.class)
-public class ReleaseConfigServiceProvider implements ReleaseConfigApi {
+public class ReleaseConfigProvider implements ReleaseConfigApi {
 
-    private Logger logger = LoggerFactory.getLogger(ReleaseConfigServiceProvider.class);
+    private Logger logger = LoggerFactory.getLogger(ReleaseConfigProvider.class);
 
     @Autowired
     ReleaseConfigService releaseConfigService;

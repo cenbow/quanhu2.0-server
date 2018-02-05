@@ -36,8 +36,9 @@ public class OrderQuestionNotifyServiceImpl implements IOrderNotifyService {
     public void notify(OutputOrder outputOrder) {
      if(outputOrder!=null && outputOrder.getBizContent()!=null){
          Question question=JSONObject.parseObject(outputOrder.getBizContent(), Question.class);
-         question.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
-         questionService.updateByPrimaryKeySelective(question);
+         Question questionByQuery=this.questionService.queryAvailableQuestionByKid(question.getKid());
+         questionByQuery.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
+         questionService.updateByPrimaryKeySelective(questionByQuery);
 
          /**
           * 发送通知消息
