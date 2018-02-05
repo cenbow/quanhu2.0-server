@@ -19,7 +19,7 @@ public class UserAccount implements Serializable {
      */
     private Long accountSum;
     /**
-     * 积分账户余额
+     * 收益账户余额
      */
     private Long integralSum;
     /**
