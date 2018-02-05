@@ -57,7 +57,7 @@ public class HotspotConsumer {
 		logger.info("handle resource message : " + data);
 		HotSpotEventInfo eventInfo = GsonUtils.json2Obj(data, HotSpotEventInfo.class);
 		//如果两个都没有执行。则直接返回
-		if(!EventTypeCollection.checkResourceHotCalculation(eventInfo.getEventCode()) || !EventTypeCollection.checkUserHotCalculation(eventInfo.getEventCode())){
+		if(!EventTypeCollection.checkResourceHotCalculation(eventInfo.getEventCode()) && !EventTypeCollection.checkUserHotCalculation(eventInfo.getEventCode())){
 			return ;
 		}
 		try {
