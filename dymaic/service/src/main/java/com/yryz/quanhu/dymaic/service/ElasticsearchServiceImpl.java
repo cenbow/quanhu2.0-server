@@ -1,6 +1,7 @@
 package com.yryz.quanhu.dymaic.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.PageModel;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.dymaic.canal.dao.CoterieInfoRepository;
@@ -106,6 +109,9 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	@Reference(check = false)
 	private EventAcountApiService acountApiService;
 
+	@Reference(check = false)
+    private CountApi countApi;
+	
 	@Autowired
 	private DymaicServiceImpl dymaicService;
 
@@ -262,15 +268,26 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 					}
 				}
 
-				if (info.getResourceType() == 2 && info.getTopicPostInfo() != null
-						&& info.getTopicPostInfo().getCreateUserId() != null) {
-					Optional<UserInfo> user = userRepository.findById(info.getTopicPostInfo().getCreateUserId());
-					if (user.isPresent()) {
-						UserSimpleVo userVo = new UserSimpleVo();
-						BeanUtils.copyProperties(user.get(), userVo);
-						vo.setCreateUserInfo(userVo);
-					}
-				}
+				// 2帖子
+                if (info.getResourceType() == 2) {
+                    if (info.getTopicPostInfo() != null && info.getTopicPostInfo().getCreateUserId() != null) {
+                        Optional<UserInfo> user = userRepository.findById(info.getTopicPostInfo().getCreateUserId());
+                        if (user.isPresent()) {
+                            UserSimpleVo userVo = new UserSimpleVo();
+                            BeanUtils.copyProperties(user.get(), userVo);
+                            vo.setCreateUserInfo(userVo);
+                        }
+                    }
+
+                    // 帖子浏览数
+                    Map<String, Long> statistics = new HashMap<>();
+                    try {
+                        String countType = BehaviorEnum.Read.getCode();
+                        statistics = ResponseUtils.getResponseData(countApi.getCount(countType, info.getKid(), null));
+                    } catch (Exception e) {
+                        logger.warn("cannot get statics cause: " + e.getMessage());
+                    }
+                }
 			}
 
 			PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
