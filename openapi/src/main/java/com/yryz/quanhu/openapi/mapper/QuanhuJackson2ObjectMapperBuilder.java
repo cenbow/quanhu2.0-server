@@ -33,9 +33,9 @@ public class QuanhuJackson2ObjectMapperBuilder {
 			@Override
 			public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
                 jacksonObjectMapperBuilder.serializationInclusion(Include.NON_NULL);
-                jacksonObjectMapperBuilder.failOnUnknownProperties(false);
-                jacksonObjectMapperBuilder.propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-                jacksonObjectMapperBuilder.dateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+//                jacksonObjectMapperBuilder.failOnUnknownProperties(false);
+//                jacksonObjectMapperBuilder.propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+//                jacksonObjectMapperBuilder.dateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 			}
 
         };

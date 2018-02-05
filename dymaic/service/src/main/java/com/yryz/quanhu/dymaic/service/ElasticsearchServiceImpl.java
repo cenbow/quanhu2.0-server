@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -417,7 +418,9 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			checkAdminParam(adminUserDTO);
 			List<UserInfo> userInfoList = userRepository.adminSearchUser(adminUserDTO);
 			List<UserInfoVO> userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
-			setUserOrderIntegral(userInfoVOS);
+			if (BooleanUtils.isTrue(adminUserDTO.getNeedIntegral())) {
+				setUserOrderIntegral(userInfoVOS);
+			}
 			PageList<UserInfoVO> pageList = new PageModel<UserInfoVO>().getPageList(userInfoVOS);
 			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (Exception e) {

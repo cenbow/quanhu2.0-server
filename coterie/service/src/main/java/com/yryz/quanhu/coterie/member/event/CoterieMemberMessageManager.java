@@ -76,13 +76,11 @@ public class CoterieMemberMessageManager {
             message.setContent(user.getUserNickName() + "申请加入私圈" + (StringUtils.isEmpty(reason) ? "" : "，加入理由：" + reason));
             message.setImg(coterie.getIcon());
             message.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            message.setCircleRoute(coterie.getCircleRoute());
             message.setCoterieId(coterieId.toString());
 
             InteractiveBody body = new InteractiveBody();
             body.setBodyImg(coterie.getIcon());
             body.setBodyTitle(coterie.getName());
-            body.setCircleName(coterie.getCircleName());
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
@@ -129,7 +127,6 @@ public class CoterieMemberMessageManager {
             InteractiveBody body = new InteractiveBody();
             body.setBodyImg(coterie.getIcon());
             body.setBodyTitle(coterie.getName());
-            body.setCircleName(coterie.getCircleName());
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
@@ -173,13 +170,11 @@ public class CoterieMemberMessageManager {
             message.setContent(user.getUserNickName() + "将你设为了禁言。");
             message.setImg(coterie.getIcon());
             message.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            message.setCircleRoute(coterie.getCircleRoute());
             message.setCoterieId(coterieId.toString());
 
             InteractiveBody body = new InteractiveBody();
             body.setBodyImg(coterie.getIcon());
             body.setBodyTitle(coterie.getName());
-            body.setCircleName(coterie.getCircleName());
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 

@@ -133,7 +133,7 @@ public class QuestionController {
 	public Response<Integer> executeInValidQuestionRefund( HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String userId=header.getUserId();
-		if(StringUtils.isBlank(userId) && "48".equals(userId)){
+		if(StringUtils.isBlank(userId) && !"48".equals(userId)){
 			return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"缺失用户编号"));
 		}
 		return questionApi.executeInValidQuestionRefund();

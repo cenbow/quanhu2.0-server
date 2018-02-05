@@ -80,11 +80,6 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private Byte auditStatus;
 
-	/**
-	 * 是否被推荐
-	 */
-	private Byte recommendStatus;
-
 	//注册信息
 	/**
 	 * 渠道号
@@ -107,13 +102,6 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String applyAuthEndDate;
 
-	public Byte getRecommendStatus() {
-		return recommendStatus;
-	}
-
-	public void setRecommendStatus(Byte recommendStatus) {
-		this.recommendStatus = recommendStatus;
-	}
 
 	public String getApplyAuthBeginDate() {
 		return applyAuthBeginDate;

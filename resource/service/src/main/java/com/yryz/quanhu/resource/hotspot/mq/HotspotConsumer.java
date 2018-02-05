@@ -53,7 +53,13 @@ public class HotspotConsumer {
 	)
 	public void handleMessage(String data){
 		logger.info("handle resource message : " + data);
-		HotSpotEventInfo eventInfo = GsonUtils.json2Obj(data, HotSpotEventInfo.class);
+		HotSpotEventInfo eventInfo = null;
+		try {
+			eventInfo = GsonUtils.json2Obj(data, HotSpotEventInfo.class);
+		} catch (Exception e) {
+			logger.warn("handle resource message : data is not validation " + data);
+			return ;
+		}
 		//如果两个都没有执行。则直接返回
 		if(!EventTypeCollection.checkResourceHotCalculation(eventInfo.getEventCode()) && !EventTypeCollection.checkUserHotCalculation(eventInfo.getEventCode())){
 			return ;
