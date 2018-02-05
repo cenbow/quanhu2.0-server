@@ -447,9 +447,9 @@ public class LikeProvider implements LikeApi {
         messageVo.setTitle(likeAssemble.getTitle());
         messageVo.setLink(likeAssemble.getLink());
         messageVo.setActionCode(MessageActionCode.COMMON_DETAIL);
-        messageVo.setLabel(MessageLabel.LIKE);
+        messageVo.setLabel(MessageLabel.INTERACTIVE_LIKE);
         messageVo.setToCust(String.valueOf(likeAssemble.getTargetUserId()));
-        messageVo.setType(MessageType.SYSTEM_TYPE);
+        messageVo.setType(MessageType.INTERACTIVE_TYPE);
         messageVo.setCreateTime(DateUtils.getDateTime());
         messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_2);
         try {
