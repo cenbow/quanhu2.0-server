@@ -1,5 +1,6 @@
 package com.yryz.quanhu.message.message.mongo;
 
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.mongodb.AbsBaseMongoDAO;
 import com.yryz.common.mongodb.Page;
 import com.yryz.common.response.PageList;
@@ -7,6 +8,8 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.message.constants.MessageContants;
 import com.yryz.quanhu.message.message.dto.MessageAdminDto;
 import com.yryz.quanhu.message.message.vo.MessageAdminVo;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,9 +41,47 @@ public class MessageAdminMongo extends AbsBaseMongoDAO<MessageAdminVo> {
         if (StringUtils.isNotBlank(messageAdminVo.getMessageId())) {
             query.addCriteria(Criteria.where("messageId").is(messageAdminVo.getMessageId()));
         }
+
         if (messageAdminVo.getPushStatus() != null) {
             update.set("pushStatus", messageAdminVo.getPushStatus());
         }
+
+        if (messageAdminVo.getDelFlag() != null) {
+            update.set("delFlag", messageAdminVo.getDelFlag());
+        }
+
+        if (messageAdminVo.getMessageSource() != null) {
+            update.set("messageSource", messageAdminVo.getMessageSource());
+        }
+
+        if (StringUtils.isNotBlank(messageAdminVo.getTitle())) {
+            update.set("title", messageAdminVo.getTitle());
+        }
+
+        if (StringUtils.isNotBlank(messageAdminVo.getContent())) {
+            update.set("content", messageAdminVo.getContent());
+        }
+
+        if (StringUtils.isNotBlank(messageAdminVo.getImg())) {
+            update.set("img", messageAdminVo.getImg());
+        }
+
+        if (StringUtils.isNotBlank(messageAdminVo.getLink())) {
+            update.set("link", messageAdminVo.getLink());
+        }
+
+        if (messageAdminVo.getPersistentType() != null) {
+            update.set("persistentType", messageAdminVo.getPersistentType());
+        }
+
+        if (CollectionUtils.isNotEmpty(messageAdminVo.getPushUserIds())) {
+            update.set("pushUserIds", messageAdminVo.getPushUserIds());
+        }
+
+        if (messageAdminVo.getPushType() != null) {
+            update.set("pushType", messageAdminVo.getPushType());
+        }
+
         return this.update(query, update);
     }
 
@@ -63,14 +104,21 @@ public class MessageAdminMongo extends AbsBaseMongoDAO<MessageAdminVo> {
         }
 
         if (StringUtils.isNotBlank(messageAdminDto.getStartDate())) {
-            query.addCriteria(Criteria.where("pushDate").gte(messageAdminDto.getStartDate()));
+            if (StringUtils.isNotBlank(messageAdminDto.getEndDate())) {
+                query.addCriteria(Criteria.where("pushDate").gte(messageAdminDto.getStartDate()).lte(messageAdminDto.getEndDate()));
+            } else {
+                query.addCriteria(Criteria.where("pushDate").gte(messageAdminDto.getStartDate()));
+            }
+        } else if (StringUtils.isNotBlank(messageAdminDto.getEndDate())) {
+            query.addCriteria(Criteria.where("pushDate").lte(messageAdminDto.getEndDate()));
         }
 
-        if (StringUtils.isNotBlank(messageAdminDto.getEndDate())) {
-            query.addCriteria(Criteria.where("pushDate").lte(messageAdminDto.getStartDate()));
-        }
+        /*if (StringUtils.isNotBlank(messageAdminDto.getEndDate())) {
+            query.addCriteria(Criteria.where("pushDate").lte(messageAdminDto.getEndDate()));
+        }*/
 
         query.addCriteria(Criteria.where("delFlag").is(MessageContants.DEL_FLAG_NOT_DELETE));
+        query.with(new Sort(Sort.Direction.DESC, "pushDate"));
 
         Page page1 = this.findPage(page, query);
 
@@ -80,5 +128,14 @@ public class MessageAdminMongo extends AbsBaseMongoDAO<MessageAdminVo> {
         pageList.setPageSize(messageAdminDto.getPageSize());
         pageList.setEntities((List<MessageAdminVo>) page1.getEntities());
         return pageList;
+    }
+
+    public MessageAdminVo findOne(MessageAdminDto messageAdminDto) {
+        if (StringUtils.isBlank(messageAdminDto.getMessageId())) {
+            throw QuanhuException.busiError("消息id不能为空！");
+        }
+        Query query = new Query();
+        query.addCriteria(Criteria.where("messageId").is(messageAdminDto.getMessageId()));
+        return this.findOne(query);
     }
 }

@@ -66,15 +66,15 @@ public class MessageController {
     public Response<List<MessageVo>> getList(@RequestHeader Long userId, Integer type, Integer label, Integer start, Integer limit) {
         Assert.notNull(userId, "缺少userId");
         Assert.notNull(type, "缺少type");
-        Assert.notNull(label, "缺少label");
+        //Assert.notNull(label, "缺少label");
         Assert.notNull(start, "缺少start");
         Assert.notNull(limit, "缺少limit");
         if (type <= 0) {
             throw QuanhuException.busiError("type参数错误！");
         }
-        if (label <= 0) {
+        /*if (label <= 0) {
             throw QuanhuException.busiError("label参数错误！");
-        }
+        }*/
         if (start < 0) {
             throw QuanhuException.busiError("start参数错误！");
         }

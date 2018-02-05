@@ -65,13 +65,16 @@ public class UserInvitationServiceImpl implements UserInvitationService {
         //分页查询列表用户信息
         PageHelper.startPage(dto.getPageNo(),dto.getPageSize());
         List<UserInvitationDto> infos = userOperateInfoDao.getUserByParam(dto);
+
+        PageList<UserInvitationDto> pageArray = new PageModel<UserInvitationDto>().getPageList(infos);
+
         PageHelper.clearPage();
 
 
         //构建查询用户iD
         Set<Long> fromUserIds = new HashSet<>();
         for (int i = 0 ; i< infos.size() ; i++){
-            fromUserIds.add(infos.get(i).getUserId());
+            fromUserIds.add(infos.get(i).getUserInviterId());
         }
 
         //查询用户的邀请人关系
@@ -93,7 +96,8 @@ public class UserInvitationServiceImpl implements UserInvitationService {
 
             returnArray.add(invitationDto);
         }
-        return new PageModel<UserInvitationDto>().getPageList(returnArray);
+        pageArray.setEntities(returnArray);
+        return pageArray;
     }
 
 
@@ -139,10 +143,8 @@ public class UserInvitationServiceImpl implements UserInvitationService {
     @Override
     public PageList<UserInvitationDto> list(UserInvitationDto dto) {
 
-        //分页查询列表用户信息
-        PageHelper.startPage(dto.getPageNo(),dto.getPageSize());
+        //查询列表用户信息
         List<UserInvitationDto> fromInfos = userOperateInfoDao.getUserByParam(dto);
-        PageHelper.clearPage();
 
         //构建邀请人集合
         Set<Long> fromUserIds = new HashSet<>();
@@ -151,11 +153,19 @@ public class UserInvitationServiceImpl implements UserInvitationService {
         }
 
         //查询所有待查询邀请人所邀请的所有人
+        PageHelper.startPage(dto.getPageNo(),dto.getPageSize());
+
         List<UserInvitationDto> invitations = userOperateInfoDao.getUserByInviterIds(fromUserIds);
+        PageList<UserInvitationDto> pageArray = new PageModel<UserInvitationDto>().getPageList(invitations);
+
+        PageHelper.clearPage();
+
+
         Set<Long> allUserIds = new HashSet<>();
         List<String> allUserIdsArray = new ArrayList<>();
         for (int i = 0 ; i < invitations.size() ; i++){
             allUserIds.add(invitations.get(i).getUserId());
+            allUserIdsArray.add(String.valueOf(invitations.get(i).getUserId()));
         }
 
         //查询积分成长值
@@ -195,6 +205,7 @@ public class UserInvitationServiceImpl implements UserInvitationService {
             returnArray.add(invitationDto);
 
         }
-        return new PageModel<UserInvitationDto>().getPageList(returnArray);
+        pageArray.setEntities(returnArray);
+        return pageArray;
     }
 }
