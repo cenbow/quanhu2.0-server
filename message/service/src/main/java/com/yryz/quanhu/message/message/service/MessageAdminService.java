@@ -17,4 +17,8 @@ public interface MessageAdminService {
     PageList<MessageAdminVo> listAdmin(MessageAdminDto messageAdminDto);
 
     Boolean push(MessageAdminVo messageAdminVo);
+
+    Boolean update(MessageAdminVo messageAdminVo);
+
+    MessageAdminVo findOne(MessageAdminDto messageAdminDto);
 }

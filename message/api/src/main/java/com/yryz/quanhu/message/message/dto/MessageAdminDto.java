@@ -1,5 +1,7 @@
 package com.yryz.quanhu.message.message.dto;
 
+import java.io.Serializable;
+
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
@@ -8,11 +10,16 @@ package com.yryz.quanhu.message.message.dto;
  * @Date: Created in 2018 2018/1/31 17:03
  * @Author: pn
  */
-public class MessageAdminDto {
+public class MessageAdminDto implements Serializable {
 
     private Integer pageNo = 1;
 
     private Integer pageSize = 10;
+
+    /**
+     * 消息id
+     */
+    private String messageId;
 
     /**
      * 标题
@@ -32,6 +39,14 @@ public class MessageAdminDto {
     private String startDate;
 
     private String endDate;
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
 
     public String getTitle() {
         return title;

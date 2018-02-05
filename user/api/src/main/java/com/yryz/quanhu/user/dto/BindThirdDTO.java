@@ -25,7 +25,7 @@ public class BindThirdDTO implements Serializable {
 	 */
 	private String accessToken;
 	/**
-	 * 第三方类型
+	 * 第三方类型 {@link #RegType}
 	 */
 	private Integer thirdType;
 	public Long getUserId() {

@@ -14,6 +14,8 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.common.util.RemoteResourceUtils;
+import com.yryz.quanhu.behavior.common.vo.RemoteResource;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.transmit.dao.TransmitMongoDao;
@@ -29,11 +31,12 @@ import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -75,6 +78,9 @@ public class TransmitServiceImpl implements TransmitService {
     @Reference(check = false, timeout = 30000)
     MessageAPI messageAPI;
 
+    @Reference(check = false, timeout = 30000)
+    EventAPI eventAPI;
+
     /**
      * 转发
      * @param   transmitInfo
@@ -82,7 +88,6 @@ public class TransmitServiceImpl implements TransmitService {
     public void single(TransmitInfo transmitInfo) {
         String extJson = "";
         Response<ResourceVo> result = null;
-        Long userId = null;
         ResourceVo resourceVo = null;
         if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
@@ -109,7 +114,6 @@ public class TransmitServiceImpl implements TransmitService {
                 throw QuanhuException.busiError("资源不存在或者已删除");
             }
             extJson = resourceVo.getExtJson();
-            userId = resourceVo.getUserId();
         }
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
@@ -123,7 +127,9 @@ public class TransmitServiceImpl implements TransmitService {
         //发送动态
         this.sendDymaic(transmitInfo, extJson);
         //发送消息
-        this.sendMessage(userId, transmitInfo, resourceVo);
+        this.sendMessage(transmitInfo.getTargetUserId(), transmitInfo, resourceVo);
+        //提交事件
+        this.sendEvent(transmitInfo, resourceVo);
         try {
             //递增转发数
             countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, 1L);
@@ -237,12 +243,36 @@ public class TransmitServiceImpl implements TransmitService {
                     }
                 }
                 body.setBodyTitle(title);
-                //TODO:缺少首张图获取
+                RemoteResource convert = RemoteResourceUtils.convert(resourceVo);
+                body.setBodyImg(convert != null ? convert.getImgUrl() : null);
             }
             messageVo.setBody(body);
             messageAPI.sendMessage(messageVo, isPush);
         } catch (Exception e) {
             logger.error("发送消息 失败", e);
+        }
+    }
+
+    /**
+     * 提交event
+     * @param   transmitInfo
+     * @param   resourceVo
+     * */
+    private void sendEvent(TransmitInfo transmitInfo, ResourceVo resourceVo) {
+        try {
+            //提交事件
+            EventInfo event = new EventInfo();
+            event.setEventCode("6");
+            event.setUserId(transmitInfo.getCreateUserId().toString());
+            event.setResourceId(transmitInfo.getResourceId().toString());
+            event.setOwnerId(resourceVo.getUserId() != null ? resourceVo.getUserId().toString() : null);
+            event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
+            if (StringUtils.isNotEmpty(resourceVo.getCoterieId()) ) {
+                event.setCoterieId(resourceVo.getCoterieId());
+            }
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("提交event 失败", e);
         }
     }
 
