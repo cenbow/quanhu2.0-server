@@ -73,7 +73,7 @@
 		update qh_user_violation set user_status = 11 where user_id = #{userId}
   </update>
   
-  <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserViolation" >
+  <insert id="saveViolation" parameterType="com.yryz.quanhu.user.entity.UserViolation" >
     insert into qh_user_violation
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
