@@ -133,35 +133,34 @@ public enum MessageConstant {
     JOIN_COTERIE_REWARD(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "私圈奖励", "{name}加入您的私圈，您获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
-     *在第三方绑定手机号获得奖励券
+     * 在第三方绑定手机号获得奖励券
      */
-    PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE,MessageLabel.SYSTEM_NOTICE,"投票活动奖励","您已通过活动获得{count1} {count2}张",MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
+    PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_NOTICE, "投票活动奖励", "您已通过活动获得{count1} {count2}张", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
 
     /**
      * 转发
-     * */
-    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_TRANSMIT, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+     */
+    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_FORWARD, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 付费参加活动
      */
-    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "参加活动", "您成功参与{count}活动，支付{count1}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 打赏消费
      */
-    REWARD_ACCOUNT(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"支付成功","您打赏了一个%s，支付%s悠然币。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
+    REWARD_ACCOUNT(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "支付成功", "您打赏了一个%s，支付%s悠然币。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 被打赏收益
      */
-    REWARD_INTEGRAL(MessageType.ORDER_TYPE,MessageLabel.ORDER_ACCOUNT,"奖励通知","%s打赏了一个%s，您获得%s奖励。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
+    REWARD_INTEGRAL(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "奖励通知", "%s打赏了一个%s，您获得%s奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
      * 内容下架
      */
-    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE),
-    ;
+    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE);
 
     private Integer type;
 
@@ -176,13 +175,13 @@ public enum MessageConstant {
     private String messageActionCode;
 
     /**
-     * @param type                     一级分类
-     * @param label                    二级分类
-     * @param title                    消息标题
-     * @param content                  消息内容
-     * @param messageViewCode          消息视图码
-     * @param messageActionCode        消息跳转码
-     *                                 详情参见：http://confluence.yryz.com/pages/viewpage.action?pageId=14975116
+     * @param type              一级分类
+     * @param label             二级分类
+     * @param title             消息标题
+     * @param content           消息内容
+     * @param messageViewCode   消息视图码
+     * @param messageActionCode 消息跳转码
+     *                          详情参见：http://confluence.yryz.com/pages/viewpage.action?pageId=14975116
      */
     private MessageConstant(Integer type, Integer label, String title, String content, String messageViewCode, String messageActionCode) {
         this.type = type;
