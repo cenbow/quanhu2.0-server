@@ -1,9 +1,13 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Maps;
 import com.yryz.common.annotation.UserBehaviorValidation;
+import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.collection.api.CollectionInfoApi;
 import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
 import com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo;
@@ -15,12 +19,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @Api(description = "收藏")
 @RestController
@@ -36,9 +38,10 @@ public class CollectionInfoController {
 
     /**
      * 收藏
-     * @param   collectionInfoDto
+     *
+     * @param collectionInfoDto
      * @return
-     * */
+     */
     @UserBehaviorValidation(login = true)
     @ApiOperation("收藏")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -72,5 +75,25 @@ public class CollectionInfoController {
         return collectionInfoApi.list(collectionInfoDto);
     }
 
-
+    @UserBehaviorValidation(login = true)
+    @ApiOperation("收藏状态")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "services/app/{version}/collection/collectionStatus")
+    public Response<Map<String, Long>> collectionStatus(@RequestHeader Long userId, @RequestBody CollectionInfoDto collectionInfoDto, HttpServletRequest request) {
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("用户ID不能为空"));
+        }
+        if (collectionInfoDto == null || collectionInfoDto.getResourceId() == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError("resourceId不能为空"));
+        }
+        collectionInfoDto.setCreateUserId(userId);
+        Map<String, Long> map = Maps.newHashMap();
+        try {
+            Integer collectionStatus = collectionInfoApi.collectionStatus(collectionInfoDto).getData();
+            map.put("collectionFlag", collectionStatus.longValue());
+        } catch (Exception e) {
+            logger.error("collectionStatus error", e);
+        }
+        return ResponseUtils.returnObjectSuccess(map);
+    }
 }
