@@ -135,7 +135,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             this.commitResourceAndDynamic(record, createUser);
             try {
                 // 资源计数接入
-                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+                countApi.commitCount(BehaviorEnum.Release, record.getCreateUserId(), null, 1L);
             } catch (Exception e) {
                 logger.error("统计计数 接入异常！", e);
             }

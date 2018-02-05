@@ -17,6 +17,8 @@ public class CoterieBuyRecordVo extends ReleaseBuyRecord {
 
     private ResourceVo resourceVo;
 
+    private Object extJsonObj;
+
     private UserSimpleVO user;
 
     public String getCoterieName() {
@@ -33,6 +35,14 @@ public class CoterieBuyRecordVo extends ReleaseBuyRecord {
 
     public void setResourceVo(ResourceVo resourceVo) {
         this.resourceVo = resourceVo;
+    }
+
+    public Object getExtJsonObj() {
+        return extJsonObj;
+    }
+
+    public void setExtJsonObj(Object extJsonObj) {
+        this.extJsonObj = extJsonObj;
     }
 
     public UserSimpleVO getUser() {

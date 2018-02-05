@@ -13,7 +13,7 @@ import java.io.Serializable;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * @author xiepeng
+ * @author suyongcheng
  * @version 1.0
  * @date 2017年8月25日
  */
@@ -24,6 +24,12 @@ public class EventInfo implements Serializable {
 	 */
 	private static final long serialVersionUID = -8234067721074858571L;
 	
+	
+	/** 事件ID */
+    @ApiModelProperty(value = "事件ID")
+    private String  eventId;
+    
+    
 	/** 事件用户ID */
     @ApiModelProperty(value = "事件用户ID")
     private String  userId;
@@ -80,8 +86,17 @@ public class EventInfo implements Serializable {
 	
 	@ApiModelProperty(value="成长值")
     private String eventGrow;
-
 	
+
+    
+	public String getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
+	}
+
 	public String getEventScore() {
 		return eventScore;
 	}
