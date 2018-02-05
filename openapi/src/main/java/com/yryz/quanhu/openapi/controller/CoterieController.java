@@ -56,7 +56,7 @@ public class CoterieController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
-    @PostMapping(value = "/{version}/coterieInfo/create")
+    @PostMapping(value = "/{version}/coterieInfo/count")
     public Response<Integer> getMyCoterieCount(@RequestHeader Long userId, HttpServletRequest request) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
@@ -155,7 +155,7 @@ public class CoterieController {
      */
     @ApiOperation("分页获取私圈列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/coterieInfo/list/")
+    @GetMapping(value = "/{version}/coterieInfo/list")
     public Response<PageList<CoterieInfo>> queryPage(Integer currentPage, Integer pageSize, HttpServletRequest request) {
         PageList<CoterieInfo> page = new PageList<>();
         page.setCurrentPage(currentPage);
