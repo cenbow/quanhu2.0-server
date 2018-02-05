@@ -166,7 +166,7 @@ public class TopicServiceImpl implements TopicService {
                 vo.setUser(apIservice.getUser(createUserId));
             }
             vo.setReplyCount(0L);
-            Response<Map<String,Long>> data=countApi.getCount(BehaviorEnum.TALK.getKey(),  vo.getKid(),null);
+            Response<Map<String,Long>> data=countApi.getCount(BehaviorEnum.TALK.getCode(),  vo.getKid(),null);
             if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
                 Map<String,Long> map=data.getData();
                 if(map!=null && map.containsKey(BehaviorEnum.TALK.getKey())){

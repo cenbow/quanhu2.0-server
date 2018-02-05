@@ -425,14 +425,14 @@ public class CoterieProvider implements CoterieApi {
 		}
 		CoterieInfo info=coterieService.find(coterieId);
 		if(info==null){
-			throw QuanhuException.busiError("私圈（"+coterieId+"）不存在");
+			return ResponseUtils.returnCommonException("私圈（"+coterieId+"）不存在");
 		}
 		Set<String> set = new HashSet<String>();
 		set.add(info.getOwnerId());
 		Map<String,UserBaseInfoVO> cust=ResponseUtils.getResponseData(userApi.getUser(set));
 		UserBaseInfoVO user = cust.get(info.getOwnerId());
 		if(user==null){
-			throw QuanhuException.busiError("用户（"+info.getOwnerId()+"）不存在");
+			return ResponseUtils.returnCommonException("用户（"+info.getOwnerId()+"）不存在");
 		}
 		try {
 			BufferedImage base = ImageUtils.createBaseImage(300, 400, Color.WHITE);
@@ -479,9 +479,9 @@ public class CoterieProvider implements CoterieApi {
 			// 将图片字节流数组转换为base64
 			result = "data:image/png;base64," + new String(Base64.encodeBase64(bytes));
 			//Base64Util.encodeToString(bytes);
-
 		} catch (Exception e) {
 			logger.error("组装私圈二维码图片异常！", e);
+			return ResponseUtils.returnCommonException("组装私圈二维码图片异常！");
 		}
 		return ResponseUtils.returnObjectSuccess(result);
 	}

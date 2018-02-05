@@ -22,6 +22,7 @@ import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
+import com.yryz.quanhu.order.vo.UserAccount;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
@@ -106,11 +107,11 @@ public class QuestionServiceImpl implements QuestionService {
          */
         Long citeriaId = question.getCoterieId();
         String targetId = question.getTargetId();
-        String conttent = question.getContent();
+        String content = question.getContent();
         Long createUserId = question.getCreateUserId();
         Byte isAnonymity = question.getIsAnonymity();
         Byte isOnlyShowMe = question.getIsOnlyShowMe();
-        if (null == citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(conttent)
+        if (null == citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(content)
                 || isAnonymity == null || null == isOnlyShowMe || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
@@ -131,11 +132,25 @@ public class QuestionServiceImpl implements QuestionService {
 
         //圈主10 成员20 路人未审请30 路人待审核40
         if (!checkIdentity(createUserId, Long.valueOf(citeriaId), MemberConstant.Permission.MEMBER)) {
-            throw QuanhuException.busiError("非圈粉不能提问");
+            throw QuanhuException.busiError("您还不是该私圈成员，请先加入私圈");
         }
 
         if (!checkIdentity(Long.valueOf(targetId), Long.valueOf(citeriaId), MemberConstant.Permission.OWNER)) {
             throw QuanhuException.busiError("不能向非圈主用户提问.");
+        }
+
+        if(StringUtils.isBlank(content) || content.length()>300 ||content.length()<10){
+            throw QuanhuException.busiError("提问正文只能输入文字,10到300字.");
+        }
+        if(consultingFee>0) {
+            UserAccount userAccount = orderSDK.getUserAccount(createUserId);
+            if (userAccount == null) {
+                throw QuanhuException.busiError("提问者没有账户信息.");
+            }
+            Long accountSum=userAccount.getAccountSum()==null?0L:userAccount.getAccountSum();
+            if(consultingFee>accountSum){
+                throw QuanhuException.busiError(ExceptionEnum.USER_NOT_SUFFICIENT_FUNDS);
+            }
         }
 
         question.setKid(apIservice.getKid());
@@ -154,9 +169,14 @@ public class QuestionServiceImpl implements QuestionService {
         question.setIsValid(QuestionAnswerConstants.validType.YES);
         question.setDelFlag(CommonConstants.DELETE_NO);
         question.setShelveFlag(CommonConstants.SHELVE_YES);
+        if(consultingFee > 0){
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
+        }else{
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
+        }
 
         questionDao.insertSelective(question);
-        if (question.getChargeAmount().longValue() > 0) {
+        if (consultingFee > 0) {
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JSON.toJSONString(question));
             inputOrder.setCost(question.getChargeAmount());
@@ -362,7 +382,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         if(question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag())!=0){
-            throw QuanhuException.busiError("问题未支付完成，圈主不能操作");
+            throw QuanhuException.busiError("该问题未付费成功，无法拒绝");
         }
         String targetId = question.getTargetId();
         if (!String.valueOf(userId).equals(targetId)) {
@@ -454,7 +474,7 @@ public class QuestionServiceImpl implements QuestionService {
                 questionVo.setTargetUser(apIservice.getUser(Long.valueOf(question.getTargetId())));
             }
             questionVo.setModuleEnum(ModuleContants.QUESTION);
-            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getKey()+","+BehaviorEnum.Like.getKey(),
+            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getCode()+","+BehaviorEnum.Like.getCode(),
                     questionVo.getKid(), null);
             if (ResponseConstant.SUCCESS.getCode().equals(countData.getCode())) {
                 Map<String, Long> count = countData.getData();
