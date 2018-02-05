@@ -13,7 +13,6 @@ import com.yryz.quanhu.behavior.transmit.entity.TransmitInfo;
 import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.score.service.EventAPI;
-import com.yryz.quanhu.score.vo.EventInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -59,21 +58,7 @@ public class TransmitController {
         if(!StringUtils.isEmpty(transmitInfo.getContent()) && transmitInfo.getContent().length() > 140) {
             throw new QuanhuException(ExceptionEnum.TRANSMIT_CONTENT_ERROR);
         }
-        Response result = transmitApi.single(transmitInfo);
-        if(result.success()) {
-            try {
-                //提交事件
-                EventInfo event = new EventInfo();
-                event.setUserId(userId);
-                event.setEventCode("6");
-//                event.setResourceId(transmitInfo.getResourceId().toString());
-                eventAPI.commit(event);
-            } catch (Exception e) {
-                logger.error("提交eventApi 失败", e);
-            }
-        }
-
-        return result;
+        return transmitApi.single(transmitInfo);
     }
 
     /**

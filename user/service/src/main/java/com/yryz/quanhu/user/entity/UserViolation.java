@@ -67,7 +67,7 @@ public class UserViolation extends GenericEntity{
     /**
      * 违规是否对账户有效10:有效 11:无效
      */
-    private Byte status;
+    private Byte userStatus;
 
 
     public Long getUserId() {
@@ -134,12 +134,12 @@ public class UserViolation extends GenericEntity{
         this.banPostTime = banPostTime;
     }
 
-    public Byte getStatus() {
-        return status;
+    public Byte getUserStatus() {
+        return userStatus;
     }
 
-    public void setStatus(Byte status) {
-        this.status = status;
+    public void setUserStatus(Byte userStatus) {
+        this.userStatus = userStatus;
     }
 
 }

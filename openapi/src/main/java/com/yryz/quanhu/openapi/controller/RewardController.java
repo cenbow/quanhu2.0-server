@@ -98,6 +98,23 @@ public class RewardController {
         return rewardInfoApi.pageByCondition(dto, true);
     }
 
+    @ApiOperation("某资源打赏-用户列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true),
+            @ApiImplicitParam(name = "resourceId", paramType = "query", required = false) })
+    @GetMapping(value = "{version}/resource/reward/user/list")
+    public Response<PageList<RewardInfoVo>> rewardResourceUserList(HttpServletRequest request,
+            @RequestParam Integer currentPage, @RequestParam Integer pageSize, @RequestParam Long resourceId) {
+        RewardInfoDto dto = new RewardInfoDto();
+        dto.setCurrentPage(currentPage);
+        dto.setPageSize(pageSize);
+        dto.setQueryType(RewardConstants.QueryType.reward_resource_user_list);
+
+        return rewardInfoApi.pageByCondition(dto, true);
+    }
+    
     @ApiOperation("我打赏/收到打赏 金额")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),

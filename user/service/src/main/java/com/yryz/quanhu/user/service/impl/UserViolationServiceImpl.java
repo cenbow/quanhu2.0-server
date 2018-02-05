@@ -77,9 +77,9 @@ public class UserViolationServiceImpl implements UserViolationService {
 		if (violation.getViolationType() == ViolatType.WARN.getType()
 				|| violation.getViolationType() == ViolatType.ALLTAIK.getType()
 				|| violation.getViolationType() == ViolatType.NOFREEZE.getType()) {
-			violation.setStatus((byte) 11);
+			violation.setUserStatus((byte) 11);
 		} else {
-			violation.setStatus((byte) 10);
+			violation.setUserStatus((byte) 10);
 		}
 		// 设置用户其他违规记录过期
 
@@ -97,7 +97,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 				// 禁言
 				if (times == Constants.WARN_TIMES) {
 					UserViolation violation2 = (UserViolation) GsonUtils.parseObj(violation, UserViolation.class);
-					violation2.setStatus((byte) 0);
+					violation2.setUserStatus((byte)UserAccountStatus.NORMAL.getStatus());
 					violation2.setViolationType((byte) ViolatType.NOTALK.getType());
 					saveViolationDao(violation2);
 					updateUserStatus(violation2, appId);
@@ -157,6 +157,12 @@ public class UserViolationServiceImpl implements UserViolationService {
 	private void saveViolationDao(UserViolation violation) {
 		try {
 			violation.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_VIOLATION)));
+			if (violation.getViolationType().intValue() == ViolatType.NOTALK.getType()) {
+				// 同步用户状态
+				violation.setBanPostTime(DateUtils.addHours(new Date(), Constants.NO_TALK_HOUR));
+			}else{
+				violation.setBanPostTime(new Date());
+			}
 			violation.setCreateDate(new Date());
 			mysqlDao.saveViolation(violation);
 		} catch (Exception e) {
@@ -225,7 +231,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 			// 同步用户状态
 			userService
 					.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(),
-							null, null, null, null, DateUtils.addDays(new Date(), Constants.NO_TALK_HOUR)));
+							null, null, null, null, DateUtils.addHours(new Date(), Constants.NO_TALK_HOUR)));
 			// 消息
 			messageManager.disTalk(violation.getUserId().toString());
 		} // 冻结

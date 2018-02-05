@@ -110,7 +110,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(loginVO));
 	}
 
-	@Test
+	//@Test
 	public void getLoginMethod() {
 		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -216,12 +216,13 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void sendVerifyCode() {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
 		codeDTO.setCode(SmsContants.CODE_FIND_PWD);
-		codeDTO.setPhone("16612345689");
+		codeDTO.setUserId(738943677265461248l);
+		//codeDTO.setPhone("16612345689");
 
 		Response<SmsVerifyCodeVO> response = accountApi.sendVerifyCode(codeDTO);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -282,9 +283,12 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response2));
 	}
 	
-	//@Test
+	@Test
 	public void getAdmin(){
-		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 20, new AdminUserInfoDTO("1", null, null, null, null, "vebff12m1762"));
+		AdminUserInfoDTO infoDTO = new AdminUserInfoDTO(null, null, null, null, null, "vebff12m1762");
+		infoDTO.setUserStatus(1);
+		
+		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 20, infoDTO);
 		//Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
 		System.out.println(JsonUtils.toFastJson(response));
 	}

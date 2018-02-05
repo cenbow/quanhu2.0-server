@@ -123,10 +123,9 @@
         <if test="endDate !=null and endDate != ''">
             and create_date &lt;= #{endDate}
         </if>
-        <!--
-        <if test="nickName !=null and nickName != ''">
-            and user_nick_nname like CONCAT('%',#{nickName},'%')
-        </if> -->
+        <if test="key !=null and key != ''">
+            and ext_json like CONCAT('%',#{key},'%')
+        </if>
         ORDER BY create_date DESC
     </select>
 

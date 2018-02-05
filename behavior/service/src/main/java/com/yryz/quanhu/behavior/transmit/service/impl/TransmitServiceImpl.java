@@ -1,6 +1,7 @@
 package com.yryz.quanhu.behavior.transmit.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.mongodb.WriteResult;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
@@ -31,11 +32,12 @@ import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -43,7 +45,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -76,6 +80,9 @@ public class TransmitServiceImpl implements TransmitService {
 
     @Reference(check = false, timeout = 30000)
     MessageAPI messageAPI;
+
+    @Reference(check = false, timeout = 30000)
+    EventAPI eventAPI;
 
     /**
      * 转发
@@ -118,12 +125,15 @@ public class TransmitServiceImpl implements TransmitService {
         transmitInfo.setKid(idResult.getData());
         transmitInfo.setCreateDate(new Date());
         transmitInfo.setCreateDateLong(transmitInfo.getCreateDate().getTime());
+        transmitInfo.setShelveFlag(Integer.valueOf(CommonConstants.SHELVE_YES));
         //保存转发记录
         transmitMongoDao.save(transmitInfo);
         //发送动态
         this.sendDymaic(transmitInfo, extJson);
         //发送消息
         this.sendMessage(transmitInfo.getTargetUserId(), transmitInfo, resourceVo);
+        //提交事件
+        this.sendEvent(transmitInfo, resourceVo);
         try {
             //递增转发数
             countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, 1L);
@@ -142,6 +152,7 @@ public class TransmitServiceImpl implements TransmitService {
         Query query = new Query();
         query.addCriteria(Criteria.where("parentId").is(transmitInfoDto.getParentId()));
         query.addCriteria(Criteria.where("moduleEnum").is(transmitInfoDto.getModuleEnum()));
+        query.addCriteria(Criteria.where("shelveFlag").is(Integer.valueOf(CommonConstants.SHELVE_YES)));
         long count = transmitMongoDao.count(query);
         if(count > 0) {
             query.with(new Sort(Sort.Direction.DESC, "createDateLong"));
@@ -162,6 +173,32 @@ public class TransmitServiceImpl implements TransmitService {
         pageList.setEntities(resultList);
         pageList.setCount(count);
         return pageList;
+    }
+
+    /**
+     * 更新上下架状态
+     * @param   transmitId      transmitInfo.kid
+     * @param   shelvesFlag     上下架状态：10上架  11下架
+     * */
+    public Integer updateShelvesFlag(Long transmitId, Integer shelvesFlag) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("kid").is(transmitId));
+        Update update = new Update();
+        update.set("shelveFlag", shelvesFlag == null ? CommonConstants.SHELVE_NO : shelvesFlag);
+
+        return transmitMongoDao.update(query, update) == null ? 0 : 1;
+    }
+
+    /**
+     * 删除转发记录
+     * @param   transmitId
+     * */
+    public Integer removeTransmit(Long transmitId) {
+        Assert.notNull(transmitId, "transmitId不能为空");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("kid").is(transmitId));
+
+        return transmitMongoDao.remove(query);
     }
 
     private void sendDymaic(TransmitInfo transmitInfo, String extJson) {
@@ -244,6 +281,29 @@ public class TransmitServiceImpl implements TransmitService {
             messageAPI.sendMessage(messageVo, isPush);
         } catch (Exception e) {
             logger.error("发送消息 失败", e);
+        }
+    }
+
+    /**
+     * 提交event
+     * @param   transmitInfo
+     * @param   resourceVo
+     * */
+    private void sendEvent(TransmitInfo transmitInfo, ResourceVo resourceVo) {
+        try {
+            //提交事件
+            EventInfo event = new EventInfo();
+            event.setEventCode("6");
+            event.setUserId(transmitInfo.getCreateUserId().toString());
+            event.setResourceId(transmitInfo.getResourceId().toString());
+            event.setOwnerId(resourceVo.getUserId() != null ? resourceVo.getUserId().toString() : null);
+            event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
+            if (StringUtils.isNotEmpty(resourceVo.getCoterieId()) ) {
+                event.setCoterieId(resourceVo.getCoterieId());
+            }
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("提交event 失败", e);
         }
     }
 
