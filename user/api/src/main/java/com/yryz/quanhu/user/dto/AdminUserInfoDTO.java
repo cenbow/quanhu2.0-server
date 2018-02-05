@@ -5,6 +5,7 @@ package com.yryz.quanhu.user.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author danshiyu
@@ -58,7 +59,10 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 用户角色 10-普通用户 11-达人 
 	 */
 	private Integer userRole;
-
+	/**
+	 * 标签集合
+	 */
+	private Set<Long> tagIds;
 
 	//达人信息
 	/**
@@ -76,7 +80,6 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private Byte auditStatus;
 
-
 	//注册信息
 	/**
 	 * 渠道号
@@ -88,6 +91,24 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 成长级别
 	 */
 	private String growLevel;
+
+	/**
+	 * 申请认证开始时间
+	 */
+	private String applyAuthBeginDate;
+
+	/**
+	 * 申请认证结束时间
+	 */
+	private String applyAuthEndDate;
+
+	public Set<Long> getTagIds() {
+		return tagIds;
+	}
+
+	public void setTagIds(Set<Long> tagIds) {
+		this.tagIds = tagIds;
+	}
 
 	public String getGrowLevel() {
 		return growLevel;
