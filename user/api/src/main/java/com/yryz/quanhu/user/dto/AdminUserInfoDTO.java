@@ -106,7 +106,11 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 申请认证结束时间
 	 */
 	private String applyAuthEndDate;
-
+	
+	/**
+	 * 是否需要收入 
+	 */
+	private boolean needIntegral = false;
 	public Byte getRecommendStatus() {
 		return recommendStatus;
 	}
@@ -260,6 +264,14 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setUserRole(Integer userRole) {
 		this.userRole = userRole;
 	}
+	public boolean isNeedIntegral() {
+		return needIntegral;
+	}
+
+	public void setNeedIntegral(boolean needIntegral) {
+		this.needIntegral = needIntegral;
+	}
+
 	public AdminUserInfoDTO() {
 		super();
 	}
