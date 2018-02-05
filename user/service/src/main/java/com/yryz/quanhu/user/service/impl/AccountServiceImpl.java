@@ -333,7 +333,7 @@ public class AccountServiceImpl implements AccountService {
 		UserThirdLogin thirdLogin = new UserThirdLogin();
 		thirdLogin.setUserId(userId);
 		thirdLogin.setLoginType(type.byteValue());
-		thirdLogin.setNickName(thirdLogin.getNickName());
+		thirdLogin.setNickName(thirdUser.getNickName());
 		thirdLogin.setThirdId(thirdUser.getThirdId());
 		thirdLogin.setAppId(appId);
 		thirdLoginService.insert(thirdLogin);
