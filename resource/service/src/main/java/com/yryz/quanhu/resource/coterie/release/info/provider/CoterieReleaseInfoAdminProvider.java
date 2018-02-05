@@ -18,6 +18,8 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.BeanUtils;
+import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.resource.coterie.release.info.api.CoterieReleaseInfoAdminApi;
 import com.yryz.quanhu.resource.coterie.release.info.vo.CoterieReleaseInfoVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -42,6 +44,9 @@ public class CoterieReleaseInfoAdminProvider implements CoterieReleaseInfoAdminA
     @Reference(lazy = true, check = false, timeout = 10000)
     private UserApi userApi;
 
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private CoterieApi coterieApi;
+    
     @Override
     public Response<PageList<CoterieReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto) {
         try {
@@ -91,7 +96,11 @@ public class CoterieReleaseInfoAdminProvider implements CoterieReleaseInfoAdminA
                     UserSimpleVO userVo = userMap.get(String.valueOf(info.getCreateUserId()));
                     info.setUser(userVo);
 
-                    info.setCoterieName("私圈名称-TODO 待完成");
+                    CoterieInfo coterieInfo = ResponseUtils
+                            .getResponseData(coterieApi.queryCoterieInfo(info.getCoterieId()));
+                    if (null != coterieInfo) {
+                        info.setCoterieName(coterieInfo.getName());
+                    }
                 }
             }
 
