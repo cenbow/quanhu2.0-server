@@ -102,9 +102,11 @@ public class AccountServiceImpl implements AccountService {
 		if (registerDTO.getIsVest() == 11) {
 			regChannel = Constants.ADMIN_REG_VEST_CHANNEL;
 		}
-		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel,regChannel, registerDTO.getAppId(), regChannel);
+		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, registerDTO.getAppId(), regChannel);
 		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
-		createUser(new RegisterDTO(regChannel, registerDTO.getUserPhone(), registerDTO.getUserPwd(), logDTO), null);
+		createUser(new RegisterDTO(regChannel, registerDTO.getUserNickName(), registerDTO.getUserPhone(),
+				registerDTO.getUserPwd(), registerDTO.getIsVest(), registerDTO.getUserImg(), registerDTO.getUserDesc(),
+				registerDTO.getUserSignature(), logDTO), null);
 	}
 
 	@Override
@@ -112,7 +114,7 @@ public class AccountServiceImpl implements AccountService {
 	public void mergeActivityUser(Long userId, String phone) {
 		ActivityTempUser tempUser = null;
 		try {
-			tempUser = tempUserService.get(userId, null,null);
+			tempUser = tempUserService.get(userId, null, null);
 			if (tempUser == null) {
 				logger.info("[mergeActivityUser]:msg:参与者不存在");
 				throw QuanhuException.busiError("参与者不存在");
@@ -130,11 +132,11 @@ public class AccountServiceImpl implements AccountService {
 							" "));
 			registerDTO.setRegLogDTO(logDTO);
 			userId = createUser(registerDTO, tempUser.getKid());
-			//删除活动参与者信息
+			// 删除活动参与者信息
 			tempUserService.delete(userId);
 			// 创建第三方账户
-			thirdLoginService.insert(new UserThirdLogin(userId, tempUser.getThirdId(),
-					(byte) RegType.WEIXIN.getType(), tempUser.getNickName(), tempUser.getAppId()));
+			thirdLoginService.insert(new UserThirdLogin(userId, tempUser.getThirdId(), (byte) RegType.WEIXIN.getType(),
+					tempUser.getNickName(), tempUser.getAppId()));
 			logger.info("[user_bindPhone]:userId:{},bindType:activityMergeByPhone,oldPhone:,newPhone:{}", userId,
 					phone);
 		} catch (Exception e) {
@@ -214,23 +216,25 @@ public class AccountServiceImpl implements AccountService {
 	public Long loginThirdBindPhone(ThirdLoginDTO loginDTO, ThirdUser thirdUser) {
 		RegisterDTO registerDTO = new RegisterDTO();
 		registerDTO.setUserChannel(String.format("app_%s", RegType.getEnumByTye(loginDTO.getType()).getText()));
-		registerDTO.setUserNickName(getThirdNickName(loginDTO.getRegLogDTO().getAppId(),thirdUser.getNickName()));
+		registerDTO.setUserNickName(getThirdNickName(loginDTO.getRegLogDTO().getAppId(), thirdUser.getNickName()));
 		registerDTO.setUserLocation(thirdUser.getLocation());
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
 		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
 		registerDTO.setUserPhone(loginDTO.getPhone());
 		// 根据第三方账户查询临时用户表生成用户
-		ActivityTempUser tempUser = tempUserService.get(null, thirdUser.getThirdId(),loginDTO.getRegLogDTO().getAppId());
+		ActivityTempUser tempUser = tempUserService.get(null, thirdUser.getThirdId(),
+				loginDTO.getRegLogDTO().getAppId());
 		Long userId = null;
 		if (tempUser != null) {
 			userId = tempUser.getKid();
 			registerDTO.setActivityChannelCode(tempUser.getActivivtyChannelCode());
-			if (StringUtils.isBlank(registerDTO.getRegLogDTO().getActivityChannelCode())){
+			if (StringUtils.isBlank(registerDTO.getRegLogDTO().getActivityChannelCode())) {
 				registerDTO.getRegLogDTO().setActivityChannelCode(tempUser.getActivivtyChannelCode());
-				String channelCode = StringUtils.join(new String[]{RegType.WEIXIN_OAUTH.getText(),tempUser.getActivivtyChannelCode()}, " ");
+				String channelCode = StringUtils
+						.join(new String[] { RegType.WEIXIN_OAUTH.getText(), tempUser.getActivivtyChannelCode() }, " ");
 				registerDTO.getRegLogDTO().setChannelCode(channelCode);
 			}
-			//删除活动参与者用户
+			// 删除活动参与者用户
 			tempUserService.delete(userId);
 		}
 
@@ -254,8 +258,8 @@ public class AccountServiceImpl implements AccountService {
 
 		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
-			LoginMethodVO methodVO = new LoginMethodVO(account.getKid(), account.getUserPhone(),
-					"",RegType.PHONE.getType(), havePwd);
+			LoginMethodVO methodVO = new LoginMethodVO(account.getKid(), account.getUserPhone(), "",
+					RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
 
@@ -281,7 +285,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public String webLoginThird(String loginType, String returnUrl,ThirdLoginConfigVO configVO) {
+	public String webLoginThird(String loginType, String returnUrl, ThirdLoginConfigVO configVO) {
 		// 得到第三方登录回调的host
 		String apiHost = UserUtils.getReturnApiHost(returnUrl);
 		if (RegType.SINA.getText().equals(loginType)) {
@@ -306,7 +310,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public String wxOauthLogin(WebThirdLoginDTO loginDTO,ThirdLoginConfigVO configVO) {
+	public String wxOauthLogin(WebThirdLoginDTO loginDTO, ThirdLoginConfigVO configVO) {
 		// 得到第三方登录回调的host
 		String apiHost = UserUtils.getReturnOauthApiHost(loginDTO.getReturnUrl());
 		return OatuhWeixin.getWxOauthUrl(configVO.getWxOauthAppKey(), apiHost, loginDTO.getReturnUrl(),
@@ -527,9 +531,10 @@ public class AccountServiceImpl implements AccountService {
 		account.setCreateDate(new Date());
 		insert(account);
 		// 创建用户基础信息
-		userService
-				.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(), registerDTO.getUserPhone(),
-						registerDTO.getUserLocation(), registerDTO.getDeviceId(), registerDTO.getCityCode(),registerDTO.getUserNickName()));
+		userService.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(),
+				registerDTO.getUserNickName(), registerDTO.getUserImg(), registerDTO.getUserSign(),
+				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getDeviceId(),
+				registerDTO.getCityCode(), registerDTO.getIsVest().byteValue(), registerDTO.getUserDesc()));
 		registerDTO.getRegLogDTO().setUserId(userId);
 
 		// 异步处理
@@ -634,24 +639,25 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return logins;
 	}
-	
+
 	/**
 	 * 第三方昵称获取
+	 * 
 	 * @param thirdNickName
 	 * @return
 	 * @Description 初始化昵称，截取过长的昵称，处理重复的昵称
 	 */
-	private String getThirdNickName(String appId,String thirdNickName){
+	private String getThirdNickName(String appId, String thirdNickName) {
 		int nickNameLength = StringUtils.length(thirdNickName);
-		if(nickNameLength == 0){
+		if (nickNameLength == 0) {
 			thirdNickName = String.format("qh%s1", UserUtils.randomappId());
 		}
-		if(StringUtils.length(thirdNickName) >= Constants.NICK_NAME_MAX_LENGTH){
+		if (StringUtils.length(thirdNickName) >= Constants.NICK_NAME_MAX_LENGTH) {
 			thirdNickName = StringUtils.substring(thirdNickName, 0, 9);
 		}
-		UserBaseInfo baseInfo = userService.getUserByNickName(appId,thirdNickName);
-		if(baseInfo != null){
-			thirdNickName = String.format("%s%s",StringUtils.substring(thirdNickName, 0, 5),UserUtils.randomappId());
+		UserBaseInfo baseInfo = userService.getUserByNickName(appId, thirdNickName);
+		if (baseInfo != null) {
+			thirdNickName = String.format("%s%s", StringUtils.substring(thirdNickName, 0, 5), UserUtils.randomappId());
 		}
 		return thirdNickName;
 	}
