@@ -929,7 +929,7 @@ public class OrderController {
     @PostMapping(value = "/{version}/pay/executeOrder")
     public Response<?> executeOrder(@RequestHeader String userId, @RequestBody ExecuteOrderDTO executeOrderDTO) {
 		String orderId = executeOrderDTO.getOrderId();
-		String password = executeOrderDTO.getPayPassord();
+		String password = executeOrderDTO.getPayPassword();
 		if (StringUtils.isEmpty(orderId)) {
 			return ResponseUtils.returnCommonException("orderId必填");
 		}
