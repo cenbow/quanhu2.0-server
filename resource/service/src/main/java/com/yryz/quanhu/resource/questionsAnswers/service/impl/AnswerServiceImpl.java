@@ -74,6 +74,7 @@ public class AnswerServiceImpl implements AnswerService {
         Long coterieId = answerdto.getCoterieId();
         String content=answerdto.getContent();
         String answerAudio=answerdto.getAnswerAudio();
+        String imgUrl=answerdto.getImgUrl();
         Long audioLength= answerdto.getAudioLength()==null?0L:answerdto.getAudioLength();
 
         if (null == questionId || null == coterieId) {
@@ -84,8 +85,21 @@ public class AnswerServiceImpl implements AnswerService {
             throw  QuanhuException.busiError("音频回答和文字回答互斥");
         }
 
-        if(StringUtils.isNotBlank(answerAudio) && audioLength.longValue()==0){
-            throw  QuanhuException.busiError("有音频回答，音频时长必填");
+        if(StringUtils.isNotBlank(answerAudio) && (audioLength.longValue()<1 || audioLength>180)){
+            throw  QuanhuException.busiError("有音频回答，音频时长最少1秒最多180秒");
+        }
+
+        if(StringUtils.isBlank(answerAudio) && audioLength.longValue()>0){
+            throw  QuanhuException.busiError("无音频回答，应该无音频时长");
+        }
+
+        if(StringUtils.isNotBlank(content) && content.length()>10000){
+            throw  QuanhuException.busiError("文字最多10000字");
+        }
+
+
+        if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>30){
+            throw  QuanhuException.busiError("图片最多上传30张");
         }
 
         Question questionCheck=this.questionService.queryAvailableQuestionByKid(questionId);

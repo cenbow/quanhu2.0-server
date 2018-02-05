@@ -449,7 +449,7 @@ public class QuestionServiceImpl implements QuestionService {
         criteria.andCoterieIdEqualTo(coteriaId);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
-        criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
+        criteria.andOrderFlagGreaterThanOrEqualTo(QuestionAnswerConstants.OrderType.paid);
         /**
          *检查用户是否是圈主
          */
