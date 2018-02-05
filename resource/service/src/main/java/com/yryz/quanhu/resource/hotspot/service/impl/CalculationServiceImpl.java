@@ -83,6 +83,7 @@ public class CalculationServiceImpl implements CalculationService {
 			long heat = heatInfo.countHeat();
 			heatInfo.setHeat(heat);
 			heatInfoMongo.update(heatInfo);
+			updateResourceHeat(heatInfo.getObjectId(), heatInfo);
 		}
 	}
 
@@ -156,13 +157,7 @@ public class CalculationServiceImpl implements CalculationService {
 						HeatInfo heatInfo = heatInfoMongo.update(HeatInfoEnum.HEAT_TYPE_RESOURCE, resourceId, dhotValue.longValue());
 						if(heatInfo != null){
 							try {
-								ResourceModel resourceModel = new ResourceModel();
-								resourceModel.setResourceId(resourceId);
-								resourceModel.setHeat(heatInfo.getHeat());
-								List<ResourceModel> list = new ArrayList<>();
-								list.add(resourceModel);
-								resourceService.updateResource(list);
-								resourceCanalDao.sendToCannel(resourceId, heatInfo.getHeat());
+								updateResourceHeat(resourceId, heatInfo);
 							} catch (Exception e) {
 								logger.info("更新资源热度失败：resourceId:" + resourceId);
 							}
@@ -176,6 +171,16 @@ public class CalculationServiceImpl implements CalculationService {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public void updateResourceHeat(String resourceId ,HeatInfo heatInfo){
+		ResourceModel resourceModel = new ResourceModel();
+		resourceModel.setResourceId(resourceId);
+		resourceModel.setHeat(heatInfo.getHeat());
+		List<ResourceModel> list = new ArrayList<>();
+		list.add(resourceModel);
+		resourceService.updateResource(list);
+		resourceCanalDao.sendToCannel(resourceId, heatInfo.getHeat());
 	}
 
 }
