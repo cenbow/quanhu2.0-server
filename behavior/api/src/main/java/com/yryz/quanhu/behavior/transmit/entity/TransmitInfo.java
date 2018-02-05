@@ -47,6 +47,11 @@ public class TransmitInfo implements Serializable {
 
     private Long createDateLong;
 
+    /**
+     *  上下架标识
+     * */
+    private Integer shelveFlag;
+
     public Long getKid() {
         return kid;
     }
@@ -117,5 +122,13 @@ public class TransmitInfo implements Serializable {
 
     public void setCreateDateLong(Long createDateLong) {
         this.createDateLong = createDateLong;
+    }
+
+    public Integer getShelveFlag() {
+        return shelveFlag;
+    }
+
+    public void setShelveFlag(Integer shelveFlag) {
+        this.shelveFlag = shelveFlag;
     }
 }
