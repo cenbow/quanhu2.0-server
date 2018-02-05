@@ -59,7 +59,6 @@ public class CoterieProvider implements CoterieApi {
 	 * 查询私圈信息列表
 	 * @param coterieIdList 私圈ID集合
 	 * @return
-	 * @throws ServiceException
 	 */
 	@Override
 	public Response<List<CoterieInfo>> queryListByCoterieIdList(List<Long> coterieIdList) {
@@ -82,7 +81,6 @@ public class CoterieProvider implements CoterieApi {
 	 * 查询私圈信息
 	 * @param
 	 * @return
-	 * @throws ServiceException
 	 */
 	@Override
 	public Response<CoterieInfo> queryCoterieInfo(Long coterieId) {
@@ -106,7 +104,6 @@ public class CoterieProvider implements CoterieApi {
 	/**
 	 * 设置私圈信息
 	 * @param info  coterieId必填
-	 * @throws ServiceException
 	 */
 	@Override
 	public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info) {
@@ -451,6 +448,7 @@ public class CoterieProvider implements CoterieApi {
 				}
 			}
 			ImageUtils.middleAddText(base, info.getName(), 100, 20);
+
 			ImageUtils.middleAddText(base, user.getUserNickName(), 350, 16);
 			//ImageUtils.writeImageLocal("F:/合成123.png", base);
 
