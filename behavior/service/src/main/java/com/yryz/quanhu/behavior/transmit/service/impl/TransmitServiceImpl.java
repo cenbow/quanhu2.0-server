@@ -31,11 +31,12 @@ import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -76,6 +77,9 @@ public class TransmitServiceImpl implements TransmitService {
 
     @Reference(check = false, timeout = 30000)
     MessageAPI messageAPI;
+
+    @Reference(check = false, timeout = 30000)
+    EventAPI eventAPI;
 
     /**
      * 转发
@@ -124,6 +128,8 @@ public class TransmitServiceImpl implements TransmitService {
         this.sendDymaic(transmitInfo, extJson);
         //发送消息
         this.sendMessage(transmitInfo.getTargetUserId(), transmitInfo, resourceVo);
+        //提交事件
+        this.sendEvent(transmitInfo, resourceVo);
         try {
             //递增转发数
             countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, 1L);
@@ -244,6 +250,29 @@ public class TransmitServiceImpl implements TransmitService {
             messageAPI.sendMessage(messageVo, isPush);
         } catch (Exception e) {
             logger.error("发送消息 失败", e);
+        }
+    }
+
+    /**
+     * 提交event
+     * @param   transmitInfo
+     * @param   resourceVo
+     * */
+    private void sendEvent(TransmitInfo transmitInfo, ResourceVo resourceVo) {
+        try {
+            //提交事件
+            EventInfo event = new EventInfo();
+            event.setEventCode("6");
+            event.setUserId(transmitInfo.getCreateUserId().toString());
+            event.setResourceId(transmitInfo.getResourceId().toString());
+            event.setOwnerId(resourceVo.getUserId() != null ? resourceVo.getUserId().toString() : null);
+            event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
+            if (StringUtils.isNotEmpty(resourceVo.getCoterieId()) ) {
+                event.setCoterieId(resourceVo.getCoterieId());
+            }
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("提交event 失败", e);
         }
     }
 

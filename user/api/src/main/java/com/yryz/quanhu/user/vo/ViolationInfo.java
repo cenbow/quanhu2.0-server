@@ -40,7 +40,7 @@ public class ViolationInfo implements Serializable {
 	/**
 	 * 违规类型 {@link #ViolatType}
 	 */
-	private Byte type;
+	private Byte violationType;
 
 	/**
 	 * 创建时间
@@ -98,12 +98,12 @@ public class ViolationInfo implements Serializable {
 		this.message = message == null ? null : message.trim();
 	}
 
-	public Byte getType() {
-		return type;
+	public Byte getViolationType() {
+		return violationType;
 	}
 
-	public void setType(Byte type) {
-		this.type = type;
+	public void setViolationType(Byte violationType) {
+		this.violationType = violationType;
 	}
 
 	public Date getCreateTime() {
@@ -141,7 +141,7 @@ public class ViolationInfo implements Serializable {
 	@Override
 	public String toString() {
 		return "ViolationInfo [userId=" + userId + ", scopeDesc=" + scopeDesc + ", picUrl=" + picUrl + ", reason="
-				+ reason + ", message=" + message + ", type=" + type + ", createTime=" + createTime + ", operational="
+				+ reason + ", message=" + message + ", violationType=" + violationType + ", createTime=" + createTime + ", operational="
 				+ operational + ", freezeTime=" + freezeTime + "]";
 	}
 
