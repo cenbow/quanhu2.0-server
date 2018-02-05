@@ -261,7 +261,7 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
 		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
-		if (StringUtils.equals(response.getCode(), ResponseConstant.SUCCESS.getCode())) {
+		if (!StringUtils.equals(response.getCode(), ResponseConstant.SUCCESS.getCode()) && !StringUtils.equals(response.getCode(), ExceptionEnum.NEED_PHONE.getCode())) {
 			throw QuanhuException.busiError("第三方登录失败");
 		}
 		Map<String, Object> map = new HashMap<>();
