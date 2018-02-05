@@ -30,4 +30,20 @@ public interface MessageAdminAPI {
      * @return
      */
     Response<Boolean> push(MessageAdminVo messageAdminVo);
+
+    /**
+     * 更新未发送消息
+     *
+     * @param messageAdminVo
+     * @return
+     */
+    Response<Boolean> update(MessageAdminVo messageAdminVo);
+
+    /**
+     * 查询详情
+     *
+     * @param messageAdminDto
+     * @return
+     */
+    Response<MessageAdminVo> findOne(MessageAdminDto messageAdminDto);
 }
