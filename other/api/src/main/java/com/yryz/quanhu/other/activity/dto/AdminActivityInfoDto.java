@@ -3,6 +3,8 @@ package com.yryz.quanhu.other.activity.dto;
 
 import com.yryz.quanhu.other.activity.entity.ActivityInfo;
 
+import java.util.Date;
+
 public class AdminActivityInfoDto extends ActivityInfo {
 
 	/**
@@ -22,6 +24,31 @@ public class AdminActivityInfoDto extends ActivityInfo {
 	
 	/*排序方式,默认按排序值*/
 	private	String	orderType="sort";
+
+	/**
+	 *开始时间  开始
+	 */
+	private Date beginTimeStart;
+	/**
+	 *开始时间  结束
+	 */
+		private Date beginTimeEnd;
+
+	public Date getBeginTimeStart() {
+		return beginTimeStart;
+	}
+
+	public void setBeginTimeStart(Date beginTimeStart) {
+		this.beginTimeStart = beginTimeStart;
+	}
+
+	public Date getBeginTimeEnd() {
+		return beginTimeEnd;
+	}
+
+	public void setBeginTimeEnd(Date beginTimeEnd) {
+		this.beginTimeEnd = beginTimeEnd;
+	}
 
 	public Byte getActivityStatus() {
 		return activityStatus;

@@ -418,7 +418,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			checkAdminParam(adminUserDTO);
 			List<UserInfo> userInfoList = userRepository.adminSearchUser(adminUserDTO);
 			List<UserInfoVO> userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
-			if (BooleanUtils.isTrue(adminUserDTO.getNeedIntegral())) {
+			if (BooleanUtils.isTrue(adminUserDTO.isNeedIntegral())) {
 				setUserOrderIntegral(userInfoVOS);
 			}
 			PageList<UserInfoVO> pageList = new PageModel<UserInfoVO>().getPageList(userInfoVOS);

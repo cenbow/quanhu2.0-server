@@ -28,9 +28,11 @@ import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
 import com.yryz.quanhu.message.commonsafe.constants.CheckSlipCodeReturn;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
+import com.yryz.quanhu.message.sms.constants.SmsTypeEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.service.AuthService;
 import com.yryz.quanhu.openapi.utils.ComponentUtils;
+import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
@@ -63,8 +65,16 @@ public class ComponentController {
 	public Response<SmsVerifyCodeVO> sendVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
-		if(StringUtils.isBlank(codeDTO.getPhone())){
+		
+		//设置支付密码、提现、验证身份、手机号变更 必须登录且输入的手机号无效
+		if(StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_SET_PAYPWD.getType())) 
+				|| StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_TAKE_CASH.getType())) || 
+				StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_OTHER.getType())) || 
+				StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_CHANGE_PHONE.getType()))){
 			authService.checkToken(request);
+			if(!StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_CHANGE_PHONE.getType()))){
+				codeDTO.setPhone(null);
+			}
 			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		}
 		SmsVerifyCodeVO codeVO = ResponseUtils.getResponseData(accountApi.sendVerifyCode(codeDTO));

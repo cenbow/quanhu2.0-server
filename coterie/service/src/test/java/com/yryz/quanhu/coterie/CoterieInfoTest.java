@@ -78,4 +78,10 @@ public class CoterieInfoTest {
     	System.out.println(list);
     }
     
+    @Test
+    public void regroupQr() {
+    	String list=ResponseUtils.getResponseData(coterieApi.regroupQr(8764485668L));
+    	System.out.println(list);
+    }
+    
 }

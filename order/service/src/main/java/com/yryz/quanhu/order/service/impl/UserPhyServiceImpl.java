@@ -126,6 +126,7 @@ public class UserPhyServiceImpl implements UserPhyService{
 			userPhy.setCreateTime(new Date());
 			saveUserPhy(userPhy);
 		} else {
+			//修改支付密码
 			if (rrzOrderUserPhy.getPayPassword() != null) {
 				if (StringUtils.isEmpty(userPhy.getPayPassword())) {
 					// 如果原密码为空，则直接修改
@@ -143,21 +144,27 @@ public class UserPhyServiceImpl implements UserPhyService{
 					userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
 					reSetPayWord = true;
 				} else {
+					//根据旧密码修改支付密码
 					if (userPhy.getPayPassword().equals(oldPassword)) {
 						// 验证旧密码
 						userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
-					} else if (!StringUtils.isBlank(rrzOrderUserPhy.getCustIdcardNo())
+					}
+					//根据密保修改支付密码
+					else if (!StringUtils.isBlank(rrzOrderUserPhy.getCustIdcardNo())
 							&& !StringUtils.isBlank(rrzOrderUserPhy.getPhyName())
 							&& rrzOrderUserPhy.getCustIdcardNo().equals(userPhy.getCustIdcardNo())
 							&& rrzOrderUserPhy.getPhyName().equals(userPhy.getPhyName())) {
 						// 验证密保问题
 						userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
 					} else {
-						return ResponseUtils.returnException(new CommonException("验证失败"));
+						return ResponseUtils.returnCommonException("密码验证失败！");
 					}
+					//发送消息
 					quanhuMessage.sendMessage(MessageConstant.EDIT_PAY_PASSWORD, userPhy.getCustId(), null);
 				}
-			} else {
+			}
+			//设置密保问题
+			else {
 				if (rrzOrderUserPhy.getCustIdcardType() != null) {
 					userPhy.setCustIdcardType(rrzOrderUserPhy.getCustIdcardType());
 				}
@@ -168,7 +175,7 @@ public class UserPhyServiceImpl implements UserPhyService{
 					userPhy.setPhyName(rrzOrderUserPhy.getPhyName());
 				}
 			}
-
+			//修改小额免密设置
 			if (rrzOrderUserPhy.getSmallNopass() != null) {
 				userPhy.setSmallNopass(rrzOrderUserPhy.getSmallNopass());
 			}

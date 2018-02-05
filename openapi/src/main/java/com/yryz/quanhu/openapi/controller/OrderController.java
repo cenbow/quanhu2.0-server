@@ -21,6 +21,9 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.message.commonsafe.api.CommonSafeApi;
+import com.yryz.quanhu.message.commonsafe.constants.CheckVerifyCodeReturnCode;
+import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
+import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.order.dto.*;
 import com.yryz.quanhu.openapi.order.utils.BankUtil;
@@ -33,7 +36,9 @@ import com.yryz.quanhu.order.enums.OrderPayConstants;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.*;
 import com.yryz.quanhu.support.config.api.BasicConfigApi;
+import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -79,7 +84,7 @@ public class OrderController {
 
 	/**
 	 * 设置支付密码
-	 * @param userPhy
+	 * @param setPayPasswordDTO
 	 * @return
 	 */
     @ApiOperation("设置支付密码")
@@ -89,27 +94,19 @@ public class OrderController {
 	})
 	@UserBehaviorValidation(login = true)
 	@PostMapping(value = "/{version}/pay/setPayPassword")
-	public Response<?> setPayPassword(@RequestHeader String userId,@RequestBody UserPhy userPhy) {
+	public Response<?> setPayPassword(@RequestHeader String userId, @RequestBody SetPayPasswordDTO setPayPasswordDTO) {
 		if (StringUtils.isEmpty(userId)) {
-			return ResponseUtils.returnCommonException("用户ID为必填");
+			return ResponseUtils.returnCommonException("用户ID不能为空");
 		}
-		if (StringUtils.isEmpty(userPhy.getPayPassword())) {
-			return ResponseUtils.returnCommonException("新密码必填");
+		if (null == setPayPasswordDTO || StringUtils.isEmpty(setPayPasswordDTO.getPayPassword())) {
+			return ResponseUtils.returnCommonException("新密码不能为空");
 		}
+		UserPhy userPhy = new UserPhy();
 		//设置custId为Header里面获取的userId
 		userPhy.setCustId(userId);
-		try {
-			orderApi.checkUserPayPassword(userPhy.getCustId(), userPhy.getPayPassword());
-			Response<?> response = orderApi.dealUserPhy(userPhy);
-			if(response.success()){
-				//发送消息
-//				pushService.setSecurityProblem(custId, cost,appId);
-			}
-			return response;
-		} catch (Exception e) {
-			logger.error("设置支付密码失败", e);
-			return ResponseUtils.returnCommonException("密码验证失败");
-		}
+		userPhy.setOldPassword(setPayPasswordDTO.getOldPayPassword());
+		userPhy.setPayPassword(setPayPasswordDTO.getPayPassword());
+		return orderApi.dealUserPhy(userPhy);
 	}
 
     /**
@@ -132,13 +129,9 @@ public class OrderController {
 		if (StringUtils.isEmpty(userPhy.getPhyName()) || StringUtils.isEmpty(userPhy.getCustIdcardNo())) {
 			return ResponseUtils.returnCommonException("信息必填");
 		}
-		try {
-			userPhy.setCustId(userId);
-			return orderApi.dealUserPhy(userPhy);
-		} catch (Exception e) {
-			logger.error("设置密保问题失败", e);
-			return ResponseUtils.returnCommonException("验证失败");
-		}
+		userPhy.setCustId(userId);
+//		return orderApi.dealUserPhy(userPhy);
+		return ResponseUtils.returnCommonException("接口已下线");
 	}
     
     /**
@@ -156,48 +149,31 @@ public class OrderController {
     @PostMapping(value = "/{version}/pay/findPayPassword")
 	public Response<?> findPayPassword(@RequestHeader String appId, @RequestHeader String userId,
 									   @RequestBody FindPayPasswordDTO findPayPasswordDTO) {
-
-		if (StringUtils.isBlank(userId) || StringUtils.isBlank(findPayPasswordDTO.getVeriCode())) {
-			return ResponseUtils.returnCommonException("please check paramter: custId | veriCode");
+		if(StringUtils.isBlank(userId)){
+			return ResponseUtils.returnCommonException("用户ID不能为空！");
 		}
-//		if (StringUtils.isBlank(findPayPasswordDTO.getPhyName()) || StringUtils.isBlank(findPayPasswordDTO.getCustIdcardNo())) {
-//			return ResponseUtils.returnCommonException("please check paramter: phyName | phyCardNo");
-//		}
-
-		try {
-			String phone = findPayPasswordDTO.getPhone();
-//			if(StringUtils.isEmpty(phone)){
-//				Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(userId);
-//				UserLoginSimpleVO userBase = response.success() ? response.getData() : null;
-//				if(userBase == null || StringUtils.isEmpty(userBase.getUserPhone())){
-//					return ResponseUtils.returnCommonException("当前用户不存在或者没有绑定手机号码");
-//				}
-//				phone = userBase.getUserPhone();
-//			}
-//			
-//
-//			Response<Integer> checkCode = this.commonSafeApi.checkVerifyCode(new VerifyCodeDTO(SmsType.CODE_CHANGE_PAYPWD.getType(),
-//					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId,
-//					findPayPasswordDTO.getVeriCode(), false));
-//			if (!checkCode.success() || checkCode.getData() != 0 ) {
-//				return ResponseUtils.returnCommonException("短信码错误");
-//			}
-			//重置支付密码
-			UserPhy userPhy = new UserPhy();
-			userPhy.setCustId(userId);
-			userPhy.setPayPassword("");
-			orderApi.dealUserPhy(userPhy);
-			//设置新密码
-			userPhy = new UserPhy();
-			userPhy.setCustId(userId);
-			userPhy.setPayPassword(findPayPasswordDTO.getPayPassword());
-			orderApi.dealUserPhy(userPhy);
-		} catch (Exception e) {
-			logger.error("验证安全信息失败", e);
-			return ResponseUtils.returnCommonException("验证失败");
+    	if(null == findPayPasswordDTO){
+			return ResponseUtils.returnCommonException("参数对象不能为空！");
 		}
-
-		return ResponseUtils.returnSuccess();
+		if(StringUtils.isBlank(findPayPasswordDTO.getVeriCode())){
+			return ResponseUtils.returnCommonException("验证码不能为空！");
+		}
+		UserLoginSimpleVO userLoginSimpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(Long.valueOf(userId)));
+		if(null == userLoginSimpleVO || StringUtils.isBlank(userLoginSimpleVO.getUserPhone())){
+			return ResponseUtils.returnCommonException("用户未绑定手机号！");
+		}
+		Response<Integer> checkVerifyCodeResponse = commonSafeApi.checkVerifyCode(
+				new VerifyCodeDTO(SmsType.CODE_CHANGE_PAYPWD.getType(), CommonServiceType.PHONE_VERIFYCODE_SEND.getName(),
+						userLoginSimpleVO.getUserPhone(), appId, findPayPasswordDTO.getVeriCode(), true));
+		if(!checkVerifyCodeResponse.success()
+				|| checkVerifyCodeResponse.getData() != CheckVerifyCodeReturnCode.SUCCESS.getCode()){
+			return ResponseUtils.returnCommonException("验证码验证失败！");
+		}
+		//重置支付密码
+		UserPhy userPhy = new UserPhy();
+		userPhy.setCustId(userId);
+		userPhy.setPayPassword("");
+		return orderApi.dealUserPhy(userPhy);
 	}
     
     /**

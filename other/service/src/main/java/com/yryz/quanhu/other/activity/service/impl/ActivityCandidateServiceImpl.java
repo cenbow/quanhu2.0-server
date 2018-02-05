@@ -455,16 +455,16 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
                     int zero = differ.get(0).getScore() == null ? 0 : differ.get(0).getScore().intValue();
                     int one = differ.get(1).getScore() == null ? 0 : differ.get(1).getScore().intValue();
                     if(candidateId.equals(differ.get(0).getValue())) {
-                        afterVoteDiffer = (zero - one) + 1;
+                        afterVoteDiffer = (zero - one > 0 ? zero - one : (zero - one) * -1) + 1;
                     } else {
-                        frontVoteDiffer = (one - zero) + 1;
+                        frontVoteDiffer = (one - zero > 0 ? one - zero : (one - zero) * -1) + 1;
                     }
                 } else if(differ.size() == 3) {
                     int zero = differ.get(0).getScore() == null ? 0 : differ.get(0).getScore().intValue();
                     int one = differ.get(1).getScore() == null ? 0 : differ.get(1).getScore().intValue();
                     int two = differ.get(2).getScore() == null ? 0 : differ.get(2).getScore().intValue();
-                    frontVoteDiffer = (zero - one) + 1;
-                    afterVoteDiffer = (one - two) + 1;
+                    frontVoteDiffer = (zero - one > 0 ? zero - one : (zero - one) * -1) + 1;
+                    afterVoteDiffer = (one - two > 0 ? one - two : (one - two) * -1) + 1;
                 }
                 detail.setFrontVoteDiffer(frontVoteDiffer > 0 ? frontVoteDiffer : 0);
                 detail.setAfterVoteDiffer(afterVoteDiffer > 0 ? afterVoteDiffer : 0);
