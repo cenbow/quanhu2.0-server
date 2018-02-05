@@ -160,7 +160,15 @@ public interface UserService {
 	 * @return
 	 */
 	List<Long> getUserIdByCreateDate(String startDate,String endDate);
-    
+
+	/**
+	 * 查询一段时间的全部用户信息
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	List<UserBaseInfo> getUserListByCreateDate(String startDate,String endDate);
+
 	/**
 	 * 根据用户ID查询全部用户，不分状态
 	 * @param userIds
