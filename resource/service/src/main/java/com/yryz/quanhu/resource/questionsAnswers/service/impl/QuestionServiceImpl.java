@@ -352,7 +352,7 @@ public class QuestionServiceImpl implements QuestionService {
          */
         EventInfo eventInfo = new EventInfo();
         eventInfo.setAmount(0D);
-        eventInfo.setCoterieId(questionVo.getCoterieId());
+        eventInfo.setCoterieId(questionVo.getCoterieId().toString());
         eventInfo.setCreateTime(DateUtils.getTime());
         eventInfo.setEventCode(EventEnum.READ_RESOURCE.getCode());
         eventInfo.setOwnerId(String.valueOf(createUserId));

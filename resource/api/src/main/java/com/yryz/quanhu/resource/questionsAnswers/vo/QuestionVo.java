@@ -25,7 +25,7 @@ public class QuestionVo  implements Serializable {
 
     private Date createDate;
 
-    private String coterieId;
+    private Long coterieId;
 
     private Long chargeAmount;
 
@@ -110,11 +110,11 @@ public class QuestionVo  implements Serializable {
     }
 
     @JsonSerialize(using = ToStringSerializer.class)
-    public String getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
-    public void setCoterieId(String coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 
