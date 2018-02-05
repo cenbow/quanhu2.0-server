@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.quanhu.coterie.coterie.exception.MysqlOptException;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dao.ActivityTempUserDao;
 import com.yryz.quanhu.user.entity.ActivityTempUser;
@@ -31,37 +30,22 @@ public class ActivityTempUserServiceImpl implements ActivityTempUserService {
 
 	@Override
 	public Long save(ActivityTempUser tempUser) {
-		try {
-			tempUser.setCreateDate(new Date());
-			tempUser.setKid(NumberUtils.createLong(ResponseUtils.getResponseData(idApi.getUserId())));
-			mysqlDao.insert(tempUser);
-			return tempUser.getKid();
-		} catch (Exception e) {
-			logger.error("[ActivityTempUserDao.insert]", e);
-			throw new MysqlOptException(e);
-		}
+		tempUser.setCreateDate(new Date());
+		tempUser.setKid(NumberUtils.createLong(ResponseUtils.getResponseData(idApi.getUserId())));
+		mysqlDao.insert(tempUser);
+		return tempUser.getKid();
 	}
 
 	@Override
 	public ActivityTempUser get(Long userId, String thirdId, String appId) {
-		try {
-			return mysqlDao.selectOne(userId, thirdId, appId);
-		} catch (Exception e) {
-			logger.error("[ActivityTempUserDao.selectOne]", e);
-			throw new MysqlOptException(e);
-		}
+		return mysqlDao.selectOne(userId, thirdId, appId);
 	}
 
 	@Override
 	public List<UserBaseInfo> getUserBaseInfoByTempUser(List<String> userIds) {
 		List<UserBaseInfo> infos = null;
 		List<ActivityTempUser> tempUsers = null;
-		try {
-			tempUsers = mysqlDao.getByUserIds(userIds);
-		} catch (Exception e) {
-			logger.error("[ActivityTempUserDao.getByUserIds]", e);
-			throw new MysqlOptException(e);
-		}
+		tempUsers = mysqlDao.getByUserIds(userIds);
 		if (CollectionUtils.isNotEmpty(tempUsers)) {
 			int tempLength = tempUsers.size();
 			infos = new ArrayList<>(tempLength);
@@ -80,12 +64,7 @@ public class ActivityTempUserServiceImpl implements ActivityTempUserService {
 
 	@Override
 	public int delete(Long kid) {
-		try {
-			return mysqlDao.delete(kid);
-		} catch (Exception e) {
-			logger.error("[ActivityTempUserDao.delete]", e);
-			throw new MysqlOptException(e);
-		}
+		return mysqlDao.delete(kid);
 	}
 
 }

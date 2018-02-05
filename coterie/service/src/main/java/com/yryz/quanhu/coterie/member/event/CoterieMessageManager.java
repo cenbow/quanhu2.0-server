@@ -58,14 +58,12 @@ public class CoterieMessageManager {
 			message.setContent("您申请创建的私圈已审核通过！");
 			message.setImg(coterie.getIcon());
 			message.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-			message.setCircleRoute(coterie.getCircleRoute());
 			message.setCoterieId(coterieId);
 			
 			SystemBody body=new SystemBody();
 			body.setBodyImg(coterie.getIcon());
 			body.setBodyTitle(coterie.getName());
 
-			body.setCircleName(coterie.getCircleName());
 			body.setCoterieId(coterie.getCoterieId()+"");
 			body.setCoterieName(coterie.getName());
 			message.setBody(body);
@@ -101,7 +99,6 @@ public class CoterieMessageManager {
 			body.setBodyImg(coterie.getIcon());
 			body.setBodyTitle(coterie.getName());
 
-			body.setCircleName(coterie.getCircleName());
 			body.setCoterieId(coterie.getCoterieId()+"");
 			body.setCoterieName(coterie.getName());
 			message.setBody(body);
@@ -135,7 +132,6 @@ public class CoterieMessageManager {
 			SystemBody body=new SystemBody();
 			body.setBodyImg(coterie.getIcon());
 			body.setBodyTitle(coterie.getName());
-			body.setCircleName(coterie.getCircleName());
 			body.setCoterieId(coterie.getCoterieId()+"");
 			body.setCoterieName(coterie.getName());
 			message.setBody(body);
