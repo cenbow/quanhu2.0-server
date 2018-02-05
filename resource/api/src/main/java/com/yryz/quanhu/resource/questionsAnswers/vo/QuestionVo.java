@@ -7,6 +7,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class QuestionVo  implements Serializable {
 
@@ -44,7 +45,10 @@ public class QuestionVo  implements Serializable {
 
     private String orderId;
 
-    private BehaviorVo behaviorVo;
+    /**
+     * 阅读数状态
+     */
+    private Map<String, Long> statistics;
 
     private  UserSimpleVO targetUser;
 
@@ -186,12 +190,12 @@ public class QuestionVo  implements Serializable {
         this.orderId = orderId;
     }
 
-    public BehaviorVo getBehaviorVo() {
-        return behaviorVo;
+    public Map<String, Long> getStatistics() {
+        return statistics;
     }
 
-    public void setBehaviorVo(BehaviorVo behaviorVo) {
-        this.behaviorVo = behaviorVo;
+    public void setStatistics(Map<String, Long> statistics) {
+        this.statistics = statistics;
     }
 
     public UserSimpleVO getTargetUser() {
