@@ -9,6 +9,7 @@ package com.yryz.quanhu.order.sdk;
 
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
+import com.yryz.quanhu.order.vo.UserAccount;
 
 /**
  * @author yehao
@@ -45,5 +46,13 @@ public interface OrderSDK {
      * @return
      */
     boolean isBuyOrderSuccess(String moduleEnum, long userId, long resourceId);
+
+    /**
+     * 获取用户账户信息
+     *
+     * @param userId 用户ID
+     * @return
+     */
+    UserAccount getUserAccount(Long userId);
 
 }
