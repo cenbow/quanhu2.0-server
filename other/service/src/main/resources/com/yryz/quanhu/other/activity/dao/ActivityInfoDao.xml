@@ -269,8 +269,8 @@
     </update>
 	<!-- (前台)所有上架我的活动 -->
 	<select id="selectMyList"  resultType="com.yryz.quanhu.other.activity.vo.ActivityInfoAppListVo">
-		select   id,kid, title, cover_plan,activity_type,create_date from (
-		select  t.id, t.title, t.cover_plan,t.activity_type,R.create_date
+		select   id,kid, title, cover_plan,activity_type,create_date,module_enum from (
+		select  t.id,t.kid, t.title, t.cover_plan,t.activity_type,R.create_date,t.module_enum
 		from qh_activity_info T,qh_activity_record R
 		where t.id=R.activity_info_id and t.shelve_flag=10
 		<![CDATA[
@@ -278,7 +278,7 @@
   	]]>
 		and   R.create_user_id = #{custId,jdbcType=BIGINT}
 		UNION
-		select  t.id, t.title, t.cover_plan,t.activity_type,D.create_date
+		select  t.id,t.kid, t.title, t.cover_plan,t.activity_type,D.create_date,t.module_enum
 		from qh_activity_info T,qh_activity_vote_detail D
 		where t.id=D.activity_info_id and t.shelve_flag=10
 		<![CDATA[
@@ -309,7 +309,7 @@
 	<!-- (前台)所有上架未结束的活动 -->
 	<select id="selectAppList" resultType="com.yryz.quanhu.other.activity.vo.ActivityInfoAppListVo">
 		select
-		id, kid,title, cover_plan,activity_type
+		id, kid,title, cover_plan,activity_type,module_enum
 		from qh_activity_info where shelve_flag=10 and NOW()>=online_time
 		<if test="type ==1" >
 			<![CDATA[

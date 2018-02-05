@@ -75,9 +75,11 @@ public class EventManager {
 			}
 			// 邀请注册事件
 			if (StringUtils.isNotBlank(inviter)) {
+				//被邀请人也增加额外事件
+				inviterRegister(userId,EventEnum.INVITEE_REGISTER.getCode());
 				String userRegId = regService.selectUserIdByInviter(inviter);
 				if (StringUtils.isNotBlank(userRegId)) {
-					inviterRegister(userRegId);
+					inviterRegister(userRegId,EventEnum.INVITE_FRIENDS_TO_REGISTER.getCode());
 				}
 			}
 			logger.info("[event_regiter]:params:{},result:{}", JsonUtils.toFastJson(eventInfo), "");
@@ -92,14 +94,14 @@ public class EventManager {
 	 * 
 	 * @param userId
 	 */
-	public void inviterRegister(String userId) {
+	public void inviterRegister(String userId,String eventCode) {
 		if (StringUtils.isEmpty(userId)) {
 			return;
 		}
 		EventInfo eventInfo = null;
 		try {
 			eventInfo = new EventInfo();
-			eventInfo.setEventCode(EventEnum.INVITE_FRIENDS_TO_REGISTER.getCode());
+			eventInfo.setEventCode(eventCode);
 			eventInfo.setUserId(userId);
 			eventInfo.setEventNum(1);
 			commit(eventInfo);

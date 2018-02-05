@@ -26,6 +26,18 @@ public class ActivityInfoAppListVo implements Serializable{
     private Date createDate;
 
 	private Integer listType;
+	/**
+	 * 功能枚举
+	 */
+	private  String moduleEnum;
+
+	public String getModuleEnum() {
+		return moduleEnum;
+	}
+
+	public void setModuleEnum(String moduleEnum) {
+		this.moduleEnum = moduleEnum;
+	}
 
 	public Integer getListType() {
 		return listType;

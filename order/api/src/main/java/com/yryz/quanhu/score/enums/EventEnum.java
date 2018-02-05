@@ -76,7 +76,10 @@ public enum EventEnum {
 	READ("24","阅读","阅读"),
 		
 	/** 邀请好友注册 */
-	INVITE_FRIENDS_TO_REGISTER("25","邀请好友注册","邀请好友注册奖励500积分"),
+	INVITE_FRIENDS_TO_REGISTER("25","邀请好友注册","每次触发（可获得500积分/人）"),
+	
+	/** 被邀请人注册 */
+	INVITEE_REGISTER("26","被邀请人注册","一次性触发（可获得500积分/人）"),
 	
 	/** 发布活动 */
 	PUBLICATION_OF_ACTIVITY("30","发布活动","一次性触发(100,300,500)"),

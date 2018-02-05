@@ -56,4 +56,33 @@ public class TransmitProvider implements TransmitApi {
         }
     }
 
+    /**
+     * 更新上下架状态
+     * @param   transmitId      transmitInfo.kid
+     * @param   shelvesFlag     上下架状态：10上架  11下架
+     * */
+    public Response<Integer> updateShelvesFlag(Long transmitId, Integer shelvesFlag) {
+        try {
+            Assert.notNull(transmitId, "transmitId不能为空");
+            return ResponseUtils.returnObjectSuccess(transmitService.updateShelvesFlag(transmitId, shelvesFlag));
+        } catch (Exception e) {
+            logger.error("更新上下架状态 失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    /**
+     * 删除转发记录
+     * @param   transmitId
+     * */
+    public Response<Integer> removeTransmit(Long transmitId) {
+        try {
+            Assert.notNull(transmitId, "transmitId不能为空");
+            return ResponseUtils.returnObjectSuccess(transmitService.removeTransmit(transmitId));
+        } catch (Exception e) {
+            logger.error("删除转发记录 失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
 }

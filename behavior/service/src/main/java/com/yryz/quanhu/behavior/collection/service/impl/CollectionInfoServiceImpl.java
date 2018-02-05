@@ -101,6 +101,8 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         try {
             //递增收藏数
             countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, 1L);
+            //递增用户收藏数
+            countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getCreateUserId(), null, 1L);
         } catch (Exception e) {
             logger.error("递增收藏数 失败", e);
         }
@@ -112,12 +114,17 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
      * @return
      * */
     public void del(CollectionInfoDto collectionInfoDto) {
-        collectionInfoDao.deleteByResourceId(collectionInfoDto.getResourceId(), collectionInfoDto.getModuleEnum(), collectionInfoDto.getCreateUserId());
-        try {
-            //递减收藏数
-            countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, -1L);
-        } catch (Exception e) {
-            logger.error("递减收藏数 失败", e);
+        int i = collectionInfoDao.deleteByResourceId(collectionInfoDto.getResourceId(),
+                collectionInfoDto.getModuleEnum(), collectionInfoDto.getCreateUserId());
+        if(i > 0) {
+            try {
+                //递减收藏数
+                countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, -1L);
+                //递减用户收藏数
+                countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getCreateUserId(), null, -1L);
+            } catch (Exception e) {
+                logger.error("递减收藏数 失败", e);
+            }
         }
     }
 

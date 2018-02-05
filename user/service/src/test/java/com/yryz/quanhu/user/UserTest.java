@@ -110,7 +110,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(loginVO));
 	}
 
-	@Test
+	//@Test
 	public void getLoginMethod() {
 		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -216,12 +216,13 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void sendVerifyCode() {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
 		codeDTO.setCode(SmsContants.CODE_FIND_PWD);
-		codeDTO.setPhone("16612345689");
+		codeDTO.setUserId(738943677265461248l);
+		//codeDTO.setPhone("16612345689");
 
 		Response<SmsVerifyCodeVO> response = accountApi.sendVerifyCode(codeDTO);
 		System.out.println(JsonUtils.toFastJson(response));
