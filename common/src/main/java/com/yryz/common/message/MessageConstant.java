@@ -73,10 +73,14 @@ public enum MessageConstant {
      */
     COMMENT_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您在{count}下发布的评论因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
+
+    POST_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的帖子因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
+
     /**
      * 帖子被圈主删除
      */
     POST_HAVE_DELETE(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COTERIE, "删除帖子通知", "{someone}删除了你的帖子。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COTERIE_HOME),
+
 
     /**
      * 话题有新帖子

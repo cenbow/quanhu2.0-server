@@ -30,6 +30,7 @@ public class ActivityVoteRedisServiceImpl implements ActivityVoteRedisService {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
+
     /**
      * 增加参与者
      * @param   activityInfoId      活动id
@@ -42,6 +43,21 @@ public class ActivityVoteRedisServiceImpl implements ActivityVoteRedisService {
         //递增参与人数
         stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityInfoId),
                 "joinCount", 1d);
+        this.shelvesCandidate(activityInfoId, detailKid, detailId, totalCount, template);
+    }
+
+    /**
+     * 上架参与者
+     * @param   activityInfoId      活动id
+     * @param   detailKid            参与者kid
+     * @param   detailId             参与者id
+     * @param   totalCount           总票数
+     * @param   template
+     * */
+    public void shelvesCandidate(Long activityInfoId, Long detailKid, Long detailId, Long totalCount, RedisTemplate<String, Long> template) {
+        if(template == null) {
+            template = templateBuilder.buildRedisTemplate(Long.class);
+        }
         //增加首页列表
         String keyId = ActivityCandidateConstants.getKeyId(activityInfoId);
         if(!template.hasKey(keyId)) {
@@ -64,9 +80,6 @@ public class ActivityVoteRedisServiceImpl implements ActivityVoteRedisService {
      * */
     public void remCandidate(Long activityInfoId, Long detailKid) {
         RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
-        //递减参与人数
-        stringRedisTemplate.opsForHash().increment(ActivityVoteConstants.getKeyConfig(activityInfoId),
-                "joinCount", -1d);
         //增加首页列表
         String keyId = ActivityCandidateConstants.getKeyId(activityInfoId);
         if(!template.hasKey(keyId)) {
