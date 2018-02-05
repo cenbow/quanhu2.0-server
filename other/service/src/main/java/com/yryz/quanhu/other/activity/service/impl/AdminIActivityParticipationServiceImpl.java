@@ -12,9 +12,6 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
-import com.yryz.framework.core.cache.RedisTemplateBuilder;
-import com.yryz.quanhu.other.activity.constants.ActivityRedisConstants;
-import com.yryz.quanhu.other.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.other.activity.dao.ActivityInfoDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteConfigDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteDetailDao;
@@ -26,6 +23,7 @@ import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService;
 import com.yryz.quanhu.other.activity.vo.*;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
@@ -45,15 +43,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static org.springframework.util.Assert.isNull;
 @Service
@@ -85,8 +82,8 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
     ResourceDymaicApi resourceDymaicApi;
     @Reference(check = false)
     private AccountApi accountApi;
-    @Autowired
-    ActivityVoteDetailDao activityVoteDetailDao;
+    @Reference(check=false)
+    ResourceApi resourceApi;
 
     @Autowired
     ActivityVoteRedisService activityVoteRedisService;
@@ -109,21 +106,32 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         if(count==1){
             AdminActivityVoteDetailVo adminActivityVoteDetailVo = activityParticipationDao.selectByPrimaryKey(id);
             ActivityVoteConfig config = activityVoteConfigDao.selectVoteByActivityInfoId(adminActivityVoteDetailVo.getActivityInfoId());
+
             if(status==10){
-                //增加已参与人数
+              /*  //增加已参与人数
                 int flag = activityInfoDao.updateJoinCount(adminActivityVoteDetailVo.getActivityInfoId(), config.getUserNum());
                 if(flag == 0) {
                     throw QuanhuException.busiError("参加人数已满,无法上架");
-                }
-                //TODO 资源提交
-                activityVoteRedisService.addCandidate(adminActivityVoteDetailVo.getActivityInfoId(),adminActivityVoteDetailVo.getKid(),adminActivityVoteDetailVo.getId(),Long.valueOf(adminActivityVoteDetailVo.getVoteCount()+adminActivityVoteDetailVo.getAddVote()));
+                }*/
+                //资源提交
+                AdminActivityInfoVo1 adminActivityInfoVo1 = activityInfoDao.selectByPrimaryKey(adminActivityVoteDetailVo.getActivityInfoId());
+                this.commitResource(adminActivityVoteDetailVo,adminActivityInfoVo1);
+                activityVoteRedisService.shelvesCandidate(adminActivityVoteDetailVo.getActivityInfoId(),
+                        adminActivityVoteDetailVo.getKid(),adminActivityVoteDetailVo.getId(),
+                        Long.valueOf(adminActivityVoteDetailVo.getVoteCount()+adminActivityVoteDetailVo.getAddVote()),
+                        null);
             }else if (status==11){
-                //减少已参与人数
+               /* //减少已参与人数
                 int flag = activityInfoDao.updateJoinCountDiff(adminActivityVoteDetailVo.getActivityInfoId());
                 if(flag == 0) {
                     throw QuanhuException.busiError("参加人数减少异常,无法上架");
+                }*/
+                //资源删除
+                try {
+                    resourceApi.deleteResourceById(String.valueOf(adminActivityVoteDetailVo.getKid()));
+                } catch (Exception e) {
+                    logger.error("资源删除失败");
                 }
-                //TODO 资源删除
                 activityVoteRedisService.remCandidate(adminActivityVoteDetailVo.getActivityInfoId(),adminActivityVoteDetailVo.getKid());
             }
         }
@@ -408,20 +416,16 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         commitResource(voteDetailDto, adminActivityInfoVo1);
 		return null;
     }
-    private void commitResource(AdminActivityVoteDetailDto voteDetail,AdminActivityInfoVo1 activityInfo) {
+    private void commitResource(ActivityVoteDetail activityVoteDetail,AdminActivityInfoVo1 activityInfo) {
         try {
-            ActivityVoteDetail activityVoteDetail = new ActivityVoteDetail();
-            BeanUtilsBean.getInstance().getConvertUtils().register(new SqlDateConverter(null), Date.class);
-            BeanUtils.copyProperties(activityVoteDetail, voteDetail);
             ResourceTotal resourceTotal = new ResourceTotal();
-            resourceTotal.setContent(voteDetail.getContent());
+            resourceTotal.setContent(activityVoteDetail.getContent());
             resourceTotal.setCreateDate(DateUtils.getString(new Date()));
             resourceTotal.setExtJson(JsonUtils.toFastJson(activityVoteDetail));
-            resourceTotal.setModuleEnum(new Integer(voteDetail.getModuleEnum()));
+            resourceTotal.setModuleEnum(new Integer(activityVoteDetail.getModuleEnum()));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-            resourceTotal.setResourceId(voteDetail.getKid());
-
-            Response<UserSimpleVO> userSimple = userApi.getUserSimple(voteDetail.getCreateUserId());
+            resourceTotal.setResourceId(activityVoteDetail.getKid());
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(activityVoteDetail.getCreateUserId());
             if(userSimple.success()
                     && userSimple.getData() != null
                     && userSimple.getData().getUserRole() != null) {
@@ -429,7 +433,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             }
 
             resourceTotal.setTitle(activityInfo.getTitle());
-            resourceTotal.setUserId(voteDetail.getCreateUserId());
+            resourceTotal.setUserId(activityVoteDetail.getCreateUserId());
             resourceDymaicApi.commitResourceDymaic(resourceTotal);
         } catch (Exception e) {
             logger.error("资源聚合 接入异常！", e);
