@@ -116,7 +116,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
-	@Test
+	//@Test
 	public void thirdLogin(){
 		RequestHeader header = new RequestHeader();
 		header.setAppId("vebff12m1762");
