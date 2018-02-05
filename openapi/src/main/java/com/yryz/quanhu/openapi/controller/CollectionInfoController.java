@@ -79,13 +79,15 @@ public class CollectionInfoController {
     @ApiOperation("收藏状态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "services/app/{version}/collection/collectionStatus")
-    public Response<Map<String, Long>> collectionStatus(@RequestHeader Long userId, @RequestBody CollectionInfoDto collectionInfoDto, HttpServletRequest request) {
+    public Response<Map<String, Long>> collectionStatus(@RequestHeader Long userId, @RequestParam Long resourceId, HttpServletRequest request) {
         if (userId == null) {
             return ResponseUtils.returnException(QuanhuException.busiError("用户ID不能为空"));
         }
-        if (collectionInfoDto == null || collectionInfoDto.getResourceId() == null) {
+        if (resourceId == null) {
             return ResponseUtils.returnException(QuanhuException.busiError("resourceId不能为空"));
         }
+        CollectionInfoDto collectionInfoDto = new CollectionInfoDto();
+        collectionInfoDto.setResourceId(resourceId);
         collectionInfoDto.setCreateUserId(userId);
         Map<String, Long> map = Maps.newHashMap();
         try {
