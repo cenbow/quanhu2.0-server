@@ -53,7 +53,13 @@ public class ResourceConsumer {
 	)
 	public void handleMessage(String data){
 		logger.info("handle resource message : " + data);
-		ResourceModel resourceModel = GsonUtils.json2Obj(data, ResourceModel.class);
+		ResourceModel resourceModel = null;
+		try {
+			resourceModel = GsonUtils.json2Obj(data, ResourceModel.class);
+		} catch (Exception e) {
+			logger.warn("handle resource message : data is not validation :" + data);
+			return ;
+		}
 		if(!ResourceConsumerCollection.check(resourceModel.getModuleEnum())){
 			return ;
 		}
