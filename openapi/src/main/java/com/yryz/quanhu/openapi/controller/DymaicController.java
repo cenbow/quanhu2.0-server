@@ -61,7 +61,7 @@ public class DymaicController {
         List<DymaicVo> list = ResponseUtils.getResponseData(dymaicService.getSendList(userId, targetUserId, kid, limit));
         if (kid == null || kid == 0L) {
             DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
-            list.add(topDymaic);
+            list.add(0, topDymaic);
         }
         return ResponseUtils.returnObjectSuccess(list);
     }

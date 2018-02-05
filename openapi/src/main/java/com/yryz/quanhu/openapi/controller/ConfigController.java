@@ -62,7 +62,7 @@ public class ConfigController {
             JSONObject config = GsonUtils.json2Obj(configStr, JSONObject.class);
             String upgradeVersion = config.get("upgradeVersion").toString();
             //强制升级的版本比当前版本高
-            if (new Integer(upgradeVersion.replace(".", "")) > new Integer(appVersion)) {
+            if (new Integer(upgradeVersion.replace(".", "")) > new Integer(appVersion.replace(".", ""))) {
                 map.put("forceUpgradeFlag", true);
             } else {
                 map.put("forceUpgradeFlag", false);
@@ -73,4 +73,5 @@ public class ConfigController {
         }
         return ResponseUtils.returnObjectSuccess(map);
     }
+
 }
