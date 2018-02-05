@@ -102,6 +102,23 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String applyAuthEndDate;
 
+
+	public String getApplyAuthBeginDate() {
+		return applyAuthBeginDate;
+	}
+
+	public void setApplyAuthBeginDate(String applyAuthBeginDate) {
+		this.applyAuthBeginDate = applyAuthBeginDate;
+	}
+
+	public String getApplyAuthEndDate() {
+		return applyAuthEndDate;
+	}
+
+	public void setApplyAuthEndDate(String applyAuthEndDate) {
+		this.applyAuthEndDate = applyAuthEndDate;
+	}
+
 	public Set<Long> getTagIds() {
 		return tagIds;
 	}
