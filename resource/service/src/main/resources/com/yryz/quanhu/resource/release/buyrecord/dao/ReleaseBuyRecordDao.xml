@@ -3,7 +3,7 @@
 <mapper namespace="com.yryz.quanhu.resource.release.buyrecord.dao.ReleaseBuyRecordDao">
 
     <sql id="Base_Column_List">
-        kid, order_id, coterie_id, resource_id, amount, pay_type, buy_type, remark, create_user_id, create_date,
+        id, kid, order_id, coterie_id, resource_id, amount, pay_type, buy_type, remark, create_user_id, create_date,
         last_update_user_id, last_update_date
     </sql>
 
@@ -32,11 +32,19 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM qh_release_buy_record
-        WHERE create_user_id = #{userId,jdbcType=BIGINT}
-        AND buy_type = 10
+        WHERE buy_type = 10
+        <if test="userId != null">
+            AND create_user_id = #{userId,jdbcType=BIGINT}
+        </if>
         <if test="coterieId != null">
             AND coterie_id = #{coterieId,jdbcType=BIGINT}
         </if>
-        ORDER BY create_date DESC
+        <if test="beginDate != null">
+            and create_date &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null">
+            and create_date &lt;= #{endDate}
+        </if>
+        ORDER BY create_date DESC,id DESC
     </select>
 </mapper>

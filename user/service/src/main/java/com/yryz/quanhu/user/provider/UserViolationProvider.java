@@ -28,8 +28,8 @@ public class UserViolationProvider implements ViolationApi {
 	@Override
 	public Response<Boolean> addViolation(ViolationInfo info) {
 		try {
-			if (info == null || StringUtils.isEmpty(info.getUserId()) || info.getType() == null
-					|| info.getType() < ViolatType.WARN.getType() || info.getType() > ViolatType.DISTORY.getType()) {
+			if (info == null || StringUtils.isEmpty(info.getUserId()) || info.getViolationType() == null
+					|| info.getViolationType() < ViolatType.WARN.getType() || info.getViolationType() > ViolatType.DISTORY.getType()) {
 				throw QuanhuException.busiError("userId、type不合法");
 			}
 			if (StringUtils.isBlank(info.getAppId())) {
@@ -50,8 +50,8 @@ public class UserViolationProvider implements ViolationApi {
 	public Response<Boolean> updateViolation(ViolationInfo violationInfo) {
 		try {
 			if (violationInfo == null || StringUtils.isEmpty(violationInfo.getUserId())
-					|| violationInfo.getType() == null || violationInfo.getType() < ViolatType.ALLTAIK.getType()
-					|| violationInfo.getType() > ViolatType.NOFREEZE.getType()) {
+					|| violationInfo.getViolationType() == null || violationInfo.getViolationType() < ViolatType.ALLTAIK.getType()
+					|| violationInfo.getViolationType() > ViolatType.NOFREEZE.getType()) {
 				throw QuanhuException.busiError("userId、type不合法");
 			}
 			if (StringUtils.isBlank(violationInfo.getAppId())) {
