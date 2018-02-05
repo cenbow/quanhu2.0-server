@@ -135,7 +135,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             this.commitResourceAndDynamic(record, createUser);
             try {
                 // 资源计数接入
-                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+                countApi.commitCount(BehaviorEnum.Release, record.getCreateUserId(), null, 1L);
             } catch (Exception e) {
                 logger.error("统计计数 接入异常！", e);
             }
@@ -306,13 +306,14 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             ResourceTotal resourceTotalCoterie = new ResourceTotal();
             resourceTotalCoterie.setCreateDate(DateUtils.getDate());
             resourceTotalCoterie.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
+            resourceTotalCoterie.setTransmitType(NumberUtils.toInt(ModuleContants.RELEASE));
             CoterieInfo coterieInfo = ResponseUtils
                     .getResponseData(this.coterieAPI.queryCoterieInfo(releaseInfo.getCoterieId()));
             if (null != coterieInfo) {
                 resourceTotalCoterie.setExtJson(JSON.toJSONString(coterieInfo));
                 resourceTotalCoterie.setResourceId(coterieInfo.getCoterieId());
-                resourceTotalCoterie.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
-                resourceTotalCoterie.setUserId(Long.valueOf(coterieInfo.getOwnerId()));
+                resourceTotalCoterie.setModuleEnum(NumberUtils.toInt(ModuleContants.COTERIE));
+                resourceTotalCoterie.setUserId(NumberUtils.toLong(coterieInfo.getOwnerId()));
                 resourceDymaicApi.commitResourceDymaic(resourceTotalCoterie);
             }
         } catch (Exception e) {

@@ -110,13 +110,13 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(loginVO));
 	}
 
-	@Test
+	//@Test
 	public void getLoginMethod() {
 		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
-	//@Test
+	@Test
 	public void thirdLogin(){
 		RequestHeader header = new RequestHeader();
 		header.setAppId("vebff12m1762");
@@ -126,8 +126,8 @@ public class UserTest {
 		header.setDevType("11");
 		header.setDitchCode("APP");
 		ThirdLoginDTO loginDTO = new ThirdLoginDTO();
-		loginDTO.setAccessToken("162C9522156358786DE06E441E9C2A3F");
-		loginDTO.setOpenId("F1E167B92BB7D1B1D093B1D44A9147E3");
+		loginDTO.setAccessToken("077C5D51858725575DDC14FA85ED0EC4");
+		loginDTO.setOpenId("EF6CCDB1A0B1E87C9259139A1E5756B9");
 		loginDTO.setUserRegInviterCode("48565247");
 		loginDTO.setType(12);
 		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(),
@@ -221,7 +221,8 @@ public class UserTest {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
 		codeDTO.setCode(SmsContants.CODE_FIND_PWD);
-		codeDTO.setPhone("16612345689");
+		codeDTO.setUserId(738943677265461248l);
+		//codeDTO.setPhone("16612345689");
 
 		Response<SmsVerifyCodeVO> response = accountApi.sendVerifyCode(codeDTO);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -284,7 +285,10 @@ public class UserTest {
 	
 	//@Test
 	public void getAdmin(){
-		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 20, new AdminUserInfoDTO("1", null, null, null, null, "vebff12m1762"));
+		AdminUserInfoDTO infoDTO = new AdminUserInfoDTO(null, null, null, null, null, "vebff12m1762");
+		infoDTO.setUserStatus(1);
+		
+		Response<PageList<UserBaseInfoVO>> response = userApi.listUserInfo(1, 20, infoDTO);
 		//Response<List<String>> response2 = userApi.getUserIdByParams(new AdminUserInfoDTO(null, "ss", null, null, null, "vebff12m1762"));
 		System.out.println(JsonUtils.toFastJson(response));
 	}

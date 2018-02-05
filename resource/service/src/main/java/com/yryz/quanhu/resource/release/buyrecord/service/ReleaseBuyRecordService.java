@@ -17,4 +17,6 @@ public interface ReleaseBuyRecordService {
     int insert(ReleaseBuyRecord releaseBuyRecord);
 
     PageList<ReleaseBuyRecordVo> selectByCondition(ReleaseBuyRecordDto releaseBuyRecordDto);
+
+    PageList<ReleaseBuyRecord> pageByCondition(ReleaseBuyRecordDto releaseBuyRecordDto, boolean isCount);
 }

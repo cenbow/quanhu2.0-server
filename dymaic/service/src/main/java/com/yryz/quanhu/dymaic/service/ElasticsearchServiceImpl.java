@@ -237,7 +237,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 				}
 			}
 		}
-		logger.info("getNeedDynamicUserIds result: ", GsonUtils.parseJson(userIds));
+		logger.info("getNeedDynamicUserIds result: {}", GsonUtils.parseJson(userIds));
 		return userIds;
 	}
 

@@ -19,7 +19,7 @@ public class ActivityCountConstant {
     /**
      * 我的活动计数key
      */
-    public static final String ACTIVITY_RECORD_COUNT = "ACTIVITY-RECORD-COUNT";
+    public static final String ACTIVITY_RECORD_COUNT = "";
     /**
      * 浏览数增加量
      */

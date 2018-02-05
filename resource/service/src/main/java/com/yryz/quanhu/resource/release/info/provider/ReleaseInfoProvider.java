@@ -118,7 +118,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             this.commitResourceAndDynamic(record, createUser);
             try {
                 // 接入统计计数
-                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+                countApi.commitCount(BehaviorEnum.Release, record.getCreateUserId(), null, 1L);
             } catch (Exception e) {
                 logger.error("统计计数 接入异常！", e);
             }
@@ -241,7 +241,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             try {
                 // 接入统计计数
-                countApi.commitCount(BehaviorEnum.Release, upInfo.getKid(), null, -1L);
+                countApi.commitCount(BehaviorEnum.Release, upInfo.getCreateUserId(), null, -1L);
             } catch (Exception e) {
                 logger.error("资源聚合、统计计数 接入异常！", e);
             }

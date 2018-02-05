@@ -7,6 +7,7 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.collection.dao.CollectionInfoDao;
 import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
@@ -20,6 +21,8 @@ import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -53,6 +56,9 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
 
     @Reference
     CoterieApi coterieApi;
+
+    @Reference(check = false, timeout = 30000)
+    EventAPI eventAPI;
 
     /**
      * 收藏
@@ -90,9 +96,13 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         if(collectionInfoDao.insertByPrimaryKeySelective(collectionInfo) == 0) {
             throw QuanhuException.busiError("已收藏不能重复收藏");
         }
+        //提交事件
+        this.sendEvent(collectionInfo, resourceVo);
         try {
             //递增收藏数
             countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, 1L);
+            //递增用户收藏数
+            countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getCreateUserId(), null, 1L);
         } catch (Exception e) {
             logger.error("递增收藏数 失败", e);
         }
@@ -104,12 +114,17 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
      * @return
      * */
     public void del(CollectionInfoDto collectionInfoDto) {
-        collectionInfoDao.deleteByResourceId(collectionInfoDto.getResourceId(), collectionInfoDto.getModuleEnum(), collectionInfoDto.getCreateUserId());
-        try {
-            //递减收藏数
-            countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, -1L);
-        } catch (Exception e) {
-            logger.error("递减收藏数 失败", e);
+        int i = collectionInfoDao.deleteByResourceId(collectionInfoDto.getResourceId(),
+                collectionInfoDto.getModuleEnum(), collectionInfoDto.getCreateUserId());
+        if(i > 0) {
+            try {
+                //递减收藏数
+                countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getResourceId(), null, -1L);
+                //递减用户收藏数
+                countApi.commitCount(BehaviorEnum.Collection, collectionInfoDto.getCreateUserId(), null, -1L);
+            } catch (Exception e) {
+                logger.error("递减收藏数 失败", e);
+            }
         }
     }
 
@@ -220,6 +235,29 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
             }
         } catch (Exception e) {
             logger.error("获取私圈信息 失败", e);
+        }
+    }
+
+    /**
+     * 提交event
+     * @param   collectionInfo
+     * @param   resourceVo
+     * */
+    private void sendEvent(CollectionInfo collectionInfo, ResourceVo resourceVo) {
+        try {
+            //提交事件
+            EventInfo event = new EventInfo();
+            event.setEventCode("23");
+            event.setUserId(collectionInfo.getCreateUserId().toString());
+            event.setResourceId(collectionInfo.getResourceId().toString());
+            event.setOwnerId(resourceVo.getUserId() != null ? resourceVo.getUserId().toString() : null);
+            event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
+            if (StringUtils.isNotEmpty(resourceVo.getCoterieId()) ) {
+                event.setCoterieId(resourceVo.getCoterieId());
+            }
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("提交event 失败", e);
         }
     }
 

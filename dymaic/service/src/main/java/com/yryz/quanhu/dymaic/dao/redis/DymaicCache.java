@@ -162,7 +162,7 @@ public class DymaicCache {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheSendListKey(userId);
         Set<Long> sendList = null;
-        if (kid <= 0) {
+        if (kid == null || kid <= 0) {
             sendList = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
         } else {
             sendList = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid - 1, 0, limit);
@@ -261,7 +261,7 @@ public class DymaicCache {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
         final String key = cacheTimeLineKey(userId);
         Set<Long> timeLine = null;
-        if (kid <= 0) {
+        if (kid == null || kid <= 0) {
             timeLine = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
         } else {
             timeLine = redisTemplate.opsForZSet().reverseRangeByScore(key, 0, kid - 1, 0, limit);
