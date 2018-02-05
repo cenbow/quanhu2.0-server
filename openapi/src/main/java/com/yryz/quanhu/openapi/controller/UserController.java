@@ -453,6 +453,7 @@ public class UserController {
 	public Response<Boolean> bindPhone(@RequestBody BindPhoneDTO phoneDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		phoneDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+		phoneDTO.setAppId(header.getAppId());
 		Boolean result = ResponseUtils.getResponseData(accountApi.bindPhone(phoneDTO));
 		return ResponseUtils.returnApiObjectSuccess(result);
 	}

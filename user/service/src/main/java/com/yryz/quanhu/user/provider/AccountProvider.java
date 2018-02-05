@@ -561,15 +561,6 @@ public class AccountProvider implements AccountApi {
 		}
 	}
 
-	/**
-	 * 绑定 第三方账户
-	 * 
-	 * @param accessToken
-	 * @param openId
-	 * @param type
-	 *            1，微信 2，微博 3，qq
-	 * @return 需要在header获取用户id
-	 */
 	@Override
 	public Response<Boolean> bindThird(BindThirdDTO thirdDTO) {
 		try {

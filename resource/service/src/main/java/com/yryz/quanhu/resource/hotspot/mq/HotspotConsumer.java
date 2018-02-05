@@ -20,13 +20,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.resource.entity.ResourceModel;
-import com.yryz.quanhu.resource.enums.ResourceConsumerCollection;
 import com.yryz.quanhu.resource.hotspot.entity.HotSpotEventInfo;
 import com.yryz.quanhu.resource.hotspot.enums.EventTypeCollection;
 import com.yryz.quanhu.resource.hotspot.service.HotspotService;
-import com.yryz.quanhu.resource.mq.AmqpConstant;
 
 /**
  * @author yehao
@@ -57,8 +55,16 @@ public class HotspotConsumer {
 		logger.info("handle resource message : " + data);
 		HotSpotEventInfo eventInfo = GsonUtils.json2Obj(data, HotSpotEventInfo.class);
 		//如果两个都没有执行。则直接返回
-		if(!EventTypeCollection.checkResourceHotCalculation(eventInfo.getEventCode()) || !EventTypeCollection.checkUserHotCalculation(eventInfo.getEventCode())){
+		if(!EventTypeCollection.checkResourceHotCalculation(eventInfo.getEventCode()) && !EventTypeCollection.checkUserHotCalculation(eventInfo.getEventCode())){
 			return ;
+		}
+		
+		//设置事件的默认值
+		if(eventInfo.getEventNum() == null){
+			eventInfo.setEventNum(1);
+		}
+		if(eventInfo.getCreateDate() == null){
+			eventInfo.setCreateDate(DateUtils.currentDatetime());
 		}
 		try {
 			hotspotService.processEvent(eventInfo);
