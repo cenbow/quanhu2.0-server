@@ -12,13 +12,13 @@
     <result column="violation_type" property="violationType" jdbcType="TINYINT" />
     <result column="operational" property="operational" jdbcType="VARCHAR" />
     <result column="ban_post_time" property="banPostTime" jdbcType="TIMESTAMP" />
-    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="user_status" property="userStatus" jdbcType="TINYINT" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, kid, user_id, scope_desc, pic_url, reason, push_message, violation_type, operational, 
-    ban_post_time, status, create_date, last_update_date
+    ban_post_time, user_status, create_date, last_update_date
   </sql>
   
   <select id="listViolation"
@@ -70,7 +70,7 @@
   </select>  
   
   <update id="updateViolation">
-		update qh_user_violation set status = 11 where user_id = #{userId}
+		update qh_user_violation set user_status = 11 where user_id = #{userId}
   </update>
   
   <insert id="insert" parameterType="com.yryz.quanhu.user.entity.UserViolation" >
@@ -106,8 +106,8 @@
       <if test="banPostTime != null" >
         ban_post_time,
       </if>
-      <if test="status != null" >
-        status,
+      <if test="userStatus != null" >
+        user_status,
       </if>
       <if test="createDate != null" >
         create_date,
@@ -147,8 +147,8 @@
       <if test="banPostTime != null" >
         #{banPostTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="status != null" >
-        #{status,jdbcType=TINYINT},
+      <if test="userStatus != null" >
+        #{userStatus,jdbcType=TINYINT},
       </if>
       <if test="createDate != null" >
         #{createDate,jdbcType=TIMESTAMP},

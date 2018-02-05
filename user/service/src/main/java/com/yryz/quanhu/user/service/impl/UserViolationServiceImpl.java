@@ -77,9 +77,9 @@ public class UserViolationServiceImpl implements UserViolationService {
 		if (violation.getViolationType() == ViolatType.WARN.getType()
 				|| violation.getViolationType() == ViolatType.ALLTAIK.getType()
 				|| violation.getViolationType() == ViolatType.NOFREEZE.getType()) {
-			violation.setStatus((byte) 11);
+			violation.setUserStatus((byte) 11);
 		} else {
-			violation.setStatus((byte) 10);
+			violation.setUserStatus((byte) 10);
 		}
 		// 设置用户其他违规记录过期
 
@@ -97,7 +97,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 				// 禁言
 				if (times == Constants.WARN_TIMES) {
 					UserViolation violation2 = (UserViolation) GsonUtils.parseObj(violation, UserViolation.class);
-					violation2.setStatus((byte) 0);
+					violation2.setUserStatus((byte) 0);
 					violation2.setViolationType((byte) ViolatType.NOTALK.getType());
 					saveViolationDao(violation2);
 					updateUserStatus(violation2, appId);
