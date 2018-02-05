@@ -5,6 +5,8 @@ import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.message.dto.MessageAdminDto;
 import com.yryz.quanhu.message.message.vo.MessageAdminVo;
 
+import java.util.List;
+
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
@@ -29,7 +31,7 @@ public interface MessageAdminAPI {
      * @param messageAdminVo
      * @return
      */
-    Response<Boolean> push(MessageAdminVo messageAdminVo);
+    Response<MessageAdminVo> push(MessageAdminVo messageAdminVo);
 
     /**
      * 更新未发送消息
@@ -37,7 +39,7 @@ public interface MessageAdminAPI {
      * @param messageAdminVo
      * @return
      */
-    Response<Boolean> update(MessageAdminVo messageAdminVo);
+    Response<MessageAdminVo> update(MessageAdminVo messageAdminVo);
 
     /**
      * 查询详情
@@ -46,4 +48,10 @@ public interface MessageAdminAPI {
      * @return
      */
     Response<MessageAdminVo> findOne(MessageAdminDto messageAdminDto);
+
+    /**
+     *
+     * @return
+     */
+    Response<List<MessageAdminVo>> startCheck();
 }
