@@ -159,6 +159,16 @@ public class UserTest {
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
+
+	@Test
+	public void getUserListByCreateDateTest(){
+		String start = "2018-01-01";
+		String end = "2018-03-01";
+		Response<List<UserBaseInfoVO>> listResponse = userApi.getUserListByCreateDate(start, end);
+		System.out.println("listResponse result: "+ JsonUtils.toFastJson(listResponse));
+	}
+
+
 	
 	//@Test
 	public void bindPhone(){

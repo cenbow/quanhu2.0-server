@@ -456,6 +456,14 @@
 	where a.create_date &gt;= #{startDate}
 		and a.create_date &lt;= #{endDate}
   </select>
+
+    <select id="getUserListByCreateDate" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from qh_user_baseinfo a
+        where a.create_date &gt;= #{startDate}
+        and a.create_date &lt;= #{endDate}
+    </select>
    
   <select id="getAllByUserIds" resultMap="BaseResultMap">
 	select

@@ -4,6 +4,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.mongodb.AbsBaseMongoDAO;
 import com.yryz.common.mongodb.Page;
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.message.message.constants.MessageContants;
 import com.yryz.quanhu.message.message.dto.MessageAdminDto;
@@ -82,6 +83,10 @@ public class MessageAdminMongo extends AbsBaseMongoDAO<MessageAdminVo> {
             update.set("pushType", messageAdminVo.getPushType());
         }
 
+        if (messageAdminVo.getPushDate() != null) {
+            update.set("pushDate", messageAdminVo.getPushDate());
+        }
+
         return this.update(query, update);
     }
 
@@ -137,5 +142,16 @@ public class MessageAdminMongo extends AbsBaseMongoDAO<MessageAdminVo> {
         Query query = new Query();
         query.addCriteria(Criteria.where("messageId").is(messageAdminDto.getMessageId()));
         return this.findOne(query);
+    }
+
+    public List<MessageAdminVo> startCheck() {
+        Query query = new Query();
+        String dateTime = DateUtils.getDateTime();
+        query.addCriteria(Criteria.where("delFlag").is(MessageContants.DEL_FLAG_NOT_DELETE))
+                .addCriteria(Criteria.where("pushType").is(MessageContants.PUSH_TYPE_TIMING))
+                .addCriteria(Criteria.where("pushDate").gt(dateTime))
+                .addCriteria(Criteria.where("pushStatus").is(MessageContants.PUSH_STATUS_NOT));
+
+        return this.find(query);
     }
 }

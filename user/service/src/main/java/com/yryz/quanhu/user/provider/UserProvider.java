@@ -290,6 +290,19 @@ public class UserProvider implements UserApi{
 	}
 
 	@Override
+	public Response<List<UserBaseInfoVO>> getUserListByCreateDate(String startDate, String endDate) {
+		try {
+			List<UserBaseInfo> userBaseInfoList = userService.getUserListByCreateDate(startDate, endDate);
+			List<UserBaseInfoVO> list = GsonUtils.parseList(userBaseInfoList, UserBaseInfoVO.class);
+			return ResponseUtils.returnListSuccess(list);
+		} catch (Exception e) {
+			logger.error("getUserListByCreateDate error", e);
+			return ResponseUtils.returnException(e);
+		}
+
+	}
+
+	@Override
 	public Response<List<UserBaseInfoVO>> getAllByUserIds(List<Long> userIds) {
 		try {
 			logger.info("getAllByUserIds userIds: {}", userIds);

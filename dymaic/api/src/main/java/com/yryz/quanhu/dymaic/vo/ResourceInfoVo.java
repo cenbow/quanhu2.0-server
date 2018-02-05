@@ -2,6 +2,7 @@ package com.yryz.quanhu.dymaic.vo;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class ResourceInfoVo implements Serializable {
 	private static final long serialVersionUID = -3670262531273122386L;
@@ -14,6 +15,11 @@ public class ResourceInfoVo implements Serializable {
 	private Long lastHeat;
 	private UserSimpleVo createUserInfo;
 
+	/**
+     * 计数、状态
+     */
+    private Map<String, Long> statistics;
+	
 	public Integer getResourceType() {
 		return resourceType;
 	}
@@ -70,11 +76,18 @@ public class ResourceInfoVo implements Serializable {
 		this.createUserInfo = createUserInfo;
 	}
 
-	@Override
-	public String toString() {
-		return "ResourceInfoVo [resourceType=" + resourceType + ", topicInfo=" + topicInfo + ", topicPostInfo="
-				+ topicPostInfo + ", releaseInfo=" + releaseInfo + ", createDate=" + createDate + ", lastHeat="
-				+ lastHeat + ", createUserInfo=" + createUserInfo + "]";
-	}
+	public Map<String, Long> getStatistics() {
+        return statistics;
+    }
 
+    public void setStatistics(Map<String, Long> statistics) {
+        this.statistics = statistics;
+    }
+
+    @Override
+    public String toString() {
+        return "ResourceInfoVo [resourceType=" + resourceType + ", topicInfo=" + topicInfo + ", topicPostInfo="
+                + topicPostInfo + ", releaseInfo=" + releaseInfo + ", createDate=" + createDate + ", lastHeat="
+                + lastHeat + ", createUserInfo=" + createUserInfo + ", statistics=" + statistics + "]";
+    }
 }
