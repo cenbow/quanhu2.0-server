@@ -62,8 +62,10 @@ public class UserStarProvider implements UserStarApi {
 			}
 			UserStarAuth model = (UserStarAuth) GsonUtils.parseObj(info, UserStarAuth.class);
 			UserStarAuth authModel = userStarService.get(info.getUserId(), null);
+			
+			//兼容重复提交的申请
 			if (authModel != null) {
-				if (authModel.getAuditStatus() == StarAuditStatus.WAIT_AUDIT.getStatus()) {
+				/*if (authModel.getAuditStatus() == StarAuditStatus.WAIT_AUDIT.getStatus()) {
 					throw QuanhuException.busiError("待审核中，不允许重复申请");
 				}
 				if (authModel.getAuditStatus() == StarAuditStatus.AUDIT_SUCCESS.getStatus()) {
@@ -79,8 +81,8 @@ public class UserStarProvider implements UserStarApi {
 							throw QuanhuException.busiError("身份证信息已存在");
 						}
 					}
-				}
-				userStarService.update(model);
+				}*/
+				update(info);
 			} else {
 				checkParam(info);
 				if (info.getAuthType().intValue() == StarAuthType.PERSON.getType()
@@ -111,7 +113,7 @@ public class UserStarProvider implements UserStarApi {
 			if(model == null){
 				model = new UserStarAuth();
 				model.setUserId(NumberUtils.createLong(userId));
-				model.setAuditStatus((byte)14);
+				model.setAuditStatus(StarAuditStatus.NO_APPLY.getStatus());
 			}
 			StarAuthInfo authInfo = (StarAuthInfo) GsonUtils.parseObj(model, StarAuthInfo.class);
 			return ResponseUtils.returnObjectSuccess(authInfo);

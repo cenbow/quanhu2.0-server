@@ -14,7 +14,7 @@ import java.util.Map;
 import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
+import com.yryz.quanhu.resource.enums.ResourceModuleEnum;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
@@ -46,6 +46,7 @@ public class ResourceVo implements Serializable {
     /**
      * 资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
+     * @see ResourceModuleEnum
      */
     private String moduleEnum;
 

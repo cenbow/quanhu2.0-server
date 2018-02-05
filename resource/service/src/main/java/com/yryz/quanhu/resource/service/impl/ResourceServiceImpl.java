@@ -24,6 +24,7 @@ import com.yryz.quanhu.resource.dao.mongo.ResourceMongo;
 import com.yryz.quanhu.resource.dao.redis.ResourceRedis;
 import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
+import com.yryz.quanhu.resource.enums.ResourceModuleEnum;
 import com.yryz.quanhu.resource.hotspot.entity.HeatInfo;
 import com.yryz.quanhu.resource.hotspot.service.HotspotService;
 import com.yryz.quanhu.resource.service.ResourceService;
@@ -61,10 +62,10 @@ public class ResourceServiceImpl implements ResourceService {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
 				if(resourceMongo.get(resourceModel) != null){
-					resourceMongo.update(resourceModel);
 					if(ResourceEnum.RECOMMEND_TYPE_TRUE.equals(resourceModel.getRecommend())){
 						resourceModel.setRecommendTime(System.currentTimeMillis());
 					}
+					resourceMongo.update(resourceModel);
 					updateCache(resourceModel.getResourceId());
 				} else {
 					//创建资源时候要创建对应的热度对象
@@ -103,6 +104,9 @@ public class ResourceServiceImpl implements ResourceService {
 	public void updateResource(List<ResourceModel> resources) {
 		if(CollectionUtils.isNotEmpty(resources)){
 			for (ResourceModel resourceModel : resources) {
+				if(ResourceEnum.RECOMMEND_TYPE_TRUE.equals(resourceModel.getRecommend())){
+					resourceModel.setRecommendTime(System.currentTimeMillis());
+				}
 				resourceMongo.update(resourceModel);
 				updateCache(resourceModel.getResourceId());
 			}
@@ -363,6 +367,7 @@ public class ResourceServiceImpl implements ResourceService {
 	 */
 	public List<ResourceModel> getNoneRecommendResource(int start , int limit){
 		ResourceModel resourceModel = new ResourceModel();
+		resourceModel.setModuleEnum(ResourceModuleEnum.RELEASE);
 		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_FALSE);
 		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
 		resourceModel.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);

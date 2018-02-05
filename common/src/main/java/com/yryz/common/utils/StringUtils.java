@@ -4,6 +4,9 @@
 package com.yryz.common.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -383,4 +386,28 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     	return result.toString();
     }
     
+	
+	/**
+	 * 分转成元，保留2位有效数字的浮点数字符串,整数元的直接除100返回
+	 * 
+	 * @param money
+	 * @return
+	 */
+	public static String getTwoPointDouble(long money) {
+		BigDecimal decimal = new BigDecimal(money);
+		BigDecimal decimal1 = new BigDecimal(100);
+		decimal = decimal.divide(decimal1);
+		if(money%100 == 0){
+			return String.valueOf(decimal.toString());
+		}
+		DecimalFormat formater = new DecimalFormat();
+		formater.setMaximumFractionDigits(2);
+		formater.setGroupingSize(0);
+		formater.setRoundingMode(RoundingMode.FLOOR);
+		return formater.format(decimal);
+	}
+	
+	public static void main(String[] args){
+		System.out.println(getTwoPointDouble(62011));
+	}
 }

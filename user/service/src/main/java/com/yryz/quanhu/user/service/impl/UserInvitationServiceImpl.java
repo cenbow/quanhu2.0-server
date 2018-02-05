@@ -186,13 +186,13 @@ public class UserInvitationServiceImpl implements UserInvitationService {
 
             UserInvitationDto invitationDto = invitations.get(i);
 
-            this.mergeEvents(eventMap,dto);
+            this.mergeEvents(eventMap,invitationDto);
 
-            this.mergeLastLogs(loginLogs,dto);
+            this.mergeLastLogs(loginLogs,invitationDto);
 
-            this.mergeFromArray(fromInfos,dto);
+            this.mergeFromArray(fromInfos,invitationDto);
 
-            returnArray.add(dto);
+            returnArray.add(invitationDto);
 
         }
         return new PageModel<UserInvitationDto>().getPageList(returnArray);

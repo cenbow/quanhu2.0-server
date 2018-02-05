@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
-import com.yryz.quanhu.resource.enums.ResourceTypeEnum;
 import com.yryz.quanhu.resource.hotspot.dao.CalculationConfigMongo;
 import com.yryz.quanhu.resource.hotspot.dao.HeatInfoMongo;
 import com.yryz.quanhu.resource.hotspot.dao.ResourceHotCalculationMongo;

@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -46,6 +47,7 @@ public class UserRelationRemarkController {
     @ApiOperation("用户备注名-设置/重置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @RequestMapping("/{version}/user/relation/remark")
+    @UserBehaviorValidation(login = true)
     public Response<Boolean> setRemarkName(HttpServletRequest request,
                                            @RequestBody Map<String,String> jsonBody){
 

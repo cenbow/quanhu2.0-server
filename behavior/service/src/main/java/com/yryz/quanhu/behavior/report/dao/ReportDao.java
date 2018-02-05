@@ -20,5 +20,7 @@ public interface ReportDao {
     int accretion(Report report);
 
     Report querySingleReport(Report report);
+
+    Long queryReportForAdminCount(ReportDTO reportDTO);
 }
 

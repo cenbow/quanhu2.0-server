@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -46,6 +47,7 @@ public class UserRelationController {
     @ApiOperation("用户关系-关注/取消关注")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @RequestMapping("/{version}/user/relation/follow")
+    @UserBehaviorValidation(login = true)
     public Response<UserRelationEventVo> setFollow(HttpServletRequest request, @RequestBody Map<String,String> jsonBody){
 
         String userId       = request.getHeader("userId");
@@ -81,6 +83,7 @@ public class UserRelationController {
     @ApiOperation("用户关系-拉黑/取消拉黑")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @RequestMapping("/{version}/user/relation/black")
+    @UserBehaviorValidation(login = true)
     public Response<UserRelationEventVo> setBlack(HttpServletRequest request, @RequestBody Map<String,String> jsonBody){
 
         String userId       = request.getHeader("userId");
@@ -117,6 +120,7 @@ public class UserRelationController {
     @ApiOperation("用户关系-查询（一对一）根据目标用户手机号查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @RequestMapping("/{version}/user/relation/query/phone")
+    @UserBehaviorValidation(login = true)
     public Response<UserRelationQueryVo> getRelationByPhone(HttpServletRequest request){
         String userId       = request.getHeader("userId");
         String targetPhoneNo = request.getParameter("targetPhoneNo");
@@ -141,6 +145,7 @@ public class UserRelationController {
     @ApiOperation("用户关系-查询（一对一）根据ID查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @RequestMapping("/{version}/user/relation/query/id")
+    @UserBehaviorValidation(login = true)
     public Response<UserRelationQueryVo> getRelation(HttpServletRequest request){
         String userId       = request.getHeader("userId");
         String targetUserId = request.getParameter("targetUserId");

@@ -92,7 +92,6 @@ public class ResourceTotal {
 	 * @exception 
 	 */
 	public ResourceTotal() {
-		super();
 	}
 
 	/**
