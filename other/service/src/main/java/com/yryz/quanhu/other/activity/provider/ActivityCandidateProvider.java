@@ -41,7 +41,7 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
             Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
             activityCandidateService.join(activityVoteDto);
             Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("kid", activityVoteDto.getKid());
+            resultMap.put("kid", activityVoteDto.getKid().toString());
             return ResponseUtils.returnObjectSuccess(resultMap);
         } catch (Exception e) {
             logger.error("增加参与者 失败", e);
