@@ -118,7 +118,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             this.commitResourceAndDynamic(record, createUser);
             try {
                 // 接入统计计数
-                countApi.commitCount(BehaviorEnum.Release, record.getKid(), null, 1L);
+                countApi.commitCount(BehaviorEnum.Release, record.getCreateUserId(), null, 1L);
             } catch (Exception e) {
                 logger.error("统计计数 接入异常！", e);
             }
@@ -177,9 +177,10 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<PageList<ReleaseInfoVo>> pageByCondition(ReleaseInfoDto dto, Long headerUserId, boolean isCount,
             boolean isGetCreateUser) {
         try {
-            // 只查询 平台文章
-            dto.setCoterieId(0L);
-            dto.setOrderType(ReleaseConstants.OrderType.time_new);
+            if (null == dto.getOrderType()) {
+                dto.setOrderType(ReleaseConstants.OrderType.time_new);
+            }
+            
             PageList<ReleaseInfoVo> pageList = releaseInfoService.pageByCondition(dto, isCount);
             if (!isGetCreateUser || null == pageList || CollectionUtils.isEmpty(pageList.getEntities())) {
                 return ResponseUtils.returnObjectSuccess(pageList);
@@ -200,10 +201,10 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             Map<String, UserSimpleVO> userMap = ResponseUtils.getResponseData(userApi.getUserSimple(userIds));
             if (null != userMap) {
                 for (ReleaseInfoVo info : voList) {
-                    if (null == info || null == info.getCreateUserId() || null == userMap.get(info.getCreateUserId())) {
+                    if (null == info || null == info.getCreateUserId()) {
                         continue;
                     }
-                    UserSimpleVO userVo = userMap.get(info.getCreateUserId());
+                    UserSimpleVO userVo = userMap.get(String.valueOf(info.getCreateUserId()));
                     info.setUser(userVo);
                 }
             }
@@ -240,7 +241,7 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
 
             try {
                 // 接入统计计数
-                countApi.commitCount(BehaviorEnum.Release, upInfo.getKid(), null, -1L);
+                countApi.commitCount(BehaviorEnum.Release, upInfo.getCreateUserId(), null, -1L);
             } catch (Exception e) {
                 logger.error("资源聚合、统计计数 接入异常！", e);
             }

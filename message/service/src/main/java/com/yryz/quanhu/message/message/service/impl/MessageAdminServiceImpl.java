@@ -6,6 +6,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.*;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.constants.MessageContants;
 import com.yryz.quanhu.message.message.dto.MessageAdminDto;
 import com.yryz.quanhu.message.message.mongo.MessageAdminMongo;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,8 +56,11 @@ public class MessageAdminServiceImpl implements MessageAdminService {
     @Autowired
     private MessageSender messageSender;
 
-    @Resource
-    private RedisTemplate<String, ScheduledFuture> redisTemplate;
+    /*@Resource
+    private RedisTemplate<String, ScheduledFuture> redisTemplate;*/
+
+    @Autowired
+    private RedisTemplateBuilder redisTemplateBuilder;
 
     private static final String QH_MESSAGE_ADMIN_SCHEDULE = "qh:message:admin:schedule:";
 
@@ -82,7 +85,7 @@ public class MessageAdminServiceImpl implements MessageAdminService {
             return true;
         } catch (Exception e) {
             LOGGER.error("发送消息失败! " + msg, e);
-            return false;
+            throw QuanhuException.busiError("发送消息失败!" + e);
         }
     }
 
@@ -152,6 +155,7 @@ public class MessageAdminServiceImpl implements MessageAdminService {
                         }
                     }, millisecond, TimeUnit.MILLISECONDS);
 
+                    RedisTemplate<String, ScheduledFuture> redisTemplate = redisTemplateBuilder.buildRedisTemplate(ScheduledFuture.class);
                     redisTemplate.opsForValue().set(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId(), schedule, millisecond, TimeUnit.MILLISECONDS);
                 } catch (Exception e) {
                     LOGGER.error("设置定时任务异常,开始取消定时任务", e);
@@ -171,4 +175,31 @@ public class MessageAdminServiceImpl implements MessageAdminService {
         }
     }
 
+    @Override
+    public Boolean update(MessageAdminVo messageAdminVo) {
+        //管理后台编辑功能：先取消之前的定时任务，然后在发往队列
+        RedisTemplate<String, ScheduledFuture> redisTemplate = redisTemplateBuilder.buildRedisTemplate(ScheduledFuture.class);
+        ScheduledFuture<?> scheduledFuture = redisTemplate.opsForValue().get(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+        boolean cancel = scheduledFuture.cancel(true);
+
+        if (cancel) {
+            Integer delFlag = messageAdminVo.getDelFlag();
+            if (delFlag != null && delFlag.equals(MessageContants.DEL_FLAG_DELETE)) {
+                messageAdminMongo.update(messageAdminVo);
+                return true;
+            }
+
+            String msg = JSON.toJSONString(messageAdminVo);
+            messageSender.send(msg);
+            messageAdminMongo.update(messageAdminVo);
+            return true;
+        }
+        LOGGER.error("===========取消定时任务出错！===========messageId-->" + QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+        throw QuanhuException.busiError("取消定时任务出错！messageId-->" + QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+    }
+
+    @Override
+    public MessageAdminVo findOne(MessageAdminDto messageAdminDto) {
+        return messageAdminMongo.findOne(messageAdminDto);
+    }
 }

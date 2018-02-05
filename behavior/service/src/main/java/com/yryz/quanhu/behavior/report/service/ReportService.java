@@ -3,6 +3,7 @@ package com.yryz.quanhu.behavior.report.service;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.behavior.report.dto.ReportDTO;
 import com.yryz.quanhu.behavior.report.entity.Report;
+import com.yryz.quanhu.behavior.report.vo.ReportVoForAdmin;
 
 /**
  * @Author:sun
@@ -12,7 +13,7 @@ import com.yryz.quanhu.behavior.report.entity.Report;
  */
 public interface ReportService {
 
-    PageList<Report> queryReportForAdmin(ReportDTO reportDTO);
+    PageList<ReportVoForAdmin> queryReportForAdmin(ReportDTO reportDTO);
 
     int accretion(Report report);
 

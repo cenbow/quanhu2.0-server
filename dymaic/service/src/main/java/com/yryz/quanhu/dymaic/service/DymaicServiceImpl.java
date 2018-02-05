@@ -8,6 +8,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.behavior.transmit.api.TransmitApi;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import com.yryz.quanhu.dymaic.dao.redis.DymaicCache;
 import com.yryz.quanhu.dymaic.dto.QueryDymaicDTO;
@@ -60,6 +61,9 @@ public class DymaicServiceImpl {
     @Reference
     private CountApi countApi;
 
+    @Reference
+    private TransmitApi transmitApi;
+
     @Autowired
     private SortIdHelper sortIdHelper;
 
@@ -103,9 +107,14 @@ public class DymaicServiceImpl {
             return true;
         }
 
-        dymaic.setDelFlag(STATUS_OFF);
+        //删除转发
+        Long transmitId = dymaic.getTransmitId();
+        if (transmitId != null && transmitId > 0) {
+            transmitApi.removeTransmit(transmitId);
+        }
 
         //write db
+        dymaic.setDelFlag(STATUS_OFF);
         dymaicDao.update(dymaic);
 
         //update cache
@@ -276,7 +285,9 @@ public class DymaicServiceImpl {
      */
     public List<DymaicVo> getTimeLine(Long userId, Long kid, Long limit) {
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
-        logger.info("[dymaic] getTimeLine dymaicId " + (kids == null ? 0 : kids.size()) + ", userId " + userId);
+        if (logger.isDebugEnabled()) {
+            logger.info("[dymaic] getTimeLine dymaicId " + (kids == null ? 0 : kids.size()) + ", userId " + userId);
+        }
 
         List<DymaicVo> result;
         if (kids == null || kids.isEmpty()) {
@@ -419,7 +430,7 @@ public class DymaicServiceImpl {
             vo.setUser(userSimpleVO);
 
             //评论数，点赞数，转发数, ignore exception
-            vo.setStatistics(invokeStatics(kid));
+            vo.setStatistics(invokeStatics(kid,userId));
         }
 
         return vo;
@@ -470,7 +481,7 @@ public class DymaicServiceImpl {
                     }
 
                     //评论数，点赞数，转发数, ignore exception
-                    vo.setStatistics(invokeStatics(kid));
+                    vo.setStatistics(invokeStatics(kid, userId));
 
                     result.add(vo);
                 }
@@ -510,11 +521,11 @@ public class DymaicServiceImpl {
      * @param kid
      * @return
      */
-    private Map<String, Long> invokeStatics(Long kid) {
+    private Map<String, Long> invokeStatics(Long kid, Long userId) {
         Map<String, Long> statistics = null;
         try {
             String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-            statistics = countApi.getCount(countType, kid, null).getData();
+            statistics = countApi.getCountFlag(countType, kid, null, userId).getData();
         } catch (Exception e) {
             logger.warn("cannot get statics cause: " + e.getMessage());
         }

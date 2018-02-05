@@ -8,6 +8,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.rongzhong.component.pay.api.YryzPaySDK;
 import com.rongzhong.component.pay.entity.PayResponse;
 import com.rongzhong.component.pay.iospay.IosVerify;
@@ -28,8 +29,10 @@ import com.yryz.quanhu.openapi.service.PayService;
 import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
+import com.yryz.quanhu.order.enums.OrderPayConstants;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.vo.*;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import com.yryz.quanhu.user.service.UserApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -70,6 +73,9 @@ public class OrderController {
 
 	@Autowired
 	private PayService payService;
+
+	@Reference
+	private BasicConfigApi basicConfigApi;
 
 	/**
 	 * 设置支付密码
@@ -218,57 +224,46 @@ public class OrderController {
 		if (cost == null || cost.intValue() < 100 || cost % 100 != 0) {
 			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
 		}
-		try {
-			String orderId = payService.getOrderId();
-			OrderInfo orderInfo = new OrderInfo();
-			orderInfo.setCustId(userId);
-			orderInfo.setCost(cost);
-			orderInfo.setOrderDesc(OrderDescEnum.ACCOUNT_EXCHANGE);
-			orderInfo.setOrderId(orderId);
-			orderInfo.setOrderType(3);
-			orderInfo.setProductDesc(ProductEnum.INTEGRAL_2_ACCOUNT.getDesc());
-			orderInfo.setProductId(ProductEnum.INTEGRAL_2_ACCOUNT.getType() + "");
-			orderInfo.setProductType(ProductEnum.INTEGRAL_2_ACCOUNT.getType());
-			orderInfo.setType(3);
+		String orderId = payService.getOrderId();
+		OrderInfo orderInfo = new OrderInfo();
+		orderInfo.setCustId(userId);
+		orderInfo.setCost(cost);
+		orderInfo.setOrderDesc(OrderDescEnum.ACCOUNT_EXCHANGE);
+		orderInfo.setOrderId(orderId);
+		orderInfo.setOrderType(0);
+		orderInfo.setProductDesc(ProductEnum.INTEGRAL_2_ACCOUNT.getDesc());
+		orderInfo.setProductId(ProductEnum.INTEGRAL_2_ACCOUNT.getType() + "");
+		orderInfo.setProductType(ProductEnum.INTEGRAL_2_ACCOUNT.getType());
+		orderInfo.setType(3);
 
-			AccountOrder accountOrder = new AccountOrder();
-			accountOrder.setCost(cost);
-			accountOrder.setCustId(userId);
-			accountOrder.setOrderDesc(OrderDescEnum.ACCOUNT_EXCHANGE);
-			accountOrder.setOrderId(orderId);
-			accountOrder.setOrderType(1);
-			accountOrder.setProductDesc(ProductEnum.INTEGRAL_2_ACCOUNT.getDesc());
-			accountOrder.setProductId(ProductEnum.INTEGRAL_2_ACCOUNT.getType() + "");
-			accountOrder.setProductType(ProductEnum.INTEGRAL_2_ACCOUNT.getType());
-			List<AccountOrder> accounts = new ArrayList<>();
-			accounts.add(accountOrder);
+		AccountOrder accountOrder = new AccountOrder();
+		accountOrder.setCost(cost);
+		accountOrder.setCustId(userId);
+		accountOrder.setOrderDesc(OrderDescEnum.ACCOUNT_EXCHANGE);
+		accountOrder.setOrderId(orderId);
+		accountOrder.setOrderType(1);
+		accountOrder.setProductDesc(ProductEnum.INTEGRAL_2_ACCOUNT.getDesc());
+		accountOrder.setProductId(ProductEnum.INTEGRAL_2_ACCOUNT.getType() + "");
+		accountOrder.setProductType(ProductEnum.INTEGRAL_2_ACCOUNT.getType());
+		List<AccountOrder> accounts = new ArrayList<>();
+		accounts.add(accountOrder);
 
-			IntegralOrder integralOrder = new IntegralOrder();
-			integralOrder.setCost(cost);
-			integralOrder.setCustId(userId);
-			integralOrder.setOrderDesc(OrderDescEnum.INTEGRAL_EXCHANGE);
-			integralOrder.setOrderId(orderId);
-			integralOrder.setOrderType(0);
-			integralOrder.setProductDesc(ProductEnum.INTEGRAL_2_ACCOUNT.getDesc());
-			integralOrder.setProductId(ProductEnum.INTEGRAL_2_ACCOUNT.getType() + "");
-			integralOrder.setProductType(ProductEnum.INTEGRAL_2_ACCOUNT.getType());
-			List<IntegralOrder> integrals = new ArrayList<>();
-			integrals.add(integralOrder);
-			try {
-				Response<?> return1 = orderApi.executeOrder(orderInfo, accounts, integrals, userId, payPassword, null);
-				if (return1.success()) {
-//					pushService.pointToAccount(userId, cost,appId);
-					return ResponseUtils.returnSuccess();
-				} else {
-					return ResponseUtils.returnCommonException("兑换失败，请检查余额后重试");
-				}
-			} catch (Exception e) {
-				return ResponseUtils.returnCommonException("资金RPC，executeOrder调用异常");
-			}
-		} catch (Exception e) {
-			logger.error("积分兑换失败", e);
-			return ResponseUtils.returnCommonException("密码输入错误或者余额不足");
-		}
+		IntegralOrder integralOrder = new IntegralOrder();
+		integralOrder.setCost(cost);
+		integralOrder.setCustId(userId);
+		integralOrder.setOrderDesc(OrderDescEnum.INTEGRAL_EXCHANGE);
+		integralOrder.setOrderId(orderId);
+		integralOrder.setOrderType(0);
+		integralOrder.setProductDesc(ProductEnum.INTEGRAL_2_ACCOUNT.getDesc());
+		integralOrder.setProductId(ProductEnum.INTEGRAL_2_ACCOUNT.getType() + "");
+		integralOrder.setProductType(ProductEnum.INTEGRAL_2_ACCOUNT.getType());
+		List<IntegralOrder> integrals = new ArrayList<>();
+		integrals.add(integralOrder);
+		Response<?> response =  orderApi.executeOrder(orderInfo, accounts, integrals, userId, payPassword, null);
+//		if(response.success()){
+//			pushService.pointToAccount(userId, cost,appId);
+//		}
+		return response;
 	}
     
     /**
@@ -308,6 +303,17 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("账户不存在");
 		}
 	}
+
+	private WithdrawCashConfig getWithdrawCashConfig(){
+		WithdrawCashConfig withdrawCashConfig = new WithdrawCashConfig();
+		try {
+			String value = ResponseUtils.getResponseData(basicConfigApi.getValue("account.nopass.pay"));
+			withdrawCashConfig = JSON.parseObject(value,WithdrawCashConfig.class);
+		}catch (Exception e){
+			logger.error("获取资金-提现配置失败", e);
+		}
+		return withdrawCashConfig;
+	}
     
     /**
      * 用户提现
@@ -323,7 +329,6 @@ public class OrderController {
 	@UserBehaviorValidation(login = true)
     @PostMapping(value = "/{version}/pay/getCash")
 	public Response<?> getCash(@RequestHeader String appId, @RequestHeader String userId, @RequestBody GetCashDTO getCashDTO) {
-		// return ReturnCodeUtils.getWarnResult(ActEnums.GET_CASH, "资金系统正在维护中");
     	String cost = getCashDTO.getCost();
     	String cust2BankId = getCashDTO.getCust2BankId();
     	String payPassword = getCashDTO.getPayPassword();
@@ -349,15 +354,12 @@ public class OrderController {
 		if (DateUtils.checkBetween(new Date(), "23:00", "9:00")) {
 			return ResponseUtils.returnCommonException("提现系统维护中，23:00-9:00 是系统维护时间");
 		}
-
-		try {
-			return payService.getCash(appId , userId, cost, cust2BankId, payPassword);
-		} catch (RpcOptException e) {
-			return ResponseUtils.returnCommonException(e.getMessage());
-		} catch (Exception e) {
-			logger.error("getCash未知异常", e);
-			return ResponseUtils.returnCommonException("账户不存在");
+		//添加提现控制开关
+		WithdrawCashConfig withdrawCashConfig = getWithdrawCashConfig();
+		if(WithdrawCashConfig.NOT_ALLOWED == withdrawCashConfig.getAllowFlag()){
+			return ResponseUtils.returnCommonException(withdrawCashConfig.getMsg());
 		}
+		return payService.getCash(appId , userId, cost, cust2BankId, payPassword);
 	}
 	
     /**
@@ -627,8 +629,7 @@ public class OrderController {
 
 		String ipAddress = WebUtil.getClientIP(request);
 		long fee = DataEnum.countFee(payWay, orderAmount);
-		PayVO payVO = payService.getNewPayFlowId(userId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
-		return ResponseUtils.returnObjectSuccess(payVO);
+		return payService.getNewPayFlowId(userId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
 	}
 	
     /**
@@ -644,7 +645,6 @@ public class OrderController {
     	logger.info("receive alipayNotify");
 		PayResponse payResp = null;
 		try {
-			// payResp = Alipay.parsePayResult(request);
 			payResp = YryzPaySDK.parseAliPayResult(request);
 		} catch (Exception e) {
 			logger.error("alipayNotify faild ", e);
@@ -656,15 +656,18 @@ public class OrderController {
 		if (payResp.getResult() == PayResponse.SUCCESS || payResp.getResult() == PayResponse.FAILURE) {
 			System.out.println("支付宝回调成功");
 
-			int orderState = 2;
+			int orderState = OrderPayConstants.OrderState.FAILURE;
 			if (payResp.getResult() == PayResponse.SUCCESS) {
-				orderState = 1;
+				orderState = OrderPayConstants.OrderState.SUCCESS;
 			}
-			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_ALIPAY, orderState);
-
-			response.getWriter().write("success");
+			Response<?> payResponse = payService.completePayInfo(payResp, OrderConstant.PAY_WAY_ALIPAY, orderState);
+			if(payResponse.success()){
+				response.getWriter().write("success");
+			}else {
+				response.getWriter().write("failure");
+			}
 		}
-		// logger.info("支付宝回调结束");
+		logger.info("支付宝回调结束");
 	}
     
     /**
@@ -680,7 +683,6 @@ public class OrderController {
 		logger.info("receive wxpayNotify...");
 		PayResponse payResp = null;
 		try {
-			// payResp = Wxpay.parsePayResult(request);
 			payResp = YryzPaySDK.parseWxPayResult(request);
 		} catch (Exception e) {
 			logger.error("wxpayNotify faild ", e);
@@ -690,13 +692,18 @@ public class OrderController {
 		}
 		logger.info("收到微信回调并解析成功，结果为：" + payResp);
 		if (payResp.getResult() == PayResponse.SUCCESS || payResp.getResult() == PayResponse.FAILURE) {
-			int orderState = 2;
+			int orderState = OrderPayConstants.OrderState.FAILURE;
 			if (payResp.getResult() == PayResponse.SUCCESS) {
-				orderState = 1;
+				orderState = OrderPayConstants.OrderState.SUCCESS;
 			}
-			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_WXPAY, orderState);
-			response.getWriter().write(Wxpay.buildReturnXML("SUCCESS", "OK"));
-			response.getWriter().flush();
+			Response<?> payResponse = payService.completePayInfo(payResp, OrderConstant.PAY_WAY_WXPAY, orderState);
+			if(payResponse.success()){
+				response.getWriter().write(Wxpay.buildReturnXML("SUCCESS", "OK"));
+				response.getWriter().flush();
+			}else{
+				response.getWriter().write("wxpayNotify faild ");
+				response.getWriter().flush();
+			}
 		}
     }
     
@@ -865,12 +872,11 @@ public class OrderController {
 			payResp.setPayAmount(payAmount);
 			int orderState = 1;
 			payResp.setEndDesc(receipt);
-			payService.completePayInfo(payResp, OrderConstant.PAY_WAY_IOS_IAP, orderState);
+			return payService.completePayInfo(payResp, OrderConstant.PAY_WAY_IOS_IAP, orderState);
 		} catch (Exception e) {
 			logger.error("苹果内购验证失败", e);
-			return ResponseUtils.returnCommonException("验证苹果服务失败");
+			return ResponseUtils.returnException(e);
 		}
-		return ResponseUtils.returnSuccess();
 	}
     
     /**

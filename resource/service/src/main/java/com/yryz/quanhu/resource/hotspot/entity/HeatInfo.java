@@ -180,8 +180,8 @@ public class HeatInfo {
 	}
 	
 	public Long countCommonHeat(){
-		
-		return initHeat + behaviorHeat - 100 * getCount();
+		attenuation = 100L * getCount();
+		return initHeat + behaviorHeat - attenuation;
 	}
 	
 	/**

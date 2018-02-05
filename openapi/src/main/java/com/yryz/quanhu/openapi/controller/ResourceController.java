@@ -7,6 +7,13 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
 import com.yryz.common.annotation.UserBehaviorValidation;
@@ -19,10 +26,10 @@ import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
 
 /**
  * @author yehao
@@ -81,11 +88,12 @@ public class ResourceController {
         return ResponseUtils.returnObjectSuccess(pageList);
     }
 
-    //    @UserBehaviorValidation(login = true)
-    @ApiOperation("我的发布")
+    @UserBehaviorValidation(login = true)
+    @ApiOperation("我的发布/他人个人主页发布")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/myRelease")
-    public Response<PageList<ResourceVo>> myRelease(@RequestHeader Long userId, @RequestParam Integer currentPage, @RequestParam Integer pageSize) {
+    public Response<PageList<ResourceVo>> myRelease(@RequestParam Long userId, @RequestParam Integer currentPage,
+            @RequestParam Integer pageSize) {
         int start = 0;
         if (pageSize == null) {
             pageSize = 10;
@@ -101,7 +109,8 @@ public class ResourceController {
         resourceVo.setUserId(userId);
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);
-        pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
+        pageList.setEntities(ResponseUtils
+                .getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
         pageList.setPageSize(pageSize);
         return ResponseUtils.returnObjectSuccess(pageList);
     }

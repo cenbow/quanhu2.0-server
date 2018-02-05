@@ -1,12 +1,35 @@
 package com.yryz.quanhu.user.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.BOTH_BLACK;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FANS;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FOLLOW;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FRIEND;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FROM_BLACK;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.NONE;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.TO_BLACK;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.PageModel;
-import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dao.UserRelationCacheDao;
 import com.yryz.quanhu.user.dao.UserRelationDao;
@@ -16,25 +39,10 @@ import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.dto.UserRelationRemarkDto;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserStarAuth;
-import com.yryz.quanhu.user.provider.UserRelationProvider;
 import com.yryz.quanhu.user.service.UserRelationService;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarService;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-
-import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.*;
-import static com.yryz.quanhu.user.entity.UserStarAuth.StarAuditStatus.AUDIT_SUCCESS;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.

@@ -162,6 +162,32 @@ public class MessageAdminVo implements Serializable{
      */
     private Integer delFlag;
 
+    /**
+     * 推送人数
+     */
+    private Long pushNumber;
+
+    /**
+     * 最后更新人名字
+     */
+    private String lastUpdateUserName;
+
+    public String getLastUpdateUserName() {
+        return lastUpdateUserName;
+    }
+
+    public void setLastUpdateUserName(String lastUpdateUserName) {
+        this.lastUpdateUserName = lastUpdateUserName;
+    }
+
+    public Long getPushNumber() {
+        return pushNumber;
+    }
+
+    public void setPushNumber(Long pushNumber) {
+        this.pushNumber = pushNumber;
+    }
+
     public Integer getDelFlag() {
         return delFlag;
     }

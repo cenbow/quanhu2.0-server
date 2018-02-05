@@ -11,6 +11,8 @@ import java.io.Serializable;
 
 import org.springframework.context.annotation.Configuration;
 
+import com.yryz.common.utils.JsonUtils;
+
 /**
  * 认证配置
  * @author danshiyu
@@ -34,9 +36,9 @@ public class AuthConfig implements Serializable{
 	private Integer refreshExpire = 30;
 	
 	/**
-	 * refreshToken
+	 * refreshToken过期时间后延条件的时间点，即距离refreshExpire过期前的时间范围/小时
 	 */
-	private Integer refreshTokenDelayExpireTime = 1;
+	private Integer refreshTokenDelayExpireTime = 24;
 	public Integer getWebTokenExpire() {
 		return webTokenExpire;
 	}
@@ -54,6 +56,12 @@ public class AuthConfig implements Serializable{
 	}
 	public void setRefreshExpire(Integer refreshExpire) {
 		this.refreshExpire = refreshExpire;
+	}
+	public Integer getRefreshTokenDelayExpireTime() {
+		return refreshTokenDelayExpireTime;
+	}
+	public void setRefreshTokenDelayExpireTime(Integer refreshTokenDelayExpireTime) {
+		this.refreshTokenDelayExpireTime = refreshTokenDelayExpireTime;
 	}
 	/**
 	 * 
@@ -79,4 +87,5 @@ public class AuthConfig implements Serializable{
 		return "AuthConfig [webTokenExpire=" + webTokenExpire + ", tokenExpire=" + tokenExpire + ", refreshExpire="
 				+ refreshExpire + "]";
 	}
+
 }

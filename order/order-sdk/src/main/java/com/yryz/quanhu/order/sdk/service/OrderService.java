@@ -22,6 +22,7 @@ import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.sdk.entity.Order;
 import com.yryz.quanhu.order.vo.OrderInfo;
 import com.yryz.quanhu.order.vo.PreOrderVo;
+import com.yryz.quanhu.order.vo.UserAccount;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -160,11 +161,10 @@ public class OrderService implements OrderSDK {
         Long orderId = Long.valueOf(orderIdResponse.getData());
         PreOrderVo orderVo = orderEnum.getOrder(orderId, Long.valueOf(AccountEnum.SYSID), toId, cost);
         Response<?> response = orderApi.executeOrder(orderVo.getOrderInfo(), orderVo.getAccounts(), orderVo.getIntegrals(), null, null, null);
-        if (null != response && response.success()) {
+        if (response.success()) {
             return orderId;
         }
-        throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
-                ExceptionEnum.BusiException.getShowMsg(), response == null ? "execute order error" : response.getErrorMsg());
+        throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getErrorMsg());
     }
 
     private void check(InputOrder inputOrder) {
@@ -218,6 +218,15 @@ public class OrderService implements OrderSDK {
             }
         }
         return success;
+    }
+
+    @Override
+    public UserAccount getUserAccount(Long userId) {
+        Response<UserAccount> response = orderApi.getUserAccount(String.valueOf(userId));
+        if (response.success()) {
+            return response.getData();
+        }
+        return null;
     }
 
 }

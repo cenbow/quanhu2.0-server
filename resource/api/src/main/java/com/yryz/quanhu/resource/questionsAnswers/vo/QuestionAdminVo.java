@@ -53,6 +53,8 @@ public class QuestionAdminVo implements Serializable {
 
     private Long createUserId;
 
+    private Byte orderFlag;
+
     @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
@@ -221,5 +223,13 @@ public class QuestionAdminVo implements Serializable {
 
     public void setCreateUserId(Long createUserId) {
         this.createUserId = createUserId;
+    }
+
+    public Byte getOrderFlag() {
+        return orderFlag;
+    }
+
+    public void setOrderFlag(Byte orderFlag) {
+        this.orderFlag = orderFlag;
     }
 }

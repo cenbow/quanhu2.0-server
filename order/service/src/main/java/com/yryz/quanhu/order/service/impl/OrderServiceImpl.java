@@ -15,8 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.exception.RpcOptException;
+import com.yryz.common.response.PageList;
+import com.yryz.common.utils.*;
+import com.yryz.quanhu.order.enums.*;
+import com.yryz.quanhu.order.vo.*;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +35,6 @@ import com.github.pagehelper.PageHelper;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.common.utils.IdGen;
-import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.common.EventManager;
 import com.yryz.quanhu.order.common.QuanhuMessage;
 import com.yryz.quanhu.order.dao.persistence.RrzOrderCust2bankDao;
@@ -46,11 +50,6 @@ import com.yryz.quanhu.order.entity.RrzOrderPayHistory;
 import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
 import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
 import com.yryz.quanhu.order.entity.RrzOrderVO;
-import com.yryz.quanhu.order.enums.AccountEnum;
-import com.yryz.quanhu.order.enums.OrderConstant;
-import com.yryz.quanhu.order.enums.OrderDescEnum;
-import com.yryz.quanhu.order.enums.OrderMsgEnum;
-import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.exception.CommonException;
 import com.yryz.quanhu.order.exception.SourceNotEnoughException;
 import com.yryz.quanhu.order.notify.MQCallBack;
@@ -62,7 +61,6 @@ import com.yryz.quanhu.order.service.UserAccountService;
 import com.yryz.quanhu.order.service.UserPhyService;
 import com.yryz.quanhu.order.utils.CollectionUtils;
 import com.yryz.quanhu.order.utils.Page;
-import com.yryz.quanhu.order.vo.PayInfo;
 
 /**
  * @author yehao
@@ -108,11 +106,25 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private RrzOrderInfoRedis rrzOrderInfoRedis;
+
+	@Reference
+	private BasicConfigApi basicConfigApi;
 	
-	@Autowired
-	private NotifyQueue notifyQueue;
+//	@Autowired
+//	private NotifyQueue notifyQueue;
 	
 	private static final int SAVE_LIMIT = 5;
+
+	private NopassPayConfig getNopassPayConfig(){
+		NopassPayConfig nopassPayConfig = new NopassPayConfig();
+		try {
+			String value = ResponseUtils.getResponseData(basicConfigApi.getValue("account.nopass.pay"));
+			nopassPayConfig = JSON.parseObject(value,NopassPayConfig.class);
+		}catch (Exception e){
+			logger.error("获取资金-免密支付配置失败", e);
+		}
+		return nopassPayConfig;
+	}
 
 	/**
 	 * 执行订单。
@@ -123,27 +135,33 @@ public class OrderServiceImpl implements OrderService {
 	 * @param payPassword 支付密码,选填，不填则不校验
 	 * @param remark
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#executeOrder(com.yryz.service.order.modules.order.entity.RrzOrderInfo, java.util.List, java.util.List, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public Response<?> executeOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts,
+	public void executeOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts,
 			List<RrzOrderIntegralHistory> integrals, String custId, String payPassword, String remark) {
 		if(StringUtils.isNotEmpty(custId)){
 			RrzOrderUserAccount account = userAccountService.getUserAccount(custId);
 			if (account == null){
-				return ResponseUtils.returnException(new CommonException("账户不存在或者系统异常"));
+				throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+						ExceptionEnum.BusiException.getShowMsg(),"账户不存在或者系统异常");
 			}
-			if (account.getAccountState().intValue() == 0){
-				return ResponseUtils.returnException(new CommonException("账户被冻结"));
+			if (account.getAccountState() == 0){
+				throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "账户被冻结","账户被冻结");
 			}
-			if ((account.getSmallNopass().intValue() == 0
-					|| account.getSmallNopass().intValue() == 1 && orderInfo.getCost().longValue() > 50000)
+			NopassPayConfig nopassPayConfig = getNopassPayConfig();
+			if ((account.getSmallNopass() == 0
+					|| account.getSmallNopass() == 1 && orderInfo.getCost() > nopassPayConfig.getMaxAmount())
 					&& StringUtils.isEmpty(payPassword)){
-				return ResponseUtils.returnException(new CommonException("支付密码为空"));
+				if(orderInfo.getCost() > nopassPayConfig.getMaxAmount()){
+					throw new QuanhuException(ExceptionEnum.BusiException.getCode(), nopassPayConfig.getMsg(),nopassPayConfig.getMsg());
+				}
+				else{
+					throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "支付密码不能为空", "支付密码不能为空");
+				}
 			}
-			Response<?> return1 = userPhyService.checkPayPassword(custId, payPassword);
-			if (!return1.success()) {
-				return return1;
+			Response<?> checkResponse = userPhyService.checkPayPassword(custId, payPassword);
+			if (!checkResponse.success()) {
+				throw new QuanhuException(checkResponse.getCode(), checkResponse.getMsg(),checkResponse.getErrorMsg());
 			}
 		}
 		// 先检查是否存在余额不足的问题
@@ -153,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
 				for (RrzOrderAccountHistory rrzOrderAccountHistory : accounts) {
 					String orderCustId = rrzOrderAccountHistory.getCustId();
 					RrzOrderUserAccount rrzOrderUserAccount = userAccountService.getUserAccount(orderCustId);
-					if(rrzOrderAccountHistory.getOrderType().intValue() == 1){
+					if(rrzOrderAccountHistory.getOrderType() == 1){
 						rrzOrderAccountHistory.setAccountSum(rrzOrderUserAccount.getAccountSum() + rrzOrderAccountHistory.getCost());
 					} else {
 						rrzOrderAccountHistory.setAccountSum(rrzOrderUserAccount.getAccountSum() - rrzOrderAccountHistory.getCost());
@@ -167,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
 				for (RrzOrderIntegralHistory rrzOrderIntegralHistory : integrals) {
 					String orderCustId = rrzOrderIntegralHistory.getCustId();
 					RrzOrderUserAccount rrzOrderUserAccount = userAccountService.getUserAccount(orderCustId);
-					if(rrzOrderIntegralHistory.getOrderType().intValue() == 1){
+					if(rrzOrderIntegralHistory.getOrderType() == 1){
 						rrzOrderIntegralHistory.setAccountSum(rrzOrderUserAccount.getIntegralSum() + rrzOrderIntegralHistory.getCost());
 					} else {
 						rrzOrderIntegralHistory.setAccountSum(rrzOrderUserAccount.getIntegralSum() - rrzOrderIntegralHistory.getCost());
@@ -180,12 +198,7 @@ public class OrderServiceImpl implements OrderService {
 				RrzOrderInfo orderInfo2 = rrzOrderInfoDao.getForUpdate(orderInfo.getOrderId());
 				try {
 					// 如果订单已存在，则不用再次更新。
-					if (orderInfo2 == null) { 
-						// --
-						// create
-						// by
-						// yehao
-						// 2017-4-11
+					if (orderInfo2 == null) {
 						orderInfo.setCreateTime(new Date());
 						// 默认设置消费类型为 用户消费账户金额
 						if (orderInfo.getConsumeType() == null){
@@ -194,13 +207,14 @@ public class OrderServiceImpl implements OrderService {
 						orderInfo.setOrderState(RrzOrderInfo.ORDER_STATE_ON);
 						rrzOrderInfoDao.insert(orderInfo);
 					} else {
-						int orderState = orderInfo2.getOrderState() == null ? 0 : orderInfo2.getOrderState().intValue();
+						int orderState = orderInfo2.getOrderState() == null ? 0 : orderInfo2.getOrderState();
 						if(orderState == RrzOrderInfo.ORDER_STATE_ON){
-							throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"该订单已经处理","该订单已经处理");
+							throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "该订单已经处理","该订单已经处理");
 						}
 						if(!StringUtils.equals(orderInfo2.getCustId(), orderInfo.getCustId()) ||  
 								!StringUtils.equals(orderInfo2.getOrderId(), orderInfo.getOrderId())){
-							throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"新旧订单信息不一致","新旧订单信息不一致");
+							throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+									ExceptionEnum.BusiException.getShowMsg(), "新旧订单信息不一致");
 						}
 						orderInfo2.setOrderState(RrzOrderInfo.ORDER_STATE_ON);
 					}
@@ -212,14 +226,13 @@ public class OrderServiceImpl implements OrderService {
 				
 			}
 			
-			
 			//处理账户余额
 			// 处理消费账户余额
 			if (CollectionUtils.isNotEmpty(accounts)) { 
 				for (RrzOrderAccountHistory rrzOrderAccountHistory : accounts) {
 					String orderCustId = rrzOrderAccountHistory.getCustId();
 					userAccountService.optAccountSource(orderCustId,
-							rrzOrderAccountHistory.getCost().longValue(), rrzOrderAccountHistory.getOrderType());
+							rrzOrderAccountHistory.getCost(), rrzOrderAccountHistory.getOrderType());
 				}
 			}
 			// 处理积分账户余额
@@ -227,20 +240,19 @@ public class OrderServiceImpl implements OrderService {
 				for (RrzOrderIntegralHistory rrzOrderIntegralHistory : integrals) {
 					String orderCustId = rrzOrderIntegralHistory.getCustId();
 					userAccountService.optIntegralSource(orderCustId,
-							rrzOrderIntegralHistory.getCost().longValue(), rrzOrderIntegralHistory.getOrderType());
+							rrzOrderIntegralHistory.getCost(), rrzOrderIntegralHistory.getOrderType());
 				}
 			}
 			
 		} else {
 			// 已经检查过余额不足的话，就直接返回结果
-			return ResponseUtils.returnCommonException(OrderMsgEnum.NOT_ENOUGH.getMsg());
-//			throw new SourceNotEnoughException(OrderMsgEnum.NOT_ENOUGH.getMsg());
+			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+					OrderMsgEnum.NOT_ENOUGH.getMsg(), OrderMsgEnum.NOT_ENOUGH.getMsg());
 		}
 		//如果是退款订单，则发送推销消息
-		if(orderInfo.getProductType().intValue() == ProductEnum.CASH_REFUND.getType()){ 
+		if(null != orderInfo && orderInfo.getProductType() == ProductEnum.CASH_REFUND.getType()){
 			quanhuMessage.sendMessage(MessageConstant.CASH_REFUND, orderInfo.getCustId(), orderInfo.getCost().toString());
 		}
-		return ResponseUtils.returnSuccess();
 	}
 
 	/**
@@ -254,17 +266,17 @@ public class OrderServiceImpl implements OrderService {
 		}
 		Map<String, Long> map = new HashMap<String, Long>(1);
 		for (RrzOrderAccountHistory rrzOrderAccountHistory : orders) {
-			long cost = rrzOrderAccountHistory.getCost().longValue();
+			long cost = rrzOrderAccountHistory.getCost();
 			if(cost < 0) {
 				return false;
 			}
 			String custId = rrzOrderAccountHistory.getCustId();
 			long count = map.get(custId) == null ? 0 : map.get(custId);
 			// 如果是消费，则累计消费需要增加
-			if (rrzOrderAccountHistory.getOrderType().intValue() == 0) { 
-				count = count - rrzOrderAccountHistory.getCost().longValue();
+			if (rrzOrderAccountHistory.getOrderType() == 0) {
+				count = count - rrzOrderAccountHistory.getCost();
 			} else {
-				count = count + rrzOrderAccountHistory.getCost().longValue();
+				count = count + rrzOrderAccountHistory.getCost();
 			}
 			map.put(custId, count);
 		}
@@ -279,10 +291,10 @@ public class OrderServiceImpl implements OrderService {
 				return false;
 			}
 			// 如果是扣费，且账户异常状态，也直接返回失败
-			if (map.get(custId) < 0 && rrzOrderUserAccount.getAccountState().intValue() == 0) { 
+			if (map.get(custId) < 0 && rrzOrderUserAccount.getAccountState() == 0) {
 				return false;
 			}
-			if ((rrzOrderUserAccount.getAccountSum().longValue() + map.get(custId)) < 0) {
+			if ((rrzOrderUserAccount.getAccountSum() + map.get(custId)) < 0) {
 				return false;
 			}
 		}
@@ -301,16 +313,16 @@ public class OrderServiceImpl implements OrderService {
 		}
 		Map<String, Long> map = new HashMap<String, Long>(1);
 		for (RrzOrderIntegralHistory rrzOrderIntegralHistory : orders) {
-			long cost = rrzOrderIntegralHistory.getCost().longValue();
+			long cost = rrzOrderIntegralHistory.getCost();
 			if(cost < 0) {
 				return false;
 			}
 			String custId = rrzOrderIntegralHistory.getCustId();
 			long count = map.get(custId) == null ? 0 : map.get(custId);
-			if (rrzOrderIntegralHistory.getOrderType().intValue() == 0) {
-				count = count - rrzOrderIntegralHistory.getCost().longValue();
+			if (rrzOrderIntegralHistory.getOrderType() == 0) {
+				count = count - rrzOrderIntegralHistory.getCost();
 			} else {
-				count = count + rrzOrderIntegralHistory.getCost().longValue();
+				count = count + rrzOrderIntegralHistory.getCost();
 			}
 			// 计算好的余额存入缓存
 			map.put(custId, count); 
@@ -327,10 +339,10 @@ public class OrderServiceImpl implements OrderService {
 				return false;
 			}
 			// 如果是扣费，且账户异常状态，也直接返回失败
-			if (map.get(custId) < 0 && rrzOrderUserAccount.getAccountState().intValue() == 0) { 
+			if (map.get(custId) < 0 && rrzOrderUserAccount.getAccountState() == 0) {
 				return false;
 			}
-			if ((rrzOrderUserAccount.getIntegralSum().longValue() + map.get(custId)) < 0) {
+			if ((rrzOrderUserAccount.getIntegralSum() + map.get(custId)) < 0) {
 				return false;
 			}
 		}
@@ -338,18 +350,19 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public RrzOrderPayInfo executePayInfo(RrzOrderPayInfo rrzOrderPayInfo, String custId, String payPassword,
-			String remark) {
-		if (!userPhyService.checkPayPassword(custId, payPassword).success()){
-			return null;
+	public RrzOrderPayInfo executePayInfo(RrzOrderPayInfo rrzOrderPayInfo, String custId, String payPassword, String remark) {
+		Response<?> checkResponse = userPhyService.checkPayPassword(custId, payPassword);
+		if (!checkResponse.success()){
+			throw new QuanhuException(checkResponse.getCode(),checkResponse.getMsg(),checkResponse.getErrorMsg());
 		}
-		boolean flag = true;
 		RrzOrderPayInfo orderPayInfo = rrzOrderPayInfoDao.get(rrzOrderPayInfo.getOrderId());
 		// 检查此订单是否已经被执行过。
 		if (orderPayInfo != null && orderPayInfo.getOrderState() != null
-				&& orderPayInfo.getOrderState().intValue() == 1) {
-			logger.info("this order has been excuted ... payInfo : " + rrzOrderPayInfo );
-			return null;
+				&& orderPayInfo.getOrderState().equals(rrzOrderPayInfo.getOrderState())) {
+			logger.info("this order has been excuted ... payInfo : " + JSON.toJSONString(rrzOrderPayInfo));
+			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+					ExceptionEnum.BusiException.getShowMsg(),
+					"this order has been excuted ... payInfo : " + JSON.toJSONString(rrzOrderPayInfo) );
 		}
 		// 执行充值订单信息保存操作
 		if (orderPayInfo == null) { 
@@ -368,31 +381,81 @@ public class OrderServiceImpl implements OrderService {
 			rrzOrderPayInfoDao.update(orderPayInfo);
 		}
 
-		if (orderPayInfo.getOrderState() != null && orderPayInfo.getOrderState() != null
-				&& orderPayInfo.getOrderState().intValue() == 1) {// 生效订单则须执行订单
-			// 如果是苹果支付，则需要验证金额,由于苹果的订单无校验
-			if (OrderConstant.PAY_WAY_IOS_IAP.equals(orderPayInfo.getOrderChannel())) { 
-				// 屏蔽苹果安全校验
-				// if(rrzOrderPayInfo.getCost().longValue() !=
-				// orderPayInfo.getCost().longValue()){
-				// System.out.println("苹果支付数据不对：苹果金额：" +
-				// rrzOrderPayInfo.getCost() + "实际金额：" +
-				// orderPayInfo.getCost());
-				// return null;
-				// }
+		// 生效订单则须执行订单
+		if (null != orderPayInfo.getOrderState()) {
+			//提现
+			if(OrderPayConstants.OrderType.WITHDRAW_CASH.equals(orderPayInfo.getOrderType())){
+				if(OrderPayConstants.OrderState.CREATE.equals(orderPayInfo.getOrderState())){
+ 					if (orderPayInfo.getProductType() == ProductEnum.CASH_TYPE.getType()) {
+ 						//执行提现订单
+						executeCashOrder(orderPayInfo);
+					}
+				}else if(OrderPayConstants.OrderState.FAILURE.equals(orderPayInfo.getOrderState())){
+					if (orderPayInfo.getProductType() == ProductEnum.CASH_TYPE.getType()) {
+						//执行提现退款订单
+						executeCashRefundOrder(orderPayInfo);
+					}
+				}
 			}
-			// 如果是生效订单，则执行订单的相关资金交割
-			int productType = orderPayInfo.getProductType();
-			if (productType == ProductEnum.RECHARGE_TYPE.getType()) {
-				flag = executeRechargeOrder(orderPayInfo);
-			} else if (productType == ProductEnum.CASH_TYPE.getType()) {
-				flag = executeCashOrder(orderPayInfo);
+			//充值
+			else if(OrderPayConstants.OrderType.RECHARGE.equals(orderPayInfo.getOrderType())){
+				if(OrderPayConstants.OrderState.SUCCESS.equals(orderPayInfo.getOrderState())){
+					// 如果是苹果支付，则需要验证金额,由于苹果的订单无校验
+//					if (OrderConstant.PAY_WAY_IOS_IAP.equals(orderPayInfo.getOrderChannel())) {
+						// 屏蔽苹果安全校验
+						// if(rrzOrderPayInfo.getCost().longValue() !=
+						// orderPayInfo.getCost().longValue()){
+						// System.out.println("苹果支付数据不对：苹果金额：" +
+						// rrzOrderPayInfo.getCost() + "实际金额：" +
+						// orderPayInfo.getCost());
+						// return null;
+						// }
+//					}
+					// 如果是生效订单，则执行订单的相关资金交割
+					if (orderPayInfo.getProductType() == ProductEnum.RECHARGE_TYPE.getType()) {
+						//执行充值订单
+						executeRechargeOrder(orderPayInfo);
+					}
+				}
 			}
-		}
-		if (!flag) {
-			throw new CommonException("订单执行失败，请检查账户余额是否充足");
 		}
 		return orderPayInfo;
+	}
+
+	/**
+	 * 执行提现退款
+	 * @param rrzOrderPayInfo
+	 */
+	private void executeCashRefundOrder(RrzOrderPayInfo rrzOrderPayInfo) {
+		logger.info("开始执行提现退款，rrzOrderPayInfo={}",JSON.toJSONString(rrzOrderPayInfo));
+		// 执行资金变动
+		RrzOrderInfo orderInfo = new RrzOrderInfo();
+		orderInfo.setCost(rrzOrderPayInfo.getCostTrue());
+		if (StringUtils.isNotEmpty(rrzOrderPayInfo.getCustId())){
+			orderInfo.setCustId(rrzOrderPayInfo.getCustId());
+		}
+		orderInfo.setOrderDesc(OrderDescEnum.INTEGRAL_CASH_REFUND);
+		orderInfo.setOrderId(rrzOrderPayInfo.getOrderId());
+		orderInfo.setOrderType(1);
+		orderInfo.setProductDesc(ProductEnum.CASH_REFUND.getDesc());
+		orderInfo.setProductId(ProductEnum.CASH_REFUND.getType() + "");
+		orderInfo.setProductType(ProductEnum.CASH_REFUND.getType());
+		orderInfo.setType(2);
+		orderInfo.setCreateTime(new Date());
+
+		RrzOrderIntegralHistory orderIntegralHistory = new RrzOrderIntegralHistory();
+		orderIntegralHistory.setCost(rrzOrderPayInfo.getCostTrue());
+		orderIntegralHistory.setCustId(rrzOrderPayInfo.getCustId());
+		orderIntegralHistory.setOrderDesc(OrderDescEnum.INTEGRAL_CASH_REFUND);
+		orderIntegralHistory.setOrderId(rrzOrderPayInfo.getOrderId());
+		orderIntegralHistory.setOrderType(1);
+		orderIntegralHistory.setProductDesc(ProductEnum.CASH_REFUND.getDesc());
+		orderIntegralHistory.setProductId(ProductEnum.CASH_REFUND.getType() + "");
+		orderIntegralHistory.setProductType(ProductEnum.CASH_REFUND.getType());
+		List<RrzOrderIntegralHistory> integrals = new ArrayList<>();
+		integrals.add(orderIntegralHistory);
+		executeOrder(orderInfo, null, integrals, null, null, null);
+		logger.info("执行提现退款完成");
 	}
 
 	/**
@@ -402,7 +465,7 @@ public class OrderServiceImpl implements OrderService {
 	 * 
 	 * @param rrzOrderPayInfo
 	 */
-	public boolean executeRechargeOrder(RrzOrderPayInfo rrzOrderPayInfo) {
+	private void executeRechargeOrder(RrzOrderPayInfo rrzOrderPayInfo) {
 		// 执行资金变动
 		RrzOrderInfo orderInfo = new RrzOrderInfo();
 		orderInfo.setCost(rrzOrderPayInfo.getCostTrue());
@@ -429,36 +492,31 @@ public class OrderServiceImpl implements OrderService {
 		orderAccountHistory.setProductType(ProductEnum.RECHARGE_TYPE.getType());
 		List<RrzOrderAccountHistory> list = new ArrayList<>();
 		list.add(orderAccountHistory);
-		Response<?> return1 = executeOrder(orderInfo, list, null, null, null, null);
-		if (return1.success()) {
-			// 增加进账记录
-			RrzOrderPayHistory orderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
-					RrzOrderPayHistory.class);
-			orderPayHistory.setHistoryId(IdGen.uuid());
-			orderPayHistory.setCreateTime(new Date());
-			orderPayHistory.setOrderType(1);
-			rrzOrderPayHistoryDao.insert(orderPayHistory);
+		//执行订单
+		executeOrder(orderInfo, list, null, null, null, null);
+		// 增加进账记录
+		RrzOrderPayHistory orderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
+				RrzOrderPayHistory.class);
+		orderPayHistory.setHistoryId(IdGen.uuid());
+		orderPayHistory.setCreateTime(new Date());
+		orderPayHistory.setOrderType(1);
+		rrzOrderPayHistoryDao.insert(orderPayHistory);
 
-			// 增加手续费出账记录
-			RrzOrderPayHistory feeOrderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
-					RrzOrderPayHistory.class);
-			feeOrderPayHistory.setCostTrue(rrzOrderPayInfo.getCostFee());
-			feeOrderPayHistory.setOrderType(0);
-			feeOrderPayHistory.setCreateTime(new Date());
-			feeOrderPayHistory.setOrderDesc(OrderDescEnum.ACCOUNT_FEE);
-			feeOrderPayHistory.setProductDesc(ProductEnum.FEE_TYPE.getDesc());
-			feeOrderPayHistory.setProductId(ProductEnum.FEE_TYPE.getType() + "");
-			feeOrderPayHistory.setProductType(ProductEnum.FEE_TYPE.getType());
-			feeOrderPayHistory.setHistoryId(IdGen.uuid());
-			rrzOrderPayHistoryDao.insert(feeOrderPayHistory);
-			//提交事件
-			eventManager.commitRecharge(rrzOrderPayInfo.getCustId(),rrzOrderPayInfo.getCostTrue());
-			quanhuMessage.sendMessage(MessageConstant.RECHARGE, rrzOrderPayInfo.getCustId(), "" + rrzOrderPayInfo.getCost());
-			return true;
-		} else {
-			return false;
-		}
-
+		// 增加手续费出账记录
+		RrzOrderPayHistory feeOrderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
+				RrzOrderPayHistory.class);
+		feeOrderPayHistory.setCostTrue(rrzOrderPayInfo.getCostFee());
+		feeOrderPayHistory.setOrderType(0);
+		feeOrderPayHistory.setCreateTime(new Date());
+		feeOrderPayHistory.setOrderDesc(OrderDescEnum.ACCOUNT_FEE);
+		feeOrderPayHistory.setProductDesc(ProductEnum.FEE_TYPE.getDesc());
+		feeOrderPayHistory.setProductId(ProductEnum.FEE_TYPE.getType() + "");
+		feeOrderPayHistory.setProductType(ProductEnum.FEE_TYPE.getType());
+		feeOrderPayHistory.setHistoryId(IdGen.uuid());
+		rrzOrderPayHistoryDao.insert(feeOrderPayHistory);
+		//提交事件
+		eventManager.commitRecharge(rrzOrderPayInfo.getCustId(),rrzOrderPayInfo.getCostTrue());
+		quanhuMessage.sendMessage(MessageConstant.RECHARGE, rrzOrderPayInfo.getCustId(), "" + rrzOrderPayInfo.getCost());
 	}
 
 	/**
@@ -468,8 +526,7 @@ public class OrderServiceImpl implements OrderService {
 	 * 
 	 * @param rrzOrderPayInfo
 	 */
-	public boolean executeCashOrder(RrzOrderPayInfo rrzOrderPayInfo) {
-
+	private void executeCashOrder(RrzOrderPayInfo rrzOrderPayInfo) {
 		// 执行资金变动
 		RrzOrderInfo orderInfo = new RrzOrderInfo();
 		orderInfo.setCost(rrzOrderPayInfo.getCostTrue());
@@ -507,34 +564,29 @@ public class OrderServiceImpl implements OrderService {
 		feeFrderIntegralHistory.setProductId(ProductEnum.FEE_CASH_TYPE.getType() + "");
 		feeFrderIntegralHistory.setProductType(ProductEnum.FEE_CASH_TYPE.getType());
 		list.add(feeFrderIntegralHistory);
-		Response<?> return1 = executeOrder(orderInfo, null, list, null, null, null);
+		//执行订单
+		executeOrder(orderInfo, null, list, null, null, null);
+		// 增加出账记录
+		RrzOrderPayHistory orderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
+				RrzOrderPayHistory.class);
+		orderPayHistory.setCreateTime(new Date());
+		orderPayHistory.setOrderType(0);
+		orderPayHistory.setHistoryId(IdGen.uuid());
+		rrzOrderPayHistoryDao.insert(orderPayHistory);
 
-		if (return1.success()) {
-			// 增加出账记录
-			RrzOrderPayHistory orderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
-					RrzOrderPayHistory.class);
-			orderPayHistory.setCreateTime(new Date());
-			orderPayHistory.setOrderType(0);
-			orderPayHistory.setHistoryId(IdGen.uuid());
-			rrzOrderPayHistoryDao.insert(orderPayHistory);
-
-			// 增加出账记录
-			RrzOrderPayHistory feeOrderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
-					RrzOrderPayHistory.class);
-			feeOrderPayHistory.setCostTrue(rrzOrderPayInfo.getCostFee());
-			feeOrderPayHistory.setOrderType(0);
-			feeOrderPayHistory.setCreateTime(new Date());
-			feeOrderPayHistory.setOrderDesc(OrderDescEnum.INTEGRAL_CASH_FEE);
-			feeOrderPayHistory.setProductDesc(ProductEnum.FEE_CASH_TYPE.getDesc());
-			feeOrderPayHistory.setProductId(ProductEnum.FEE_CASH_TYPE.getType() + "");
-			feeOrderPayHistory.setProductType(ProductEnum.FEE_CASH_TYPE.getType());
-			feeOrderPayHistory.setHistoryId(IdGen.uuid());
-			rrzOrderPayHistoryDao.insert(feeOrderPayHistory);
-			quanhuMessage.sendMessage(MessageConstant.CASH, rrzOrderPayInfo.getCustId(), rrzOrderPayInfo.getCost() + "");
-			return true;
-		} else {
-			return false;
-		}
+		// 增加出账记录
+		RrzOrderPayHistory feeOrderPayHistory = (RrzOrderPayHistory) GsonUtils.parseObj(rrzOrderPayInfo,
+				RrzOrderPayHistory.class);
+		feeOrderPayHistory.setCostTrue(rrzOrderPayInfo.getCostFee());
+		feeOrderPayHistory.setOrderType(0);
+		feeOrderPayHistory.setCreateTime(new Date());
+		feeOrderPayHistory.setOrderDesc(OrderDescEnum.INTEGRAL_CASH_FEE);
+		feeOrderPayHistory.setProductDesc(ProductEnum.FEE_CASH_TYPE.getDesc());
+		feeOrderPayHistory.setProductId(ProductEnum.FEE_CASH_TYPE.getType() + "");
+		feeOrderPayHistory.setProductType(ProductEnum.FEE_CASH_TYPE.getType());
+		feeOrderPayHistory.setHistoryId(IdGen.uuid());
+		rrzOrderPayHistoryDao.insert(feeOrderPayHistory);
+		quanhuMessage.sendMessage(MessageConstant.CASH, rrzOrderPayInfo.getCustId(), rrzOrderPayInfo.getCost() + "");
 	}
 
 	@Override
@@ -655,7 +707,6 @@ public class OrderServiceImpl implements OrderService {
 	 * @param orderInfo
 	 * @param accounts
 	 * @param integrals
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#refreshOrder(com.yryz.service.order.modules.order.entity.RrzOrderInfo, java.util.List, java.util.List)
 	 */
 	@Override
 	public void refreshOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts,
@@ -685,7 +736,6 @@ public class OrderServiceImpl implements OrderService {
 	/**
 	 * 更新资金用户缓存，回滚数据库与redis关系
 	 * @param payInfo
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#refreshPay(com.yryz.service.api.order.entity.PayInfo)
 	 */
 	@Override
 	public void refreshPay(PayInfo payInfo) {
@@ -696,6 +746,23 @@ public class OrderServiceImpl implements OrderService {
 		}
 	}
 
+	@Override
+	public RrzOrderPayInfo getPayInfo(String orderId) {
+		return rrzOrderPayInfoDao.get(orderId);
+	}
+
+	@Override
+	public PageList<RrzOrderPayInfo> getWithdrawCashPage(WithdrawCashDto withdrawCashDto) {
+		com.github.pagehelper.Page<RrzOrderPayInfo> page = PageHelper.startPage(withdrawCashDto.getCurrentPage(),
+				withdrawCashDto.getPageSize());
+		PageList<RrzOrderPayInfo> pageList = new PageList<>();
+		pageList.setCurrentPage(withdrawCashDto.getCurrentPage());
+		pageList.setPageSize(withdrawCashDto.getPageSize());
+		pageList.setEntities(rrzOrderPayInfoDao.getWithdrawCashList(withdrawCashDto));
+		pageList.setCount(page.getTotal());
+		return pageList;
+	}
+
 	/**
 	 * 获取现金流水列表
 	 * @param custId
@@ -704,10 +771,9 @@ public class OrderServiceImpl implements OrderService {
 	 * @param start
 	 * @param limit
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#getPayInfo(java.lang.String, java.lang.String, java.lang.String, long, long)
 	 */
 	@Override
-	public List<RrzOrderPayInfo> getPayInfo(String custId, String date, String orderId, long start, long limit) {
+	public List<RrzOrderPayInfo> getPayInfoList(String custId, String date, String orderId, long start, long limit) {
 		if (logger.isDebugEnabled()) {
 			logger.info("getPayInfo,custId:" + custId + "-date:" + date + "-start:" + start + "-limit:" + limit);
 		}
@@ -728,7 +794,6 @@ public class OrderServiceImpl implements OrderService {
 	 * @param pageNo
 	 * @param pageSize
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#getPayInfoWeb(java.lang.String, java.lang.String, java.lang.String, int, int)
 	 */
 	@Override
 	public Page<RrzOrderPayInfo> getPayInfoWeb(String custId, String date, String orderId, int pageNo, int pageSize) {
@@ -757,7 +822,6 @@ public class OrderServiceImpl implements OrderService {
 	 * 创建预处理订单
 	 * @param orderVO
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#createOrder(com.yryz.service.order.modules.order.entity.RrzOrderVO)
 	 */
 	@Override
 	public RrzOrderVO createOrder(RrzOrderVO orderVO) {
@@ -802,30 +866,24 @@ public class OrderServiceImpl implements OrderService {
 	 * @param custId
 	 * @param password
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#executeOrder(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public Response<?> executeOrder(String orderId, String custId, String password) {
+	public void executeOrder(String orderId, String custId, String password) {
 		RrzOrderVO orderVO = rrzOrderInfoRedis.getOrderVO(orderId);
 		if(orderVO == null){
-			return ResponseUtils.returnException(new CommonException("无此订单信息或者订单已经执行"));
+			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
+					ExceptionEnum.BusiException.getShowMsg(), "无此订单信息或者订单已经执行");
 		}
-		Response<?> return1 = executeOrder(orderVO.getOrderInfo(), orderVO.getAccounts(), orderVO.getIntegrals(), custId, password, null);
-		if(return1 != null && return1.success()){
+		executeOrder(orderVO.getOrderInfo(), orderVO.getAccounts(), orderVO.getIntegrals(), custId, password, null);
 //			notifyQueue.addOrderInfoNotify(orderVO.getOrderInfo());
 			//使用MQ后，这里可以直接发送MQ队列即可
 			MQCallBack.doSend(orderVO.getOrderInfo().getCallback(), GsonUtils.parseJson(orderVO.getOrderInfo()));
-		} else {
-			logger.warn("订单处理失败...orderId: " + orderId + "-custId:" + custId + "-password" + password);
-		}
-		return return1;
 	}
 
 	/**
 	 * 获取订单详情
 	 * @param orderId
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.IOrderService#getOrderInfo(java.lang.String)
 	 */
 	@Override
 	public RrzOrderInfo getOrderInfo(String orderId) {

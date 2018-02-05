@@ -1,5 +1,18 @@
 package com.yryz.quanhu.resource.release.buyrecord.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Sets;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -18,18 +31,6 @@ import com.yryz.quanhu.resource.release.buyrecord.service.ReleaseBuyRecordServic
 import com.yryz.quanhu.resource.release.buyrecord.vo.ReleaseBuyRecordVo;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
-import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Sets;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -115,6 +116,22 @@ public class ReleaseBuyRecordServiceImpl implements ReleaseBuyRecordService {
             }
         }
         pageList.setEntities(resultList);
+        return pageList;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public PageList<ReleaseBuyRecord> pageByCondition(ReleaseBuyRecordDto releaseBuyRecordDto, boolean isCount) {
+        //创建返回值对象
+        PageList<ReleaseBuyRecord> pageList = new PageList<>();
+        pageList.setCurrentPage(releaseBuyRecordDto.getCurrentPage());
+        pageList.setPageSize(releaseBuyRecordDto.getPageSize());
+        //组装分页
+        Page page = PageHelper.startPage(releaseBuyRecordDto.getCurrentPage(), releaseBuyRecordDto.getPageSize(),
+                isCount);
+        List<ReleaseBuyRecord> list = releaseBuyRecordDao.selectByCondition(releaseBuyRecordDto);
+        pageList.setEntities(list);
+        pageList.setCount(page.getTotal());
         return pageList;
     }
 }

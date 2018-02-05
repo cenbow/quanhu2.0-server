@@ -7,6 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.context.Context;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.DateUtils;
@@ -18,9 +19,11 @@ import com.yryz.quanhu.other.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.other.activity.dto.*;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.entity.ActivityVoteDetail;
+import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService;
 import com.yryz.quanhu.other.activity.vo.*;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
@@ -28,6 +31,7 @@ import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -40,7 +44,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -73,19 +80,62 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
     ScoreAPI scoreAPI;
     @Reference(check=false)
     ResourceDymaicApi resourceDymaicApi;
+    @Reference(check = false)
+    private AccountApi accountApi;
+    @Reference(check=false)
+    ResourceApi resourceApi;
+
+    @Autowired
+    ActivityVoteRedisService activityVoteRedisService;
     /**
      * 增加票数
      */
     @Override
     public Integer addVote(Long id, Integer count) {
-
-        return activityParticipationDao.updateAddVote(id, count);
+        AdminActivityVoteDetailVo adminActivityVoteDetailVo = activityParticipationDao.selectByPrimaryKey(id);
+        Integer act = activityParticipationDao.updateAddVote(id, count);
+        if (act == 1){
+            activityVoteRedisService.vote(adminActivityVoteDetailVo.getActivityInfoId(),id, count-adminActivityVoteDetailVo.getAddVote());
+        }
+        return act;
     }
 
     @Override
     public Integer updateStatus(Long id, Byte status) {
+        Integer count = activityParticipationDao.updateStatus(id, status);
+        if(count==1){
+            AdminActivityVoteDetailVo adminActivityVoteDetailVo = activityParticipationDao.selectByPrimaryKey(id);
+            ActivityVoteConfig config = activityVoteConfigDao.selectVoteByActivityInfoId(adminActivityVoteDetailVo.getActivityInfoId());
 
-        return activityParticipationDao.updateStatus(id, status);
+            if(status==10){
+              /*  //增加已参与人数
+                int flag = activityInfoDao.updateJoinCount(adminActivityVoteDetailVo.getActivityInfoId(), config.getUserNum());
+                if(flag == 0) {
+                    throw QuanhuException.busiError("参加人数已满,无法上架");
+                }*/
+                //资源提交
+                AdminActivityInfoVo1 adminActivityInfoVo1 = activityInfoDao.selectByPrimaryKey(adminActivityVoteDetailVo.getActivityInfoId());
+                this.commitResource(adminActivityVoteDetailVo,adminActivityInfoVo1);
+                activityVoteRedisService.shelvesCandidate(adminActivityVoteDetailVo.getActivityInfoId(),
+                        adminActivityVoteDetailVo.getKid(),adminActivityVoteDetailVo.getId(),
+                        Long.valueOf(adminActivityVoteDetailVo.getVoteCount()+adminActivityVoteDetailVo.getAddVote()),
+                        null);
+            }else if (status==11){
+               /* //减少已参与人数
+                int flag = activityInfoDao.updateJoinCountDiff(adminActivityVoteDetailVo.getActivityInfoId());
+                if(flag == 0) {
+                    throw QuanhuException.busiError("参加人数减少异常,无法上架");
+                }*/
+                //资源删除
+                try {
+                    resourceApi.deleteResourceById(String.valueOf(adminActivityVoteDetailVo.getKid()));
+                } catch (Exception e) {
+                    logger.error("资源删除失败");
+                }
+                activityVoteRedisService.remCandidate(adminActivityVoteDetailVo.getActivityInfoId(),adminActivityVoteDetailVo.getKid());
+            }
+        }
+        return count;
     }
 
     /**
@@ -320,29 +370,42 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         return pageList;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public String saveVoteDetail(AdminActivityVoteDetailDto voteDetailDto) {
-
+        Response<Boolean> rpc = null;
+        try {
+            rpc = accountApi.checkUserDisTalk(voteDetailDto.getCreateUserId());
+        } catch (Exception e) {
+            logger.error("查询禁言异常",e);
+            throw new QuanhuException("","","查询禁言异常");
+        }
+        if(!rpc.success()||rpc.getData()){
+            throw new QuanhuException("","","该用户已被平台管理员禁言，不允许操作");
+        }
+        AdminActivityInfoVo1 adminActivityInfoVo1 = activityInfoDao.selectByPrimaryKey(voteDetailDto.getActivityInfoId());
+        ActivityVoteConfig config = activityVoteConfigDao.selectVoteByActivityInfoId(voteDetailDto.getActivityInfoId());
+        //增加已参与人数
+        int flag = activityInfoDao.updateJoinCount(voteDetailDto.getActivityInfoId(), config.getUserNum());
+        if(flag == 0) {
+            throw QuanhuException.busiError("参加人数已满");
+        }
         //在一个活动里一个用户只能参与一次
         List<AdminActivityVoteDetailVo> voteDetailVos = activityParticipationDao.selectByParam(voteDetailDto);
-
         if ( ! CollectionUtils.isEmpty(voteDetailVos)) {
            return "此用户已参加此次活动，不能重复参加活动" ;
         }
-
-        Integer voteNo = activityParticipationDao.maxId(voteDetailDto.getActivityInfoId());
-
+        /*Integer voteNo = activityParticipationDao.maxId(voteDetailDto.getActivityInfoId());
         if (voteNo == null) {
             voteNo = 0;
-        }
+        }*/
         voteDetailDto.setKid(idApi.getSnowflakeId().getData());
         //maxId
-        voteDetailDto.setVoteNo(voteNo + 1);
+        voteDetailDto.setVoteNo(activityVoteRedisService.getMaxVoteNo(voteDetailDto.getActivityInfoId()).intValue());
         voteDetailDto.setModuleEnum(ModuleContants.ACTIVITY_WORKS_ENUM);
-        AdminActivityInfoVo1 adminActivityInfoVo1 = activityInfoDao.selectByPrimaryKey(voteDetailDto.getActivityInfoId());
-        ActivityVoteConfig config = activityVoteConfigDao.selectVoteByActivityInfoId(voteDetailDto.getActivityInfoId());
         voteDetailDto.setObtainIntegral(config.getAmount());
         voteDetailDto.setAddVote(0);
         activityParticipationDao.insertByPrimaryKeySelective(voteDetailDto);
+        activityVoteRedisService.addCandidate(voteDetailDto.getActivityInfoId(),voteDetailDto.getKid(),voteDetailDto.getId(),0L);
         if(config.getAmount()!=0){
             try {
                 scoreAPI.addScore(voteDetailDto.getCreateUserId().toString(), config.getAmount().intValue(), EventEnum.ADD_SCORE.getCode());
@@ -353,20 +416,16 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         commitResource(voteDetailDto, adminActivityInfoVo1);
 		return null;
     }
-    private void commitResource(AdminActivityVoteDetailDto voteDetail,AdminActivityInfoVo1 activityInfo) {
+    private void commitResource(ActivityVoteDetail activityVoteDetail,AdminActivityInfoVo1 activityInfo) {
         try {
-            ActivityVoteDetail activityVoteDetail = new ActivityVoteDetail();
-            BeanUtilsBean.getInstance().getConvertUtils().register(new SqlDateConverter(null), Date.class);
-            BeanUtils.copyProperties(activityVoteDetail, voteDetail);
             ResourceTotal resourceTotal = new ResourceTotal();
-            resourceTotal.setContent(voteDetail.getContent());
+            resourceTotal.setContent(activityVoteDetail.getContent());
             resourceTotal.setCreateDate(DateUtils.getString(new Date()));
             resourceTotal.setExtJson(JsonUtils.toFastJson(activityVoteDetail));
-            resourceTotal.setModuleEnum(new Integer(voteDetail.getModuleEnum()));
+            resourceTotal.setModuleEnum(new Integer(activityVoteDetail.getModuleEnum()));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-            resourceTotal.setResourceId(voteDetail.getKid());
-
-            Response<UserSimpleVO> userSimple = userApi.getUserSimple(voteDetail.getCreateUserId());
+            resourceTotal.setResourceId(activityVoteDetail.getKid());
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(activityVoteDetail.getCreateUserId());
             if(userSimple.success()
                     && userSimple.getData() != null
                     && userSimple.getData().getUserRole() != null) {
@@ -374,15 +433,10 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             }
 
             resourceTotal.setTitle(activityInfo.getTitle());
-            resourceTotal.setUserId(voteDetail.getCreateUserId());
+            resourceTotal.setUserId(activityVoteDetail.getCreateUserId());
             resourceDymaicApi.commitResourceDymaic(resourceTotal);
         } catch (Exception e) {
             logger.error("资源聚合 接入异常！", e);
         }
 	}
-
-	/*@Override
-    public List<CircleInfo> circleList() {
-        return circleAPI.getCircleList(null, null);
-    }*/
 }

@@ -154,7 +154,7 @@ public interface AccountApi {
 	 * @return
 	 * @Description
 	 */
-	public Response<String> webLoginThird(String loginType, String returnUrl);
+	public Response<String> webLoginThird(String loginType, String returnUrl,String appId);
 	
 	/**
 	 * (web)第三方登录回调

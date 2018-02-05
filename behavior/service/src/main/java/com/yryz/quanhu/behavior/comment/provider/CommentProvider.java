@@ -264,7 +264,11 @@ public class CommentProvider implements CommentApi {
         if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
             AnswerVo answerVo = answerApi.getDetail(comment.getResourceId()).getData();
             CommentAssemble commentAssembleAnswer = new CommentAssemble();
-            commentAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
+            if(null!=answerVo&&answerVo.getContent().length()>20){
+                commentAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
+            }else{
+                commentAssembleAnswer.setTitle(answerVo.getContent());
+            }
             commentAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
             commentAssembleAnswer.setLink("");
             commentAssembleAnswer.setContent(nickName + "评论了您的问题。");
@@ -306,7 +310,12 @@ public class CommentProvider implements CommentApi {
                     String img = getImgFirstUrl(topicPostVo.getImgUrl());
                     commentAssemble.setImg(img);
                 }
-                commentAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
+                if(null!=topicPostVo&&topicPostVo.getContent().length()>20){
+                    commentAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
+                }else{
+                    commentAssemble.setTitle(topicPostVo.getContent());
+                }
+
             }
             if (contentType != 0) {
                 commentAssemble.setViewCode((byte) 1);

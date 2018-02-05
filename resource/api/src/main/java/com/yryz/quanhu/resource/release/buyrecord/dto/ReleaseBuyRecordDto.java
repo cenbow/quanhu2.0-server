@@ -1,8 +1,8 @@
 package com.yryz.quanhu.resource.release.buyrecord.dto;
 
-import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -20,10 +20,20 @@ public class ReleaseBuyRecordDto implements Serializable {
     //私圈ID
     private Long coterieId;
     //页码
-    private Integer currentPage;
+    private Integer currentPage = 1;
     //每页条数
-    private Integer pageSize;
+    private Integer pageSize = 20;
 
+    /**  
+    * @Fields beginDate : 开始日期
+    */
+    private String beginDate;
+
+    /**  
+    * @Fields endDate : 结束日期
+    */
+    private String endDate;
+    
     public Long getUserId() {
         return userId;
     }
@@ -54,5 +64,21 @@ public class ReleaseBuyRecordDto implements Serializable {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public String getBeginDate() {
+        return beginDate;
+    }
+
+    public void setBeginDate(String beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }

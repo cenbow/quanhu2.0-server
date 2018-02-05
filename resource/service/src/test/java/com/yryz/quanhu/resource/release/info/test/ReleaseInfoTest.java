@@ -87,6 +87,8 @@ public class ReleaseInfoTest {
     @Test
     public void test004() throws JsonProcessingException {
         ReleaseInfoDto dto = new ReleaseInfoDto();
+        // 只查询 平台文章
+        dto.setCoterieId(0L);
         // dto.setCoterieId(5259149661L);
         System.out.println(new ObjectMapper()
                 .writeValueAsString(releaseInfoApi.pageByCondition(dto, 727909974996672512L, false, true)));

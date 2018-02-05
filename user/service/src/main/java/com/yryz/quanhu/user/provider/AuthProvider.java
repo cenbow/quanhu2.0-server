@@ -45,7 +45,7 @@ public class AuthProvider implements AuthApi {
 		try {
 			checkParam(tokenDTO);
 			if (StringUtils.isBlank(tokenDTO.getToken())) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"token不能为空");
+				throw QuanhuException.busiError("token不能为空");
 			}
 			return ResponseUtils.returnObjectSuccess(authService.checkToken(tokenDTO).getStatus());
 		} catch (RedisOptException e) {
@@ -108,15 +108,22 @@ public class AuthProvider implements AuthApi {
 		try {
 			checkParam(refreshDTO);
 			if (StringUtils.isBlank(refreshDTO.getToken())) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"token不能为空");
+				throw QuanhuException.busiError("token不能为空");
 			}
 			if (StringUtils.isBlank(refreshDTO.getRefreshToken())) {
-				throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"refreshToken不能为空");
+				throw QuanhuException.busiError("refreshToken不能为空");
 			}
 			TokenCheckEnum checkEnum = authService.checkToken(refreshDTO);
 			if (checkEnum != TokenCheckEnum.EXPIRE && checkEnum != TokenCheckEnum.SUCCESS) {
 				throw QuanhuException.busiError("登录状态不合法不允许刷新token");
 			}
+			
+			//刷新不通过直接返回
+			boolean refreshFlag = authService.checkRefreshFlag(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
+			if(!refreshFlag){
+				return ResponseUtils.returnObjectSuccess(new AuthTokenVO(false));
+			}
+			
 			refreshDTO.setRefreshTokenFlag(true);
 			return ResponseUtils.returnObjectSuccess(authService.getToken(refreshDTO));
 		} catch (RedisOptException e) {
@@ -131,13 +138,13 @@ public class AuthProvider implements AuthApi {
 
 	private void checkParam(AuthTokenDTO tokenDTO) {
 		if (tokenDTO == null || StringUtils.isBlank(tokenDTO.getAppId())) {
-			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"appId不能为空");
+			throw QuanhuException.busiError("appId不能为空");
 		}
 		if (tokenDTO.getUserId() == null) {
-			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"userId不能为空");
+			throw QuanhuException.busiError("userId不能为空");
 		}
 		if (tokenDTO.getType() == null) {
-			throw QuanhuException.busiError(ExceptionEnum.PARAM_MISSING.getCode(),"devType不能为空");
+			throw QuanhuException.busiError("devType不能为空");
 		}
 	}
 

@@ -173,13 +173,13 @@ public class AccountServiceImpl implements AccountService {
 		if (account == null) {
 			if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(),
 					SmsType.CODE_REGISTER, appId)) {
-				throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+				throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			return createUser(registerDTO, null);
 		}
 		if (!smsService.checkVerifyCode(registerDTO.getUserPhone(), registerDTO.getVeriCode(), SmsType.CODE_LOGIN,
 				appId)) {
-			throw new QuanhuException(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+			throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
@@ -195,12 +195,12 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId) {
 		if (userId == null) {
-			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 兼容未绑定手机号的老用户
 		UserAccount account = getUserAccountByUserId(userId);
 		if (StringUtils.isBlank(account.getUserPhone())) {
-			throw new QuanhuException(ExceptionEnum.NEED_PHONE);
+			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
@@ -227,7 +227,7 @@ public class AccountServiceImpl implements AccountService {
 			registerDTO.setActivityChannelCode(tempUser.getActivivtyChannelCode());
 			if (StringUtils.isBlank(registerDTO.getRegLogDTO().getActivityChannelCode())){
 				registerDTO.getRegLogDTO().setActivityChannelCode(tempUser.getActivivtyChannelCode());
-				String channelCode = StringUtils.join(new String[]{"WeixinOauth",tempUser.getActivivtyChannelCode()}, " ");
+				String channelCode = StringUtils.join(new String[]{RegType.WEIXIN_OAUTH.getText(),tempUser.getActivivtyChannelCode()}, " ");
 				registerDTO.getRegLogDTO().setChannelCode(channelCode);
 			}
 			//删除活动参与者用户
@@ -255,7 +255,7 @@ public class AccountServiceImpl implements AccountService {
 		if (StringUtils.isNotBlank(account.getUserPhone())) {
 			boolean havePwd = StringUtils.isBlank(account.getUserPwd()) ? false : true;
 			LoginMethodVO methodVO = new LoginMethodVO(account.getKid(), account.getUserPhone(),
-					RegType.PHONE.getType(), havePwd);
+					"",RegType.PHONE.getType(), havePwd);
 			list.add(methodVO);
 		}
 
@@ -281,11 +281,9 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public String webLoginThird(String loginType, String returnUrl) {
+	public String webLoginThird(String loginType, String returnUrl,ThirdLoginConfigVO configVO) {
 		// 得到第三方登录回调的host
 		String apiHost = UserUtils.getReturnApiHost(returnUrl);
-		// 读取配置
-		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
 		if (RegType.SINA.getText().equals(loginType)) {
 			return OatuhWeibo.getAuthUrl(configVO.getWeiboAppKey(), returnUrl, apiHost, configVO.getNotifyUrl());
 		}
@@ -308,11 +306,9 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public String wxOauthLogin(WebThirdLoginDTO loginDTO) {
+	public String wxOauthLogin(WebThirdLoginDTO loginDTO,ThirdLoginConfigVO configVO) {
 		// 得到第三方登录回调的host
 		String apiHost = UserUtils.getReturnOauthApiHost(loginDTO.getReturnUrl());
-		// 读取配置
-		ThirdLoginConfigVO configVO = new ThirdLoginConfigVO();
 		return OatuhWeixin.getWxOauthUrl(configVO.getWxOauthAppKey(), apiHost, loginDTO.getReturnUrl(),
 				loginDTO.getActivityChannelCode(), configVO.getWxOauthNotifyUrl());
 	}

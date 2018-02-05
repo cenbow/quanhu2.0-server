@@ -49,6 +49,7 @@ public class MessageAdminTest {
         messageAdminVo.setCreateTime(DateUtils.getDateTime());
         //messageAdminVo.setPushDate("2018-02-01 14:15:00");
         messageAdminVo.setPushDate(DateUtils.getDateTime());
+        messageAdminVo.setDelFlag(MessageContants.DEL_FLAG_NOT_DELETE);
 
         List<String> list = new ArrayList<>();
         list.add("726907134491074560");

@@ -23,17 +23,17 @@ public enum MessageConstant {
     /**
      * 充值
      */
-    RECHARGE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RECHARGE, "充值成功", "您充值成功，到账消费账户。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    RECHARGE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RECHARGE, "充值成功", "您充值成功，消费账户已到账。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 提现
      */
-    CASH(MessageType.ORDER_TYPE, MessageLabel.ORDER_CASH, "提现成功", "提现成功，提现金额{count}元/点。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
+    CASH(MessageType.ORDER_TYPE, MessageLabel.ORDER_CASH, "提现申请成功", "提现申请成功，申请提现金额{count}元。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
      * 提现退款
      */
-    CASH_REFUND(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "提现退款通知", "由于提现不成功，您的提现金额被退回，退回{count}元。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
+    CASH_REFUND(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "系统退款", "提现失败，您的提现金额被退回，退回{count}元。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
      * 问题待回答
@@ -73,10 +73,14 @@ public enum MessageConstant {
      */
     COMMENT_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您在{count}下发布的评论因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
+
+    POST_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的帖子因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
+
     /**
      * 帖子被圈主删除
      */
     POST_HAVE_DELETE(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_COTERIE, "删除帖子通知", "{someone}删除了你的帖子。", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COTERIE_HOME),
+
 
     /**
      * 话题有新帖子
@@ -129,35 +133,34 @@ public enum MessageConstant {
     JOIN_COTERIE_REWARD(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "私圈奖励", "{name}加入您的私圈，您获得{money}奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
-     *在第三方绑定手机号获得奖励券
+     * 在第三方绑定手机号获得奖励券
      */
-    PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE,MessageLabel.SYSTEM_NOTICE,"投票活动奖励","您已通过活动获得{count1} {count2}张",MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
+    PRIZES_HAVE_POST(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_NOTICE, "投票活动奖励", "您已通过活动获得{count1} {count2}张", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.MYCARD),
 
     /**
      * 转发
-     * */
-    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_TRANSMIT, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+     */
+    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_FORWARD, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 付费参加活动
      */
-    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"参加活动","您成功参与{count}活动，支付{count1}悠然币。",MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+    ACTIVITY_JOIN_POST(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "参加活动", "您成功参与{count}活动，支付{count1}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 打赏消费
      */
-    REWARD_ACCOUNT(MessageType.ORDER_TYPE,MessageLabel.ORDER_PAY,"支付成功","您打赏了一个%s，支付%s悠然币。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
+    REWARD_ACCOUNT(MessageType.ORDER_TYPE, MessageLabel.ORDER_PAY, "支付成功", "您打赏了一个%s，支付%s悠然币。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
      * 被打赏收益
      */
-    REWARD_INTEGRAL(MessageType.ORDER_TYPE,MessageLabel.ORDER_ACCOUNT,"奖励通知","%s打赏了一个%s，您获得%s奖励。",MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
+    REWARD_INTEGRAL(MessageType.ORDER_TYPE, MessageLabel.ORDER_ACCOUNT, "奖励通知", "%s打赏了一个%s，您获得%s奖励。", MessageViewCode.ORDER_PIC_MESSAGE, MessageActionCode.INTEGRAL),
 
     /**
      * 内容下架
      */
-    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE),
-    ;
+    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE);
 
     private Integer type;
 
@@ -172,13 +175,13 @@ public enum MessageConstant {
     private String messageActionCode;
 
     /**
-     * @param type                     一级分类
-     * @param label                    二级分类
-     * @param title                    消息标题
-     * @param content                  消息内容
-     * @param messageViewCode          消息视图码
-     * @param messageActionCode        消息跳转码
-     *                                 详情参见：http://confluence.yryz.com/pages/viewpage.action?pageId=14975116
+     * @param type              一级分类
+     * @param label             二级分类
+     * @param title             消息标题
+     * @param content           消息内容
+     * @param messageViewCode   消息视图码
+     * @param messageActionCode 消息跳转码
+     *                          详情参见：http://confluence.yryz.com/pages/viewpage.action?pageId=14975116
      */
     private MessageConstant(Integer type, Integer label, String title, String content, String messageViewCode, String messageActionCode) {
         this.type = type;

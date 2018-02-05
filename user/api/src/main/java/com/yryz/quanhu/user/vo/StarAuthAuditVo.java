@@ -2,6 +2,9 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * 达人审核参数
  * @author danshiyu
@@ -12,9 +15,10 @@ public class StarAuthAuditVo implements Serializable{
 	/**
 	 * 用户id
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long userId;
 	/**
-	 * 审核状态 0:待审核 1:审核通过 2:审核失败 3:取消认证
+	 * 审核状态 {@link #UserStarContants.StarAuditStatus}
 	 */
 	private Byte auditStatus;
 	
@@ -26,6 +30,10 @@ public class StarAuthAuditVo implements Serializable{
 	 * 操作人
 	 */
 	private String operational;
+	/**
+	 * 应用id
+	 */
+	private String appId;
 	public String getOperational() {
 		return operational;
 	}
@@ -56,6 +64,14 @@ public class StarAuthAuditVo implements Serializable{
 
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 	
 	

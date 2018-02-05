@@ -14,5 +14,5 @@ public interface Question4AdminApi {
 
     Response<PageList<QuestionAdminVo>> queryQuestionAnswerVoList(QuestionDto questionDto);
 
-    Response<Question> queryDetail(Long kid);
+    Response<QuestionAnswerVo> queryDetail(Long kid);
 }

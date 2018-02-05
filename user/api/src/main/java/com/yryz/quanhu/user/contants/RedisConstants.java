@@ -19,6 +19,10 @@ public class RedisConstants {
 	 */
 	public static final String AUTH_TOKEN = "TOKEN";
 	/**
+	 * refreshToken刷新状态
+	 */
+	public static final String AUTH_REFRESH_FLAG = "TOKENREFEF";
+	/**
 	 * 用户账户
 	 */
 	public static final String ACCOUNT_USER = "ACUSER";

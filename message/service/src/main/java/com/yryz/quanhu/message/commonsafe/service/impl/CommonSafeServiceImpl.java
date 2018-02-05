@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.aliyun.jaq.AfsCheckManager;
 import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.constant.IdConstants;
@@ -29,6 +31,8 @@ import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.message.common.constant.ConfigConstants;
+import com.yryz.quanhu.message.common.remote.MessageCommonConfigRemote;
 import com.yryz.quanhu.message.commonsafe.constants.CheckVerifyCodeReturnCode;
 import com.yryz.quanhu.message.commonsafe.constants.CommonServiceType;
 import com.yryz.quanhu.message.commonsafe.constants.RedisConstants;
@@ -66,7 +70,8 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	private IdAPI idApi;
 	@Autowired
 	private VerifyCodeConfigVO configVO;
-
+	@Autowired
+	private MessageCommonConfigRemote configService;
 	@Autowired
 	private VerifyCodeDao persistenceDao;
 
@@ -75,9 +80,16 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	public VerifyCodeVO getVerifyCode(VerifyCodeDTO codeDTO) {
 		String code = null;
 		VerifyStatus status = VerifyStatus.SUCCESS;
+		VerifyCodeConfigVO rangeConfigVo = JSON.parseObject(
+				configService.getConfig(ConfigConstants.VERIFY_CODE_CONFIG_NAME, codeDTO.getAppId()),
+				new TypeReference<VerifyCodeConfigVO>() {
+				});
+		if(rangeConfigVo == null){
+			rangeConfigVo = configVO;
+		}
 		try {
-			status = checkVerifyCodeSendTime(configVO, codeDTO);
-			code = CommonUtils.getRandomNum(configVO.getCodeNum());
+			status = checkVerifyCodeSendTime(rangeConfigVo, codeDTO);
+			code = CommonUtils.getRandomNum(rangeConfigVo.getCodeNum());
 			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(),
 					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
@@ -87,21 +99,21 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			Logger.error("getVerifyCode", e);
 			throw new MysqlOptException(e);
 		}
-		redisDao.saveVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), codeDTO.getServiceCode(), code, configVO);
+		redisDao.saveVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), codeDTO.getServiceCode(), code,
+				rangeConfigVo);
 		// 发送短信验证码
 		if (CommonServiceType.PHONE_VERIFYCODE_SEND.getName().equals(codeDTO.getCommonServiceType())) {
 			Map<String, Object> params = new HashMap<>();
 			params.put("verifyCode", code);
-			params.put("expire", configVO.getNormalCodeExpireTime() / 60);
+			params.put("expire", rangeConfigVo.getNormalCodeExpireTime() / 60);
 			try {
-				smsService.sendSms(
-						new SmsDTO(codeDTO.getVerifyKey(), codeDTO.getAppId(), SmsType.VERIFY_CODE, params));
+				smsService.sendSms(new SmsDTO(codeDTO.getVerifyKey(), codeDTO.getAppId(), SmsType.VERIFY_CODE, params));
 			} catch (Exception e) {
 				Logger.error("短信验证码发送失败", e);
 			}
 		}
 		return new VerifyCodeVO(codeDTO.getServiceCode(), codeDTO.getCommonServiceType(), code, status,
-				DateUtils.addDateSecond(configVO.getNormalCodeExpireTime()));
+				DateUtils.addDateSecond(rangeConfigVo.getNormalCodeExpireTime()));
 	}
 
 	@Override
@@ -273,18 +285,19 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public boolean checkSmsSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
-		//不需要验证码直接成功
+		// 不需要验证码直接成功
 		if ((afsCheckReq == null) && !checkNeedSlipCode(configVO, verifyCodeDTO)) {
 			return true;
 		}
-		//图形码为空直接返回false
+		// 图形码为空直接返回false
 		if (afsCheckReq == null) {
 			return false;
 		}
 
 		String accessKey = Context.getProperty("afs_check_accesskeyid");
 		String accessSecret = Context.getProperty("afs_check_accesssecret");
-		if (org.apache.commons.lang.StringUtils.isBlank(accessKey) || org.apache.commons.lang.StringUtils.isBlank(accessSecret)) {
+		if (org.apache.commons.lang.StringUtils.isBlank(accessKey)
+				|| org.apache.commons.lang.StringUtils.isBlank(accessSecret)) {
 			throw QuanhuException.busiError("未获取到afs_check验证码的配置信息");
 		}
 		AfsCheckManager afsCheckManager = new AfsCheckManager(accessKey, accessSecret);

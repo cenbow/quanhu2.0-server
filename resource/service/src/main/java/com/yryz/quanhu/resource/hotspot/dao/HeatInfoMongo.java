@@ -49,13 +49,13 @@ public class HeatInfoMongo extends AbsBaseMongoDAO<HeatInfo>{
 	
 	public HeatInfo get(String type,String objectId){
 		Query query = new Query();
-		query.addCriteria(Criteria.where("resourceId").is(objectId).andOperator(Criteria.where("type").is(type)));
+		query.addCriteria(Criteria.where("objectId").is(objectId).andOperator(Criteria.where("type").is(type)));
 		return findOne(query);
 	}
 	
 	public HeatInfo update(HeatInfo heatInfo){
 		Query query = new Query();
-		query.addCriteria(Criteria.where("resourceId").is(heatInfo.getObjectId()).andOperator(Criteria.where("type").is(heatInfo.getType())));
+		query.addCriteria(Criteria.where("objectId").is(heatInfo.getObjectId()).andOperator(Criteria.where("type").is(heatInfo.getType())));
 		String obj = GsonUtils.parseJson(heatInfo);
 		JSONObject json = new JSONObject(obj);
 		Set<String> keys = json.keySet();
@@ -63,7 +63,7 @@ public class HeatInfoMongo extends AbsBaseMongoDAO<HeatInfo>{
 		for (String key : keys) {
 			update.set(key, json.get(key));
 		}
-		mongoTemplate.updateMulti(query, update, ResourceModel.class);
+		mongoTemplate.updateMulti(query, update, HeatInfo.class);
 		return get(heatInfo.getType(), heatInfo.getObjectId());
 	}
 	

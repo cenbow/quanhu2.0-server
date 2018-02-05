@@ -3,6 +3,7 @@ package com.yryz.quanhu.other.activity.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.count.api.CountApi;
@@ -15,6 +16,7 @@ import com.yryz.quanhu.other.activity.dto.AdminActivityInfoSignUpDto;
 import com.yryz.quanhu.other.activity.entity.ActivityEnrolConfig;
 import com.yryz.quanhu.other.activity.entity.ActivityInfo;
 import com.yryz.quanhu.other.activity.entity.ActivityInfoAndEnrolConfig;
+import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.AdminActivityEnrolConfigService;
 import com.yryz.quanhu.other.activity.service.AdminActivitySignUpService;
 import com.yryz.quanhu.other.activity.vo.*;
@@ -55,6 +57,10 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 	UserApi userApi;
 	@Reference(check=false)
 	CountApi countApi;
+
+	@Autowired
+	ActivityVoteRedisService activityVoteRedisService;
+
 	private Logger logger = LoggerFactory.getLogger(AdminActivitySignUpServiceImpl.class);
 	
 	/**
@@ -88,7 +94,7 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			BeanUtils.copyProperties(activityEnrolConfig, activityInfoAndEnrolConfig);
 			activityInfo.setKid(idApi.getSnowflakeId().getData());
 			activityInfo.setActivityChannelCode("HD-"+activityInfo.getKid());
-			activityInfo.setModuleEnum(ACTIVITY_ENUM);
+			activityInfo.setModuleEnum(ModuleContants.ACTIVITY_SIGNUP_ENUM);
 			activityInfoDao.insertByPrimaryKeySelective(activityInfo);
 			activityEnrolConfig.setActivityInfoId(activityInfo.getKid());
 			activityEnrolConfig.setKid(idApi.getSnowflakeId().getData());
@@ -309,7 +315,11 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 		if(activityInfo.getShelveFlag()!=null && activityInfo.getShelveFlag()==11 ){
 			activityInfo.setRecommend(10);
 		}
-		return activityInfoDao.update(activityInfo);
+		Integer count = activityInfoDao.update(activityInfo);
+		if(count==1){
+			activityVoteRedisService.delVoteInfo(activityInfo.getKid());
+		}
+		return count;
 	}
 	
 	/**

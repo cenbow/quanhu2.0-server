@@ -5,6 +5,7 @@ package com.yryz.quanhu.user.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author danshiyu
@@ -51,14 +52,17 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String appId;
 	/**
-	 * 用户状态 0-正常 1-禁言 2-冻结 3-注销
+	 * 用户状态 0-正常 1-违规 2-禁言 3-冻结 4-注销
 	 */
 	private Integer userStatus;
 	/**
 	 * 用户角色 10-普通用户 11-达人 
 	 */
 	private Integer userRole;
-
+	/**
+	 * 标签集合
+	 */
+	private Set<Long> tagIds;
 
 	//达人信息
 	/**
@@ -76,7 +80,6 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private Byte auditStatus;
 
-
 	//注册信息
 	/**
 	 * 渠道号
@@ -88,6 +91,41 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 成长级别
 	 */
 	private String growLevel;
+
+	/**
+	 * 申请认证开始时间
+	 */
+	private String applyAuthBeginDate;
+
+	/**
+	 * 申请认证结束时间
+	 */
+	private String applyAuthEndDate;
+
+
+	public String getApplyAuthBeginDate() {
+		return applyAuthBeginDate;
+	}
+
+	public void setApplyAuthBeginDate(String applyAuthBeginDate) {
+		this.applyAuthBeginDate = applyAuthBeginDate;
+	}
+
+	public String getApplyAuthEndDate() {
+		return applyAuthEndDate;
+	}
+
+	public void setApplyAuthEndDate(String applyAuthEndDate) {
+		this.applyAuthEndDate = applyAuthEndDate;
+	}
+
+	public Set<Long> getTagIds() {
+		return tagIds;
+	}
+
+	public void setTagIds(Set<Long> tagIds) {
+		this.tagIds = tagIds;
+	}
 
 	public String getGrowLevel() {
 		return growLevel;

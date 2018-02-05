@@ -9,6 +9,9 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * web token vo
  * @author danshiyu
@@ -20,6 +23,7 @@ public class AuthTokenVO implements Serializable {
 	/**
 	 * 用户账户id
 	 */
+	@JsonSerialize(using=ToStringSerializer.class)
 	private Long userId;
 	/**
 	 * token
@@ -37,6 +41,10 @@ public class AuthTokenVO implements Serializable {
 	 * refreshToken过期时间
 	 */
 	private Long refreshExpireAt;
+	/**
+	 * 刷新标识 默认刷新成功 true-刷新token成功 false-不允许刷新
+	 */
+	private Boolean refreshTokenFlag = true;
 	public Long getUserId() {
 		return userId;
 	}
@@ -67,12 +75,22 @@ public class AuthTokenVO implements Serializable {
 	public void setRefreshExpireAt(Long refreshExpireAt) {
 		this.refreshExpireAt = refreshExpireAt;
 	}
+	public Boolean getRefreshTokenFlag() {
+		return refreshTokenFlag;
+	}
+	public void setRefreshTokenFlag(Boolean refreshTokenFlag) {
+		this.refreshTokenFlag = refreshTokenFlag;
+	}
 	/**
 	 * 
 	 * @exception 
 	 */
 	public AuthTokenVO() {
 		super();
+	}
+	public AuthTokenVO(Boolean refreshTokenFlag) {
+		super();
+		this.refreshTokenFlag = refreshTokenFlag;
 	}
 	/**
 	 * @param userId

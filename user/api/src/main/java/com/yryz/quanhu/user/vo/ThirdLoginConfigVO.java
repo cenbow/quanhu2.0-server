@@ -9,8 +9,12 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
+import com.yryz.common.utils.JsonUtils;
+
 /**
- * 第三方登录配置
+ * web第三方登录配置<br/>
+ * 目前存在三种第三方登录方式，微信、QQ、微博，其中微信、微博存在app和web方式，微信拥有客户端内部认证方式<br/>
+ * 微信、微博的appKey和secret各个端的配置都不同，由于获取第三方用户信息需要的appKey不分端校验，所有后台只配置了微信、微博web端应用的第三方配置
  * @author danshiyu
  * @version 1.0
  * @date 2018年1月15日 下午1:39:21
@@ -18,25 +22,33 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class ThirdLoginConfigVO implements Serializable {
 	/**
+	 * qq app_id
+	 */
+	private String qqAppKey = "101419427";
+	/**
+	 * qq app_secret
+	 */
+	private String qqAppSecret = "17fe3acefa3aeaae815d10f0315e9093";
+	/**
 	 * 微信appkey
 	 */
-	private String wxAppKey;
+	private String wxAppKey = "wxe739b71ab7671656";
 	/**
 	 * 微信appSecret
 	 */
-	private String wxAppSecret;
+	private String wxAppSecret = "3954320f9e50961a70d1584eee43451e";
 	/**
 	 * 微博appKey
 	 */
-	private String weiboAppKey;
+	private String weiboAppKey = "3886564843";
 	/**
 	 * 微博appSecret
 	 */
-	private String weiboAppSecret;
+	private String weiboAppSecret = "50db720e51cbaff793b6e569de4e9cfc";
 	/**
 	 * 回调地址
 	 */
-	private String notifyUrl;
+	private String notifyUrl = "/openapi/services/app/v2/user/thirdLoginNotify";
 	
 	/**
 	 * 微信授权 app key
@@ -118,5 +130,21 @@ public class ThirdLoginConfigVO implements Serializable {
 	}
 	public void setNotifyUrl(String notifyUrl) {
 		this.notifyUrl = notifyUrl;
+	}
+	
+	public String getQqAppKey() {
+		return qqAppKey;
+	}
+	public void setQqAppKey(String qqAppKey) {
+		this.qqAppKey = qqAppKey;
+	}
+	public String getQqAppSecret() {
+		return qqAppSecret;
+	}
+	public void setQqAppSecret(String qqAppSecret) {
+		this.qqAppSecret = qqAppSecret;
+	}
+	public static void main(String[] args){
+		System.out.println(JsonUtils.toFastJson(new ThirdLoginConfigVO()));
 	}
 }

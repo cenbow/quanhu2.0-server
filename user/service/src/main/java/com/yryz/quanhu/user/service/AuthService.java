@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.user.service;
 
+import com.yryz.common.constant.DevType;
 import com.yryz.quanhu.user.contants.TokenCheckEnum;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
@@ -49,6 +50,15 @@ public interface AuthService {
 	 * @Description app端token获取
 	 */
 	AuthTokenVO getToken(AuthRefreshDTO refreshDTO);
+	
+	/**
+	 * 检查刷新标识判断是否允许刷新token,第一次执行刷新就把token的过期时间设置为当前标识的过期时间
+	 * @param userId
+	 * @param appId
+	 * @param devType
+	 * @return
+	 */
+	boolean checkRefreshFlag(Long userId,String appId,DevType devType);
 	
 	/**
 	 * 删除当前应用下所有端token 后台踢人下线

@@ -93,8 +93,8 @@
 		from qh_user_star_auth
 	</select>
 
-	<!-- 达人后台查询需要依赖积分 -->
-	<select id="listByParams" resultMap="BaseResultMap">
+	<!-- 达人后台查询需要依赖积分废弃，走es搜索 -->
+	<!-- <select id="listByParams" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
 		from qh_user_star_auth a
@@ -144,7 +144,7 @@
 			r.star_recommend_status desc,r.star_weight
 			desc,a.recommend_time desc,a.auth_time desc
 		</if>
-	</select>
+	</select> -->
 
 	<select id="starList" resultType="com.yryz.quanhu.user.entity.UserStarAuth">
 		select

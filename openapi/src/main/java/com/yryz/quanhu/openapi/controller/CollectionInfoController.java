@@ -9,7 +9,6 @@ import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
 import com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.score.service.EventAPI;
-import com.yryz.quanhu.score.vo.EventInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -48,20 +47,7 @@ public class CollectionInfoController {
         String userId = request.getHeader("userId");
         Assert.hasText(userId, "userId不能为空");
         collectionInfoDto.setCreateUserId(Long.valueOf(userId));
-        Response result = collectionInfoApi.single(collectionInfoDto);
-        if(result.success()) {
-            try {
-                //提交事件
-                EventInfo event = new EventInfo();
-                event.setUserId(userId);
-                event.setEventCode("23");
-                eventAPI.commit(event);
-            } catch (Exception e) {
-                logger.error("提交eventApi 失败", e);
-            }
-        }
-
-        return result;
+        return collectionInfoApi.single(collectionInfoDto);
     }
 
     @UserBehaviorValidation(login = true)

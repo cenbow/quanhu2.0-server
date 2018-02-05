@@ -6,6 +6,7 @@ import com.yryz.quanhu.behavior.report.dao.ReportDao;
 import com.yryz.quanhu.behavior.report.dto.ReportDTO;
 import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.behavior.report.service.ReportService;
+import com.yryz.quanhu.behavior.report.vo.ReportVoForAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +25,14 @@ public class ReportServiceImpl implements ReportService {
     private ReportDao reportDao;
 
     @Override
-    public PageList<Report> queryReportForAdmin(ReportDTO reportDTO) {
+    public PageList<ReportVoForAdmin> queryReportForAdmin(ReportDTO reportDTO) {
         PageHelper.startPage(reportDTO.getCurrentPage(),reportDTO.getPageSize());
         PageList pageList=new PageList();
         pageList.setCurrentPage(reportDTO.getCurrentPage());
         pageList.setPageSize(reportDTO.getPageSize());
         List<Report> reports=reportDao.queryReportForAdmin(reportDTO);
-        pageList.setCount(Long.valueOf(reports.size()));
         pageList.setEntities(reports);
+        pageList.setCount(reportDao.queryReportForAdminCount(reportDTO));
         return pageList;
     }
 

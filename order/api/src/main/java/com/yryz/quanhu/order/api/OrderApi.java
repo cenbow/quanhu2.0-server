@@ -164,6 +164,20 @@ public interface OrderApi {
                                                     int pageSize);
 
     /**
+     * 获取支付订单详情
+     * @param orderId
+     * @return
+     */
+    Response<PayInfo> getPayInfo(String orderId);
+
+    /**
+     * 获取提现申请订单列表
+     * @param withdrawCashDto
+     * @return
+     */
+    Response<PageList<PayInfo>> getWithdrawCashPage(WithdrawCashDto withdrawCashDto);
+
+    /**
      * 获取充值订单
      *
      * @param custId
@@ -174,7 +188,7 @@ public interface OrderApi {
      * @param limit
      * @return
      */
-    Response<List<PayInfo>> getPayInfo(String custId, String date, String orderId, int type, long start, long limit);
+    Response<List<PayInfo>> getPayInfoList(String custId, String date, String orderId, int type, long start, long limit);
 
 
     /**

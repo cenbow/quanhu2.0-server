@@ -9,6 +9,8 @@ package com.yryz.quanhu.user.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.common.entity.GenericEntity;
 
 /**
@@ -24,6 +26,7 @@ public class UserStarAuth extends GenericEntity{
     /**
      * 用户id
      */
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**
@@ -79,80 +82,28 @@ public class UserStarAuth extends GenericEntity{
      * 应用id
      */
     private String appId;
-    public enum StarAuthType{
-    	/** 用户申请 */
-    	USER_APLLY((byte)10),
-    	/** 平台设置 */
-    	ADMIN_SET((byte)11);
-    	private byte type;
-    	StarAuthType(byte type) {
-			this.type = type;
-		}
-    	public byte getType(){
-    		return this.type;
-    	}
-    }
+
     
     /**
      * 认证方式 10:用户申请 11:平台设置
      */
     private Byte authWay;
     
-    public enum StarAuthWay{
-    	/** 用户申请 */
-    	USER_APLLY((byte)10),
-    	/** 平台设置 */
-    	ADMIN_SET((byte)11);
-    	private byte way;
-    	StarAuthWay(byte way) {
-			this.way = way;
-		}
-    	public byte getWay(){
-    		return this.way;
-    	}
-    }
+
     
     /**
      * 审核状态 10:待审核 11:审核通过 12:审核失败 13:取消认证
      */
     private Byte auditStatus;
     
-    public enum StarAuditStatus{
-    	/** 待申请 */
-    	WAIT_AUDIT((byte)10),
-    	/** 审核通过 */
-    	AUDIT_SUCCESS((byte)11),
-    	/** 审核失败 */
-    	AUDIT_FAIL((byte)12),
-    	/** 取消认证 */
-    	CANCEL_AUTH((byte)13);
-    	private byte status;
-    	StarAuditStatus(byte status) {
-			this.status = status;
-		}
-    	public byte getStatus(){
-    		return this.status;
-    	}
-    }
+
     
     /**
      * 是否被推荐 10:否 11:是
      */
     private Byte recommendStatus;
     
-    public enum StarRecommendStatus{
-    	/** 否 */
-    	FALSE((byte)10),
-    	/** 是 */
-    	TRUE((byte)11);
-    	private byte status;
-    	StarRecommendStatus(byte status) {
-			this.status = status;
-		}
-    	public byte getStatus(){
-    		return this.status;
-    	}
-    }
+
     
     /**
      * 推荐语
