@@ -12,7 +12,7 @@ import java.util.Date;
 public class StarAuthInfoVO implements Serializable {
 
 
-    private String kid;
+    private Long kid;
     /**
      * 应用id
      */
@@ -140,11 +140,11 @@ public class StarAuthInfoVO implements Serializable {
      */
     private String recommendDesc;
 
-    public String getKid() {
+    public Long getKid() {
         return kid;
     }
 
-    public void setKid(String kid) {
+    public void setKid(Long kid) {
         this.kid = kid;
     }
 

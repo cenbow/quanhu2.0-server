@@ -2,48 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yryz.quanhu.user.dao.UserStarAuthDao">
 	<resultMap id="BaseResultMap" type="com.yryz.quanhu.user.entity.UserStarAuth">
-		<id column="id" property="id" jdbcType="BIGINT" />
-		<result column="kid" property="kid" jdbcType="BIGINT" />
-		<result column="user_id" property="userId" jdbcType="BIGINT" />
-		<result column="app_id" property="appId" jdbcType="VARCHAR" />
-		<result column="organization_name" property="organizationName"
-			jdbcType="VARCHAR" />
-		<result column="real_name" property="realName" jdbcType="VARCHAR" />
-		<result column="id_card" property="idCard" jdbcType="VARCHAR" />
-		<result column="location" property="location" jdbcType="VARCHAR" />
-		<result column="trade_field" property="tradeField" jdbcType="VARCHAR" />
-		<result column="owner_app_id" property="ownerAppId" jdbcType="VARCHAR" />
-		<result column="resource_desc" property="resourceDesc"
-			jdbcType="VARCHAR" />
-		<result column="contact_call" property="contactCall" jdbcType="VARCHAR" />
-		<result column="organization_paper" property="organizationPaper"
-			jdbcType="VARCHAR" />
-		<result column="auth_type" property="authType" jdbcType="TINYINT" />
-		<result column="auth_way" property="authWay" jdbcType="TINYINT" />
-		<result column="audit_status" property="auditStatus" jdbcType="TINYINT" />
-		<result column="recommend_status" property="recommendStatus"
-			jdbcType="TINYINT" />
-		<result column="recommend_desc" property="recommendDesc"
-			jdbcType="VARCHAR" />
-		<result column="recommend_height" property="recommendHeight"
-			jdbcType="INTEGER" />
-		<result column="operational" property="operational" jdbcType="VARCHAR" />
-		<result column="recommend_operate" property="recommendOperate"
-			jdbcType="VARCHAR" />
-		<result column="audit_fail_reason" property="auditFailReason"
-			jdbcType="VARCHAR" />
-		<result column="auth_time" property="authTime" jdbcType="TIMESTAMP" />
-		<result column="audit_fail_time" property="auditFailTime"
-			jdbcType="TIMESTAMP" />
-		<result column="auth_cancel_time" property="authCancelTime"
-			jdbcType="TIMESTAMP" />
-		<result column="recommend_time" property="recommendTime"
-			jdbcType="TIMESTAMP" />
-		<result column="recommend_cancel_time" property="recommendCancelTime"
-			jdbcType="TIMESTAMP" />
-		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
-		<result column="last_update_date" property="lastUpdateDate"
-			jdbcType="TIMESTAMP" />
+		<id column="id" 					property="id" 				jdbcType="BIGINT"/>
+		<result column="kid" 				property="kid" 				jdbcType="BIGINT"/>
+		<result column="user_id" 			property="userId" 			jdbcType="BIGINT"/>
+		<result column="app_id" 			property="appId" 			jdbcType="VARCHAR"/>
+		<result column="organization_name" 	property="organizationName" jdbcType="VARCHAR"/>
+		<result column="real_name" 			property="realName" 		jdbcType="VARCHAR"/>
+		<result column="id_card" 			property="idCard" 			jdbcType="VARCHAR"/>
+		<result column="location" 			property="location" 		jdbcType="VARCHAR"/>
+		<result column="trade_field" 		property="tradeField" 		jdbcType="VARCHAR"/>
+		<result column="owner_app_id" 		property="ownerAppId" 		jdbcType="VARCHAR"/>
+		<result column="resource_desc" 		property="resourceDesc" 	jdbcType="VARCHAR"/>
+		<result column="contact_call" 		property="contactCall" 		jdbcType="VARCHAR"/>
+		<result column="organization_paper" property="organizationPaper" jdbcType="VARCHAR"/>
+		<result column="auth_type" 			property="authType" 		jdbcType="TINYINT"/>
+		<result column="auth_way" 			property="authWay" 			jdbcType="TINYINT"/>
+		<result column="audit_status" 		property="auditStatus" 		jdbcType="TINYINT"/>
+		<result column="recommend_status" 	property="recommendStatus" 	jdbcType="TINYINT"/>
+		<result column="recommend_desc" 	property="recommendDesc" 	jdbcType="VARCHAR"/>
+		<result column="recommend_height" 	property="recommendHeight" 	jdbcType="INTEGER"/>
+		<result column="operational" 		property="operational" 		jdbcType="VARCHAR"/>
+		<result column="recommend_operate" 	property="recommendOperate" jdbcType="VARCHAR"/>
+		<result column="audit_fail_reason" 	property="auditFailReason" 	jdbcType="VARCHAR"/>
+		<result column="auth_time" 			property="authTime" 		jdbcType="TIMESTAMP"/>
+		<result column="audit_fail_time" 	property="auditFailTime" 	jdbcType="TIMESTAMP"/>
+		<result column="auth_cancel_time" 	property="authCancelTime" 	jdbcType="TIMESTAMP"/>
+		<result column="recommend_time" 	property="recommendTime" 	jdbcType="TIMESTAMP"/>
+		<result column="recommend_cancel_time" property="recommendCancelTime" jdbcType="TIMESTAMP"/>
+		<result column="create_date" 		property="createDate" 		jdbcType="TIMESTAMP"/>
+		<result column="last_update_date" 	property="lastUpdateDate" 	jdbcType="TIMESTAMP"/>
 	</resultMap>
 
 	<sql id="Base_Column_List">
@@ -449,4 +436,56 @@
 		</set>
 		where user_id = #{userId}
 	</update>
+
+
+
+	<!--通过KID查询认证信息-->
+	<select id="selectByKid" resultMap="BaseResultMap">
+		SELECT * FROM qh_user_star_auth a
+		WHERE kid = #{kid,jdbcType=BIGINT}
+	</select>
+
+
+	<!--更新审核结果-->
+	<update id="updateAuditStatus" parameterType="com.yryz.quanhu.user.entity.UserStarAuth">
+		UPDATE qh_user_star_auth SET
+		last_update_date = NOW()
+		,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+		,audit_status = #{auditStatus,jdbcType=TINYINT}
+		<choose>
+			<when test="auditStatus != null and auditStatus == 11">
+				,auth_time = NOW()
+			</when>
+			<when test="auditStatus != null and auditStatus == 12">
+				,audit_fail_time = NOW()
+				,audit_fail_reason = #{auditFailReason,jdbcType=VARCHAR}
+			</when>
+			<when test="auditStatus != null and auditStatus == 13">
+				,auth_cancel_time = NOW()
+			</when>
+		</choose>
+		WHERE kid = #{kid,jdbcType=BIGINT}
+	</update>
+
+
+	<!--更新推荐状态-->
+	<update id="updateRecommendStatus" parameterType="com.yryz.quanhu.user.entity.UserStarAuth">
+		UPDATE qh_user_star_auth SET
+		last_update_date = NOW()
+		,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+		,recommend_status = #{recommend_status,jdbcType=TINYINT}
+		,recommend_height = #{recommendHeight,jdbcType=INTEGER}
+		<choose>
+			<when test="recommendStatus != null and recommendStatus = 10">
+				,recommend_cancel_time = NOW()
+			</when>
+			<when test="recommendStatus != null and recommendStatus = 11">
+				,operational = #{operational,jdbcType=VARCHAR}
+				,recommend_time = NOW()
+				,recommend_desc = #{recommendDesc,jdbcType=VARCHAR}
+			</when>
+		</choose>
+		WHERE kid = #{kid,jdbcType=BIGINT}
+	</update>
+
 </mapper>
