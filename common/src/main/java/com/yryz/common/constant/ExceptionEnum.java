@@ -20,6 +20,7 @@ public enum ExceptionEnum {
     USER_NO_RIGHT_TOREAD("1020", "您无权去查看。", "你无权执行此操作"),
     USER_NO_RIGHT_TODELETE("1021", "您无权执行删除操作。", "您无权执行删除操作。"),
     USER_NO_RIGHT_TOREJECT("1022", "您无权执行拒接回答操作。", "您无权执行拒接回答操作。"),
+    USER_NOT_SUFFICIENT_FUNDS("1025", "您的余额不足。", "您的余额不足。"),
     RESOURCE_NO_EXIST("1030", "资源不存在", "资源不存在。"),
     SMS_VERIFY_CODE_ERROR("1023","验证码错误","验证码错误"),
     ValidateException("2000", "数据验证失败！", "网络开小差了，请稍候再试！"),
