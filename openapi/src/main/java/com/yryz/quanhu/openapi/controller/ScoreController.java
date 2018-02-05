@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -162,6 +163,7 @@ public class ScoreController {
 
 	@NotLogin
     @ApiOperation("获取积分明细")
+	@UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/score/flow")
 //	@RequestMapping(path="/score/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
@@ -176,6 +178,7 @@ public class ScoreController {
 	
 	@NotLogin
     @ApiOperation("获取全部积分明细")
+	@UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/score/flow/list")
 	public Response<List<ScoreFlowReportVo>> getScoreFlowALL( ScoreFlowQuery sfq ){
@@ -185,6 +188,7 @@ public class ScoreController {
 	
 	@NotLogin
     @ApiOperation("获取成长明细")
+	@UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/grow/flow")
 	public Response<PageList<GrowFlowReportVo>> getGrowFlow( GrowFlowQuery gfq){
@@ -194,6 +198,7 @@ public class ScoreController {
 	
 	@NotLogin
     @ApiOperation("获取全部成长明细")
+	@UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/grow/flow/list")
 	public Response<List<GrowFlowReportVo>> getGrowFlowALL( GrowFlowQuery gfq){
