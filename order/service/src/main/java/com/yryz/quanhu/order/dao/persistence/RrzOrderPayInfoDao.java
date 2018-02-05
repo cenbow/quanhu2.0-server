@@ -9,6 +9,7 @@ package com.yryz.quanhu.order.dao.persistence;
 
 import java.util.List;
 
+import com.yryz.quanhu.order.vo.WithdrawCashDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
@@ -17,7 +18,7 @@ import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
  * @author yehao
  * @version 2.0
  * @date 2018年1月18日 上午11:17:56
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 支付订单DAO
  */
 @Mapper
 public interface RrzOrderPayInfoDao {
@@ -54,5 +55,12 @@ public interface RrzOrderPayInfoDao {
 	 * @return
 	 */
 	public List<RrzOrderPayInfo> getListWeb(RrzOrderPayInfo rrzOrderPayInfo);
+
+	/**
+	 * 获取提现申请订单列表
+	 * @param withdrawCashDto
+	 * @return
+	 */
+	List<RrzOrderPayInfo> getWithdrawCashList(WithdrawCashDto withdrawCashDto);
 
 }

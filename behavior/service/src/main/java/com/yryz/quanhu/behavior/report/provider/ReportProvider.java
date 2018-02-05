@@ -2,6 +2,7 @@ package com.yryz.quanhu.behavior.report.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -51,6 +52,9 @@ public class ReportProvider implements ReportApi {
             report.setKid(idAPI.getSnowflakeId().getData());
             Map<String,Integer> map=new HashMap<String,Integer>();
             report.setInformStatus((byte) 10);
+            if(report.getResourceId()==0){
+                report.setModuleEnum(ModuleContants.USER);
+            }
             int count = reportService.accretion(report);
             if(count>0){
                 map.put("result",1);
