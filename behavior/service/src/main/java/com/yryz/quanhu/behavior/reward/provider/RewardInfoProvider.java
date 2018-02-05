@@ -143,12 +143,13 @@ public class RewardInfoProvider implements RewardInfoApi {
                 }
                 if (RewardConstants.QueryType.my_reward_resource_list.equals(dto.getQueryType())) {
                     resourceIds.add(String.valueOf(info.getResourceId()));
+                } else if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())) {
+                    userIds.add(String.valueOf(info.getToUserId()));
                 } else if (RewardConstants.QueryType.reward_my_resource_list.equals(dto.getQueryType())) {
                     userIds.add(String.valueOf(info.getCreateUserId()));
                     resourceIds.add(String.valueOf(info.getResourceId()));
-                } else if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())) {
-                    userIds.add(String.valueOf(info.getToUserId()));
-                } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())) {
+                } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())
+                        || RewardConstants.QueryType.reward_resource_user_list.equals(dto.getQueryType())) {
                     userIds.add(String.valueOf(info.getCreateUserId()));
                 }
             }

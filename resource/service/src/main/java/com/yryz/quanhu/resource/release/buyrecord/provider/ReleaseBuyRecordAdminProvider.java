@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -74,13 +75,18 @@ public class ReleaseBuyRecordAdminProvider implements ReleaseBuyRecordAdminApi {
                 }
 
                 vo.setResourceVo(resourceVo);
+                try {
+                    vo.setExtJsonObj(JSON.parse(resourceVo.getExtJson()));
+                } catch (Exception e) {
+                    logger.error("ExtJson is not json Obj !", e);
+                }
                 // 私圈信息
                 CoterieInfo coterieInfo = ResponseUtils
                         .getResponseData(coterieApi.queryCoterieInfo(record.getCoterieId()));
                 if (null != coterieInfo) {
                     vo.setCoterieName(coterieInfo.getName());
                 }
-
+                
                 // 购买人信息
                 UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
                 if (null != user) {
