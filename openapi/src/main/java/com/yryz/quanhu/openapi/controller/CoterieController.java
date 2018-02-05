@@ -181,11 +181,27 @@ public class CoterieController {
         page.setCurrentPage(currentPage);
         page.setPageSize(pageSize);
         
-        //todo 1、优先展示后台人工推荐的私圈X个，再从剩下的私圈中选取加入人数超过50人的私圈Y，X+Y<=200；
-        //todo 2、人工推荐的私圈按照推荐排序从小到大顺序，加入人数超过50人的私圈按照加入人数从多到少排；
+        //1、优先展示后台人工推荐的私圈X个，再从剩下的私圈中选取加入人数超过50人的私圈Y，X+Y<=200；
+        //2、人工推荐的私圈按照推荐排序从小到大顺序，加入人数超过50人的私圈按照加入人数从多到少排；
         List<CoterieInfo> list = ResponseUtils.getResponseData(coterieApi.queryHotCoterieList(currentPage, pageSize));
         page.setCount(null);
         page.setEntities(list);
         return ResponseUtils.returnObjectSuccess(page);
+    }
+    
+    /**
+     * 私圈 二维码
+     *
+     * @param
+     * @return
+     */
+    @ApiOperation("获取私圈二维码base64 ")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/{version}/coterieInfo/qr")
+    public Response<String> getQrurl(Long coterieId, HttpServletRequest request) {
+    	if(coterieId==null){
+    		return ResponseUtils.returnCommonException("参数错误");
+    	}
+        return coterieApi.regroupQr(coterieId);
     }
 }
