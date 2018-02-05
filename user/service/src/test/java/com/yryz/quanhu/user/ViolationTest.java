@@ -18,7 +18,7 @@ public class ViolationTest {
 	@Reference
 	ViolationApi api;
 	
-	@Test
+	//@Test
 	public void save(){
 		ViolationInfo info = new ViolationInfo();
 		info.setAppId("vebff12m1762");
@@ -28,7 +28,7 @@ public class ViolationTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void update(){
 		ViolationInfo info = new ViolationInfo();
 		info.setAppId("vebff12m1762");

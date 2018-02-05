@@ -54,7 +54,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * 检查是否已经超过密码输入错误次数
 	 * @param custId
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#banCheck(java.lang.String)
 	 */
 	@Override
 	public boolean banCheck(String custId) {
@@ -65,7 +64,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * 添加密码输入错误的次数判断
 	 * @param custId
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#increaseBan(java.lang.String)
 	 */
 	@Override
 	public int increaseBan(String custId) {
@@ -75,7 +73,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	/**
 	 * 在用户输入正确密码后，清理安全输入次数的错误次数
 	 * @param custId
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#clearBan(java.lang.String)
 	 */
 	@Override
 	public void clearBan(String custId) {
@@ -117,7 +114,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * @param rrzOrderUserPhy
 	 * @param oldPassword
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#dealUserPhy(com.yryz.service.order.modules.order.entity.RrzOrderUserPhy, java.lang.String)
 	 */
 	@Override
 	public Response<?> dealUserPhy(RrzOrderUserPhy rrzOrderUserPhy, String oldPassword) {
@@ -210,7 +206,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * 验证用户安全信息
 	 * @param rrzOrderUserPhy
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#checkSecurityProblem(com.yryz.service.order.modules.order.entity.RrzOrderUserPhy)
 	 */
 	@Override
 	public Response<?> checkSecurityProblem(RrzOrderUserPhy rrzOrderUserPhy) {
@@ -238,7 +233,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * @param custId
 	 * @param payPassword
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#checkPayPassword(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Response<?> checkPayPassword(String custId, String payPassword) {
