@@ -221,8 +221,16 @@ public class OrderController {
     	if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
+		if (StringUtils.isEmpty(payPassword)) {
+			return ResponseUtils.returnCommonException("支付密码为必填");
+		}
 		if (cost == null || cost.intValue() < 100 || cost % 100 != 0) {
 			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
+		}
+		//验证密码
+		Response<?> checkResponse = payService.checkPassword(userId, payPassword);
+		if (!checkResponse.success()) {
+			return checkResponse;
 		}
 		String orderId = payService.getOrderId();
 		OrderInfo orderInfo = new OrderInfo();
@@ -515,9 +523,11 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("验证密码：payPassword必填");
 		}
 
-		Response<?> return1 = payService.checkPassword(userId, unbindBankCardDTO.getPayPassword());
-		if (return1 == null || !return1.success()) {
-			return ResponseUtils.returnCommonException(return1.getMsg());
+		//验证密码
+		Response<?> checkResponse = payService.checkPassword(userId, unbindBankCardDTO.getPayPassword());
+		if (!checkResponse.success()) {
+			logger.warn("支付密码验证失败");
+			return checkResponse;
 		}
 
 		UserBankDTO userBankDTO = new UserBankDTO();
@@ -563,8 +573,11 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("密码必填");
 		}
 		try {
-			if (!payService.checkPassword(userId, password).success()) {
-				return ResponseUtils.returnCommonException("支付密码验证失败");
+			//验证密码
+			Response<?> checkResponse = payService.checkPassword(userId, password);
+			if (!checkResponse.success()) {
+				logger.warn("支付密码验证失败");
+				return checkResponse;
 			}
 			if (payService.setFreePay(userId, type)) {
 				return ResponseUtils.returnSuccess();
