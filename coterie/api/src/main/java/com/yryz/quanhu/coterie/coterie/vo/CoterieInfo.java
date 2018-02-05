@@ -8,9 +8,7 @@ import java.util.Date;
  * @author jiangkun
  * @version 1.0
  * @date 2017年10月18日 上午9:50:34
- * @Description TODO (这里用一句话描述这个方法的作用)
  */
-@SuppressWarnings("serial")
 public class CoterieInfo implements Serializable{
 	private static final long serialVersionUID = 2137320647778802349L;
 
@@ -28,14 +26,6 @@ public class CoterieInfo implements Serializable{
      * 用户图标
      */
     private String custIcon;
-
-
-    
-    /**
-     * 圈子名称
-     */
-    private String circleName;
-
     /**
      * 姓名
      */
@@ -45,57 +35,105 @@ public class CoterieInfo implements Serializable{
      * 个人简介
      */
     private String ownerIntro;
+    
+	/**
+	 * 私圈名称
+	 */
+	private String name;
+	
+	/**
+	 * 封面图
+	 */
+	private String icon;
 
-    /**
-     * 封面图
-     */
-    private String icon;
+	/**
+	 * 圈子简介
+	 */
+	private String intro;
 
-    /**
-     * 圈子名称
-     */
-    private String name;
+	/**
+	 * 加入私圈金额(悠然币)，0表示免费
+	 */
+	private Integer joinFee;
 
-    /**
-     * 圈子简介
-     */
-    private String intro;
+	/**
+	 * 咨询费，0表示免费
+	 */
+	private Integer consultingFee;
 
-    /**
-     * 私圈名片(二维码)
-     */
-    private String qrUrl;
+	/**
+	 * 成员加入是否需要审核（0不审核，1审核）
+	 */
+	private Integer joinCheck;
 
+	/**
+	 * 成员数量
+	 */
+	private Integer memberNum;
 
-
-	private Integer shelveFlag;
-	private Integer  deleted;
-
-
-
-	private Long auditUserId;
-	private String auditRemark;
-	private Long lastUpdateUserId;
+	/**
+	 * 状态：10待审核，11审批通过，12审批未通过
+	 */
+	private Byte status;
+	
+	/**
+	 * 审批时间
+	 */
 	private Date processTime;
+	
+	/**
+	 * 热度值
+	 */
+	private Long heat;
+	
+	/**
+	 * 上下架
+	 */
+	private Integer shelveFlag;
+	
+	/**
+	 * 0:未删除，1：删除
+	 */
+	private Byte deleted;
+	
+	/**
+	 * 创建时间
+	 */
+	private Date createDate;
+
+	/**
+	 * 更新时间
+	 */
 	private Date lastUpdateDate;
+	
+	/**
+	 * 版本号
+	 */
+	private Integer revision;
 
+	/**
+	 * 是否达人
+	 */
+	private Byte isExpert;
 
-	public Integer getDeleted() {
-		return deleted;
-	}
+	/**
+	 * 是否推荐
+	 */
+	private Byte recommend;
 
-	public void setDeleted(Integer deleted) {
-		this.deleted = deleted;
-	}
-
-
-	public Integer getShelveFlag() {
-		return shelveFlag;
-	}
-
-	public void setShelveFlag(Integer shelveFlag) {
-		this.shelveFlag = shelveFlag;
-	}
+	/**
+	 * 圈主最后访问时间
+	 */
+	private Date masterLastViewTime;
+	
+	private Integer auditUserId;
+	private String auditRemark;
+	/**
+	 * 10:显示，11:不显示
+	 */
+	private Integer redDot;
+	
+    private  User  user;
 	public User getUser() {
 		return user;
 	}
@@ -103,66 +141,6 @@ public class CoterieInfo implements Serializable{
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-	private  User  user;
-    /**
-     * 加入私圈金额(悠然币)，0表示免费
-     */
-    private Integer joinFee;
-
-    /**
-     * 咨询费，0表示免费
-     */
-    private Integer consultingFee;
-
-    /**
-     * 成员加入是否需要审核（0不审核，1审核）
-     */
-    private Integer joinCheck;
-
-    /**
-     * 成员数量
-     */
-    private Integer memberNum;
-
-    /**
-     * 状态：0待审核，1审批通过，2审批未通过，3上架，4下架
-     */
-    private Byte status;
-
-    /**
-     * 创建时间
-     */
-    private Date createDate;
-    
-    /**
-     * 新成员数量
-     */
-    private Integer newMemberNum;
-    /**
-     * 私圈最大能拥有的成员数
-     */
-    private Integer maxMemberNum=500;
-    
-    /**
-     * 圈子工程名（路由用）
-     */
-    private String circleRoute;
-    
-    /**
-     * 是否达人，0否，1是
-     */
-    private String isExpert;
-    
-    /**
-	 * 热度值
-	 */
-	private Long heat;
-	
-	/**
-	 * 私圈文章最新发布时间
-	 */
-	private Date lastInfoTime;
 
 	public Long getCoterieId() {
 		return coterieId;
@@ -180,8 +158,6 @@ public class CoterieInfo implements Serializable{
 		this.ownerId = ownerId;
 	}
 
-
-
 	public String getOwnerName() {
 		return ownerName;
 	}
@@ -198,12 +174,12 @@ public class CoterieInfo implements Serializable{
 		this.ownerIntro = ownerIntro;
 	}
 
-	public String getIcon() {
-		return icon;
+	public String getCustIcon() {
+		return custIcon;
 	}
 
-	public void setIcon(String icon) {
-		this.icon = icon;
+	public void setCustIcon(String custIcon) {
+		this.custIcon = custIcon;
 	}
 
 	public String getName() {
@@ -214,20 +190,20 @@ public class CoterieInfo implements Serializable{
 		this.name = name;
 	}
 
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
 	public String getIntro() {
 		return intro;
 	}
 
 	public void setIntro(String intro) {
 		this.intro = intro;
-	}
-
-	public String getQrUrl() {
-		return qrUrl;
-	}
-
-	public void setQrUrl(String qrUrl) {
-		this.qrUrl = qrUrl;
 	}
 
 	public Integer getJoinFee() {
@@ -270,60 +246,12 @@ public class CoterieInfo implements Serializable{
 		this.status = status;
 	}
 
-	public Date getCreateDate() {
-		return createDate;
+	public Date getProcessTime() {
+		return processTime;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public Integer getNewMemberNum() {
-		return newMemberNum;
-	}
-
-	public void setNewMemberNum(Integer newMemberNum) {
-		this.newMemberNum = newMemberNum;
-	}
-
-	public String getCustIcon() {
-		return custIcon;
-	}
-
-	public void setCustIcon(String custIcon) {
-		this.custIcon = custIcon;
-	}
-
-	public Integer getMaxMemberNum() {
-		return maxMemberNum;
-	}
-
-	public void setMaxMemberNum(Integer maxMemberNum) {
-		this.maxMemberNum = maxMemberNum;
-	}
-
-	public String getCircleName() {
-		return circleName;
-	}
-
-	public void setCircleName(String circleName) {
-		this.circleName = circleName;
-	}
-
-	public String getCircleRoute() {
-		return circleRoute;
-	}
-
-	public void setCircleRoute(String circleRoute) {
-		this.circleRoute = circleRoute;
-	}
-
-	public String getIsExpert() {
-		return isExpert;
-	}
-
-	public void setIsExpert(String isExpert) {
-		this.isExpert = isExpert;
+	public void setProcessTime(Date processTime) {
+		this.processTime = processTime;
 	}
 
 	public Long getHeat() {
@@ -334,22 +262,105 @@ public class CoterieInfo implements Serializable{
 		this.heat = heat;
 	}
 
-	public Date getLastInfoTime() {
-		return lastInfoTime;
+	public Integer getShelveFlag() {
+		return shelveFlag;
 	}
 
-	public void setLastInfoTime(Date lastInfoTime) {
-		this.lastInfoTime = lastInfoTime;
+	public void setShelveFlag(Integer shelveFlag) {
+		this.shelveFlag = shelveFlag;
+	}
+
+	public Byte getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Byte deleted) {
+		this.deleted = deleted;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getLastUpdateDate() {
+		return lastUpdateDate;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+		this.lastUpdateDate = lastUpdateDate;
+	}
+
+	public Integer getRevision() {
+		return revision;
+	}
+
+	public void setRevision(Integer revision) {
+		this.revision = revision;
+	}
+
+	public Byte getIsExpert() {
+		return isExpert;
+	}
+
+	public void setIsExpert(Byte isExpert) {
+		this.isExpert = isExpert;
+	}
+
+	public Byte getRecommend() {
+		return recommend;
+	}
+
+	public void setRecommend(Byte recommend) {
+		this.recommend = recommend;
+	}
+
+	public Date getMasterLastViewTime() {
+		return masterLastViewTime;
+	}
+
+	public void setMasterLastViewTime(Date masterLastViewTime) {
+		this.masterLastViewTime = masterLastViewTime;
+	}
+
+	public Integer getAuditUserId() {
+		return auditUserId;
+	}
+
+	public void setAuditUserId(Integer auditUserId) {
+		this.auditUserId = auditUserId;
+	}
+
+	public String getAuditRemark() {
+		return auditRemark;
+	}
+
+	public void setAuditRemark(String auditRemark) {
+		this.auditRemark = auditRemark;
+	}
+
+	public Integer getRedDot() {
+		return redDot;
+	}
+
+	public void setRedDot(Integer redDot) {
+		this.redDot = redDot;
 	}
 
 	@Override
 	public String toString() {
-		return "CoterieInfo [coterieId=" + coterieId + ", ownerId=" + ownerId + ", custIcon="   + ", circleName=" + circleName + ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro
-				+ ", icon=" + icon + ", name=" + name + ", intro=" + intro + ", qrUrl=" + qrUrl + ", joinFee=" + joinFee
-				+ ", consultingFee=" + consultingFee + ", joinCheck=" + joinCheck + ", memberNum=" + memberNum
-				+ ", status=" + status + ", createDate=" + createDate + ", newMemberNum=" + newMemberNum
-				+ ", maxMemberNum=" + maxMemberNum + ", circleRoute=" + circleRoute + ", isExpert=" + isExpert
-				+ ", heat=" + heat + ", lastInfoTime=" + lastInfoTime + "]";
+		return "CoterieInfo [coterieId=" + coterieId + ", ownerId=" + ownerId + ", custIcon=" + custIcon
+				+ ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro + ", name=" + name + ", icon=" + icon
+				+ ", intro=" + intro + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee + ", joinCheck="
+				+ joinCheck + ", memberNum=" + memberNum + ", status=" + status + ", processTime=" + processTime
+				+ ", heat=" + heat + ", shelveFlag=" + shelveFlag + ", deleted=" + deleted + ", createDate="
+				+ createDate + ", lastUpdateDate=" + lastUpdateDate + ", revision=" + revision + ", isExpert="
+				+ isExpert + ", recommend=" + recommend + ", masterLastViewTime=" + masterLastViewTime
+				+ ", auditUserId=" + auditUserId + ", auditRemark=" + auditRemark + ", redDot=" + redDot + ", user="
+				+ user + "]";
 	}
 
 	@Override
@@ -375,44 +386,5 @@ public class CoterieInfo implements Serializable{
 		return true;
 	}
 
-	public Long getAuditUserId() {
-		return auditUserId;
-	}
-
-	public void setAuditUserId(Long auditUserId) {
-		this.auditUserId = auditUserId;
-	}
-
-	public String getAuditRemark() {
-		return auditRemark;
-	}
-
-	public void setAuditRemark(String auditRemark) {
-		this.auditRemark = auditRemark;
-	}
-
-	public Long getLastUpdateUserId() {
-		return lastUpdateUserId;
-	}
-
-	public void setLastUpdateUserId(Long lastUpdateUserId) {
-		this.lastUpdateUserId = lastUpdateUserId;
-	}
-
-	public Date getProcessTime() {
-		return processTime;
-	}
-
-	public void setProcessTime(Date processTime) {
-		this.processTime = processTime;
-	}
-
-	public Date getLastUpdateDate() {
-		return lastUpdateDate;
-	}
-
-	public void setLastUpdateDate(Date lastUpdateDate) {
-		this.lastUpdateDate = lastUpdateDate;
-	}
 }
 

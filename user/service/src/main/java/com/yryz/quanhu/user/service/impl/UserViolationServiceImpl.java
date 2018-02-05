@@ -110,21 +110,21 @@ public class UserViolationServiceImpl implements UserViolationService {
 	@Transactional(rollbackFor = RuntimeException.class)
 	public void updateViolation(UserViolation violation, String appId) {
 		// 解除禁言
-		if (violation.getViolationType().intValue() == Constants.WARN_TIMES) {
+		if (violation.getViolationType().intValue() == ViolatType.ALLTAIK.getType()) {
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
-					(byte) UserAccountStatus.NORMAL.getStatus(), null, null, null, null, new Date()));
+					null, null, null, null, null, new Date()));
 			violation.setPushMessage("解除禁言");
 			violation.setReason("解除禁言");
 		} // 解冻
-		else {
+		else if(violation.getViolationType().intValue() == ViolatType.NOFREEZE.getType()){
 			// 同步用户状态
 			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.NORMAL.getStatus(), null, null, null, null, new Date()));
 			violation.setPushMessage("解冻");
 			violation.setReason("解冻");
 		}
-		saveViolation(violation, appId);
+		saveViolationDao(violation);
 		clearUserWarnTimes(violation.getUserId().toString());
 	}
 

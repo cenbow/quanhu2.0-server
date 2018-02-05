@@ -12,6 +12,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
@@ -86,6 +87,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         String imgUrl=topicPostDto.getImgUrl();
         String viderUrl=topicPostDto.getVideoUrl();
         String content=topicPostDto.getContent();
+        String contentSource=topicPostDto.getContentSource();
         Topic topic=this.topicDao.selectByPrimaryKey(topicId);
         if(null==topic){
             throw QuanhuException.busiError("跟帖的话题不存在");
@@ -96,6 +98,19 @@ public class TopicPostServiceImpl implements TopicPostService {
         if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(viderUrl) && StringUtils.isBlank(content)){
             throw QuanhuException.busiError("文本，视频，图片不能都为空");
         }
+
+        if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>30){
+            throw QuanhuException.busiError("图片不能超过30张");
+        }
+
+        if(StringUtils.isNotBlank(content) && content.length()>10000){
+            throw QuanhuException.busiError("帖子输入不能超过10000的文字");
+        }
+
+        if(StringUtils.isNotBlank(contentSource) && contentSource.length()>10000){
+            throw QuanhuException.busiError("帖子输入不能超过10000的文字");
+        }
+
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         BeanUtils.copyProperties(topicPostDto, topicPost);
         topicPost.setKid(apIservice.getKid());
@@ -106,6 +121,8 @@ public class TopicPostServiceImpl implements TopicPostService {
         topicPost.setShelveFlag(CommonConstants.SHELVE_YES);
 
         Integer result= this.topicPostDao.insertSelective(topicPost);
+
+
 
         /**
          * 发送消息
@@ -136,6 +153,9 @@ public class TopicPostServiceImpl implements TopicPostService {
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC_POST));
         resourceTotal.setUserId(topicPost.getCreateUserId());
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
+
+        //提交讨论数
+        Response<Object> data=countApi.commitCount(BehaviorEnum.TALK,topic.getKid(),null,1L);
         return result;
     }
 

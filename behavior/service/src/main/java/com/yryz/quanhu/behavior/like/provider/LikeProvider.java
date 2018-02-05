@@ -336,7 +336,7 @@ public class LikeProvider implements LikeApi {
             if (like.getModuleEnum().equals(ModuleContants.ANSWER)) {
                 AnswerVo answerVo = answerApi.getDetail(like.getResourceId()).getData();
                 LikeAssemble likeAssembleAnswer = new LikeAssemble();
-                if(null!=likeAssembleAnswer&&likeAssembleAnswer.getContent().length()>20){
+                if(null!=likeAssembleAnswer.getContent()&&likeAssembleAnswer.getContent().length()>20){
                     likeAssembleAnswer.setTitle(answerVo.getContent().substring(0,20));
                 }else{
                     likeAssembleAnswer.setTitle(answerVo.getContent());
@@ -392,7 +392,7 @@ public class LikeProvider implements LikeApi {
         try {
             TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
             likeAssemble.setTargetUserId(topicPostVo.getUser().getUserId());
-            if (!topicPostVo.getContent().equals("")&&topicPostVo.getContent().length()>20) {
+            if (null!=topicPostVo.getContent()&&topicPostVo.getContent().length()>20) {
                 likeAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
             }else{
                 likeAssemble.setTitle(topicPostVo.getContent());

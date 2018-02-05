@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,6 +18,8 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.aliyun.oss.ServiceException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
@@ -38,6 +41,8 @@ public class EventAPIImpl implements EventAPI {
 
     @Override
     public void commit(EventInfo event) {
+    	event.setEventId( IdGen.uuid() );
+    	event.setCreateTime(  DateUtils.getDate("yyyy-MM-dd HH:mm:ss") );
         eventService.processEvent(event);
     }
 

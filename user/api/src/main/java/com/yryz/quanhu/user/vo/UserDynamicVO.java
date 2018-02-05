@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 动态基础信息
@@ -25,12 +26,17 @@ public class UserDynamicVO implements Serializable {
      * 资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     /**
      * 资源ID
      */
-    private Integer resourceId;
+    private Long resourceId;
+
+    /**
+     * 转发ID
+     */
+    private Long transmitId;
 
     /**
      * 转发理由
@@ -41,7 +47,7 @@ public class UserDynamicVO implements Serializable {
      * 转发资源类型模块ID
      * 1000私圈,1001用户,1002转发,1003文章,1004话题,1005帖子,1006问题,1007答案
      */
-    private Integer transmitType;
+    private String transmitType;
 
     /**
      * 文章、话题、私圈等标准json扩展属性
@@ -63,7 +69,11 @@ public class UserDynamicVO implements Serializable {
     /**
      * 发布时间
      */
-    private String createDate;
+    private Date createDate;
+
+
+    private Long lastUpdateUserId;
+    private Date lastUpdateDate;
 
 
     public Long getKid() {
@@ -82,20 +92,28 @@ public class UserDynamicVO implements Serializable {
         this.userId = userId;
     }
 
-    public Integer getModuleEnum() {
+    public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public void setModuleEnum(Integer moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
     }
 
-    public Integer getResourceId() {
+    public Long getResourceId() {
         return resourceId;
     }
 
-    public void setResourceId(Integer resourceId) {
+    public void setResourceId(Long resourceId) {
         this.resourceId = resourceId;
+    }
+
+    public Long getTransmitId() {
+        return transmitId;
+    }
+
+    public void setTransmitId(Long transmitId) {
+        this.transmitId = transmitId;
     }
 
     public String getTransmitNote() {
@@ -106,11 +124,11 @@ public class UserDynamicVO implements Serializable {
         this.transmitNote = transmitNote;
     }
 
-    public Integer getTransmitType() {
+    public String getTransmitType() {
         return transmitType;
     }
 
-    public void setTransmitType(Integer transmitType) {
+    public void setTransmitType(String transmitType) {
         this.transmitType = transmitType;
     }
 
@@ -138,11 +156,27 @@ public class UserDynamicVO implements Serializable {
         this.delFlag = delFlag;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Long getLastUpdateUserId() {
+        return lastUpdateUserId;
+    }
+
+    public void setLastUpdateUserId(Long lastUpdateUserId) {
+        this.lastUpdateUserId = lastUpdateUserId;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

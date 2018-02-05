@@ -264,7 +264,7 @@ public class CommentProvider implements CommentApi {
         if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
             AnswerVo answerVo = answerApi.getDetail(comment.getResourceId()).getData();
             CommentAssemble commentAssembleAnswer = new CommentAssemble();
-            if(null!=answerVo&&answerVo.getContent().length()>20){
+            if(null!=answerVo.getContent()&&answerVo.getContent().length()>20){
                 commentAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
             }else{
                 commentAssembleAnswer.setTitle(answerVo.getContent());
@@ -291,7 +291,7 @@ public class CommentProvider implements CommentApi {
         Comment commentSingle = commentService.querySingleComment(comentSub);
         String pingContent = "";
         if (null != commentSingle) {
-            if (commentSingle.getContentComment().length() > 20) {
+            if (null!=commentSingle.getContentComment()&&commentSingle.getContentComment().length() > 20) {
                 pingContent = commentSingle.getContentComment().substring(0, 20);
             } else {
                 pingContent = commentSingle.getContentComment();
@@ -310,7 +310,7 @@ public class CommentProvider implements CommentApi {
                     String img = getImgFirstUrl(topicPostVo.getImgUrl());
                     commentAssemble.setImg(img);
                 }
-                if(null!=topicPostVo&&topicPostVo.getContent().length()>20){
+                if(null!=topicPostVo.getContent()&&topicPostVo.getContent().length()>20){
                     commentAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
                 }else{
                     commentAssemble.setTitle(topicPostVo.getContent());

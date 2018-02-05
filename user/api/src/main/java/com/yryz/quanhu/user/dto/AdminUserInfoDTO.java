@@ -102,6 +102,19 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String applyAuthEndDate;
 
+	/**
+	 * 是否需要查询用户收入信息
+	 * @return
+	 */
+	private Boolean needIntegral;
+
+	public Boolean getNeedIntegral() {
+		return needIntegral;
+	}
+
+	public void setNeedIntegral(Boolean needIntegral) {
+		this.needIntegral = needIntegral;
+	}
 
 	public String getApplyAuthBeginDate() {
 		return applyAuthBeginDate;
