@@ -149,7 +149,11 @@ public class HotspotServiceImpl implements HotspotService {
 		heatInfo.setCreateTime(System.currentTimeMillis());
 		heatInfo.setUpdateTime(System.currentTimeMillis());
 		heatInfo.setHeat(heatInfo.countHeat());
-		return heatInfoMongo.save(heatInfo);
+		if(heatInfoMongo.get(type, objectId) != null){
+			return heatInfoMongo.update(heatInfo);
+		} else {
+			return heatInfoMongo.save(heatInfo);
+		}
 	}
 
 
