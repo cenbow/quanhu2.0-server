@@ -124,6 +124,16 @@
 			AND a.order_id = #{orderId}
 		</if>
 	</select>
-	
-	
+
+	<select id="getWithdrawCashList" resultMap="rrzOrderPayInfoMap" parameterType="com.yryz.quanhu.order.vo.WithdrawCashDto" >
+		SELECT
+		<include refid="columns" />
+		FROM rrz_order_pay_info a
+		WHERE a.order_type = 0
+			AND a.product_type = 2001
+			<if test="orderState != null ">
+				AND a.order_state = #{orderState}
+			</if>
+		ORDER BY a.create_time DESC, auto_id DESC
+	</select>
 </mapper>

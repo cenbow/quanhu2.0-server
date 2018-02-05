@@ -60,8 +60,9 @@ public class OrderAsynProvider implements OrderAsynApi {
     @Override
     public Response<?> executeOrder(String orderId, String custId, String password) {
         try {
-            return orderService.executeOrder(orderId, custId, password);
-        }catch (QuanhuException e){
+            orderService.executeOrder(orderId, custId, password);
+            return ResponseUtils.returnSuccess();
+        }catch (Exception e){
             return ResponseUtils.returnException(e);
         }
     }

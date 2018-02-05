@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.order.enums.OrderPayConstants;
+import com.yryz.quanhu.order.vo.*;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,10 +29,6 @@ import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.api.OrderAsynApi;
 import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
-import com.yryz.quanhu.order.vo.AccountOrder;
-import com.yryz.quanhu.order.vo.IntegralOrder;
-import com.yryz.quanhu.order.vo.OrderInfo;
-import com.yryz.quanhu.order.vo.PreOrderVo;
 
 /**
  * @author yehao
@@ -87,7 +86,7 @@ public class OrderTest {
 		orderInfo.setCustId("4qqcxnbnht");
 		orderInfo.setOrderDesc("测试订单" + num);
 		orderInfo.setOrderId(orderId);
-		orderInfo.setOrderType(3);
+		orderInfo.setOrderType(1);
 		orderInfo.setProductDesc("测试产品描述");
 		orderInfo.setProductId("1000");
 		orderInfo.setProductType(1000);
@@ -137,7 +136,7 @@ public class OrderTest {
 		orderInfo.setCost(number);
 		orderInfo.setOrderDesc(OrderDescEnum.ACTIVITY_USER_LOTTERY);
 		orderInfo.setOrderId(orderId);
-		orderInfo.setOrderType(3);
+		orderInfo.setOrderType(1);
 		orderInfo.setProductDesc(ProductEnum.LOTTERY_TYPE.getDesc());
 		orderInfo.setProductId(ProductEnum.LOTTERY_TYPE.getType() + "");
 		orderInfo.setProductType(ProductEnum.LOTTERY_TYPE.getType());
@@ -186,6 +185,24 @@ public class OrderTest {
 	@Test
 	public void testUserTotalIntegral(){
 		Response<Map<Long, Long>> response = orderAPI.getUserTotalIntegral(Lists.newArrayList(1000L));
+		if(response.success()){
+			System.out.println(JSON.toJSONString(response.getData()));
+		}
+	}
+
+	@Test
+	public void testGetPayInfo(){
+		Response<PayInfo> response = orderAPI.getPayInfo("12017102611917028");
+		if(response.success()){
+			System.out.println(JSON.toJSONString(response.getData()));
+		}
+	}
+
+	@Test
+	public void testGetWithdrawCashPage(){
+		WithdrawCashDto withdrawCashDto = new WithdrawCashDto();
+		withdrawCashDto.setOrderState(OrderPayConstants.OrderState.CREATE);
+		Response<PageList<PayInfo>> response = orderAPI.getWithdrawCashPage(withdrawCashDto);
 		if(response.success()){
 			System.out.println(JSON.toJSONString(response.getData()));
 		}
