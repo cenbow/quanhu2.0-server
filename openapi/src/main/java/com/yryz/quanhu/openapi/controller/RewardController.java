@@ -110,6 +110,7 @@ public class RewardController {
         RewardInfoDto dto = new RewardInfoDto();
         dto.setCurrentPage(currentPage);
         dto.setPageSize(pageSize);
+        dto.setResourceId(resourceId);
         dto.setQueryType(RewardConstants.QueryType.reward_resource_user_list);
 
         return rewardInfoApi.pageByCondition(dto, true);
