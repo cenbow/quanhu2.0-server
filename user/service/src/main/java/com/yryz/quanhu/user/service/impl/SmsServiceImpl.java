@@ -46,7 +46,8 @@ public class SmsServiceImpl implements SmsService{
 		   }
 		   if(StringUtils.isBlank(account.getUserPhone())){
 			   throw QuanhuException.busiError("手机号码不存在");
-		   }		   
+		   }
+		   codeDTO.setPhone(account.getUserPhone());
 		}
 		
 		SmsType smsType = null;
