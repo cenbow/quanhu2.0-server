@@ -2,6 +2,8 @@ package com.yryz.quanhu.openapi.exception;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.openapi.validation.BehaviorEventValidAspect;
@@ -39,10 +41,20 @@ public class QuanhuExceptionHandler implements HandlerExceptionResolver {
             response.setStatus(HttpStatus.OK.value()); //设置状态码
             response.setContentType(MediaType.APPLICATION_JSON_VALUE); //设置ContentType
             response.setCharacterEncoding("UTF-8"); //避免乱码
-//            String language = request.getHeader("language");
+
+            if(e instanceof QuanhuException){
+
+                /**
+                 * 针对于前端特别返回码设置 当token过期时，返回http返回码401
+                 */
+                QuanhuException qhException = (QuanhuException) e;
+                if(ExceptionEnum.TOKEN_EXPIRE.getCode().equalsIgnoreCase(qhException.getCode())){
+                    response.setStatus(401);
+                }
+            }
+
             response.getWriter().write(JSON.toJSONString(ResponseUtils.returnException(e), SerializerFeature.WriteMapNullValue));
             logger.error("【ExceptionHandler】", e);
-
         } catch (Exception _e) {
             logger.error("处理异常失败", _e);
         }

@@ -38,9 +38,9 @@ public class ElasticsearchController {
     @ApiOperation("搜索用户")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "keyWord", paramType = "keyWord", required = true),
-            @ApiImplicitParam(name = "currentPage", paramType = "currentPage", required = true),
-            @ApiImplicitParam(name = "pageSize", paramType = "pageSize", required = true) })
+            @ApiImplicitParam(name = "keyWord", paramType = "query", required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/search/user")
     public Response<PageList<UserSimpleVo>> searchUser(@RequestParam String keyWord, @RequestParam Integer currentPage,
             @RequestParam Integer pageSize, HttpServletRequest request) {
@@ -69,9 +69,9 @@ public class ElasticsearchController {
     @ApiOperation("搜索文章")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "keyWord", paramType = "keyWord", required = true),
-            @ApiImplicitParam(name = "currentPage", paramType = "currentPage", required = true),
-            @ApiImplicitParam(name = "pageSize", paramType = "pageSize", required = true) })
+            @ApiImplicitParam(name = "keyWord", paramType = "query", required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/search/release")
     public Response<PageList<ResourceInfoVo>> searchArticle(@RequestParam String keyWord,
             @RequestParam Integer currentPage, @RequestParam Integer pageSize, HttpServletRequest request) {
@@ -100,9 +100,9 @@ public class ElasticsearchController {
     @ApiOperation("搜索话题")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "keyWord", paramType = "keyWord", required = true),
-            @ApiImplicitParam(name = "currentPage", paramType = "currentPage", required = true),
-            @ApiImplicitParam(name = "pageSize", paramType = "pageSize", required = true) })
+            @ApiImplicitParam(name = "keyWord", paramType = "query", required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/search/topic")
     public Response<PageList<ResourceInfoVo>> searchTopic(@RequestParam String keyWord,
             @RequestParam Integer currentPage, @RequestParam Integer pageSize, HttpServletRequest request) {
@@ -131,9 +131,9 @@ public class ElasticsearchController {
     @ApiOperation("搜索私圈")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "keyWord", paramType = "keyWord", required = true),
-            @ApiImplicitParam(name = "currentPage", paramType = "currentPage", required = true),
-            @ApiImplicitParam(name = "pageSize", paramType = "pageSize", required = true) })
+            @ApiImplicitParam(name = "keyWord", paramType = "query", required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/search/coterie")
     public Response<PageList<CoterieInfoVo>> searchCoterie(@RequestParam String keyWord,
             @RequestParam Integer currentPage, @RequestParam Integer pageSize, HttpServletRequest request) {

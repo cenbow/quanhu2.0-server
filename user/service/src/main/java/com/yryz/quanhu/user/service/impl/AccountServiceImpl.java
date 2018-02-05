@@ -534,7 +534,7 @@ public class AccountServiceImpl implements AccountService {
 		userService.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(),
 				registerDTO.getUserNickName(), registerDTO.getUserImg(), registerDTO.getUserSign(),
 				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getDeviceId(),
-				registerDTO.getCityCode(), registerDTO.getIsVest().byteValue(), registerDTO.getUserDesc()));
+				registerDTO.getCityCode(), registerDTO.getIsVest() == null ? null : registerDTO.getIsVest().byteValue(), registerDTO.getUserDesc()));
 		registerDTO.getRegLogDTO().setUserId(userId);
 
 		// 异步处理

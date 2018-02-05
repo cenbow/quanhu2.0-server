@@ -287,6 +287,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
                     } catch (Exception e) {
                         logger.warn("cannot get statics cause: " + e.getMessage());
                     }
+                    vo.setStatistics(statistics);
                 }
 			}
 
