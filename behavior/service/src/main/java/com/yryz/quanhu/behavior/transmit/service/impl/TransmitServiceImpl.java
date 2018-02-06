@@ -116,7 +116,7 @@ public class TransmitServiceImpl implements TransmitService {
                     Dymaic dymaic = dymaicResponse.getData();
                     if(dymaic == null
                             || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
-                            || CommonConstants.SHELVE_NO.equals(dymaic.getShelveFlag()) ) {
+                            || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
                         throw QuanhuException.busiError("资源不存在或者已删除");
                     }
                 }
