@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -57,11 +58,12 @@ public class ConfigController {
         map.put("upgradeVersion", "1.0.0");
         try {
             String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(devType));
-            JSONObject config = GsonUtils.json2Obj(configStr, JSONObject.class);
+            Map<String,Object> config = GsonUtils.json2Obj(configStr, Map.class);
             String upgradeVersion = config.get("upgradeVersion").toString();
             //强制升级的版本比当前版本高
             if (new Integer(upgradeVersion.replace(".", "")) > new Integer(appVersion.replace(".", ""))) {
                 map.put("forceUpgradeFlag", true);
+                map.put("releaseNote", config.get("releaseNote").toString());
             } else {
                 map.put("forceUpgradeFlag", false);
             }
