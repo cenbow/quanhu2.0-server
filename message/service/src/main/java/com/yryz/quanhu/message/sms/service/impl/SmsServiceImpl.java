@@ -55,9 +55,9 @@ public class SmsServiceImpl implements SmsService {
 		if(rangeConfigVO == null){
 			rangeConfigVO = configVO;
 		}
-		SmsSign sign = smsChannelService.getSign(configVO.getSmsSignId());
+		SmsSign sign = smsChannelService.getSign(rangeConfigVO.getSmsSignId());
 		SmsChannel channel = smsChannelService.get(sign.getSmsChannelId());
-		SmsTemplate template = smsTemplateService.get(configVO.getVerifyTemplateId());
+		SmsTemplate template = smsTemplateService.get(rangeConfigVO.getVerifyTemplateId());
 		if (smsDTO.getSmsType() != SmsType.VERIFY_CODE) {
 			template = smsTemplateService.get(smsDTO.getMsgTemplateId());
 		}
