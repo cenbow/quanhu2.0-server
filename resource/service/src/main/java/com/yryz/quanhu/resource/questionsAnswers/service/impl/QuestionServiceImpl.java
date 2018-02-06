@@ -267,7 +267,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if (questionBySearch.getChargeAmount() > 0) {
+        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0) {
             Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
             if (null != orderId) {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
