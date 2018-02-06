@@ -21,13 +21,16 @@
 		last_update_date
 	</sql>
 
-	<select id="selectByUserId" resultMap="BaseResultMap">
+	<select id="listByUserId" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
 		from qh_user_img_audit
-		where user_id = #{userId}
+		where 1=1 
+		<if test="userId">
+		   and user_id = #{userId}
+		</if>
 		<if test="auditStatus != null ">
-			and a.audit_status = #{auditStatus}
+			and audit_status = #{auditStatus}
 		</if>
 		order by create_date desc
 	</select>
@@ -65,6 +68,9 @@
 			<if test="lastUpdateDate != null">
 				last_update_date,
 			</if>
+			<if test="lastUpdateUserId != null">
+				last_update_user_id,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="id != null">
@@ -91,19 +97,22 @@
 			<if test="lastUpdateDate != null">
 				#{lastUpdateDate,jdbcType=TIMESTAMP},
 			</if>
+			<if test="lastUpdateUserId != null">
+				#{lastUpdateUserId},
+			</if>
 		</trim>
 	</insert>
 
 	<insert id="batchSave">
-		insert into qh_user_img_audit (kid,user_id, cust_img,
+		insert into qh_user_img_audit (kid,user_id, user_img,
 		audit_status,
 		create_date,
-		operational)
+		operational,last_update_user_id)
 		values
 		<foreach item="item" index="index" collection="imgAudits"
 			separator=",">
-			(#{item.kid},#{item.userId},#{item.custImg},
-			#{item.auditStatus},#{item.createDate},#{item.operational})
+			(#{item.kid},#{item.userId},#{item.userImg},
+			#{item.auditStatus},#{item.createDate},#{item.operational},#{item.lastUpdateUserId})
 		</foreach>
 	</insert>
 

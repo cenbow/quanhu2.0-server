@@ -71,6 +71,10 @@ public class RegisterDTO implements Serializable {
 	 */
 	private String userImg;
 	/**
+	 * 性别
+	 */
+	private Integer userGenders;
+	/**
 	 * 用户简介
 	 */
 	private String userDesc;
@@ -177,6 +181,12 @@ public class RegisterDTO implements Serializable {
 	}
 	public void setUserSign(String userSign) {
 		this.userSign = userSign;
+	}
+	public Integer getUserGenders() {
+		return userGenders;
+	}
+	public void setUserGenders(Integer userGenders) {
+		this.userGenders = userGenders;
 	}
 	/**
 	 * 

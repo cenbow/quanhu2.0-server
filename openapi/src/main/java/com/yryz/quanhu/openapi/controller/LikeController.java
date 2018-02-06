@@ -1,7 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
@@ -30,7 +30,7 @@ public class LikeController {
     @Reference(check = false)
     private LikeApi likeApi;
 
-    @NotLogin
+    
     @ApiOperation("用户点赞/取消点赞")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/like/dian")
@@ -39,7 +39,7 @@ public class LikeController {
         return likeApi.dian(like);
     }
 
-    @NotLogin
+    
     @ApiOperation("点赞列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/like/frontlist")

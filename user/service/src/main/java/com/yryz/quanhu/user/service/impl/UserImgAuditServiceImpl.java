@@ -21,10 +21,10 @@ import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.contants.Constants.ImgAuditStatus;
 import com.yryz.quanhu.user.dao.UserImgAuditDao;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserImgAudit;
-import com.yryz.quanhu.user.entity.UserImgAudit.ImgAuditStatus;
 import com.yryz.quanhu.user.manager.MessageManager;
 import com.yryz.quanhu.user.service.UserImgAuditService;
 import com.yryz.quanhu.user.service.UserService;
@@ -86,7 +86,8 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 				UserImgAudit auditModel = record.get(i);
 				UserImgAudit imgAuditModel = new UserImgAudit();
 				imgAuditModel.setUserId(auditModel.getUserId());
-				imgAuditModel.setOperational(auditModel.getOperational());
+				imgAuditModel.setOperational(auditModel.getOperational() == null ? "" : auditModel.getOperational());
+				imgAuditModel.setLastUpdateUserId(auditModel.getLastUpdateUserId() == null ? 0l : auditModel.getLastUpdateUserId());
 				imgAuditModel.setUserImg(auditModel.getUserImg());
 				imgAuditModel.setAuditStatus(aduitActionStatus.byteValue());
 				// 待审核图片表示不存在

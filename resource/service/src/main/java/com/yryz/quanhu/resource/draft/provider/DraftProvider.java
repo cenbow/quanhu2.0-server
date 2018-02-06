@@ -355,6 +355,68 @@ public class DraftProvider implements DraftApi {
             return ResponseUtils.returnException(e);
         }
 	}
+
+	/**
+	 * 编辑草稿箱
+	 * @param record
+	 * @return
+	 * @see com.yryz.quanhu.resource.draft.api.DraftApi#edit(com.yryz.quanhu.resource.release.info.entity.ReleaseInfo)
+	 */
+	@Override
+	public Response<ReleaseInfo> edit(ReleaseInfo record) {
+		try {
+            Assert.hasText(record.getContentSource(), "ContentSource is NULL !");
+
+//            record.setClassifyId(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
+//            record.setDelFlag(CommonConstants.DELETE_NO);
+//            record.setShelveFlag(CommonConstants.SHELVE_YES);
+
+            Assert.isNull(record.getCoterieId(), "平台文章发布 没有：CoterieId");
+            Assert.isNull(record.getKid(), "平台文章发布 没有：Kid");
+            Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() == 0L,
+                    "平台文章发布 不能设置付费：ContentPrice");
+
+            // 校验用户是否存在
+            UserSimpleVO createUser = ResponseUtils.getResponseData(userApi.getUserSimple(record.getCreateUserId()));
+            Assert.notNull(createUser, "发布者用户不存在！userId：" + record.getCreateUserId());
+
+            ReleaseConfigVo cfgVo = releaseConfigService.getTemplate(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
+            Assert.notNull(cfgVo, "平台发布文章，发布模板不存在！classifyId：" + ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
+
+            // 校验模板
+            Assert.isTrue(draftService.releaseInfoCheck(record, cfgVo), "平台发布文章，参数校验不通过！");
+
+            // 用户输入时至少有一个（富文本）元素不为空
+            if (StringUtils.isEmpty(record.getContent()) && StringUtils.isEmpty(record.getImgUrl())
+                    && StringUtils.isEmpty(record.getVideoUrl()) && StringUtils.isEmpty(record.getAudioUrl())) {
+                throw QuanhuException.busiError("富文本元素(文字、图片、视频、音频)至少有一个不能为空！");
+            }
+
+            // kid 生成
+//            record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+            draftService.edit(record);
+
+//            // 资源进聚合、进好友动态
+//            this.commitResourceAndDynamic(record, createUser);
+//            try {
+//                // 接入统计计数
+//                countApi.commitCount(BehaviorEnum.Release, record.getCreateUserId(), null, 1L);
+//            } catch (Exception e) {
+//                logger.error("统计计数 接入异常！", e);
+//            }
+//
+//            // 对接积分事件
+//            draftService.commitEvent(eventAPI, record);
+
+            return ResponseUtils.returnObjectSuccess(record);
+
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("平台发布文章异常！", e);
+            return ResponseUtils.returnException(e);
+        }
+	}
 	
 //	/**  
 //	    * @Description: 资源聚合[首页聚合、好友动态聚合]

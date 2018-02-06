@@ -2,7 +2,7 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 
-import com.yryz.common.annotation.NotLogin;
+
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.report.entity.Report;
 import com.yryz.quanhu.behavior.report.service.ReportApi;
@@ -31,7 +31,7 @@ public class ReportConrtoller {
     @Reference
     private ReportApi reportApi;
 
-    @NotLogin
+    
     @ApiOperation("用户举报")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/report/accretion")
@@ -40,7 +40,7 @@ public class ReportConrtoller {
         return reportApi.accretion(report);
     }
 
-    @NotLogin
+    
     @ApiOperation("举报类型")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/report/informdesc")

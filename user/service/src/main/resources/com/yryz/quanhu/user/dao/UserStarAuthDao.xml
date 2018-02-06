@@ -74,9 +74,9 @@
 		</foreach>
 	</select>
 
-	<select id="getStarMaxWeight" resultType="java.lang.Integer">
+	<select id="getMaxHeight" resultType="java.lang.Integer">
 		select
-		max(recommend_weight)
+		max(recommend_height)
 		from qh_user_star_auth
 	</select>
 
@@ -473,16 +473,19 @@
 		UPDATE qh_user_star_auth SET
 		last_update_date = NOW()
 		,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
-		,recommend_status = #{recommend_status,jdbcType=TINYINT}
-		,recommend_height = #{recommendHeight,jdbcType=INTEGER}
+		,recommend_status = #{recommendStatus,jdbcType=TINYINT}
 		<choose>
-			<when test="recommendStatus != null and recommendStatus = 10">
+			<when test="recommendStatus != null and recommendStatus == 10">
 				,recommend_cancel_time = NOW()
+				,recommend_desc=''
 			</when>
-			<when test="recommendStatus != null and recommendStatus = 11">
+			<when test="recommendStatus != null and recommendStatus == 11">
+				,recommend_height = #{recommendHeight,jdbcType=INTEGER}
 				,operational = #{operational,jdbcType=VARCHAR}
 				,recommend_time = NOW()
-				,recommend_desc = #{recommendDesc,jdbcType=VARCHAR}
+				<if test="recommendDesc != null and recommendDesc != ''">
+					,recommend_desc = #{recommendDesc,jdbcType=VARCHAR}
+				</if>
 			</when>
 		</choose>
 		WHERE kid = #{kid,jdbcType=BIGINT}

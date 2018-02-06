@@ -2,6 +2,8 @@ package com.yryz.quanhu.coterie.coterie.vo;
 
 import java.io.Serializable;
 
+import com.yryz.common.utils.GsonUtils;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**
