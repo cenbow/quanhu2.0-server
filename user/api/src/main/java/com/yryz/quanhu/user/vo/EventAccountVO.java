@@ -1,5 +1,6 @@
 package com.yryz.quanhu.user.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -8,7 +9,9 @@ import java.util.Date;
  * @date 2018/2/1
  * @description
  */
-public class EventAccountVO {
+public class EventAccountVO implements Serializable {
+
+    private static final long serialVersionUID = -560497354978823348L;
 
     /**
      * 用户id

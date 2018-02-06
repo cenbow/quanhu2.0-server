@@ -4,9 +4,14 @@ import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import com.google.common.collect.Lists;
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.user.vo.UserInfoVO;
+import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -20,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Repository;
@@ -100,7 +106,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
     }
 
     @Override
-    public List<UserInfo> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
+    public PageList<UserInfoVO> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
         Integer pageNo = adminUserDTO.getPageNo();
         Integer pageSize = adminUserDTO.getPageSize();
         String startDateStr = adminUserDTO.getStartDate();
@@ -118,7 +124,8 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte authWay = adminUserDTO.getAuthWay();
         String growLevel = adminUserDTO.getGrowLevel();
         Integer userStatus = adminUserDTO.getUserStatus();
-        
+        Set<Long> tagIds = adminUserDTO.getTagIds();
+
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNoneBlank(nickName)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
@@ -141,11 +148,18 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if (growLevel != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
         }
-        if(userStatus != null){
-        	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
-        		boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
-        		boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.BAN_POST_TIME).lte(System.currentTimeMillis()));
-        	}
+        if (CollectionUtils.isNotEmpty(tagIds)) {
+            BoolQueryBuilder tagBoolQusery = QueryBuilders.boolQuery();
+            for (Long tagId : tagIds) {
+                tagBoolQusery.should(QueryBuilders.matchQuery(ESConstants.USER_TAG_ID, tagId));
+            }
+            boolQueryBuilder.must(tagBoolQusery);
+        }
+        if (userStatus != null) {
+            if (userStatus == AdminQueryUserStatus.NORMAL.getStatus()) {
+                boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
+                boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.BAN_POST_TIME).lte(System.currentTimeMillis()));
+            }
         }
         if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
             long startDate = DateUtils.parseDate(startDateStr).getTime();
@@ -154,11 +168,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
-
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         queryBuilder.withFilter(boolQueryBuilder)
                 .withPageable(pageable);
-
         List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
         for (FieldSortBuilder sortBuilder : sortBuilders) {
             queryBuilder.withSort(sortBuilder);
@@ -166,7 +178,19 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         SearchQuery query = queryBuilder.build();
         logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
-        return elasticsearchTemplate.queryForList(query, UserInfo.class);
+        AggregatedPage<UserInfo> page = elasticsearchTemplate.queryForPage(query, UserInfo.class);
+        List<UserInfo> userInfoList = page.getContent();
+        List<UserInfoVO> userInfoVOS = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(userInfoList)) {
+            userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
+        }
+        PageList<UserInfoVO> pageList = new PageList<>();
+        pageList.setCurrentPage(pageNo);
+        pageList.setPageSize(pageSize);
+        pageList.setEntities(userInfoVOS);
+        pageList.setCount(page.getTotalElements());
+//        logger.info("elasticsearchTemplate page result: {}", GsonUtils.parseJson(page));
+        return pageList;
     }
 
     private List<FieldSortBuilder> getAdminUserSortBuilder() {

@@ -1,5 +1,7 @@
 package com.yryz.quanhu.dymaic;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
@@ -48,10 +50,13 @@ public class EsTest {
         AdminUserInfoDTO dto = new AdminUserInfoDTO();
         dto.setStartDate("2018-01-01");
         dto.setEndDate("2018-03-01");
+        dto.setTagIds(Sets.newHashSet(16L));
 //        dto.setPhone("13");
 //        dto.setNickName("q");
-        dto.setAuditStatus((byte) 11);
-        dto.setGrowLevel("5");
+//        dto.setAuditStatus((byte) 11);
+//        dto.setGrowLevel("5");
+        dto.setNeedIntegral(true);
+        dto.setAuthWay((byte) 11);
         Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
         System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }

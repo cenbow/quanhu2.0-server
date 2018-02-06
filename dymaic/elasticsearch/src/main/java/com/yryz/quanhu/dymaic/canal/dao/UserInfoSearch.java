@@ -2,9 +2,11 @@ package com.yryz.quanhu.dymaic.canal.dao;
 
 import java.util.List;
 
+import com.yryz.common.response.PageList;
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.StarInfoDTO;
+import com.yryz.quanhu.user.vo.UserInfoVO;
 
 /**
  * 复杂的查询  用ElasticsearchTemplate
@@ -26,5 +28,5 @@ public interface UserInfoSearch {
 	 * @param adminUserDTO
 	 * @return
 	 */
-	List<UserInfo> adminSearchUser(AdminUserInfoDTO adminUserDTO);
+	PageList<UserInfoVO> adminSearchUser(AdminUserInfoDTO adminUserDTO);
 }

@@ -20,6 +20,10 @@ public class ESConstants {
     //等级
     public static final String EVENT_GROWLEVEL = "eventAccountInfo.growLevel";
 
+    //标签
+    public static final String USER_TAG_ID = "userTagInfo.userTagInfoList.tagId";
+
+
 
     //reg log
     public static final String USER_ACTIVITYCHANNELCODE = "userRegLog.activityChannelCode";

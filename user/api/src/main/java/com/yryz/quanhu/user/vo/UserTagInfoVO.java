@@ -12,13 +12,13 @@ import java.util.List;
 public class UserTagInfoVO implements Serializable {
     private static final long serialVersionUID = -7080012351087632243L;
 
-    private List<UserTagVO> userTagList;
+    private List<UserTagVO> userTagInfoList;
 
-    public List<UserTagVO> getUserTagList() {
-        return userTagList;
+    public List<UserTagVO> getUserTagInfoList() {
+        return userTagInfoList;
     }
 
-    public void setUserTagList(List<UserTagVO> userTagList) {
-        this.userTagList = userTagList;
+    public void setUserTagInfoList(List<UserTagVO> userTagInfoList) {
+        this.userTagInfoList = userTagInfoList;
     }
 }
