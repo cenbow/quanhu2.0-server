@@ -77,8 +77,9 @@ public class ScoreController {
 	
 	
 	
-	@NotLogin
-    @ApiOperation("积分事件")
+	
+    @ApiOperation("积分事件提交")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/score/commit")
 	public void commit(@RequestBody EventInfo event){
@@ -86,8 +87,9 @@ public class ScoreController {
 		eventAPI.commit(event);
 	}
 	
-	@NotLogin
+	
     @ApiOperation("积分统计查询")
+    @UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/score/getScoreFlowList")
 	public Response<EventReportVo> getScoreFlowList(EventInfo event){
@@ -96,6 +98,7 @@ public class ScoreController {
 
 
     @ApiOperation("获取用户事件账户记录")
+    @UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/score/acount")
 	public Response<?> getEventAcount(String userId){
@@ -119,8 +122,9 @@ public class ScoreController {
 //		
 //	}
 	
-	@NotLogin
+	
     @ApiOperation("签到")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/sign")
 //	@RequestMapping(path="/sign"  , method = { RequestMethod.POST, RequestMethod.OPTIONS })
@@ -140,8 +144,9 @@ public class ScoreController {
 	}
 	
 	
-	@NotLogin
+	
     @ApiOperation("获取签到状态")
+    @UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/sign/status")
 //	@RequestMapping(path="/sign/status" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
@@ -161,9 +166,9 @@ public class ScoreController {
 	}	
 	}
 
-	@NotLogin
+	
     @ApiOperation("获取积分明细")
-	@UserBehaviorValidation(login = true)
+	@UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/score/flow")
 //	@RequestMapping(path="/score/flow" , method = { RequestMethod.POST, RequestMethod.OPTIONS })
@@ -176,9 +181,9 @@ public class ScoreController {
 	}
 	
 	
-	@NotLogin
+	
     @ApiOperation("获取全部积分明细")
-	@UserBehaviorValidation(login = true)
+	@UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/score/flow/list")
 	public Response<List<ScoreFlowReportVo>> getScoreFlowALL( ScoreFlowQuery sfq ){
@@ -186,9 +191,9 @@ public class ScoreController {
 	}
 	
 	
-	@NotLogin
+	
     @ApiOperation("获取成长明细")
-	@UserBehaviorValidation(login = true)
+	@UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/grow/flow")
 	public Response<PageList<GrowFlowReportVo>> getGrowFlow( GrowFlowQuery gfq){
@@ -196,9 +201,9 @@ public class ScoreController {
 	}
 	
 	
-	@NotLogin
+	
     @ApiOperation("获取全部成长明细")
-	@UserBehaviorValidation(login = true)
+	@UserBehaviorValidation(login = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/grow/flow/list")
 	public Response<List<GrowFlowReportVo>> getGrowFlowALL( GrowFlowQuery gfq){
