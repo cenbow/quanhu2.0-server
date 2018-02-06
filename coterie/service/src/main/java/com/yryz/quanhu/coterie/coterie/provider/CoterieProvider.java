@@ -10,6 +10,9 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 import com.yryz.quanhu.coterie.coterie.vo.*;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +38,7 @@ import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import com.yryz.quanhu.score.vo.EventReportVo;
 
 /**
  * 私圈服务实现
@@ -49,11 +53,15 @@ public class CoterieProvider implements CoterieApi {
 
 	@Reference
 	private UserApi userApi;
+	
 	@Reference
 	private AccountApi accountApi;
 	
 	@Value("${coterie.qr.url}")
 	private String coterieQrUrl;
+	
+	@Reference
+	private EventAPI eventAPI;
 	
 	/**
 	 * 查询私圈信息列表
@@ -182,6 +190,19 @@ public class CoterieProvider implements CoterieApi {
 		UserSimpleVO cust=ResponseUtils.getResponseData(userApi.getUserSimple(Long.valueOf(info.getOwnerId())));
 		if(cust==null){
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "用户不存在","用户("+info.getOwnerId()+")不存在");
+		}
+		EventInfo param=new EventInfo();
+		param.setUserId(info.getOwnerId());
+		EventReportVo vo=ResponseUtils.getResponseData(eventAPI.getScoreFlowList(param));
+		int level=1;
+		if(vo==null){
+			level=1;
+		}else{
+			level=Integer.valueOf(vo.getGrowLevel());
+		}
+		if(level<5){
+			String msg="当前用户等级为"+level+",5级以上才能创建私圈";
+			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,msg);
 		}
 	}
 	/**
