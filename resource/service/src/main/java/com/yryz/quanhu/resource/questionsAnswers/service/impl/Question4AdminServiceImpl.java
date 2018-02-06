@@ -23,8 +23,11 @@ import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
+import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
+import com.yryz.quanhu.resource.questionsAnswers.entity.Answer;
+import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
 import com.yryz.quanhu.resource.questionsAnswers.service.*;
@@ -55,6 +58,9 @@ public class Question4AdminServiceImpl implements Question4AdminService {
 
     @Autowired
     private QuestionDao questionDao;
+
+    @Autowired
+    private AnswerDao answerDao;
 
     @Autowired
     private APIservice apIservice;
@@ -99,10 +105,26 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         QuestionExample example = new QuestionExample();
         example.setPageStartIndex(pageStartIndex);
         example.setPageSize(pageSize);
+        example.setOrderByClause("create_date desc");
 
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
+        if(StringUtils.isNotBlank(dto.getLastAnswerDateBegin()) && StringUtils.isNotBlank(dto.getLastAnswerDateEnd())){
+            AnswerExample answerExample=new AnswerExample();
+            AnswerExample.Criteria answerCriteria=answerExample.createCriteria();
+            answerCriteria.andCreateDateBetween(DateUtils.parseDate(dto.getLastAnswerDateBegin()),
+                    DateUtils.parseDate(dto.getLastAnswerDateEnd()));
+            List<Answer> answers=this.answerDao.selectByExample(answerExample);
+            if(answers!=null && !answers.isEmpty()){
+                List<Long> kids=new ArrayList<>();
+                for(Answer answer:answers){
+                    kids.add(answer.getQuestionId());
+                }
+                criteria.andKidIn(kids);
+            }
+        }
+
         Long coteriaId = dto.getCoterieId();
         if(coteriaId!=null) {
             criteria.andCoterieIdEqualTo(coteriaId);
@@ -186,7 +208,7 @@ public class Question4AdminServiceImpl implements Question4AdminService {
               questionVo.setUser(userSimpleVO);
             }
             if(question.getTargetId()!=null){
-                UserSimpleVO userSimpleVO= apIservice.getUser(question.getCreateUserId());
+                UserSimpleVO userSimpleVO= apIservice.getUser(Long.valueOf(question.getTargetId()));
                 questionVo.setTargetUser(userSimpleVO);
             }
             questionAnswerVo.setQuestion(questionVo);

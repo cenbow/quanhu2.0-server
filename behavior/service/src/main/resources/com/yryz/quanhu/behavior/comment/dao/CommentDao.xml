@@ -33,7 +33,7 @@
         user_img AS userImg,resource_id AS resourceId
     </sql>
 
-    <insert id="accretion" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
+    <insert id="accretion" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment" useGeneratedKeys="true" keyProperty="id">
         insert into qh_comment_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="kid != null">
@@ -268,5 +268,16 @@
         </where>
     </select>
 
+    <select id="querySingleCommentById" parameterType="java.lang.Long" resultType="com.yryz.quanhu.behavior.comment.entity.Comment">
+        SELECT
+        <include refid="Base_Comment_Column_List_trans"/>
+        FROM qh_comment_info
+        <where>
+            1=1
+            <if test="id!=null">
+                AND id=#{id,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
 
 </mapper>
