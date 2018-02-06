@@ -1020,7 +1020,8 @@ public class AccountProvider implements AccountApi {
 				thirdUser = OatuhWeibo.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());
 			} // qq
 			else if (loginDTO.getType() == RegType.QQ.getType()) {
-				thirdUser = OatuhQq.getUser(ThirdConstants.QQ_APP_ID, loginDTO.getOpenId(), loginDTO.getAccessToken());
+				ThirdLoginConfigVO configVO = getThirdLoginConfig(appId);
+				thirdUser = OatuhQq.getUser(configVO.getQqAppKey(), loginDTO.getOpenId(), loginDTO.getAccessToken());
 			} // 微信
 			else {
 				thirdUser = OatuhWeixin.getUser(loginDTO.getOpenId(), loginDTO.getAccessToken());

@@ -60,13 +60,11 @@ public class BaseHttpSSLSocketFactory extends SSLSocketFactory {
 
 	@Override
 	public String[] getSupportedCipherSuites() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String[] getDefaultCipherSuites() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

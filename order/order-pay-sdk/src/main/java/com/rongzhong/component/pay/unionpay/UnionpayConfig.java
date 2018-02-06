@@ -60,7 +60,6 @@ public class UnionpayConfig {
 		//注意:1.需设置为外网能访问，否则收不到通知    2.http https均可  3.收单后台通知后需要10秒内返回http200或302状态码 
 		//    4.如果银联通知服务器发送通知后10秒内未收到返回状态码或者应答码非http200或302，那么银联会间隔一段时间再次发送。总共发送5次，银联后续间隔1、2、4、5 分钟后会再次通知。
 		//    5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
-		//TODO
 		contentData.put("backUrl", DemoBase.backUrl);
 				
 		/**对请求参数进行签名并发送http post请求，接收同步应答报文**/
@@ -77,7 +76,6 @@ public class UnionpayConfig {
 				System.out.println("respCode:" + respCode);
 				if(("00").equals(respCode)){
 					//交易已受理(不代表交易已成功），等待接收后台通知确定交易成功，也可以主动发起 查询交易确定交易状态。
-					//TODO
 					
 					
 					//如果返回卡号且配置了敏感信息加密，解密卡号方法：
@@ -92,14 +90,12 @@ public class UnionpayConfig {
 						 ("34").equals(respCode) ||
 						 ("60").equals(respCode) ){
 					//后续需发起交易状态查询交易确定交易状态。
-					//TODO
 				}else{
 					//其他应答码为失败请排查原因
-					//TODO
 				}
 			}else{
 				LogUtil.writeErrorLog("验证签名失败");
-				//TODO 检查验证签名失败的原因
+				//检查验证签名失败的原因
 			}	
 		}else{
 			//未返回正确的http状态

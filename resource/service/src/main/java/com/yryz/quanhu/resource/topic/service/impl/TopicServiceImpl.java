@@ -200,7 +200,7 @@ public class TopicServiceImpl implements TopicService {
 
         Topic topic = this.topicDao.selectByPrimaryKey(kid);
         if (null == topic) {
-            throw QuanhuException.busiError("删除的话题不存在");
+            throw QuanhuException.busiError("","删除的话题不存在","删除的话题不存在");
         }
         if (topic.getCreateUserId().compareTo(userId) != 0) {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);

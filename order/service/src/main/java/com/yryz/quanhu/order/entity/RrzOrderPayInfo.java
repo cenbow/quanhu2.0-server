@@ -124,7 +124,6 @@ public class RrzOrderPayInfo extends PageEntity implements Serializable {
 	 */
 	public RrzOrderPayInfo() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

@@ -126,12 +126,12 @@ public class QuestionServiceImpl implements QuestionService {
          *校验私圈是否合法
          */
         if (targetId.equals(String.valueOf(createUserId))) {
-            throw QuanhuException.busiError("不能向自己提问。");
+            throw QuanhuException.busiError("","不能向自己提问。","不能向自己提问。");
         }
         CoterieInfo coterieInfo = apIservice.getCoterieinfo(citeriaId);
         if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || COTERIE_STATUS_UP.compareTo(coterieInfo.getStatus()) != 0)
         {
-            throw QuanhuException.busiError("提问的私圈不存在。");
+            throw QuanhuException.busiError("","提问的私圈不存在。","提问的私圈不存在。");
         }
         Integer consultingFee = coterieInfo.getConsultingFee() == null ? 0 : coterieInfo.getConsultingFee();
         //保存提问费用
@@ -139,20 +139,20 @@ public class QuestionServiceImpl implements QuestionService {
 
         //圈主10 成员20 路人未审请30 路人待审核40
         if (!checkIdentity(createUserId, Long.valueOf(citeriaId), MemberConstant.Permission.MEMBER)) {
-            throw QuanhuException.busiError("您还不是该私圈成员，请先加入私圈");
+            throw QuanhuException.busiError("","您还不是该私圈成员，请先加入私圈","您还不是该私圈成员，请先加入私圈");
         }
 
         if (!checkIdentity(Long.valueOf(targetId), Long.valueOf(citeriaId), MemberConstant.Permission.OWNER)) {
-            throw QuanhuException.busiError("不能向非圈主用户提问.");
+            throw QuanhuException.busiError("","不能向非圈主用户提问.","不能向非圈主用户提问.");
         }
 
         if (StringUtils.isBlank(content) || content.length() > CONTENT_LENGTH_MAX || content.length() < CONTENT_LENGTH_MIN) {
-            throw QuanhuException.busiError("提问正文只能输入文字,10到300字.");
+            throw QuanhuException.busiError("","提问正文只能输入文字,10到300字.","提问正文只能输入文字,10到300字.");
         }
         if (consultingFee > 0) {
             UserAccount userAccount = orderSDK.getUserAccount(createUserId);
             if (userAccount == null) {
-                throw QuanhuException.busiError("提问者没有账户信息.");
+                throw QuanhuException.busiError("","提问者没有账户信息.","提问者没有账户信息.");
             }
             Long accountSum = userAccount.getAccountSum() == null ? 0L : userAccount.getAccountSum();
             if (consultingFee > accountSum) {
@@ -258,19 +258,18 @@ public class QuestionServiceImpl implements QuestionService {
          */
         Question questionBySearch = this.questionDao.selectByPrimaryKey(kid);
         if (null == questionBySearch) {
-            throw QuanhuException.busiError("删除的问题不存在");
+            throw QuanhuException.busiError("","删除的问题不存在","删除的问题不存在");
         }
         if (userId.compareTo(questionBySearch.getCreateUserId()) != 0) {
-            throw QuanhuException.busiError("非本人不能删除问题");
+            throw QuanhuException.busiError("","非本人不能删除问题","非本人不能删除问题");
         }
-//        if (questionBySearch.getAnswerdFlag().compareTo(QuestionAnswerConstants.AnswerdFlag.ANSWERED) != 0) {
-////            throw QuanhuException.busiError("问题已经回答，不能删除");
-////        }
+
         questionBySearch.setDelFlag(CommonConstants.DELETE_YES);
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0) {
+        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0
+                && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionBySearch.getAnswerdFlag())==0) {
             Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
             if (null != orderId) {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
@@ -385,11 +384,11 @@ public class QuestionServiceImpl implements QuestionService {
 
         Question question = this.questionDao.selectByPrimaryKey(kid);
         if (null == question) {
-            throw QuanhuException.busiError("圈主拒接回答的问题不存在");
+            throw QuanhuException.busiError("","圈主拒接回答的问题不存在","圈主拒接回答的问题不存在");
         }
 
         if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) != 0) {
-            throw QuanhuException.busiError("该问题未付费成功，无法拒绝");
+            throw QuanhuException.busiError("","该问题未付费成功，无法拒绝","该问题未付费成功，无法拒绝");
         }
         String targetId = question.getTargetId();
         if (!String.valueOf(userId).equals(targetId)) {
