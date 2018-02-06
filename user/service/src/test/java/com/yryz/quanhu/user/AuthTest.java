@@ -47,9 +47,9 @@ public class AuthTest {
 	public void refreshToken(){
 		final String name = "2, refreshToken";
 		try {
-			Long userId = 724011759597371392L;
-			String token = "724011759597371392-NbrqutpC2MSG1517901435034";
-			String refreshToken = "724011759597371392-c4p9CKy2PJcN1517901435034";
+			Long userId = 739855842419507200l;
+			String token = "739855842419507200-iXimWc5UIeEK1517900966647";
+			String refreshToken = "739855842419507200-n8qTcivNcplq1517900966647";
 			AuthTokenDTO tokenDTO = new AuthTokenDTO(userId, DevType.ANDROID, "vebff12m1762",token);
 			AuthRefreshDTO refreshDTO = new AuthRefreshDTO(refreshToken, true);
 			refreshDTO.setAppId(tokenDTO.getAppId());

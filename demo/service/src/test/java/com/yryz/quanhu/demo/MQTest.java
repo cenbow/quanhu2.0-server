@@ -23,7 +23,7 @@ import com.yryz.quanhu.demo.mq.AmqpConstant;
  * @author yehao
  * @version 2.0
  * @date 2018年1月17日 下午3:26:27
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
