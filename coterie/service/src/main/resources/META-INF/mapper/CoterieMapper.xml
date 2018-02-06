@@ -403,6 +403,15 @@
     WHERE owner_id=#{custId}
     and (state =10 or shelve_flag=10)
   </select>
+  
+  <select id="selectCreateCoterie" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from qh_coterie
+    WHERE owner_id=#{custId} and shelve_flag=10
+    ORDER BY create_date DESC
+    limit #{start},#{pageSize}
+  </select>
 
   <select id="selectMyJoinCoterie" resultMap="BaseResultMap">
     SELECT c.*

@@ -47,6 +47,12 @@ public interface CoterieMapper {
      * @return
      */
     Integer selectMyCreateCoterieCount(@Param("custId") String custId);
+    
+    /**
+     * 个人主页创建的私圈
+     * @return
+     */
+    List<Coterie> selectCreateCoterie(@Param("custId") String custId,@Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
     List<Coterie> selectMyJoinCoterie(@Param("custId") String custId);
     
