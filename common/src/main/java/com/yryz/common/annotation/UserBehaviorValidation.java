@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
- * <p>
+ * <p>登录、平台禁言、拉黑、敏感词、私圈成员、私圈禁言
  * Created on 2018/1/24 20:01
  * Created by huangxy
  */
@@ -60,7 +60,7 @@ public @interface UserBehaviorValidation {
     */
     boolean blacklist() default false;
     /**  
-    * @Description: 铭感词 
+    * @Description: 敏感词
     * @author wangheng
     * @param @return
     * @return boolean
