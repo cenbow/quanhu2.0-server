@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
 			if (user != null && nickName.equals(user.getUserNickName())) {
 				baseInfo.setUserNickName(null);
 			} else {
-				existByName = this.getUserByNickName(baseInfo.getAppId(), nickName);
+				existByName = this.getUserByNickName(user.getAppId(), nickName);
 			}
 			// 昵称已存在
 			if (existByName != null) {
@@ -582,6 +582,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Long> getUserIdByCreateDate(String startDate, String endDate) {
 		return custbaseinfoDao.getUserIdByCreateDate(startDate, endDate);
+	}
+
+	@Override
+	public List<UserBaseInfo> getUserListByCreateDate(String startDate, String endDate) {
+		return custbaseinfoDao.getUserListByCreateDate(startDate, endDate);
 	}
 
 	@Override

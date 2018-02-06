@@ -1,17 +1,24 @@
 package com.yryz.quanhu.dymaic.canal.dao;
 
+import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
-import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
-import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
-import com.yryz.quanhu.user.dto.StarInfoDTO;
-import org.elasticsearch.index.query.*;
+import com.google.common.collect.Lists;
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.user.vo.UserInfoVO;
+import org.apache.commons.collections.CollectionUtils;
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.user.vo.UserInfoVO;
+import org.apache.commons.collections.CollectionUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -22,13 +29,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Repository;
 
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
-
-import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
+import com.yryz.quanhu.user.contants.AdminQueryUserStatus;
+import com.yryz.quanhu.user.contants.UserAccountStatus;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 
 @Repository
 public class UserInfoSearchImpl implements UserInfoSearch {
@@ -96,7 +111,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
     }
 
     @Override
-    public List<UserInfo> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
+    public PageList<UserInfoVO> adminSearchUser(AdminUserInfoDTO adminUserDTO) {
         Integer pageNo = adminUserDTO.getPageNo();
         Integer pageSize = adminUserDTO.getPageSize();
         String startDateStr = adminUserDTO.getStartDate();
@@ -113,6 +128,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte authType = adminUserDTO.getAuthType();
         Byte authWay = adminUserDTO.getAuthWay();
         String growLevel = adminUserDTO.getGrowLevel();
+        Integer userStatus = adminUserDTO.getUserStatus();
+        String appId = adminUserDTO.getAppId();
+        Set<Long> tagIds = adminUserDTO.getTagIds();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNoneBlank(nickName)) {
@@ -136,6 +154,23 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if (growLevel != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
         }
+        if(StringUtils.isNotBlank(appId)){
+        	boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
+        }
+
+        if (CollectionUtils.isNotEmpty(tagIds)) {
+            BoolQueryBuilder tagBoolQusery = QueryBuilders.boolQuery();
+            for (Long tagId : tagIds) {
+                tagBoolQusery.should(QueryBuilders.matchQuery(ESConstants.USER_TAG_ID, tagId));
+            }
+            boolQueryBuilder.must(tagBoolQusery);
+        }
+        if(userStatus != null){
+        	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
+        		boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
+        		boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.BAN_POST_TIME).lte(System.currentTimeMillis()));
+        	}
+        }
         if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
             long startDate = DateUtils.parseDate(startDateStr).getTime();
             long endDate = DateUtils.parseDate(endDateStr).getTime();
@@ -143,11 +178,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
-
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         queryBuilder.withFilter(boolQueryBuilder)
                 .withPageable(pageable);
-
         List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
         for (FieldSortBuilder sortBuilder : sortBuilders) {
             queryBuilder.withSort(sortBuilder);
@@ -155,7 +188,19 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         SearchQuery query = queryBuilder.build();
         logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
-        return elasticsearchTemplate.queryForList(query, UserInfo.class);
+        AggregatedPage<UserInfo> page = elasticsearchTemplate.queryForPage(query, UserInfo.class);
+        List<UserInfo> userInfoList = page.getContent();
+        List<UserInfoVO> userInfoVOS = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(userInfoList)) {
+            userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
+        }
+        PageList<UserInfoVO> pageList = new PageList<>();
+        pageList.setCurrentPage(pageNo);
+        pageList.setPageSize(pageSize);
+        pageList.setEntities(userInfoVOS);
+        pageList.setCount(page.getTotalElements());
+//        logger.info("elasticsearchTemplate page result: {}", GsonUtils.parseJson(page));
+        return pageList;
     }
 
     private List<FieldSortBuilder> getAdminUserSortBuilder() {

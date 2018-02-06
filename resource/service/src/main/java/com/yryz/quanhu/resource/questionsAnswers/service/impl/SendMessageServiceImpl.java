@@ -7,6 +7,7 @@ import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.order.sdk.constant.FeeDetail;
@@ -85,11 +86,11 @@ public class SendMessageServiceImpl implements SendMessageService {
          * 组装MessageVo对象
          */
         MessageVo messageVo = new MessageVo();
-        messageVo.setMessageId(UUID.randomUUID().toString());
+        messageVo.setMessageId(IdGen.uuid());
         messageVo.setResourceId(String.valueOf(kid));
         messageVo.setCoterieId(String.valueOf(coterieId));
         messageVo.setActionCode(messageConstant.getMessageActionCode());
-        messageVo.setCreateTime(DateUtils.getTime());
+        messageVo.setCreateTime(DateUtils.getDateTime());
         messageVo.setLabel(messageConstant.getLabel());
         messageVo.setType(messageConstant.getType());
         messageVo.setTitle(messageConstant.getTitle());

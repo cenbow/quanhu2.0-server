@@ -43,7 +43,11 @@
 	<include refid="Base_Column_List" />
 	FROM qh_user_baseinfo 
 	where 
-	 user_nick_name = #{nickName} and app_id = #{appId} and del_flag = 10 and user_status != 12
+	 user_nick_name = #{nickName} 
+	 <if test="appId != null and appId != ''">
+	 	and app_id = #{appId}
+	 </if>
+	  and del_flag = 10 and user_status != 12
 	LIMIT 1
   </select>
   
@@ -456,6 +460,14 @@
 	where a.create_date &gt;= #{startDate}
 		and a.create_date &lt;= #{endDate}
   </select>
+
+    <select id="getUserListByCreateDate" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from qh_user_baseinfo a
+        where a.create_date &gt;= #{startDate}
+        and a.create_date &lt;= #{endDate}
+    </select>
    
   <select id="getAllByUserIds" resultMap="BaseResultMap">
 	select

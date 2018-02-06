@@ -63,6 +63,22 @@ public class RegisterDTO implements Serializable {
 	 */
 	private String activityChannelCode;
 	/**
+	 * 是否马甲 10-否 11-是
+	 */
+	private Integer isVest;
+	/**
+	 * 用户头像
+	 */
+	private String userImg;
+	/**
+	 * 用户简介
+	 */
+	private String userDesc;
+	/**
+	 * 用户签名
+	 */
+	private String userSign;
+	/**
 	 * 注册日志对象
 	 */
 	private UserRegLogDTO regLogDTO;
@@ -138,6 +154,30 @@ public class RegisterDTO implements Serializable {
 	public void setActivityChannelCode(String activityChannelCode) {
 		this.activityChannelCode = activityChannelCode;
 	}
+	public Integer getIsVest() {
+		return isVest;
+	}
+	public void setIsVest(Integer isVest) {
+		this.isVest = isVest;
+	}
+	public String getUserImg() {
+		return userImg;
+	}
+	public void setUserImg(String userImg) {
+		this.userImg = userImg;
+	}
+	public String getUserDesc() {
+		return userDesc;
+	}
+	public void setUserDesc(String userDesc) {
+		this.userDesc = userDesc;
+	}
+	public String getUserSign() {
+		return userSign;
+	}
+	public void setUserSign(String userSign) {
+		this.userSign = userSign;
+	}
 	/**
 	 * 
 	 */
@@ -164,6 +204,19 @@ public class RegisterDTO implements Serializable {
 		this.userChannel = userChannel;
 		this.userPhone = userPhone;
 		this.userPwd = userPwd;
+		this.regLogDTO = regLogDTO;
+	}
+	public RegisterDTO(String userChannel, String userNickName, String userPhone, String userPwd, Integer isVest,
+			String userImg, String userDesc, String userSign, UserRegLogDTO regLogDTO) {
+		super();
+		this.userChannel = userChannel;
+		this.userNickName = userNickName;
+		this.userPhone = userPhone;
+		this.userPwd = userPwd;
+		this.isVest = isVest;
+		this.userImg = userImg;
+		this.userDesc = userDesc;
+		this.userSign = userSign;
 		this.regLogDTO = regLogDTO;
 	}
 	@Override

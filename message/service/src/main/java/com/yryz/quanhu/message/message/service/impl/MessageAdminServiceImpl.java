@@ -8,6 +8,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.utils.*;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.constants.MessageContants;
+import com.yryz.quanhu.message.message.constants.MessageMap;
 import com.yryz.quanhu.message.message.dto.MessageAdminDto;
 import com.yryz.quanhu.message.message.mongo.MessageAdminMongo;
 import com.yryz.quanhu.message.message.mq.MessageSender;
@@ -20,7 +21,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,18 +71,22 @@ public class MessageAdminServiceImpl implements MessageAdminService {
     }
 
     @Override
-    public Boolean push(MessageAdminVo messageAdminVo) {
-        String msg = "";
-        try {
-            messageAdminVo.setMessageId(IdGen.uuid());
-            if (messageAdminVo.getPushType() != null && messageAdminVo.getPushType().equals(MessageContants.PUSH_TYPE_START)) {
-                messageAdminVo.setPushStatus(MessageContants.PUSH_STATUS_ING);
-            }
-            messageAdminMongo.save(messageAdminVo);
+    public MessageAdminVo push(MessageAdminVo messageAdminVo) {
+        if (messageAdminVo.getPushType() == null) {
+            throw QuanhuException.busiError("pushType不能为空！");
+        }
 
-            msg = JSON.toJSONString(messageAdminVo);
-            messageSender.send(msg);
-            return true;
+        String msg = "";
+        messageAdminVo.setMessageId(IdGen.uuid());
+        try {
+            if (messageAdminVo.getPushType().equals(MessageContants.PUSH_TYPE_START)) {
+                messageAdminVo.setPushStatus(MessageContants.PUSH_STATUS_ING);
+                MessageAdminVo adminVo = messageAdminMongo.save(messageAdminVo);
+                msg = JSON.toJSONString(messageAdminVo);
+                messageSender.send(msg);
+                return adminVo;
+            }
+            return messageAdminMongo.save(messageAdminVo);
         } catch (Exception e) {
             LOGGER.error("发送消息失败! " + msg, e);
             throw QuanhuException.busiError("发送消息失败!" + e);
@@ -154,9 +158,9 @@ public class MessageAdminServiceImpl implements MessageAdminService {
                             messageHandle(messageAdminVo);
                         }
                     }, millisecond, TimeUnit.MILLISECONDS);
-
-                    RedisTemplate<String, ScheduledFuture> redisTemplate = redisTemplateBuilder.buildRedisTemplate(ScheduledFuture.class);
-                    redisTemplate.opsForValue().set(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId(), schedule, millisecond, TimeUnit.MILLISECONDS);
+                    MessageMap.MAP.put(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId(), schedule);
+                   /* RedisTemplate<String, ScheduledFuture> redisTemplate = redisTemplateBuilder.buildRedisTemplate(ScheduledFuture.class);
+                    redisTemplate.opsForValue().set(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId(), schedule, millisecond, TimeUnit.MILLISECONDS);*/
                 } catch (Exception e) {
                     LOGGER.error("设置定时任务异常,开始取消定时任务", e);
 
@@ -176,30 +180,46 @@ public class MessageAdminServiceImpl implements MessageAdminService {
     }
 
     @Override
-    public Boolean update(MessageAdminVo messageAdminVo) {
+    public MessageAdminVo update(MessageAdminVo messageAdminVo) {
         //管理后台编辑功能：先取消之前的定时任务，然后在发往队列
-        RedisTemplate<String, ScheduledFuture> redisTemplate = redisTemplateBuilder.buildRedisTemplate(ScheduledFuture.class);
-        ScheduledFuture<?> scheduledFuture = redisTemplate.opsForValue().get(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
-        boolean cancel = scheduledFuture.cancel(true);
+        /*RedisTemplate<String, ScheduledFuture> redisTemplate = redisTemplateBuilder.buildRedisTemplate(ScheduledFuture.class);
+        ScheduledFuture<?> scheduledFuture = redisTemplate.opsForValue().get(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());*/
+        /*ScheduledFuture scheduledFuture = MessageMap.MAP.get(QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+        boolean cancel = false;
+        if (scheduledFuture != null) {
+            cancel = scheduledFuture.cancel(true);
+            if (cancel) {
+                if (deleteMessage(messageAdminVo)) return true;
 
-        if (cancel) {
-            Integer delFlag = messageAdminVo.getDelFlag();
-            if (delFlag != null && delFlag.equals(MessageContants.DEL_FLAG_DELETE)) {
+                String msg = JSON.toJSONString(messageAdminVo);
+                messageSender.send(msg);
                 messageAdminMongo.update(messageAdminVo);
                 return true;
             }
+            LOGGER.error("===========取消定时任务出错！===========messageId-->" + QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+            throw QuanhuException.busiError("取消定时任务出错！messageId-->" + QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+        }
 
-            String msg = JSON.toJSONString(messageAdminVo);
-            messageSender.send(msg);
+        return deleteMessage(messageAdminVo);*/
+        return messageAdminMongo.update(messageAdminVo);
+    }
+
+    private boolean deleteMessage(MessageAdminVo messageAdminVo) {
+        Integer delFlag = messageAdminVo.getDelFlag();
+        if (delFlag != null && delFlag.equals(MessageContants.DEL_FLAG_DELETE)) {
             messageAdminMongo.update(messageAdminVo);
             return true;
         }
-        LOGGER.error("===========取消定时任务出错！===========messageId-->" + QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
-        throw QuanhuException.busiError("取消定时任务出错！messageId-->" + QH_MESSAGE_ADMIN_SCHEDULE + messageAdminVo.getMessageId());
+        return false;
     }
 
     @Override
     public MessageAdminVo findOne(MessageAdminDto messageAdminDto) {
         return messageAdminMongo.findOne(messageAdminDto);
+    }
+
+    @Override
+    public List<MessageAdminVo> startCheck() {
+        return messageAdminMongo.startCheck();
     }
 }

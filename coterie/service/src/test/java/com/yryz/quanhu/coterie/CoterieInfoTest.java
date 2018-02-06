@@ -50,7 +50,7 @@ public class CoterieInfoTest {
     
     @Test
     public void getMyCreateCoterie() {
-    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getMyCreateCoterie("729669966696603648"));
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getMyCreateCoterie("729669966696603648",1,10));
     	System.out.println(list);
     }
     
@@ -78,4 +78,15 @@ public class CoterieInfoTest {
     	System.out.println(list);
     }
     
+    @Test
+    public void regroupQr() {
+    	String list=ResponseUtils.getResponseData(coterieApi.regroupQr(8764485668L));
+    	System.out.println(list);
+    }
+    
+    @Test
+    public void getCreateCoterie() {
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getCreateCoterie("729669966696603648", 1, 10));
+    	System.out.println(list);
+    }
 }

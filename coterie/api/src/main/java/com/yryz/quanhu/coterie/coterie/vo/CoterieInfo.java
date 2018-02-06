@@ -35,7 +35,7 @@ public class CoterieInfo implements Serializable{
      * 个人简介
      */
     private String ownerIntro;
-    
+
 	/**
 	 * 私圈名称
 	 */
@@ -182,13 +182,6 @@ public class CoterieInfo implements Serializable{
 		this.custIcon = custIcon;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getIcon() {
 		return icon;
@@ -350,41 +343,12 @@ public class CoterieInfo implements Serializable{
 		this.redDot = redDot;
 	}
 
-	@Override
-	public String toString() {
-		return "CoterieInfo [coterieId=" + coterieId + ", ownerId=" + ownerId + ", custIcon=" + custIcon
-				+ ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro + ", name=" + name + ", icon=" + icon
-				+ ", intro=" + intro + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee + ", joinCheck="
-				+ joinCheck + ", memberNum=" + memberNum + ", status=" + status + ", processTime=" + processTime
-				+ ", heat=" + heat + ", shelveFlag=" + shelveFlag + ", deleted=" + deleted + ", createDate="
-				+ createDate + ", lastUpdateDate=" + lastUpdateDate + ", revision=" + revision + ", isExpert="
-				+ isExpert + ", recommend=" + recommend + ", masterLastViewTime=" + masterLastViewTime
-				+ ", auditUserId=" + auditUserId + ", auditRemark=" + auditRemark + ", redDot=" + redDot + ", user="
-				+ user + "]";
+	public String getName() {
+		return name;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		CoterieInfo other = (CoterieInfo) obj;
-		if (coterieId == null) {
-			if (other.coterieId != null) {
-				return false;
-			}
-		} else if (!coterieId.equals(other.coterieId)) {
-			return false;
-		}
-		
-		return true;
+	public void setName(String name) {
+		this.name = name;
 	}
-
 }
 

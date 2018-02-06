@@ -25,6 +25,7 @@ import com.yryz.common.utils.*;
 import com.yryz.quanhu.order.enums.*;
 import com.yryz.quanhu.order.vo.*;
 import com.yryz.quanhu.support.config.api.BasicConfigApi;
+import com.yryz.quanhu.support.id.api.IdAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +110,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Reference
 	private BasicConfigApi basicConfigApi;
+
+	@Reference
+	private IdAPI idAPI;
 	
 //	@Autowired
 //	private NotifyQueue notifyQueue;
@@ -428,6 +432,7 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	private void executeCashRefundOrder(RrzOrderPayInfo rrzOrderPayInfo) {
 		logger.info("开始执行提现退款，rrzOrderPayInfo={}",JSON.toJSONString(rrzOrderPayInfo));
+		String orderId = ResponseUtils.getResponseData(idAPI.getOrderId());
 		// 执行资金变动
 		RrzOrderInfo orderInfo = new RrzOrderInfo();
 		orderInfo.setCost(rrzOrderPayInfo.getCostTrue());
@@ -435,7 +440,7 @@ public class OrderServiceImpl implements OrderService {
 			orderInfo.setCustId(rrzOrderPayInfo.getCustId());
 		}
 		orderInfo.setOrderDesc(OrderDescEnum.INTEGRAL_CASH_REFUND);
-		orderInfo.setOrderId(rrzOrderPayInfo.getOrderId());
+		orderInfo.setOrderId(orderId);
 		orderInfo.setOrderType(1);
 		orderInfo.setProductDesc(ProductEnum.CASH_REFUND.getDesc());
 		orderInfo.setProductId(ProductEnum.CASH_REFUND.getType() + "");
@@ -447,7 +452,7 @@ public class OrderServiceImpl implements OrderService {
 		orderIntegralHistory.setCost(rrzOrderPayInfo.getCostTrue());
 		orderIntegralHistory.setCustId(rrzOrderPayInfo.getCustId());
 		orderIntegralHistory.setOrderDesc(OrderDescEnum.INTEGRAL_CASH_REFUND);
-		orderIntegralHistory.setOrderId(rrzOrderPayInfo.getOrderId());
+		orderIntegralHistory.setOrderId(orderId);
 		orderIntegralHistory.setOrderType(1);
 		orderIntegralHistory.setProductDesc(ProductEnum.CASH_REFUND.getDesc());
 		orderIntegralHistory.setProductId(ProductEnum.CASH_REFUND.getType() + "");

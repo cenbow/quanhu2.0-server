@@ -70,6 +70,13 @@ public interface CoterieService {
 	Integer findMyCreateCoterieCount(String custId);
 	
 	/**
+	 * 个人主页创建的私圈列表 已上线的
+	 * @param custId
+	 * @return
+	 */
+	List<CoterieInfo> findCreateCoterie(String custId,Integer pageNum,Integer pageSize);
+	
+	/**
 	 * 我参与的私圈列表
 	 * @param custId
 	 * @return

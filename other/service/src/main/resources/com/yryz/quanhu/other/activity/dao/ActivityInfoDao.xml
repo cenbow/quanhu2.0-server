@@ -518,10 +518,8 @@
 		select
 		<include refid="Base_Column_List" />
 		from qh_activity_info where shelve_flag=10 and NOW()>=online_time
-		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==11">
-			<![CDATA[
-	    	AND begin_time > NOW()
-	       ]]>
+		<if test="activityInfoDto.activityType != null and ''!=activityInfoDto.activityType">
+			AND activity_type = #{activityInfoDto.activityType}
 		</if>
 		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==12">
 			<![CDATA[
@@ -544,7 +542,16 @@
 	    	and remark like CONCAT('%',#{activityInfoDto.remark},'%')
 	    	 ]]>
 		</if>
-
+		<if test="activityInfoDto.beginTimeStart != null">
+			<![CDATA[
+	    	AND begin_time >= #{activityInfoDto.beginTimeStart}
+	       ]]>
+		</if>
+		<if test="activityInfoDto.beginTimeEnd != null ">
+			<![CDATA[
+	    	AND end_time <= #{activityInfoDto.beginTimeEnd}
+	       ]]>
+		</if>
 		<if test="activityInfoDto.orderType	=='sort'">
 			order by sort desc
 		</if>

@@ -120,6 +120,8 @@ public class Coterie implements Serializable {
 	 */
 	private Byte recommend;
 
+	private String ownerName;
+
 	/**
 	 * 圈主最后访问时间
 	 */
@@ -146,14 +148,6 @@ public class Coterie implements Serializable {
 
 	public void setCoterieId(Long coterieId) {
 		this.coterieId = coterieId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getIcon() {
@@ -324,36 +318,19 @@ public class Coterie implements Serializable {
 		this.redDot = redDot;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj){
-			return true;
-		}
-		if (obj == null){
-			return false;
-		}
-		if (getClass() != obj.getClass()){
-			return false;
-		}
-		Coterie other = (Coterie) obj;
-		if (coterieId == null) {
-			if (other.coterieId != null){
-				return false;
-			}
-		} else if (!coterieId.equals(other.coterieId)){
-			return false;
-		}
-		return true;
+	public String getName() {
+		return name;
 	}
 
-	@Override
-	public String toString() {
-		return "Coterie [id=" + id + ", coterieId=" + coterieId + ", name=" + name + ", icon=" + icon + ", intro="
-				+ intro + ", ownerId=" + ownerId + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee
-				+ ", joinCheck=" + joinCheck + ", memberNum=" + memberNum + ", status=" + status + ", processTime="
-				+ processTime + ", heat=" + heat + ", shelveFlag=" + shelveFlag + ", deleted=" + deleted
-				+ ", createDate=" + createDate + ", lastUpdateDate=" + lastUpdateDate + ", revision=" + revision
-				+ ", isExpert=" + isExpert + ", recommend=" + recommend + ", masterLastViewTime=" + masterLastViewTime
-				+ ", auditUserId=" + auditUserId + ", auditRemark=" + auditRemark + ", redDot=" + redDot + "]";
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 }

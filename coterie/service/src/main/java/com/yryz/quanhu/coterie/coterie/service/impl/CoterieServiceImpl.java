@@ -196,4 +196,11 @@ public class CoterieServiceImpl implements CoterieService {
 		List<Coterie> list = coterieMapper.selectOrderByMemberNum();
 		return GsonUtils.parseList(list, CoterieInfo.class);
 	}
+
+	@Override
+	public List<CoterieInfo> findCreateCoterie(String custId, Integer pageNum, Integer pageSize) {
+		int start=(pageNum-1)*pageSize;
+		List<Coterie> list = coterieMapper.selectCreateCoterie(custId, start, pageSize);
+		return GsonUtils.parseList(list, CoterieInfo.class);
+	}
 }

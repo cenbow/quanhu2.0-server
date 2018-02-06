@@ -80,6 +80,11 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private Byte auditStatus;
 
+	/**
+	 * 是否被推荐 10:否 11:是
+	 */
+	private Byte recommendStatus;
+
 	//注册信息
 	/**
 	 * 渠道号
@@ -101,19 +106,17 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 申请认证结束时间
 	 */
 	private String applyAuthEndDate;
-
+	
 	/**
-	 * 是否需要查询用户收入信息
-	 * @return
+	 * 是否需要收入 
 	 */
-	private Boolean needIntegral;
-
-	public Boolean getNeedIntegral() {
-		return needIntegral;
+	private Boolean needIntegral = false;
+	public Byte getRecommendStatus() {
+		return recommendStatus;
 	}
 
-	public void setNeedIntegral(Boolean needIntegral) {
-		this.needIntegral = needIntegral;
+	public void setRecommendStatus(Byte recommendStatus) {
+		this.recommendStatus = recommendStatus;
 	}
 
 	public String getApplyAuthBeginDate() {
@@ -261,6 +264,15 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setUserRole(Integer userRole) {
 		this.userRole = userRole;
 	}
+
+	public Boolean getNeedIntegral() {
+		return needIntegral;
+	}
+
+	public void setNeedIntegral(Boolean needIntegral) {
+		this.needIntegral = needIntegral;
+	}
+
 	public AdminUserInfoDTO() {
 		super();
 	}

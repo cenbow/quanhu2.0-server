@@ -6,6 +6,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class TopicVo implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
@@ -38,6 +39,11 @@ public class TopicVo implements Serializable {
     private String moduleEnum;
 
     private Long createUserId;
+
+    /**
+     * 阅读数状态
+     */
+    private Map<String, Long> statistics;
 
     public Long getKid() {
         return kid;
@@ -158,5 +164,13 @@ public class TopicVo implements Serializable {
 
     public void setCreateUserId(Long createUserId) {
         this.createUserId = createUserId;
+    }
+
+    public Map<String, Long> getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(Map<String, Long> statistics) {
+        this.statistics = statistics;
     }
 }
