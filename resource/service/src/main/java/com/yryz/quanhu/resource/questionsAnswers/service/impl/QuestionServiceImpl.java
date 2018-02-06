@@ -263,14 +263,13 @@ public class QuestionServiceImpl implements QuestionService {
         if (userId.compareTo(questionBySearch.getCreateUserId()) != 0) {
             throw QuanhuException.busiError("","非本人不能删除问题","非本人不能删除问题");
         }
-//        if (questionBySearch.getAnswerdFlag().compareTo(QuestionAnswerConstants.AnswerdFlag.ANSWERED) != 0) {
-////            throw QuanhuException.busiError("问题已经回答，不能删除");
-////        }
+
         questionBySearch.setDelFlag(CommonConstants.DELETE_YES);
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0) {
+        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0
+                && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionBySearch.getAnswerdFlag())==0) {
             Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
             if (null != orderId) {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
