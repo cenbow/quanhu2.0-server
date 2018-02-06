@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.dto;
 
 import com.yryz.common.entity.GenericEntity;
+import com.yryz.quanhu.user.contants.Constants.ImgAuditStatus;
 
 /**
  * 用户头像审核
@@ -18,7 +19,10 @@ public class UserImgAuditDTO extends GenericEntity{
      * 用户头像
      */
     private String userImg;
-
+    /**
+     * 审核状态 {@link ImgAuditStatus}
+     */
+    private Byte auditStatus;
     public String getUserImg() {
 		return userImg;
 	}
@@ -35,18 +39,23 @@ public class UserImgAuditDTO extends GenericEntity{
 		this.userId = userId;
 	}
 
+	public Byte getAuditStatus() {
+		return auditStatus;
+	}
+
+	public void setAuditStatus(Byte auditStatus) {
+		this.auditStatus = auditStatus;
+	}
+
 	public UserImgAuditDTO() {
 		super();
 	}
-	/**
-	 * 批量头像审核
-	 * @param userId
-	 * @param userImg
-	 */
-	public UserImgAuditDTO(String userId, String userImg) {
+
+	public UserImgAuditDTO(String userId, String userImg, Byte auditStatus) {
 		super();
 		this.userId = userId;
 		this.userImg = userImg;
+		this.auditStatus = auditStatus;
 	}
 
 

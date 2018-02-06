@@ -86,7 +86,8 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 				UserImgAudit auditModel = record.get(i);
 				UserImgAudit imgAuditModel = new UserImgAudit();
 				imgAuditModel.setUserId(auditModel.getUserId());
-				imgAuditModel.setOperational(auditModel.getOperational());
+				imgAuditModel.setOperational(auditModel.getOperational() == null ? "" : auditModel.getOperational());
+				imgAuditModel.setLastUpdateUserId(auditModel.getLastUpdateUserId() == null ? 0l : auditModel.getLastUpdateUserId());
 				imgAuditModel.setUserImg(auditModel.getUserImg());
 				imgAuditModel.setAuditStatus(aduitActionStatus.byteValue());
 				// 待审核图片表示不存在

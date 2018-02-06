@@ -3,7 +3,6 @@ package com.yryz.quanhu.user.provider;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.Constants.ImgAuditStatus;
 import com.yryz.quanhu.user.dto.UserImgAuditDTO;
+import com.yryz.quanhu.user.dto.UserImgAuditFindDTO;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 import com.yryz.quanhu.user.service.UserImgAuditApi;
 import com.yryz.quanhu.user.service.UserImgAuditService;
@@ -35,6 +35,7 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 		try {
 			checkDTO(record,auditActionStatus);
 			UserImgAudit audit = GsonUtils.parseObj(record, UserImgAudit.class);
+			audit.setAuditStatus(auditActionStatus.byteValue());
 			imgService.auditImg(audit, auditActionStatus);
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
@@ -70,16 +71,10 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 	}
 
 	@Override
-	public Response<PageList<UserImgAuditVO>> listByParams(Integer pageNo, Integer pageSize, Long userId, Integer auditStatus) {
-		if(pageNo == null || pageNo < 0){
-			pageNo = 1;
-		}
-		if(pageSize == null || pageSize < 0 || pageSize > 100){
-			pageSize = 10;
-		}
+	public Response<PageList<UserImgAuditVO>> listByParams(UserImgAuditFindDTO findDTO) {
 		try {
-			PageList<UserImgAuditVO> pageList = new PageList<>(pageNo, pageSize, null);
-			Page<UserImgAudit> page = imgService.listByUserId(pageNo, pageSize, userId, auditStatus);
+			PageList<UserImgAuditVO> pageList = new PageList<>(findDTO.getPageNo(), findDTO.getPageSize(), null);
+			Page<UserImgAudit> page = imgService.listByUserId(findDTO.getPageNo(), findDTO.getPageSize(), findDTO.getUserId(), findDTO.getAuditStatus());
 			List<UserImgAuditVO> auditVOs = GsonUtils.parseList(page.getResult(), UserImgAuditVO.class);
 			pageList.setCount(page.getTotal());
 			pageList.setEntities(auditVOs);
@@ -100,6 +95,9 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 		}
 		if(StringUtils.isBlank(auditDTO.getUserImg())){
 			throw QuanhuException.busiError("用户头像为空");
+		}
+		if(auditDTO.getAuditStatus() == null || auditDTO.getAuditStatus() < ImgAuditStatus.NO_AUDIT.getStatus() || auditDTO.getAuditStatus() > ImgAuditStatus.FAIL.getStatus()){
+			throw QuanhuException.busiError("头像状态为空");
 		}
 		if(auditActionStatus == null || auditActionStatus < ImgAuditStatus.NO_AUDIT.getStatus() || auditActionStatus > ImgAuditStatus.FAIL.getStatus()){
 			throw QuanhuException.busiError("操作类型不合法为空");

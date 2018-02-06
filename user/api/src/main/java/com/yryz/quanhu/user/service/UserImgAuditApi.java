@@ -6,6 +6,7 @@ import com.aliyun.oss.ServiceException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.user.dto.UserImgAuditDTO;
+import com.yryz.quanhu.user.dto.UserImgAuditFindDTO;
 import com.yryz.quanhu.user.vo.UserImgAuditVO;
 
 /**
@@ -33,12 +34,8 @@ public interface UserImgAuditApi {
 
 	/**
 	 * 查询头像审核信息
-	 * @param pageNo
-	 * @param pageSize
-	 * @param custId
-	 * @param auditStatus 10:待审核 11:通过 12:拒绝
+	 * @param findDTO
 	 * @return
-	 * @throws ServiceException
 	 */
-	Response<PageList<UserImgAuditVO>> listByParams(Integer pageNo,Integer pageSize,Long userId, Integer auditStatus);
+	Response<PageList<UserImgAuditVO>> listByParams(UserImgAuditFindDTO findDTO);
 }

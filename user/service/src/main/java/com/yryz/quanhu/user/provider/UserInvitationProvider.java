@@ -1,5 +1,9 @@
 package com.yryz.quanhu.user.provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.PageList;
@@ -8,10 +12,6 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.user.dto.UserInvitationDto;
 import com.yryz.quanhu.user.service.UserInvitationForAdminApi;
 import com.yryz.quanhu.user.service.UserInvitationService;
-import com.yryz.quanhu.user.service.UserRelationApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
