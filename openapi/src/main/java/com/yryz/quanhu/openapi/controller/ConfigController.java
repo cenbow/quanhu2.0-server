@@ -41,9 +41,9 @@ public class ConfigController {
     @ApiOperation("获取强制升级配置接口")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/config/forceUpgrade")
-    public Response<Map<String, Object>> forceUpgrade(@RequestHeader String appVersion, @RequestParam String os, HttpServletRequest request) {
-        if (StringUtils.isEmpty(os)) {
-            return ResponseUtils.returnException(QuanhuException.busiError("os参数缺失"));
+    public Response<Map<String, Object>> forceUpgrade(@RequestHeader String appVersion, @RequestHeader String devType, HttpServletRequest request) {
+        if (StringUtils.isEmpty(devType)) {
+            return ResponseUtils.returnException(QuanhuException.busiError("devType参数缺失"));
         }
         if (StringUtils.isEmpty(appVersion)) {
             return ResponseUtils.returnException(QuanhuException.busiError("appVersion参数缺失"));
@@ -53,12 +53,10 @@ public class ConfigController {
         map.put("forceUpgradeFlag", false);
         //当前版本号
         map.put("version", appVersion);
-        //当前操作系统
-        map.put("os", os);
         //要升级的版本号
         map.put("upgradeVersion", "1.0.0");
         try {
-            String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(os));
+            String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(devType));
             JSONObject config = GsonUtils.json2Obj(configStr, JSONObject.class);
             String upgradeVersion = config.get("upgradeVersion").toString();
             //强制升级的版本比当前版本高
