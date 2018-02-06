@@ -186,7 +186,7 @@ public class Question4AdminServiceImpl implements Question4AdminService {
               questionVo.setUser(userSimpleVO);
             }
             if(question.getTargetId()!=null){
-                UserSimpleVO userSimpleVO= apIservice.getUser(question.getCreateUserId());
+                UserSimpleVO userSimpleVO= apIservice.getUser(Long.valueOf(question.getTargetId()));
                 questionVo.setTargetUser(userSimpleVO);
             }
             questionAnswerVo.setQuestion(questionVo);
