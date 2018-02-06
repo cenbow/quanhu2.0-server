@@ -158,38 +158,4 @@ public class CategoryServiceImpl implements ICategoryService {
 
         return checkedSet;
     }
-
-//    public static void main(String[] args) {
-//        randomChecked(10, 5);
-//    }
-
-
-    @Override
-    public Integer save(String ids) {
-
-        String[] idList = StringUtils.split(ids, ",");
-
-        //todo  调用用户接口保存用户的分类标签
-
-        return 1;
-    }
-
-    /**********************************************************************************************************/
-
-//
-//    public Integer saveWithUser(String ids) {
-//
-//        Category category = new Category();
-//
-//        Integer result = categoryDao.save(category);
-//
-//        return null;
-//    }
-//
-//    @Override
-//    public Integer update(Category category) {
-//        return categoryDao.update(category);
-//    }
-
-
 }

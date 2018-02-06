@@ -123,7 +123,7 @@ public class MessageAdminVo implements Serializable{
     private Integer persistentType;
 
     /**
-     * 消息推送状态分为三种：0:未推送，表示还没到推送时间的消息；1:进行中，表示正在进行推送的消息；2:已推送，表示已经推送过的消息；
+     * 消息推送状态分为三种：0:未推送，表示还没到推送时间的消息；1:进行中，表示正在进行推送的消息；2:已推送，表示已经推送过的消息；3:推送失败
      */
     private Integer pushStatus;
 

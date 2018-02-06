@@ -19,29 +19,43 @@ public class HomePageBody implements Body{
 	 * 
 	 */
 	private static final long serialVersionUID = -3082664056469603703L;
-	
-	private String custId;
 
 	/**
-	 * 
-	 * @exception 
+	 * 用户id
+	 */
+	private Long userId;
+
+	/**
+	 * 功能id
+	 */
+	private String moduleEnum;
+
+	/**
+	 *
+	 * @exception
 	 */
 	public HomePageBody() {
 		super();
 	}
 
-	/**
-	 * @return the custId
-	 */
-	public String getCustId() {
-		return custId;
+	public HomePageBody(Long userId, String moduleEnum) {
+		this.userId = userId;
+		this.moduleEnum = moduleEnum;
 	}
 
-	/**
-	 * @param custId the custId to set
-	 */
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public String getModuleEnum() {
+		return moduleEnum;
 	}
-	
+
+	public void setModuleEnum(String moduleEnum) {
+		this.moduleEnum = moduleEnum;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 }

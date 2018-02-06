@@ -80,6 +80,11 @@ public class MessageContants {
      */
     public static final Integer PUSH_STATUS_END = 2;
 
+    /**
+     * 3:已推送，表示消息推送失败；
+     */
+    public static final Integer PUSH_STATUS_FAILURE = 3;
+
 
 
 

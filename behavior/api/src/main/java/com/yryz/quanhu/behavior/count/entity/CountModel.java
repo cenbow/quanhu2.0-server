@@ -102,13 +102,14 @@ public class CountModel {
         this.createTime = createTime;
     }
 
-    public CountModel(String type, String kid, String page, Long count, Integer date, Integer time) {
+    public CountModel(String type, String kid, String page, Long count, Integer date, Integer time, Long createTime) {
         this.type = type;
         this.kid = kid;
         this.page = page;
         this.count = count;
         this.date = date;
         this.time = time;
+        this.createTime = createTime;
     }
 
     @Override

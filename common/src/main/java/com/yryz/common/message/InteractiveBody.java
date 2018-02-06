@@ -65,6 +65,19 @@ public class InteractiveBody implements Body {
 	private String bodyTitle;
 
 	/**
+	 * 功能id
+	 */
+	private String moduleEnum;
+
+	public String getModuleEnum() {
+		return moduleEnum;
+	}
+
+	public void setModuleEnum(String moduleEnum) {
+		this.moduleEnum = moduleEnum;
+	}
+
+	/**
 	 * 
 	 * @exception 
 	 */
@@ -94,6 +107,19 @@ public class InteractiveBody implements Body {
 		this.coterieName = coterieName;
 		this.bodyImg = bodyImg;
 		this.bodyTitle = bodyTitle;
+	}
+
+	public InteractiveBody(String custId, String custImg, String custName, String circleId, String circleName, String coterieId, String coterieName, String bodyImg, String bodyTitle, String moduleEnum) {
+		this.custId = custId;
+		this.custImg = custImg;
+		this.custName = custName;
+		this.circleId = circleId;
+		this.circleName = circleName;
+		this.coterieId = coterieId;
+		this.coterieName = coterieName;
+		this.bodyImg = bodyImg;
+		this.bodyTitle = bodyTitle;
+		this.moduleEnum = moduleEnum;
 	}
 
 	/**
