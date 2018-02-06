@@ -31,6 +31,7 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.AppConstants;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
@@ -112,11 +113,11 @@ public class UserServiceImpl implements UserService {
 			if (user != null && nickName.equals(user.getUserNickName())) {
 				baseInfo.setUserNickName(null);
 			} else {
-				existByName = this.getUserByNickName(baseInfo.getAppId(), nickName);
+				existByName = this.getUserByNickName(user.getAppId(), nickName);
 			}
 			// 昵称已存在
 			if (existByName != null) {
-				throw QuanhuException.busiError("nickName is already ");
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(),"该昵称已存在","该昵称已存在");
 			}
 		}
 
@@ -385,6 +386,7 @@ public class UserServiceImpl implements UserService {
 	 * @param nickName
 	 * @return
 	 */
+	@Override
 	public  UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
@@ -582,6 +584,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Long> getUserIdByCreateDate(String startDate, String endDate) {
 		return custbaseinfoDao.getUserIdByCreateDate(startDate, endDate);
+	}
+
+	@Override
+	public List<UserBaseInfo> getUserListByCreateDate(String startDate, String endDate) {
+		return custbaseinfoDao.getUserListByCreateDate(startDate, endDate);
 	}
 
 	@Override

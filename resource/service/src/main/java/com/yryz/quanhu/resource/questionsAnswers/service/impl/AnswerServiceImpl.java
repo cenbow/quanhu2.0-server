@@ -8,6 +8,7 @@ import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
@@ -40,6 +41,12 @@ import java.util.List;
 @Service
 public class AnswerServiceImpl implements AnswerService {
 
+    private static final Integer AUDIOLENGTH_MAX=180*1000;
+    private static final Integer AUDIOLENGTH_MIN=1*1000;
+
+    private static final Integer IMGS_MAX=30;
+    private static final Integer CONTENT_LENGTH_MAX=10000;
+
     @Autowired
     private AnswerDao answerDao;
 
@@ -71,17 +78,47 @@ public class AnswerServiceImpl implements AnswerService {
          */
         Long questionId = answerdto.getQuestionId();
         Long coterieId = answerdto.getCoterieId();
+        String content=answerdto.getContent();
+        String answerAudio=answerdto.getAnswerAudio();
+        String imgUrl=answerdto.getImgUrl();
+        Long audioLength= answerdto.getAudioLength()==null?0L:answerdto.getAudioLength();
+
         if (null == questionId || null == coterieId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
+        if(StringUtils.isNotBlank(content) && StringUtils.isNotBlank(answerAudio)){
+            throw  QuanhuException.busiError("","音频回答和文字回答互斥","音频回答和文字回答互斥");
+        }
+
+        if(StringUtils.isNotBlank(answerAudio) && (audioLength.longValue()<AUDIOLENGTH_MIN || audioLength>AUDIOLENGTH_MAX)){
+            throw  QuanhuException.busiError("","有音频回答，音频时长最少1秒最多180秒","有音频回答，音频时长最少1秒最多180秒");
+        }
+
+        if(StringUtils.isBlank(answerAudio) && audioLength.longValue()>0){
+            throw  QuanhuException.busiError("","无音频回答，应该无音频时长","无音频回答，应该无音频时长");
+        }
+
+        if(StringUtils.isNotBlank(content) && content.length()>CONTENT_LENGTH_MAX){
+            throw  QuanhuException.busiError("","文字最多10000字","文字最多10000字");
+        }
+
+
+        if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>IMGS_MAX){
+            throw  QuanhuException.busiError("","图片最多上传30张","图片最多上传30张");
+        }
+
         Question questionCheck=this.questionService.queryAvailableQuestionByKid(questionId);
         if(null==questionCheck){
-            throw  QuanhuException.busiError("提问不存在");
+            throw  QuanhuException.busiError("","提问不存在","提问不存在");
         }
 
         if(null !=questionCheck.getAnswerdFlag() && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionCheck.getAnswerdFlag())==-1){
-            throw  QuanhuException.busiError("圈主已处理过该问题，不能再回答");
+            throw  QuanhuException.busiError("","圈主已处理过该问题，不能再回答","圈主已处理过该问题，不能再回答");
+        }
+
+        if(questionCheck.getChargeAmount().longValue()>0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionCheck.getOrderFlag())!=0){
+            throw  QuanhuException.busiError("","该付费问题订单未完成，无法回答","该付费问题订单未完成，无法回答");
         }
         AnswerWithBLOBs answerWithBLOBs = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answerWithBLOBs);

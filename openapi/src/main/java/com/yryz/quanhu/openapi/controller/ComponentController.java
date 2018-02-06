@@ -31,6 +31,7 @@ import com.yryz.quanhu.message.commonsafe.dto.VerifyCodeDTO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.service.AuthService;
 import com.yryz.quanhu.openapi.utils.ComponentUtils;
+import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
@@ -63,26 +64,37 @@ public class ComponentController {
 	public Response<SmsVerifyCodeVO> sendVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
+		//没有手机号需要验证token
 		if(StringUtils.isBlank(codeDTO.getPhone())){
 			authService.checkToken(request);
 			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		}
+		//设置支付密码、提现、验证身份、手机号变更 必须登录 
+		if(StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_SET_PAYPWD.getType())) 
+				|| StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_TAKE_CASH.getType())) || 
+				StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_OTHER.getType())) || 
+				StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_CHANGE_PHONE.getType()))){
+			authService.checkToken(request);
+			//非变更手机号的业务输入的手机号无效
+			if(!StringUtils.equals(codeDTO.getCode(),String.valueOf(SmsType.CODE_CHANGE_PHONE.getType()))){
+				codeDTO.setPhone(null);
+				codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+			}
+		}
+		
 		SmsVerifyCodeVO codeVO = ResponseUtils.getResponseData(accountApi.sendVerifyCode(codeDTO));
 		return ResponseUtils.returnApiObjectSuccess(codeVO);
 	}
 
 	@ApiOperation("验证码校验（只校验不删除）")
-	@UserBehaviorValidation(login=false)
+	@UserBehaviorValidation(login=true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/component/checkVerifyCode")
 	public Response<Map<String,Integer>> checkVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
 		String phone = null;
-		
-		//手机号不存在需要校验token
 		if(StringUtils.isBlank(codeDTO.getPhone())){
-			authService.checkToken(request);
 			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 			UserLoginSimpleVO simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(codeDTO.getUserId()));
 			if(simpleVO != null){

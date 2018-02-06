@@ -49,7 +49,9 @@ public class CountRedisDao {
         // 若writeCountKey不存在，从mongdb中查询出值再increment。
         if (!redisTemplate.hasKey(writeCountKey)) {
             countModel = countMongoDao.getLastData(code, kid, "");
+            logger.info("setCount code:" + code + ".kid:" + kid);
             if (countModel != null) {
+                logger.info("setCount countModel:" + countModel.toString());
                 redisTemplate.opsForValue().increment(writeCountKey, countModel.getCount());
             }
             flag = false;

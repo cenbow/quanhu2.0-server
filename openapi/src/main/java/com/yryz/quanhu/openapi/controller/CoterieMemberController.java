@@ -108,9 +108,9 @@ public class CoterieMemberController {
     @ApiOperation("申请加入私圈列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/applyList")
-    public Response applyList(Long coterieId, Integer pageNo, Integer pageSize) {
+    public Response applyList(Long coterieId, Integer currentPage, Integer pageSize) {
 
-        Response<PageList<CoterieMemberApplyVo>> result = coterieMemberAPI.queryMemberApplyList(coterieId, pageNo, pageSize);
+        Response<PageList<CoterieMemberApplyVo>> result = coterieMemberAPI.queryMemberApplyList(coterieId, currentPage, pageSize);
         return result;
     }
 

@@ -9,6 +9,9 @@ package com.yryz.quanhu.coterie.coterie.dao;
 
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.entity.CoterieSearch;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -47,6 +50,12 @@ public interface CoterieMapper {
      * @return
      */
     Integer selectMyCreateCoterieCount(@Param("custId") String custId);
+    
+    /**
+     * 个人主页创建的私圈
+     * @return
+     */
+    List<Coterie> selectCreateCoterie(@Param("custId") String custId,@Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
     List<Coterie> selectMyJoinCoterie(@Param("custId") String custId);
     
@@ -68,4 +77,15 @@ public interface CoterieMapper {
      */
     List<Coterie> selectRecommendList();
     List<Coterie> selectOrderByMemberNum();
+
+
+
+
+    /********* admin *************************/
+
+    int updateCoterieAdmin(CoterieUpdateAdmin record);
+
+    List<Coterie> selectBySearchParam(CoterieSearchParam param);
+
+    Integer selectCountBySearchParam(CoterieSearchParam param);
 }

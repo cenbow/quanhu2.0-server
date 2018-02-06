@@ -207,7 +207,7 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<String> getDeviceIdByUserId(Long userId) {
 		try {
-			if(userId == null || userId == 0l){
+			if(userId == null || userId == 0L){
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			String devId = userService.getDeviceIdByUserId(userId);
@@ -287,6 +287,19 @@ public class UserProvider implements UserApi{
 			logger.error("用户ID查询异常", e);
 			return ResponseUtils.returnException(e);
 		}
+	}
+
+	@Override
+	public Response<List<UserBaseInfoVO>> getUserListByCreateDate(String startDate, String endDate) {
+		try {
+			List<UserBaseInfo> userBaseInfoList = userService.getUserListByCreateDate(startDate, endDate);
+			List<UserBaseInfoVO> list = GsonUtils.parseList(userBaseInfoList, UserBaseInfoVO.class);
+			return ResponseUtils.returnListSuccess(list);
+		} catch (Exception e) {
+			logger.error("getUserListByCreateDate error", e);
+			return ResponseUtils.returnException(e);
+		}
+
 	}
 
 	@Override

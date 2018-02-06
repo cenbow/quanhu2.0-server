@@ -181,7 +181,7 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			if("0".equals(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").is(null).andOperator(criteria);
 			} else if("1".equals(resourceModel.getCoterieId())){
-				criteria = Criteria.where("coterieId").not().andOperator(criteria);
+				criteria = Criteria.where("coterieId").ne(null).andOperator(criteria);
 			} else if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
 			}

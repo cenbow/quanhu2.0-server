@@ -12,8 +12,7 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+
 /**
  * 私圈
  * 
@@ -30,48 +29,26 @@ public class CoterieInfo implements Serializable {
 	 */
 	@Id
 	private Long kid;
-	
+
 	/**
 	 * 私圈名称
 	 */
-	@Field(type = FieldType.text)
 	private String coterieName;
-	
+
 	/**
 	 * 封面图
 	 */
-	@Field(type = FieldType.text)
 	private String icon;
 
 	/**
 	 * 圈子简介
 	 */
-	@Field(type = FieldType.text)
 	private String intro;
 
 	/**
-	 * 私圈名片(二维码)
-	 */
-	@Field(type = FieldType.text)
-	private String qrUrl;
-	
-	/**
 	 * 用户ID
 	 */
-	@Field(type = FieldType.text)
 	private String ownerId;
-
-	/**
-	 * 圈主姓名
-	 */
-	@Field(type = FieldType.text)
-	private String ownerName;
-
-	/**
-	 * 个人简介
-	 */
-	@Field(type = FieldType.text)
-	private String ownerIntro;
 
 	/**
 	 * 加入私圈金额(悠然币)，0表示免费
@@ -86,7 +63,7 @@ public class CoterieInfo implements Serializable {
 	/**
 	 * 成员加入是否需要审核（0不审核，1审核）
 	 */
-	private Byte joinCheck;
+	private Integer joinCheck;
 
 	/**
 	 * 成员数量
@@ -94,7 +71,7 @@ public class CoterieInfo implements Serializable {
 	private Integer memberNum;
 
 	/**
-	 * 审核状态
+	 * 状态：10待审核，11审批通过，12审批未通过
 	 */
 	private Byte state;
 
@@ -102,44 +79,37 @@ public class CoterieInfo implements Serializable {
 	 * 审批时间
 	 */
 	private Date processTime;
-	
-	private Long auditUserId;
-	
-	@Field(type = FieldType.text)
-	private String auditRemark;
-	
+
 	/**
 	 * 热度值
 	 */
 	private Long heat;
-	private Byte shelveFlag;
-	
+
+	/**
+	 * 上下架
+	 */
+	private Integer shelveFlag;
+
 	/**
 	 * 0:未删除，1：删除
 	 */
 	private Byte deleted;
-	private Integer sort;
-	
+
 	/**
 	 * 创建时间
 	 */
 	private Date createDate;
-	private Long createUserId;
 
 	/**
 	 * 更新时间
 	 */
 	private Date lastUpdateDate;
-	private Long lastUpdateUserId;
-	
-	@Field(type = FieldType.text)
-	private String moduleEnum;
-	
-	@Field(type = FieldType.text)
-	private String tenantId;
-	
+
+	/**
+	 * 版本号
+	 */
 	private Integer revision;
-	
+
 	/**
 	 * 是否达人
 	 */
@@ -151,12 +121,17 @@ public class CoterieInfo implements Serializable {
 	private Byte recommend;
 
 	/**
-	 * 最后更新文章时间
+	 * 圈主最后访问时间
 	 */
-	private Date lastInfoTime;
-	
 	private Date masterLastViewTime;
-	
+
+	private Integer auditUserId;
+	private String auditRemark;
+	/**
+	 * 10:显示，11:不显示
+	 */
+	private Integer redDot;
+
 	public Long getKid() {
 		return kid;
 	}
@@ -165,29 +140,12 @@ public class CoterieInfo implements Serializable {
 		this.kid = kid;
 	}
 
-	public String getOwnerId() {
-		return ownerId;
+	public String getCoterieName() {
+		return coterieName;
 	}
 
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId == null ? null : ownerId.trim();
-	}
-
-
-	public String getOwnerName() {
-		return ownerName;
-	}
-
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName == null ? null : ownerName.trim();
-	}
-
-	public String getOwnerIntro() {
-		return ownerIntro;
-	}
-
-	public void setOwnerIntro(String ownerIntro) {
-		this.ownerIntro = ownerIntro == null ? null : ownerIntro.trim();
+	public void setCoterieName(String coterieName) {
+		this.coterieName = coterieName;
 	}
 
 	public String getIcon() {
@@ -195,7 +153,7 @@ public class CoterieInfo implements Serializable {
 	}
 
 	public void setIcon(String icon) {
-		this.icon = icon == null ? null : icon.trim();
+		this.icon = icon;
 	}
 
 	public String getIntro() {
@@ -203,15 +161,15 @@ public class CoterieInfo implements Serializable {
 	}
 
 	public void setIntro(String intro) {
-		this.intro = intro == null ? null : intro.trim();
+		this.intro = intro;
 	}
 
-	public String getQrUrl() {
-		return qrUrl;
+	public String getOwnerId() {
+		return ownerId;
 	}
 
-	public void setQrUrl(String qrUrl) {
-		this.qrUrl = qrUrl == null ? null : qrUrl.trim();
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public Integer getJoinFee() {
@@ -230,11 +188,11 @@ public class CoterieInfo implements Serializable {
 		this.consultingFee = consultingFee;
 	}
 
-	public Byte getJoinCheck() {
+	public Integer getJoinCheck() {
 		return joinCheck;
 	}
 
-	public void setJoinCheck(Byte joinCheck) {
+	public void setJoinCheck(Integer joinCheck) {
 		this.joinCheck = joinCheck;
 	}
 
@@ -244,6 +202,46 @@ public class CoterieInfo implements Serializable {
 
 	public void setMemberNum(Integer memberNum) {
 		this.memberNum = memberNum;
+	}
+
+	public Byte getState() {
+		return state;
+	}
+
+	public void setState(Byte state) {
+		this.state = state;
+	}
+
+	public Date getProcessTime() {
+		return processTime;
+	}
+
+	public void setProcessTime(Date processTime) {
+		this.processTime = processTime;
+	}
+
+	public Long getHeat() {
+		return heat;
+	}
+
+	public void setHeat(Long heat) {
+		this.heat = heat;
+	}
+
+	public Integer getShelveFlag() {
+		return shelveFlag;
+	}
+
+	public void setShelveFlag(Integer shelveFlag) {
+		this.shelveFlag = shelveFlag;
+	}
+
+	public Byte getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Byte deleted) {
+		this.deleted = deleted;
 	}
 
 	public Date getCreateDate() {
@@ -262,28 +260,12 @@ public class CoterieInfo implements Serializable {
 		this.lastUpdateDate = lastUpdateDate;
 	}
 
-	public Date getProcessTime() {
-		return processTime;
+	public Integer getRevision() {
+		return revision;
 	}
 
-	public void setProcessTime(Date processTime) {
-		this.processTime = processTime;
-	}
-
-	public Byte getDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(Byte deleted) {
-		this.deleted = deleted;
-	}
-
-	public Long getHeat() {
-		return heat;
-	}
-
-	public void setHeat(Long heat) {
-		this.heat = heat;
+	public void setRevision(Integer revision) {
+		this.revision = revision;
 	}
 
 	public Byte getIsExpert() {
@@ -302,35 +284,19 @@ public class CoterieInfo implements Serializable {
 		this.recommend = recommend;
 	}
 
-	public Date getLastInfoTime() {
-		return lastInfoTime;
+	public Date getMasterLastViewTime() {
+		return masterLastViewTime;
 	}
 
-	public void setLastInfoTime(Date lastInfoTime) {
-		this.lastInfoTime = lastInfoTime;
+	public void setMasterLastViewTime(Date masterLastViewTime) {
+		this.masterLastViewTime = masterLastViewTime;
 	}
 
-	public String getCoterieName() {
-		return coterieName;
-	}
-
-	public void setCoterieName(String coterieName) {
-		this.coterieName = coterieName;
-	}
-
-	public Byte getState() {
-		return state;
-	}
-
-	public void setState(Byte state) {
-		this.state = state;
-	}
-
-	public Long getAuditUserId() {
+	public Integer getAuditUserId() {
 		return auditUserId;
 	}
 
-	public void setAuditUserId(Long auditUserId) {
+	public void setAuditUserId(Integer auditUserId) {
 		this.auditUserId = auditUserId;
 	}
 
@@ -342,81 +308,23 @@ public class CoterieInfo implements Serializable {
 		this.auditRemark = auditRemark;
 	}
 
-	public Byte getShelveFlag() {
-		return shelveFlag;
+	public Integer getRedDot() {
+		return redDot;
 	}
 
-	public void setShelveFlag(Byte shelveFlag) {
-		this.shelveFlag = shelveFlag;
-	}
-
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
-
-	public Long getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(Long createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Long getLastUpdateUserId() {
-		return lastUpdateUserId;
-	}
-
-	public void setLastUpdateUserId(Long lastUpdateUserId) {
-		this.lastUpdateUserId = lastUpdateUserId;
-	}
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
-	}
-
-	public String getTenantId() {
-		return tenantId;
-	}
-
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
-
-	public Integer getRevision() {
-		return revision;
-	}
-
-	public void setRevision(Integer revision) {
-		this.revision = revision;
-	}
-
-	public Date getMasterLastViewTime() {
-		return masterLastViewTime;
-	}
-
-	public void setMasterLastViewTime(Date masterLastViewTime) {
-		this.masterLastViewTime = masterLastViewTime;
+	public void setRedDot(Integer redDot) {
+		this.redDot = redDot;
 	}
 
 	@Override
 	public String toString() {
 		return "CoterieInfo [kid=" + kid + ", coterieName=" + coterieName + ", icon=" + icon + ", intro=" + intro
-				+ ", qrUrl=" + qrUrl + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", ownerIntro="
-				+ ownerIntro + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee + ", joinCheck=" + joinCheck
-				+ ", memberNum=" + memberNum + ", state=" + state + ", processTime=" + processTime + ", auditUserId="
-				+ auditUserId + ", auditRemark=" + auditRemark + ", heat=" + heat + ", shelveFlag=" + shelveFlag
-				+ ", deleted=" + deleted + ", sort=" + sort + ", createDate=" + createDate + ", createUserId="
-				+ createUserId + ", lastUpdateDate=" + lastUpdateDate + ", lastUpdateUserId=" + lastUpdateUserId
-				+ ", moduleEnum=" + moduleEnum + ", tenantId=" + tenantId + ", revision=" + revision + ", isExpert="
-				+ isExpert + ", recommend=" + recommend + ", lastInfoTime=" + lastInfoTime + ", masterLastViewTime="
-				+ masterLastViewTime + "]";
+				+ ", ownerId=" + ownerId + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee + ", joinCheck="
+				+ joinCheck + ", memberNum=" + memberNum + ", state=" + state + ", processTime=" + processTime
+				+ ", heat=" + heat + ", shelveFlag=" + shelveFlag + ", deleted=" + deleted + ", createDate="
+				+ createDate + ", lastUpdateDate=" + lastUpdateDate + ", revision=" + revision + ", isExpert="
+				+ isExpert + ", recommend=" + recommend + ", masterLastViewTime=" + masterLastViewTime
+				+ ", auditUserId=" + auditUserId + ", auditRemark=" + auditRemark + ", redDot=" + redDot + "]";
 	}
+
 }

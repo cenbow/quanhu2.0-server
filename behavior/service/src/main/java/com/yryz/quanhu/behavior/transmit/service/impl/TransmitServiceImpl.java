@@ -1,7 +1,6 @@
 package com.yryz.quanhu.behavior.transmit.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.mongodb.WriteResult;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
@@ -47,7 +46,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -115,6 +113,9 @@ public class TransmitServiceImpl implements TransmitService {
             resourceVo = result.getData();
             if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
                 throw QuanhuException.busiError("资源不存在或者已删除");
+            }
+            if(StringUtils.isNotBlank(resourceVo.getCoterieId())) {
+                throw QuanhuException.busiError("私圈内的资源不能转发");
             }
             extJson = resourceVo.getExtJson();
         }

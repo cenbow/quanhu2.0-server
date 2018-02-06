@@ -43,7 +43,7 @@ public class MessageMongo extends AbsBaseMongoDAO<MessageVo> {
                 query.addCriteria(Criteria.where("type").is(messageDto.getType()));
             }
 
-            if (messageDto.getLabel() != null && messageDto.getLabel() >= 0) {
+            if (messageDto.getLabel() != null && messageDto.getLabel() > 0) {
                 query.addCriteria(Criteria.where("label").is(messageDto.getLabel()));
             }
 

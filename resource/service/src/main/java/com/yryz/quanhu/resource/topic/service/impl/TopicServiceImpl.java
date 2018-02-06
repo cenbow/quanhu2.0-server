@@ -166,12 +166,10 @@ public class TopicServiceImpl implements TopicService {
                 vo.setUser(apIservice.getUser(createUserId));
             }
             vo.setReplyCount(0L);
-            Response<Map<String,Long>> data=countApi.getCount(BehaviorEnum.TALK.getKey(),  vo.getKid(),null);
+            Response<Map<String,Long>> data=countApi.getCount(BehaviorEnum.TALK.getCode(),  vo.getKid(),null);
             if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
                 Map<String,Long> map=data.getData();
-                if(map!=null && map.containsKey(BehaviorEnum.TALK.getKey())){
-                    vo.setReplyCount(map.get(BehaviorEnum.TALK.getKey()));
-                }
+                vo.setStatistics(map);
              }
             vo.setModuleEnum(ModuleContants.TOPIC);
             topicVos.add(vo);
@@ -202,7 +200,7 @@ public class TopicServiceImpl implements TopicService {
 
         Topic topic = this.topicDao.selectByPrimaryKey(kid);
         if (null == topic) {
-            throw QuanhuException.busiError("删除的话题不存在");
+            throw QuanhuException.busiError("","删除的话题不存在","删除的话题不存在");
         }
         if (topic.getCreateUserId().compareTo(userId) != 0) {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);

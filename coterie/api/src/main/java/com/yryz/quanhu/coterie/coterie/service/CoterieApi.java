@@ -32,7 +32,16 @@ public interface CoterieApi {
 	 * @return
 	 * @throws ServiceException
 	 */
-	public Response<List<CoterieInfo>> getMyCreateCoterie(String custId);
+	public Response<List<CoterieInfo>> getMyCreateCoterie(String custId,Integer pageNum,Integer pageSize);
+	
+	/**
+	 * 个人主页创建的私圈 
+	 * @param custId
+	 * @param
+	 * @return
+	 * @throws ServiceException
+	 */
+	public Response<List<CoterieInfo>> getCreateCoterie(String custId,Integer pageNum,Integer pageSize);
 	
 	/**
 	 * 我加入的私圈 审核通过，上架，未删除的私圈

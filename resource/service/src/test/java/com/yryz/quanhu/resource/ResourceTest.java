@@ -104,6 +104,7 @@ public class ResourceTest {
 //		resource.setCustId("yehao-test-id");
 //		resource.setTitle("title");
 //		resource.setModuleEnum(ResourceTypeEnum.RELEASE + "," + ResourceTypeEnum.TOPIC );
+		resource.setCoterieId("1");
 		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "orderby", 0, 10, "2018-1-17 1:1:1", "2018-2-17 14:1:1");
 		System.out.println(GsonUtils.parseJson(resonse.getData()));
 	}

@@ -110,4 +110,17 @@ public class CountModel {
         this.date = date;
         this.time = time;
     }
+
+    @Override
+    public String toString() {
+        return "CountModel{" +
+                "type='" + type + '\'' +
+                ", kid='" + kid + '\'' +
+                ", page='" + page + '\'' +
+                ", count=" + count +
+                ", date=" + date +
+                ", time=" + time +
+                ", createTime=" + createTime +
+                '}';
+    }
 }

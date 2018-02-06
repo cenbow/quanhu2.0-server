@@ -99,6 +99,14 @@ public class DymaicProvider implements DymaicService {
     @Override
     public Response<Boolean> addTopDymaic(Long userId, Long dymaicId) {
         try {
+            Dymaic dymaic = dymaicService.get(dymaicId);
+            if (dymaic == null) {
+                return ResponseUtils.returnException(new QuanhuException(ExceptionEnum.RESOURCE_NO_EXIST));
+            }
+            if (userId == null || !userId.equals(dymaic.getUserId())) {
+                return ResponseUtils.returnException(new QuanhuException(ExceptionEnum.RESOURCE_NO_EXIST));
+            }
+
             return ResponseUtils.returnObjectSuccess(dymaicTopService.add(userId, dymaicId));
         } catch (Exception e) {
             logger.error("addTopDymaic", e);

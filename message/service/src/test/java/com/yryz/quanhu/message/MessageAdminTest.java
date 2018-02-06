@@ -54,7 +54,7 @@ public class MessageAdminTest {
         List<String> list = new ArrayList<>();
         list.add("726907134491074560");
         messageAdminVo.setPushUserIds(list);
-        Response<Boolean> booleanResponse = messageAdminAPI.push(messageAdminVo);
+        Response<MessageAdminVo> booleanResponse = messageAdminAPI.push(messageAdminVo);
         System.out.println(ResponseUtils.getResponseNotNull(booleanResponse));
     }
 
