@@ -2,53 +2,38 @@ package com.yryz.quanhu.coterie.coterie.vo;
 
 import java.io.Serializable;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 
  * @author jiangkun
  * @version 1.0
  * @date 2017年10月18日 上午9:50:23
- * @Description TODO (这里用一句话描述这个方法的作用)
  */
 public class CoterieBasicInfo implements Serializable{
 	private static final long serialVersionUID = 2264458786258618711L;
-	/**
-     * 私圈id,设置私圈信息的时候传
-     */
+	@ApiModelProperty("私圈id,修改私圈信息的时候传")
     private Long coterieId;
     
-	/**
-     * 用户ID
-     */
+	@ApiModelProperty("圈主用户ID")
     private String ownerId;
 
-    /**
-     * 封面图
-     */
+	@ApiModelProperty("封面图")
     private String icon;
 
-    /**
-     * 圈子名称
-     */
+	@ApiModelProperty("圈子名称")
     private String name;
 
-    /**
-     * 圈子简介
-     */
+	@ApiModelProperty("圈子简介")
     private String intro;
     
-    /**
-     * 加入私圈 收费金额 0表示免费
-     */
+	@ApiModelProperty("加入私圈 收费金额 0表示免费")
     private Integer joinFee;
     
-    /**
-     * 加入私圈 收费需要审核 0不审核，1审核
-     */
+	@ApiModelProperty("成员加入是否需要审核10不审核，11审核")
     private Integer joinCheck;
     
-    /**
-     * 咨询费，0表示免费
-     */
+	@ApiModelProperty("咨询费，0表示免费")
     private Integer consultingFee;
     
 	public String getOwnerId() {

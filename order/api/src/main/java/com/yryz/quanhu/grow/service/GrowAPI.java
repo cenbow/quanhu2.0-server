@@ -6,6 +6,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.score.vo.GrowFlowReportVo;
+import com.yryz.quanhu.score.vo.GrowLevelVo;
 
 /**
  * @author lsn 
@@ -76,4 +77,13 @@ public interface GrowAPI {
 	 * @Description 全部成长值明细
 	 */
 	public  List<GrowFlowReportVo> getGrowFlowAll(GrowFlowQuery gfq);
+	
+	
+	/**
+	 * @param  
+	 * @return  
+	 * @Description 查级别
+	 */
+	public List<GrowLevelVo> getGrowLevelAll();
+	
 }
