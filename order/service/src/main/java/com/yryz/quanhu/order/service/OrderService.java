@@ -9,6 +9,7 @@ package com.yryz.quanhu.order.service;
 
 import java.util.List;
 
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.order.entity.RrzOrderAccountHistory;
 import com.yryz.quanhu.order.entity.RrzOrderCust2bank;
@@ -18,6 +19,7 @@ import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
 import com.yryz.quanhu.order.entity.RrzOrderVO;
 import com.yryz.quanhu.order.utils.Page;
 import com.yryz.quanhu.order.vo.PayInfo;
+import com.yryz.quanhu.order.vo.WithdrawCashDto;
 
 /**
  * @author yehao
@@ -37,7 +39,7 @@ public interface OrderService {
 	 * @param remark	备注信息
 	 * @return
 	 */
-	public Response<?> executeOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts, List<RrzOrderIntegralHistory> integrals,
+	void executeOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts, List<RrzOrderIntegralHistory> integrals,
 			String custId, String payPassword, String remark);
 	
 	/**
@@ -48,7 +50,7 @@ public interface OrderService {
 	 * @param remark
 	 * @return
 	 */
-	public RrzOrderPayInfo executePayInfo(RrzOrderPayInfo rrzOrderPayInfo ,String custId, String payPassword, String remark);
+	RrzOrderPayInfo executePayInfo(RrzOrderPayInfo rrzOrderPayInfo ,String custId, String payPassword, String remark);
 	
 	/**
 	 * 我的银行卡列表
@@ -56,7 +58,7 @@ public interface OrderService {
 	 * @param custId
 	 * @return
 	 */
-	public List<RrzOrderCust2bank> getCustBanks(String custId);
+	List<RrzOrderCust2bank> getCustBanks(String custId);
 	
 	/**
 	 * 处理我的银行卡信息
@@ -64,7 +66,7 @@ public interface OrderService {
 	 * @param rrzOrderCust2bank
 	 * @param type
 	 */
-	public RrzOrderCust2bank dealCustBank(RrzOrderCust2bank rrzOrderCust2bank, int type);
+	RrzOrderCust2bank dealCustBank(RrzOrderCust2bank rrzOrderCust2bank, int type);
 	
 	/**
 	 * 获取银行信息
@@ -72,7 +74,7 @@ public interface OrderService {
 	 * @param custBankId
 	 * @return
 	 */
-	public RrzOrderCust2bank getCustBank(String custBankId);
+	RrzOrderCust2bank getCustBank(String custBankId);
 	
 	/**
 	 * 回滚相关用户的账务数据。重新一致化mysql和redis数据
@@ -81,14 +83,28 @@ public interface OrderService {
 	 * @param accounts
 	 * @param integrals
 	 */
-	public void refreshOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts, List<RrzOrderIntegralHistory> integrals);
+	void refreshOrder(RrzOrderInfo orderInfo, List<RrzOrderAccountHistory> accounts, List<RrzOrderIntegralHistory> integrals);
 	
 	/**
 	 * 刷新订单充值相关用户
 	 * 
 	 * @param payInfo
 	 */
-	public void refreshPay(PayInfo payInfo);
+	void refreshPay(PayInfo payInfo);
+
+	/**
+	 * 获取支付订单详情
+	 * @param orderId
+	 * @return
+	 */
+	RrzOrderPayInfo getPayInfo(String orderId);
+
+	/**
+	 * 获取提现申请订单列表
+	 * @param withdrawCashDto
+	 * @return
+	 */
+	PageList<RrzOrderPayInfo> getWithdrawCashPage(WithdrawCashDto withdrawCashDto);
 	
 	/**
 	 * 获取充值订单列表
@@ -96,12 +112,11 @@ public interface OrderService {
 	 * @param custId
 	 * @param date
 	 * @param orderId
-	 * @param type
 	 * @param start
 	 * @param limit
 	 * @return
 	 */
-	public List<RrzOrderPayInfo> getPayInfo(String custId, String date, String orderId, long start, long limit);
+	List<RrzOrderPayInfo> getPayInfoList(String custId, String date, String orderId, long start, long limit);
 	
 	/**
 	 * 获取充值订单列表
@@ -113,14 +128,14 @@ public interface OrderService {
 	 * @param pageSize
 	 * @return
 	 */
-	public Page<RrzOrderPayInfo> getPayInfoWeb(String custId, String date, String orderId, int pageNo, int pageSize);
+	Page<RrzOrderPayInfo> getPayInfoWeb(String custId, String date, String orderId, int pageNo, int pageSize);
 	
 	/**
 	 * 创建预处理订单
 	 * @param orderVO
 	 * @return
 	 */
-	public RrzOrderVO createOrder(RrzOrderVO orderVO);
+	RrzOrderVO createOrder(RrzOrderVO orderVO);
 	
 	/**
 	 * 执行订单
@@ -129,13 +144,13 @@ public interface OrderService {
 	 * @param password
 	 * @return
 	 */
-	public Response<?> executeOrder(String orderId ,String custId ,String password);
+	void executeOrder(String orderId ,String custId ,String password);
 	
 	/**
 	 * 查询订单详情
 	 * @param orderId
 	 * @return
 	 */
-	public RrzOrderInfo getOrderInfo(String orderId);
+	RrzOrderInfo getOrderInfo(String orderId);
 
 }

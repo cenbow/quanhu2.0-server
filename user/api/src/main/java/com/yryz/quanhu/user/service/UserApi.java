@@ -149,6 +149,14 @@ public interface UserApi {
 	 * @return
 	 */
 	Response<List<Long>> getUserIdByCreateDate(String startDate,String endDate);
+
+	/**
+	 * 查询一段时间的全部用户信息，不分状态
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	Response<List<UserBaseInfoVO>> getUserListByCreateDate(String startDate, String endDate);
     
 	/**
 	 * 根据用户ID查询全部用户，不分状态

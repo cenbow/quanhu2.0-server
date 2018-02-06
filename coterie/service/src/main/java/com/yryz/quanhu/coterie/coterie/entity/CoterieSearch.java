@@ -31,7 +31,7 @@ public class CoterieSearch {
 	/**
 	 * 私圈名称
 	 */
-	private String coterieName;
+	private String name;
 	
 	/**
 	 * 圈主ID
@@ -42,7 +42,9 @@ public class CoterieSearch {
 	 * 申请开时间   起 ,格式yyyy-MM-dd
 	 */
 	private String startTime;
-	
+
+	private String ownerName;
+
 	/**
 	 * 申请时间 止,格式yyyy-MM-dd
 	 */
@@ -75,14 +77,6 @@ public class CoterieSearch {
 
 	public void setCircleName(String circleName) {
 		this.circleName = circleName;
-	}
-
-	public String getCoterieName() {
-		return coterieName;
-	}
-
-	public void setCoterieName(String coterieName) {
-		this.coterieName = coterieName;
 	}
 
 	public String getOwnerId() {
@@ -157,11 +151,21 @@ public class CoterieSearch {
 		this.recommend = recommend;
 	}
 
-	@Override
-	public String toString() {
-		return "CoterieSearch [status=" + status + ", recommend=" + recommend + ", circleName=" + circleName
-				+ ", circleId=" + circleId + ", coterieName=" + coterieName + ", ownerId=" + ownerId + ", startTime="
-				+ startTime + ", endTime=" + endTime + ", coterieIdList=" + coterieIdList + ", start=" + start
-				+ ", pageSize=" + pageSize + ", sortValue=" + sortValue + "]";
+
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

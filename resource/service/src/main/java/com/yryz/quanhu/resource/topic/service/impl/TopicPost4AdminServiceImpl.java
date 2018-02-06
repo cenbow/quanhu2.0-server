@@ -158,6 +158,18 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
         TopicPostWithBLOBs topicPost=new TopicPostWithBLOBs();
         topicPost.setKid(kid);
         topicPost.setShelveFlag(shelveFlag);
+
+        TopicPostWithBLOBs topicPostWithBLOBs =this.topicPostDao.selectByPrimaryKey(kid);
+        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+        messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
+        messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
+        messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
+        messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
+        messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
+        messageBusinessVo.setIsAnonymity(null);
+        messageBusinessVo.setCoterieId(null);
+        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON,true);
+
         return this.topicPostDao.updateByPrimaryKeySelective(topicPost);
     }
 

@@ -2,8 +2,6 @@ package com.yryz.quanhu.coterie.coterie.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
-import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -11,26 +9,22 @@ import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.entity.CoterieSearch;
-import com.yryz.quanhu.coterie.coterie.exception.MysqlOptException;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
-import com.yryz.quanhu.coterie.coterie.until.QrUtils;
 import com.yryz.quanhu.coterie.coterie.vo.*;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
-import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 /**
  * 私圈服务实现
+ * 
  * @author chengyunfei
  *
  */
@@ -38,445 +32,175 @@ import java.util.List;
 public class CoterieServiceImpl implements CoterieService {
 	@Resource
 	private CoterieMapper coterieMapper;
-   	@Reference(check=false)
+	@Reference(check = false)
 	private IdAPI idapi;
-	@Reference(check=false)
+	@Reference(check = false)
 	private ResourceDymaicApi resourceDymaicApi;
-	@Reference(check=false)
+	@Reference(check = false)
 	private EventAPI eventAPI;
-	@Reference(check=false)
+	@Reference(check = false)
 	private UserApi userApi;
 
 	@Override
 	public CoterieInfo save(CoterieBasicInfo info) {
-		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
+		Coterie coterie = (Coterie) GsonUtils.parseObj(info, Coterie.class);
 		coterie.setCoterieId(idapi.getSnowflakeId().getData());
-		String qrUrl= QrUtils.createQr("",coterie.getCoterieId()+"");
-		coterie.setQrUrl(qrUrl);
 		coterie.setConsultingFee(0);
 		coterie.setCreateDate(new Date());
-		coterie.setDeleted((byte)10);
-		coterie.setJoinCheck(info.getJoinCheck()==null? 11 : info.getJoinCheck() );
-		coterie.setJoinFee(info.getJoinFee()==null?0:info.getJoinFee());
+		coterie.setDeleted((byte) 10);
+		coterie.setHeat(0L);
+		coterie.setJoinCheck(info.getJoinCheck() == null ? 11 : info.getJoinCheck());
+		coterie.setJoinFee(info.getJoinFee() == null ? 0 : info.getJoinFee());
 		coterie.setLastUpdateDate(new Date());
 		coterie.setMemberNum(0);
+		coterie.setShelveFlag(11);
+		coterie.setRevision(1);
 		coterie.setStatus(CoterieConstant.Status.WAIT.getStatus());
-		coterie.setRecommend((byte)10);
-		//todo  查用户api
+		coterie.setRecommend((byte) 10);
 		UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(Long.parseLong(info.getOwnerId())));
 		coterie.setIsExpert(user.getUserRole());
-
-		try{
-			coterieMapper.insertSelective(coterie);
-			return (CoterieInfo) GsonUtils.parseObj(coterie, CoterieInfo.class);
-		}catch (Exception e) {
-
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-
-		}
+		coterie.setRedDot(10);
+		coterieMapper.insertSelective(coterie);
+		return (CoterieInfo) GsonUtils.parseObj(coterie, CoterieInfo.class);
 	}
 
 	@Override
 	public void modify(CoterieInfo info) {
-		Coterie coterie=(Coterie) GsonUtils.parseObj(info, Coterie.class);
-		try{
-			coterieMapper.updateByCoterieIdSelective(coterie);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-		}
+		Coterie coterie = (Coterie) GsonUtils.parseObj(info, Coterie.class);
+		coterieMapper.updateByCoterieIdSelective(coterie);
 	}
 
 	@Override
 	public void remove(Long coterieId) {
-		try{
-			Coterie coterie=new Coterie();
-			coterie.setCoterieId( coterieId );
-			coterie.setDeleted((byte)1);
-			coterieMapper.updateByCoterieIdSelective(coterie);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-		}
+		Coterie coterie = new Coterie();
+		coterie.setCoterieId(coterieId);
+		coterie.setDeleted((byte) 1);
+		coterieMapper.updateByCoterieIdSelective(coterie);
 	}
 
 	@Override
 	public CoterieInfo find(Long coterieId) {
-		Coterie info=null;
-		try{
-			info=coterieMapper.selectByCoterieId(coterieId);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-		}
+		Coterie info = null;
+		info = coterieMapper.selectByCoterieId(coterieId);
 		return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 	}
 
 	@Override
-	public List<CoterieInfo> findList(Integer status) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			list=coterieMapper.selectListByStatus(status);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-		}
-		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
-	}
-
-	@Override
 	public List<CoterieInfo> findList(Coterie coterie) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			list=coterieMapper.selectListByCoterie(coterie);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-		}
-		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
-	}
-
-	@Override
-	public List<CoterieInfo> findPage(Integer pageNum, Integer pageSize, Byte status) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			Integer start=(pageNum-1)*pageSize;
-			list=coterieMapper.findPageByStatus( start, pageSize, status);
-		}catch (Exception e) {
-			String msg="param pageNum:"+pageNum+"pageSize:"+pageSize+"status:"+status;
-			throw new QuanhuException( "2007","参数错误","msg",null);
-		}
+		List<Coterie> list = Lists.newArrayList();
+		list = coterieMapper.selectListByCoterie(coterie);
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
 	public List<CoterieInfo> findPage(Integer pageNum, Integer pageSize) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			Integer start=(pageNum-1)*pageSize;
-			list=coterieMapper.findPage(start, pageSize);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param coterie",null);
-		}
+		List<Coterie> list = Lists.newArrayList();
+		Integer start = (pageNum - 1) * pageSize;
+		list = coterieMapper.findPage(start, pageSize);
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
 	public List<CoterieInfo> findList(List<Long> coterieIdList) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			list=coterieMapper.selectListByCoterieIdList(coterieIdList);
-		}catch (Exception e) {
-
-			throw new QuanhuException( "2007","参数错误","param coterieIdList",null);
-		}
+		List<Coterie> list = Lists.newArrayList();
+		list = coterieMapper.selectListByCoterieIdList(coterieIdList);
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
-	public List<CoterieInfo> findMyCreateCoterie(String custId ) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			list=coterieMapper.selectMyCreateCoterie(custId );
-		}catch (Exception e) {
-
-			throw new QuanhuException( "2007","参数错误","param custId",null);
-		}
+	public List<CoterieInfo> findMyCreateCoterie(String custId) {
+		List<Coterie> list = Lists.newArrayList();
+		list = coterieMapper.selectMyCreateCoterie(custId);
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
-	public List<CoterieInfo> findMyJoinCoterie(String custId ) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			list=coterieMapper.selectMyJoinCoterie(custId );
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param custId",null);
-		}
+	public List<CoterieInfo> findMyJoinCoterie(String custId) {
+		List<Coterie> list = Lists.newArrayList();
+		list = coterieMapper.selectMyJoinCoterie(custId);
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
 	public List<CoterieInfo> findByName(String name) {
-		List<Coterie> list=Lists.newArrayList();
-		try{
-			list=coterieMapper.selectByName(name);
-		}catch (Exception e) {
-
-			throw new QuanhuException( "2007","参数错误","param name:"+name,null);
-		}
+		List<Coterie> list = Lists.newArrayList();
+		list = coterieMapper.selectByName(name);
 		return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
-	public CoterieInfo find(String custId, String circleId) {
-		try{
-			Coterie info=coterieMapper.selectByCustIdAndCircleId(custId, circleId);
-			return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
-		}catch (Exception e) {
-
-			throw new QuanhuException( "2007","参数错误","find param custId:"+custId+",circleId:",null);
-		}
-	}
-
-	@Override
-	public void saveAuditRecord(CoterieAuditRecord record) {
-		try{
-			//coterieAuditRecordMapper.insert(record);
-		}catch (Exception e) {
-
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<CoterieAuditRecord> findAuditRecordList(String coterieId, Integer pageNum, Integer pageSize) {
-		try{
-			int start = (pageNum-1)*pageSize;
-			return null;//coterieAuditRecordMapper.selectPage(coterieId,start, pageSize);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-
-		}
-	}
-
-	@Override
-	public List<CoterieAdmin> find(CoterieSearchParam param) {
-		try{
-			CoterieSearch searchParam= GsonUtils.parseObj(param, CoterieSearch.class);
-			int start=(param.getPageNum()-1)*param.getPageSize();
-			searchParam.setStart(start);
-			List<Coterie> list=coterieMapper.selectBySearchParam(searchParam);
-			
-			List<CoterieAdmin> rstList=Lists.newArrayList();
-			for (int i = 0; i < list.size(); i++) {
-				Coterie c=list.get(i);
-				CoterieAdmin info=new CoterieAdmin();
-				info.setConsultingFee(c.getConsultingFee());
-				info.setCoterieId(c.getCoterieId());
-				info.setCreateDate(c.getCreateDate());
-				info.setIntro(c.getIntro());
-				info.setJoinFee(c.getJoinFee());
-				info.setName(c.getName());
-				info.setCustId(c.getOwnerId());
-				info.setJoinCheck(c.getJoinCheck());
-				info.setStatus(c.getStatus());
-				info.setOwnerIntro(c.getOwnerIntro());
-				info.setRecommend(c.getRecommend());
-				info.setIsExpert(c.getIsExpert());
-				rstList.add(info);
-			}
-			
-			return rstList;
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public Integer getCoterieCount(String circleId,Byte status) {
-		try{
-			return coterieMapper.selectCountByCircleId(circleId, status);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public Integer findCountBySearchParam(CoterieSearchParam param) {
-		try{
-			CoterieSearch searchParam= GsonUtils.parseObj(param, CoterieSearch.class);
-			int start=(param.getPageNum()-1)*param.getPageSize();
-			searchParam.setStart(start);
-			return coterieMapper.selectCountBySearchParam(searchParam);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<CoterieInfo> findMyCreateCoterie(String custId, Integer pageNum, Integer pageSize, Integer status) {
-		try{
-			int start=(pageNum-1)*pageSize;
-			List<Coterie> list=coterieMapper.selectMyCreateCoteriePage(custId, start, pageSize,status);
-			return GsonUtils.parseList(list, CoterieInfo.class);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public Integer findMyCreateCoterieCount(String custId,Integer status) {
-		try{
-			return coterieMapper.selectMyCreateCoterieCount(custId,status);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+	public Integer findMyCreateCoterieCount(String custId) {
+		return coterieMapper.selectMyCreateCoterieCount(custId);
 	}
 
 	@Override
 	public List<CoterieInfo> findMyJoinCoterie(String custId, Integer pageNum, Integer pageSize) {
-		try{
-			int start=(pageNum-1)*pageSize;
-			List<Coterie> list=coterieMapper.selectMyJoinCoteriePage(custId, start, pageSize);
-			return GsonUtils.parseList(list, CoterieInfo.class);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+		int start = (pageNum - 1) * pageSize;
+		List<Coterie> list = coterieMapper.selectMyJoinCoteriePage(custId, start, pageSize);
+		return GsonUtils.parseList(list, CoterieInfo.class);
 	}
 
 	@Override
 	public Integer findMyJoinCoterieCount(String custId) {
-		try{
-			return coterieMapper.selectMyJoinCoterieCount(custId);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+		return coterieMapper.selectMyJoinCoterieCount(custId);
 	}
 
 	@Override
 	public void recommendCoterie(List<Long> coterieIdList) {
-		try{
-			coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.YES.getStatus());
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+		coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.YES.getStatus());
 	}
 
 	@Override
 	public void cancelRecommendCoterie(List<Long> coterieIdList) {
-		try{
-			coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.NO.getStatus());
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<CoterieInfo> getRecommendList(String circleId, Integer start, Integer pageSize) {
-		try{
-			List<Coterie> list=coterieMapper.selectRecommendList(circleId, start, pageSize);
-			return GsonUtils.parseList(list, CoterieInfo.class);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<CoterieInfo> getHeatList(String circleId, Byte expert, Integer start, Integer pageSize) {
-		try{
-			List<Coterie> list=coterieMapper.selectHeatList(circleId, expert, start, pageSize);
-			return GsonUtils.parseList(list, CoterieInfo.class);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<Coterie> getHeatList(String circleId, Integer start, Integer pageSize) {
-		try{
-			List<Coterie> list=coterieMapper.selectHeatListByCircleId(circleId,start, pageSize);
-			return list;
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<CoterieInfo> queryPageForApp(Integer pageNum, Integer pageSize) {
-		try{
-			int start=(pageNum-1)*pageSize;
-			List<Coterie> list=coterieMapper.findPage(start, pageSize);
-			Collections.sort(list, new Comparator<Coterie>() {
-				@Override
-	            public int compare(Coterie o1, Coterie o2) {
-	            	if(o1.getHeat()==null){
-	            		o1.setHeat(0L);
-	            	}
-	            	if(o2.getHeat()==null){
-	            		o2.setHeat(0L);
-	            	}
-	                return o2.getHeat().compareTo(o1.getHeat());
-	            }
-	        });
-			return GsonUtils.parseList(list, CoterieInfo.class);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-
-	@Override
-	public List<CoterieInfo> getCoterieLikeName(String circleId, String name, Integer start, Integer pageSize) {
-		try{
-			List<Coterie> list=coterieMapper.selectLikeName(circleId,name, start, pageSize);
-			return GsonUtils.parseList(list, CoterieInfo.class);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+		coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.NO.getStatus());
 	}
 
 	@Override
 	public void modifyCoterieExpert(String custId, Byte isExpert) {
-		try{
-			coterieMapper.updateExpert(custId, isExpert);
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+		coterieMapper.updateExpert(custId, isExpert);
 	}
 
 	@Override
-	public List<String> getCircleIdListByOwnerId(String ownerId) {
-		try{
-			List<String> list=coterieMapper.selectCircleIdListByOwnerId(ownerId);
-			return list;
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
-	}
-	@Override
-	public int updateMemberNum( Long coterieId,  Integer newMemberNum, Integer oldMemberNum)
-	{
-		try{
-			return  coterieMapper.updateMemberNum( coterieId,    newMemberNum,  oldMemberNum);
-
-		}catch (Exception e) {
-			throw new QuanhuException( "2007","参数错误","param record:"+"record,circleId:",null);
-		}
+	public int updateMemberNum(Long coterieId, Integer newMemberNum, Integer oldMemberNum) {
+		return coterieMapper.updateMemberNum(coterieId, newMemberNum, oldMemberNum);
 	}
 
 	@Override
 	public List<Long> getKidByCreateDate(String startDate, String endDate) {
-		try{
-			return  coterieMapper.selectKidByCreateDate(startDate, endDate);
-		}catch (Exception e) {
-			throw new MysqlOptException("getKidByCreateDate startDate:"+startDate+",endDate:"+endDate,e);
-		}
+		return coterieMapper.selectKidByCreateDate(startDate, endDate);
 	}
 
 	@Override
 	public List<Coterie> getByKids(List<Long> kidList) {
-		try{
-			return  coterieMapper.selectByKids(kidList);
-		}catch (Exception e) {
-			throw new MysqlOptException("getByKids kidList:"+kidList,e);
-		}
+		return coterieMapper.selectByKids(kidList);
 	}
-
-
-	/************************/
-
-
 
 	@Override
 	public PageList<CoterieInfo> queryCoterieByPage(CoterieSearchParam param) {
 		List<Coterie> list = Lists.newArrayList();
-		try {
-			int start = (param.getPageNum() - 1) * param.getPageSize();
-			list = coterieMapper.findPageByStatus(param.getPageNum(), param.getPageSize(),param.getStatus());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new QuanhuException(ExceptionEnum.SysException);
-		}
-
-		PageList<CoterieInfo> pageList = new PageList<>(param.getPageNum(), param.getPageSize(), GsonUtils.parseList(list, CoterieInfo.class));
-
+		int start = (param.getPageNum() - 1) * param.getPageSize();
+		list = coterieMapper.findPageByStatus(start, param.getPageSize(), param.getStatus());
+		PageList<CoterieInfo> pageList = new PageList<>(param.getPageNum(), param.getPageSize(),
+				GsonUtils.parseList(list, CoterieInfo.class));
 		return pageList;
 	}
 
+	@Override
+	public List<CoterieInfo> getRecommendCoterieList() {
+		List<Coterie> list = coterieMapper.selectRecommendList();
+		return GsonUtils.parseList(list, CoterieInfo.class);
+	}
 
+	@Override
+	public List<CoterieInfo> getOrderByMemberNum() {
+		List<Coterie> list = coterieMapper.selectOrderByMemberNum();
+		return GsonUtils.parseList(list, CoterieInfo.class);
+	}
+
+	@Override
+	public List<CoterieInfo> findCreateCoterie(String custId, Integer pageNum, Integer pageSize) {
+		int start=(pageNum-1)*pageSize;
+		List<Coterie> list = coterieMapper.selectCreateCoterie(custId, start, pageSize);
+		return GsonUtils.parseList(list, CoterieInfo.class);
+	}
 }

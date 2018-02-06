@@ -3,50 +3,36 @@
 <mapper namespace="com.yryz.quanhu.coterie.coterie.dao.CoterieMapper" >
   <resultMap id="BaseResultMap" type="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="kid" property="coterieId" jdbcType="CHAR" />
-    <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
-    <result column="owner_name" property="ownerName" jdbcType="VARCHAR" />
-    <result column="owner_intro" property="ownerIntro" jdbcType="VARCHAR" />
-    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="kid" property="coterieId" jdbcType="BIGINT" />
     <result column="coterie_name" property="name" jdbcType="VARCHAR" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
     <result column="intro" property="intro" jdbcType="VARCHAR" />
-    <result column="qr_url" property="qrUrl" jdbcType="VARCHAR" />
+    <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
     <result column="join_fee" property="joinFee" jdbcType="INTEGER" />
     <result column="consulting_fee" property="consultingFee" jdbcType="INTEGER" />
     <result column="join_check" property="joinCheck" jdbcType="TINYINT" />
     <result column="member_num" property="memberNum" jdbcType="INTEGER" />
     <result column="state" property="status" jdbcType="TINYINT" />
+    <result column="process_time" property="processTime" jdbcType="TIMESTAMP" />
+    <result column="heat" property="heat" jdbcType="BIGINT" />
+    <result column="shelve_flag" property="shelveFlag" jdbcType="TINYINT" />
+    <result column="deleted" property="deleted" jdbcType="TINYINT" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
-    <result column="process_time" property="processTime" jdbcType="TIMESTAMP" />
-    <result column="deleted" property="deleted" jdbcType="TINYINT" />
-    <result column="heat" property="heat" jdbcType="BIGINT" />
+    <result column="revision" property="revision" jdbcType="INTEGER" />
     <result column="is_expert" property="isExpert" jdbcType="TINYINT" />
     <result column="recommend" property="recommend" jdbcType="TINYINT" />
-    <result column="last_info_time" property="lastInfoTime" jdbcType="TIMESTAMP" />
+    <result column="master_last_view_time" property="masterLastViewTime" jdbcType="TIMESTAMP" />
+    <result column="audit_user_id" property="auditUserId" jdbcType="INTEGER" />
+    <result column="audit_remark" property="auditRemark" jdbcType="VARCHAR" />
+    <result column="red_dot" property="redDot" jdbcType="TINYINT" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, kid, owner_id,  owner_name, owner_intro, icon, coterie_name, intro,
-    qr_url, join_fee, consulting_fee, join_check, member_num, state, create_date, last_update_date,
-    process_time, deleted,heat,is_expert,recommend,last_info_time, audit_user_id, audit_remark, sort,
-    module_enum, create_user_id, last_update_user_id, master_last_view_time, shelve_flag
+    id, kid, owner_id, icon, coterie_name, intro,
+    join_fee, consulting_fee, join_check, member_num, state,process_time,heat, shelve_flag,deleted, create_date, last_update_date,
+    revision,is_expert,recommend, audit_user_id, audit_remark,master_last_view_time,red_dot
   </sql>
-  <insert id="insert" parameterType="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
-    insert into qh_coterie (id, kid, owner_id,
-    owner_name, owner_intro,
-    icon, coterie_name, intro,
-    qr_url, join_fee, consulting_fee,
-    join_check, member_num, state,
-    create_date, last_update_date, process_time,
-    deleted,heat,is_expert,recommend,last_info_time)
-    values (#{id,jdbcType=BIGINT}, #{coterieId,jdbcType=CHAR}, #{ownerId,jdbcType=VARCHAR},
-    #{ownerName,jdbcType=VARCHAR}, #{ownerIntro,jdbcType=VARCHAR},
-    #{icon,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{intro,jdbcType=VARCHAR},
-    #{qrUrl,jdbcType=VARCHAR}, #{joinFee,jdbcType=INTEGER}, #{consultingFee,jdbcType=INTEGER},
-    #{joinCheck,jdbcType=TINYINT}, #{memberNum,jdbcType=INTEGER}, #{status,jdbcType=TINYINT},
-    #{createDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{processTime,jdbcType=TIMESTAMP},
-    #{deleted,jdbcType=TINYINT},#{heat},#{isExpert},#{recommend},#{lastInfoTime)
-  </insert>
+  
   <insert id="insertSelective" parameterType="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
     insert into qh_coterie
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -59,13 +45,6 @@
       <if test="ownerId != null" >
         owner_id,
       </if>
-
-      <if test="ownerName != null" >
-        owner_name,
-      </if>
-      <if test="ownerIntro != null" >
-        owner_intro,
-      </if>
       <if test="icon != null" >
         icon,
       </if>
@@ -74,9 +53,6 @@
       </if>
       <if test="intro != null" >
         intro,
-      </if>
-      <if test="qrUrl != null" >
-        qr_url,
       </if>
       <if test="joinFee != null" >
         join_fee,
@@ -105,7 +81,6 @@
       <if test="deleted != null" >
         deleted,
       </if>
-
       <if test="heat != null" >
         heat,
       </if>
@@ -115,27 +90,34 @@
       <if test="recommend != null" >
         recommend,
       </if>
-      <if test="lastInfoTime != null" >
-        last_info_time,
+      <if test="revision != null" >
+        revision,
       </if>
-      tenant_id,revision,shelve_flag
+      <if test="shelveFlag != null" >
+        shelve_flag,
+      </if>
+      <if test="auditUserId != null" >
+        audit_user_id,
+      </if>
+      <if test="auditRemark != null" >
+        audit_remark,
+      </if>
+      <if test="masterLastViewTime != null" >
+        master_last_view_time,
+      </if>
+      <if test="redDot != null" >
+        red_dot,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
       <if test="coterieId != null" >
-        #{coterieId,jdbcType=CHAR},
+        #{coterieId,jdbcType=BIGINT},
       </if>
       <if test="ownerId != null" >
         #{ownerId,jdbcType=VARCHAR},
-      </if>
-
-      <if test="ownerName != null" >
-        #{ownerName,jdbcType=VARCHAR},
-      </if>
-      <if test="ownerIntro != null" >
-        #{ownerIntro,jdbcType=VARCHAR},
       </if>
       <if test="icon != null" >
         #{icon,jdbcType=VARCHAR},
@@ -145,9 +127,6 @@
       </if>
       <if test="intro != null" >
         #{intro,jdbcType=VARCHAR},
-      </if>
-      <if test="qrUrl != null" >
-        #{qrUrl,jdbcType=VARCHAR},
       </if>
       <if test="joinFee != null" >
         #{joinFee,jdbcType=INTEGER},
@@ -185,10 +164,24 @@
       <if test="recommend != null" >
         #{recommend},
       </if>
-      <if test="lastInfoTime != null" >
-        #{lastInfoTime},
+      <if test="revision != null" >
+      	#{revision},
       </if>
-      '',0,10
+      <if test="shelveFlag != null" >
+        #{shelveFlag},
+      </if>
+      <if test="auditUserId != null" >
+        #{auditUserId},
+      </if>
+      <if test="auditRemark != null" >
+        #{auditRemark},
+      </if>
+      <if test="masterLastViewTime != null" >
+        #{masterLastViewTime},
+      </if>
+      <if test="redDot != null" >
+        #{redDot},
+      </if>
     </trim>
   </insert>
   <update id="updateByCoterieIdSelective" parameterType="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
@@ -200,13 +193,6 @@
       <if test="ownerId != null" >
         owner_id = #{ownerId,jdbcType=VARCHAR},
       </if>
-
-      <if test="ownerName != null" >
-        owner_name = #{ownerName,jdbcType=VARCHAR},
-      </if>
-      <if test="ownerIntro != null" >
-        owner_intro = #{ownerIntro,jdbcType=VARCHAR},
-      </if>
       <if test="icon != null" >
         icon = #{icon,jdbcType=VARCHAR},
       </if>
@@ -215,9 +201,6 @@
       </if>
       <if test="intro != null" >
         intro = #{intro,jdbcType=VARCHAR},
-      </if>
-      <if test="qrUrl != null" >
-        qr_url = #{qrUrl,jdbcType=VARCHAR},
       </if>
       <if test="joinFee != null" >
         join_fee = #{joinFee,jdbcType=INTEGER},
@@ -246,7 +229,6 @@
       <if test="deleted != null" >
         deleted = #{deleted,jdbcType=TINYINT},
       </if>
-
       <if test="heat != null" >
         heat = #{heat},
       </if>
@@ -256,36 +238,26 @@
       <if test="recommend != null" >
         recommend = #{recommend},
       </if>
-      <if test="lastInfoTime != null" >
-        last_info_time = #{lastInfoTime},
+      <if test="revision != null" >
+      	revision = #{revision},
+      </if>
+      <if test="shelveFlag != null" >
+        shelve_flag = #{shelveFlag},
+      </if>
+      <if test="auditUserId != null" >
+        audit_userId = #{auditUserId},
+      </if>
+      <if test="auditRemark != null" >
+        audit_remark = #{auditRemark},
+      </if>
+      <if test="masterLastViewTime != null" >
+      	master_last_view_time = #{masterLastViewTime},
+      </if>
+      <if test="redDot != null" >
+      	red_dot = #{redDot},
       </if>
     </set>
     where kid = #{coterieId,jdbcType=CHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
-    update qh_coterie
-    set kid = #{coterieId,jdbcType=CHAR},
-    owner_id = #{ownerId,jdbcType=VARCHAR},
-    owner_name = #{ownerName,jdbcType=VARCHAR},
-    owner_intro = #{ownerIntro,jdbcType=VARCHAR},
-    icon = #{icon,jdbcType=VARCHAR},
-    coterie_name = #{name,jdbcType=VARCHAR},
-    intro = #{intro,jdbcType=VARCHAR},
-    qr_url = #{qrUrl,jdbcType=VARCHAR},
-    join_fee = #{joinFee,jdbcType=INTEGER},
-    consulting_fee = #{consultingFee,jdbcType=INTEGER},
-    join_check = #{joinCheck,jdbcType=TINYINT},
-    member_num = #{memberNum,jdbcType=INTEGER},
-    state = #{status,jdbcType=TINYINT},
-    create_date = #{createDate,jdbcType=TIMESTAMP},
-    last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
-    process_time = #{processTime,jdbcType=TIMESTAMP},
-    deleted = #{deleted,jdbcType=TINYINT},
-    heat = #{heat},
-    is_expert = #{isExpert},
-    recommend = #{recommend},
-    last_info_time = #{lastInfoTime}
-    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <update id="updateMemberNum">
@@ -327,14 +299,6 @@
              separator="," close=")">
       #{item}
     </foreach>
-    order by heat desc
-  </select>
-
-  <select id="selectListByStatus" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    where state = #{status}
   </select>
 
   <select id="selectListByCoterie" resultMap="BaseResultMap" parameterType="com.yryz.quanhu.coterie.coterie.entity.Coterie" >
@@ -347,12 +311,6 @@
       </if>
       <if test="ownerId != null" >
         owner_id = #{ownerId,jdbcType=VARCHAR},
-      </if>
-      <if test="ownerName != null" >
-        owner_name = #{ownerName,jdbcType=VARCHAR},
-      </if>
-      <if test="ownerIntro != null" >
-        owner_intro = #{ownerIntro,jdbcType=VARCHAR},
       </if>
       <if test="icon != null" >
         icon = #{icon,jdbcType=VARCHAR},
@@ -409,28 +367,33 @@
     select
     <include refid="Base_Column_List" />
     from qh_coterie where state=11 and shelve_flag=10  and deleted=10
-    ORDER BY `create_date` DESC,heat desc
+    ORDER BY `create_date` DESC
     limit #{start},#{pageSize}
+  </select>
+  
+  <select id="selectRecommendList" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from qh_coterie where state=11 and shelve_flag=10  and deleted=10 and recommend=11
+    ORDER BY `create_date` DESC
+    limit 0,200
+  </select>
+  
+  <select id="selectOrderByMemberNum" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from qh_coterie where state=11 and shelve_flag=10  and deleted=10
+    and member_num >= 50
+    ORDER BY `member_num` DESC
+    limit 0,200
   </select>
 
   <select id="selectMyCreateCoterie" resultMap="BaseResultMap" >
     select
     <include refid="Base_Column_List" />
     from qh_coterie
-    WHERE owner_id=#{custId} and shelve_flag=10
-    ORDER BY state, create_date DESC
-  </select>
-
-  <select id="selectMyCreateCoteriePage" resultMap="BaseResultMap" >
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    WHERE owner_id=#{custId}
-    <if test="status !=null">
-      and state=#{status}
-    </if>
+    WHERE owner_id=#{custId} and (state =10 or shelve_flag=10 or state =12)
     ORDER BY create_date DESC
-    limit #{start},#{pageSize}
   </select>
 
   <select id="selectMyCreateCoterieCount"  resultType="java.lang.Integer" >
@@ -438,16 +401,23 @@
     count(*)
     from qh_coterie
     WHERE owner_id=#{custId}
-    <if test="status !=null">
-      and state=#{status}
-    </if>
+    and (state =10 or shelve_flag=10)
+  </select>
+  
+  <select id="selectCreateCoterie" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from qh_coterie
+    WHERE owner_id=#{custId} and shelve_flag=10
+    ORDER BY create_date DESC
+    limit #{start},#{pageSize}
   </select>
 
   <select id="selectMyJoinCoterie" resultMap="BaseResultMap">
     SELECT c.*
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=3
+    AND c.state=11 and c.shelve_flag=10 and c.deleted=10
     AND m.user_id=#{custId}
     ORDER BY m.create_date DESC
   </select>
@@ -456,7 +426,7 @@
     SELECT c.*
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=3
+    AND c.state=11 and c.shelve_flag=10 and c.deleted=10
     AND m.user_id=#{custId}
     ORDER BY m.create_date DESC
     limit #{start},#{pageSize}
@@ -466,7 +436,7 @@
     SELECT count(*)
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=11 and c.recommend=11 and c.shelve_flag=10
+    AND c.state=11 and c.shelve_flag=10 and c.deleted=10
     AND m.user_id=#{custId}
   </select>
 
@@ -475,124 +445,6 @@
     <include refid="Base_Column_List" />
     from qh_coterie
     WHERE  coterie_name=#{name}
-  </select>
-
-  <select id="selectLikeName" resultMap="BaseResultMap" parameterType="java.lang.String">
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    WHERE (coterie_name like CONCAT('%',#{name},'%')
-    or intro like CONCAT('%',#{name},'%'))
-    and state=3
-    order by heat desc
-    limit #{start},#{pageSize}
-  </select>
-
-  <select id="selectByCustIdAndCircleId" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    WHERE owner_id=#{custId}
-    and (state=0 or state=3)
-  </select>
-
-  <select id="selectBySearchParam" resultType="com.yryz.quanhu.coterie.coterie.entity.Coterie" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
-    SELECT s.owner_name ownerName,
-    s.owner_intro ownerIntro,
-    s.coterie_name,
-    s.create_date createDate,
-    s.join_fee joinFee,
-    s.consulting_fee consultingFee,
-    s.owner_id ownerId,
-    s.intro,
-    s.kid coterieId,
-    s.join_check joinCheck,
-    s.status,
-    s.recommend,
-    s.is_expert isExpert,
-    s.icon,
-    s.intro,
-    s.qr_url qrUrl,
-    s.member_num memberNum,
-    s.heat
-    FROM `qh_coterie` s
-    WHERE 1=1
-    <if test="status !=null"> AND s.state=#{status}</if>
-    <if test="coterieName !=null"> AND s.coterie_name LIKE CONCAT('%',#{coterieName},'%')</if>
-    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
-    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
-    <if test="recommend !=null"> AND s.recommend = #{recommend}</if>
-    <if test="coterieIdList !=null">
-      AND s.kid in
-      <foreach item="item" index="index" collection="coterieIdList" open="("
-               separator="," close=")">
-        #{item}
-      </foreach>
-    </if>
-    order by s.create_date ${sortValue}
-    limit #{start},#{pageSize}
-  </select>
-
-  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
-    SELECT count(*)
-    FROM `qh_coterie` s
-    WHERE 1=1
-    <if test="status !=null"> AND s.state=#{status}</if>
-    <if test="coterieName !=null"> AND s.coterie_name LIKE CONCAT('%',#{coterieName},'%')</if>
-    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
-    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
-    <if test="coterieIdList !=null">
-      AND s.kid in
-      <foreach item="item" index="index" collection="coterieIdList" open="("
-               separator="," close=")">
-        #{item}
-      </foreach>
-    </if>
-  </select>
-
-  <select id="selectRecommendList" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    where state=11 and recommend=11 and shelve_flag=10
-    order by heat desc
-    limit #{start},#{pageSize}
-  </select>
-
-  <select id="selectHeatList" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    where state=3 and is_expert=#{expert} and last_info_time is not null
-    order by heat desc
-    limit #{start},#{pageSize}
-  </select>
-
-  <select id="selectHeatListByCircleId" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from qh_coterie
-    where state=3
-    order by heat desc
-    limit #{start},#{pageSize}
-  </select>
-
-
-
-  <select id="selectCountByCircleId"  resultType="java.lang.Integer" >
-    select
-    count(*)
-    from qh_coterie
-    <where>
-      <if test="status != null"> and state = #{status}</if>
-    </where>
-  </select>
-
-  <select id="selectCircleIdListByOwnerId" resultType="java.lang.String">
-    select  DISTINCT
-    kid
-    from qh_coterie
-    WHERE owner_id=#{ownerId} and (state = 3 or state = 0)
   </select>
 
   <select id="selectKidByCreateDate" resultType="java.lang.Long">
@@ -612,4 +464,80 @@
       #{item}
     </foreach>
   </select>
+
+
+
+
+  <!--admin-->
+
+  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
+    SELECT count(*)
+    FROM `qh_coterie` s
+    WHERE 1=1
+    <if test="status !=null"> AND s.state=#{status}</if>
+    <if test="name !=null"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
+    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
+    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
+  </select>
+
+
+  <select id="selectBySearchParam" resultType="com.yryz.quanhu.coterie.coterie.entity.Coterie" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
+    SELECT
+    s.coterie_name name,
+    s.create_date createDate,
+    s.join_fee joinFee,
+    s.consulting_fee consultingFee,
+    s.owner_id ownerId,
+    s.intro,
+    s.kid coterieId,
+    s.join_check joinCheck,
+    s.state,
+    s.recommend,
+    s.is_expert isExpert,
+    s.icon,
+    s.member_num memberNum,
+    s.heat
+    FROM `qh_coterie` s
+    WHERE 1=1
+    <if test="status !=null"> AND s.state=#{status}</if>
+    <if test="name !=null"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
+    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
+    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
+    <if test="recommend !=null"> AND s.recommend = #{recommend}</if>
+    order by s.create_date ${sortValue}
+    limit #{pageNum},#{pageSize}
+  </select>
+
+
+
+
+
+  <update id="updateCoterieAdmin" parameterType="com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin" >
+    update qh_coterie
+    <set >
+      <if test="status != null" >
+        state = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="shelveFlag != null" >
+        shelve_flag = #{shelveFlag},
+      </if>
+      <if test="recommend != null" >
+        recommend = #{recommend},
+      </if>
+      <if test="auditUserId != null" >
+        audit_user_id = #{auditUserId},
+      </if>
+      <if test="auditRemark != null" >
+        audit_remark = #{auditRemark},
+      </if>
+      <if test="processTime != null" >
+        process_time = #{processTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where kid = #{coterieId,jdbcType=CHAR}
+  </update>
+
 </mapper>

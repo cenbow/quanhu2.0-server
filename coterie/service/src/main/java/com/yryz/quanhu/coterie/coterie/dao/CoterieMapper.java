@@ -9,6 +9,9 @@ package com.yryz.quanhu.coterie.coterie.dao;
 
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.entity.CoterieSearch;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,13 +24,9 @@ import java.util.List;
  */
 @Mapper
 public interface CoterieMapper {
-    int insert(Coterie record);
-
     int insertSelective(Coterie record);
 
     Coterie selectByCoterieId(Long coterieId);
-    
-    List<Coterie> selectListByStatus(Integer status);
     
     List<Coterie> selectListByCoterieIdList(@Param("coterieIdList") List<Long> coterieIdList);
     
@@ -39,17 +38,24 @@ public interface CoterieMapper {
 
     int updateByCoterieIdSelective(Coterie record);
 
-    int updateByPrimaryKey(Coterie record);
-
     int updateExpert(@Param("custId") String custId, @Param("isExpert") Byte isExpert);
 
     int updateMemberNum(@Param("coterieId") Long coterieId, @Param("newMemberNum") Integer newMemberNum, @Param("oldMemberNum") Integer oldMemberNum);
 
     List<Coterie> selectMyCreateCoterie(@Param("custId") String custId);
 
-    List<Coterie> selectMyCreateCoteriePage(@Param("custId") String custId, @Param("start") Integer start, @Param("pageSize") Integer pageSize, @Param("status") Integer status);
-
-    Integer selectMyCreateCoterieCount(@Param("custId") String custId, @Param("status") Integer status);
+    /**
+     * 创建的私圈数量(已上架或审核中)
+     * @param custId
+     * @return
+     */
+    Integer selectMyCreateCoterieCount(@Param("custId") String custId);
+    
+    /**
+     * 个人主页创建的私圈
+     * @return
+     */
+    List<Coterie> selectCreateCoterie(@Param("custId") String custId,@Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
     List<Coterie> selectMyJoinCoterie(@Param("custId") String custId);
     
@@ -59,27 +65,27 @@ public interface CoterieMapper {
     
     List<Coterie> selectByName(@Param("name") String name);
     
-    Coterie selectByCustIdAndCircleId(@Param("custId") String custId, @Param("circleId") String circleId);
-    
-    List<Coterie> selectBySearchParam(CoterieSearch param);
-    
-    Integer selectCountBySearchParam(CoterieSearch param);
-    
-    Integer selectCountByCircleId(@Param("circleId") String circleId, @Param("status") Byte status);
-    
     int updateRecommend(@Param("coterieIdList") List<Long> coterieIdList, @Param("recommend") Byte recommend);
-    
-    List<Coterie> selectRecommendList(@Param("circleId") String circleId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
-    
-    List<Coterie> selectHeatList(@Param("circleId") String circleId, @Param("expert") Byte expert, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
-    
-    List<Coterie> selectHeatListByCircleId(@Param("circleId") String circleId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
-    
-    List<Coterie> selectLikeName(@Param("circleId") String circleId, @Param("name") String name, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
-    
-    List<String> selectCircleIdListByOwnerId(@Param("ownerId") String ownerId);
     
     List<Long> selectKidByCreateDate(@Param("startDate") String startDate, @Param("endDate") String endDate);
     
     List<Coterie> selectByKids(@Param("kidList") List<Long> kidList);
+    
+    /**
+     * 获取推荐的私圈
+     * @return
+     */
+    List<Coterie> selectRecommendList();
+    List<Coterie> selectOrderByMemberNum();
+
+
+
+
+    /********* admin *************************/
+
+    int updateCoterieAdmin(CoterieUpdateAdmin record);
+
+    List<Coterie> selectBySearchParam(CoterieSearchParam param);
+
+    Integer selectCountBySearchParam(CoterieSearchParam param);
 }

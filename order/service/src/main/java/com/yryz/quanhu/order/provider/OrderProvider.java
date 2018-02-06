@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
+import com.yryz.quanhu.order.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +41,6 @@ import com.yryz.quanhu.order.service.OrderService;
 import com.yryz.quanhu.order.service.UserAccountService;
 import com.yryz.quanhu.order.service.UserPhyService;
 import com.yryz.quanhu.order.utils.Page;
-import com.yryz.quanhu.order.vo.AccountOrder;
-import com.yryz.quanhu.order.vo.CustBank;
-import com.yryz.quanhu.order.vo.IntegralOrder;
-import com.yryz.quanhu.order.vo.OrderInfo;
-import com.yryz.quanhu.order.vo.OrderListVo;
-import com.yryz.quanhu.order.vo.PayInfo;
-import com.yryz.quanhu.order.vo.UserAccount;
-import com.yryz.quanhu.order.vo.UserPhy;
 
 /**
  * @author yehao
@@ -85,7 +80,6 @@ public class OrderProvider implements OrderApi {
 	 * @param payPassword
 	 * @param remark
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#executeOrder(com.yryz.quanhu.order.vo.OrderInfo, java.util.List, java.util.List, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Response<?> executeOrder(OrderInfo orderInfo, List<AccountOrder> accounts, List<IntegralOrder> integrals,
@@ -93,34 +87,19 @@ public class OrderProvider implements OrderApi {
 		logger.info("executeOrder start orderId:" + orderInfo.getOrderId());
 		logger.info("executeOrder...orderInfo:" + GsonUtils.parseJson(orderInfo) + "...accounts:"
 				+ GsonUtils.parseJson(accounts) + "...integrals:" + GsonUtils.parseJson(integrals));
-		logger.info("executeOrder end orderId:" + orderInfo.getOrderId());
-
-		RrzOrderInfo rrzOrderInfo = (RrzOrderInfo) GsonUtils.parseObj(orderInfo, RrzOrderInfo.class);
-		List<RrzOrderAccountHistory> rrzOrderAccountHistories = (List<RrzOrderAccountHistory>) GsonUtils
-				.parseList(accounts, RrzOrderAccountHistory.class);
-		List<RrzOrderIntegralHistory> rrzOrderIntegralHistories = (List<RrzOrderIntegralHistory>) GsonUtils
-				.parseList(integrals, RrzOrderIntegralHistory.class);
+		RrzOrderInfo rrzOrderInfo = GsonUtils.parseObj(orderInfo, RrzOrderInfo.class);
+		List<RrzOrderAccountHistory> rrzOrderAccountHistories = GsonUtils.parseList(accounts, RrzOrderAccountHistory.class);
+		List<RrzOrderIntegralHistory> rrzOrderIntegralHistories = GsonUtils.parseList(integrals, RrzOrderIntegralHistory.class);
 		try {
-			return orderService.executeOrder(rrzOrderInfo, rrzOrderAccountHistories, rrzOrderIntegralHistories, custId,
+			orderService.executeOrder(rrzOrderInfo, rrzOrderAccountHistories, rrzOrderIntegralHistories, custId,
 					payPassword, remark);
-		} catch (MysqlOptException e) {
-			// 出现任何异常，将重新刷新缓存，以防出现数据不一致的问题
-			orderService.refreshOrder(rrzOrderInfo, rrzOrderAccountHistories, rrzOrderIntegralHistories);
-			logger.warn("executeOrder error ...orderInfo:" + GsonUtils.parseJson(orderInfo) + "...accounts:"
-					+ GsonUtils.parseJson(accounts) + "...integrals:" + GsonUtils.parseJson(integrals));
-			return ResponseUtils.returnException(new CommonException("数据库异常"));
-		} catch (SourceNotEnoughException e) {
-			// 出现任何异常，将重新刷新缓存，以防出现数据不一致的问题
-			orderService.refreshOrder(rrzOrderInfo, rrzOrderAccountHistories, rrzOrderIntegralHistories);
-			return ResponseUtils.returnException(new CommonException("余额不足"));
+			logger.info("executeOrder end orderId:" + orderInfo.getOrderId());
+			return ResponseUtils.returnSuccess();
 		} catch (Exception e) {
 			// 出现任何异常，将重新刷新缓存，以防出现数据不一致的问题
 			orderService.refreshOrder(rrzOrderInfo, rrzOrderAccountHistories, rrzOrderIntegralHistories);
-			e.printStackTrace();
-			logger.warn("unknown Exception", e);
-			logger.warn("executeOrder error ...orderInfo:" + GsonUtils.parseJson(orderInfo) + "...accounts:"
-					+ GsonUtils.parseJson(accounts) + "...integrals:" + GsonUtils.parseJson(integrals));
-			return ResponseUtils.returnException(new CommonException("未知异常"));
+			logger.error("executeOrder error", e);
+			return ResponseUtils.returnException(e);
 		}
 	}
 
@@ -131,14 +110,13 @@ public class OrderProvider implements OrderApi {
 	 * @param payPassword
 	 * @param remark
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#executePay(com.yryz.quanhu.order.vo.PayInfo, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Response<PayInfo> executePay(PayInfo payInfo, String custId, String payPassword, String remark) {
 		logger.info("executePay...payInfo:" + GsonUtils.parseJson(payInfo) + "...custId:" + custId + "...payPassword:"
 				+ payPassword + "...remark:" + remark);
 		try {
-			RrzOrderPayInfo orderPayInfo = (RrzOrderPayInfo) GsonUtils.parseObj(payInfo, RrzOrderPayInfo.class);
+			RrzOrderPayInfo orderPayInfo = GsonUtils.parseObj(payInfo, RrzOrderPayInfo.class);
 			orderPayInfo = orderService.executePayInfo(orderPayInfo, custId, payPassword, remark);
 //			// 生效的充值订单推送消息
 //			if (orderPayInfo != null && orderPayInfo.getProductType() != null
@@ -147,18 +125,13 @@ public class OrderProvider implements OrderApi {
 //				pushService.charge(orderPayInfo.getCustId(), orderPayInfo.getCost());
 //			}
 			return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(orderPayInfo, PayInfo.class));
-		} catch (MysqlOptException e) {
-			// 出现任何异常，将重新刷新缓存缓存数据，以防出现数据不一致的问题
-			orderService.refreshPay(payInfo);
-			return ResponseUtils.returnException(new CommonException("数据库异常"));
 		} catch (Exception e) {
 			// 出现任何异常，将重新刷新缓存缓存数据，以防出现数据不一致的问题
 			orderService.refreshPay(payInfo);
-			e.printStackTrace();
-			logger.warn("unknown Exception", e);
-			logger.warn("executePay error...payInfo:" + GsonUtils.parseJson(payInfo) + "...custId:" + custId
+			logger.error("executePay error", e);
+			logger.error("executePay error...payInfo:" + GsonUtils.parseJson(payInfo) + "...custId:" + custId
 					+ "...payPassword:" + payPassword + "...remark:" + remark);
-			return ResponseUtils.returnException(new CommonException("未知异常"));
+			return ResponseUtils.returnException(e);
 		}
 	}
 
@@ -171,7 +144,6 @@ public class OrderProvider implements OrderApi {
 	 * @param start
 	 * @param limit
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getOrderList(java.lang.String, java.lang.String, java.lang.Integer, int, long, long)
 	 */
 	@Override
 	public Response<List<OrderListVo>> getOrderList(String custId, String date, Integer productTypeId, int type,
@@ -199,7 +171,6 @@ public class OrderProvider implements OrderApi {
 	 * 查询账户信息
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getUserAccount(java.lang.String)
 	 */
 	@Override
 	public Response<UserAccount> getUserAccount(String custId) {
@@ -207,13 +178,11 @@ public class OrderProvider implements OrderApi {
 			RrzOrderUserAccount account = new RrzOrderUserAccount();
 			account.setCustId(custId);
 			account = userAccountService.getUserAccount(account);
-			UserAccount userAccount = (UserAccount) GsonUtils.json2Obj(GsonUtils.parseJson(account), UserAccount.class);
+			UserAccount userAccount = GsonUtils.json2Obj(GsonUtils.parseJson(account), UserAccount.class);
 			return ResponseUtils.returnObjectSuccess(userAccount);
-		} catch (MysqlOptException e) {
-			return null;
-		} catch (Exception e) {
-			logger.warn("unknown Exception", e);
-			return null;
+		}catch (Exception e) {
+			logger.warn("getUserAccount Exception", e);
+			return ResponseUtils.returnException(e);
 		}
 	}
 
@@ -221,7 +190,6 @@ public class OrderProvider implements OrderApi {
 	 * 修改账户信息
 	 * @param account
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#dealUserAccount(com.yryz.quanhu.order.vo.UserAccount)
 	 */
 	@Override
 	public Response<?> dealUserAccount(UserAccount account) {
@@ -240,7 +208,6 @@ public class OrderProvider implements OrderApi {
 	 * 验证密码
 	 * @param userPhy
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#checkSecurityProblem(com.yryz.quanhu.order.vo.UserPhy)
 	 */
 	@Override
 	public Response<?> checkSecurityProblem(UserPhy userPhy) {
@@ -261,7 +228,6 @@ public class OrderProvider implements OrderApi {
 	 * 锁定账户
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#lockUserAccount(java.lang.String)
 	 */
 	@Override
 	public Response<?> lockUserAccount(String custId) {
@@ -280,7 +246,6 @@ public class OrderProvider implements OrderApi {
 	 * 解锁系统账户
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#unlockUserAccount(java.lang.String)
 	 */
 	@Override
 	public Response<?> unlockUserAccount(String custId) {
@@ -300,18 +265,14 @@ public class OrderProvider implements OrderApi {
 	 * @param custId
 	 * @param payPassword
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#checkUserPayPassword(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Response<?> checkUserPayPassword(String custId, String payPassword) {
 		logger.info("收到支付密码验证需求，custId：" + custId + ",payPassword:" + payPassword);
 		try {
 			return userPhyService.checkPayPassword(custId, payPassword);
-		} catch (MysqlOptException e) {
-			return ResponseUtils.returnCommonException("数据提交失败");
 		} catch (Exception e) {
-			logger.warn("unknown Exception", e);
-			return ResponseUtils.returnCommonException("未知异常");
+			return ResponseUtils.returnException(e);
 		}
 	}
 
@@ -319,7 +280,6 @@ public class OrderProvider implements OrderApi {
 	 * 处理安全信息
 	 * @param userPhy
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#dealUserPhy(com.yryz.quanhu.order.vo.UserPhy)
 	 */
 	@Override
 	public Response<?> dealUserPhy(UserPhy userPhy) {
@@ -327,11 +287,11 @@ public class OrderProvider implements OrderApi {
 			if (StringUtils.isEmpty(userPhy.getCustId())){
 				return ResponseUtils.returnCommonException("客户ID不能为空");
 			}
-			RrzOrderUserPhy rrzOrderUserPhy = (RrzOrderUserPhy) GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
+			RrzOrderUserPhy rrzOrderUserPhy = GsonUtils.parseObj(userPhy, RrzOrderUserPhy.class);
 			return userPhyService.dealUserPhy(rrzOrderUserPhy, userPhy.getOldPassword());
 		} catch (Exception e) {
-			logger.warn("unknown Exception", e);
-			return ResponseUtils.returnCommonException("未知错误");
+			logger.warn("dealUserPhy Exception", e);
+			return ResponseUtils.returnException(e);
 		}
 	}
 
@@ -339,7 +299,6 @@ public class OrderProvider implements OrderApi {
 	 * 获取物理信息
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getUserPhy(java.lang.String)
 	 */
 	@Override
 	public Response<UserPhy> getUserPhy(String custId) {
@@ -358,7 +317,6 @@ public class OrderProvider implements OrderApi {
 	 * 获取用户银行卡信息
 	 * @param custBankId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getCustBankById(java.lang.String)
 	 */
 	@Override
 	public Response<CustBank> getCustBankById(String custBankId) {
@@ -377,7 +335,6 @@ public class OrderProvider implements OrderApi {
 	 * 返回绑定的银行卡
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getCustBanks(java.lang.String)
 	 */
 	@Override
 	public Response<List<CustBank>> getCustBanks(String custId) {
@@ -397,7 +354,6 @@ public class OrderProvider implements OrderApi {
 	 * @param custBank
 	 * @param type
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#dealCustBank(com.yryz.quanhu.order.vo.CustBank, int)
 	 */
 	@Override
 	public Response<?> dealCustBank(CustBank custBank, int type) {
@@ -425,7 +381,6 @@ public class OrderProvider implements OrderApi {
 	 * @param pageNo
 	 * @param pageSize
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getOrderListWeb(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, int, int, int)
 	 */
 	@Override
 	public Response<PageList<OrderListVo>> getOrderListWeb(String custId, String orderDesc, String startDate,
@@ -468,6 +423,30 @@ public class OrderProvider implements OrderApi {
 		}
 	}
 
+	@Override
+	public Response<PayInfo> getPayInfo(String orderId) {
+		try {
+			return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(orderService.getPayInfo(orderId),PayInfo.class));
+		}catch (Exception e){
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<PageList<PayInfo>> getWithdrawCashPage(WithdrawCashDto withdrawCashDto) {
+		try {
+			PageList<RrzOrderPayInfo> originPage = orderService.getWithdrawCashPage(withdrawCashDto);
+			PageList<PayInfo> pageList = new PageList<>();
+			pageList.setCurrentPage(withdrawCashDto.getCurrentPage());
+			pageList.setPageSize(withdrawCashDto.getPageSize());
+			pageList.setCount(originPage.getCount());
+			pageList.setEntities(GsonUtils.parseList(originPage.getEntities(), PayInfo.class));
+			return ResponseUtils.returnObjectSuccess(pageList);
+		}catch (Exception e){
+			return ResponseUtils.returnException(e);
+		}
+	}
+
 	/**
 	 * 获取资金信息
 	 * @param custId
@@ -477,12 +456,11 @@ public class OrderProvider implements OrderApi {
 	 * @param start
 	 * @param limit
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getPayInfo(java.lang.String, java.lang.String, java.lang.String, int, long, long)
 	 */
 	@Override
-	public Response<List<PayInfo>> getPayInfo(String custId, String date, String orderId, int type, long start,
+	public Response<List<PayInfo>> getPayInfoList(String custId, String date, String orderId, int type, long start,
 			long limit) {
-		List<RrzOrderPayInfo> list = orderService.getPayInfo(custId, date, orderId, start, limit);
+		List<RrzOrderPayInfo> list = orderService.getPayInfoList(custId, date, orderId, start, limit);
 		return ResponseUtils.returnListSuccess(GsonUtils.parseList(list, PayInfo.class));
 	}
 
@@ -494,7 +472,6 @@ public class OrderProvider implements OrderApi {
 	 * @param pageNo
 	 * @param pageSize
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getPayInfoWeb(java.lang.String, java.lang.String, java.lang.String, int, int)
 	 */
 	@Override
 	public Response<PageList<PayInfo>> getPayInfoWeb(String custId, String date, String orderId, int pageNo,
@@ -522,7 +499,6 @@ public class OrderProvider implements OrderApi {
 	/**
 	 * 执行统计信息
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#integralSum()
 	 */
 	@Override
 	public Response<?> integralSum() {
@@ -534,7 +510,6 @@ public class OrderProvider implements OrderApi {
 	 * 获取用户统计信息
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getUserIntegralSum(java.lang.String)
 	 */
 	@Override
 	public Response<Map<String, String>> getUserIntegralSum(String custId) {
@@ -545,7 +520,6 @@ public class OrderProvider implements OrderApi {
 	 * 初始化用户统计信息
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#integralSumByCustId(java.lang.String)
 	 */
 	@Override
 	public Response<?> integralSumByCustId(String custId) {
@@ -557,7 +531,6 @@ public class OrderProvider implements OrderApi {
 	 * 更新缓存
 	 * @param custId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#updateUserCache(java.lang.String)
 	 */
 	@Override
 	public Response<?> updateUserCache(String custId) {
@@ -569,7 +542,6 @@ public class OrderProvider implements OrderApi {
 	 * 获取订单信息
 	 * @param orderId
 	 * @return
-	 * @see com.yryz.quanhu.order.api.OrderApi#getOrderInfo(java.lang.String)
 	 */
 	@Override
 	public Response<OrderInfo> getOrderInfo(String orderId) {

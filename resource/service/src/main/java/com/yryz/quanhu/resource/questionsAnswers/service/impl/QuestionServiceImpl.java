@@ -12,7 +12,9 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
+import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
@@ -21,6 +23,7 @@ import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
+import com.yryz.quanhu.order.vo.UserAccount;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
@@ -55,6 +58,8 @@ import java.util.*;
  */
 @Service
 public class QuestionServiceImpl implements QuestionService {
+
+    private static final Byte COTERIE_STATUS_UP = 11;
 
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
@@ -105,11 +110,11 @@ public class QuestionServiceImpl implements QuestionService {
          */
         Long citeriaId = question.getCoterieId();
         String targetId = question.getTargetId();
-        String conttent = question.getContent();
+        String content = question.getContent();
         Long createUserId = question.getCreateUserId();
         Byte isAnonymity = question.getIsAnonymity();
         Byte isOnlyShowMe = question.getIsOnlyShowMe();
-        if (null == citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(conttent)
+        if (null == citeriaId || StringUtils.isBlank(targetId) || StringUtils.isBlank(content)
                 || isAnonymity == null || null == isOnlyShowMe || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
@@ -121,7 +126,8 @@ public class QuestionServiceImpl implements QuestionService {
             throw QuanhuException.busiError("不能向自己提问。");
         }
         CoterieInfo coterieInfo = apIservice.getCoterieinfo(citeriaId);
-        if (null == coterieInfo) {
+        if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || coterieInfo.getStatus().compareTo(COTERIE_STATUS_UP) != 0)
+        {
             throw QuanhuException.busiError("提问的私圈不存在。");
         }
         Integer consultingFee = coterieInfo.getConsultingFee() == null ? 0 : coterieInfo.getConsultingFee();
@@ -130,11 +136,25 @@ public class QuestionServiceImpl implements QuestionService {
 
         //圈主10 成员20 路人未审请30 路人待审核40
         if (!checkIdentity(createUserId, Long.valueOf(citeriaId), MemberConstant.Permission.MEMBER)) {
-            throw QuanhuException.busiError("非圈粉不能提问");
+            throw QuanhuException.busiError("您还不是该私圈成员，请先加入私圈");
         }
 
         if (!checkIdentity(Long.valueOf(targetId), Long.valueOf(citeriaId), MemberConstant.Permission.OWNER)) {
             throw QuanhuException.busiError("不能向非圈主用户提问.");
+        }
+
+        if (StringUtils.isBlank(content) || content.length() > 300 || content.length() < 10) {
+            throw QuanhuException.busiError("提问正文只能输入文字,10到300字.");
+        }
+        if (consultingFee > 0) {
+            UserAccount userAccount = orderSDK.getUserAccount(createUserId);
+            if (userAccount == null) {
+                throw QuanhuException.busiError("提问者没有账户信息.");
+            }
+            Long accountSum = userAccount.getAccountSum() == null ? 0L : userAccount.getAccountSum();
+            if (consultingFee > accountSum) {
+                throw QuanhuException.busiError(ExceptionEnum.USER_NOT_SUFFICIENT_FUNDS);
+            }
         }
 
         question.setKid(apIservice.getKid());
@@ -153,9 +173,14 @@ public class QuestionServiceImpl implements QuestionService {
         question.setIsValid(QuestionAnswerConstants.validType.YES);
         question.setDelFlag(CommonConstants.DELETE_NO);
         question.setShelveFlag(CommonConstants.SHELVE_YES);
+        if (consultingFee > 0) {
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.Not_paid);
+        } else {
+            question.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
+        }
 
         questionDao.insertSelective(question);
-        if (question.getChargeAmount().longValue() > 0) {
+        if (consultingFee > 0) {
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JSON.toJSONString(question));
             inputOrder.setCost(question.getChargeAmount());
@@ -175,7 +200,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 发送通知消息
          */
-        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+        MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
         messageBusinessVo.setAmount(question.getChargeAmount());
         messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
         messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
@@ -185,7 +210,7 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setTosendUserId(Long.valueOf(question.getTargetId()));
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setImgUrl("");
-        Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_ANSWERED,true);
+        Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_ANSWERED, true);
         if (!sendResult) {
             logger.info("提问被删除，发送消息失败");
         }
@@ -193,11 +218,11 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 资源聚合
          */
-        ResourceTotal resourceTotal=new ResourceTotal();
+        ResourceTotal resourceTotal = new ResourceTotal();
         resourceTotal.setCreateDate(DateUtils.getDate());
-        Question questionQuery=this.questionDao.selectByPrimaryKey(question.getKid());
-        QuestionVo vo=new QuestionVo();
-        if(questionQuery!=null) {
+        Question questionQuery = this.questionDao.selectByPrimaryKey(question.getKid());
+        QuestionVo vo = new QuestionVo();
+        if (questionQuery != null) {
             BeanUtils.copyProperties(questionQuery, vo);
             resourceTotal.setExtJson(JSON.toJSONString(vo));
         }
@@ -242,7 +267,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if (questionBySearch.getChargeAmount() > 0) {
+        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0) {
             Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
             if (null != orderId) {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
@@ -250,7 +275,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 
                 //发送通知消息
-                MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
                 messageBusinessVo.setAmount(questionBySearch.getChargeAmount());
                 messageBusinessVo.setCoterieId(String.valueOf(questionBySearch.getCoterieId()));
                 messageBusinessVo.setIsAnonymity(questionBySearch.getIsAnonymity());
@@ -260,7 +285,7 @@ public class QuestionServiceImpl implements QuestionService {
                 messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
                 messageBusinessVo.setTitle(questionBySearch.getContent());
                 messageBusinessVo.setImgUrl("");
-                Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE,true);
+                Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE, true);
                 if (!sendResult) {
                     logger.info("提问被删除，发送消息失败");
                 }
@@ -290,8 +315,8 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionExample example = new QuestionExample();
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
-      //  criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        //  criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         List<Question> questions = this.questionDao.selectByExample(example);
         if (null == questions || questions.isEmpty()) {
             //throw QuanhuException.busiError("查询的问题不存在");
@@ -321,13 +346,13 @@ public class QuestionServiceImpl implements QuestionService {
 
 
         //虚拟阅读数
-        readApi.read(kid,questionBysearch.getCreateUserId());
+        readApi.read(kid, questionBysearch.getCreateUserId());
         /**
          * 提交积分成长值事件
          */
-        EventInfo eventInfo=new EventInfo();
+        EventInfo eventInfo = new EventInfo();
         eventInfo.setAmount(0D);
-        eventInfo.setCoterieId(questionVo.getCoterieId());
+        eventInfo.setCoterieId(questionVo.getCoterieId().toString());
         eventInfo.setCreateTime(DateUtils.getTime());
         eventInfo.setEventCode(EventEnum.READ_RESOURCE.getCode());
         eventInfo.setOwnerId(String.valueOf(createUserId));
@@ -359,6 +384,10 @@ public class QuestionServiceImpl implements QuestionService {
         if (null == question) {
             throw QuanhuException.busiError("圈主拒接回答的问题不存在");
         }
+
+        if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) != 0) {
+            throw QuanhuException.busiError("该问题未付费成功，无法拒绝");
+        }
         String targetId = question.getTargetId();
         if (!String.valueOf(userId).equals(targetId)) {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREJECT);
@@ -368,7 +397,7 @@ public class QuestionServiceImpl implements QuestionService {
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if (question.getChargeAmount() > 0) {
+        if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) == 0) {
             Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
             if (null != orderId) {
                 question.setRefundOrderId(String.valueOf(orderId));
@@ -378,7 +407,7 @@ public class QuestionServiceImpl implements QuestionService {
             }
         }
 
-        MessageBusinessVo messageBusinessVo =new MessageBusinessVo();
+        MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
         messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setKid(question.getKid());
@@ -387,8 +416,8 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setTosendUserId(question.getCreateUserId());
         messageBusinessVo.setAmount(question.getChargeAmount());
-        questionMessageService.sendNotify4Question(messageBusinessVo,MessageConstant.QUESTION_TO_BE_REJECT,false);
-        int result= this.questionDao.updateByPrimaryKeySelective(question);
+        questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_REJECT, false);
+        int result = this.questionDao.updateByPrimaryKeySelective(question);
         return result;
     }
 
@@ -420,6 +449,7 @@ public class QuestionServiceImpl implements QuestionService {
         criteria.andCoterieIdEqualTo(coteriaId);
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
+        criteria.andOrderFlagGreaterThanOrEqualTo(QuestionAnswerConstants.OrderType.paid);
         /**
          *检查用户是否是圈主
          */
@@ -449,19 +479,11 @@ public class QuestionServiceImpl implements QuestionService {
                 questionVo.setTargetUser(apIservice.getUser(Long.valueOf(question.getTargetId())));
             }
             questionVo.setModuleEnum(ModuleContants.QUESTION);
-            Response<Map<String, Long>> countData = countApi.getCount("10,11", questionVo.getKid(), null);
+            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode(),
+                    questionVo.getKid(), null);
             if (ResponseConstant.SUCCESS.getCode().equals(countData.getCode())) {
                 Map<String, Long> count = countData.getData();
-                if (count != null) {
-                    BehaviorVo behaviorVo = new BehaviorVo();
-                    if (count.containsKey("likeCount")) {
-                        behaviorVo.setLikeCount(count.get("likeCount"));
-                    }
-                    if (count.containsKey("commentCount")) {
-                        behaviorVo.setCommentCount(count.get("commentCount"));
-                    }
-                    questionVo.setBehaviorVo(behaviorVo);
-                }
+                questionVo.setStatistics(count);
             }
 
             /**
@@ -559,7 +581,7 @@ public class QuestionServiceImpl implements QuestionService {
             } else {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
             }
-            MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+            MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
             messageBusinessVo.setAmount(question.getChargeAmount());
             messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
             messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
@@ -569,7 +591,7 @@ public class QuestionServiceImpl implements QuestionService {
             messageBusinessVo.setTosendUserId(question.getCreateUserId());
             messageBusinessVo.setTitle(question.getContent());
             messageBusinessVo.setImgUrl("");
-            Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID,true);
+            Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID, true);
             if (!sendMessageResult) {
                 logger.error("失效问题发送问题失败,提问的kid{}", question.getKid());
             }

@@ -69,7 +69,7 @@ public class ElasticsearchSyncConsumer {
 	@Scheduled(fixedRate=30*1000)
 	public void createRabbitListener(){
 		boolean success=RedisDistributedLock.lockAndHold(stringRedisTemplate.opsForValue(), lockName, unlockKey, expireSeconds);
-		logger.info("-----lock and hold------");
+		logger.info("-----lock and hold----："+success);
 		if(success && !isListenerCreated){
 			SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
 			container.setConnectionFactory(connectionFactory);

@@ -54,7 +54,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * 检查是否已经超过密码输入错误次数
 	 * @param custId
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#banCheck(java.lang.String)
 	 */
 	@Override
 	public boolean banCheck(String custId) {
@@ -65,7 +64,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * 添加密码输入错误的次数判断
 	 * @param custId
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#increaseBan(java.lang.String)
 	 */
 	@Override
 	public int increaseBan(String custId) {
@@ -75,7 +73,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	/**
 	 * 在用户输入正确密码后，清理安全输入次数的错误次数
 	 * @param custId
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#clearBan(java.lang.String)
 	 */
 	@Override
 	public void clearBan(String custId) {
@@ -117,7 +114,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * @param rrzOrderUserPhy
 	 * @param oldPassword
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#dealUserPhy(com.yryz.service.order.modules.order.entity.RrzOrderUserPhy, java.lang.String)
 	 */
 	@Override
 	public Response<?> dealUserPhy(RrzOrderUserPhy rrzOrderUserPhy, String oldPassword) {
@@ -130,6 +126,7 @@ public class UserPhyServiceImpl implements UserPhyService{
 			userPhy.setCreateTime(new Date());
 			saveUserPhy(userPhy);
 		} else {
+			//修改支付密码
 			if (rrzOrderUserPhy.getPayPassword() != null) {
 				if (StringUtils.isEmpty(userPhy.getPayPassword())) {
 					// 如果原密码为空，则直接修改
@@ -147,21 +144,27 @@ public class UserPhyServiceImpl implements UserPhyService{
 					userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
 					reSetPayWord = true;
 				} else {
+					//根据旧密码修改支付密码
 					if (userPhy.getPayPassword().equals(oldPassword)) {
 						// 验证旧密码
 						userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
-					} else if (!StringUtils.isBlank(rrzOrderUserPhy.getCustIdcardNo())
+					}
+					//根据密保修改支付密码
+					else if (!StringUtils.isBlank(rrzOrderUserPhy.getCustIdcardNo())
 							&& !StringUtils.isBlank(rrzOrderUserPhy.getPhyName())
 							&& rrzOrderUserPhy.getCustIdcardNo().equals(userPhy.getCustIdcardNo())
 							&& rrzOrderUserPhy.getPhyName().equals(userPhy.getPhyName())) {
 						// 验证密保问题
 						userPhy.setPayPassword(rrzOrderUserPhy.getPayPassword());
 					} else {
-						return ResponseUtils.returnException(new CommonException("验证失败"));
+						return ResponseUtils.returnCommonException("密码验证失败！");
 					}
+					//发送消息
 					quanhuMessage.sendMessage(MessageConstant.EDIT_PAY_PASSWORD, userPhy.getCustId(), null);
 				}
-			} else {
+			}
+			//设置密保问题
+			else {
 				if (rrzOrderUserPhy.getCustIdcardType() != null) {
 					userPhy.setCustIdcardType(rrzOrderUserPhy.getCustIdcardType());
 				}
@@ -172,7 +175,7 @@ public class UserPhyServiceImpl implements UserPhyService{
 					userPhy.setPhyName(rrzOrderUserPhy.getPhyName());
 				}
 			}
-
+			//修改小额免密设置
 			if (rrzOrderUserPhy.getSmallNopass() != null) {
 				userPhy.setSmallNopass(rrzOrderUserPhy.getSmallNopass());
 			}
@@ -210,7 +213,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * 验证用户安全信息
 	 * @param rrzOrderUserPhy
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#checkSecurityProblem(com.yryz.service.order.modules.order.entity.RrzOrderUserPhy)
 	 */
 	@Override
 	public Response<?> checkSecurityProblem(RrzOrderUserPhy rrzOrderUserPhy) {
@@ -238,7 +240,6 @@ public class UserPhyServiceImpl implements UserPhyService{
 	 * @param custId
 	 * @param payPassword
 	 * @return
-	 * @see com.yryz.service.order.modules.order.service.UserPhyService#checkPayPassword(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public Response<?> checkPayPassword(String custId, String payPassword) {

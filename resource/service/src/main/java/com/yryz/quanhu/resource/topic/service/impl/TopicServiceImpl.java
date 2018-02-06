@@ -6,7 +6,11 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -42,6 +47,9 @@ public class TopicServiceImpl implements TopicService {
 
     @Reference
     private ReadApi readApi;
+
+    @Reference
+    private CountApi countApi;
 
     @Autowired
     private TopicPostService topicPostService;
@@ -157,6 +165,12 @@ public class TopicServiceImpl implements TopicService {
             if (createUserId != null) {
                 vo.setUser(apIservice.getUser(createUserId));
             }
+            vo.setReplyCount(0L);
+            Response<Map<String,Long>> data=countApi.getCount(BehaviorEnum.TALK.getCode(),  vo.getKid(),null);
+            if(ResponseConstant.SUCCESS.getCode().equals(data.getCode())){
+                Map<String,Long> map=data.getData();
+                vo.setStatistics(map);
+             }
             vo.setModuleEnum(ModuleContants.TOPIC);
             topicVos.add(vo);
         }

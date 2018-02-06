@@ -126,8 +126,8 @@ public class UserTest {
 		header.setDevType("11");
 		header.setDitchCode("APP");
 		ThirdLoginDTO loginDTO = new ThirdLoginDTO();
-		loginDTO.setAccessToken("162C9522156358786DE06E441E9C2A3F");
-		loginDTO.setOpenId("F1E167B92BB7D1B1D093B1D44A9147E3");
+		loginDTO.setAccessToken("077C5D51858725575DDC14FA85ED0EC4");
+		loginDTO.setOpenId("EF6CCDB1A0B1E87C9259139A1E5756B9");
 		loginDTO.setUserRegInviterCode("48565247");
 		loginDTO.setType(12);
 		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(),
@@ -159,6 +159,16 @@ public class UserTest {
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
+
+	@Test
+	public void getUserListByCreateDateTest(){
+		String start = "2018-01-01";
+		String end = "2018-03-01";
+		Response<List<UserBaseInfoVO>> listResponse = userApi.getUserListByCreateDate(start, end);
+		System.out.println("listResponse result: "+ JsonUtils.toFastJson(listResponse));
+	}
+
+
 	
 	//@Test
 	public void bindPhone(){
@@ -216,7 +226,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void sendVerifyCode() {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
@@ -283,7 +293,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response2));
 	}
 	
-	@Test
+	//@Test
 	public void getAdmin(){
 		AdminUserInfoDTO infoDTO = new AdminUserInfoDTO(null, null, null, null, null, "vebff12m1762");
 		infoDTO.setUserStatus(1);

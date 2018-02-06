@@ -585,6 +585,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<UserBaseInfo> getUserListByCreateDate(String startDate, String endDate) {
+		return custbaseinfoDao.getUserListByCreateDate(startDate, endDate);
+	}
+
+	@Override
 	public List<UserBaseInfo> getAllByUserIds(List<Long> userIds) {
 		return custbaseinfoDao.getAllByUserIds(userIds);
 	}

@@ -58,7 +58,12 @@ public class DymaicController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/homepage")
     public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam Long targetUserId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
-        return dymaicService.getSendList(userId, targetUserId, kid, limit);
+        List<DymaicVo> list = ResponseUtils.getResponseData(dymaicService.getSendList(userId, targetUserId, kid, limit));
+        if (kid == null || kid == 0L) {
+            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
+            list.add(0, topDymaic);
+        }
+        return ResponseUtils.returnObjectSuccess(list);
     }
 
     @ApiOperation("动态详情ID")
@@ -112,5 +117,12 @@ public class DymaicController {
             return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
         }
         return dymaicService.deleteTopDymaic(userId, dymaic.getKid());
+    }
+
+    @ApiOperation("动态置顶状态查询")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/dymaic/getTopDymaic")
+    public Response<DymaicVo> getTopDymaic(@RequestHeader Long userId) {
+        return dymaicService.getTopDymaic(userId);
     }
 }

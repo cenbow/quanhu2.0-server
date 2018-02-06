@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.yryz.common.mongodb.AbsBaseMongoDAO;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.count.entity.CountModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -22,6 +24,9 @@ import java.util.List;
  */
 @Service
 public class CountMongoDao extends AbsBaseMongoDAO<CountModel> {
+
+    private static Logger logger = LoggerFactory.getLogger(CountMongoDao.class);
+
     /**
      * mongoTemplate
      *
@@ -79,6 +84,7 @@ public class CountMongoDao extends AbsBaseMongoDAO<CountModel> {
         Sort sort = new Sort(order);
         query.with(sort);
         query.limit(1);
+        logger.info("getLastData query :" + query.getQueryObject().toString() + ".sort:" + query.getSortObject().toString());
         return findOne(query);
     }
 }
