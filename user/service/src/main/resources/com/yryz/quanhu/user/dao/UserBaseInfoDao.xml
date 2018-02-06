@@ -38,12 +38,16 @@
     last_heat, del_flag, ban_post_time, create_date, last_update_date
   </sql>
   
-  <select id="checkUserByNname" resultType="java.lang.String">
+  <select id="checkUserByNname">
 	SELECT
 	<include refid="Base_Column_List" />
 	FROM qh_user_baseinfo 
 	where 
-	 user_nick_name = #{nickName} and app_id = #{appId} and del_flag = 10 and user_status != 12
+	 user_nick_name = #{nickName} 
+	 <if test="appId != null and appId != ''">
+	 	and app_id = #{appId}
+	 </if>
+	  and del_flag = 10 and user_status != 12
 	LIMIT 1
   </select>
   

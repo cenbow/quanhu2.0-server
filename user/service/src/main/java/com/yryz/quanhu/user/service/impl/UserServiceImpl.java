@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
 			if (user != null && nickName.equals(user.getUserNickName())) {
 				baseInfo.setUserNickName(null);
 			} else {
-				existByName = this.getUserByNickName(baseInfo.getAppId(), nickName);
+				existByName = this.getUserByNickName(user.getAppId(), nickName);
 			}
 			// 昵称已存在
 			if (existByName != null) {
@@ -385,6 +385,7 @@ public class UserServiceImpl implements UserService {
 	 * @param nickName
 	 * @return
 	 */
+	@Override
 	public  UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}

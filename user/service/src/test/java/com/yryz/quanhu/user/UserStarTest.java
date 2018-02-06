@@ -73,7 +73,7 @@ public class UserStarTest {
 	
 	@Test
 	public void getInviter(){
-		Response<MyInviterVO> response = operateApi.getMyInviter(738943677265461248l, 10, null);
+		Response<MyInviterVO> response = operateApi.getMyInviter(738943677265461248L, 10, null);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 }
