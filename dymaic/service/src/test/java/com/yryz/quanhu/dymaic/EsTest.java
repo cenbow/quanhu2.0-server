@@ -11,7 +11,7 @@ import com.yryz.quanhu.user.vo.UserInfoVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
@@ -19,14 +19,10 @@ import org.springframework.test.context.junit4.SpringRunner;
  * 按照下面模板可以进行单元测试 测试dubbo提供者直接@Autowired
  */
 @RunWith(SpringRunner.class)
-//@SpringBootTest
-@ContextConfiguration(locations = {"classpath:test.xml"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EsTest {
     @Autowired
     private ElasticsearchService elasticsearchService;
-
-//    @Resource
-//    private ElasticsearchTemplate elasticsearchTemplate;
 
     @Test
     public void searchStarUserTest() {
@@ -40,7 +36,7 @@ public class EsTest {
 
     @Test
     public void buildTest() {
-        elasticsearchService.rebuildUserInfo();
+        elasticsearchService.rebuildCoterieInfo();
     }
 
     @Test
