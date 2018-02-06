@@ -2,14 +2,23 @@ package com.yryz.quanhu.coterie.coterie.vo;
 
 import java.io.Serializable;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Created by KF on 2018/1/29.
  */
 public class User implements Serializable{
+	private static final long serialVersionUID = -886802207285084885L;
 
-    private String   authStatus	;//是否认证 : 10未认证，11认证）
-    private String headImg;	//头像	string
-    private String nickName;//	昵称
+	@ApiModelProperty("是否达人 : 10未认证，11认证")
+    private String   authStatus	;
+	
+	@ApiModelProperty("头像")
+    private String headImg;	
+	
+	@ApiModelProperty("昵称")
+    private String nickName;
+	
     public String getAuthStatus() {
         return authStatus;
     }

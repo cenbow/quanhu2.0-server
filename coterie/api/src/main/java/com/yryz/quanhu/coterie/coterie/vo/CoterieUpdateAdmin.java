@@ -34,7 +34,7 @@ public class CoterieUpdateAdmin implements Serializable{
 	/**
 	 *  审核备注
 	 */
-	private Long auditRemark;
+	private String auditRemark;
 
 
 	private Date processTime;
@@ -81,14 +81,6 @@ public class CoterieUpdateAdmin implements Serializable{
 		this.auditUserId = auditUserId;
 	}
 
-	public Long getAuditRemark() {
-		return auditRemark;
-	}
-
-	public void setAuditRemark(Long auditRemark) {
-		this.auditRemark = auditRemark;
-	}
-
 	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
@@ -107,5 +99,13 @@ public class CoterieUpdateAdmin implements Serializable{
 
 	public void setProcessTime(Date processTime) {
 		this.processTime = processTime;
+	}
+
+	public String getAuditRemark() {
+		return auditRemark;
+	}
+
+	public void setAuditRemark(String auditRemark) {
+		this.auditRemark = auditRemark;
 	}
 }

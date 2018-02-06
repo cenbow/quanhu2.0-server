@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,7 +58,7 @@ public class CoterieController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
-    @PostMapping(value = "/{version}/coterieInfo/count")
+    @GetMapping(value = "/{version}/coterieInfo/count")
     public Response<Integer> getMyCoterieCount(@RequestHeader Long userId, HttpServletRequest request) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
@@ -108,13 +110,27 @@ public class CoterieController {
      * @return
      */
     @ApiOperation("获取私圈详情")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @ApiImplicitParams({
+		    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+		    @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+		    @ApiImplicitParam(name = "coterieId", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/coterieInfo/single")
-    public Response<CoterieInfo> details(Long coterieId, HttpServletRequest request) {
+    public Response<CoterieInfo> details(@RequestHeader Long userId,Long coterieId, HttpServletRequest request) {
         if(coterieId==null){
         	return ResponseUtils.returnCommonException("参数不能为空");
         }
+        
         Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
+        if(userId!=null){
+        	//如果是圈主第一次访问则记录时间
+        	Integer permission = ResponseUtils.getResponseData(coterieMemberAPI.permission(userId,coterieId));
+            if (permission!=null && permission == MemberConstant.Permission.OWNER.getStatus()) {
+            	CoterieInfo info=new CoterieInfo();
+            	info.setMasterLastViewTime(new Date());
+            	info.setCoterieId(coterieId);
+            	coterieApi.modifyCoterieInfo(info);
+            }
+        }
         return coterieInfo;
     }
 
@@ -147,7 +163,7 @@ public class CoterieController {
     @ApiOperation("个人主页圈主创建的私圈列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
+            @ApiImplicitParam(name = "userId", paramType = "query", required = true)})
     @GetMapping(value = "/{version}/coterieInfo/createlist")
     public Response<List<CoterieInfo>> getCreateCoterie(Long userId,Integer currentPage, Integer pageSize) {
     	if(userId==null){
@@ -163,17 +179,48 @@ public class CoterieController {
     }
 
     /**
-     * 获取我加入的私圈详情
-     *
+     * 获取我加入的私圈列表
      * @return
      */
-    @ApiOperation("我加入的私圈列表或个人主页加入的私圈列表")
+    @ApiOperation("我加入的私圈列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @GetMapping(value = "/{version}/coterieInfo/list/join")
-    public Response<List<CoterieInfo>> getMyJoinCoterie(@RequestHeader Long userId) {
-        return coterieApi.getMyJoinCoterie(userId.toString());
+    public Response<List<CoterieInfo>> getMyJoinCoterie(@RequestHeader Long userId,Integer pageNum,Integer pageSize) {
+    	if(userId==null){
+    		return ResponseUtils.returnCommonException("参数错误");
+    	}
+    	if(pageNum==null || pageNum<1){
+    		pageNum=1;
+    	}
+    	if(pageSize==null || pageSize<1){
+    		pageSize=10;
+    	}
+        return coterieApi.getMyJoinCoterie(userId.toString(),pageNum,pageSize);
+    }
+    
+    /**
+     * 获取我加入的私圈详情
+     *
+     * @return
+     */
+    @ApiOperation("个人主页加入的私圈列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "userId", paramType = "query", required = true) })
+    @GetMapping(value = "/{version}/coterieInfo/user/join")
+    public Response<List<CoterieInfo>> getJoinCoterie(Long userId,Integer pageNum,Integer pageSize) {
+    	if(userId==null){
+    		return ResponseUtils.returnCommonException("参数错误");
+    	}
+    	if(pageNum==null || pageNum<1){
+    		pageNum=1;
+    	}
+    	if(pageSize==null || pageSize<1){
+    		pageSize=10;
+    	}
+        return coterieApi.getMyJoinCoterie(userId.toString(),pageNum,pageSize);
     }
 
     /**
@@ -185,6 +232,12 @@ public class CoterieController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/coterieInfo/list")
     public Response<PageList<CoterieInfo>> queryPage(Integer currentPage, Integer pageSize, HttpServletRequest request) {
+    	if(currentPage==null || currentPage<1){
+    		currentPage=1;
+    	}
+    	if(pageSize==null || pageSize<1){
+    		pageSize=10;
+    	}
         PageList<CoterieInfo> page = new PageList<>();
         page.setCurrentPage(currentPage);
         page.setPageSize(pageSize);

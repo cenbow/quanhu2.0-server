@@ -110,7 +110,7 @@ public class AdminUserInfoDTO implements Serializable{
 	/**
 	 * 是否需要收入 
 	 */
-	private boolean needIntegral = false;
+	private Boolean needIntegral = false;
 	public Byte getRecommendStatus() {
 		return recommendStatus;
 	}
@@ -264,11 +264,12 @@ public class AdminUserInfoDTO implements Serializable{
 	public void setUserRole(Integer userRole) {
 		this.userRole = userRole;
 	}
-	public boolean isNeedIntegral() {
+
+	public Boolean getNeedIntegral() {
 		return needIntegral;
 	}
 
-	public void setNeedIntegral(boolean needIntegral) {
+	public void setNeedIntegral(Boolean needIntegral) {
 		this.needIntegral = needIntegral;
 	}
 

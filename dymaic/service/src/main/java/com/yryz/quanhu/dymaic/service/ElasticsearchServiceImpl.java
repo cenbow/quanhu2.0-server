@@ -434,12 +434,11 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		try {
 			logger.info("adminSearchUser request, adminUserDTO: {}", GsonUtils.parseJson(adminUserDTO));
 			checkAdminParam(adminUserDTO);
-			List<UserInfo> userInfoList = userRepository.adminSearchUser(adminUserDTO);
-			List<UserInfoVO> userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
-			if (BooleanUtils.isTrue(adminUserDTO.isNeedIntegral())) {
-				setUserOrderIntegral(userInfoVOS);
+			PageList<UserInfoVO> pageList = userRepository.adminSearchUser(adminUserDTO);
+			if (BooleanUtils.isTrue(adminUserDTO.getNeedIntegral())) {
+				setUserOrderIntegral(pageList.getEntities());
 			}
-			PageList<UserInfoVO> pageList = new PageModel<UserInfoVO>().getPageList(userInfoVOS);
+			logger.info("adminSearchUser result: {}", GsonUtils.parseJson(pageList));
 			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (Exception e) {
 			logger.error("adminSearchUser error", e);
@@ -718,30 +717,36 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	 * @param userInfoVOS
 	 */
 	private void setUserOrderIntegral(List<UserInfoVO> userInfoVOS) {
-		if (CollectionUtils.isEmpty(userInfoVOS)) {
-			return;
-		}
-		int userLength = userInfoVOS.size();
-		List<Long> userIds = new ArrayList<>(userLength);
-		for (int i = 0; i < userLength; i++) {
-			UserInfoVO infoVO = userInfoVOS.get(i);
-			if (infoVO != null && infoVO.getUserBaseInfo().getUserId() != null
-					&& infoVO.getUserBaseInfo().getUserId() != 0l) {
-				userIds.add(infoVO.getUserBaseInfo().getUserId());
+		try {
+			if (CollectionUtils.isEmpty(userInfoVOS)) {
+				return;
 			}
-		}
-		Map<Long, Long> map = ResponseUtils.getResponseData(orderApi.getUserTotalIntegral(userIds));
-		if (MapUtils.isEmpty(map)) {
-			return;
-		}
-		for (int i = 0; i < userLength; i++) {
-			Long userId = userInfoVOS.get(i).getUserBaseInfo().getUserId();
-			Long userIntegral = map.get(userId);
-			if(userIntegral == null){
-				userInfoVOS.get(i).setUserOrderIntegralTotal("0");
-			}else{
-				userInfoVOS.get(i).setUserOrderIntegralTotal(StringUtils.getTwoPointDouble(userIntegral));
+			int userLength = userInfoVOS.size();
+			List<Long> userIds = new ArrayList<>(userLength);
+			for (int i = 0; i < userLength; i++) {
+				UserInfoVO infoVO = userInfoVOS.get(i);
+				if (infoVO != null && infoVO.getUserBaseInfo().getUserId() != null
+						&& infoVO.getUserBaseInfo().getUserId() != 0l) {
+					userIds.add(infoVO.getUserBaseInfo().getUserId());
+				}
 			}
+			Map<Long, Long> map = ResponseUtils.getResponseData(orderApi.getUserTotalIntegral(userIds));
+			if (MapUtils.isEmpty(map)) {
+				return;
+			}
+			for (int i = 0; i < userLength; i++) {
+				Long userId = userInfoVOS.get(i).getUserBaseInfo().getUserId();
+				Long userIntegral = map.get(userId);
+				if(userIntegral == null){
+					userInfoVOS.get(i).setUserOrderIntegralTotal("0");
+				}else{
+					userInfoVOS.get(i).setUserOrderIntegralTotal(StringUtils.getTwoPointDouble(userIntegral));
+				}
+			}
+
+		} catch (Exception e) {
+			logger.error("setUserOrderIntegral error", e);
 		}
 	}
+
 }

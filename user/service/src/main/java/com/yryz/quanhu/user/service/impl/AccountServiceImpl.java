@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
@@ -154,7 +155,8 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError("该用户不存在");
 		}
 		if (!StringUtils.equals(account.getUserPwd(), loginDTO.getPassword())) {
-			throw QuanhuException.busiError("登录密码错误");
+			logger.info("[user_login]:params:{},appId:{},result:登录密码错误",JSON.toJSON(loginDTO),appId);
+			throw QuanhuException.busiError(ExceptionEnum.USER_LOGIN_PWD_ERROR);
 		}
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
 			// 更新设备号

@@ -21,7 +21,7 @@ import com.yryz.quanhu.demo.redis.UserRedis;
  * @author yehao
  * @version 2.0
  * @date 2018年1月19日 下午4:03:08
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

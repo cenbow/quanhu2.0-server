@@ -29,6 +29,11 @@ public class Dymaic implements Serializable {
     private String moduleEnum;
 
     /**
+     * 私圈ID，用于判断处理
+     */
+    private String coterieId;
+
+    /**
      * 资源ID
      */
     private Long resourceId;
@@ -178,5 +183,13 @@ public class Dymaic implements Serializable {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public String getCoterieId() {
+        return coterieId;
+    }
+
+    public void setCoterieId(String coterieId) {
+        this.coterieId = coterieId;
     }
 }

@@ -31,11 +31,4 @@ public interface AdminActivityPrizesApi {
 	 */
 	Response<Integer> updateBatchUsed(Long[] ids)	throws	Exception;
 	
-	 /**
-	   * 读取Excel里面客户的信息
-	   * @param wb
-	   * @return
-	   */
-	 //Response<List<String>> readExcelValue(Workbook wb);
-
 }
