@@ -118,6 +118,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte authWay = adminUserDTO.getAuthWay();
         String growLevel = adminUserDTO.getGrowLevel();
         Integer userStatus = adminUserDTO.getUserStatus();
+        String appId = adminUserDTO.getAppId();
         
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNoneBlank(nickName)) {
@@ -140,6 +141,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
         if (growLevel != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
+        }
+        if(StringUtils.isNotBlank(appId)){
+        	boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
         }
         if(userStatus != null){
         	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
