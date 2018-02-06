@@ -49,11 +49,6 @@ public class SystemBody implements Body {
 	private String bodyTitle;
 
 	/**
-	 * 功能id
-	 */
-	private String moduleEnum;
-
-	/**
 	 * 
 	 * @exception 
 	 */
@@ -79,24 +74,6 @@ public class SystemBody implements Body {
 		this.coterieName = coterieName;
 		this.bodyImg = bodyImg;
 		this.bodyTitle = bodyTitle;
-	}
-
-	public SystemBody(String circleId, String circleName, String coterieId, String coterieName, String bodyImg, String bodyTitle, String moduleEnum) {
-		this.circleId = circleId;
-		this.circleName = circleName;
-		this.coterieId = coterieId;
-		this.coterieName = coterieName;
-		this.bodyImg = bodyImg;
-		this.bodyTitle = bodyTitle;
-		this.moduleEnum = moduleEnum;
-	}
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
 	}
 
 	/**

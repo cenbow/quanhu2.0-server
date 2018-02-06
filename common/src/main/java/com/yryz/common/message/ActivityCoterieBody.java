@@ -65,19 +65,6 @@ public class ActivityCoterieBody implements Body{
 	private Integer memberNum;
 
 	/**
-	 * 功能id
-	 */
-	private String moduleEnum;
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
-	}
-
-	/**
 	 * 
 	 * @exception 
 	 */
@@ -107,19 +94,6 @@ public class ActivityCoterieBody implements Body{
 		this.intro = intro;
 		this.joinFee = joinFee;
 		this.memberNum = memberNum;
-	}
-
-	public ActivityCoterieBody(String circleId, String circleName, String coterieId, String coterieName, String ownerName, String ownerIntro, String intro, Integer joinFee, Integer memberNum, String moduleEnum) {
-		this.circleId = circleId;
-		this.circleName = circleName;
-		this.coterieId = coterieId;
-		this.coterieName = coterieName;
-		this.ownerName = ownerName;
-		this.ownerIntro = ownerIntro;
-		this.intro = intro;
-		this.joinFee = joinFee;
-		this.memberNum = memberNum;
-		this.moduleEnum = moduleEnum;
 	}
 
 	/**

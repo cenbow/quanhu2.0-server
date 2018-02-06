@@ -41,7 +41,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.*;
 
@@ -71,9 +71,6 @@ public class CommentProvider implements CommentApi {
     @Reference(check = false)
     private MessageAPI messageAPI;
 
-    @Autowired
-    private RedisTemplateBuilder redisTemplateBuilder;
-
     @Reference(check = false)
     private ReleaseInfoApi releaseInfoApi;
 
@@ -88,6 +85,9 @@ public class CommentProvider implements CommentApi {
 
     @Reference(check = false)
     private QuestionApi questionApi;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public Response<Comment> accretion(Comment comment) {
@@ -124,7 +124,6 @@ public class CommentProvider implements CommentApi {
 
     @Override
     public Response<Map<String, Integer>> delComment(Comment comment) {
-        RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
         try {
             Map<String, Integer> map = new HashMap<String, Integer>();
             int count = commentService.delComment(comment);
@@ -134,7 +133,7 @@ public class CommentProvider implements CommentApi {
                 comments.setKid(comment.getKid());
                 Comment commentStr = commentService.querySingleComment(comments);
                 try {
-                    redisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
+                    stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
                 } catch (Exception e) {
                     logger.info("从redis中移除评论数据失败" + e);
                 }
@@ -163,9 +162,19 @@ public class CommentProvider implements CommentApi {
     public Response<Integer> updownBatch(List<Comment> comments) {
         try {
             int count = commentService.updownBatch(comments);
-
-            //待定 审核成功后同步到Redis
-
+            if(count>0){
+                String strKeys="";
+                for(Comment comment:comments){
+                    Comment commentSingle = commentService.querySingleComment(comment);
+                    strKeys+="COMMENT:"+commentSingle.getModuleEnum()+":"+commentSingle.getKid()+ "_" + commentSingle.getTopId() + "_" + commentSingle.getResourceId()+",";
+                }
+                if(null!=strKeys&&!strKeys.equals("")){
+                    String[] strArray=strKeys.split(",");
+                    for (int i=0;i<strArray.length;i++){
+                        stringRedisTemplate.delete(strArray[i]);
+                    }
+                }
+            }
             return ResponseUtils.returnObjectSuccess(count);
         } catch (Exception e) {
             logger.error("", e);
