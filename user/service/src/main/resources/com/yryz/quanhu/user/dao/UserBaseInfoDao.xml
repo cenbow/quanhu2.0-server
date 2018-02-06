@@ -38,7 +38,7 @@
     last_heat, del_flag, ban_post_time, create_date, last_update_date
   </sql>
   
-  <select id="checkUserByNname" resultType="java.lang.String">
+  <select id="checkUserByNname">
 	SELECT
 	<include refid="Base_Column_List" />
 	FROM qh_user_baseinfo 
