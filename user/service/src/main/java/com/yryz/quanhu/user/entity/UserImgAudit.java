@@ -74,25 +74,5 @@ public class UserImgAudit extends GenericEntity{
     public void setOperational(String operational) {
         this.operational = operational == null ? null : operational.trim();
     }
-    /**
-	 * 头像审核状态
-	 *
-	 */
-	public enum ImgAuditStatus{
-		/** 待审核 */
-		NO_AUDIT(10),
-		/** 审核成功 */
-		SUCCESS(11),
-		/** 审核失败 */
-		FAIL(12);
-		
-		private int status;
-		
-		ImgAuditStatus(int status) {
-			this.status = status;
-		}
-		public int getStatus(){
-			return status;
-		}
-	}
+
 }

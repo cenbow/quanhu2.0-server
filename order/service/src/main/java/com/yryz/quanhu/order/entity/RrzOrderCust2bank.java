@@ -114,7 +114,6 @@ public class RrzOrderCust2bank implements Serializable {
 	 */
 	public RrzOrderCust2bank() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

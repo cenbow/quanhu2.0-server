@@ -40,7 +40,6 @@ public class RrzOrderVO implements Serializable {
 	 */
 	public RrzOrderVO() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

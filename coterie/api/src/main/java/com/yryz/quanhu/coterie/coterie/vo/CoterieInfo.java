@@ -3,6 +3,8 @@ package com.yryz.quanhu.coterie.coterie.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 
  * @author jiangkun
@@ -12,128 +14,90 @@ import java.util.Date;
 public class CoterieInfo implements Serializable{
 	private static final long serialVersionUID = 2137320647778802349L;
 
-    /**
-     * 私圈id
-     */
+	@ApiModelProperty("私圈id")
     private Long coterieId;
 
-    /**
-     * 用户ID
-     */
+	@ApiModelProperty("用户ID")
     private String ownerId;
     
-    /**
-     * 用户图标
-     */
+	@ApiModelProperty("用户图标")
     private String custIcon;
-    /**
-     * 姓名
-     */
+    
+	@ApiModelProperty("姓名")
     private String ownerName;
 
-    /**
-     * 个人简介
-     */
+	@ApiModelProperty("个人简介")
     private String ownerIntro;
 
-	/**
-	 * 私圈名称
-	 */
+	@ApiModelProperty("私圈名称")
 	private String name;
 	
-	/**
-	 * 封面图
-	 */
+	@ApiModelProperty("封面图")
 	private String icon;
 
-	/**
-	 * 圈子简介
-	 */
+	@ApiModelProperty("圈子简介")
 	private String intro;
 
-	/**
-	 * 加入私圈金额(悠然币)，0表示免费
-	 */
+	@ApiModelProperty("加入私圈金额(悠然币)，0表示免费")
 	private Integer joinFee;
 
-	/**
-	 * 咨询费，0表示免费
-	 */
+	@ApiModelProperty("咨询费，0表示免费")
 	private Integer consultingFee;
 
-	/**
-	 * 成员加入是否需要审核（0不审核，1审核）
-	 */
+	@ApiModelProperty("成员加入是否需要审核（10不审核，11审核）")
 	private Integer joinCheck;
 
-	/**
-	 * 成员数量
-	 */
+	@ApiModelProperty("成员数量")
 	private Integer memberNum;
 
-	/**
-	 * 状态：10待审核，11审批通过，12审批未通过
-	 */
+	@ApiModelProperty("状态：10待审核，11审批通过，12审批未通过")
 	private Byte status;
 	
-	/**
-	 * 审批时间
-	 */
+	@ApiModelProperty("审批时间")
 	private Date processTime;
 	
-	/**
-	 * 热度值
-	 */
+	@ApiModelProperty("热度值")
 	private Long heat;
 	
-	/**
-	 * 上下架
-	 */
+	@ApiModelProperty("上下架状态10：上架,11：下架")
 	private Integer shelveFlag;
 	
-	/**
-	 * 0:未删除，1：删除
-	 */
+	@ApiModelProperty("删除状态10：未删除,11：删除")
 	private Byte deleted;
 	
-	/**
-	 * 创建时间
-	 */
+	@ApiModelProperty("创建时间")
 	private Date createDate;
 
-	/**
-	 * 更新时间
-	 */
+	@ApiModelProperty("更新时间")
 	private Date lastUpdateDate;
 	
-	/**
-	 * 版本号
-	 */
+	@ApiModelProperty("版本号")
 	private Integer revision;
 
-	/**
-	 * 是否达人
-	 */
+	@ApiModelProperty("预留字段")
 	private Byte isExpert;
 
-	/**
-	 * 是否推荐
-	 */
+	@ApiModelProperty("预留字段")
 	private Byte recommend;
 
-	/**
-	 * 圈主最后访问时间
-	 */
+	@ApiModelProperty("圈主最后访问时间")
 	private Date masterLastViewTime;
 	
+	@ApiModelProperty("审批人")
 	private Integer auditUserId;
+	
+	@ApiModelProperty("审批备注")
 	private String auditRemark;
-	/**
-	 * 10:显示，11:不显示
-	 */
+
+	@ApiModelProperty("红点10:显示，11:不显示")
 	private Integer redDot;
 	
+	@ApiModelProperty("最大成员数")
+	private Integer maxMemberNum=2000;
+	
+	@ApiModelProperty("圈主信息")
     private  User  user;
+	
 	public User getUser() {
 		return user;
 	}
@@ -350,5 +314,14 @@ public class CoterieInfo implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public Integer getMaxMemberNum() {
+		return maxMemberNum;
+	}
+
+	public void setMaxMemberNum(Integer maxMemberNum) {
+		this.maxMemberNum = maxMemberNum;
+	}
+	
 }
 

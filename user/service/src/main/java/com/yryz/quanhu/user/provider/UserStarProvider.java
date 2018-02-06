@@ -278,7 +278,7 @@ public class UserStarProvider implements UserStarApi {
 	public Response<Boolean> updateStarWeight(Long userId, Integer weight) {
 
 		try {
-			if (userId == null || userId == 0l || weight == null) {
+			if (userId == null || userId == 0L || weight == null) {
 				throw QuanhuException.busiError("userId、weight为空");
 			}
 			UserStarAuth model = userStarService.get(userId.toString(), null);

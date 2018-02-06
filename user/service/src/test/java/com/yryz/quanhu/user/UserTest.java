@@ -31,6 +31,7 @@ import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
+import com.yryz.quanhu.user.dto.UnBindThirdDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserTagDTO;
@@ -154,13 +155,13 @@ public class UserTest {
 	//@Test
 	public void updateUser(){
 		UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
-		infoDTO.setUserId(731519998090690560l);
+		infoDTO.setUserId(731519998090690560L);
 		infoDTO.setUserGenders(10);
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
-	@Test
+	//@Test
 	public void getUserListByCreateDateTest(){
 		String start = "2018-01-01";
 		String end = "2018-03-01";
@@ -174,6 +175,17 @@ public class UserTest {
 	public void bindPhone(){
 		BindPhoneDTO phoneDTO = new BindPhoneDTO(724007310011252736L, "16612345689", "5023", "vebff12m1762");
 		Response<Boolean> response = accountApi.bindPhone(phoneDTO);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	@Test
+	public void unBindThird(){
+		UnBindThirdDTO thirdDTO = new UnBindThirdDTO();
+		thirdDTO.setAppId("vebff12m1762");
+		thirdDTO.setThirdId("8F84EB30809A007E14F0ACAF657E4547");
+		thirdDTO.setUserId(729748409979297792l);
+		thirdDTO.setType(12);
+		Response<Boolean> response = accountApi.unbindThird(thirdDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
@@ -231,7 +243,7 @@ public class UserTest {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
 		codeDTO.setCode(SmsContants.CODE_FIND_PWD);
-		codeDTO.setUserId(738943677265461248l);
+		codeDTO.setUserId(738943677265461248L);
 		//codeDTO.setPhone("16612345689");
 
 		Response<SmsVerifyCodeVO> response = accountApi.sendVerifyCode(codeDTO);
@@ -246,7 +258,7 @@ public class UserTest {
 	
 	//@Test
 	public void getUserSimple(){
-		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560l);
+		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560L);
 		//UserSimpleVO simpleVO = response.getData();
 		//Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
 		System.out.println(JsonUtils.toFastJson(response));

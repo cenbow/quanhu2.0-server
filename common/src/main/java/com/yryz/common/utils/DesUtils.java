@@ -149,7 +149,6 @@ public class DesUtils {
 //                System.out.println("aa=="+mapResult.get("aa"));
 //            }
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

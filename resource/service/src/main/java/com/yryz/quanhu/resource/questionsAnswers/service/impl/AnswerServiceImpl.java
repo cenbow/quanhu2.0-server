@@ -88,37 +88,37 @@ public class AnswerServiceImpl implements AnswerService {
         }
 
         if(StringUtils.isNotBlank(content) && StringUtils.isNotBlank(answerAudio)){
-            throw  QuanhuException.busiError("音频回答和文字回答互斥");
+            throw  QuanhuException.busiError("","音频回答和文字回答互斥","音频回答和文字回答互斥");
         }
 
         if(StringUtils.isNotBlank(answerAudio) && (audioLength.longValue()<AUDIOLENGTH_MIN || audioLength>AUDIOLENGTH_MAX)){
-            throw  QuanhuException.busiError("有音频回答，音频时长最少1秒最多180秒");
+            throw  QuanhuException.busiError("","有音频回答，音频时长最少1秒最多180秒","有音频回答，音频时长最少1秒最多180秒");
         }
 
         if(StringUtils.isBlank(answerAudio) && audioLength.longValue()>0){
-            throw  QuanhuException.busiError("无音频回答，应该无音频时长");
+            throw  QuanhuException.busiError("","无音频回答，应该无音频时长","无音频回答，应该无音频时长");
         }
 
         if(StringUtils.isNotBlank(content) && content.length()>CONTENT_LENGTH_MAX){
-            throw  QuanhuException.busiError("文字最多10000字");
+            throw  QuanhuException.busiError("","文字最多10000字","文字最多10000字");
         }
 
 
         if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>IMGS_MAX){
-            throw  QuanhuException.busiError("图片最多上传30张");
+            throw  QuanhuException.busiError("","图片最多上传30张","图片最多上传30张");
         }
 
         Question questionCheck=this.questionService.queryAvailableQuestionByKid(questionId);
         if(null==questionCheck){
-            throw  QuanhuException.busiError("提问不存在");
+            throw  QuanhuException.busiError("","提问不存在","提问不存在");
         }
 
         if(null !=questionCheck.getAnswerdFlag() && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionCheck.getAnswerdFlag())==-1){
-            throw  QuanhuException.busiError("圈主已处理过该问题，不能再回答");
+            throw  QuanhuException.busiError("","圈主已处理过该问题，不能再回答","圈主已处理过该问题，不能再回答");
         }
 
         if(questionCheck.getChargeAmount().longValue()>0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionCheck.getOrderFlag())!=0){
-            throw  QuanhuException.busiError("该付费问题订单未完成，无法回答");
+            throw  QuanhuException.busiError("","该付费问题订单未完成，无法回答","该付费问题订单未完成，无法回答");
         }
         AnswerWithBLOBs answerWithBLOBs = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answerWithBLOBs);
@@ -200,7 +200,7 @@ public class AnswerServiceImpl implements AnswerService {
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(answerVo1.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.ANSWER));
-        resourceTotal.setUserId(questionCheck.getCreateUserId());
+        resourceTotal.setUserId(answerVo1.getCreateUserId());
         resourceTotal.setCoterieId(String.valueOf(coterieId));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
 
@@ -294,9 +294,9 @@ public class AnswerServiceImpl implements AnswerService {
             if (null != createUserId) {
                 answerVo.setUser(apIservice.getUser(createUserId));
             }
+            answerVo.setModuleEnum(ModuleContants.ANSWER);
             return answerVo;
         }
         return null;
     }
-
 }

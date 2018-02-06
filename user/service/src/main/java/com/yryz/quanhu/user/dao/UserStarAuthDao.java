@@ -69,7 +69,7 @@ public interface UserStarAuthDao extends BaseDao{
      * 获取达人推荐最大权重
      * @return
      */
-    Integer getStarMaxWeight();
+    Integer getMaxHeight();
     
     /**
      * 统计达人总数

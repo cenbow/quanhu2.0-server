@@ -30,7 +30,7 @@ public class AuthTest {
 	public void checkToken() {
 		final String name = "4, checkToken";
 		try {
-			AuthTokenDTO tokenDTO = new AuthTokenDTO(0l, DevType.ANDROID, "vebff12m1762","");
+			AuthTokenDTO tokenDTO = new AuthTokenDTO(0L, DevType.ANDROID, "vebff12m1762","");
 			AuthRefreshDTO refreshDTO = new AuthRefreshDTO("uW77hO3yyWXSKuunF5esIL1nKAc8WbokgS0unW//QLwOMEblYctjEg==", false);
 			refreshDTO.setAppId(tokenDTO.getAppId());
 			refreshDTO.setUserId(tokenDTO.getUserId());
@@ -47,9 +47,9 @@ public class AuthTest {
 	public void refreshToken(){
 		final String name = "2, refreshToken";
 		try {
-			Long userId = 724007310011252736l;
-			String token = "724007310011252736-sMrAD4AS3zGU1517640982202";
-			String refreshToken = "724007310011252736-t8zVeGkTRS1a1517640758070";
+			Long userId = 739855842419507200l;
+			String token = "739855842419507200-iXimWc5UIeEK1517900966647";
+			String refreshToken = "739855842419507200-n8qTcivNcplq1517900966647";
 			AuthTokenDTO tokenDTO = new AuthTokenDTO(userId, DevType.ANDROID, "vebff12m1762",token);
 			AuthRefreshDTO refreshDTO = new AuthRefreshDTO(refreshToken, true);
 			refreshDTO.setAppId(tokenDTO.getAppId());
@@ -67,7 +67,7 @@ public class AuthTest {
 	public void getToken(){
 		final String name = "1, getToken";
 		try {
-			AuthTokenDTO tokenDTO = new AuthTokenDTO(724007310011252736l, DevType.ANDROID, "vebff12m1762");
+			AuthTokenDTO tokenDTO = new AuthTokenDTO(724007310011252736L, DevType.ANDROID, "vebff12m1762");
 			tokenDTO.setRefreshLogin(true);
 			AuthRefreshDTO refreshDTO = new AuthRefreshDTO();
 			refreshDTO.setAppId(tokenDTO.getAppId());

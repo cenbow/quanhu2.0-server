@@ -18,7 +18,7 @@ import com.yryz.quanhu.order.entity.RrzOrderIntegralHistory;
  * @author yehao
  * @version 2.0
  * @date 2018年1月18日 上午11:16:33
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 积分订单数据库连接类
  */
 @Mapper
 public interface RrzOrderIntegralHistoryDao {

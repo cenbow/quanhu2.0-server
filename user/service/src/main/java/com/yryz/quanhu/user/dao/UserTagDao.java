@@ -9,6 +9,7 @@ package com.yryz.quanhu.user.dao;
 
 import java.util.List;
 
+import com.yryz.quanhu.user.dto.UserTagDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -47,4 +48,13 @@ public interface UserTagDao {
      * @return
      */
     List<UserTag> getUserTags(@Param("userIds") List<Long> userIds);
+
+
+    /**
+     * 批量查询
+     * @param userId
+     * @return
+     */
+    List<UserTagDTO> getUserUnionTags(@Param("userId") Long userId);
+
 }

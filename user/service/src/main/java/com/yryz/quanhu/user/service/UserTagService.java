@@ -43,4 +43,7 @@ public interface UserTagService {
     List<String> getTagByUserId(Long userId, Integer tagType);
 
     Map<Long, List<UserTagVO>> getUserTags(List<Long> userIds);
+
+
+    List<UserTagDTO> getUserTags(Long userId);
 }

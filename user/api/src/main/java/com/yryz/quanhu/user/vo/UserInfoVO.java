@@ -31,7 +31,7 @@ public class UserInfoVO implements Serializable {
     /**
      * 积分事件信息
      */
-    private EventAccountVO eventAccountInfo;
+    private EventAccountVO eventAccountInfo = new EventAccountVO();
 
     /**
      * 注册渠道信息

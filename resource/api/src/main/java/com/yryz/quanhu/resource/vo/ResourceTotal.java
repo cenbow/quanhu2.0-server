@@ -100,7 +100,6 @@ public class ResourceTotal implements Serializable {
 	 */
 	public ResourceTotal() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

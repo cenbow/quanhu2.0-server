@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -108,13 +110,27 @@ public class CoterieController {
      * @return
      */
     @ApiOperation("获取私圈详情")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @ApiImplicitParams({
+		    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+		    @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+		    @ApiImplicitParam(name = "coterieId", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/coterieInfo/single")
-    public Response<CoterieInfo> details(Long coterieId, HttpServletRequest request) {
+    public Response<CoterieInfo> details(@RequestHeader Long userId,Long coterieId, HttpServletRequest request) {
         if(coterieId==null){
         	return ResponseUtils.returnCommonException("参数不能为空");
         }
+        
         Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
+        if(coterieInfo.success() && userId!=null){
+        	//如果是圈主第一次访问则记录时间
+        	CoterieInfo info = coterieInfo.getData();
+            if (info!=null && userId.toString().equals(info.getOwnerId())) {
+            	CoterieInfo param=new CoterieInfo();
+            	param.setMasterLastViewTime(new Date());
+            	param.setCoterieId(coterieId);
+            	coterieApi.modifyCoterieInfo(param);
+            }
+        }
         return coterieInfo;
     }
 

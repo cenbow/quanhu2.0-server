@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 	private AuthConfig authConfig;
 	@Reference
 	private BasicConfigApi configApi;
-	
+
 	@Override
 	public TokenCheckEnum checkToken(AuthTokenDTO tokenDTO) {
 		String token = tokenDTO.getToken();
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 		if (tokenVO == null) {
 			return TokenCheckEnum.NO_TOKEN;
 		}
-		// web token过期就算错误
+		// webToken校验
 		if (StringUtils.equals(token, tokenVO.getToken())) {
 			if (System.currentTimeMillis() < tokenVO.getExpireAt()) {
 				return TokenCheckEnum.SUCCESS;
@@ -76,32 +76,32 @@ public class AuthServiceImpl implements AuthService {
 		String token = tokenDTO.getToken();
 		String refreshToken = tokenDTO.getRefreshToken();
 
-
 		// 比对redis token
 		AuthTokenVO tokenVO = redisDao.getToken(tokenDTO);
 		if (tokenVO == null) {
 			return TokenCheckEnum.NO_TOKEN;
 		}
 		// 校验短期token
-		if (StringUtils.equals(token, tokenVO.getToken())) {
-			if (System.currentTimeMillis() < tokenVO.getExpireAt()) {
-				return TokenCheckEnum.SUCCESS;
-			} else {
-				// refreshToken存在时，校验长期token，否则判断token为过期
-				if(StringUtils.isNotBlank(refreshToken)){
-					if (StringUtils.equals(refreshToken, tokenVO.getRefreshToken())
-							&& System.currentTimeMillis() < tokenVO.getRefreshExpireAt()) {
-						return TokenCheckEnum.EXPIRE;
-					} else {
-						return TokenCheckEnum.ERROR;
-					}
-				} else {
-					return TokenCheckEnum.EXPIRE;
-				}
-			}
-		} else {
+		if (!StringUtils.equals(token, tokenVO.getToken())) {
 			return TokenCheckEnum.ERROR;
 		}
+		//短期token没有过期
+		if (System.currentTimeMillis() < tokenVO.getExpireAt()) {
+			return TokenCheckEnum.SUCCESS;
+		}
+		//验证refreshToken
+		if (StringUtils.isNotBlank(refreshToken)) {
+			if (!StringUtils.equals(refreshToken, tokenVO.getRefreshToken())) {
+				return TokenCheckEnum.ERROR;
+			}
+			//长期token过期直接返回错误
+			if (System.currentTimeMillis() > tokenVO.getRefreshExpireAt()) {
+				return TokenCheckEnum.ERROR;
+			}
+		} else {
+			return TokenCheckEnum.EXPIRE;
+		}
+		return TokenCheckEnum.EXPIRE;
 	}
 
 	@Override
@@ -109,11 +109,11 @@ public class AuthServiceImpl implements AuthService {
 		String token = null;
 		// 拿配置
 		AuthConfig rangeConfig = getAuthConfig(tokenDTO.getAppId());
-		
+
 		Long expireAt = rangeConfig.getWebTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
 		AuthTokenVO tokenVO;
 		tokenVO = redisDao.getToken(tokenDTO);
-		logger.info("[getToken]:tokenDTO:{},tokenVO:{}",JsonUtils.toFastJson(tokenDTO),JsonUtils.toFastJson(tokenVO));
+		logger.info("[getToken]:tokenDTO:{},tokenVO:{}", JsonUtils.toFastJson(tokenDTO), JsonUtils.toFastJson(tokenVO));
 		// token过期或者设置登录刷新token都重新获取新token
 		if (tokenVO == null || (tokenVO.getExpireAt() != null && tokenVO.getExpireAt() < System.currentTimeMillis())
 				|| BooleanUtils.toBoolean(tokenDTO.isRefreshLogin())) {
@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
 			token = tokenVO.getToken();
 		}
 		try {
-			tokenVO = new AuthTokenVO(tokenDTO.getUserId(), token,expireAt);
+			tokenVO = new AuthTokenVO(tokenDTO.getUserId(), token, expireAt);
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException);
@@ -138,15 +138,17 @@ public class AuthServiceImpl implements AuthService {
 		String refreshToken = null;
 		// 拿配置
 		AuthConfig rangeConfig = getAuthConfig(refreshDTO.getAppId());
-		
-		//计算token和refreshToken过期时间，不使用就从缓存中获取返回
+
+		// 计算token和refreshToken过期时间，不使用就从缓存中获取返回
 		Long expireAt = rangeConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
-		Long refreshExpireAt = rangeConfig.getRefreshExpire().longValue() * 3600 * 24 * 1000 + System.currentTimeMillis();
-		
+		Long refreshExpireAt = rangeConfig.getRefreshExpire().longValue() * 3600 * 24 * 1000
+				+ System.currentTimeMillis();
+
 		AuthTokenVO tokenVO;
-		
+
 		tokenVO = redisDao.getToken(refreshDTO);
-		logger.info("[getToken_begin]:refreshDTO:{},tokenVO:{}",JsonUtils.toFastJson(refreshDTO),JsonUtils.toFastJson(tokenVO));
+		logger.info("[getToken_begin]:refreshDTO:{},tokenVO:{}", JsonUtils.toFastJson(refreshDTO),
+				JsonUtils.toFastJson(tokenVO));
 		// 长期token过期或者设置登录刷新token都重新获取新token
 		if (tokenVO == null
 				|| (tokenVO.getRefreshExpireAt() != null && tokenVO.getRefreshExpireAt() < System.currentTimeMillis())
@@ -156,26 +158,26 @@ public class AuthServiceImpl implements AuthService {
 			refreshDTO.setToken(token);
 			refreshDTO.setRefreshToken(refreshToken);
 			redisDao.setToken(refreshDTO, expireAt, refreshExpireAt);
-			//只要登录操作就删除刷新标识
+			// 只要登录操作就删除刷新标识
 			redisDao.deleteRefreshFlag(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
 		} else {
 			token = tokenVO.getToken();
-			//刷新短期token，分两种情况
-			//普通刷新只更新token，
-			//满足延长refreshToken条件都两个token都更新过期时间重新计算
+			// 刷新短期token，分两种情况
+			// 普通刷新只更新token，
+			// 满足延长refreshToken条件都两个token都更新过期时间重新计算
 			if (refreshDTO.isRefreshTokenFlag()) {
 				token = TokenUtils.constructToken(refreshDTO.getUserId().toString());
 				refreshDTO.setToken(token);
 				refreshDTO.setRefreshToken(tokenVO.getRefreshToken());
-				
-				//满足更新refreshToken的条件,更新refreshToken和过期时间并返回				
-				if(checkRefreshTokenDelayUpdate(tokenVO, rangeConfig)){
+
+				// 满足更新refreshToken的条件,更新refreshToken和过期时间并返回
+				if (checkRefreshTokenDelayUpdate(tokenVO, rangeConfig)) {
 					refreshToken = TokenUtils.constructToken(refreshDTO.getUserId().toString());
 					refreshDTO.setRefreshToken(refreshToken);
-					tokenVO.setRefreshToken(refreshToken);					
+					tokenVO.setRefreshToken(refreshToken);
 				}
-				//不满足refreshToken刷新，就不更新refresh任何参数，
-				else{
+				// 不满足refreshToken刷新，就不更新refresh任何参数，
+				else {
 					refreshExpireAt = tokenVO.getRefreshExpireAt();
 				}
 				redisDao.setToken(refreshDTO, expireAt, refreshExpireAt);
@@ -184,59 +186,62 @@ public class AuthServiceImpl implements AuthService {
 		}
 		try {
 			tokenVO = new AuthTokenVO(refreshDTO.getUserId(), token, expireAt, refreshToken, refreshExpireAt);
-			logger.info("[getToken_return]:refreshDTO:{},tokenVO:{}",JsonUtils.toFastJson(refreshDTO),JsonUtils.toFastJson(tokenVO));
+			logger.info("[getToken_return]:refreshDTO:{},tokenVO:{}", JsonUtils.toFastJson(refreshDTO),
+					JsonUtils.toFastJson(tokenVO));
 		} catch (Exception e) {
 			logger.error("[des decrypt token]", e);
 			throw new QuanhuException(ExceptionEnum.BusiException);
 		}
 		return tokenVO;
 	}
-	
+
 	@Override
 	public boolean checkRefreshFlag(Long userId, String appId, DevType devType) {
 		AuthConfig rangeConfig = getAuthConfig(appId);
-		long expireAt = rangeConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
-		return redisDao.getRefreshFlag(userId, appId, devType,expireAt) <= 1;
+		long expireTime = rangeConfig.getTokenExpire().longValue() * (3600/2) ;
+		return redisDao.getRefreshFlag(userId, appId, devType, expireTime) <= 1;
 	}
-	
+
 	@Override
 	public void delToken(Long userId, String appId) {
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.ANDROID, appId));
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WAP, appId));
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WEB, appId));
 	}
-	
+
 	/**
 	 * 获取用户认证配置
+	 * 
 	 * @param appId
 	 * @return
 	 */
-	private AuthConfig getAuthConfig(String appId){
-		String configName = String.format("%s.%s", Constants.AUTH_CONFIG_NAME,appId);
+	private AuthConfig getAuthConfig(String appId) {
+		String configName = String.format("%s.%s", Constants.AUTH_CONFIG_NAME, appId);
 		String configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
-		logger.info("[getAuthConfig]:configName:{},configValue:{}",configName,configValue);
-		AuthConfig config = JSON.parseObject(configValue, new TypeReference<AuthConfig>(){});
-		if(config == null){
+		logger.info("[getAuthConfig]:configName:{},configValue:{}", configName, configValue);
+		AuthConfig config = JSON.parseObject(configValue, new TypeReference<AuthConfig>() {
+		});
+		if (config == null) {
 			config = authConfig;
 		}
 		return config;
 	}
-	
+
 	/**
 	 * 检查refreshToken是否满足延期更新的条件
+	 * 
 	 * @param tokenVO
 	 * @param config
 	 * @return
 	 */
-	private boolean checkRefreshTokenDelayUpdate(AuthTokenVO tokenVO,AuthConfig config){
+	private boolean checkRefreshTokenDelayUpdate(AuthTokenVO tokenVO, AuthConfig config) {
 		long refreshExpireAt = tokenVO.getRefreshExpireAt();
-		long refreshTokenDelayExpireTime = config.getRefreshTokenDelayExpireTime()*3600*1000;
+		long refreshTokenDelayExpireTime = config.getRefreshTokenDelayExpireTime() * 3600 * 1000;
 		long nowTime = System.currentTimeMillis();
-		if(refreshTokenDelayExpireTime >= refreshExpireAt - nowTime){
+		if (refreshTokenDelayExpireTime >= refreshExpireAt - nowTime) {
 			return true;
 		}
 		return false;
 	}
-
 
 }

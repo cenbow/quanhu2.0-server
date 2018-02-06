@@ -317,7 +317,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         try {
             dt = sdf.parse(str);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         Calendar rightNow = Calendar.getInstance();

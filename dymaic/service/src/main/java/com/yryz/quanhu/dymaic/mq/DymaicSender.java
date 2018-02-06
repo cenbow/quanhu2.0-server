@@ -14,6 +14,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author yehao
  * @version 2.0
@@ -33,7 +36,11 @@ public class DymaicSender {
 	 * direct exchange 单一消息指定发送，需同时指定exchange-key和queue的routing-key
 	 */
 	public void directSend(Dymaic dymaic){
-		String msg = GsonUtils.parseJson(dymaic).toString();
+		Map<String, Object> map = new HashMap<>();
+		map.put("userId", dymaic.getUserId());
+		map.put("kid", dymaic.getKid());
+
+		String msg = GsonUtils.parseJson(map);
 
 		rabbitTemplate.setExchange(AmqpConstant.DYMAIC_DIRECT_EXCHANGE);
 		rabbitTemplate.setRoutingKey(AmqpConstant.DYMAIC_TIMELINE_QUEUE);

@@ -95,7 +95,6 @@ public class AlidayuMsg {
 			String str = new String(sign.getBytes(), "utf-8");
 			System.out.println(str);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 //		msg.sendVerifyCode("13627148006", "869512",null,null);
