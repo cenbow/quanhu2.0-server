@@ -130,7 +130,6 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         String growLevel = adminUserDTO.getGrowLevel();
         Integer userStatus = adminUserDTO.getUserStatus();
         String appId = adminUserDTO.getAppId();
-
         Set<Long> tagIds = adminUserDTO.getTagIds();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
