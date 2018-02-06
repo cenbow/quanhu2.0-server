@@ -125,6 +125,8 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
             } catch (Exception e) {
                 logger.error("递减收藏数 失败", e);
             }
+        } else {
+            throw QuanhuException.busiError("未收藏不能取消收藏");
         }
     }
 

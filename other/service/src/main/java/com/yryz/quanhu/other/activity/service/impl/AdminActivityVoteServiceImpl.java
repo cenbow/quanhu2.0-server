@@ -98,7 +98,10 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 					activity.setVoteTotalCount(0);
 				}
 				// 设置活动状态
-				if (DateUtils.getDistanceOfTwoDate(date, activity.getBeginTime()) > 0) {
+				if (DateUtils.getDistanceOfTwoDate(date, activity.getOnlineTime()) > 0) {
+					// 未到上线时间
+					activity.setActivityStatus(10);
+				} else if (DateUtils.getDistanceOfTwoDate(date, activity.getBeginTime()) > 0) {
 					// 未开始
 					activity.setActivityStatus(11);
 					// 进行中

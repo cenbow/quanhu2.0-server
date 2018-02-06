@@ -150,7 +150,10 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 					adminActivityInfoSignUpVo.setIntegralTotalIncome(adminActivityInfoSignUpVo.getJoinCount()*activityEnrolConfig.getAmount());
 				}
 				//设置活动状态
-				if (DateUtils.getDistanceOfTwoDate(date, adminActivityInfoSignUpVo.getBeginTime()) > 0) {
+				if (DateUtils.getDistanceOfTwoDate(date, adminActivityInfoSignUpVo.getOnlineTime()) > 0) {
+					// 未到上线时间
+					adminActivityInfoSignUpVo.setActivityStatus(10);
+				} else if (DateUtils.getDistanceOfTwoDate(date, adminActivityInfoSignUpVo.getBeginTime()) > 0) {
 					// 未开始
 					adminActivityInfoSignUpVo.setActivityStatus(11);
 					// 进行中
@@ -253,10 +256,17 @@ public class AdminActivitySignUpServiceImpl implements AdminActivitySignUpServic
 			vo.setMap(voMap);
 			userIds.add(String.valueOf(vo.getCreateUserId()));
 		}
-		Response<Map<String,UserBaseInfoVO>> users = userApi.getUser(userIds);
-		for(AdminActivityRecordVo vo:list){
-			vo.setNickName(users.getData().get(vo.getCreateUserId().toString()).getUserNickName());
-			vo.setCustPhone(users.getData().get(vo.getCreateUserId().toString()).getUserPhone());
+		Response<Map<String,UserBaseInfoVO>> users = null;
+		try {
+			users = userApi.getUser(userIds);
+		} catch (Exception e) {
+			logger.error("查询用户失败",e);
+		}
+		if(null!=users && users.success() && users.getData()!=null){
+			for(AdminActivityRecordVo vo:list){
+				vo.setNickName(users.getData().get(vo.getCreateUserId().toString()).getUserNickName());
+				vo.setCustPhone(users.getData().get(vo.getCreateUserId().toString()).getUserPhone());
+			}
 		}
 		return new PageList<AdminActivityRecordVo>(pageNo,pageSize,list,page.getTotal());
 	}

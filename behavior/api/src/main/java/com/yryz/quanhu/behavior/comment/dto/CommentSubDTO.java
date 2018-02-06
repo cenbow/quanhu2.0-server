@@ -17,6 +17,16 @@ public class CommentSubDTO extends PageList implements Serializable {
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long resourceId;
+
+    public Long getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(Long resourceId) {
+        this.resourceId = resourceId;
+    }
 
     public Long getKid() {
         return kid;

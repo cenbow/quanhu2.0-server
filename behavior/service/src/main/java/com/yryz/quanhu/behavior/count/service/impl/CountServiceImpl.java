@@ -162,7 +162,7 @@ public class CountServiceImpl implements CountService {
             for (String key : redisTemplate.keys(RedisContants.WRITE_COUNT_KEY + "*")) {
                 String str = key.replace(RedisContants.WRITE_COUNT_KEY, "");
                 String[] arr = str.split("_");
-                CountModel countModel = new CountModel(arr[1], arr[0], arr[2], redisTemplate.opsForValue().get(key), date, dateTime.getHour());
+                CountModel countModel = new CountModel(arr[1], arr[0], arr[2], redisTemplate.opsForValue().get(key), date, dateTime.getHour(), new Date().getTime());
                 list.add(countModel);
             }
         } catch (Exception e) {

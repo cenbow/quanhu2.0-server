@@ -23,7 +23,7 @@ import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.utils.Page;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.GrowFlowReportVo;
-import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
+import com.yryz.quanhu.score.vo.GrowLevelVo;
 
 @Service(interfaceClass=GrowAPI.class)
 public class GrowAPIImpl implements GrowAPI {
@@ -189,6 +189,26 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 		return listVO;
 		
 	 
+	}
+	
+	@Override
+	public List<GrowLevelVo> getGrowLevelAll(){
+		
+		List<GrowLevel> list  = 	 growLevelManageService.getAll();
+		List<GrowLevelVo> voList = new ArrayList<GrowLevelVo>();
+		for(GrowLevel growLevel:list){
+			GrowLevelVo VO = new GrowLevelVo();
+			VO.setCreateTime(growLevel.getCreateTime());
+			VO.setGrade(growLevel.getGrade());
+			VO.setId(growLevel.getId());
+			VO.setLevel(growLevel.getLevel());
+			VO.setLevelEnd(growLevel.getLevelEnd());
+			VO.setLevelStart(growLevel.getLevelStart());
+			VO.setUpdateTime(growLevel.getUpdateTime());
+			voList.add(VO);
+		}
+		
+		return voList;
 	}
 
 }

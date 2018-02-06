@@ -46,7 +46,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	@Override
 	public int delete(Long userId,String thirdId) {
 		try {
-			int result = mysqlDao.delete(userId,thirdId);
+			int result = mysqlDao.delete(userId,thirdId,null);
 			accountRedisDao.deleteLoginMethod(userId);
 			return result;
 		} catch (Exception e) {

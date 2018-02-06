@@ -91,7 +91,6 @@ public class CommentProvider implements CommentApi {
 
     @Override
     public Response<Comment> accretion(Comment comment) {
-        RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
         try {
             comment.setKid(idAPI.getSnowflakeId().getData());
             Map<String, Integer> map = new HashMap<String, Integer>();
@@ -105,11 +104,6 @@ public class CommentProvider implements CommentApi {
             int count = commentService.accretion(comment);
             if (count > 0) {
                 map.put("result", 1);
-                try {
-                    redisTemplate.opsForValue().set("COMMENT:" + comment.getModuleEnum() + ":" + comment.getKid() + "_" + comment.getTopId() + "_" + comment.getResourceId(), comment);
-                } catch (Exception e) {
-                    logger.info("同步评论数据到redis中失败" + e);
-                }
                 if (comment.getTopId() == 0) {
                     try {
                         countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", 1L);

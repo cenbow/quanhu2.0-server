@@ -375,6 +375,11 @@
 		from qh_activity_info
 		<where>
 			and activity_type = 11
+			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==10">
+				<![CDATA[
+	    	AND online_time > NOW() AND shelve_flag = 10
+	       ]]>
+			</if>
 			<if test="activityInfoSignUpDto.activityStatus != null and activityInfoSignUpDto.activityStatus==11">
 				<![CDATA[
 	    	AND begin_time > NOW() AND shelve_flag = 10

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
+import com.yryz.quanhu.order.grow.entity.GrowLevel;
 
 /**
  * Created by lsn on 2017/8/28.
@@ -21,5 +22,10 @@ public interface GrowFlowService {
     long countgetPage(GrowFlowQuery gfq);
     
     List<GrowFlow> getAll(GrowFlowQuery gfq );
+    
+
+    
+    
+
  
 }
