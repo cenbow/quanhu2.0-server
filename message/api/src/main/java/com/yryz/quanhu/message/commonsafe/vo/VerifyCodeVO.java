@@ -129,19 +129,24 @@ public class VerifyCodeVO implements Serializable {
 	 */
 	public enum VerifyStatus{
 		/** 成功 */
-		SUCCESS(0),
+		SUCCESS(0,"success"),
 		/** 失败 */
-		FAIL(1),
+		FAIL(1,"发送失败"),
 		/** 超过限制 */
-		MORETHAN_LIMIT(2),
+		MORETHAN_LIMIT(2,"日发送总量超过了"),
 		/** 频率过快 */
-		TOO_FAST(3);
+		TOO_FAST(3,"超过了短信发送频率");
 		private int status;
-		VerifyStatus(int status) {
+		private String msg;
+		VerifyStatus(int status,String msg) {
 			this.status = status;
+			this.msg = msg;
 		}
 		public int getStatus(){
 			return this.status;
+		}
+		public String getMsg(){
+			return this.msg;
 		}
 	}
 

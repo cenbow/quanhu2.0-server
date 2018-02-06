@@ -3,6 +3,9 @@
 <mapper namespace="com.yryz.quanhu.other.activity.dao.ActivityVoteDao">
 	
 	<sql id="conditions">
+			<if test="activityStatus != null and activityStatus==10">
+				<![CDATA[   AND online_time > NOW()   ]]> AND shelve_flag = 10
+			</if>
 			<if test="activityStatus != null and activityStatus==11">
 				<![CDATA[    AND begin_time > NOW()    ]]> AND shelve_flag = 10
 			</if>
