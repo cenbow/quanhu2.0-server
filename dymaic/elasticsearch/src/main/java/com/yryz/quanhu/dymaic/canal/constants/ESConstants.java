@@ -8,6 +8,7 @@ package com.yryz.quanhu.dymaic.canal.constants;
  */
 public class ESConstants {
     public static final String USER_CREATEDATE = "userBaseInfo.createDate";
+    public static final String USER_APPID = "userBaseInfo.appId";
     public static final String USER_NICKNAME = "userBaseInfo.userNickName";
     public static final String USER_PHONE = "userBaseInfo.userPhone";
     public static final String USER_STATUS = "userBaseInfo.userStatus";

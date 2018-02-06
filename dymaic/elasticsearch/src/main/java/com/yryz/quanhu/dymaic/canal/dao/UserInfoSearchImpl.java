@@ -5,10 +5,14 @@ import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import com.google.common.collect.Lists;
+import com.yryz.common.response.PageList;
+import com.yryz.quanhu.user.vo.UserInfoVO;
+import org.apache.commons.collections.CollectionUtils;
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.user.vo.UserInfoVO;
 import org.apache.commons.collections.CollectionUtils;
@@ -25,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -124,6 +129,8 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte authWay = adminUserDTO.getAuthWay();
         String growLevel = adminUserDTO.getGrowLevel();
         Integer userStatus = adminUserDTO.getUserStatus();
+        String appId = adminUserDTO.getAppId();
+
         Set<Long> tagIds = adminUserDTO.getTagIds();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -148,6 +155,10 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if (growLevel != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
         }
+        if(StringUtils.isNotBlank(appId)){
+        	boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
+        }
+
         if (CollectionUtils.isNotEmpty(tagIds)) {
             BoolQueryBuilder tagBoolQusery = QueryBuilders.boolQuery();
             for (Long tagId : tagIds) {
@@ -155,11 +166,11 @@ public class UserInfoSearchImpl implements UserInfoSearch {
             }
             boolQueryBuilder.must(tagBoolQusery);
         }
-        if (userStatus != null) {
-            if (userStatus == AdminQueryUserStatus.NORMAL.getStatus()) {
-                boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
-                boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.BAN_POST_TIME).lte(System.currentTimeMillis()));
-            }
+        if(userStatus != null){
+        	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
+        		boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
+        		boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.BAN_POST_TIME).lte(System.currentTimeMillis()));
+        	}
         }
         if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
             long startDate = DateUtils.parseDate(startDateStr).getTime();
