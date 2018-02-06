@@ -59,6 +59,9 @@ public class DymaicController {
     @GetMapping(value = "/{version}/dymaic/homepage")
     public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam Long targetUserId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
         List<DymaicVo> list = ResponseUtils.getResponseData(dymaicService.getSendList(userId, targetUserId, kid, limit));
+        if (list == null || list.size() == 0) {
+            return ResponseUtils.returnSuccess();
+        }
         if (kid == null || kid == 0L) {
             DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
             list.add(0, topDymaic);
