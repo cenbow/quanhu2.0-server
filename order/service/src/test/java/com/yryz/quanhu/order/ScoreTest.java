@@ -10,6 +10,7 @@ package com.yryz.quanhu.order;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -19,6 +20,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
+import com.yryz.quanhu.grow.service.GrowAPI;
+import com.yryz.quanhu.order.grow.entity.GrowLevel;
+import com.yryz.quanhu.order.grow.service.GrowFlowService;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
@@ -37,11 +41,20 @@ public class ScoreTest {
 
 	
 	@Reference
+	private static GrowFlowService growFlowService;
+	
+
+
+	@Reference
 	private static EventAPI eventAPI;
 	
 	
 	@Reference
 	private static EventAcountApiService eventAcountApiService;
+	
+	
+	@Reference
+	private static GrowAPI growAPI;
 
 	
 	@Test
@@ -130,6 +143,12 @@ public class ScoreTest {
 		
 	}
 	
+	
+	@Test
+	public void getGrowLevelAll(){
+		System.out.println("growAPI.getGrowLevelAll():"+growAPI.getGrowLevelAll());
+         
+	}
 
 	
 }

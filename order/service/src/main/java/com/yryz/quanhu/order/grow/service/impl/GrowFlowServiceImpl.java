@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.order.grow.dao.persistence.GrowFlowDao;
+import com.yryz.quanhu.order.grow.entity.GrowLevel;
+import com.yryz.quanhu.order.grow.manage.service.GrowLevelManageService;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
 
 /**
@@ -22,10 +24,21 @@ public class GrowFlowServiceImpl implements GrowFlowService{
 	@Autowired
 	GrowFlowDao growFlowDao;
 
+	@Autowired
+	GrowLevelManageService growLevelManageService;
+
 	@Override
 	public Long save(GrowFlow sf) {
 		growFlowDao.save(sf);
 		return sf.getId();
+	}
+
+	public GrowFlowDao getGrowFlowDao() {
+		return growFlowDao;
+	}
+
+	public void setGrowFlowDao(GrowFlowDao growFlowDao) {
+		this.growFlowDao = growFlowDao;
 	}
 
 	@Override
@@ -56,6 +69,7 @@ public class GrowFlowServiceImpl implements GrowFlowService{
 		return growFlowDao.getAll(gfq);
 	}
 
+	
 
 
 

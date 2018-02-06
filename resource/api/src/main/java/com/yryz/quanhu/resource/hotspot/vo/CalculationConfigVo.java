@@ -13,10 +13,10 @@ import java.util.Date;
  * @author yehao
  * @version 2.0
  * @date 2018年1月25日 下午5:28:32
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 热度相关配置Vo
  */
 public class CalculationConfigVo {
-	
+
 	/**
 	 * 计算类型：衰减配置，1-1(人)/1-2(资源)；热度系数类型，2-1(人)，2-2(资源)
 	 */

@@ -94,14 +94,16 @@ public class ComponentController {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
 		String phone = null;
-		codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		UserLoginSimpleVO simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(codeDTO.getUserId()));
-		if(simpleVO != null){
-			phone = simpleVO.getUserPhone();
-			if(StringUtils.isBlank(phone)){
-				throw QuanhuException.busiError("手机号不存在");
+		if(StringUtils.isBlank(codeDTO.getPhone())){
+			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+			UserLoginSimpleVO simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(codeDTO.getUserId()));
+			if(simpleVO != null){
+				phone = simpleVO.getUserPhone();
+				if(StringUtils.isBlank(phone)){
+					throw QuanhuException.busiError("手机号不存在");
+				}
+				codeDTO.setPhone(phone);
 			}
-			codeDTO.setPhone(phone);
 		}
 		Integer result = ResponseUtils.getResponseData(commonSafeApi.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
