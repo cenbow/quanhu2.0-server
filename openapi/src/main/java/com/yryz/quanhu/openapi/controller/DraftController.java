@@ -62,6 +62,22 @@ public class DraftController {
 
         return draftApi.release(record);
     }
+    
+    @ApiOperation("文章编辑(kid必填，其他值跟insert一样)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "record", paramType = "body", required = true),
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+            @ApiImplicitParam(name = "token", paramType = "header", required = true) })
+    @UserBehaviorValidation(event = "文章编辑", login = true, mute = true)
+    @PostMapping(value = "{version}/draft/info/edit")
+    public Response<ReleaseInfo> edit(HttpServletRequest request, @RequestBody ReleaseInfo record,
+            @RequestHeader("userId") Long headerUserId) {
+
+//        record.setCreateUserId(headerUserId);
+
+        return draftApi.edit(record);
+    }
 
     @NotLogin
     @ApiOperation("文章详情")

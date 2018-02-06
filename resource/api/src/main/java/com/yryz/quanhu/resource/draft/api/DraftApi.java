@@ -89,5 +89,14 @@ public interface DraftApi {
     * @throws  
     */
     public Response<List<ReleaseInfoVo>> selectByCondition(ReleaseInfoDto dto);
+    
+    /**  
+    * @Description: 发布
+    * @author wangheng
+    * @param record
+    * @return ReleaseInfo
+    * @throws  
+    */
+    public Response<ReleaseInfo> edit(ReleaseInfo record);
 
 }
