@@ -58,24 +58,24 @@ public class ModuleContants {
     /**
      * 动态
      */
-    public static final String DYNAMIC="1010";
+    public static final String DYNAMIC = "1010";
 
     /**
      * 平台报名类活动
      */
-    public static final String ACTIVITY_SIGNUP_ENUM  = "1009";
+    public static final String ACTIVITY_SIGNUP_ENUM = "1009";
     /**
      * 私圈活动
      */
-    public static final String ACTIVITY_COTERIE  = "1012";
+    public static final String ACTIVITY_COTERIE = "1012";
 
     /**
      * 举报
      */
-    public static final String REPORT="1013";
+    public static final String REPORT = "1013";
 
     /**
      * 评论
      */
-    public static final String COMMENT="1011";
+    public static final String COMMENT = "1011";
 }

@@ -40,19 +40,6 @@ public class ActivityBody implements Body {
 	private String coterieName;
 
 	/**
-	 * 功能id
-	 */
-	private String moduleEnum;
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
-	}
-
-	/**
 	 * @param circleId
 	 * @param circleName
 	 * @param coterieId
@@ -65,14 +52,6 @@ public class ActivityBody implements Body {
 		this.circleName = circleName;
 		this.coterieId = coterieId;
 		this.coterieName = coterieName;
-	}
-
-	public ActivityBody(String circleId, String circleName, String coterieId, String coterieName, String moduleEnum) {
-		this.circleId = circleId;
-		this.circleName = circleName;
-		this.coterieId = coterieId;
-		this.coterieName = coterieName;
-		this.moduleEnum = moduleEnum;
 	}
 
 	/**
