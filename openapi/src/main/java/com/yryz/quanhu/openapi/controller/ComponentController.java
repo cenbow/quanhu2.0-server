@@ -87,14 +87,16 @@ public class ComponentController {
 	}
 
 	@ApiOperation("验证码校验（只校验不删除）")
-	@UserBehaviorValidation(login=true)
+	@UserBehaviorValidation(login=false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/component/checkVerifyCode")
 	public Response<Map<String,Integer>> checkVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
 		String phone = null;
+		//没传手机号就验证token,并获取用户手机号
 		if(StringUtils.isBlank(codeDTO.getPhone())){
+			authService.checkToken(request);
 			codeDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 			UserLoginSimpleVO simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(codeDTO.getUserId()));
 			if(simpleVO != null){
