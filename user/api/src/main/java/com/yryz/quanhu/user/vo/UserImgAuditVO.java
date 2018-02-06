@@ -5,7 +5,7 @@
  * ---------------------------------------------------------------------
  * 2018-01-12 Created
  */
-package com.yryz.quanhu.user.entity;
+package com.yryz.quanhu.user.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -19,7 +19,7 @@ import com.yryz.common.entity.GenericEntity;
  * @since 1.0
  */
 @SuppressWarnings("serial")
-public class UserImgAudit extends GenericEntity{
+public class UserImgAuditVO extends GenericEntity{
 
     /**
      * 用户id
@@ -74,5 +74,4 @@ public class UserImgAudit extends GenericEntity{
     public void setOperational(String operational) {
         this.operational = operational == null ? null : operational.trim();
     }
-
 }
