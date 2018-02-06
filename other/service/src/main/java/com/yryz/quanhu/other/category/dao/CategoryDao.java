@@ -24,6 +24,8 @@ public interface CategoryDao {
 
     List<Category> selectByRecommend();
 
+    List<Category> findAll();
+
     List<Category> selectBySearch(CategorySearchAdminVo search);
     Integer selectCountBySearch(CategorySearchAdminVo search);
 

@@ -23,6 +23,12 @@ public class CategoryAdminTest {
     private CategoryAdminAPI categoryAdminAPI;
 
     @Test
+    public void findAll() {
+        Response<List<CategoryAdminVo>> response = categoryAdminAPI.findAllCategory();
+        System.out.println(JsonUtils.toFastJson(response));
+    }
+
+    @Test
     public void findCategoryTree() {
         CategoryAdminVo category = new CategoryAdminVo();
         category.setParentKid(0L);
