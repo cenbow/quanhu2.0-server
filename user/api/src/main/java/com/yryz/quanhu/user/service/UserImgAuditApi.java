@@ -40,5 +40,5 @@ public interface UserImgAuditApi {
 	 * @return
 	 * @throws ServiceException
 	 */
-	Response<PageList<UserImgAuditVO>> listByCustId(Integer pageNo,Integer pageSize,Long userId, Integer auditStatus);
+	Response<PageList<UserImgAuditVO>> listByParams(Integer pageNo,Integer pageSize,Long userId, Integer auditStatus);
 }

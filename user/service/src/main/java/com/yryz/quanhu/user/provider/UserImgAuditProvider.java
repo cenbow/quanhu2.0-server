@@ -70,7 +70,7 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 	}
 
 	@Override
-	public Response<PageList<UserImgAuditVO>> listByCustId(Integer pageNo, Integer pageSize, Long userId, Integer auditStatus) {
+	public Response<PageList<UserImgAuditVO>> listByParams(Integer pageNo, Integer pageSize, Long userId, Integer auditStatus) {
 		if(pageNo == null || pageNo < 0){
 			pageNo = 1;
 		}
