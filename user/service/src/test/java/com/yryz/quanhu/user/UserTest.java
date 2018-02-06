@@ -31,6 +31,7 @@ import com.yryz.quanhu.user.dto.LoginDTO;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.dto.SmsVerifyCodeDTO;
 import com.yryz.quanhu.user.dto.ThirdLoginDTO;
+import com.yryz.quanhu.user.dto.UnBindThirdDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.dto.UserRegLogDTO;
 import com.yryz.quanhu.user.dto.UserTagDTO;
@@ -160,7 +161,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 
-	@Test
+	//@Test
 	public void getUserListByCreateDateTest(){
 		String start = "2018-01-01";
 		String end = "2018-03-01";
@@ -174,6 +175,17 @@ public class UserTest {
 	public void bindPhone(){
 		BindPhoneDTO phoneDTO = new BindPhoneDTO(724007310011252736L, "16612345689", "5023", "vebff12m1762");
 		Response<Boolean> response = accountApi.bindPhone(phoneDTO);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	@Test
+	public void unBindThird(){
+		UnBindThirdDTO thirdDTO = new UnBindThirdDTO();
+		thirdDTO.setAppId("vebff12m1762");
+		thirdDTO.setThirdId("8F84EB30809A007E14F0ACAF657E4547");
+		thirdDTO.setUserId(729748409979297792l);
+		thirdDTO.setType(12);
+		Response<Boolean> response = accountApi.unbindThird(thirdDTO);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
