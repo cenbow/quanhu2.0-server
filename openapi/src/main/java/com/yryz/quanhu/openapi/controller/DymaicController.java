@@ -124,7 +124,7 @@ public class DymaicController {
 
     @ApiOperation("动态置顶状态查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
-    @PostMapping(value = "/{version}/dymaic/getTopDymaic")
+    @GetMapping(value = "/{version}/dymaic/getTopDymaic")
     public Response<DymaicVo> getTopDymaic(@RequestHeader Long userId) {
         return dymaicService.getTopDymaic(userId);
     }

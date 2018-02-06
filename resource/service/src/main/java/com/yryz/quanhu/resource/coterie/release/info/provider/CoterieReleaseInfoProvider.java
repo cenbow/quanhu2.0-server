@@ -263,13 +263,13 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
         }
     }
 
-    /**  
+    /**
      * @Description: 资源聚合[首页聚合、好友动态聚合]
      * @author wangheng
      * @param @param releaseInfo
      * @param @param createUser
      * @return void
-     * @throws  
+     * @throws
      */
     public void commitResourceAndDynamic(ReleaseInfo releaseInfo, UserSimpleVO createUser) {
         // 资源聚合
@@ -283,7 +283,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             }
 
             resourceTotal.setCreateDate(DateUtils.getString(Calendar.getInstance().getTime()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(releaseInfo));
+            CoterieReleaseInfoVo coterieReleaseInfoVo = new CoterieReleaseInfoVo();
+            BeanUtils.copyProperties(coterieReleaseInfoVo,releaseInfo);
+            resourceTotal.setExtJson(JsonUtils.toFastJson(coterieReleaseInfoVo));
             resourceTotal.setModuleEnum(NumberUtils.toInt(ModuleContants.RELEASE));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(releaseInfo.getKid());
