@@ -93,7 +93,7 @@ public class ResourceController {
         resourceVo.setCoterieId(coterieId);
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);
-        pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "createTime", start, pageSize, null, null)));
+        pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "sort,createTime", start, pageSize, null, null)));
         pageList.setPageSize(pageSize);
         return ResponseUtils.returnObjectSuccess(pageList);
     }
