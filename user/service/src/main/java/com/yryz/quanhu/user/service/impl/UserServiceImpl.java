@@ -385,6 +385,7 @@ public class UserServiceImpl implements UserService {
 	 * @param nickName
 	 * @return
 	 */
+	@Override
 	public  UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
