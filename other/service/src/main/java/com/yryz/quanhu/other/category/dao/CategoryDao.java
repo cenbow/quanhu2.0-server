@@ -8,6 +8,8 @@
 package com.yryz.quanhu.other.category.dao;
 
 import com.yryz.quanhu.other.category.entity.Category;
+import com.yryz.quanhu.other.category.vo.CategoryAdminVo;
+import com.yryz.quanhu.other.category.vo.CategorySearchAdminVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,15 +18,17 @@ import java.util.List;
 @Mapper
 public interface CategoryDao {
 
-//    Integer save(Category category);
-//    Integer update(Category category);
-//    Integer selectByKid(@Param("kid") Long kid);
-//    List<Category> selectByParentKid(@Param("parentKid") Long parentKid);
-
     List<Category> selectByPid(@Param("pid") Long parentKid, @Param("limit") Integer limit);
 
     Category selectByKid(@Param("kid") Long kid);
 
     List<Category> selectByRecommend();
+
+    List<Category> selectBySearch(CategorySearchAdminVo search);
+    Integer selectCountBySearch(CategorySearchAdminVo search);
+
+    Integer insert(CategoryAdminVo category);
+
+    Integer update(CategoryAdminVo category);
 
 }

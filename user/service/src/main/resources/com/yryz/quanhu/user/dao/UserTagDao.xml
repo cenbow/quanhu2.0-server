@@ -115,4 +115,17 @@
     </foreach>
     and del_flag = 10
   </select>
+
+  <select id="getUserUnionTags" resultType="com.yryz.quanhu.user.dto.UserTagDTO">
+    SELECT qt.id, qt.kid
+    ,qt.user_id, qt.tag_type, qt.tag_id, qt.create_date, qt.last_update_date, qt.last_update_user_id,qt.del_flag
+    ,qc.category_name as tagName
+    FROM qh_user_tag qt left join qh_category qc
+    ON qt.tag_id = qc.kid
+    WHERE qc.kid IS NOT NULL
+    AND qc.category_status = 10
+    AND qt.user_id = #{userId,jdbcType=BIGINT}
+    AND qt.del_flag = 10
+  </select>
+
 </mapper>

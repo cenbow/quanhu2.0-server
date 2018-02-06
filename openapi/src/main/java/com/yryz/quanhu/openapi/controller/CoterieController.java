@@ -121,14 +121,14 @@ public class CoterieController {
         }
         
         Response<CoterieInfo> coterieInfo = coterieApi.queryCoterieInfo(coterieId);
-        if(userId!=null){
+        if(coterieInfo.success() && userId!=null){
         	//如果是圈主第一次访问则记录时间
-        	Integer permission = ResponseUtils.getResponseData(coterieMemberAPI.permission(userId,coterieId));
-            if (permission!=null && permission == MemberConstant.Permission.OWNER.getStatus()) {
-            	CoterieInfo info=new CoterieInfo();
-            	info.setMasterLastViewTime(new Date());
-            	info.setCoterieId(coterieId);
-            	coterieApi.modifyCoterieInfo(info);
+        	CoterieInfo info = coterieInfo.getData();
+            if (info!=null && userId.toString().equals(info.getOwnerId())) {
+            	CoterieInfo param=new CoterieInfo();
+            	param.setMasterLastViewTime(new Date());
+            	param.setCoterieId(coterieId);
+            	coterieApi.modifyCoterieInfo(param);
             }
         }
         return coterieInfo;

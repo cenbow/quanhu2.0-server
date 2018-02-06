@@ -16,4 +16,102 @@
   <select id="selectByRecommend"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
     select * from qh_category where recommend = 10;
   </select>
+
+
+
+
+  <!--admin-->
+  <select id="selectBySearch"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="com.yryz.quanhu.other.category.vo.CategorySearchAdminVo">
+    select
+     *
+     from qh_category
+     where 1=1
+    <if test="parentKid != null">
+      AND parent_kid =  #{parentKid}
+    </if>
+    <if test="categoryName!= null">
+	    AND category_name =  #{categoryName}
+    </if>
+    <if test="categoryStatus!= null">
+      AND category_status =  #{categoryStatus}
+    </if>
+    <if test="recommend!= null">
+      AND recommend =  #{recommend}
+    </if>
+    <if test="categoryType != null">
+      AND category_type =  #{categoryType}
+    </if>
+    <if test="sortField != null ">
+      ORDER BY #{sortField} DESC
+    </if>
+    <if test="start != null and limit != null ">
+      limit #{start}, #{limit}
+    </if>
+  </select>
+
+  <select id="selectCountBySearch"  resultType="java.lang.Integer" parameterType="com.yryz.quanhu.other.category.vo.CategorySearchAdminVo">
+    select
+    count(*)
+    from qh_category
+    where 1=1
+    <if test="parentKid != null">
+      AND parent_kid =  #{parentKid}
+    </if>
+    <if test="categoryName!= null">
+      AND category_name =  #{categoryName}
+    </if>
+    <if test="categoryStatus!= null">
+      AND category_status =  #{categoryStatus}
+    </if>
+    <if test="recommend!= null">
+      AND recommend =  #{recommend}
+    </if>
+    <if test="categoryType != null">
+      AND category_type =  #{categoryType}
+    </if>
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.other.category.vo.CategoryAdminVo">
+    insert into qh_category (
+    kid, category_name, parent_kid, recommend, category_sort, category_status, category_type,
+    create_date, create_user_id, last_update_date, last_update_user_id
+    )
+    values (
+    #{kid,jdbcType=BIGINT}
+    ,#{categoryName,jdbcType=VARCHAR}
+    ,#{parentKid,jdbcType=BIGINT}
+    ,#{recommend,jdbcType=TINYINT}
+    ,#{categorySort,jdbcType=TINYINT}
+    ,#{categoryStatus,jdbcType=TINYINT}
+    ,#{categoryType,jdbcType=TINYINT}
+    ,#{createDate,jdbcType=TIMESTAMP}
+    ,#{createUserId,jdbcType=BIGINT}
+    ,#{lastUpdateDate,jdbcType=TIMESTAMP}
+    ,#{lastUpdateUserId,jdbcType=BIGINT}
+    )
+  </insert>
+
+
+  <update id="update" parameterType="com.yryz.quanhu.other.category.vo.CategoryAdminVo">
+    update qh_category
+    <set>
+      <if test="recommend != null">
+        recommend = #{recommend},
+      </if>
+      <if test="categoryStatus != null">
+        category_status = #{categoryStatus},
+      </if>
+      <if test="categorySort!= null">
+        category_sort = #{categorySort},
+      </if>
+      <if test="lastUpdateDate!= null">
+        last_update_date = #{lastUpdateDate},
+      </if>
+      <if test="lastUpdateUserId!= null">
+        last_update_user_id= #{lastUpdateUserId},
+      </if>
+    </set>
+    where kid = #{kid}
+  </update>
+
 </mapper>

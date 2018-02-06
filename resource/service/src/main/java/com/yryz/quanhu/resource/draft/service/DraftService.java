@@ -135,5 +135,15 @@ public interface DraftService {
     * @throws  
     */
     public void commitEvent(EventAPI eventAPI, ReleaseInfo record);
+    
+    /**  
+    * @Description: 插入记录
+    * @author wangheng
+    * @param @param record
+    * @param @return
+    * @return int
+    * @throws  
+    */
+    int edit(ReleaseInfo record);
 
 }
