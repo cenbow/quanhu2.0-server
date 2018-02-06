@@ -26,29 +26,11 @@ public class HomePageBody implements Body{
 	private Long userId;
 
 	/**
-	 * 功能id
-	 */
-	private String moduleEnum;
-
-	/**
 	 *
 	 * @exception
 	 */
 	public HomePageBody() {
 		super();
-	}
-
-	public HomePageBody(Long userId, String moduleEnum) {
-		this.userId = userId;
-		this.moduleEnum = moduleEnum;
-	}
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
 	}
 
 	public Long getUserId() {
