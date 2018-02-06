@@ -61,6 +61,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     private static final Byte COTERIE_STATUS_UP = 11;
 
+    private static final Integer CONTENT_LENGTH_MAX = 300;
+    private static final Integer CONTENT_LENGTH_MIN = 10;
+
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
@@ -126,7 +129,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw QuanhuException.busiError("不能向自己提问。");
         }
         CoterieInfo coterieInfo = apIservice.getCoterieinfo(citeriaId);
-        if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || coterieInfo.getStatus().compareTo(COTERIE_STATUS_UP) != 0)
+        if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || COTERIE_STATUS_UP.compareTo(coterieInfo.getStatus()) != 0)
         {
             throw QuanhuException.busiError("提问的私圈不存在。");
         }
@@ -143,7 +146,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw QuanhuException.busiError("不能向非圈主用户提问.");
         }
 
-        if (StringUtils.isBlank(content) || content.length() > 300 || content.length() < 10) {
+        if (StringUtils.isBlank(content) || content.length() > CONTENT_LENGTH_MAX || content.length() < CONTENT_LENGTH_MIN) {
             throw QuanhuException.busiError("提问正文只能输入文字,10到300字.");
         }
         if (consultingFee > 0) {
