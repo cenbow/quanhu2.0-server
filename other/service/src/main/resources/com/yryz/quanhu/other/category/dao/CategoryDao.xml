@@ -21,6 +21,12 @@
 
 
   <!--admin-->
+  <select id="findAll"  resultType="com.yryz.quanhu.other.category.entity.Category">
+    select
+    *
+    from qh_category
+  </select>
+
   <select id="selectBySearch"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="com.yryz.quanhu.other.category.vo.CategorySearchAdminVo">
     select
      *
