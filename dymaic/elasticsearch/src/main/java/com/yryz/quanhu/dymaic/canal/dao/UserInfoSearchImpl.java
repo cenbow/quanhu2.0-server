@@ -130,9 +130,14 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         String growLevel = adminUserDTO.getGrowLevel();
         Integer userStatus = adminUserDTO.getUserStatus();
         String appId = adminUserDTO.getAppId();
+        Integer userRole = adminUserDTO.getUserRole();
+        Byte recommendStatus = adminUserDTO.getRecommendStatus();
         Set<Long> tagIds = adminUserDTO.getTagIds();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if(userRole!=null){
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
+        }
         if (StringUtils.isNoneBlank(nickName)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
         }
@@ -150,6 +155,9 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
         if (authWay != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHWAY, authWay));
+        }
+        if (recommendStatus!=null){
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_RECOMMENDSTATUS, recommendStatus));
         }
         if (growLevel != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));

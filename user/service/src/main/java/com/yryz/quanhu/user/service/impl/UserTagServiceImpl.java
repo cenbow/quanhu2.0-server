@@ -133,4 +133,9 @@ public class UserTagServiceImpl implements UserTagService {
 		return result;
 	}
 
+	@Override
+	public List<UserTagDTO> getUserTags(Long userId) {
+		return mysqlDao.getUserUnionTags(userId);
+	}
+
 }

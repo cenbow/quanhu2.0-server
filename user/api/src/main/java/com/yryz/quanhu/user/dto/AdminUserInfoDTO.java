@@ -21,6 +21,10 @@ public class AdminUserInfoDTO implements Serializable{
 	private String keyword;
 
 
+	/**
+	 * 注册:10 充值:11 提现: 12
+	 */
+	private String dataSource;
 
 	//用户信息
 	/**
@@ -111,6 +115,16 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 是否需要收入 
 	 */
 	private Boolean needIntegral = false;
+
+
+	public String getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(String dataSource) {
+		this.dataSource = dataSource;
+	}
+
 	public Byte getRecommendStatus() {
 		return recommendStatus;
 	}

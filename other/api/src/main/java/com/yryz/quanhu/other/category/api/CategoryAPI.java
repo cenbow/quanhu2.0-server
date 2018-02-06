@@ -32,10 +32,4 @@ public interface CategoryAPI {
 	 */
 	Response<List<CategoryCheckedVo>> recommend();
 
-	/**
-     * 设置用户标签分类(引导页 button 选好了)
-	 * @return
-	 */
-	Response<String> save(String ids);
-
 }

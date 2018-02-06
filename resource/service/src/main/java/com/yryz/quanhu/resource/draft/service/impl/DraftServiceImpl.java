@@ -359,6 +359,17 @@ public class DraftServiceImpl implements DraftService {
         }
 		
 	}
+
+	/**
+	 * 编辑草稿箱
+	 * @param record
+	 * @return
+	 * @see com.yryz.quanhu.resource.draft.service.DraftService#edit(com.yryz.quanhu.resource.release.info.entity.ReleaseInfo)
+	 */
+	@Override
+	public int edit(ReleaseInfo record) {
+		return this.getDao().updateByUkSelective(record);
+	}
 	
 	
 

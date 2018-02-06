@@ -95,13 +95,20 @@ public class MessageAdminServiceImpl implements MessageAdminService {
 
     @Override
     public void handleMessage(MessageAdminVo messageAdminVo) {
-        if (messageAdminVo != null && messageAdminVo.getPushType().equals(MessageContants.PUSH_TYPE_START)) {
-            //立即推送,判断是否是持久化消息，写入mongo,推极光
-            messageHandle(messageAdminVo);
+        try {
+            if (messageAdminVo != null && messageAdminVo.getPushType().equals(MessageContants.PUSH_TYPE_START)) {
+                //立即推送,判断是否是持久化消息，写入mongo,推极光
+                messageHandle(messageAdminVo);
 
-        } else if (messageAdminVo != null && messageAdminVo.getPushType().equals(MessageContants.PUSH_TYPE_TIMING)) {
-            //定时推送
-            timePushMessage(messageAdminVo);
+            } else if (messageAdminVo != null && messageAdminVo.getPushType().equals(MessageContants.PUSH_TYPE_TIMING)) {
+                //定时推送
+                timePushMessage(messageAdminVo);
+            }
+        } catch (Exception e) {
+            LOGGER.error("==========处理管理后台推送消息异常！============", e);
+            messageAdminVo.setPushStatus(MessageContants.PUSH_STATUS_FAILURE);
+            messageAdminMongo.update(messageAdminVo);
+            throw QuanhuException.busiError("处理管理后台推送消息异常" + e);
         }
     }
 
