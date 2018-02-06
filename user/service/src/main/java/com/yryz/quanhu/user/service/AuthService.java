@@ -52,11 +52,11 @@ public interface AuthService {
 	AuthTokenVO getToken(AuthRefreshDTO refreshDTO);
 	
 	/**
-	 * 检查刷新标识判断是否允许刷新token,第一次执行刷新就把token的过期时间设置为当前标识的过期时间
+	 * 检查刷新标识判断是否允许刷新token,第一次执行刷新就把token的过期时间的一半设置为当前标识的过期时间
 	 * @param userId
 	 * @param appId
 	 * @param devType
-	 * @return
+	 * @return 
 	 */
 	boolean checkRefreshFlag(Long userId,String appId,DevType devType);
 	

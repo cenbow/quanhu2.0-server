@@ -81,7 +81,7 @@ public class CommentServiceImpl implements CommentService {
             Comment commentRedis = commentDao.querySingleCommentById(comment.getId());
             if (null != commentRedis) {
                 try {
-                    redisTemplate.opsForValue().set("COMMENT:" + ModuleContants.COMMENT+ ":" + commentRedis.getKid() + "_" + commentRedis.getTopId() + "_" + commentRedis.getResourceId(), commentRedis);
+                    redisTemplate.opsForValue().set("COMMENT:" + commentRedis.getModuleEnum()+ ":" + commentRedis.getKid() + "_" + commentRedis.getTopId() + "_" + commentRedis.getResourceId(), commentRedis);
                 } catch (Exception e) {
                     logger.info("同步评论数据到redis中失败" + e);
                 }
@@ -196,7 +196,7 @@ public class CommentServiceImpl implements CommentService {
         PageList pageList = new PageList();
         Set<String> setKeys = null;
         if (null != stringRedisTemplate) {
-            setKeys = stringRedisTemplate.keys("COMMENT:" + ModuleContants.COMMENT + ":*_0_" + commentFrontDTO.getResourceId());
+            setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
             logger.info("先走redis查值1");
         }
         List<CommentVO> commentVOS = null;
@@ -247,7 +247,7 @@ public class CommentServiceImpl implements CommentService {
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
             Set<String> setSubKey = null;
             if (null != stringRedisTemplate) {
-                setSubKey = stringRedisTemplate.keys("COMMENT:*:*_" + commentVO.getKid() + "_" + commentVO.getResourceId());
+                setSubKey = stringRedisTemplate.keys("COMMENT:"+commentVO.getModuleEnum()+":*_" + commentVO.getKid() + "_" + commentVO.getResourceId());
                 logger.info("先走redis查4");
             }
             if (setSubKey.size() <= 0) {
@@ -403,7 +403,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO) {
         CommentInfoVO commentInfoVO = new CommentInfoVO();
-        Set<String> strKey = stringRedisTemplate.keys("COMMENT:"+ModuleContants.COMMENT+":" + commentSubDTO.getKid() + "_0_"+commentSubDTO.getResourceId());
+        Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_"+commentSubDTO.getResourceId());
         if (strKey.size() > 0) {
             logger.info("评论详情走redis1");
             for (String str : strKey) {
@@ -449,7 +449,7 @@ public class CommentServiceImpl implements CommentService {
         CommentSubDTO commentSubDTO_ = new CommentSubDTO();
         commentSubDTO_.setKid(commentSubDTO.getKid());
         CommentInfoVO commentInfoVO = new CommentInfoVO();
-        Set<String> strKey = stringRedisTemplate.keys("COMMENT:"+ModuleContants.COMMENT+":" + commentSubDTO.getKid() + "_0_"+commentSubDTO.getResourceId());
+        Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_"+commentSubDTO.getResourceId());
         if (strKey.size() > 0) {
             logger.info("评论详情走redis1");
             for (String str : strKey) {
@@ -499,7 +499,7 @@ public class CommentServiceImpl implements CommentService {
         pageList.setCurrentPage(commentSubDTO.getCurrentPage());
         pageList.setPageSize(commentSubDTO.getPageSize());
         List<CommentVO> commentVOS = new ArrayList<CommentVO>();
-        Set<String> setSubKey = stringRedisTemplate.keys("COMMENT:"+ModuleContants.COMMENT+":*_" + commentFrontDTO.getTopId() + "_"+commentSubDTO.getResourceId());
+        Set<String> setSubKey = stringRedisTemplate.keys("COMMENT:*:*_" + commentFrontDTO.getTopId() + "_"+commentSubDTO.getResourceId());
         if (setSubKey.size() > 0) {
             logger.info("评论详情走redis3");
             for (String strkey : setSubKey) {

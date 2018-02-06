@@ -205,7 +205,7 @@ public class UserStarServiceImpl implements UserStarService {
 		if (starRecommendStatus == StarRecommendStatus.TRUE.getStatus()) {
 			authModel.setRecommendCancelTime(new Date());
 			// 设置权重
-			Integer maxWeight = persistenceDao.getStarMaxWeight();
+			Integer maxWeight = persistenceDao.getMaxHeight();
 			authModel.setRecommendHeight((maxWeight == null ? 0 : maxWeight) + 10);
 		}
 		try {

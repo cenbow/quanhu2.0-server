@@ -10,7 +10,6 @@ package com.yryz.quanhu.order;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -19,14 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.grow.service.GrowAPI;
-import com.yryz.quanhu.order.grow.entity.GrowLevel;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
 import com.yryz.quanhu.score.vo.EventSign;
 
 /**
@@ -80,15 +80,7 @@ public class ScoreTest {
     }
 	
 	
-	@Test
-    public void getScoreFlowList() {
-        EventInfo info = new EventInfo();
-        info.setUserId("123456789");
-      //  List<EventReportVo>   list =   eventAPI.getScoreFlowList(info);
 
-      //  System.out.println("ScoreFlow list: "+list.size());
-    }
-	
 	@Test
     public  void getEventSign()  {
 		String custId = "123456789";
@@ -149,6 +141,16 @@ public class ScoreTest {
 		System.out.println("growAPI.getGrowLevelAll():"+growAPI.getGrowLevelAll());
          
 	}
+	
+	@Test
+	public void getScoreFlowList(){
+		EventInfo event = new EventInfo();
+		event.setUserId("738941993638281216");
+	Response<EventReportVo> VO = eventAPI.getScoreFlowList(event);
+	System.out.println(" VO.getData().getGrowLevel(): "+VO.getData().getGrowLevel());
+         
+	}
+
 
 	
 }

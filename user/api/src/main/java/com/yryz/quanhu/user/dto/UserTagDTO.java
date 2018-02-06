@@ -12,7 +12,11 @@ public class UserTagDTO implements Serializable{
 	 * 标签类型 标签类型 10-用户自选 11-运营设置达人推荐标签
 	 */
 	private Byte tagType;
-	
+
+	private Long tagId;
+
+	private String tagName;
+
 	/**
 	 * 用户标签类型
 	 *
@@ -59,5 +63,21 @@ public class UserTagDTO implements Serializable{
 	}
 	public void setUpdateUserId(Long updateUserId) {
 		this.updateUserId = updateUserId;
+	}
+
+	public Long getTagId() {
+		return tagId;
+	}
+
+	public void setTagId(Long tagId) {
+		this.tagId = tagId;
+	}
+
+	public String getTagName() {
+		return tagName;
+	}
+
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
 	}
 }
