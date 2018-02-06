@@ -27,7 +27,7 @@ public class AdvertisementController {
     @Reference(check = false, timeout = 30000)
     private AdvertisementAPI advertisementAPI;
 
-    @NotLogin
+    
     @ApiOperation("广告")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/ad/list")

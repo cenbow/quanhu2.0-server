@@ -40,7 +40,7 @@ public class CategoryController {
         return categoryAPI.listById(categoryId);
     }
 
-    @NotLogin
+    
     @ApiOperation("获取向用户推荐的标签分类(引导页)")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/other/category/recommend")

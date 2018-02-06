@@ -32,7 +32,7 @@ public class CommentController {
     @Reference
     private CommentApi commentApi;
 
-    @NotLogin
+    
     @ApiOperation("用户评论")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/accretion")
@@ -41,7 +41,7 @@ public class CommentController {
         return commentApi.accretion(comment);
     }
 
-    @NotLogin
+    
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/comment/list")
@@ -49,7 +49,7 @@ public class CommentController {
         return commentApi.queryComments(commentFrontDTO);
     }
 
-    @NotLogin
+    
     @ApiOperation("用户删除评论")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/clean")
@@ -58,7 +58,7 @@ public class CommentController {
         return commentApi.delComment(comment);
     }
 
-    @NotLogin
+    
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/comment/singleInfo")

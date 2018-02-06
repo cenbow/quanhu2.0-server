@@ -39,7 +39,7 @@ public class NoticeController {
     @ApiOperation("获取公告列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping("/{version}/notice/list")
-    @NotLogin
+    
     public Response<NoticeVo> list(NoticeDto noticeDto) {
         Assert.hasText(noticeDto.getSearchDate(), "查询时间点不能为空！");
         return noticeAPI.list(noticeDto);
@@ -48,7 +48,7 @@ public class NoticeController {
     @ApiOperation("获取公告详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping("/{version}/notice/detail")
-    @NotLogin
+    
     public Response<NoticeDetailVo> detail(NoticeDto noticeDto) {
         Assert.notNull(noticeDto.getKid(), "公告id不能为空！");
         return noticeAPI.detail(noticeDto);

@@ -29,7 +29,7 @@ public class BackManagerTestController {
     @Reference(check=false)
     private CommentApi commentApi;
 
-    @NotLogin
+    
     @ApiOperation("评论查看")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/comment/backlist")

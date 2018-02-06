@@ -31,7 +31,7 @@ public class ReportConrtoller {
     @Reference
     private ReportApi reportApi;
 
-    @NotLogin
+    
     @ApiOperation("用户举报")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/report/accretion")
@@ -40,7 +40,7 @@ public class ReportConrtoller {
         return reportApi.accretion(report);
     }
 
-    @NotLogin
+    
     @ApiOperation("举报类型")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/report/informdesc")

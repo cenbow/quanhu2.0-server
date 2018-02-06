@@ -55,7 +55,7 @@ public class ReleaseInfoController {
         return releaseInfoApi.release(record);
     }
 
-    @NotLogin
+    
     @ApiOperation("文章详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
