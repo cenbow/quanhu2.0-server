@@ -8,6 +8,7 @@ import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -37,5 +38,7 @@ public interface CommentDao {
     int updownSingle(Comment comment);
 
     Long queryCommentForAdminCount(CommentDTO commentDTO);
+
+    Comment querySingleCommentById(@Param("id") long id);
 
 }

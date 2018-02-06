@@ -154,7 +154,7 @@ public class UserTest {
 	//@Test
 	public void updateUser(){
 		UpdateBaseInfoDTO infoDTO = new UpdateBaseInfoDTO();
-		infoDTO.setUserId(731519998090690560l);
+		infoDTO.setUserId(731519998090690560L);
 		infoDTO.setUserGenders(10);
 		Response<Boolean> response = userApi.updateUserInfo(infoDTO);
 		System.out.println(JsonUtils.toFastJson(response));
@@ -231,7 +231,7 @@ public class UserTest {
 		SmsVerifyCodeDTO codeDTO = new SmsVerifyCodeDTO();
 		codeDTO.setAppId("vebff12m1762");
 		codeDTO.setCode(SmsContants.CODE_FIND_PWD);
-		codeDTO.setUserId(738943677265461248l);
+		codeDTO.setUserId(738943677265461248L);
 		//codeDTO.setPhone("16612345689");
 
 		Response<SmsVerifyCodeVO> response = accountApi.sendVerifyCode(codeDTO);
@@ -246,7 +246,7 @@ public class UserTest {
 	
 	//@Test
 	public void getUserSimple(){
-		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560l);
+		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560L);
 		//UserSimpleVO simpleVO = response.getData();
 		//Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
 		System.out.println(JsonUtils.toFastJson(response));

@@ -93,7 +93,6 @@ public class RrzOrderUserAccount implements Serializable {
 	 */
 	public RrzOrderUserAccount() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

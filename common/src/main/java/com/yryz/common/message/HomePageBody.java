@@ -28,7 +28,6 @@ public class HomePageBody implements Body{
 	 */
 	public HomePageBody() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**

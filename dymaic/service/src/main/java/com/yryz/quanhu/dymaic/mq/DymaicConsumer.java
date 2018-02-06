@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.dymaic.mq;
 
+import cn.jiguang.common.utils.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.provider.DymaicProvider;
@@ -62,9 +63,18 @@ public class DymaicConsumer {
 		try {
 			Dymaic dymaic = GsonUtils.json2Obj(data, Dymaic.class);
 			String modelEnum = dymaic.getModuleEnum();
-			if (modelEnum != null && (modelEnum.equals("1000") || modelEnum.equals("1002") || modelEnum.equals("1003")
-				|| modelEnum.equals("1004") || modelEnum.equals("1005")) ) {
+			String coterieId = dymaic.getCoterieId();
+
+			boolean debarCoterie = (modelEnum.equals("1003") || modelEnum.equals("1004") || modelEnum.equals("1005"))
+					&& StringUtils.isEmpty(coterieId);
+			if (modelEnum == null) {
+				return;
+			} else if (modelEnum.equals("1000") || modelEnum.equals("1002")) {
 				dymaicProvider.send(dymaic);
+			} else if (debarCoterie) {
+				dymaicProvider.send(dymaic);
+			} else {
+				return;
 			}
 		} catch (Exception e) {
 			logger.error(data, e);

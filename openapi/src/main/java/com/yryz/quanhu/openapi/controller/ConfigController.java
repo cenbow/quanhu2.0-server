@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,9 +42,9 @@ public class ConfigController {
     @ApiOperation("获取强制升级配置接口")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/config/forceUpgrade")
-    public Response<Map<String, Object>> forceUpgrade(@RequestHeader String appVersion, @RequestParam String os, HttpServletRequest request) {
-        if (StringUtils.isEmpty(os)) {
-            return ResponseUtils.returnException(QuanhuException.busiError("os参数缺失"));
+    public Response<Map<String, Object>> forceUpgrade(@RequestHeader String appVersion, @RequestHeader String devType, HttpServletRequest request) {
+        if (StringUtils.isEmpty(devType)) {
+            return ResponseUtils.returnException(QuanhuException.busiError("devType参数缺失"));
         }
         if (StringUtils.isEmpty(appVersion)) {
             return ResponseUtils.returnException(QuanhuException.busiError("appVersion参数缺失"));
@@ -53,17 +54,16 @@ public class ConfigController {
         map.put("forceUpgradeFlag", false);
         //当前版本号
         map.put("version", appVersion);
-        //当前操作系统
-        map.put("os", os);
         //要升级的版本号
         map.put("upgradeVersion", "1.0.0");
         try {
-            String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(os));
-            JSONObject config = GsonUtils.json2Obj(configStr, JSONObject.class);
+            String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(devType));
+            Map<String,Object> config = GsonUtils.json2Obj(configStr, Map.class);
             String upgradeVersion = config.get("upgradeVersion").toString();
             //强制升级的版本比当前版本高
             if (new Integer(upgradeVersion.replace(".", "")) > new Integer(appVersion.replace(".", ""))) {
                 map.put("forceUpgradeFlag", true);
+                map.put("releaseNote", config.get("releaseNote").toString());
             } else {
                 map.put("forceUpgradeFlag", false);
             }

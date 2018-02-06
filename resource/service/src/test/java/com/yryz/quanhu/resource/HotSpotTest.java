@@ -22,7 +22,7 @@ import com.yryz.quanhu.resource.hotspot.vo.EventInfo;
  * @author yehao
  * @version 2.0
  * @date 2018年1月25日 下午5:17:59
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 热度计算TEST类
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
