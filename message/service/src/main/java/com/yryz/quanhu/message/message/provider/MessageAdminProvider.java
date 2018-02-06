@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
  * All rights reserved.
@@ -43,7 +45,7 @@ public class MessageAdminProvider implements MessageAdminAPI {
     }
 
     @Override
-    public Response<Boolean> push(MessageAdminVo messageAdminVo) {
+    public Response<MessageAdminVo> push(MessageAdminVo messageAdminVo) {
         try {
             return ResponseUtils.returnObjectSuccess(messageAdminService.push(messageAdminVo));
         } catch (QuanhuException e) {
@@ -56,7 +58,7 @@ public class MessageAdminProvider implements MessageAdminAPI {
     }
 
     @Override
-    public Response<Boolean> update(MessageAdminVo messageAdminVo) {
+    public Response<MessageAdminVo> update(MessageAdminVo messageAdminVo) {
         try {
             return ResponseUtils.returnObjectSuccess(messageAdminService.update(messageAdminVo));
         } catch (QuanhuException e) {
@@ -77,6 +79,19 @@ public class MessageAdminProvider implements MessageAdminAPI {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
             LOGGER.error("查询管理后台消息详情异常！", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<List<MessageAdminVo>> startCheck() {
+        try {
+            return ResponseUtils.returnObjectSuccess(messageAdminService.startCheck());
+        } catch (QuanhuException e) {
+            LOGGER.error("管理后台定时任务消息启动检查查询异常！", e);
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            LOGGER.error("管理后台定时任务消息启动检查查询异常！", e);
             return ResponseUtils.returnException(e);
         }
     }

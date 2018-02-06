@@ -31,7 +31,7 @@ public class AnswerVo  implements Serializable {
 
     private String answerAudio;
 
-    private String coterieId;
+    private Long coterieId;
 
     private Long audioLength;
 
@@ -133,12 +133,12 @@ public class AnswerVo  implements Serializable {
         this.answerAudio = answerAudio;
     }
 
-    public String getCoterieId() {
+    public Long getCoterieId() {
         return coterieId;
     }
 
     @JsonSerialize(using = ToStringSerializer.class)
-    public void setCoterieId(String coterieId) {
+    public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }
 

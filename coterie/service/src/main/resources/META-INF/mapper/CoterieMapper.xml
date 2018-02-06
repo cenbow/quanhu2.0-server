@@ -464,4 +464,80 @@
       #{item}
     </foreach>
   </select>
+
+
+
+
+  <!--admin-->
+
+  <select id="selectCountBySearchParam" resultType="java.lang.Integer" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
+    SELECT count(*)
+    FROM `qh_coterie` s
+    WHERE 1=1
+    <if test="status !=null"> AND s.state=#{status}</if>
+    <if test="name !=null"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
+    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
+    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
+  </select>
+
+
+  <select id="selectBySearchParam" resultType="com.yryz.quanhu.coterie.coterie.entity.Coterie" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
+    SELECT
+    s.coterie_name name,
+    s.create_date createDate,
+    s.join_fee joinFee,
+    s.consulting_fee consultingFee,
+    s.owner_id ownerId,
+    s.intro,
+    s.kid coterieId,
+    s.join_check joinCheck,
+    s.state,
+    s.recommend,
+    s.is_expert isExpert,
+    s.icon,
+    s.member_num memberNum,
+    s.heat
+    FROM `qh_coterie` s
+    WHERE 1=1
+    <if test="status !=null"> AND s.state=#{status}</if>
+    <if test="name !=null"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
+    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
+    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
+    <if test="recommend !=null"> AND s.recommend = #{recommend}</if>
+    order by s.create_date ${sortValue}
+    limit #{pageNum},#{pageSize}
+  </select>
+
+
+
+
+
+  <update id="updateCoterieAdmin" parameterType="com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin" >
+    update qh_coterie
+    <set >
+      <if test="status != null" >
+        state = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="shelveFlag != null" >
+        shelve_flag = #{shelveFlag},
+      </if>
+      <if test="recommend != null" >
+        recommend = #{recommend},
+      </if>
+      <if test="auditUserId != null" >
+        audit_user_id = #{auditUserId},
+      </if>
+      <if test="auditRemark != null" >
+        audit_remark = #{auditRemark},
+      </if>
+      <if test="processTime != null" >
+        process_time = #{processTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateDate != null" >
+        last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where kid = #{coterieId,jdbcType=CHAR}
+  </update>
+
 </mapper>

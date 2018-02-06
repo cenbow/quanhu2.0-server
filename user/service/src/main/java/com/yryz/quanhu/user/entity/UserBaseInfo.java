@@ -441,6 +441,37 @@ public class UserBaseInfo extends GenericEntity {
 	}
 
 	/**
+	 * 注册初始化
+	 * @param userId
+	 * @param appId
+	 * @param userNickName
+	 * @param userImg
+	 * @param userSignature
+	 * @param userPhone
+	 * @param userLocation
+	 * @param userDeviceId
+	 * @param cityCode
+	 * @param userVest
+	 * @param userDesc
+	 */
+	public UserBaseInfo(Long userId, String appId, String userNickName, String userImg, String userSignature,
+			String userPhone, String userLocation, String userDeviceId, String cityCode, Byte userVest,
+			String userDesc) {
+		super();
+		this.userId = userId;
+		this.appId = appId;
+		this.userNickName = userNickName;
+		this.userImg = userImg;
+		this.userSignature = userSignature;
+		this.userPhone = userPhone;
+		this.userLocation = userLocation;
+		this.userDeviceId = userDeviceId;
+		this.cityCode = cityCode;
+		this.userVest = userVest;
+		this.userDesc = userDesc;
+	}
+
+	/**
 	 * 昵称头像更新
 	 * 
 	 * @param userId

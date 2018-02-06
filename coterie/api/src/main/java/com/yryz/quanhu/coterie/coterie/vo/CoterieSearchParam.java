@@ -13,7 +13,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class CoterieSearchParam implements Serializable{
 	private static final long serialVersionUID = 7520811012527140155L;
-	
+
 	/**
 	 * 圈子状态 ：0待审核，2审批未通过，3上架，4下架 
 	 */
@@ -37,7 +37,7 @@ public class CoterieSearchParam implements Serializable{
 	/**
 	 * 私圈名称
 	 */
-	private String coterieName;
+	private String name;
 	
 	/**
 	 * 圈主名称
@@ -94,14 +94,6 @@ public class CoterieSearchParam implements Serializable{
 
 	public void setCircleName(String circleName) {
 		this.circleName = circleName;
-	}
-
-	public String getCoterieName() {
-		return coterieName;
-	}
-
-	public void setCoterieName(String coterieName) {
-		this.coterieName = coterieName;
 	}
 
 	public String getOwnerName() {
@@ -184,12 +176,11 @@ public class CoterieSearchParam implements Serializable{
 		this.ownerId = ownerId;
 	}
 
-	@Override
-	public String toString() {
-		return "CoterieSearchParam [status=" + status + ", recommend=" + recommend + ", circleName=" + circleName
-				+ ", circleId=" + circleId + ", coterieName=" + coterieName + ", ownerName=" + ownerName + ", ownerId="
-				+ ownerId + ", startTime=" + startTime + ", endTime=" + endTime + ", coterieIdList=" + coterieIdList
-				+ ", pageNum=" + pageNum + ", pageSize=" + pageSize + ", sortValue=" + sortValue + "]";
+	public String getName() {
+		return name;
 	}
-	
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

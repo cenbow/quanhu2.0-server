@@ -9,6 +9,9 @@ package com.yryz.quanhu.coterie.coterie.dao;
 
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.entity.CoterieSearch;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -74,4 +77,15 @@ public interface CoterieMapper {
      */
     List<Coterie> selectRecommendList();
     List<Coterie> selectOrderByMemberNum();
+
+
+
+
+    /********* admin *************************/
+
+    int updateCoterieAdmin(CoterieUpdateAdmin record);
+
+    List<Coterie> selectBySearchParam(CoterieSearchParam param);
+
+    Integer selectCountBySearchParam(CoterieSearchParam param);
 }

@@ -9,6 +9,7 @@ package com.yryz.quanhu.user.dao;
 
 import java.util.List;
 
+import com.yryz.common.dao.BaseDao;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,7 +17,7 @@ import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.entity.UserStarAuth;
 
 @Mapper
-public interface UserStarAuthDao {
+public interface UserStarAuthDao extends BaseDao{
 	/**
 	 * 保存达人认证信息
 	 * @param record
@@ -66,7 +67,6 @@ public interface UserStarAuthDao {
 
     /**
      * 获取达人推荐最大权重
-     * @param userId
      * @return
      */
     Integer getStarMaxWeight();
@@ -76,4 +76,19 @@ public interface UserStarAuthDao {
      * @return
      */
     Integer countStar();
+
+    /**
+     * 后台更新达人审核记录
+     * @param starAuth
+     * @return
+     */
+    int updateAuditStatus(UserStarAuth starAuth);
+
+    /**
+     * 后台推荐更新达人记录
+     * @param starAuth
+     * @return
+     */
+    int updateRecommendStatus(UserStarAuth starAuth);
+
 }

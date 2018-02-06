@@ -160,6 +160,9 @@ public class CountProvider implements CountApi {
                 case "21":
                     list.add(BehaviorEnum.RealRead);
                     break;
+                case "22":
+                    list.add(BehaviorEnum.TALK);
+                    break;
             }
         }
         return list;

@@ -1,17 +1,15 @@
 package com.yryz.quanhu.dymaic.canal.dao;
 
+import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
 import javax.annotation.Resource;
 
-import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
-import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
-import com.yryz.quanhu.user.dto.StarInfoDTO;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -26,9 +24,15 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Repository;
 
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
 import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
-
-import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
+import com.yryz.quanhu.user.contants.AdminQueryUserStatus;
+import com.yryz.quanhu.user.contants.UserAccountStatus;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 
 @Repository
 public class UserInfoSearchImpl implements UserInfoSearch {
@@ -113,7 +117,8 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte authType = adminUserDTO.getAuthType();
         Byte authWay = adminUserDTO.getAuthWay();
         String growLevel = adminUserDTO.getGrowLevel();
-
+        Integer userStatus = adminUserDTO.getUserStatus();
+        
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNoneBlank(nickName)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
@@ -135,6 +140,12 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
         if (growLevel != null) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
+        }
+        if(userStatus != null){
+        	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
+        		boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
+        		boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.BAN_POST_TIME).lte(System.currentTimeMillis()));
+        	}
         }
         if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
             long startDate = DateUtils.parseDate(startDateStr).getTime();
