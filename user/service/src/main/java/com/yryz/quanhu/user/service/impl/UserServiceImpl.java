@@ -31,6 +31,7 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.yryz.common.constant.AppConstants;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
@@ -116,7 +117,7 @@ public class UserServiceImpl implements UserService {
 			}
 			// 昵称已存在
 			if (existByName != null) {
-				throw QuanhuException.busiError("nickName is already ");
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(),"该昵称已存在","该昵称已存在");
 			}
 		}
 
