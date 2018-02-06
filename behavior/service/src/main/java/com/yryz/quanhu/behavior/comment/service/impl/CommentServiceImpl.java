@@ -63,9 +63,6 @@ public class CommentServiceImpl implements CommentService {
     private EventAPI eventAPI;
 
     @Reference(check = false)
-    private HotSpotApi hotSpotApi;
-
-    @Reference(check = false)
     private EventAcountApiService eventAcountApiService;
 
     @Autowired
@@ -145,12 +142,6 @@ public class CommentServiceImpl implements CommentService {
             }
             if (currentCount_ < 10) {
                 eventInfos.add(eventInfo_);
-            }
-            try {
-                hotSpotApi.saveHeat("1", String.valueOf(comment.getResourceId()));
-                hotSpotApi.saveHeat("2", String.valueOf(comment.getCreateUserId()));
-            } catch (Exception e) {
-                logger.info("评论接入热度值出现异常:" + e);
             }
             eventAPI.commit(eventInfos);
         } catch (Exception e) {

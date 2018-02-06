@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.aliyun.jaq.AfsCheckManager;
 import com.yryz.common.config.VerifyCodeConfigVO;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.context.Context;
 import com.yryz.common.entity.AfsCheckRequest;
@@ -89,12 +90,17 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		}
 		try {
 			status = checkVerifyCodeSendTime(rangeConfigVo, codeDTO);
+			if(status != VerifyStatus.SUCCESS){
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(),status.getMsg(),ExceptionEnum.BusiException.getErrorMsg());
+			}
 			code = CommonUtils.getRandomNum(rangeConfigVo.getCodeNum());
 			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(),
 					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
 			infoModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE)));
 			persistenceDao.insert(infoModel);
+		} catch (QuanhuException e) {
+			throw new MysqlOptException(e);
 		} catch (Exception e) {
 			Logger.error("getVerifyCode", e);
 			throw new MysqlOptException(e);
