@@ -34,14 +34,4 @@ public interface ICategoryService {
 	 */
 	List<CategoryCheckedVo> findCategories();
 
-	/**
-	 * 设置用户标签分类(引导页 button 选好了)
-	 * @return
-	 */
-	public Integer save(String ids);
-
-//	/**
-//	 * 更新标签
-//	 */
-//	public Integer update(Category category);
 }

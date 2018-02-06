@@ -98,28 +98,4 @@ public class CategoryAPIImpl implements CategoryAPI {
             return ResponseUtils.returnException(e);
         }
     }
-
-    /**
-     * 设置用户标签分类(引导页 button 选好了)
-     *
-     * @return
-     */
-    @Override
-    public Response<String> save(String ids) {
-        try {
-
-            Integer result = categoryService.save(ids);
-
-            if (result > 0) {
-                return ResponseUtils.returnSuccess();
-            } else {
-                throw QuanhuException.busiError("设置用户标签分类不成功 result : " + result);
-            }
-        } catch (QuanhuException e) {
-            return ResponseUtils.returnException(e);
-        } catch (Exception e) {
-            logger.error("通过分类ID查找相关分类列表发生异常!", e);
-            return ResponseUtils.returnException(e);
-        }
-    }
 }

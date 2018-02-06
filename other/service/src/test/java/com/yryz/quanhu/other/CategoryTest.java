@@ -36,10 +36,4 @@ public class CategoryTest {
         Response<List<CategoryCheckedVo>> response = categoryAPI.recommend();
         System.out.println(JsonUtils.toFastJson(response));
     }
-
-    @Test
-    public void save() {
-        Response response = categoryAPI.save("3,4,5");
-        System.out.println(JsonUtils.toFastJson(response));
-    }
 }
