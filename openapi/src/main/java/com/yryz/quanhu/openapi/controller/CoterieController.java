@@ -56,7 +56,7 @@ public class CoterieController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
-    @PostMapping(value = "/{version}/coterieInfo/count")
+    @GetMapping(value = "/{version}/coterieInfo/count")
     public Response<Integer> getMyCoterieCount(@RequestHeader Long userId, HttpServletRequest request) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
