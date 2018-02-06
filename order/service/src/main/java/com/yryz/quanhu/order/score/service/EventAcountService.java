@@ -18,14 +18,5 @@ public interface EventAcountService {
 	
     String redislocksset(RedisTemplate<String, String> redisTemplate, String key, String value, String nxxx, String expx, long time );
 	  
-	/**
-	 * 
-	 * @param userId
-	 * @param score
-	 * @param eventCode
-	 * @return
-	 * @Description 消费积分
-	 */
-    int consumeScore(String userId , int score , String eventCode);
 
 }

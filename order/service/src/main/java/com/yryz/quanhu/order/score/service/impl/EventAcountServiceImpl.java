@@ -68,19 +68,6 @@ public class EventAcountServiceImpl implements EventAcountService {
 	}
 
 	
-	/**
-	 * 
-	 * @param userId
-	 * @param score
-	 * @param eventCode
-	 * @return
-	 * @Description 消费积分
-	 */
-	    
-	@Override
-	public int consumeScore(String userId, int score, String eventCode) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	
 
 }
