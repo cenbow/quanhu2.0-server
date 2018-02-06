@@ -41,6 +41,12 @@ import java.util.List;
 @Service
 public class AnswerServiceImpl implements AnswerService {
 
+    private static final Integer AUDIOLENGTH_MAX=180*1000;
+    private static final Integer AUDIOLENGTH_MIN=1*1000;
+
+    private static final Integer IMGS_MAX=30;
+    private static final Integer CONTENT_LENGTH_MAX=10000;
+
     @Autowired
     private AnswerDao answerDao;
 
@@ -85,7 +91,7 @@ public class AnswerServiceImpl implements AnswerService {
             throw  QuanhuException.busiError("音频回答和文字回答互斥");
         }
 
-        if(StringUtils.isNotBlank(answerAudio) && (audioLength.longValue()<1 || audioLength>180)){
+        if(StringUtils.isNotBlank(answerAudio) && (audioLength.longValue()<AUDIOLENGTH_MIN || audioLength>AUDIOLENGTH_MAX)){
             throw  QuanhuException.busiError("有音频回答，音频时长最少1秒最多180秒");
         }
 
@@ -93,12 +99,12 @@ public class AnswerServiceImpl implements AnswerService {
             throw  QuanhuException.busiError("无音频回答，应该无音频时长");
         }
 
-        if(StringUtils.isNotBlank(content) && content.length()>10000){
+        if(StringUtils.isNotBlank(content) && content.length()>CONTENT_LENGTH_MAX){
             throw  QuanhuException.busiError("文字最多10000字");
         }
 
 
-        if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>30){
+        if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>IMGS_MAX){
             throw  QuanhuException.busiError("图片最多上传30张");
         }
 
