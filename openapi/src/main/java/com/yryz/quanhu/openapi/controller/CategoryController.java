@@ -48,11 +48,4 @@ public class CategoryController {
         return categoryAPI.recommend();
     }
 
-    @NotLogin
-    @ApiOperation("设置用户标签分类(引导页 button 选好了)")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/other/category/save")
-    public Response save(String ids) {
-        return categoryAPI.save(ids);
-    }
 }
