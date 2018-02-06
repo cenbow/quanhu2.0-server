@@ -1,7 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.other.category.api.CategoryAPI;
