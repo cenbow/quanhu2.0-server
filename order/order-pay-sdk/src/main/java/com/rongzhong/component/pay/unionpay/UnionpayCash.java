@@ -82,7 +82,6 @@ public class UnionpayCash {
 				System.out.println("respCode:" + respCode);
 				if(("00").equals(respCode)){
 					//交易已受理(不代表交易已成功），等待接收后台通知确定交易成功，也可以主动发起 查询交易确定交易状态。
-					//TODO
 					
 					flag = true;
 					//如果返回卡号且配置了敏感信息加密，解密卡号方法：
@@ -98,14 +97,12 @@ public class UnionpayCash {
 						 ("34").equals(respCode) ||
 						 ("60").equals(respCode) ){
 					//后续需发起交易状态查询交易确定交易状态。
-					//TODO
 				}else{
 					//其他应答码为失败请排查原因
-					//TODO
 				}
 			}else{
 				LogUtil.writeErrorLog("验证签名失败");
-				//TODO 检查验证签名失败的原因
+				//检查验证签名失败的原因
 			}	
 		}else{
 			//未返回正确的http状态

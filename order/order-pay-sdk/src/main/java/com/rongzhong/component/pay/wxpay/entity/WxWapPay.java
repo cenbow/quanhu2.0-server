@@ -11,7 +11,7 @@ package com.rongzhong.component.pay.wxpay.entity;
  * @author yehao
  * @version 1.0
  * @date 2017年6月23日 上午8:59:59
- * @Description TODO (这里用一句话描述这个方法的作用)
+ * @Description 微信支付
  */
 public class WxWapPay {
 	
@@ -25,7 +25,6 @@ public class WxWapPay {
 	
 	public WxWapPay() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public WxWapPay(String tradeType, String prepayId, String packageId, String mwebUrl) {
