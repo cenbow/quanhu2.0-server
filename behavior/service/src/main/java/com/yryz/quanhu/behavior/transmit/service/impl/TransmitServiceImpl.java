@@ -114,6 +114,9 @@ public class TransmitServiceImpl implements TransmitService {
             if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
                 throw QuanhuException.busiError("资源不存在或者已删除");
             }
+            if(StringUtils.isNotBlank(resourceVo.getCoterieId())) {
+                throw QuanhuException.busiError("私圈内的资源不能转发");
+            }
             extJson = resourceVo.getExtJson();
         }
         Response<Long> idResult = idAPI.getSnowflakeId();

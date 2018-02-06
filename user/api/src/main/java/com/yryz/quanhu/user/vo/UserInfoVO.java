@@ -6,8 +6,7 @@ import java.io.Serializable;
  * @author zhangkun
  * @version 1.0
  * @date 2018/2/2
- * @description
- * 用户聚合数据
+ * @description 用户聚合数据
  */
 public class UserInfoVO implements Serializable {
 
@@ -32,7 +31,7 @@ public class UserInfoVO implements Serializable {
     /**
      * 积分事件信息
      */
-    private EventAccountVO eventAccount;
+    private EventAccountVO eventAccountInfo = new EventAccountVO();
 
     /**
      * 注册渠道信息
@@ -41,7 +40,8 @@ public class UserInfoVO implements Serializable {
     /**
      * 用户收入
      */
-    private String userOrderIntegralTotal;
+    private String userOrderIntegralTotal = "0";
+
     public UserBaseInfoVO getUserBaseInfo() {
         return userBaseInfo;
     }
@@ -66,12 +66,12 @@ public class UserInfoVO implements Serializable {
         this.userStarInfo = userStarInfo;
     }
 
-    public EventAccountVO getEventAccount() {
-        return eventAccount;
+    public EventAccountVO getEventAccountInfo() {
+        return eventAccountInfo;
     }
 
-    public void setEventAccount(EventAccountVO eventAccount) {
-        this.eventAccount = eventAccount;
+    public void setEventAccountInfo(EventAccountVO eventAccountInfo) {
+        this.eventAccountInfo = eventAccountInfo;
     }
 
     public UserRegLogVO getUserRegLog() {
@@ -82,11 +82,11 @@ public class UserInfoVO implements Serializable {
         this.userRegLog = userRegLog;
     }
 
-	public String getUserOrderIntegralTotal() {
-		return userOrderIntegralTotal;
-	}
+    public String getUserOrderIntegralTotal() {
+        return userOrderIntegralTotal;
+    }
 
-	public void setUserOrderIntegralTotal(String userOrderIntegralTotal) {
-		this.userOrderIntegralTotal = userOrderIntegralTotal;
-	}
+    public void setUserOrderIntegralTotal(String userOrderIntegralTotal) {
+        this.userOrderIntegralTotal = userOrderIntegralTotal;
+    }
 }

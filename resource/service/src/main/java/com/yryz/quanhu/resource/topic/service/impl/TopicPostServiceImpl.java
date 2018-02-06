@@ -90,25 +90,25 @@ public class TopicPostServiceImpl implements TopicPostService {
         String contentSource=topicPostDto.getContentSource();
         Topic topic=this.topicDao.selectByPrimaryKey(topicId);
         if(null==topic){
-            throw QuanhuException.busiError("跟帖的话题不存在");
+            throw QuanhuException.busiError("","跟帖的话题不存在","跟帖的话题不存在");
         }
         if(StringUtils.isNotBlank(imgUrl) && StringUtils.isNotBlank(viderUrl)){
-            throw QuanhuException.busiError("图片和视频不能同时发布");
+            throw QuanhuException.busiError("","图片和视频不能同时发布","图片和视频不能同时发布");
         }
         if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(viderUrl) && StringUtils.isBlank(content)){
-            throw QuanhuException.busiError("文本，视频，图片不能都为空");
+            throw QuanhuException.busiError("","文本，视频，图片不能都为空","图片和视频不能同时发布");
         }
 
         if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>30){
-            throw QuanhuException.busiError("图片不能超过30张");
+            throw QuanhuException.busiError("","图片不能超过30张","图片不能超过30张");
         }
 
         if(StringUtils.isNotBlank(content) && content.length()>10000){
-            throw QuanhuException.busiError("帖子输入不能超过10000的文字");
+            throw QuanhuException.busiError("","帖子输入不能超过10000的文字","帖子输入不能超过10000的文字");
         }
 
         if(StringUtils.isNotBlank(contentSource) && contentSource.length()>10000){
-            throw QuanhuException.busiError("帖子输入不能超过10000的文字");
+            throw QuanhuException.busiError("","帖子输入不能超过10000的文字","帖子输入不能超过10000的文字");
         }
 
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();

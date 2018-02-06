@@ -207,7 +207,7 @@ public class UserProvider implements UserApi{
 	@Override
 	public Response<String> getDeviceIdByUserId(Long userId) {
 		try {
-			if(userId == null || userId == 0l){
+			if(userId == null || userId == 0L){
 				throw QuanhuException.busiError("userId不能为空");
 			}
 			String devId = userService.getDeviceIdByUserId(userId);
