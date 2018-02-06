@@ -18,9 +18,7 @@ public interface TopicApi {
 
     public Response<PageList<TopicVo>> queryTopicList(TopicDto dto);
 
-    // TODO: 2018/1/30 0030  
     public Response<List<Long>> getKidByCreatedate(String startDate,String endDate);
 
-    // TODO: 2018/1/30 0030
     public Response<List<Topic>> getByKids(List<Long> kidList);
 }
