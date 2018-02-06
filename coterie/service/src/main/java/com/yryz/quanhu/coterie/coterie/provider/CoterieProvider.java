@@ -192,7 +192,7 @@ public class CoterieProvider implements CoterieApi {
 	 * @throws ServiceException
 	 */
 	@Override
-	public Response<List<CoterieInfo>> getMyCreateCoterie(String custId ) {
+	public Response<List<CoterieInfo>> getMyCreateCoterie(String custId,Integer pageNum,Integer pageSize) {
 		logger.info("CoterieApi.getMyCreateCoterie params: " + custId    );
 		if (StringUtils.isEmpty(custId)  ) {
 			ResponseUtils.returnCommonException("用户id不能为空 ");
@@ -214,13 +214,21 @@ public class CoterieProvider implements CoterieApi {
 				}
 			}
 			
+			List<CoterieInfo> sortList=Lists.newArrayList();
+			sortList.addAll(shangjia);
+			sortList.addAll(shenhezhong);
+			sortList.addAll(butongguo);
+			//手动分页
 			List<CoterieInfo> resultList=Lists.newArrayList();
-			resultList.addAll(shangjia);
-			resultList.addAll(shenhezhong);
-			resultList.addAll(butongguo);
-			fillCustInfo(list);
-			setMemberNum(list);
-			return ResponseUtils.returnListSuccess(list);
+			int start=(pageNum-1)*pageSize;
+			for (int i = start; i < pageSize; i++) {
+				if(i<sortList.size()){
+					resultList.add(sortList.get(i));
+				}
+			}
+			fillCustInfo(resultList);
+			setMemberNum(resultList);
+			return ResponseUtils.returnListSuccess(resultList);
 		} catch (Exception e) {
 			logger.error("getMyCreateCoterie", e);
 			return ResponseUtils.returnException(e);
@@ -523,5 +531,18 @@ public class CoterieProvider implements CoterieApi {
 		}
 	}
 
-}
+	@Override
+	public Response<List<CoterieInfo>> getCreateCoterie(String custId, Integer pageNum, Integer pageSize) {
+		logger.info("CoterieApi.getCreateCoterie custId:"+custId+",pageNum:" + pageNum+",pageSize:"+pageSize);
+		try {
+			List<CoterieInfo> list=coterieService.findCreateCoterie(custId, pageNum, pageSize);
+			setMemberNum(list);
+			fillCustInfo(list);
+			return ResponseUtils.returnListSuccess(list);
+		} catch (Exception e) {
+			logger.error("getCreateCoterie", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
 
+}

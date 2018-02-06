@@ -127,11 +127,39 @@ public class CoterieController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @GetMapping(value = "/{version}/coterieInfo/creator")
-    public Response<List<CoterieInfo>> getMyCreateCoterie(@RequestHeader Long userId) {
+    public Response<List<CoterieInfo>> getMyCreateCoterie(@RequestHeader Long userId,Integer currentPage, Integer pageSize) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
     	}
-        return coterieApi.getMyCreateCoterie(userId.toString());
+    	if(currentPage==null || currentPage<1){
+    		currentPage=1;
+    	}
+    	if(pageSize==null || pageSize<1){
+    		pageSize=100;
+    	}
+        return coterieApi.getMyCreateCoterie(userId.toString(),currentPage,pageSize);
+    }
+    
+    /**
+     * 个人主页圈主创建的私圈列表
+     * @return
+     */
+    @ApiOperation("个人主页圈主创建的私圈列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
+    @GetMapping(value = "/{version}/coterieInfo/createlist")
+    public Response<List<CoterieInfo>> getCreateCoterie(Long userId,Integer currentPage, Integer pageSize) {
+    	if(userId==null){
+    		return ResponseUtils.returnCommonException("参数错误");
+    	}
+    	if(currentPage==null || currentPage<1){
+    		currentPage=1;
+    	}
+    	if(pageSize==null || pageSize<1){
+    		pageSize=100;
+    	}
+        return coterieApi.getCreateCoterie(userId.toString(),currentPage,pageSize);
     }
 
     /**
@@ -139,7 +167,7 @@ public class CoterieController {
      *
      * @return
      */
-    @ApiOperation("获取我加入的私圈列表")
+    @ApiOperation("我加入的私圈列表或个人主页加入的私圈列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
