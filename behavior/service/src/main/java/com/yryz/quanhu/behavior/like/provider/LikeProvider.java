@@ -78,9 +78,6 @@ public class LikeProvider implements LikeApi {
     private EventAPI eventAPI;
 
     @Reference(check = false)
-    private HotSpotApi hotSpotApi;
-
-    @Reference(check = false)
     private MessageAPI messageAPI;
 
     @Reference(check = false)
@@ -185,13 +182,6 @@ public class LikeProvider implements LikeApi {
                         }
                         if(currentCount_<10){
                             eventInfos.add(eventInfo_);
-                        }
-
-                        try {
-                            hotSpotApi.saveHeat("1", String.valueOf(like.getResourceId()));
-                            hotSpotApi.saveHeat("2", String.valueOf(like.getUserId()));
-                        } catch (Exception e) {
-                            logger.info("评论接入热度值出现异常:" + e);
                         }
                         eventAPI.commit(eventInfos);
                     } catch (Exception e) {

@@ -92,6 +92,9 @@ public class CoterieInfo implements Serializable{
 	@ApiModelProperty("红点10:显示，11:不显示")
 	private Integer redDot;
 	
+	@ApiModelProperty("最大成员数")
+	private Integer maxMemberNum=2000;
+	
 	@ApiModelProperty("圈主信息")
     private  User  user;
 	
@@ -311,5 +314,14 @@ public class CoterieInfo implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public Integer getMaxMemberNum() {
+		return maxMemberNum;
+	}
+
+	public void setMaxMemberNum(Integer maxMemberNum) {
+		this.maxMemberNum = maxMemberNum;
+	}
+	
 }
 

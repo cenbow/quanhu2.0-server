@@ -88,9 +88,9 @@ public class UserController {
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/refreshToken")
-	public Response<AuthTokenVO> refreshToken(@RequestBody String refreshToken, HttpServletRequest request) {
+	public Response<AuthTokenVO> refreshToken(@RequestBody Map<String,String> params, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		AuthRefreshDTO refreshDTO = new AuthRefreshDTO(refreshToken, true);
+		AuthRefreshDTO refreshDTO = new AuthRefreshDTO(params.get("refreshToken"), true);
 		refreshDTO.setAppId(header.getAppId());
 		refreshDTO.setToken(header.getToken());
 		refreshDTO.setUserId(NumberUtils.createLong(header.getUserId()));

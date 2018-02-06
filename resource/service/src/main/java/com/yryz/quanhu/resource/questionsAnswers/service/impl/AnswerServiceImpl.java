@@ -200,7 +200,7 @@ public class AnswerServiceImpl implements AnswerService {
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(answerVo1.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.ANSWER));
-        resourceTotal.setUserId(questionCheck.getCreateUserId());
+        resourceTotal.setUserId(answerVo1.getCreateUserId());
         resourceTotal.setCoterieId(String.valueOf(coterieId));
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
 
@@ -294,9 +294,9 @@ public class AnswerServiceImpl implements AnswerService {
             if (null != createUserId) {
                 answerVo.setUser(apIservice.getUser(createUserId));
             }
+            answerVo.setModuleEnum(ModuleContants.ANSWER);
             return answerVo;
         }
         return null;
     }
-
 }

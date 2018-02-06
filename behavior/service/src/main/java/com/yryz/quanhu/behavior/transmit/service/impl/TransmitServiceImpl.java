@@ -25,6 +25,8 @@ import com.yryz.quanhu.behavior.transmit.service.TransmitService;
 import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.message.message.api.MessageAPI;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
@@ -82,6 +84,9 @@ public class TransmitServiceImpl implements TransmitService {
     @Reference(check = false, timeout = 30000)
     EventAPI eventAPI;
 
+    @Reference(check = false, timeout = 30000)
+    DymaicService dymaicService;
+
     /**
      * 转发
      * @param   transmitInfo
@@ -102,16 +107,30 @@ public class TransmitServiceImpl implements TransmitService {
             extJson = JsonUtils.toFastJson(coterieInfo);
         } else {
             try {
+                //如果转发的是动态，判断动态对应的状态是否正常
+                if(!transmitInfo.getResourceId().equals(transmitInfo.getParentId()) ) {
+                    Response<Dymaic> dymaicResponse = dymaicService.get(transmitInfo.getParentId());
+                    if(!dymaicResponse.success()) {
+                        throw QuanhuException.busiError("资源不存在或者已删除");
+                    }
+                    Dymaic dymaic = dymaicResponse.getData();
+                    if(dymaic == null
+                            || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
+                            || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
+                        throw QuanhuException.busiError("资源不存在或者已删除");
+                    }
+                }
+                //判断是否在资源库中存在
                 result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
                 if(!result.success()) {
                     throw QuanhuException.busiError("资源不存在或者已删除");
                 }
+                resourceVo = result.getData();
+                if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
             } catch (Exception e) {
                 logger.error("获取资源失败", e);
-                throw QuanhuException.busiError("资源不存在或者已删除");
-            }
-            resourceVo = result.getData();
-            if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
                 throw QuanhuException.busiError("资源不存在或者已删除");
             }
             if(StringUtils.isNotBlank(resourceVo.getCoterieId())) {

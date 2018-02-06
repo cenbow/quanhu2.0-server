@@ -198,8 +198,8 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public boolean checkRefreshFlag(Long userId, String appId, DevType devType) {
 		AuthConfig rangeConfig = getAuthConfig(appId);
-		long expireAt = rangeConfig.getTokenExpire().longValue() * 3600 * 1000 + System.currentTimeMillis();
-		return redisDao.getRefreshFlag(userId, appId, devType, expireAt) <= 1;
+		long expireTime = rangeConfig.getTokenExpire().longValue() * (3600/2) ;
+		return redisDao.getRefreshFlag(userId, appId, devType, expireTime) <= 1;
 	}
 
 	@Override
