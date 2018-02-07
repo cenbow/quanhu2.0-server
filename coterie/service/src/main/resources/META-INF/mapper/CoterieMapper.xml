@@ -384,7 +384,7 @@
     <include refid="Base_Column_List" />
     from qh_coterie where state=11 and shelve_flag=10  and deleted=10
     and member_num >= 50
-    ORDER BY `member_num` DESC
+    ORDER BY `member_num` DESC,create_date DESC
     limit 0,200
   </select>
 
