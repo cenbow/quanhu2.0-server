@@ -3,6 +3,7 @@ package com.yryz.quanhu.user.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import com.yryz.quanhu.user.entity.UserTag;
@@ -46,4 +47,6 @@ public interface UserTagService {
 
 
     List<UserTagDTO> getUserTags(Long userId);
+
+    List<UserTagDTO> getUserGroupConcatTags(Set<Long> userIds);
 }
