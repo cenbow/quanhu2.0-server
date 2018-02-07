@@ -311,12 +311,13 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
         AdminUserInfoDTO admin = new AdminUserInfoDTO();
         admin.setPhone(dto.getContactCall());                        //手机号
-        admin.setUserRole(11);                                       //只查询达人
         admin.setRealName(dto.getRealName());                        //真实姓名
+        admin.setUserRole(11);                                       //达人
         admin.setContactCall(dto.getContactCall());                  //联系方式
         admin.setAuthType(dto.getAuthType());                        //认证类型
         admin.setAuthWay(dto.getAuthWay());                          //认证方式
-        admin.setAuditStatus(dto.getAuditStatus());                  //认证状态
+        admin.setAuditStatus(dto.getAuditStatus());                  //认证状态  通过认证状态es查询是否为达人，如果是达人肯定存在审核信息
+
         if(dto.getUserLevel() != null ){                              //全部
             admin.setGrowLevel(String.valueOf(dto.getUserLevel().intValue()));  //用户等级
         }
@@ -409,6 +410,8 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
             Response<PageList<UserInfoVO>> rpc = elasticsearchService.adminSearchUser(admin);
             List<UserInfoVO> esArray = rpc.getData().getEntities();
 
+            logger.info("elasticsearchService result entities:{} , pageCount:{}",esArray.size(),rpc.getData().getCount());
+
             for(int i = 0 ; i < esArray.size() ; i++){
                 UserInfoVO infoVo = esArray.get(i);
                 StarAuthInfoVO auth = infoVo.getUserStarInfo();
@@ -431,7 +434,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
                 returnArray.add(authDto);
             }
 
-
+            logger.info("format result entities:{} ",returnArray.size());
 
             pageList.setEntities(returnArray);
             pageList.setPageSize(rpc.getData().getPageSize());
