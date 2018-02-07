@@ -45,7 +45,8 @@ public class CategoryAdminTest {
         CategorySearchAdminVo search = new CategorySearchAdminVo();
         search.setCurrentPage(1);
         search.setPageSize(20);
-        search.setParentKid(1L);
+        search.setParentKid(0L);
+        search.setCategoryStatus(20);
 
         Response<PageList<CategoryAdminVo>> response = categoryAdminAPI.findCategoryBySearch(search);
         System.out.println(JsonUtils.toFastJson(response));

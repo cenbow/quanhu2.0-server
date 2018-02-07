@@ -61,7 +61,8 @@ public class AdminActivityPrizesServiceImpl implements AdminActivityPrizesServic
 			} catch (Exception e) {
 				logger.error("查询用户信息异常",e);
 			}
-			if(users.success()&&users.getData().get(outActivityPrizes.getCreateUserId().toString())!=null){
+			if(null!=users&&
+					users.success()&&users.getData().get(outActivityPrizes.getCreateUserId().toString())!=null){
 				outActivityPrizes.setCustName(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getUserNickName());
 				outActivityPrizes.setCreateDate(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getCreateDate());
 				outActivityPrizes.setCustPhone(users.getData().get(outActivityPrizes.getCreateUserId().toString()).getUserPhone());
