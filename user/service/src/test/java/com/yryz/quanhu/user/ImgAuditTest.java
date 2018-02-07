@@ -1,14 +1,12 @@
 package com.yryz.quanhu.user;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Lists;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.JsonUtils;
@@ -27,12 +25,15 @@ public class ImgAuditTest {
 	@Test
 	public void imgAudit(){
 		//auditApi.auditImg(auditDTO, ImgAuditStatus.FAIL.getStatus());
-		List<UserImgAuditDTO> auditDTOs = new ArrayList<>();
-		UserImgAuditDTO auditDTO = new UserImgAuditDTO("737237750614581248", "https://cdn.yryz.com/pic/opus/FF366EFF-13A4-4101-B4F5-28D0CD7771AB_iOS.jpg",(byte)10);
-		UserImgAuditDTO auditDTO1 = new UserImgAuditDTO("749375104855851008", "https://cdn-qa.yryz.com/pic/hwq/c5bbb6c5b74b56c59d33592219cfe9c1.jpg",(byte)10);
-		auditDTOs.add(auditDTO1);
-		auditDTOs.add(auditDTO);
-		auditApi.batchAuditImg(auditDTOs, 12);
+		
+		UserImgAuditDTO auditDTO = new UserImgAuditDTO();
+		auditDTO.setKid(173493l);
+		auditDTO.setAuditStatus((byte)ImgAuditStatus.FAIL.getStatus());
+		auditDTO.setKids(Lists.newArrayList(173493l,173494l));
+		auditDTO.setUserIds(Lists.newArrayList(749375104855851008l,737237750614581248l));
+		//auditApi.batchAuditImg(auditDTO);
+		Response<Boolean> response = auditApi.auditImg(auditDTO);
+		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
 	//@Test

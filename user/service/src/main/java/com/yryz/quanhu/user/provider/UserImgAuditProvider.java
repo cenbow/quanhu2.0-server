@@ -14,7 +14,6 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
-import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.contants.Constants.ImgAuditStatus;
 import com.yryz.quanhu.user.dto.UserImgAuditDTO;
 import com.yryz.quanhu.user.dto.UserImgAuditFindDTO;
@@ -31,12 +30,11 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 	private UserImgAuditService imgService;
 	
 	@Override
-	public Response<Boolean> auditImg(UserImgAuditDTO record, Integer auditActionStatus) {
+	public Response<Boolean> auditImg(UserImgAuditDTO record) {
 		try {
-			checkDTO(record,auditActionStatus);
+			checkDTO(record);
 			UserImgAudit audit = GsonUtils.parseObj(record, UserImgAudit.class);
-			audit.setAuditStatus(auditActionStatus.byteValue());
-			imgService.auditImg(audit, auditActionStatus);
+			imgService.auditImg(audit,audit.getAuditStatus().intValue());
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -47,20 +45,10 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 	}
 
 	@Override
-	public Response<Boolean> batchAuditImg(List<UserImgAuditDTO> records, Integer auditActionStatus) {
+	public Response<Boolean> batchAuditImg(UserImgAuditDTO record) {
 		try {
-			if(CollectionUtils.isEmpty(records)){
-				throw QuanhuException.busiError("传参不合法");
-			}
-			if(auditActionStatus == null || auditActionStatus < ImgAuditStatus.NO_AUDIT.getStatus() || auditActionStatus > ImgAuditStatus.FAIL.getStatus()){
-				throw QuanhuException.busiError("操作类型不合法为空");
-			}
-			for(int i = 0 ; i < records.size();i++){
-				checkDTO(records.get(i),auditActionStatus);
-			}
-			
-			List<UserImgAudit> audit = GsonUtils.parseList(records, UserImgAudit.class);
-			imgService.batchAuditImg(audit, auditActionStatus);
+			checkDTOs(record);
+			imgService.batchAuditImg(record);
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -86,22 +74,30 @@ public class UserImgAuditProvider implements UserImgAuditApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-	private void checkDTO(UserImgAuditDTO auditDTO,Integer auditActionStatus){
+	private void checkDTO(UserImgAuditDTO auditDTO){
 		if (auditDTO == null){
 			throw QuanhuException.busiError("传参不合法");
 		}
-		if(StringUtils.isBlank(auditDTO.getUserId())){
-			throw QuanhuException.busiError("用户id为空");
+		if(auditDTO.getKid() == null ){
+			throw QuanhuException.busiError("kid为空");
 		}
-		if(StringUtils.isBlank(auditDTO.getUserImg())){
-			throw QuanhuException.busiError("用户头像为空");
-		}
-		if(auditDTO.getAuditStatus() == null || auditDTO.getAuditStatus() < ImgAuditStatus.NO_AUDIT.getStatus() || auditDTO.getAuditStatus() > ImgAuditStatus.FAIL.getStatus()){
-			throw QuanhuException.busiError("头像状态为空");
-		}
-		if(auditActionStatus == null || auditActionStatus < ImgAuditStatus.NO_AUDIT.getStatus() || auditActionStatus > ImgAuditStatus.FAIL.getStatus()){
+		if(auditDTO.getAuditStatus() == null || auditDTO.getAuditStatus() < ImgAuditStatus.SUCCESS.getStatus() || auditDTO.getAuditStatus() > ImgAuditStatus.FAIL.getStatus()){
 			throw QuanhuException.busiError("操作类型不合法为空");
 		}
 	}
 	
+	private void checkDTOs(UserImgAuditDTO auditDTO){
+		if (auditDTO == null){
+			throw QuanhuException.busiError("传参不合法");
+		}
+		if(CollectionUtils.isEmpty(auditDTO.getKids())){
+			throw QuanhuException.busiError("kid为空");
+		}
+		if(CollectionUtils.isEmpty(auditDTO.getUserIds())){
+			throw QuanhuException.busiError("userIds为空");
+		}
+		if(auditDTO.getAuditStatus() == null || auditDTO.getAuditStatus() < ImgAuditStatus.SUCCESS.getStatus() || auditDTO.getAuditStatus() > ImgAuditStatus.FAIL.getStatus()){
+			throw QuanhuException.busiError("操作类型不合法为空");
+		}
+	}
 }

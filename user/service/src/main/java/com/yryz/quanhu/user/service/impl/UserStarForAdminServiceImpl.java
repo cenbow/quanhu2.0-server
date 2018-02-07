@@ -152,12 +152,16 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         AdminUserInfoDTO admin = new AdminUserInfoDTO();
         admin.setPhone(dto.getContactCall());                        //手机号
         admin.setUserRole(11);                                       //只查询达人
+        admin.setRealName(dto.getRealName());                        //真实姓名
+        admin.setContactCall(dto.getContactCall());                  //联系方式
         admin.setAuthType(dto.getAuthType());                        //认证类型
         admin.setAuthWay(dto.getAuthWay());                          //认证方式
         admin.setAuditStatus(dto.getAuditStatus());                  //认证状态
         if(dto.getUserLevel() != null ){                              //全部
             admin.setGrowLevel(String.valueOf(dto.getUserLevel().intValue()));  //用户等级
         }
+
+        //日期区间查询，暂没实现
         admin.setApplyAuthBeginDate(dto.getBeginDate());             //申请认证时间
         admin.setApplyAuthEndDate(dto.getEndDate());                 //申请认证时间
         admin.setAppId(appId);
@@ -185,9 +189,10 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         AdminUserInfoDTO admin = new AdminUserInfoDTO();
 
         admin.setUserRole(11);                                      //达人
-        admin.setNickName("");                                      //昵称
+        admin.setRealName(dto.getRealName());                       //真实姓名
+        admin.setContactCall(dto.getContactCall());                 //联系方式
         admin.setRecommendStatus(dto.getRecommendStatus());         //推荐状态
-
+        admin.setTagIds(dto.getTagIds());                           //标签查询
         admin.setAppId(appId);
         admin.setPageNo(dto.getPageNo());
         admin.setPageSize(dto.getPageSize());
@@ -235,7 +240,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
                 authDto.setUserId(Long.parseLong(auth.getUserId()));
                 authDto.setAuthTime(auth.getAuthTime());
                 authDto.setCreateDate(infoVo.getUserBaseInfo().getCreateDate());
-                if(event!=null){
+                if(event!=null&&event.getGrowLevel()!=null){
                     authDto.setUserLevel(Integer.parseInt(event.getGrowLevel()));
                 }
                 returnArray.add(authDto);

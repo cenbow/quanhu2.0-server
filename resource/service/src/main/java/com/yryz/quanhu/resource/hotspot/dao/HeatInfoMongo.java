@@ -86,7 +86,7 @@ public class HeatInfoMongo extends AbsBaseMongoDAO<HeatInfo>{
 	public List<HeatInfo> getList(String type){
 		Query query = new Query();
 		Criteria criteria = new Criteria();
-		query.addCriteria(Criteria.where("type").is(type).andOperator(Criteria.where("heat").lt(0)));
+		query.addCriteria(Criteria.where("type").is(type).andOperator(Criteria.where("heat").gt(0)));
 		query.addCriteria(criteria);
 		return find(query);
 	}

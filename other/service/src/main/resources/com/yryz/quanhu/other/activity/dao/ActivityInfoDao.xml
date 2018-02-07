@@ -526,6 +526,11 @@
 		<if test="activityInfoDto.activityType != null and ''!=activityInfoDto.activityType">
 			AND activity_type = #{activityInfoDto.activityType}
 		</if>
+		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==11">
+			<![CDATA[
+	    	AND begin_time > NOW()
+	       ]]>
+		</if>
 		<if test="activityInfoDto.activityStatus != null and activityInfoDto.activityStatus==12">
 			<![CDATA[
 	    	AND end_time >= NOW()

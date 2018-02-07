@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,8 +35,10 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.service.AuthService;
 import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.vo.EventAcount;
+import com.yryz.quanhu.support.illegalWord.api.IllegalWordsApi;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
@@ -83,7 +87,11 @@ public class UserController {
 	private UserOperateApi operateApi;
 	@Reference
 	private EventAcountAPI eventApi;
-
+	@Reference
+	private IllegalWordsApi wordApi;
+	@Autowired
+	private AuthService authService;
+	
 	@ApiOperation("用户token刷新")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -109,7 +117,12 @@ public class UserController {
 		if (userId == null) {
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
-		} else {
+		} else if(userId != null && StringUtils.isBlank(header.getUserId())){
+			simpleVO = ResponseUtils
+					.getResponseData(userApi.getUserLoginSimpleVO(userId));
+		}//用户登录的情况下
+		else {
+			authService.checkToken(request);
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
 		}
@@ -123,6 +136,18 @@ public class UserController {
 	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		infoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
+		if(StringUtils.isNotBlank(infoDTO.getUserNickName())){
+			Set<String> set = ResponseUtils.getResponseData(wordApi.matchIllegalWords(infoDTO.getUserNickName()));
+			if(CollectionUtils.isNotEmpty(set)){
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "昵称存在敏感词:"+getStringBySet(set), ExceptionEnum.BusiException.getErrorMsg());
+			}
+		}
+		if(StringUtils.isNotBlank(infoDTO.getUserDesc())){
+			Set<String> set = ResponseUtils.getResponseData(wordApi.matchIllegalWords(infoDTO.getUserDesc()));
+			if(CollectionUtils.isNotEmpty(set)){
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "个人简介存在敏感词:"+getStringBySet(set), ExceptionEnum.BusiException.getErrorMsg());
+			}
+		}
 		Boolean result = ResponseUtils.getResponseData(userApi.updateUserInfo(infoDTO));
 		return ResponseUtils.returnApiObjectSuccess(result);
 	}
@@ -465,7 +490,7 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("活动检查手机号")
-	@UserBehaviorValidation(login = false)
+	@UserBehaviorValidation(login = true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/activityCheckPhone")
 	public Response<Boolean> activityCheckPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
@@ -646,5 +671,16 @@ public class UserController {
 				logDTO.getRegType(), logDTO.getActivityChannelCode() }, " ");
 		logDTO.setChannelCode(channelCode);
 		return logDTO;
+	}
+	
+	private static String getStringBySet(Set<String> set){
+		if(CollectionUtils.isNotEmpty(set)){
+			return set.toString().substring(1,set.toString().length()-1);
+		}
+		return "";
+	}
+	
+	public static void main(String[] args){
+		System.out.println(UserController.getStringBySet(Sets.newHashSet("dsdsd")));
 	}
 }
