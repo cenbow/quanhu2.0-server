@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
@@ -61,7 +62,7 @@ public class UserCoterieMemberValidFilter implements IBehaviorValidFilter{
         //非成员，或者圈主
         if(status!=MemberConstant.Permission.MEMBER.getStatus().intValue()
                 &&status!=MemberConstant.Permission.OWNER.getStatus().intValue()){
-            throw new QuanhuException("","","您非本私圈成员，不允许操作");
+            throw new QuanhuException(ExceptionEnum.COTERIE_NOT_MEMBER);
         }
         filterChain.execute();
     }
