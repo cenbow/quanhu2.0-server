@@ -132,6 +132,11 @@ public class ResourceTest {
 	}
 	
 	@Test
+	public void attenuation(){
+		calculationService.attenuation();
+	}
+	
+	@Test
 	public void sendToCanal(){
 		resourceCanalDao.sendToCannel("100001", 0L);
 	}
