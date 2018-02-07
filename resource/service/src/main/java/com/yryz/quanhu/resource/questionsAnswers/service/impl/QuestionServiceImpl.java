@@ -64,6 +64,10 @@ public class QuestionServiceImpl implements QuestionService {
     private static final Integer CONTENT_LENGTH_MAX = 300;
     private static final Integer CONTENT_LENGTH_MIN = 10;
 
+    private static final Integer CONTENT_SPLIT_LENGTH = 100;
+
+
+
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
@@ -436,7 +440,7 @@ public class QuestionServiceImpl implements QuestionService {
      */
     @Override
     public PageList<QuestionAnswerVo> queryQuestionAnswerList(QuestionDto dto) {
-        PageList<QuestionAnswerVo> questionAnswerVoPageList = new PageList<>();
+
         Long coteriaId = dto.getCoterieId();
         Long createUserId = dto.getCreateUserId();
         /**
@@ -445,9 +449,9 @@ public class QuestionServiceImpl implements QuestionService {
         if (null == coteriaId || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
+        Integer currentPage = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
-        Integer pageStartIndex = (pageNum - 1) * pageSize;
+        Integer pageStartIndex = (currentPage - 1) * pageSize;
         QuestionExample example = new QuestionExample();
         example.setPageStartIndex(pageStartIndex);
         example.setPageSize(pageSize);
@@ -463,7 +467,7 @@ public class QuestionServiceImpl implements QuestionService {
         Boolean isCoteriaOwner = checkIdentity(createUserId, coteriaId, MemberConstant.Permission.OWNER);
         if (isCoteriaOwner) {
             criteria.andTargetIdEqualTo(String.valueOf(createUserId));
-            example.setOrderByClause("answerd_flag asc,create_date desc");
+            example.setOrderByClause("answerd_flag asc,operate_shelve_date desc,create_date desc");
             criteria.andAnswerdFlagNotEqualTo(QuestionAnswerConstants.AnswerdFlag.REJECT_ANSWERED);
             criteria.andIsValidEqualTo(QuestionAnswerConstants.validType.YES);
         } else {
@@ -471,6 +475,11 @@ public class QuestionServiceImpl implements QuestionService {
             example.setOrderByClause("create_date desc");
         }
 
+        return this.queryListByQuestionExample(example,currentPage,pageSize);
+    }
+
+
+    private PageList<QuestionAnswerVo>  queryListByQuestionExample(QuestionExample example,Integer currentPage,Integer pageSize){
         List<Question> list = this.questionDao.selectByExampleWithBLOBs(example);
         List<QuestionAnswerVo> questionAnswerVos = new ArrayList<>();
         for (Question question : list) {
@@ -493,20 +502,32 @@ public class QuestionServiceImpl implements QuestionService {
                 questionVo.setStatistics(count);
             }
 
+            String questionContent=questionVo.getContent();
+            if(questionContent.length()>CONTENT_SPLIT_LENGTH){
+                String subQuestionContetn=questionContent.substring(0,CONTENT_SPLIT_LENGTH-1);
+                questionVo.setContent(subQuestionContetn);
+            }
+
             /**
              * 根据questionId 查询回答
              */
             if (QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag()) == 0) {
                 AnswerVo answerVo =
                         this.answerService.queryAnswerVoByquestionId(question.getKid());
+                if(null!=answerVo && answerVo.getContent()!=null){
+                    String content=answerVo.getContent();
+                    if(content.length()>CONTENT_SPLIT_LENGTH){
+                        answerVo.setContent(content.substring(0,CONTENT_SPLIT_LENGTH-1));
+                    }
+                }
                 questionAnswerVo.setAnswer(answerVo);
             }
             questionAnswerVo.setQuestion(questionVo);
             questionAnswerVos.add(questionAnswerVo);
         }
-
+        PageList<QuestionAnswerVo> questionAnswerVoPageList = new PageList<>();
         questionAnswerVoPageList.setCount(0L);
-        questionAnswerVoPageList.setCurrentPage(pageNum);
+        questionAnswerVoPageList.setCurrentPage(currentPage);
         questionAnswerVoPageList.setPageSize(pageSize);
         questionAnswerVoPageList.setEntities(questionAnswerVos);
         return questionAnswerVoPageList;
