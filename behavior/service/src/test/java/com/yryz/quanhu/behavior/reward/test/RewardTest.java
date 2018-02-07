@@ -1,7 +1,10 @@
 package com.yryz.quanhu.behavior.reward.test;
 
+import java.util.Date;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -12,6 +15,8 @@ import com.yryz.quanhu.behavior.reward.api.RewardInfoApi;
 import com.yryz.quanhu.behavior.reward.constants.RewardConstants.QueryType;
 import com.yryz.quanhu.behavior.reward.dto.RewardInfoDto;
 import com.yryz.quanhu.behavior.reward.entity.RewardInfo;
+import com.yryz.quanhu.behavior.reward.service.impl.RewardOrderNotifyService;
+import com.yryz.quanhu.order.sdk.dto.OutputOrder;
 
 /**
 * @author wangheng
@@ -24,6 +29,9 @@ public class RewardTest {
     @Reference
     RewardInfoApi rewardInfoApi;
 
+    @Autowired
+    RewardOrderNotifyService rewardOrderNotifyService;
+    
     /**  
     * @Description: 打赏发起
     * @author wangheng
@@ -73,5 +81,28 @@ public class RewardTest {
         dto.setQueryType(QueryType.my_reward_resource_list);
         dto.setCreateUserId(727447149320273920L);
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoApi.pageByCondition(dto, true)));
+    }
+    
+    /**  
+    * @Description: 打賞訂單回調
+    * @author wangheng
+    * @param @throws JsonProcessingException
+    * @return void
+    * @throws  
+    */
+    @Test
+    public void test003() throws JsonProcessingException {
+        OutputOrder outputOrder = new OutputOrder();
+        outputOrder.setBizContent(
+                "{\"createUserId\":730921949663453184,\"createDate\":null,\"lastUpdateUserId\":null,\"lastUpdateDate\":null,\"id\":null,\"kid\":null,\"rewardPrice\":null,\"rewardStatus\":null,\"giftId\":6,\"giftNum\":1,\"giftPrice\":100,\"orderId\":null,\"moduleEnum\":\"1005\",\"resourceId\":750261431486922752,\"coterieId\":0,\"toUserId\":747592865226702848,\"appId\":null,\"revision\":null}");
+        outputOrder.setCoterieId(0L);
+        outputOrder.setCreateDate(new Date());
+        outputOrder.setCreateUserId(730921949663453184L);
+        outputOrder.setModuleEnum("1005");
+        outputOrder.setResourceId(750261431486922752L);
+        outputOrder.setOrderId(20180207164694L);
+        outputOrder.setCost(100L);
+        outputOrder.setPayType(10);
+        rewardOrderNotifyService.notify(outputOrder);
     }
 }

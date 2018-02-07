@@ -1,8 +1,16 @@
 package com.yryz.quanhu.user.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.ResponseUtils;
@@ -23,6 +32,7 @@ import com.yryz.quanhu.user.contants.UserStarContants.StarAuthWay;
 import com.yryz.quanhu.user.contants.UserStarContants.StarRecommendStatus;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
 import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
+import com.yryz.quanhu.user.dao.UserStarRedisDao;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserBaseInfo.UserAuthStatus;
@@ -33,6 +43,7 @@ import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.manager.MessageManager;
 import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarService;
+import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
 /**
  * 用户达人管理
@@ -54,6 +65,8 @@ public class UserStarServiceImpl implements UserStarService {
 	private EventManager eventService;
 	@Autowired
 	MessageManager messageManager;
+	@Autowired
+	UserStarRedisDao redisDao;
 	// @Autowired
 	// private CircleRemote circleService;
 	@Autowired
@@ -107,7 +120,7 @@ public class UserStarServiceImpl implements UserStarService {
 	@Override
 	public List<UserStarAuth> get(List<String> custIds) {
 		try {
-			return persistenceDao.getByUserIds(custIds);
+			return persistenceDao.getByUserIds(custIds,null);
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.getByCustIds]", e);
 			throw new MysqlOptException(e);
@@ -127,6 +140,9 @@ public class UserStarServiceImpl implements UserStarService {
 				record.setAuthTime(new Date());
 			}
 			int result = persistenceDao.update(record);
+			
+			redisDao.delete(record.getUserId().toString());
+			
 			saveStarAuthLog(record);
 			if (record.getAuthWay() == StarAuthWay.ADMIN_SET.getWay()) {
 				updateUserStar(record.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
@@ -167,6 +183,9 @@ public class UserStarServiceImpl implements UserStarService {
 
 			}
 			int result = persistenceDao.update(reAuthModel);
+			
+			redisDao.delete(reAuthModel.getUserId().toString());
+			
 			saveStarAuthLog(reAuthModel);
 			if (reAuthModel.getAuthTime() != null) {
 				updateUserStar(reAuthModel.getUserId(), UserRole.STAR, UserAuthStatus.TRUE);
@@ -209,6 +228,8 @@ public class UserStarServiceImpl implements UserStarService {
 			authModel.setRecommendHeight((maxWeight == null ? 0 : maxWeight) + 10);
 		}
 		try {
+			redisDao.delete(authModel.getUserId().toString());
+			
 			return persistenceDao.update(authModel);
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.update]", e);
@@ -315,5 +336,57 @@ public class UserStarServiceImpl implements UserStarService {
 		}
 	}
 
-
+	@Override
+	public Map<String, UserStarSimpleVo> getStarSimple(Set<String> userIds) {
+		if(CollectionUtils.isEmpty(userIds)){
+			return null;
+		}
+		List<UserStarSimpleVo> simpleVos = getStarSimpleInfo(userIds);
+		Map<String, UserStarSimpleVo> map = new HashMap<>(userIds.size());
+		for(UserStarSimpleVo simpleVo : simpleVos){
+			if(simpleVo != null){
+				map.put(simpleVo.getUserId().toString(), simpleVo);
+			}
+		}
+		return map;
+	}
+	
+	/**
+	 * 获取达人信息
+	 * @param userIds
+	 * @return
+	 */
+	private List<UserStarSimpleVo> getStarSimpleInfo(Set<String> userIds){
+		List<UserStarSimpleVo> simpleVos = redisDao.get(userIds);
+		Set<String> nullUserId = new HashSet<>();
+		// 收集缓存不存在的用户id
+		for (Iterator<String> iterator = userIds.iterator(); iterator.hasNext();) {
+			Long userId = NumberUtils.createLong(iterator.next());
+			boolean nullFlag = true;
+			for (UserStarSimpleVo simpleVo : simpleVos) {
+				if (userId == simpleVo.getUserId()) {
+					nullFlag = false;
+				}
+			}
+			if (nullFlag) {
+				nullUserId.add(userId.toString());
+			}
+		}
+		if(CollectionUtils.isEmpty(simpleVos)){
+			simpleVos = new ArrayList<>(userIds.size());
+		}
+		if (CollectionUtils.isEmpty(nullUserId)) {
+			return simpleVos;
+		}
+		List<UserStarAuth> auths = persistenceDao.getByUserIds(Lists.newArrayList(userIds),StarAuditStatus.AUDIT_SUCCESS.getStatus());
+		if (CollectionUtils.isNotEmpty(auths)) {
+			redisDao.save(auths);
+		}
+		// 合并缓存的达人
+		if (CollectionUtils.isNotEmpty(auths)) {
+			List<UserStarSimpleVo> mysqlInfos = GsonUtils.parseList(auths, UserStarSimpleVo.class);
+			simpleVos.addAll(mysqlInfos);
+		}
+		return simpleVos;
+	}
 }

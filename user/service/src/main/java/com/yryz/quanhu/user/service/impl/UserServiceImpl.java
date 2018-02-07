@@ -62,6 +62,7 @@ import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
 /**
  * @author danshiyu
@@ -210,21 +211,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserSimpleVO getUserSimple(Long userId, Long friendId) {
-		// 查询单个用户基础信息
-		List<UserBaseInfo> baseInfos = getUserInfo(Sets.newHashSet(friendId.toString()));
-		if (CollectionUtils.isEmpty(baseInfos)) {
+		Map<String, UserSimpleVO> map = getUserSimple(userId, Sets.newHashSet(friendId.toString()));
+		if(MapUtils.isEmpty(map)){
 			return new UserSimpleVO();
 		}
-		UserBaseInfo baseInfo = baseInfos.get(0);
-		UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(baseInfo);
-		// 聚合关系数据
-		if (userId != null && userId != 0L) {
-			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
-			UserRelationDto relationDto = map.get(friendId.toString());
-			simpleVO.setNameNotes(relationDto.getUserRemarkName());
-			simpleVO.setRelationStatus(relationDto.getRelationStatus());
-		}
-		return simpleVO;
+		return map.get(friendId.toString());
 	}
 
 	@Override
@@ -234,6 +225,8 @@ public class UserServiceImpl implements UserService {
 		}
 		List<UserBaseInfo> list = getUserInfo(friendIds);
 		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
+		//聚合达人信息
+		Map<String, UserStarSimpleVo> starMap = starService.getStarSimple(friendIds);
 		Map<String, UserRelationDto> relationMap = null;
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
@@ -246,6 +239,12 @@ public class UserServiceImpl implements UserService {
 					UserRelationDto dto = relationMap.get(vo.getUserId().toString());
 					simpleVO.setNameNotes(dto.getUserRemarkName());
 					simpleVO.setRelationStatus(dto.getRelationStatus());
+				}
+				//聚合达人信息
+				if(MapUtils.isNotEmpty(starMap) && simpleVO.getUserRole() == UserRole.STAR.getRole()){
+					UserStarSimpleVo starSimpleVo = starMap.get(simpleVO.getUserId().toString());
+					simpleVO.setTradeField(starSimpleVo.getTradeField());
+					simpleVO.setRecommendDesc(starSimpleVo.getRecommendDesc());
 				}
 				map.put(vo.getUserId().toString(), simpleVO);
 			}
@@ -428,7 +427,7 @@ public class UserServiceImpl implements UserService {
 		if (CollectionUtils.isNotEmpty(mysqlInfos)) {
 			infos.addAll(mysqlInfos);
 		}
-		return mysqlInfos;
+		return infos;
 	}
 
 	/**
@@ -470,7 +469,7 @@ public class UserServiceImpl implements UserService {
 		if (CollectionUtils.isNotEmpty(mysqlInfos)) {
 			infos.addAll(mysqlInfos);
 		}
-		return mysqlInfos;
+		return infos;
 	}
 
 	/**

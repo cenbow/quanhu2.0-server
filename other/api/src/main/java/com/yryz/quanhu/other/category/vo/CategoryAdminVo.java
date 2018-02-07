@@ -14,14 +14,24 @@ public class CategoryAdminVo implements Serializable {
     private Long parentKid;
     private Integer recommend;
     private String categoryName;
-    /**
-     * 0 表示一级分类
-     */
     private Integer categoryStatus;
     private Integer categoryType;
     private Integer categorySort;
+    /**
+     * 下属二级分类数
+     */
+    private Integer subordinateNum;
+    /**
+     * 下属达人数
+     */
+    private Integer starNum;
 
     private Long createUserId;
+    /**
+     * 创建人
+     */
+    private String creator;
+
     private Date createDate;
     private Long lastUpdateUserId;
     private Date lastUpdateDate;
@@ -112,5 +122,29 @@ public class CategoryAdminVo implements Serializable {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public Integer getSubordinateNum() {
+        return subordinateNum;
+    }
+
+    public void setSubordinateNum(Integer subordinateNum) {
+        this.subordinateNum = subordinateNum;
+    }
+
+    public Integer getStarNum() {
+        return starNum;
+    }
+
+    public void setStarNum(Integer starNum) {
+        this.starNum = starNum;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }

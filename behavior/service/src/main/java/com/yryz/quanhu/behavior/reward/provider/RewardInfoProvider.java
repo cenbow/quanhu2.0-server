@@ -77,7 +77,10 @@ public class RewardInfoProvider implements RewardInfoApi {
             Assert.notNull(giftInfo, "打赏礼物不存在，giftId：" + record.getGiftId());
             Assert.isTrue(giftInfo.getGiftPrice().equals(record.getGiftPrice()), "打赏礼物价值与系统初始化礼物价值 不同！");
             Assert.isTrue(!record.getCreateUserId().equals(record.getToUserId()), "打赏人不允许 打赏自己的资源！");
-
+            
+            record.setRewardStatus(RewardConstants.reward_status_pay_not);
+            record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+            
             // 创建订单
             InputOrder inputOrder = new InputOrder();
             inputOrder.setBizContent(JsonUtils.toFastJson(record, "yyyy-MM-dd HH:mm:ss"));
@@ -95,8 +98,7 @@ public class RewardInfoProvider implements RewardInfoApi {
             Long orderId = orderSDK.createOrder(inputOrder);
 
             record.setOrderId(orderId);
-            record.setRewardStatus(RewardConstants.reward_status_pay_not);
-            record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
+
             rewardInfoService.insertSelective(record);
 
             Map<String, Object> result = new HashMap<>();

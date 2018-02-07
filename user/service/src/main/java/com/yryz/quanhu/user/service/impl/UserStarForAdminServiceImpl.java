@@ -11,6 +11,7 @@ import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserStarContants;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
 import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
+import com.yryz.quanhu.user.dao.UserStarRedisDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UserStarAuthDto;
 import com.yryz.quanhu.user.dto.UserTagDTO;
@@ -66,6 +67,8 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
     private EventManager eventManager;
     @Autowired
     private MessageManager messageManager;
+    @Autowired
+    private UserStarRedisDao userStarRedisDao;
 
     @Reference(check=false)
     private IdAPI idApi;
@@ -101,11 +104,13 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
          * 2,设置等级,成长值
          * 3,更新用户为达人标识
          * 4,同步达人审核日志记录
+         * 5,同步删除达人缓存
          */
         this.syncMessage(starAuth);
         this.syncUserRole(starAuth);
         this.syncUserGrowLevel(starAuth);
         this.syncUserStarAuthLog(starAuth);
+        this.syncDeleteRedis(starAuth);
 
         return updateCount==1?true:false;
     }
@@ -136,6 +141,15 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
         //更新达人数据库
         int updateCount = userStarAuthDao.updateRecommendStatus(starAuth);
+
+        /**
+         * 反查询达人用户信息，进行联动
+         */
+        starAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+        /**
+         *1,同步删除达人缓存
+         */
+        this.syncDeleteRedis(starAuth);
 
         return updateCount==1?true:false;
     }
@@ -251,6 +265,16 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         logger.info("syncUserStarAuthLog:{} finish", JSON.toJSON(logModel));
     }
 
+    /**
+     * 同步删除缓存
+     * @param starAuth
+     */
+    private void syncDeleteRedis(UserStarAuth starAuth){
+        logger.info("syncDeleteRedis:{} start",starAuth.getUserId());
+        userStarRedisDao.delete(String.valueOf(starAuth.getUserId()));
+        logger.info("syncDeleteRedis:{} finish",starAuth.getUserId());
+    }
+
     @Override
     public List<UserTagDTO> getTags(UserStarAuthDto dto) {
         List<UserTagDTO> outArray = new ArrayList<>();
@@ -311,12 +335,13 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
         AdminUserInfoDTO admin = new AdminUserInfoDTO();
         admin.setPhone(dto.getContactCall());                        //手机号
-        admin.setUserRole(11);                                       //只查询达人
         admin.setRealName(dto.getRealName());                        //真实姓名
+        admin.setUserRole(11);                                       //达人
         admin.setContactCall(dto.getContactCall());                  //联系方式
         admin.setAuthType(dto.getAuthType());                        //认证类型
         admin.setAuthWay(dto.getAuthWay());                          //认证方式
-        admin.setAuditStatus(dto.getAuditStatus());                  //认证状态
+        admin.setAuditStatus(dto.getAuditStatus());                  //认证状态  通过认证状态es查询是否为达人，如果是达人肯定存在审核信息
+
         if(dto.getUserLevel() != null ){                              //全部
             admin.setGrowLevel(String.valueOf(dto.getUserLevel().intValue()));  //用户等级
         }
@@ -409,6 +434,8 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
             Response<PageList<UserInfoVO>> rpc = elasticsearchService.adminSearchUser(admin);
             List<UserInfoVO> esArray = rpc.getData().getEntities();
 
+            logger.info("elasticsearchService result entities:{} , pageCount:{}",esArray.size(),rpc.getData().getCount());
+
             for(int i = 0 ; i < esArray.size() ; i++){
                 UserInfoVO infoVo = esArray.get(i);
                 StarAuthInfoVO auth = infoVo.getUserStarInfo();
@@ -431,7 +458,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
                 returnArray.add(authDto);
             }
 
-
+            logger.info("format result entities:{} ",returnArray.size());
 
             pageList.setEntities(returnArray);
             pageList.setPageSize(rpc.getData().getPageSize());

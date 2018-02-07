@@ -1,7 +1,9 @@
 package com.yryz.quanhu.message.common.im.yunxin;
 
+import com.yryz.common.appinfo.AppInfo;
 import com.yryz.common.context.Context;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.quanhu.message.common.utils.YunxinConfigUtils;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -27,13 +29,13 @@ import java.util.*;
  * @author Pxie
  */
 public class YunxinHttpClient {
-	
+
 	public static final String USER_CREATE = "https://api.netease.im/nimserver/user/create.action";
 	public static final String USER_UPDATE = "https://api.netease.im/nimserver/user/updateUinfo.action";
 	public static final String USER_GET = "https://api.netease.im/nimserver/user/getUinfos.action";
 	public static final String USER_BLOCK = "https://api.netease.im/nimserver/user/block.action";
 	public static final String USER_UNBLOCK = "https://api.netease.im/nimserver/user/unblock.action";
-	
+
 	public static final String FRIEND_ADD = "https://api.netease.im/nimserver/friend/add.action";
 	public static final String FRIEND_UPDATE = "https://api.netease.im/nimserver/friend/update.action";
 	public static final String FRIEND_DELETE = "https://api.netease.im/nimserver/friend/delete.action";
@@ -56,33 +58,37 @@ public class YunxinHttpClient {
 	public static final String TEAM_MUTETLISTALL = "https://api.netease.im/nimserver/team/muteTlistAll.action";
 
 
-	
+
 	private static Logger logger = LoggerFactory.getLogger(YunxinHttpClient.class);
-	
+
 	private static String appKey;
 	private static String appSecret;
     private static YunxinHttpClient client = null;
-	
-    private YunxinHttpClient(){
-		appKey = Context.getProperty("YUNXIN_APPKEY");
-		appSecret  = Context.getProperty("YUNXIN_APPSECRET");
-		
+
+    private YunxinHttpClient(YunxinConfig config){
+    	if (config != null) {
+    		appKey = config.getAppKey();
+    		appSecret = config.getAppSecret();
+		} else {
+			appKey = Context.getProperty("YUNXIN_APPKEY");
+			appSecret  = Context.getProperty("YUNXIN_APPSECRET");
+		}
+
 //		appKey = "6392d34d5e184ff729bd159c657634e6";
 //		appSecret = "941f7f877b46";
 
 //online
-//		appKey = "6206141b1378b670588546f5822cfb51"; 
+//		appKey = "6206141b1378b670588546f5822cfb51";
 //		appSecret = "011351144ee1";
 	}
-	
-    public static YunxinHttpClient getInstance() {
-    	if (client == null) {
-			client = new YunxinHttpClient();
-		}
 
-    	return client;
+    public static YunxinHttpClient getInstance() {
+        YunxinConfig config = YunxinConfigUtils.getYunxinConfig();
+        client = new YunxinHttpClient(config);
+
+        return client;
     }
-    
+
 	/**
 	 * 请求头
 	 * @param post
