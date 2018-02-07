@@ -113,6 +113,16 @@ public class Comment extends GenericEntity {
      * 多个kid的组合
      */
     private String kids;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private long createDateNew;
+
+    public long getCreateDateNew() {
+        return createDateNew;
+    }
+
+    public void setCreateDateNew(long createDateNew) {
+        this.createDateNew = createDateNew;
+    }
 
     public String getKids() {
         return kids;
