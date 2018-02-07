@@ -82,8 +82,8 @@ public class JPushService {
 									.addPlatformNotification(androidNotification).build())
 					.setOptions(Options.newBuilder().setApnsProduction(paramsDTO.getPushEvn()).build());
 		}
-		PushPayload payload = builder.build();
 		try {
+			PushPayload payload = builder.build();
 			PushResult result = jPushClient.sendPush(payload);
 			if (!result.isResultOK()) {
 				LOGGER.warn("all推送任务执行失败  msg:{}", paramsDTO.getMsg());
