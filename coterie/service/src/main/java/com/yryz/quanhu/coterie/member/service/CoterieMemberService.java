@@ -21,7 +21,6 @@ public interface CoterieMemberService {
 	 * @param reason 申请理由
 	 */
 	public CoterieMemberVoForJoin join(Long userId, Long coterieId, String reason);
-//	public void joinCoteriePay(Long userId, Long coterieId, String reason);
 
 	/**
 	 * 申请加入私圈  审批通过
@@ -85,18 +84,5 @@ public interface CoterieMemberService {
 	 * @param coterieId
 	 */
 	public Boolean isBanSpeak(Long userId, Long coterieId);
-//	/**
-//	 * 搜索 私圈成员
-//	 * @param param
-//	 * @return
-//	 */
-//	List<CoterieMemberInfo> find(MemberSearchParam param);
-//
-//	/**
-//	 * 搜索 私圈成员数量
-//	 * @param param
-//	 * @return
-//	 */
-//	Integer findCount(MemberSearchParam param);
 
 }
