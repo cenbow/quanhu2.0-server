@@ -35,6 +35,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.List;
+
 /**
  * @author yehao
  * @version 2.0
@@ -91,7 +93,7 @@ public class ResourceController {
         ResourceVo resourceVo = new ResourceVo();
         if (permiss == null || MemberConstant.Permission.STRANGER_NON_CHECK.getStatus() == permiss || MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + ",");
-                pageSize = 3;
+            pageSize = 3;
         } else if (MemberConstant.Permission.OWNER.getStatus() == permiss || MemberConstant.Permission.MEMBER.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + "," + ModuleContants.ANSWER + "," + ModuleContants.ACTIVITY_COTERIE);
         }
@@ -143,7 +145,17 @@ public class ResourceController {
             return ResponseUtils.returnException(QuanhuException.busiError("没有权限置顶此文章"));
         }
         resource.setSort(99999L);
-        resourceApi.updateResource(Lists.newArrayList(resource));
+        //查询当前私圈的置顶数据
+        ResourceVo resourceParam = new ResourceVo();
+        resourceParam.setSort(99999L);
+        resourceParam.setCoterieId(resource.getCoterieId());
+        List<ResourceVo> list = resourceApi.getResources(resourceParam, "", 0, 0, null, null).getData();
+        //将置顶数据取消置顶
+        for (ResourceVo rv : list) {
+            rv.setSort(0L);
+        }
+        list.add(resource);
+        resourceApi.updateResource(list);
         return ResponseUtils.returnSuccess();
     }
 
