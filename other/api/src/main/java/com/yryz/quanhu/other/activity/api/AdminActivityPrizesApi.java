@@ -29,6 +29,6 @@ public interface AdminActivityPrizesApi {
 	 * @return
 	 * @throws Exception
 	 */
-	Response<Integer> updateBatchUsed(Long[] ids)	throws	Exception;
+	Response<Integer> updateBatchUsed(Long[] ids);
 	
 }

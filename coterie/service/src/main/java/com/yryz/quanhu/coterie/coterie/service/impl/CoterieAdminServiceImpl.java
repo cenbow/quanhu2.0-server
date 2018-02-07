@@ -14,6 +14,8 @@ import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminService;
 import com.yryz.quanhu.coterie.coterie.vo.*;
+import com.yryz.quanhu.coterie.member.event.CoterieEventManager;
+import com.yryz.quanhu.coterie.member.event.CoterieMemberMessageManager;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -34,6 +36,7 @@ import java.util.List;
 public class CoterieAdminServiceImpl implements CoterieAdminService {
     @Resource
     private CoterieMapper coterieMapper;
+
     @Reference(check = false)
     private IdAPI idapi;
     @Reference(check = false)
@@ -42,6 +45,13 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
     private EventAPI eventAPI;
     @Reference(check = false)
     private UserApi userApi;
+
+    @Resource
+    private CoterieMemberMessageManager coterieMemberMessageManager;
+
+    @Resource
+    private CoterieEventManager coterieEventManager;
+
 
     @Override
     public PageList<CoterieInfo> queryCoterieByCoterieSearch(CoterieSearchParam param) {
@@ -71,7 +81,7 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
             if (result > 0) {
                 Coterie coterieDb = coterieMapper.selectByCoterieId(coterie.getCoterieId());
 
-                //进动态
+                //dynamic
                 ResourceTotal resourceTotal = new ResourceTotal();
                 resourceTotal.setCreateDate(DateUtils.getDate());
                 resourceTotal.setExtJson(JSON.toJSONString(coterieDb));
@@ -80,6 +90,10 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
                 resourceTotal.setUserId(NumberUtils.toLong(coterieDb.getOwnerId()));
                 resourceTotal.setCoterieId(String.valueOf(coterie.getCoterieId()));
                 resourceDymaicApi.commitResourceDymaic(resourceTotal);
+
+                //event
+                coterieEventManager.createCoterieEvent(coterie.getCoterieId());
+
             }
             return ResponseUtils.returnSuccess();
         } catch (Exception e) {

@@ -239,6 +239,8 @@
             <if test="topId!=null">
                 AND top_id=#{topId,jdbcType=BIGINT}
             </if>
+            ORDER BY
+            create_date DESC
         </where>
     </select>
 

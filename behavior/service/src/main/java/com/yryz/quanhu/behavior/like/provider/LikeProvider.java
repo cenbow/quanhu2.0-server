@@ -122,7 +122,7 @@ public class LikeProvider implements LikeApi {
                         } catch (Exception e) {
                             logger.info("调用用户接口失败:" + e);
                         }
-                        map.put("userId", likeVO.getUserId());
+                        map.put("userId", String.valueOf(likeVO.getUserId()));
                         map.put("createDate", likeVO.getCreateDate());
                     }
                     try {
