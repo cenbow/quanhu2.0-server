@@ -144,8 +144,13 @@ public class CommentProvider implements CommentApi {
                         commentSingle.setKid(commentVO.getKid());
                         commentSingle.setResourceId(commentVO.getResourceId());
                         commentSingle.setCreateUserId(commentVO.getCreateUserId());
-                        stringRedisTemplate.delete("COMMENT:" + commentVO.getModuleEnum() + ":" + commentVO.getKid() + "_" + commentVO.getTopId() + "_" + commentVO.getResourceId());
                         commentsBatch.add(commentSingle);
+                        try{
+                            stringRedisTemplate.delete("COMMENT:" + commentVO.getModuleEnum() + ":" + commentVO.getKid() + "_" + commentVO.getTopId() + "_" + commentVO.getResourceId());
+                        }catch (Exception e){
+                            logger.info("批量删除Redis评论失败");
+                        }
+
                     }
                     try{
                        int batchCount = commentService.updownBatch(commentsBatch);
