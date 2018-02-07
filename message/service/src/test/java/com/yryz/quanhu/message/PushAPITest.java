@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.context.Context;
+import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushConfigDTO;
@@ -40,7 +41,8 @@ public class PushAPITest {
         pushReqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
         for (int i = 0; i < 1; i++) {
             RpcContext.getContext().setAttachment(AppConstants.APP_ID, "vebff12m1762");
-            pushAPI.commonSendAlias(pushReqVo);
+            Response<Boolean> response = pushAPI.commonSendAlias(pushReqVo);
+            System.out.println("fwefe" + GsonUtils.parseJson(response));
         }
 //        PushConfigDTO dto = new PushConfigDTO();
 //        dto.setPushKey("4ca5c25ed02f766b715f8aa1");
