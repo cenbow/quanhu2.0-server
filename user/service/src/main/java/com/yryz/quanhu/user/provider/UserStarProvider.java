@@ -475,7 +475,7 @@ public class UserStarProvider implements UserStarApi {
 			throw QuanhuException.busiError("用户id不能为空");
 		}
 		if (authInfo.getAuthType() == null || authInfo.getAuthType().intValue() < StarAuthType.PERSON.getType()
-				|| authInfo.getAuthType() > StarAuthType.PERSON.getType()) {
+				|| authInfo.getAuthType() > StarAuthType.BUSSIESS.getType()) {
 			throw QuanhuException.busiError("认证类型不合法");
 		}
 		if (StringUtils.isBlank(authInfo.getTradeField()) || authInfo.getTradeField().length() < 1
