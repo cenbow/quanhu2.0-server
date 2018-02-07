@@ -93,7 +93,6 @@ public class TransmitServiceImpl implements TransmitService {
      * */
     public void single(TransmitInfo transmitInfo) {
         String extJson = "";
-        Response<ResourceVo> result = null;
         ResourceVo resourceVo = null;
         if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
@@ -121,7 +120,7 @@ public class TransmitServiceImpl implements TransmitService {
                     }
                 }
                 //判断是否在资源库中存在
-                result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
+                Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
                 if(!result.success()) {
                     throw QuanhuException.busiError("资源不存在或者已删除");
                 }
@@ -151,7 +150,9 @@ public class TransmitServiceImpl implements TransmitService {
         //发送动态
         this.sendDymaic(transmitInfo, extJson);
         //发送消息
-        this.sendMessage(transmitInfo.getTargetUserId(), transmitInfo, resourceVo);
+        if(resourceVo != null) {
+            this.sendMessage(transmitInfo.getTargetUserId(), transmitInfo, resourceVo);
+        }
         //提交事件
         this.sendEvent(transmitInfo, resourceVo);
         try {
@@ -317,11 +318,14 @@ public class TransmitServiceImpl implements TransmitService {
             event.setEventCode("6");
             event.setUserId(transmitInfo.getCreateUserId().toString());
             event.setResourceId(transmitInfo.getResourceId().toString());
-            event.setOwnerId(resourceVo.getUserId() != null ? resourceVo.getUserId().toString() : null);
             event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
-            if (StringUtils.isNotEmpty(resourceVo.getCoterieId()) ) {
-                event.setCoterieId(resourceVo.getCoterieId());
+            if(resourceVo != null) {
+                event.setOwnerId(resourceVo.getUserId() != null ? resourceVo.getUserId().toString() : null);
+                if (StringUtils.isNotEmpty(resourceVo.getCoterieId()) ) {
+                    event.setCoterieId(resourceVo.getCoterieId());
+                }
             }
+
             eventAPI.commit(event);
         } catch (Exception e) {
             logger.error("提交event 失败", e);
