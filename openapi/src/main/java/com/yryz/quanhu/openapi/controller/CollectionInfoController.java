@@ -2,8 +2,8 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Maps;
+import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
-import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -42,7 +42,8 @@ public class CollectionInfoController {
      * @param collectionInfoDto
      * @return
      */
-    @UserBehaviorValidation(login = true)
+    @UserBehaviorValidation(login = true, isCoterieMember = true)
+    @UserBehaviorArgs(coterieId = "object.CollectionInfo.coterieId")
     @ApiOperation("收藏")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/collection/single")
