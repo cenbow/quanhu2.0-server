@@ -264,6 +264,8 @@ public class TransmitServiceImpl implements TransmitService {
             messageVo.setActionCode(constant.getMessageActionCode());
             String content = null;
             boolean isPush = true;
+            String moduleEnum = resourceVo.getModuleEnum();
+            String resourceId = resourceVo.getResourceId();
             if(ModuleContants.RELEASE.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的内容。";
             } else if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
@@ -273,6 +275,8 @@ public class TransmitServiceImpl implements TransmitService {
                 if(!transmitInfo.getParentId().equals(transmitInfo.getResourceId()) ) {
                     content = user.getUserNickName()+"转发了您的动态。";
                     isPush = false;
+                    moduleEnum = ModuleContants.DYNAMIC;
+                    resourceId = transmitInfo.getParentId().toString();
                 }
             }
             messageVo.setContent(content);
@@ -282,20 +286,18 @@ public class TransmitServiceImpl implements TransmitService {
             messageVo.setTitle(constant.getTitle());
             messageVo.setToCust(userId.toString());
             messageVo.setViewCode(constant.getMessageViewCode());
-            messageVo.setResourceId(resourceVo.getResourceId());
-            messageVo.setModuleEnum(resourceVo.getModuleEnum());
+            messageVo.setResourceId(resourceId);
+            messageVo.setModuleEnum(moduleEnum);
             InteractiveBody body = new InteractiveBody();
-            if(resourceVo != null) {
-                String title = resourceVo.getTitle();
-                if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
-                    if(!StringUtils.isEmpty(title) && title.length() > 20 ) {
-                        title = title.substring(0, 20);
-                    }
+            String title = resourceVo.getTitle();
+            if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
+                if(!StringUtils.isEmpty(title) && title.length() > 20 ) {
+                    title = title.substring(0, 20);
                 }
-                body.setBodyTitle(title);
-                RemoteResource convert = RemoteResourceUtils.convert(resourceVo);
-                body.setBodyImg(convert != null ? convert.getImgUrl() : null);
             }
+            body.setBodyTitle(title);
+            RemoteResource convert = RemoteResourceUtils.convert(resourceVo);
+            body.setBodyImg(convert != null ? convert.getImgUrl() : null);
             messageVo.setBody(body);
             messageAPI.sendMessage(messageVo, isPush);
         } catch (Exception e) {
