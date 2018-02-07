@@ -36,6 +36,10 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private String nickName;
 	/**
+	 * 真实姓名
+	 */
+	private String realName;
+	/**
 	 * 是否马甲 不为空即搜索马甲
 	 */
 	private String isVest;
@@ -43,6 +47,11 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 手机号
 	 */
 	private String phone;
+
+	/**
+	 * 达人联系方式
+	 */
+	private String contactCall;
 	/**
 	 * 注册起始时间
 	 */
@@ -116,6 +125,21 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private Boolean needIntegral = false;
 
+	public String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
+	public String getContactCall() {
+		return contactCall;
+	}
+
+	public void setContactCall(String contactCall) {
+		this.contactCall = contactCall;
+	}
 
 	public String getDataSource() {
 		return dataSource;

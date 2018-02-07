@@ -181,7 +181,7 @@ public class RewardInfoProvider implements RewardInfoApi {
                         UserSimpleVO userVo = null;
                         if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())) {
                             userVo = userMap.get(String.valueOf(info.getToUserId()));
-                        } else if (RewardConstants.QueryType.reward_my_user_list.equals(dto.getQueryType())) {
+                        } else {
                             userVo = userMap.get(String.valueOf(info.getCreateUserId()));
                         }
                         info.setUser(userVo);
