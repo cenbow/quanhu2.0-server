@@ -3,11 +3,15 @@ package com.yryz.quanhu.resource.release.config.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.resource.release.config.dao.ReleaseConfigDao;
 import com.yryz.quanhu.resource.release.config.entity.ReleaseConfig;
 import com.yryz.quanhu.resource.release.config.service.ReleaseConfigService;
@@ -24,6 +28,16 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
     @Autowired
     private ReleaseConfigDao ReleaseConfigDao;
 
+    protected RedisTemplate<String, Object> redisTemplate;
+    
+    @Autowired
+    protected RedisTemplateBuilder redisTemplateBuilder;
+    
+    @PostConstruct
+    public void init(){
+        redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
+    }
+    
     public ReleaseConfigDao getDao() {
         return this.ReleaseConfigDao;
     }
