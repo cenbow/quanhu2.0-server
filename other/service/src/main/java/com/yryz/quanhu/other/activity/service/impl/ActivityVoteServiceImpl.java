@@ -101,7 +101,6 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         } else {
             activityInfoVo.setJoinFlag(10);
         }
-        //TODO:判断用户是否禁言
         //设置已参与人数
         Object joinCount = stringRedisTemplate.opsForHash().get(ActivityVoteConstants.getKeyConfig(activityInfoVo.getKid()), "joinCount");
         activityInfoVo.setJoinCount( joinCount != null ? Integer.valueOf(joinCount.toString()) : 0);
