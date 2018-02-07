@@ -86,8 +86,6 @@ public class CoterieMemberController {
 
     }
 
-
-
     @ApiOperation("获取用户禁言或私圈内禁言的权限")
     @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)

@@ -278,6 +278,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     public Integer permission(Long userId, Long coterieId) {
 
         try {
+
+            if (userId == null ) {
+                return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
+            }
             CoterieInfo coterie = coterieService.find(coterieId);
             Long ownerId = Long.parseLong(coterie.getOwnerId());
 
@@ -333,6 +337,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
 
+            String reason = "";
+
+            if (null != memberApply) {
+               reason = memberApply.getReason();
+            }
+
             if (memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
                 saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
 
@@ -342,7 +352,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 //todo
                 Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
                 if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
-                    saveOrUpdateMember(userId, coterieId, memberApply.getReason(), joinType);
+                    saveOrUpdateMember(userId, coterieId, reason, joinType);
                 }
 
                 //todo event
