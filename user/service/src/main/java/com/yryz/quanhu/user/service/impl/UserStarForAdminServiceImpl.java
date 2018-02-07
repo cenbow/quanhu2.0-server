@@ -11,6 +11,7 @@ import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserStarContants;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
 import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
+import com.yryz.quanhu.user.dao.UserStarRedisDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UserStarAuthDto;
 import com.yryz.quanhu.user.dto.UserTagDTO;
@@ -66,6 +67,8 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
     private EventManager eventManager;
     @Autowired
     private MessageManager messageManager;
+    @Autowired
+    private UserStarRedisDao userStarRedisDao;
 
     @Reference(check=false)
     private IdAPI idApi;
@@ -101,11 +104,13 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
          * 2,设置等级,成长值
          * 3,更新用户为达人标识
          * 4,同步达人审核日志记录
+         * 5,同步删除达人缓存
          */
         this.syncMessage(starAuth);
         this.syncUserRole(starAuth);
         this.syncUserGrowLevel(starAuth);
         this.syncUserStarAuthLog(starAuth);
+        this.syncDeleteRedis(starAuth);
 
         return updateCount==1?true:false;
     }
@@ -136,6 +141,15 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
         //更新达人数据库
         int updateCount = userStarAuthDao.updateRecommendStatus(starAuth);
+
+        /**
+         * 反查询达人用户信息，进行联动
+         */
+        starAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+        /**
+         *1,同步删除达人缓存
+         */
+        this.syncDeleteRedis(starAuth);
 
         return updateCount==1?true:false;
     }
@@ -249,6 +263,16 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         userStarAuthLogDao.insert(logModel);
 
         logger.info("syncUserStarAuthLog:{} finish", JSON.toJSON(logModel));
+    }
+
+    /**
+     * 同步删除缓存
+     * @param starAuth
+     */
+    private void syncDeleteRedis(UserStarAuth starAuth){
+        logger.info("syncDeleteRedis:{} start",starAuth.getUserId());
+        userStarRedisDao.delete(String.valueOf(starAuth.getUserId()));
+        logger.info("syncDeleteRedis:{} finish",starAuth.getUserId());
     }
 
     @Override
