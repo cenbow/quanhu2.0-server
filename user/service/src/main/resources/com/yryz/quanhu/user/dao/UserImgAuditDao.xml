@@ -20,7 +20,20 @@
 		create_date,
 		last_update_date
 	</sql>
-
+	
+	<select id="findByUserId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from qh_user_img_audit
+		where 1=1 
+		<if test="kid != null">
+		   and kid = #{kid}
+		</if>
+		<if test="userId != null">
+		   and user_id = #{userId}
+		</if>
+	</select>
+	
 	<select id="listByUserId" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
@@ -129,6 +142,26 @@
 				operational = #{operational,jdbcType=VARCHAR},
 			</if>
 		</set>
-		where user_id = #{userId}
+		where kid = #{kid}
+	</update>
+	
+	<update id="batchUpdate">
+		update qh_user_img_audit
+		<set>
+			<if test="auditStatus != null">
+				audit_status = #{auditStatus},
+			</if>
+			<if test="operational != null">
+				operational = #{operational},
+			</if>
+			<if test="lastUpdateUserId != null">
+				last_update_user_id = #{lastUpdateUserId},
+			</if>
+		</set>
+		where kid in
+		<foreach item="item" index="index" collection="kids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
 	</update>
 </mapper>

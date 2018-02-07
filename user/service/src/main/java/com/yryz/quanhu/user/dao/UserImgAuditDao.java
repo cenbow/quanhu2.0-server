@@ -31,7 +31,15 @@ public interface UserImgAuditDao {
 	 * @param record
 	 * @return
 	 */
-	int batchSave(@Param("imgAudits")List<UserImgAudit> imgAudits);
+	int batchSave(@Param("imgAudits") List<UserImgAudit> imgAudits);
+
+	/**
+	 * 查询用户头像审核信息
+	 * 
+	 * @param kid
+	 * @return
+	 */
+	UserImgAudit findByUserId(@Param("kid") Long kid, @Param("userId") Long userId);
 
 	/**
 	 * 查询头像审核信息
@@ -57,13 +65,14 @@ public interface UserImgAuditDao {
 	 * @param updateTime
 	 * @return
 	 */
-	int batchUpdate(@Param("userIds") List<Long> userIds, @Param("auditStatus") Integer auditStatus,
-			@Param("updateTime") Date updateTime);
-	
+	int batchUpdate(@Param("kids") List<Long> kids, @Param("auditStatus") Integer auditStatus,
+			@Param("operational") String operational, @Param("lastUpdateUserId") Long lastUpdateUserId);
+
 	/**
 	 * 删除头像审核信息
+	 * 
 	 * @param userId
 	 * @return
 	 */
-	int delete(@Param("userId")Long userId);
+	int delete(@Param("userId") Long userId);
 }
