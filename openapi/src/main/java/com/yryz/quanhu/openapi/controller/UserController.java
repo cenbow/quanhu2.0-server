@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +34,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.service.AuthService;
 import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.user.contants.RegType;
@@ -83,7 +85,9 @@ public class UserController {
 	private UserOperateApi operateApi;
 	@Reference
 	private EventAcountAPI eventApi;
-
+	@Autowired
+	private AuthService authService;
+	
 	@ApiOperation("用户token刷新")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -109,7 +113,12 @@ public class UserController {
 		if (userId == null) {
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
-		} else {
+		} else if(userId != null && StringUtils.isBlank(header.getUserId())){
+			simpleVO = ResponseUtils
+					.getResponseData(userApi.getUserLoginSimpleVO(userId));
+		}//用户登录的情况下
+		else {
+			authService.checkToken(request);
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
 		}
@@ -465,7 +474,7 @@ public class UserController {
 	 * @return
 	 */
 	@ApiOperation("活动检查手机号")
-	@UserBehaviorValidation(login = false)
+	@UserBehaviorValidation(login = true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/activityCheckPhone")
 	public Response<Boolean> activityCheckPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
