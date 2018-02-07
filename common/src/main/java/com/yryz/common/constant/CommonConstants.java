@@ -53,9 +53,9 @@ public class CommonConstants {
 	/**
 	 * web 端dev类型
 	 */
-	public static final String DEV_TYPE_ANROID = "2";
-	public static final String DEV_TYPE_IOS = "1";
-	public static final String DEV_TYPE_PC = "3";
+	public static final String DEV_TYPE_ANROID = "12";
+	public static final String DEV_TYPE_IOS = "11";
+	public static final String DEV_TYPE_PC = "13";
 
     /**
      * 上架
