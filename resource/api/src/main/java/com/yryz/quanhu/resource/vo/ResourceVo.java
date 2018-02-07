@@ -122,6 +122,11 @@ public class ResourceVo implements Serializable {
     private String recommend;
     
     /**
+     * 私密状态：10非私密，11私密状态
+     */
+    private String intimate;
+    
+    /**
      * 扩展字段，仅供展示使用，由前端的发布方和列表解析方解决
      */
     private String extJson;
@@ -392,6 +397,20 @@ public class ResourceVo implements Serializable {
 	 */
 	public void setRecommend(String recommend) {
 		this.recommend = recommend;
+	}
+	
+	/**
+	 * @return the intimate
+	 */
+	public String getIntimate() {
+		return intimate;
+	}
+
+	/**
+	 * @param intimate the intimate to set
+	 */
+	public void setIntimate(String intimate) {
+		this.intimate = intimate;
 	}
 
 	/**

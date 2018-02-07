@@ -55,5 +55,15 @@ public class ResourceEnum {
 	 */
 	public static String PUBLIC_STATE_FALSE = "10";
 	
+    /**
+     * 私密状态：11私密
+     */
+    public static  String INTIMATE_TRUE = "11";
+    
+    /**
+     * 私密状态：10非私密
+     */
+    public static  String INTIMATE_FALSE = "10";
+	
 
 }

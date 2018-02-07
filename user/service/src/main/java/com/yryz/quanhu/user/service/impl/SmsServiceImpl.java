@@ -3,9 +3,12 @@
  */
 package com.yryz.quanhu.user.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.StringUtils;
@@ -18,40 +21,46 @@ import com.yryz.quanhu.user.service.AccountService;
 import com.yryz.quanhu.user.service.SmsService;
 import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 
-
 /**
- * @author danshiyu
- * 短信验证码管理
+ * @author danshiyu 短信验证码管理
  */
 @Service
-public class SmsServiceImpl implements SmsService{
-	
+public class SmsServiceImpl implements SmsService {
+	private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
 	@Autowired
 	private SmsManager smsManager;
 	@Autowired
 	private AccountService accountService;
-	
+
 	@Override
 	public SmsVerifyCodeVO sendVerifyCode(SmsVerifyCodeDTO codeDTO) {
 		SmsVerifyCodeVO result = null;
 		String msg = null;
 		boolean accountFlag = true;
-		
-		if(codeDTO.getUserId() == null){
-		   accountFlag = accountService.checkUserByPhone(codeDTO.getPhone(),codeDTO.getAppId());
-		}else{
-		   UserAccount account = accountService.getUserAccountByUserId(codeDTO.getUserId());
-		   if(account == null){
-			   throw QuanhuException.busiError("用户不存在");
-		   }
-		   if(StringUtils.isBlank(account.getUserPhone())){
-			   throw QuanhuException.busiError("手机号码不存在");
-		   }
-		   codeDTO.setPhone(account.getUserPhone());
+
+		if (codeDTO.getUserId() == null) {
+			if (codeDTO.getCode().equals(SmsContants.CODE_FIND_PWD)) {
+				logger.info("[send_verify_code]:type:找回登录密码,params:{}", JSON.toJSON(codeDTO));
+			}
+			accountFlag = accountService.checkUserByPhone(codeDTO.getPhone(), codeDTO.getAppId());
+		} else {
+			UserAccount account = accountService.getUserAccountByUserId(codeDTO.getUserId());
+
+			if (account == null) {
+				throw QuanhuException.busiError("用户不存在");
+			}
+			if (StringUtils.isBlank(account.getUserPhone())) {
+				throw QuanhuException.busiError("手机号码不存在");
+			}
+			if (codeDTO.getCode().equals(SmsContants.CODE_FIND_PWD)) {
+				logger.info("[send_verify_code]:type:设置登录密码,params:{},account:{}", JSON.toJSON(codeDTO),
+						JSON.toJSON(account));
+			}
+			codeDTO.setPhone(account.getUserPhone());
 		}
-		
+
 		SmsType smsType = null;
-		if(StringUtils.equals(codeDTO.getCode(), SmsContants.CODE_LOGIN)){
+		if (StringUtils.equals(codeDTO.getCode(), SmsContants.CODE_LOGIN)) {
 			smsType = accountFlag ? SmsType.CODE_LOGIN : SmsType.CODE_REGISTER;
 		}
 		if (codeDTO.getCode() == null) {
@@ -62,18 +71,18 @@ public class SmsServiceImpl implements SmsService{
 				smsType = SmsType.CODE_REGISTER;
 				msg = !accountFlag ? null : "该手机号已注册";
 				break;
-			case SmsContants.CODE_CHANGE_PHONE:		
+			case SmsContants.CODE_CHANGE_PHONE:
 				smsType = SmsType.CODE_CHANGE_PHONE;
 				msg = !accountFlag ? null : "该手机号已注册";
 				break;
 			case SmsContants.CODE_THIRD_PHONE:
 				smsType = SmsType.CODE_THIRD_PHONE;
 				msg = !accountFlag ? null : "该手机号已注册";
-				break;	
-			case SmsContants.ACTIVITY_PHONE_CHECK:	
+				break;
+			case SmsContants.ACTIVITY_PHONE_CHECK:
 				smsType = SmsType.ACTIVITY_BIND_PHONE;
 				msg = !accountFlag ? null : "该手机号已注册";
-				break;	
+				break;
 			case SmsContants.CODE_FIND_PWD:
 				smsType = SmsType.CODE_FIND_PWD;
 				msg = !accountFlag ? "该手机用户不存在" : null;
@@ -94,46 +103,43 @@ public class SmsServiceImpl implements SmsService{
 				smsType = SmsType.CODE_CHANGE_PAYPWD;
 				msg = !accountFlag ? "该手机用户不存在" : null;
 				break;
-			case SmsContants.CODE_OTHER:	
+			case SmsContants.CODE_OTHER:
 				smsType = SmsType.CODE_OTHER;
 				break;
-			
+
 			default:
 				break;
 			}
 		}
 
 		if (msg != null) {
-			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,ExceptionEnum.BusiException.getErrorMsg());
+			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), msg,
+					ExceptionEnum.BusiException.getErrorMsg());
 		}
-		result = this.smsManager.sendCode(codeDTO.getPhone(), smsType,codeDTO.getAppId());
+		result = this.smsManager.sendCode(codeDTO.getPhone(), smsType, codeDTO.getAppId());
 		return result;
 	}
 
 	@Override
-	public boolean checkVerifyCode(String phone, String code, String verifyCode,String appId) {
-		return smsManager.checkVerifyCode(phone, verifyCode, code,appId,false);
+	public boolean checkVerifyCode(String phone, String code, String verifyCode, String appId) {
+		return smsManager.checkVerifyCode(phone, verifyCode, code, appId, false);
 	}
 
-	/*@Override
-	public void saveIpSendVerifyCodeCount(Map<String,Object> params) {
-		smsManager.saveIpSendVerifyCodeCount(WebUtil.getClientIP(params));
-	}
-
-	@Override
-	public boolean checkIpSendVerifyCodeLimit(Map<String,Object> params) {
-		return smsManager.checkIpSendVerifyCodeLimit(WebUtil.getClientIP(params));
-	}
-
-	@Override
-	public void getSmsImgCode(String phone, HttpServletResponse response) {
-		String code = smsManager.getSmsImgCode(phone);
-		CommonUtils.getSmsImgByCode(code, response);
-	}
-
-	@Override
-	public boolean checkSmsImgCode(String phone, String code) {
-		return smsManager.checkSmsImgCode(phone, code);
-	}*/
+	/*
+	 * @Override public void saveIpSendVerifyCodeCount(Map<String,Object>
+	 * params) {
+	 * smsManager.saveIpSendVerifyCodeCount(WebUtil.getClientIP(params)); }
+	 * 
+	 * @Override public boolean checkIpSendVerifyCodeLimit(Map<String,Object>
+	 * params) { return
+	 * smsManager.checkIpSendVerifyCodeLimit(WebUtil.getClientIP(params)); }
+	 * 
+	 * @Override public void getSmsImgCode(String phone, HttpServletResponse
+	 * response) { String code = smsManager.getSmsImgCode(phone);
+	 * CommonUtils.getSmsImgByCode(code, response); }
+	 * 
+	 * @Override public boolean checkSmsImgCode(String phone, String code) {
+	 * return smsManager.checkSmsImgCode(phone, code); }
+	 */
 
 }

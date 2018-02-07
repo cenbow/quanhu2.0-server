@@ -1,18 +1,18 @@
 package com.yryz.quanhu.openapi.validation.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.validation.BehaviorArgsBuild;
 import com.yryz.quanhu.openapi.validation.BehaviorValidFilterChain;
 import com.yryz.quanhu.openapi.validation.IBehaviorValidFilter;
 import com.yryz.quanhu.user.service.AccountApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -49,7 +49,7 @@ public class UserMuteValidFilter implements IBehaviorValidFilter {
         if(rpc.success()&&!rpc.getData()){
             filterChain.execute();
         }else{
-            throw new QuanhuException("","","您已被平台管理员禁言，不允许操作");
+            throw new QuanhuException(ExceptionEnum.USER_NO_TALK);
         }
     }
 }

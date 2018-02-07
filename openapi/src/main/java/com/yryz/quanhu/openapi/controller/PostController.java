@@ -61,7 +61,7 @@ public class PostController {
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
     @UserBehaviorValidation(event = "圈主发布回答", illegalWords = true,login = false)
-    @UserBehaviorArgs(sourceContexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
+    @UserBehaviorArgs(contexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/post/add")
     public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);

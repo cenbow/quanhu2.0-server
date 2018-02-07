@@ -1,5 +1,6 @@
 package com.yryz.quanhu.message.message.mongo;
 
+import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageVo;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -71,6 +73,19 @@ public class MessageMongo extends AbsBaseMongoDAO<MessageVo> {
             return mongoTemplate.findOne(query, MessageVo.class, COLLECTION_NAME);
         } catch (Exception e) {
             LOGGER.error("【MessageMongo】 查询单一消息失败！");
+            throw new QuanhuException(ExceptionEnum.MONGO_EXCEPTION);
+        }
+    }
+
+    public void update(MessageVo messageVo) {
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("messageId").is(messageVo.getMessageId()));
+            Update update = new Update();
+            update.set("jpId", messageVo.getJpId());
+            mongoTemplate.updateMulti(query, update, COLLECTION_NAME);
+        } catch (Exception e) {
+            LOGGER.error("【MessageMongo】 更新失败！");
             throw new QuanhuException(ExceptionEnum.MONGO_EXCEPTION);
         }
     }
