@@ -45,25 +45,25 @@ public class SendMessageServiceImpl implements SendMessageService {
      * @return
      */
     @Override
-    public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant,Boolean persistent) {
-        Long kid=messageBusinessVo.getKid();
-        Long tosendUserId=messageBusinessVo.getTosendUserId();
-        long fromUserId=messageBusinessVo.getFromUserId();
-        String title=messageBusinessVo.getTitle();
-        title=StringUtils.length(title) > 20 ? title.substring(0, 19) : title;
-        Byte isAnonymity=messageBusinessVo.getIsAnonymity();
-        String coterieId=messageBusinessVo.getCoterieId();
-        Long amount=messageBusinessVo.getAmount();
-        String imgUrl=messageBusinessVo.getImgUrl();
-        String moduleEnum=messageBusinessVo.getModuleEnum();
+    public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant, Boolean persistent) {
+        Long kid = messageBusinessVo.getKid();
+        Long tosendUserId = messageBusinessVo.getTosendUserId();
+        long fromUserId = messageBusinessVo.getFromUserId();
+        String title = messageBusinessVo.getTitle();
+        title = StringUtils.length(title) > 20 ? title.substring(0, 19) : title;
+        Byte isAnonymity = messageBusinessVo.getIsAnonymity();
+        String coterieId = messageBusinessVo.getCoterieId();
+        Long amount = messageBusinessVo.getAmount();
+        String imgUrl = messageBusinessVo.getImgUrl();
+        String moduleEnum = messageBusinessVo.getModuleEnum();
 
         UserSimpleVO fromUser = this.apIservice.getUser(fromUserId);
-        if (null == fromUser){
+        if (null == fromUser) {
             return false;
         }
 
-        CoterieInfo coterieInfo=null;
-        if(coterieId!=null){
+        CoterieInfo coterieInfo = null;
+        if (coterieId != null) {
             coterieInfo = apIservice.getCoterieinfo(Long.valueOf(coterieId));
         }
 
@@ -72,9 +72,9 @@ public class SendMessageServiceImpl implements SendMessageService {
          */
         InteractiveBody interactiveBody = new InteractiveBody();
         interactiveBody.setBodyTitle(title);
-        interactiveBody.setBodyImg(imgUrl==null?"":imgUrl);
+        interactiveBody.setBodyImg(imgUrl == null ? "" : imgUrl);
         interactiveBody.setCircleId(String.valueOf(coterieId));
-        if(coterieInfo!=null) {
+        if (coterieInfo != null) {
             interactiveBody.setCoterieName(coterieInfo.getName());
         }
         interactiveBody.setCustImg(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity) ? null : fromUser.getUserImg());
@@ -100,17 +100,16 @@ public class SendMessageServiceImpl implements SendMessageService {
          * 处理消息的content
          */
         String content = messageConstant.getContent();
-        if (messageConstant == MessageConstant.QUESTION_TO_BE_ANSWERED || messageConstant == MessageConstant.ANSWER_PAYED) {
-            if (StringUtils.isNotEmpty(fromUser.getUserNickName())) {
-                content = content.replaceAll("\\{someone\\}", fromUser.getUserNickName());
-            }
+        if (StringUtils.isNotEmpty(fromUser.getUserNickName())) {
+            content = content.replaceAll("\\{someone\\}", fromUser.getUserNickName());
         }
 
-        if(StringUtils.isNotBlank(title)) {
+
+        if (StringUtils.isNotBlank(title)) {
             content = content.replaceAll("\\{title\\}", title);
         }
 
-        if(coterieInfo!=null) {
+        if (coterieInfo != null) {
             content = content.replaceAll("\\{coterieName\\}", coterieInfo.getName());
         }
 
@@ -121,7 +120,7 @@ public class SendMessageServiceImpl implements SendMessageService {
                 //FeeDetail feeDetail = BranchFeesConstant.ANSWER.getFee().get(0);
                 FeeDetail feeDetail = new FeeDetail("", 90L, 1, "");
                 logger.info("原始金额是 : " + amount + ", 抽成规则是 : " + feeDetail.getFee());
-                long cost = amount * (feeDetail.getFee()/100L);
+                long cost = amount * (feeDetail.getFee() / 100L);
                 logger.info("抽成后金额是 : " + String.valueOf(cost));
                 String money = df.format(cost);
                 content = content.replaceAll("\\{money\\}", money);

@@ -42,4 +42,8 @@ public class RedisConstants {
 	 * 用户手机号信息
 	 */
 	public static final String USER_PHONE_INFO = "UPINFO";
+	/**
+	 * 用户达人信息
+	 */
+	public static final String USER_STAR_INFO = "USTINFO";
 }

@@ -168,7 +168,7 @@ public class AnswerServiceImpl implements AnswerService {
                   messageBusinessVo.setTosendUserId(answerWithBLOBs.getCreateUserId());
                   messageBusinessVo.setTitle(answerWithBLOBs.getContent());
                   messageBusinessVo.setAmount(questionCheck.getChargeAmount());
-                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED,true);
+                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.ANSWER_PAYED,true);
               }
             }
         }
