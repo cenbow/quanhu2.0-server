@@ -100,7 +100,7 @@ public class UserImgAuditServiceImpl implements UserImgAuditService {
 	}
 
 	@Override
-	public Page<UserImgAudit> listByUserId(Integer pageNo, Integer pageSize, Long userId, Integer auditStatus) {
+	public Page<UserImgAudit> listByUserId(Integer pageNo, Integer pageSize, String userId, Integer auditStatus) {
 		try {
 			Page<UserImgAudit> page = PageHelper.startPage(pageNo, pageSize);
 			imgAuditDao.listByUserId(userId, auditStatus);
