@@ -134,9 +134,18 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Byte recommendStatus = adminUserDTO.getRecommendStatus();
         Set<Long> tagIds = adminUserDTO.getTagIds();
 
+        String contactCall= adminUserDTO.getContactCall();
+        String realName = adminUserDTO.getRealName();
+
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if(userRole!=null){
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
+        }
+        if(!StringUtils.isBlank(contactCall)){
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_CONTACTCALL, "*" + contactCall + "*"));
+        }
+        if(!StringUtils.isBlank(realName)){
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_REALNAME, "*" + realName + "*"));
         }
         if (StringUtils.isNoneBlank(nickName)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
