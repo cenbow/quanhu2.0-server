@@ -344,7 +344,9 @@ public class UserStarServiceImpl implements UserStarService {
 		List<UserStarSimpleVo> simpleVos = getStarSimpleInfo(userIds);
 		Map<String, UserStarSimpleVo> map = new HashMap<>(userIds.size());
 		for(UserStarSimpleVo simpleVo : simpleVos){
-			map.put(simpleVo.getUserId().toString(), simpleVo);
+			if(simpleVo != null){
+				map.put(simpleVo.getUserId().toString(), simpleVo);
+			}
 		}
 		return map;
 	}

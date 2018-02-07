@@ -178,7 +178,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void unBindThird(){
 		UnBindThirdDTO thirdDTO = new UnBindThirdDTO();
 		thirdDTO.setAppId("vebff12m1762");
@@ -256,7 +256,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void getUserSimple(){
 		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560L);
 		//UserSimpleVO simpleVO = response.getData();

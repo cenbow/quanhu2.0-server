@@ -81,7 +81,9 @@ public class UserStarRedisDao {
 				String userId = iterator.next();
 				String key = UserStarApi.getCacheKey(userId);
 				UserStarSimpleVo simpleVo = redisTemplate.opsForValue().get(key);
-				simpleVos.add(simpleVo);
+				if(simpleVo != null){
+					simpleVos.add(simpleVo);
+				}
 			}
 		} catch (Exception e) {
 			logger.error("[getStarSimpleInfo]",e);
