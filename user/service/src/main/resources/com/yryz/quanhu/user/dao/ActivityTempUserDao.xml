@@ -25,7 +25,7 @@
     select 
     <include refid="Base_Column_List" />
     from qh_activity_temp_user
-    where 1=1
+    where del_flag = 10
     <if test="kid != null">
     	and kid = #{kid}
     </if>

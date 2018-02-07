@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 import org.springframework.context.annotation.Configuration;
 
-import com.yryz.common.utils.JsonUtils;
-
 /**
  * 认证配置
  * @author danshiyu
@@ -29,7 +27,11 @@ public class AuthConfig implements Serializable{
 	/**
 	 * app端短期token过期时间/小时
 	 */
-	private Integer tokenExpire = 1;
+	private Integer tokenExpire = 2;
+	/**
+	 * token每次刷新有效次数，过期时间是token过期时间的一半
+	 */
+	private Integer tokenRefreshTimes = 3;
 	/**
 	 * app端长期token过期时间/天
 	 */
@@ -62,6 +64,12 @@ public class AuthConfig implements Serializable{
 	}
 	public void setRefreshTokenDelayExpireTime(Integer refreshTokenDelayExpireTime) {
 		this.refreshTokenDelayExpireTime = refreshTokenDelayExpireTime;
+	}
+	public Integer getTokenRefreshTimes() {
+		return tokenRefreshTimes;
+	}
+	public void setTokenRefreshTimes(Integer tokenRefreshTimes) {
+		this.tokenRefreshTimes = tokenRefreshTimes;
 	}
 	/**
 	 * 
