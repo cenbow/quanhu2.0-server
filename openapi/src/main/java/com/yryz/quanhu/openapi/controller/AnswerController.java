@@ -33,7 +33,7 @@ public class AnswerController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答",illegalWords = true,login = false)
+    @UserBehaviorValidation(event = "圈主发布回答",illegalWords = true,login = false,mute = true)
     @UserBehaviorArgs(contexts={"object.QuestionDto.content","object.QuestionDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/coterie/answer/add")
     public Response<AnswerVo> saveAnswer(@RequestBody AnswerDto answerDto, HttpServletRequest request) {
@@ -48,6 +48,7 @@ public class AnswerController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
+    @UserBehaviorValidation(event = "回答详情",login = false)
     @GetMapping(value = "/services/app/{version}/coterie/answer/single")
     public Response<AnswerVo> saveAnswer(Long kid, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
