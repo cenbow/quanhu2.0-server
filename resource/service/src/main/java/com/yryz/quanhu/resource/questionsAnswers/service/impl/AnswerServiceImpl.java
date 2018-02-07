@@ -123,7 +123,8 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerWithBLOBs answerWithBLOBs = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answerWithBLOBs);
         answerWithBLOBs.setKid(apIservice.getKid());
-        answerWithBLOBs.setCreateDate(new Date());
+        Date createDate=new Date();
+        answerWithBLOBs.setCreateDate(createDate);
         answerWithBLOBs.setDelFlag(CommonConstants.DELETE_NO);
         answerWithBLOBs.setRevision(0);
         answerWithBLOBs.setCityCode("");
@@ -138,10 +139,11 @@ public class AnswerServiceImpl implements AnswerService {
          */
         this.answerDao.insertSelective(answerWithBLOBs);
 
-        //更新问题的回答状态
+        //更新问题的回答状态和时间
         Question question=new Question();
         question.setKid(questionId);
         question.setAnswerdFlag(QuestionAnswerConstants.AnswerdFlag.ANSWERED);
+        question.setOperateShelveDate(createDate);
         this.questionService.updateByPrimaryKeySelective(question);
         AnswerVo answerVo = new AnswerVo();
         BeanUtils.copyProperties(answerWithBLOBs, answerVo);

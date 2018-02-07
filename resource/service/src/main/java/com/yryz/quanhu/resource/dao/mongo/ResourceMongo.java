@@ -199,6 +199,21 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				criteria = Criteria.where("publicState").is(resourceModel.getPublicState()).andOperator(criteria);
 			}
 			
+			//私密状态
+			if(resourceModel.getIntimate() != null){
+				criteria = Criteria.where("intimate").is(resourceModel.getIntimate()).andOperator(criteria);
+			}
+			
+			//首页排序值
+			if(resourceModel.getSort() != null){
+				criteria = Criteria.where("sort").is(resourceModel.getSort()).andOperator(criteria);
+			}
+			
+			//私圈排序值
+			if(resourceModel.getCoterieSort() != null){
+				criteria = Criteria.where("coterieSort").is(resourceModel.getCoterieSort()).andOperator(criteria);
+			}
+			
 			//资源类型,多条件查询，resourceType支持多类型的枚举值，以,分隔
 			if(StringUtils.isNotEmpty(resourceModel.getModuleEnum())){
 				Criteria resouceTypeCriteria = Criteria.where("moduleEnum");

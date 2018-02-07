@@ -2,6 +2,7 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Maps;
+import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -9,18 +10,17 @@ import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.support.config.api.BasicConfigApi;
-import com.yryz.quanhu.user.service.AccountApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -57,8 +57,15 @@ public class ConfigController {
         //要升级的版本号
         map.put("upgradeVersion", "1.0.0");
         try {
-            String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(devType));
-            Map<String,Object> config = GsonUtils.json2Obj(configStr, Map.class);
+            String devOs = "";
+            if (CommonConstants.DEV_TYPE_IOS.equals(devType)) {
+                devOs = "IOS";
+            }
+            if (CommonConstants.DEV_TYPE_ANROID.equals(devType)) {
+                devOs = "Android";
+            }
+            String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(devOs));
+            Map<String, Object> config = GsonUtils.json2Obj(configStr, Map.class);
             String upgradeVersion = config.get("upgradeVersion").toString();
             //强制升级的版本比当前版本高
             if (new Integer(upgradeVersion.replace(".", "")) > new Integer(appVersion.replace(".", ""))) {

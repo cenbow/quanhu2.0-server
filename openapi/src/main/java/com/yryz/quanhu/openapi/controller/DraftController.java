@@ -74,7 +74,7 @@ public class DraftController {
     public Response<ReleaseInfo> edit(HttpServletRequest request, @RequestBody ReleaseInfo record,
             @RequestHeader("userId") Long headerUserId) {
 
-//        record.setCreateUserId(headerUserId);
+        record.setCreateUserId(headerUserId);
 
         return draftApi.edit(record);
     }
