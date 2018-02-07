@@ -138,4 +138,9 @@ public class UserTagServiceImpl implements UserTagService {
 		return mysqlDao.getUserUnionTags(userId);
 	}
 
+	@Override
+	public List<UserTagDTO> getUserGroupConcatTags(Set<Long> userIds) {
+		return mysqlDao.getUserGroupConcatTags(userIds);
+	}
+
 }

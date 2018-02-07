@@ -264,7 +264,7 @@ public class CoterieController {
         page.setPageSize(pageSize);
         
         //1、优先展示后台人工推荐的私圈X个，再从剩下的私圈中选取加入人数超过50人的私圈Y，X+Y<=200；
-        //2、人工推荐的私圈按照推荐排序从小到大顺序，加入人数超过50人的私圈按照加入人数从多到少排；
+        //2、人工推荐的私圈按照私圈创建时间顺序倒序排列，加入人数超过50人的私圈按照加入人数从多到少排；
         List<CoterieInfo> list = ResponseUtils.getResponseData(coterieApi.queryHotCoterieList(currentPage, pageSize));
         page.setCount(null);
         page.setEntities(list);
