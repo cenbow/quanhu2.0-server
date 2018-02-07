@@ -371,7 +371,7 @@ public class ResourceServiceImpl implements ResourceService {
 		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_FALSE);
 		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
 		resourceModel.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-		List<ResourceModel> list = resourceMongo.getList(resourceModel, "heat", null, null, start, limit);
+		List<ResourceModel> list = resourceMongo.getList(resourceModel, "heat,createTime", null, null, start, limit);
 		return list;
 	}
 	

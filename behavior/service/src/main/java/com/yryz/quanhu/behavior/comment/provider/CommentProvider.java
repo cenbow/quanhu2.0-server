@@ -233,7 +233,7 @@ public class CommentProvider implements CommentApi {
                 contentStr = nickName + "回复了您的评论。";
                 pingContent=this.getBePingComment(comment.getParentId());
             }
-            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent);
+            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent,comment.getModuleEnum(),comment.getCoterieId());
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
@@ -247,7 +247,7 @@ public class CommentProvider implements CommentApi {
                 contentStr = nickName + "回复了您的评论。";
                 pingContent=this.getBePingComment(comment.getParentId());
             }
-            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType,pingContent);
+            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType,pingContent,comment.getModuleEnum(),comment.getCoterieId());
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
@@ -261,7 +261,7 @@ public class CommentProvider implements CommentApi {
                 contentStr = nickName + "回复了您的评论。";
                 pingContent=this.getBePingComment(comment.getParentId());
             }
-            this.dynamicPush(comment.getResourceId(), contentStr, contentType,pingContent);
+            this.dynamicPush(comment.getResourceId(), contentStr, contentType,pingContent,comment.getModuleEnum(),comment.getCoterieId());
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
@@ -274,6 +274,9 @@ public class CommentProvider implements CommentApi {
             }
             commentAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
             commentAssembleAnswer.setLink("");
+            commentAssembleAnswer.setResourceId(answerVo.getKid());
+            commentAssembleAnswer.setModuleEnum(answerVo.getModuleEnum());
+            commentAssembleAnswer.setCoterieId(answerVo.getCoterieId());
             commentAssembleAnswer.setContent(nickName + "评论了您的问题。");
             this.sendMessage(commentAssembleAnswer);
             Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
@@ -282,6 +285,9 @@ public class CommentProvider implements CommentApi {
             commentAssembleQuestion.setContent(nickName + "评论了您的问题。");
             commentAssembleQuestion.setTitle(question.getTitle());
             commentAssembleQuestion.setLink("");
+            commentAssembleQuestion.setResourceId(question.getKid());
+            commentAssembleQuestion.setModuleEnum(ModuleContants.QUESTION);
+            commentAssembleQuestion.setCoterieId(question.getCoterieId());
             this.sendMessage(commentAssembleQuestion);
         }
 
@@ -304,7 +310,7 @@ public class CommentProvider implements CommentApi {
         return pingContent;
     }
 
-    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent) {
+    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent,String moduleEnum,long coterieId) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
             TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
@@ -327,13 +333,16 @@ public class CommentProvider implements CommentApi {
             }
             commentAssemble.setContent(contentStr);
             commentAssemble.setLink("");
+            commentAssemble.setResourceId(resourceId);
+            commentAssemble.setModuleEnum(moduleEnum);
+            commentAssemble.setCoterieId(coterieId);
             this.sendMessage(commentAssemble);
         } catch (Exception e) {
             logger.error("调用文章出现异常", e);
         }
     }
 
-    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent) {
+    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent,String moduleEnum,long coterieId) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
             ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
@@ -353,13 +362,16 @@ public class CommentProvider implements CommentApi {
             }
             commentAssemble.setContent(contentStr);
             commentAssemble.setLink("");
+            commentAssemble.setResourceId(resourceId);
+            commentAssemble.setModuleEnum(moduleEnum);
+            commentAssemble.setCoterieId(coterieId);
             this.sendMessage(commentAssemble);
         } catch (Exception e) {
             logger.error("调用文章出现异常", e);
         }
     }
 
-    public void dynamicPush(long resourceId, String contentPushStr, long contentType, String bePingContent) {
+    public void dynamicPush(long resourceId, String contentPushStr, long contentType, String bePingContent,String moduleEnum,long coterieId) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
            /* Dymaic dymaic = dymaicService.get(resourceId).getData();
@@ -389,6 +401,9 @@ public class CommentProvider implements CommentApi {
                 }
                 commentAssemble.setContent(contentPushStr);
                 commentAssemble.setLink("");
+                commentAssemble.setResourceId(resourceId);
+                commentAssemble.setModuleEnum(moduleEnum);
+                commentAssemble.setCoterieId(coterieId);
                 this.sendMessage(commentAssemble);
             }*/
         } catch (Exception e) {
@@ -406,7 +421,10 @@ public class CommentProvider implements CommentApi {
         messageVo.setActionCode(MessageActionCode.COMMON_DETAIL);
         messageVo.setLabel(MessageLabel.INTERACTIVE_COMMENT);
         messageVo.setToCust(String.valueOf(commentAssemble.getTargetUserId()));
-        messageVo.setType(MessageType.SYSTEM_TYPE);
+        messageVo.setType(MessageType.INTERACTIVE_TYPE);
+        messageVo.setModuleEnum(commentAssemble.getModuleEnum());
+        messageVo.setCoterieId(String.valueOf(commentAssemble.getCoterieId()));
+        messageVo.setResourceId(String.valueOf(commentAssemble.getResourceId()));
         messageVo.setCreateTime(DateUtils.getDateTime());
         if (commentAssemble.getViewCode() == 2) {
             messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_2);

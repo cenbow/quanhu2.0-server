@@ -128,4 +128,29 @@
     AND qt.del_flag = 10
   </select>
 
+  <select id="getUserGroupConcatTags" resultType="com.yryz.quanhu.user.dto.UserTagDTO">
+
+    SELECT user_id,group_concat(tag_id)as tag_ids,group_concat(tag_name) tag_names
+	FROM (
+		SELECT qt.user_id,qt.tag_id,qc.category_name as tag_name
+		FROM qh_user_tag qt left join qh_category qc
+		ON qt.tag_id = qc.kid
+		WHERE qc.kid IS NOT NULL
+		AND qc.category_status = 10
+		<choose>
+          <when test="userIds != null and userIds.size > 0">
+            AND qt.user_id IN
+            <foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+              #{userId,jdbcType=BIGINT}
+            </foreach>
+          </when>
+          <otherwise>
+            AND  FALSE
+          </otherwise>
+        </choose>
+		AND qt.del_flag = 10
+	) tags group by user_id
+
+  </select>
+
 </mapper>

@@ -1,20 +1,34 @@
 package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
+import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.dymaic.service.ElasticsearchService;
+import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.contants.UserStarContants;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
+import com.yryz.quanhu.user.dao.UserStarAuthLogDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UserStarAuthDto;
 import com.yryz.quanhu.user.dto.UserTagDTO;
+import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserStarAuth;
+import com.yryz.quanhu.user.entity.UserStarAuthLog;
+import com.yryz.quanhu.user.manager.EventManager;
+import com.yryz.quanhu.user.manager.MessageManager;
+import com.yryz.quanhu.user.provider.UserStarForAdminProvider;
+import com.yryz.quanhu.user.service.UserService;
 import com.yryz.quanhu.user.service.UserStarForAdminService;
 import com.yryz.quanhu.user.service.UserTagService;
 import com.yryz.quanhu.user.vo.EventAccountVO;
 import com.yryz.quanhu.user.vo.StarAuthInfoVO;
 import com.yryz.quanhu.user.vo.UserInfoVO;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +36,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static com.yryz.quanhu.user.contants.UserStarContants.StarAuditStatus.AUDIT_FAIL;
+import static com.yryz.quanhu.user.contants.UserStarContants.StarAuditStatus.AUDIT_SUCCESS;
+import static com.yryz.quanhu.user.contants.UserStarContants.StarAuditStatus.CANCEL_AUTH;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -34,17 +52,30 @@ import java.util.*;
 @Transactional
 public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
+    private static final Logger logger = LoggerFactory.getLogger(UserStarForAdminServiceImpl.class);
+
     @Autowired
     private UserStarAuthDao userStarAuthDao;
-
+    @Autowired
+    private UserStarAuthLogDao userStarAuthLogDao;
     @Autowired
     private UserTagService userTagService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private EventManager eventManager;
+    @Autowired
+    private MessageManager messageManager;
 
+    @Reference(check=false)
+    private IdAPI idApi;
     @Reference(check = false)
     private ElasticsearchService elasticsearchService;
 
     @Value("${appId}")
     private String appId;
+
+
     @Override
     public Boolean updateAuth(UserStarAuthDto dto) {
         /**
@@ -58,6 +89,24 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
         //更新数据库
         int updateCount = userStarAuthDao.updateAuditStatus(starAuth);
+
+        /**
+         * 反查询达人用户信息，进行联动
+         */
+        starAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+
+        /**
+         * 同步操作：
+         * 1,联动发消息，
+         * 2,设置等级,成长值
+         * 3,更新用户为达人标识
+         * 4,同步达人审核日志记录
+         */
+        this.syncMessage(starAuth);
+        this.syncUserRole(starAuth);
+        this.syncUserGrowLevel(starAuth);
+        this.syncUserStarAuthLog(starAuth);
+
         return updateCount==1?true:false;
     }
 
@@ -85,11 +134,122 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
             starAuth.setRecommendHeight(maxRecmdNum);
         }
 
-        //更新数据库
+        //更新达人数据库
         int updateCount = userStarAuthDao.updateRecommendStatus(starAuth);
+
         return updateCount==1?true:false;
     }
 
+
+    /**
+     * 同步发生消息
+     * @param starAuth
+     */
+    private void syncMessage(UserStarAuth starAuth){
+
+        String userId = String.valueOf(starAuth.getUserId());
+        byte auditStatus = starAuth.getAuditStatus();
+
+        logger.info("syncMessage:{}={} start",userId,auditStatus);
+
+        /**
+         *判断状态，发送不同消息
+         */
+        if(AUDIT_SUCCESS.getStatus() == auditStatus){           //审核通过
+
+            logger.info("messageManager.starSuccess");
+            messageManager.starSuccess(userId);
+        }else if(AUDIT_FAIL.getStatus() == auditStatus){        //审核失败
+
+            logger.info("messageManager.starFail");
+            messageManager.starFail(userId,starAuth.getAuditFailReason());
+        }else if(CANCEL_AUTH.getStatus() == auditStatus){       //取消认证
+
+            logger.info("messageManager.starCancel");
+            messageManager.starCancel(userId);
+        }
+
+        logger.info("syncMessage:{}={} finish",userId,auditStatus);
+    }
+
+    /**
+     * 同步设置用户等级，成长值
+     * @param starAuth
+     */
+    private void syncUserGrowLevel(UserStarAuth starAuth){
+
+        String userId = String.valueOf(starAuth.getUserId());
+        byte auditStatus = starAuth.getAuditStatus();
+
+
+
+        if(AUDIT_SUCCESS.getStatus() == auditStatus){           //审核通过
+
+            logger.info("syncUserGrowLevel:{}={} start",userId,auditStatus);
+            eventManager.starAuth(userId);
+            logger.info("syncUserGrowLevel:{}={} finish",userId,auditStatus);
+
+        }else{
+            return;
+        }
+
+    }
+
+
+
+    /**
+     * 同步更新用户等级
+     * @param starAuth
+     */
+    private void syncUserRole(UserStarAuth starAuth){
+
+        Long userId = starAuth.getUserId();
+        byte auditStatus = starAuth.getAuditStatus();
+
+        UserBaseInfo info = new UserBaseInfo();
+        info.setUserId(userId);
+        info.setAuthStatus(auditStatus);
+
+
+        if(AUDIT_SUCCESS.getStatus() == auditStatus){           //审核通过      设置达人
+            info.setUserRole(UserBaseInfo.UserRole.STAR.getRole());
+        }else if(AUDIT_FAIL.getStatus() == auditStatus){        //审核失败      设置普通用户
+            info.setUserRole(UserBaseInfo.UserRole.NORMAL.getRole());
+        }else if(CANCEL_AUTH.getStatus() == auditStatus){       //取消认证      设置普通用户
+            info.setUserRole(UserBaseInfo.UserRole.NORMAL.getRole());
+        }else{
+            return;
+        }
+
+        logger.info("syncUserRole:{} start",JSON.toJSON(info));
+        /**
+         * 更新达人状态位
+         */
+        userService.updateUserInfo(info);
+
+        logger.info("syncUserRole:{} finish",JSON.toJSON(info));
+    }
+
+    /**
+     * 同步达人审核记录日志
+     * @param starAuth
+     */
+    private void syncUserStarAuthLog(UserStarAuth starAuth){
+
+        UserStarAuthLog logModel = new UserStarAuthLog();
+        BeanUtils.copyProperties(starAuth,logModel);
+
+        //生成ID
+        logModel.setId(null);
+        logModel.setKid(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG).getData());
+        logModel.setCreateDate(new Date());
+
+        logger.info("syncUserStarAuthLog:{} start", JSON.toJSON(logModel));
+        //新增数据
+        userStarAuthLogDao.insert(logModel);
+
+        logger.info("syncUserStarAuthLog:{} finish", JSON.toJSON(logModel));
+    }
 
     @Override
     public List<UserTagDTO> getTags(UserStarAuthDto dto) {
@@ -206,7 +366,33 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         //转换ES查询条件
         AdminUserInfoDTO admin = this.buildRecmdElasticQueryParameter(dto);
 
-        return this.executeElasticQuery(admin);
+        //es查询
+        PageList<UserStarAuthDto> pageList =  this.executeElasticQuery(admin);
+
+        //查询标签信息
+        Set<Long> userIds = new HashSet<>();
+        for(UserStarAuthDto esDto : pageList.getEntities()){
+            userIds.add(esDto.getUserId());
+        }
+        List<UserTagDTO> tagsArray = userTagService.getUserGroupConcatTags(userIds);
+
+        if(!CollectionUtils.isEmpty(tagsArray)){
+            //重赋值标签信息
+            for(UserStarAuthDto esDto : pageList.getEntities()){
+                this.mergeTagNames(tagsArray,esDto);
+            }
+        }
+        return pageList;
+    }
+
+    private void mergeTagNames(List<UserTagDTO> tagDtos,UserStarAuthDto dto){
+        for(int i = 0 ; i < tagDtos.size() ; i++){
+            UserTagDTO tag = tagDtos.get(i);
+            if(dto.getUserId().longValue() == tag.getUserId().longValue()){
+                dto.setTagNames(tag.getTagNames());
+                break;
+            }
+        }
     }
 
     /**
@@ -215,7 +401,6 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
      * @return
      */
     private PageList<UserStarAuthDto> executeElasticQuery(AdminUserInfoDTO admin){
-
 
         PageList<UserStarAuthDto> pageList = new PageList<>();
 
@@ -245,6 +430,9 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
                 }
                 returnArray.add(authDto);
             }
+
+
+
             pageList.setEntities(returnArray);
             pageList.setPageSize(rpc.getData().getPageSize());
             pageList.setCurrentPage(rpc.getData().getCurrentPage());
