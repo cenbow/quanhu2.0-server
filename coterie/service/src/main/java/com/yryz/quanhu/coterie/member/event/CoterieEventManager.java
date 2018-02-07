@@ -18,79 +18,84 @@ import java.util.Date;
 
 /**
  * 私圈事件
+ *
  * @author chengyunfei
  */
 @Service
 public class CoterieEventManager {
-	private Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Reference
-	private EventAPI eventAPI;
-	
-	@Resource
-	private CoterieService coterieService;
+    @Reference
+    private EventAPI eventAPI;
 
-	@Resource
-	private CoterieMemberService coterieMemberService;
-	/**
-	 * 创建私圈 事件
-	 * @param
-	 */
-	public void createCoterieEvent(Long coterieId){
-		try{
-			CoterieInfo coterie=coterieService.find(coterieId);
-			EventInfo event=new EventInfo();
-			event.setCoterieId(coterie.getCoterieId().toString());
-			event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-			event.setUserId(coterie.getOwnerId());
-			event.setEventNum(1);
-			event.setEventCode(EventEnum.CREATE_COTERIE.getCode());
-			eventAPI.commit(event);
-		}catch (Exception e) {
-			logger.error("event Exception", e);
-		}
-	}
+    @Resource
+    private CoterieService coterieService;
 
-	/**
-	 * 加入私圈 事件
-	 * @param coterieId
-	 */
-	public void joinCoterieEvent(Long coterieId){
-		try{
-			CoterieInfo coterie=coterieService.find(coterieId);
-			EventInfo event=new EventInfo();
-			event.setCoterieId(coterie.getCoterieId().toString());
-			event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-			event.setUserId(coterie.getOwnerId());
-			event.setEventNum(1);
-			event.setEventCode(EventEnum.JOIN_COTERIE.getCode());
-			eventAPI.commit(event);
-		}catch (Exception e) {
-			logger.error("event Exception", e);
-		}
-	}
-	
-	/**
-	 * 资源付费 事件
-	 * @param userId
-	 * @param coterieId
-	 * @param resourceId
-	 */
-	@Deprecated
-	public void resourcePayEvent(Long userId,Long coterieId,Long resourceId){
-		try{
-			CoterieInfo coterie=coterieService.find(coterieId);
-			EventInfo event=new EventInfo();
-			event.setCoterieId(coterie.getCoterieId().toString());
-			event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-			event.setUserId(userId.toString());
-			event.setEventNum(1);
-			event.setOwnerId(coterie.getOwnerId());
-			event.setResourceId(resourceId.toString());
-			event.setEventCode(EventEnum.RESOURCE_PAY.getCode());
-			eventAPI.commit(event);
-		}catch (Exception e) {
-			logger.error("event Exception", e);
-		}
-	}
+    @Resource
+    private CoterieMemberService coterieMemberService;
+
+    /**
+     * 创建私圈 事件
+     *
+     * @param
+     */
+    public void createCoterieEvent(Long coterieId) {
+        try {
+            CoterieInfo coterie = coterieService.find(coterieId);
+            EventInfo event = new EventInfo();
+            event.setCoterieId(coterie.getCoterieId().toString());
+            event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            event.setUserId(coterie.getOwnerId());
+            event.setEventNum(1);
+            event.setEventCode(EventEnum.CREATE_COTERIE.getCode());
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("event Exception", e);
+        }
+    }
+
+    /**
+     * 加入私圈 事件
+     *
+     * @param coterieId
+     */
+    public void joinCoterieEvent(Long coterieId) {
+        try {
+            CoterieInfo coterie = coterieService.find(coterieId);
+            EventInfo event = new EventInfo();
+            event.setCoterieId(coterie.getCoterieId().toString());
+            event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            event.setUserId(coterie.getOwnerId());
+            event.setEventNum(1);
+            event.setEventCode(EventEnum.JOIN_COTERIE.getCode());
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("event Exception", e);
+        }
+    }
+
+    /**
+     * 资源付费 事件
+     *
+     * @param userId
+     * @param coterieId
+     * @param resourceId
+     */
+    @Deprecated
+    public void resourcePayEvent(Long userId, Long coterieId, Long resourceId) {
+        try {
+            CoterieInfo coterie = coterieService.find(coterieId);
+            EventInfo event = new EventInfo();
+            event.setCoterieId(coterie.getCoterieId().toString());
+            event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            event.setUserId(userId.toString());
+            event.setEventNum(1);
+            event.setOwnerId(coterie.getOwnerId());
+            event.setResourceId(resourceId.toString());
+            event.setEventCode(EventEnum.RESOURCE_PAY.getCode());
+            eventAPI.commit(event);
+        } catch (Exception e) {
+            logger.error("event Exception", e);
+        }
+    }
 }
