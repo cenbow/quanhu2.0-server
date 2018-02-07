@@ -26,6 +26,8 @@ import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.MessageUtils;
 import com.yryz.quanhu.behavior.common.service.RemoteResourceService;
 import com.yryz.quanhu.behavior.common.vo.RemoteResource;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
 import com.yryz.quanhu.behavior.gift.entity.GiftInfo;
 import com.yryz.quanhu.behavior.reward.constants.RewardConstants;
@@ -86,6 +88,9 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
 
     @Reference
     private EventAPI eventAPI;
+    
+    @Reference
+    private CountApi countApi;
 
     @Override
     public String getModuleEnum() {
@@ -108,6 +113,14 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         rewardInfoService.updateByKid(upInfo);
         logger.info("资源打赏 订单回调，更新打賞狀態,kid==>>" + info.getKid());
 
+        // 接入资源打赏计数
+        try {
+            // 接入阅读统计计数
+            countApi.commitCount(BehaviorEnum.Reward, info.getKid(), null, 1L);
+        } catch (Exception e) {
+            logger.error("资源打赏计数 接入异常！", e);
+        }
+        
         // 更新打赏者 统计
         RewardCount uCount = new RewardCount();
         uCount.setTargetId(info.getCreateUserId());
