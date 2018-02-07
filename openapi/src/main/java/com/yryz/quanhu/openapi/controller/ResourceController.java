@@ -7,6 +7,14 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
 import com.yryz.common.annotation.UserBehaviorValidation;
@@ -22,10 +30,10 @@ import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.vo.ResourceVo;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
 
 /**
  * @author yehao
@@ -83,9 +91,7 @@ public class ResourceController {
         ResourceVo resourceVo = new ResourceVo();
         if (permiss == null || MemberConstant.Permission.STRANGER_NON_CHECK.getStatus() == permiss || MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + ",");
-            if (pageSize == null) {
                 pageSize = 3;
-            }
         } else if (MemberConstant.Permission.OWNER.getStatus() == permiss || MemberConstant.Permission.MEMBER.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + "," + ModuleContants.ANSWER + "," + ModuleContants.ACTIVITY_COTERIE);
         }
