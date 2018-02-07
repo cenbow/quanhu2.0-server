@@ -3,11 +3,12 @@
 <mapper namespace="com.yryz.quanhu.resource.release.buyrecord.dao.ReleaseBuyRecordDao">
 
     <sql id="Base_Column_List">
-        id, kid, order_id, coterie_id, resource_id, amount, pay_type, buy_type, remark, create_user_id, create_date,
+        kid, order_id, coterie_id, resource_id, amount, pay_type, buy_type, remark, create_user_id, create_date,
         last_update_user_id, last_update_date
     </sql>
 
     <insert id="insert" parameterType="com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord">
+
         INSERT INTO qh_release_buy_record
         (<include refid="Base_Column_List"/>)
         VALUES

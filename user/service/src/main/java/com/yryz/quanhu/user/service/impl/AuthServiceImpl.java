@@ -199,7 +199,7 @@ public class AuthServiceImpl implements AuthService {
 	public boolean checkRefreshFlag(Long userId, String appId, DevType devType) {
 		AuthConfig rangeConfig = getAuthConfig(appId);
 		long expireTime = rangeConfig.getTokenExpire().longValue() * (3600/2) ;
-		return redisDao.getRefreshFlag(userId, appId, devType, expireTime) <= 1;
+		return redisDao.getRefreshFlag(userId, appId, devType, expireTime) <= rangeConfig.getTokenRefreshTimes();
 	}
 
 	@Override

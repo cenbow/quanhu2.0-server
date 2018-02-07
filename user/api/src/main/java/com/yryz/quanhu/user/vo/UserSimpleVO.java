@@ -55,7 +55,15 @@ public class UserSimpleVO implements Serializable {
      * 关系状态 0-陌生人 1-关注 2-粉丝 3-相互关注 4-拉黑 5-被拉黑 6-相互拉黑 7-自己
      */
     private Integer relationStatus = STATUS.NONE.getCode();
-	public String getNameNotes() {
+    /**
+     * 推荐语
+     */
+    private String recommendDesc = "";
+	/**
+	 * 行业以及领域
+	 */
+    private String tradeField = "";
+    public String getNameNotes() {
 		return nameNotes == null ? "" : nameNotes.trim();
 	}
 	public void setNameNotes(String nameNotes) {
@@ -102,6 +110,18 @@ public class UserSimpleVO implements Serializable {
 	}
 	public void setRelationStatus(Integer relationStatus) {
 		this.relationStatus = relationStatus == null ? 0 : relationStatus;
+	}
+	public String getRecommendDesc() {
+		return recommendDesc;
+	}
+	public void setRecommendDesc(String recommendDesc) {
+		this.recommendDesc = recommendDesc;
+	}
+	public String getTradeField() {
+		return tradeField;
+	}
+	public void setTradeField(String tradeField) {
+		this.tradeField = tradeField;
 	}
 	public UserSimpleVO() {
 		super();

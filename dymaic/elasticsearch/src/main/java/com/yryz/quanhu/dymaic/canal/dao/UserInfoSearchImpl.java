@@ -139,7 +139,21 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if(userRole!=null){
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
+            /**
+             * 判断普通用户，或者达人
+             */
+            if(userRole.intValue() == 10){
+                //普通用户
+                boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
+            }else if(userRole.intValue() == 11){
+                //达人  不要通过userRole查询，因为审核中或者取消审核会为普通用户，所以通过达人申请表所有状态查询
+                BoolQueryBuilder starBoolQusery = QueryBuilders.boolQuery();
+                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 10));
+                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 11));
+                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 12));
+                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 13));
+                boolQueryBuilder.must(starBoolQusery);
+            }
         }
         if(!StringUtils.isBlank(contactCall)){
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_CONTACTCALL, "*" + contactCall + "*"));

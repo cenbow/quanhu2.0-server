@@ -606,23 +606,27 @@ public class QuestionServiceImpl implements QuestionService {
             if (null != orderId) {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
                 question.setRefundOrderId(String.valueOf(orderId));
+                /**
+                 * 48小时失效退款，通知消息
+                 */
+                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+                messageBusinessVo.setAmount(question.getChargeAmount());
+                messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+                messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
+                messageBusinessVo.setKid(question.getKid());
+                messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
+                messageBusinessVo.setFromUserId(question.getCreateUserId());
+                messageBusinessVo.setTosendUserId(question.getCreateUserId());
+                messageBusinessVo.setTitle(question.getContent());
+                messageBusinessVo.setImgUrl("");
+                Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID, true);
+                if (!sendMessageResult) {
+                    logger.error("失效问题发送问题失败,提问的kid{}", question.getKid());
+                }
             } else {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
             }
-            MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-            messageBusinessVo.setAmount(question.getChargeAmount());
-            messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
-            messageBusinessVo.setIsAnonymity(question.getIsAnonymity());
-            messageBusinessVo.setKid(question.getKid());
-            messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-            messageBusinessVo.setFromUserId(question.getCreateUserId());
-            messageBusinessVo.setTosendUserId(question.getCreateUserId());
-            messageBusinessVo.setTitle(question.getContent());
-            messageBusinessVo.setImgUrl("");
-            Boolean sendMessageResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_INVALID, true);
-            if (!sendMessageResult) {
-                logger.error("失效问题发送问题失败,提问的kid{}", question.getKid());
-            }
+
             this.questionDao.updateByPrimaryKeySelective(question);
         }
     }
