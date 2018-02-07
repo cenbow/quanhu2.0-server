@@ -49,7 +49,7 @@ public class SmsServiceImpl implements SmsService {
 	@Override
 	public boolean sendSms(SmsDTO smsDTO) {
 		SmsConfigVO rangeConfigVO = JSON.parseObject(
-				configService.getConfig(ConfigConstants.VERIFY_CODE_CONFIG_NAME, smsDTO.getAppId()),
+				configService.getConfig(ConfigConstants.SMS_CONFIG_NAME, smsDTO.getAppId()),
 				new TypeReference<SmsConfigVO>() {
 				});
 		if(rangeConfigVO == null){
