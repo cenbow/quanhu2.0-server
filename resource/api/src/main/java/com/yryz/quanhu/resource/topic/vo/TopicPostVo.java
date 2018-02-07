@@ -6,6 +6,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 
 public class TopicPostVo  implements Serializable {
@@ -43,6 +44,8 @@ public class TopicPostVo  implements Serializable {
     private BehaviorVo behaviorVo;
 
     private String title;
+
+    private Map<String, Long> statistics;
 
     @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
@@ -180,5 +183,13 @@ public class TopicPostVo  implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Map<String, Long> getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(Map<String, Long> statistics) {
+        this.statistics = statistics;
     }
 }
