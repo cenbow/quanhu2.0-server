@@ -60,7 +60,7 @@ public class PostController {
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答", illegalWords = true,login = false)
+    @UserBehaviorValidation(event = "圈主发布回答", illegalWords = true, mute = true,login = false)
     @UserBehaviorArgs(contexts={"object.TopicPostDto.content","object.TopicPostDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/post/add")
     public Response<Integer> saveTopic(@RequestBody TopicPostDto topicPostDto, HttpServletRequest request) {

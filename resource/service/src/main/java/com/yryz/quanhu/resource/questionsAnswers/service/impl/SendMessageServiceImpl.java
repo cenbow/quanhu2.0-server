@@ -50,6 +50,7 @@ public class SendMessageServiceImpl implements SendMessageService {
         Long tosendUserId=messageBusinessVo.getTosendUserId();
         long fromUserId=messageBusinessVo.getFromUserId();
         String title=messageBusinessVo.getTitle();
+        title=StringUtils.length(title) > 20 ? title.substring(0, 19) : title;
         Byte isAnonymity=messageBusinessVo.getIsAnonymity();
         String coterieId=messageBusinessVo.getCoterieId();
         Long amount=messageBusinessVo.getAmount();
@@ -70,7 +71,7 @@ public class SendMessageServiceImpl implements SendMessageService {
          * 组装InteractiveBody对象
          */
         InteractiveBody interactiveBody = new InteractiveBody();
-        interactiveBody.setBodyTitle(StringUtils.length(title) > 20 ? title.substring(0, 19) : title);
+        interactiveBody.setBodyTitle(title);
         interactiveBody.setBodyImg(imgUrl==null?"":imgUrl);
         interactiveBody.setCircleId(String.valueOf(coterieId));
         if(coterieInfo!=null) {
@@ -103,6 +104,10 @@ public class SendMessageServiceImpl implements SendMessageService {
             if (StringUtils.isNotEmpty(fromUser.getUserNickName())) {
                 content = content.replaceAll("\\{someone\\}", fromUser.getUserNickName());
             }
+        }
+
+        if(StringUtils.isNotBlank(title)) {
+            content = content.replaceAll("\\{title\\}", title);
         }
 
         if(coterieInfo!=null) {

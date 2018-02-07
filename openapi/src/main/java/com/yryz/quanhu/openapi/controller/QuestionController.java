@@ -41,7 +41,7 @@ public class QuestionController {
 			@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 	})
 	@PostMapping(value = "/services/app/{version}/coterie/question/add")
-	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,isCoterieMute =true)
+	@UserBehaviorValidation(event = "提问发布", mute = true, blacklist = true, illegalWords = true,login = false,isCoterieMute =true)
 	@UserBehaviorArgs(
 			contexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
 			coterieId="object.QuestionDto.coterieId" ,sourceUserId="object.QuestionDto.targetId")
@@ -92,6 +92,7 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
+	@UserBehaviorValidation(event = "查询提问的详情",login = false)
 	@GetMapping(value = "/services/app/{version}/coterie/question/single")
 	public Response<QuestionVo> queryQuestionAnswer(Long kid, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
@@ -108,6 +109,7 @@ public class QuestionController {
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
 					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
 			})
+	@UserBehaviorValidation(event = "查询问答列表",login = false)
 	@GetMapping(value = "/services/app/{version}/coterie/question/list")
 	public Response<PageList<QuestionAnswerVo>> queryQuestionAnswerList(Long coterieId, Integer currentPage, Integer pageSize, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
