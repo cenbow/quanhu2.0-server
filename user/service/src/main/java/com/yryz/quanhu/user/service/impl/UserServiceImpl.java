@@ -215,7 +215,7 @@ public class UserServiceImpl implements UserService {
 		if(MapUtils.isEmpty(map)){
 			return new UserSimpleVO();
 		}
-		return map.get(friendId);
+		return map.get(friendId.toString());
 	}
 
 	@Override
