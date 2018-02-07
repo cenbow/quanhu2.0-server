@@ -129,6 +129,7 @@ public class MessageAdminServiceImpl implements MessageAdminService {
                 pushUserIds.stream().forEach(
                         userId -> {
                             messageVo.setToCust(userId);
+                            messageVo.setCreateTime(DateUtils.getDateTime());
                             messageService.sendMessage(messageVo, false);
                         }
                 );

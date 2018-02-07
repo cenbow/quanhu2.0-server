@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.Response;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +44,7 @@ public class MessageController {
     @ApiOperation("查询未读消息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping("/{version}/message/unread")
+    @UserBehaviorValidation(login = true)
     public Response<Map<String, String>> getUnread(@RequestHeader Long userId) {
         Assert.notNull(userId, "缺少用户Id");
         return messageAPI.getUnread(userId);
@@ -51,6 +54,7 @@ public class MessageController {
     @ApiOperation("清理未读消息")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping("/{version}/message/clearUnread")
+    @UserBehaviorValidation(login = true)
     public Response<MessageStatusVo> clearUnread(@RequestBody MessageDto messageDto, @RequestHeader Long userId) {
         Assert.notNull(messageDto, "缺少参数或参数错误！");
         Assert.notNull(userId, "缺少用户Id！");
@@ -63,27 +67,27 @@ public class MessageController {
     @ApiOperation("查询消息列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping("/{version}/message/list")
-    public Response<List<MessageVo>> getList(@RequestHeader Long userId, Integer type, Integer label, Integer start, Integer limit) {
-        Assert.notNull(userId, "缺少userId");
+    public Response<List<MessageVo>> getList(Integer type, Integer label, Integer start, Integer limit, HttpServletRequest request) {
         Assert.notNull(type, "缺少type");
-        //Assert.notNull(label, "缺少label");
         Assert.notNull(start, "缺少start");
         Assert.notNull(limit, "缺少limit");
         if (type <= 0) {
             throw QuanhuException.busiError("type参数错误！");
         }
-        /*if (label <= 0) {
-            throw QuanhuException.busiError("label参数错误！");
-        }*/
         if (start < 0) {
             throw QuanhuException.busiError("start参数错误！");
         }
         if (limit <= 0) {
             throw QuanhuException.busiError("limit参数错误！");
         }
+        String userId = null;
+        if (MessageContants.NOTICE_TYPE != type) {
+            userId = request.getHeader("userId");
+            Assert.hasText(userId, "用户id不能为空！");
+        }
 
         MessageDto messageDto = new MessageDto();
-        messageDto.setUserId(MessageContants.NOTICE_TYPE == type ? null : userId);
+        messageDto.setUserId(MessageContants.NOTICE_TYPE == type ? null : Long.valueOf(userId));
         messageDto.setLabel(label);
         messageDto.setLimit(limit);
         messageDto.setStart(start);
@@ -96,8 +100,9 @@ public class MessageController {
     @ApiOperation("查询消息总览")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping("/{version}/message/common")
+    @UserBehaviorValidation(login = true)
     public Response<Map<Integer, MessageVo>> getMessageCommon(@RequestHeader Long userId) {
-        Assert.notNull(userId,"userId不能为空！");
+        Assert.notNull(userId, "userId不能为空！");
         return messageAPI.getMessageCommon(userId);
     }
 }
