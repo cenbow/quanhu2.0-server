@@ -1,12 +1,9 @@
 package com.yryz.quanhu.other.category.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.google.common.collect.Lists;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.other.category.dao.CategoryDao;
 import com.yryz.quanhu.other.category.entity.Category;
 import com.yryz.quanhu.other.category.service.ICategoryAdminService;
@@ -14,8 +11,10 @@ import com.yryz.quanhu.other.category.vo.CategoryAdminVo;
 import com.yryz.quanhu.other.category.vo.CategorySearchAdminVo;
 import com.yryz.quanhu.other.category.vo.CategoryTreeAdminVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -114,6 +113,18 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
             CategoryAdminVo categoryAdminVo = new CategoryAdminVo();
             BeanUtils.copyProperties(category, categoryAdminVo);
 
+
+            CategorySearchAdminVo vo = new CategorySearchAdminVo();
+            if (search.getParentKid() == 0L) {
+                //下属分类数
+                vo.setParentKid(category.getKid());
+                Integer num = categoryDao.selectCountBySearch(search);
+                categoryAdminVo.setSubordinateNum(num);
+                //todo
+                //下属达人数
+                //创建人
+            }
+
             return categoryAdminVo;
 
         }).collect(Collectors.toList());
@@ -125,8 +136,21 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
     }
 
     @Override
+    @Transactional
     public Integer update(CategoryAdminVo category) {
-        return categoryDao.update(category);
+        Integer result = categoryDao.update(category);
+
+        if (category.getCategoryStatus() != null) {
+
+            List<Category> categories = categoryDao.selectByPid(category.getKid(), null);
+            if (CollectionUtils.isNotEmpty(categories)) {
+                for (Category categoryDb : categories) {
+                    category.setKid(categoryDb.getKid());
+                    categoryDao.update(category);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
