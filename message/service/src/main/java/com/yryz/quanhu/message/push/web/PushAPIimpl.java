@@ -66,6 +66,7 @@ public class PushAPIimpl implements PushAPI {
             if (reqVo.getMsgStatus() == null) {
                 reqVo.setMsgStatus(true);
             }
+
             pushService.commonSendAlias(reqVo);
             return ResponseUtils.returnSuccess();
         } catch (QuanhuException e) {
@@ -76,12 +77,6 @@ public class PushAPIimpl implements PushAPI {
         }
     }
 
-    private void checkAppInfo() {
-        AppInfo appInfo = AppInfoUtils.getAppInfo();
-        if (StringUtils.isBlank(appInfo.getAppId())) {
-            throw QuanhuException.busiError("请传入appId");
-        }
-    }
 
     @Override
     public Response<List<PushReceived>> getReceived(List<String> msgIds) {

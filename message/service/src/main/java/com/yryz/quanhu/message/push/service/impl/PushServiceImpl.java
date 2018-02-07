@@ -13,6 +13,7 @@ import com.alibaba.dubbo.rpc.RpcContext;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.Constants;
 import com.yryz.common.context.Context;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.message.push.entity.PushConfigDTO;
 import com.yryz.quanhu.message.push.entity.PushReceived;
@@ -158,17 +159,7 @@ public class PushServiceImpl implements PushService {
 	 * @return
 	 */
 	private PushConfigDTO getPushConfig(String appId) {
-		PushConfigDTO configDTO = null;
-		configDTO = configRemote.getPushConfig(appId);
-		/*
-		if (StringUtils.isNotEmpty(appId)) {
-			AppConfig config = null;//get..... //circleRemot.get(appId);
-			if (config != null && config.getPushStatus() != null
-					&& config.getPushStatus().intValue() == CircleStatus.SmsStatus.OPEN.getStatus()) {
-				configDTO = config.getPushConfigInfo();
-			}
-		}*/
-
+		PushConfigDTO configDTO = configRemote.getPushConfig(appId);
 		return configDTO;
 	}
 
@@ -179,11 +170,8 @@ public class PushServiceImpl implements PushService {
 	 * @return
 	 */
 	private boolean checkPushConfig(PushConfigDTO configDTO) {
-		if (configDTO == null) {
-			throw new ServiceException("push config get fail", "极光配置获取失败");
-		}
-		if (StringUtils.isEmpty(configDTO.getPushKey()) || StringUtils.isEmpty(configDTO.getPushSecret())) {
-			throw new ServiceException("push config get fail", "极光配置获取失败");
+		if (configDTO == null || StringUtils.isEmpty(configDTO.getPushKey()) || StringUtils.isEmpty(configDTO.getPushSecret())) {
+			throw QuanhuException.busiError("极光配置获取失败");
 		}
 		return true;
 	}

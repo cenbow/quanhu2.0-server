@@ -23,20 +23,20 @@ public class ConfigRemote {
 
     public static final String PUSH_CONFIG = "push.config.";
 
-    @Autowired
-    private PushConfigDTO pushConfigDTO;
-
 
     @Reference(check = false)
     private BasicConfigApi basicConfigApi;
 
 
     public PushConfigDTO getPushConfig(String appId) {
-        PushConfigDTO configDTO = new PushConfigDTO();
-        Response<String> configValue = basicConfigApi.getValue(PUSH_CONFIG + appId);
-        configDTO = GsonUtils.json2Obj(configValue.getData(), PushConfigDTO.class);
-//        configDTO = this.pushConfigDTO;
-        logger.info("getPushConfig: {}", GsonUtils.parseJson(configDTO));
+        PushConfigDTO configDTO = null;
+        try {
+            Response<String> configValue = basicConfigApi.getValue(PUSH_CONFIG + appId);
+            configDTO = GsonUtils.json2Obj(configValue.getData(), PushConfigDTO.class);
+            logger.info("getPushConfig: {}", GsonUtils.parseJson(configDTO));
+        } catch (Exception e) {
+            logger.error("getPushConfig error", e);
+        }
         return configDTO;
     }
 }
