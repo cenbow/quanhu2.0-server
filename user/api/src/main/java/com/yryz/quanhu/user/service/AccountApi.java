@@ -135,8 +135,10 @@ public interface AccountApi {
 	public Response<RegisterLoginVO> loginThird(ThirdLoginDTO loginDTO,RequestHeader header);
 
 	/**
-	 * (app)第三方登录绑定手机号
-	 * 
+	 * (app)第三方登录绑定手机号<br/>
+	 * 1.校验第三方账户是否存在
+	 * 1.查询没有手机号的老用户是否存在，存在即进行绑定手机号的操作，然后返回<br/>
+	 * 2.查询活动参与者是否存在，存在就用参与者信息注册用户信息，删除参与者信息，创建第三方账号信息<br/>
 	 * @param header
 	 * @param loginDTO
 	 * @return
@@ -211,8 +213,10 @@ public interface AccountApi {
 	public Response<Boolean> bindPhone(BindPhoneDTO phoneDTO);
 	
 	/**
-	 * 活动检查手机号，存在参与者就生成正常用户，存在正常用户就只校验短信验证码
-	 * 
+	 * 活动检查手机号<br/>
+	 * 1.存在参与者就生成正常用户，存在正常用户就只校验短信验证码<br/>
+	 * 1.根据用户id查询老用户，兼容老用户不存在手机号的情况,执行绑定手机号<br/>
+	 * 2.查询观察者信息，存在就根据手机号创建用户，删除观察者信息，写入第三方账户信息表，否则提示错误<br/>
 	 * @param phoneDTO
 	 * @return
 	 */

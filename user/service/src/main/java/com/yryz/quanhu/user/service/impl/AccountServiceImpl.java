@@ -227,6 +227,7 @@ public class AccountServiceImpl implements AccountService {
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
 		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
 		registerDTO.setUserPhone(loginDTO.getPhone());
+	
 		// 根据第三方账户查询临时用户表生成用户
 		ActivityTempUser tempUser = tempUserService.get(null, thirdUser.getThirdId(),
 				loginDTO.getRegLogDTO().getAppId());
