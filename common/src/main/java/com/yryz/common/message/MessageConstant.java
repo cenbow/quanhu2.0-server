@@ -76,6 +76,8 @@ public enum MessageConstant {
 
     POST_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的帖子因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
+    QUESTIONANSWER_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "问答{title}的相关内容因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
+
     /**
      * 帖子被圈主删除
      */
@@ -140,7 +142,7 @@ public enum MessageConstant {
     /**
      * 转发
      */
-    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_FORWARD, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_FORWARD, "被转发", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 付费参加活动

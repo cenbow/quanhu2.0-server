@@ -23,6 +23,7 @@ public class CommentFrontDTO extends PageList implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private long kid;
     private byte shelveFlag;
+    @JsonSerialize(using = ToStringSerializer.class)
     private long createUserId;
 
     public long getTopId() {

@@ -16,6 +16,7 @@ import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
+import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
@@ -37,6 +38,9 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
 
     @Reference
     private UserApi userApi;
+
+    @Reference
+    private AccountApi accountApi;
 
     @Override
     public Response<CoterieMemberVoForJoin> join(Long userId, Long coterieId, String reason) {
@@ -231,7 +235,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
                 throw new QuanhuException(ExceptionEnum.USER_MISSING);
             }
 
-            coterieMemberService.audit(memberId, coterieId, memberStatus, MemberConstant.MemberStatus.PASS.getStatus());
+            coterieMemberService.audit(memberId, coterieId, MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.FREE.getStatus());
 
             return ResponseUtils.returnSuccess();
 
@@ -314,6 +318,45 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
             return ResponseUtils.returnException(e);
         } catch (Exception e) {
             logger.error("私圈成员列表异常！", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+
+    @Override
+    public Response<Integer> banSpeakStatus(Long userId, Long coterieId) {
+
+        try {
+            Assert.notNull(userId, "userId is null !");
+            Assert.notNull(coterieId, "coterieId is null !");
+
+            //用户是否存在
+            if (!isExistUser(userId)) {
+                throw new QuanhuException(ExceptionEnum.USER_MISSING);
+            }
+
+            //圈子是否存在
+            if (!isExistCoterie(coterieId)) {
+                throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
+            }
+
+            //用户禁言
+            boolean disTalk = ResponseUtils.getResponseData(accountApi.checkUserDisTalk(userId));
+            if (disTalk) {
+                return ResponseUtils.returnObjectSuccess(10);
+            }
+
+            //私圈禁言
+            Boolean flag = coterieMemberService.isBanSpeak(userId, coterieId);
+            if (flag) {
+                return ResponseUtils.returnObjectSuccess(20);
+            }
+            return ResponseUtils.returnObjectSuccess(30);
+
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("查看成员是否为禁言时发生异常！", e);
             return ResponseUtils.returnException(e);
         }
     }

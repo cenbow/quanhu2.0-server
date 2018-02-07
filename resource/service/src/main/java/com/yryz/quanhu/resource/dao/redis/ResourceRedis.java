@@ -62,7 +62,7 @@ public class ResourceRedis {
 		if(limit < 0 ) {
 			limit = 10;
 		}
-		return redisTemplate.opsForList().range(RedisConstant.APP_RECOMMEND, start, start + limit);
+		return redisTemplate.opsForList().range(RedisConstant.APP_RECOMMEND, start, start + limit - 1);
 	}
 	
 	/**
