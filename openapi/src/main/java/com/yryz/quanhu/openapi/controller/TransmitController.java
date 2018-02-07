@@ -45,7 +45,7 @@ public class TransmitController {
      * 转发
      * @param   transmitInfo
      * */
-    @UserBehaviorArgs(sourceContexts = {"object.TransmitInfo.content"}, sourceUserId="object.TransmitInfo.targetUserId")
+    @UserBehaviorArgs(contexts = {"object.TransmitInfo.content"}, sourceUserId="object.TransmitInfo.targetUserId")
     @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
     @ApiOperation("转发")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)

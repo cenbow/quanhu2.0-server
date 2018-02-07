@@ -34,7 +34,7 @@ public class AnswerController {
                     @ApiImplicitParam(name = "userId", paramType = "header", required = true)
             })
     @UserBehaviorValidation(event = "圈主发布回答",illegalWords = true,login = false)
-    @UserBehaviorArgs(sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"})
+    @UserBehaviorArgs(contexts={"object.QuestionDto.content","object.QuestionDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/coterie/answer/add")
     public Response<AnswerVo> saveAnswer(@RequestBody AnswerDto answerDto, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
