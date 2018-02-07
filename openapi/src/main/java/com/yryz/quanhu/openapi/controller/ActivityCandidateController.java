@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -39,7 +40,8 @@ public class ActivityCandidateController {
 
     private static final Logger logger = LoggerFactory.getLogger(ActivityCandidateController.class);
 
-    @UserBehaviorValidation(login = true, mute = true)
+    @UserBehaviorValidation(login = true, mute = true, illegalWords = true)
+    @UserBehaviorArgs(contexts={"object.ActivityVoteDto.content","object.ActivityVoteDto.content1","object.ActivityVoteDto.content2"})
     @ApiOperation("确认参与")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/activity/candidate/join")
