@@ -235,7 +235,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
                 throw new QuanhuException(ExceptionEnum.USER_MISSING);
             }
 
-            coterieMemberService.audit(memberId, coterieId, memberStatus, MemberConstant.MemberStatus.PASS.getStatus());
+            coterieMemberService.audit(memberId, coterieId, MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.FREE.getStatus());
 
             return ResponseUtils.returnSuccess();
 

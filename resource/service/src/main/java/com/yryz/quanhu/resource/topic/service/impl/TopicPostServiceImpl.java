@@ -119,11 +119,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         topicPost.setGps("");
         topicPost.setDelFlag(CommonConstants.DELETE_NO);
         topicPost.setShelveFlag(CommonConstants.SHELVE_YES);
-
         Integer result= this.topicPostDao.insertSelective(topicPost);
-
-
-
         /**
          * 发送消息
          */
@@ -239,20 +235,25 @@ public class TopicPostServiceImpl implements TopicPostService {
                 vo.setUser(apIservice.getUser(createUserId));
             }
             vo.setModuleEnum(ModuleContants.TOPIC_POST);
-            Response<Map<String,Long>> countData=countApi.getCount("10,11",vo.getKid(),null);
+            /**
+             * 点赞数和评论数
+             */
+            Response<Map<String,Long>> countData=countApi.getCount(BehaviorEnum.Comment.getCode()+","+BehaviorEnum.Like.getCode(),vo.getKid(),null);
             if(ResponseConstant.SUCCESS.getCode().equals(countData.getCode())){
                 Map<String,Long> count=countData.getData();
                 if(count!=null){
                     BehaviorVo behaviorVo=new BehaviorVo();
-                    if(count.containsKey("likeCount")){
-                        behaviorVo.setLikeCount(count.get("likeCount"));
+                    if(count.containsKey(BehaviorEnum.Like.getKey())){
+                        behaviorVo.setLikeCount(count.get(BehaviorEnum.Like.getKey()));
                     }
-                    if(count.containsKey("commentCount")){
-                        behaviorVo.setCommentCount(count.get("commentCount"));
+                    if(count.containsKey(BehaviorEnum.Comment.getKey())){
+                        behaviorVo.setCommentCount(count.get(BehaviorEnum.Comment.getKey()));
                     }
                     vo.setBehaviorVo(behaviorVo);
+                    vo.setStatistics(count);
                 }
             }
+
             list.add(vo);
         }
         data.setCount(0L);

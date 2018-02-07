@@ -132,6 +132,36 @@ public class CommentProvider implements CommentApi {
                 Comment comments = new Comment();
                 comments.setKid(comment.getKid());
                 Comment commentStr = commentService.querySingleComment(comments);
+
+                if (comment.getTopId() == 0) {
+                    CommentFrontDTO commenFront = new CommentFrontDTO();
+                    commenFront.setTopId(commentStr.getKid());
+                    commenFront.setResourceId(commentStr.getResourceId());
+                    List<CommentVO> commentVOS = commentService.queryComments(commenFront).getEntities();
+                    List<Comment> commentsBatch = new ArrayList<Comment>();
+                    for (CommentVO commentVO : commentVOS) {
+                        Comment commentSingle = new Comment();
+                        commentSingle.setKid(commentVO.getKid());
+                        commentSingle.setResourceId(commentVO.getResourceId());
+                        commentSingle.setCreateUserId(commentVO.getCreateUserId());
+                        commentsBatch.add(commentSingle);
+                        try{
+                            stringRedisTemplate.delete("COMMENT:" + commentVO.getModuleEnum() + ":" + commentVO.getKid() + "_" + commentVO.getTopId() + "_" + commentVO.getResourceId());
+                        }catch (Exception e){
+                            logger.info("批量删除Redis评论失败");
+                        }
+
+                    }
+                    try{
+                       int batchCount = commentService.updownBatch(commentsBatch);
+                       if(batchCount>0){
+                            logger.info("批量删除评论成功");
+                       }
+                    }catch (Exception e){
+                        logger.info("批量删除评论失败"+e);
+                    }
+
+                }
                 try {
                     stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
                 } catch (Exception e) {
@@ -162,15 +192,15 @@ public class CommentProvider implements CommentApi {
     public Response<Integer> updownBatch(List<Comment> comments) {
         try {
             int count = commentService.updownBatch(comments);
-            if(count>0){
-                String strKeys="";
-                for(Comment comment:comments){
+            if (count > 0) {
+                String strKeys = "";
+                for (Comment comment : comments) {
                     Comment commentSingle = commentService.querySingleComment(comment);
-                    strKeys+="COMMENT:"+commentSingle.getModuleEnum()+":"+commentSingle.getKid()+ "_" + commentSingle.getTopId() + "_" + commentSingle.getResourceId()+",";
+                    strKeys += "COMMENT:" + commentSingle.getModuleEnum() + ":" + commentSingle.getKid() + "_" + commentSingle.getTopId() + "_" + commentSingle.getResourceId() + ",";
                 }
-                if(null!=strKeys&&!strKeys.equals("")){
-                    String[] strArray=strKeys.split(",");
-                    for (int i=0;i<strArray.length;i++){
+                if (null != strKeys && !strKeys.equals("")) {
+                    String[] strArray = strKeys.split(",");
+                    for (int i = 0; i < strArray.length; i++) {
                         stringRedisTemplate.delete(strArray[i]);
                     }
                 }
@@ -231,9 +261,9 @@ public class CommentProvider implements CommentApi {
             } else {
                 contentType = 1;
                 contentStr = nickName + "回复了您的评论。";
-                pingContent=this.getBePingComment(comment.getParentId());
+                pingContent = this.getBePingComment(comment.getParentId());
             }
-            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent,comment.getModuleEnum(),comment.getCoterieId());
+            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent, comment.getModuleEnum(), comment.getCoterieId());
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
@@ -245,9 +275,9 @@ public class CommentProvider implements CommentApi {
             } else {
                 contentType = 1;
                 contentStr = nickName + "回复了您的评论。";
-                pingContent=this.getBePingComment(comment.getParentId());
+                pingContent = this.getBePingComment(comment.getParentId());
             }
-            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType,pingContent,comment.getModuleEnum(),comment.getCoterieId());
+            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent, comment.getModuleEnum(), comment.getCoterieId());
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
@@ -259,17 +289,17 @@ public class CommentProvider implements CommentApi {
             } else {
                 contentType = 1;
                 contentStr = nickName + "回复了您的评论。";
-                pingContent=this.getBePingComment(comment.getParentId());
+                pingContent = this.getBePingComment(comment.getParentId());
             }
-            this.dynamicPush(comment.getResourceId(), contentStr, contentType,pingContent,comment.getModuleEnum(),comment.getCoterieId());
+            this.dynamicPush(comment.getResourceId(), contentStr, contentType, pingContent, comment.getModuleEnum(), comment.getCoterieId());
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
             AnswerVo answerVo = answerApi.getDetail(comment.getResourceId()).getData();
             CommentAssemble commentAssembleAnswer = new CommentAssemble();
-            if(null!=answerVo.getContent()&&answerVo.getContent().length()>20){
+            if (null != answerVo.getContent() && answerVo.getContent().length() > 20) {
                 commentAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
-            }else{
+            } else {
                 commentAssembleAnswer.setTitle(answerVo.getContent());
             }
             commentAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
@@ -300,7 +330,7 @@ public class CommentProvider implements CommentApi {
         Comment commentSingle = commentService.querySingleComment(comentSub);
         String pingContent = "";
         if (null != commentSingle) {
-            if (null!=commentSingle.getContentComment()&&commentSingle.getContentComment().length() > 20) {
+            if (null != commentSingle.getContentComment() && commentSingle.getContentComment().length() > 20) {
                 pingContent = commentSingle.getContentComment().substring(0, 20);
             } else {
                 pingContent = commentSingle.getContentComment();
@@ -310,7 +340,7 @@ public class CommentProvider implements CommentApi {
         return pingContent;
     }
 
-    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent,String moduleEnum,long coterieId) {
+    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent, String moduleEnum, long coterieId) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
             TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
@@ -319,9 +349,9 @@ public class CommentProvider implements CommentApi {
                     String img = getImgFirstUrl(topicPostVo.getImgUrl());
                     commentAssemble.setImg(img);
                 }
-                if(null!=topicPostVo.getContent()&&topicPostVo.getContent().length()>20){
+                if (null != topicPostVo.getContent() && topicPostVo.getContent().length() > 20) {
                     commentAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
-                }else{
+                } else {
                     commentAssemble.setTitle(topicPostVo.getContent());
                 }
 
@@ -342,7 +372,7 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent,String moduleEnum,long coterieId) {
+    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent, String moduleEnum, long coterieId) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
             ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
@@ -371,7 +401,7 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    public void dynamicPush(long resourceId, String contentPushStr, long contentType, String bePingContent,String moduleEnum,long coterieId) {
+    public void dynamicPush(long resourceId, String contentPushStr, long contentType, String bePingContent, String moduleEnum, long coterieId) {
         CommentAssemble commentAssemble = new CommentAssemble();
         try {
            /* Dymaic dymaic = dymaicService.get(resourceId).getData();

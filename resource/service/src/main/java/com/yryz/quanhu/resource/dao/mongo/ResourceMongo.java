@@ -284,17 +284,17 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				criteria = Criteria.where("resourceId").is(resourceModel.getResourceId()).andOperator(criteria);
 			}
 			if(resourceModel.getUserId() != null){
-				criteria = Criteria.where("custId").is(resourceModel.getUserId()).andOperator(criteria);
+				criteria = Criteria.where("userId").is(resourceModel.getUserId()).andOperator(criteria);
 			}
 			if(StringUtils.isNotEmpty(resourceModel.getTalentType())){
 				criteria = Criteria.where("talentType").is(resourceModel.getTalentType()).andOperator(criteria);
 			}
-			if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
-				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
-			} else if("0".equals(resourceModel.getCoterieId())){
+			if("0".equals(resourceModel.getCoterieId())){
 				criteria = Criteria.where("coterieId").is(null).andOperator(criteria);
 			} else if("1".equals(resourceModel.getCoterieId())){
-				criteria = Criteria.where("coterieId").not().andOperator(criteria);
+				criteria = Criteria.where("coterieId").ne(null).andOperator(criteria);
+			} else if(StringUtils.isNotEmpty(resourceModel.getCoterieId())){
+				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
 			}
 			
 			//标题，正文，简介模糊匹配
@@ -308,6 +308,21 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 			//公开状态
 			if(resourceModel.getPublicState() != null){
 				criteria = Criteria.where("publicState").is(resourceModel.getPublicState()).andOperator(criteria);
+			}
+			
+			//私密状态
+			if(resourceModel.getIntimate() != null){
+				criteria = Criteria.where("intimate").is(resourceModel.getIntimate()).andOperator(criteria);
+			}
+			
+			//首页排序值
+			if(resourceModel.getSort() != null){
+				criteria = Criteria.where("sort").is(resourceModel.getSort()).andOperator(criteria);
+			}
+			
+			//私圈排序值
+			if(resourceModel.getCoterieSort() != null){
+				criteria = Criteria.where("coterieSort").is(resourceModel.getCoterieSort()).andOperator(criteria);
 			}
 			
 			//资源类型,多条件查询，resourceType支持多类型的枚举值，以,分隔

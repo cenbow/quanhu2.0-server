@@ -1,5 +1,8 @@
 package com.yryz.quanhu.behavior.like.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * @Author:sun
  * @version:2.0
@@ -12,9 +15,12 @@ public class LikeAssemble {
     private String img;
     private String title;
     private String link;
+    @JsonSerialize(using = ToStringSerializer.class)
     private long targetUserId;
     private String moduleEnum;
+    @JsonSerialize(using = ToStringSerializer.class)
     private long resourceId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private long coterieId;
 
     public String getModuleEnum() {
