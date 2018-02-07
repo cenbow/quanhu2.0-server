@@ -108,6 +108,6 @@ public class MessageActionCode {
     /**
      * 动态
      */
-    public static final String DYNAMIC = "8009";
+    //public static final String DYNAMIC = "8009";
 
 }
