@@ -53,6 +53,7 @@ import com.yryz.quanhu.user.dto.ThirdLoginDTO;
 import com.yryz.quanhu.user.dto.UnBindThirdDTO;
 import com.yryz.quanhu.user.dto.WebThirdLoginDTO;
 import com.yryz.quanhu.user.entity.ActivityTempUser;
+import com.yryz.quanhu.user.entity.UserAccount;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserLoginLog;
 import com.yryz.quanhu.user.entity.UserThirdLogin;
@@ -272,46 +273,49 @@ public class AccountProvider implements AccountApi {
 		}
 	}
 
-	/**
-	 * (app)第三方登录绑定手机号
-	 * 
-	 * @param thirdId
-	 *            第三方唯一id,由第三方登录接口返回
-	 * @param phone
-	 *            手机号
-	 * @param verifyCode
-	 *            验证码
-	 * @return
-	 * @Description
-	 */
 	@Override
 	public Response<RegisterLoginVO> loginThirdBindPhone(ThirdLoginDTO loginDTO, RequestHeader header) {
 		try {
 			checkThirdLoginDTO(loginDTO);
 			checkHeader(header);
+			if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(), SmsType.CODE_THIRD_PHONE,
+					header.getAppId())) {
+				throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
+			}
+			// 手机号加锁
+			lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());
+
+			boolean accountFlag = accountService.checkUserByPhone(loginDTO.getPhone(), header.getAppId());
+			if (accountFlag) {
+				throw QuanhuException.busiError("该手机号已存在");
+			}
+
+			Long userId = null;
+
 			ThirdUser thirdUser = getThirdUser(loginDTO, header.getAppId());
+
 			UserThirdLogin login = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), header.getAppId(),
 					loginDTO.getType());
 			// 已存在账户直接登录
+			// 兼容老用户没有手机号的情况
 			if (login != null) {
-				throw QuanhuException.busiError("该用户已存在");
-			} else {
-				if (!smsManager.checkVerifyCode(loginDTO.getPhone(), loginDTO.getVerifyCode(), SmsType.CODE_THIRD_PHONE,
-						header.getAppId())) {
-					throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
-				}
-				// 手机号加锁
-				lockManager.lock(Constants.BIND_PHONE, loginDTO.getPhone());
-
-				boolean accountFlag = accountService.checkUserByPhone(loginDTO.getPhone(), header.getAppId());
-				if (accountFlag) {
-					throw QuanhuException.busiError("该手机号已存在");
+				UserAccount account = accountService.getUserAccountByUserId(login.getUserId());
+				if (account != null && StringUtils.isBlank(account.getUserPhone())) {
+					accountService.bindPhone(login.getUserId(), loginDTO.getPhone(), null);
+					logger.info("[user_bindPhone]:userId:{},bindType:thirdLoginOldUserBindPhone,oldPhone:,newPhone:{}",
+							login.getUserId(), loginDTO.getPhone());
+					userId = account.getKid();
 				} else {
-					Long userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
-					return ResponseUtils.returnObjectSuccess(
-							returnRegisterLoginVO(userId, header, null, loginDTO.getRegLogDTO().getIp()));
+					throw QuanhuException.busiError("该用户已存在");
 				}
 			}
+			// 老用户不存在需要继续走第三方绑定手机号流程
+			if (userId != null && userId != 0l) {
+				userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
+			}
+
+			return ResponseUtils
+					.returnObjectSuccess(returnRegisterLoginVO(userId, header, null, loginDTO.getRegLogDTO().getIp()));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
 		} catch (Exception e) {
@@ -543,8 +547,19 @@ public class AccountProvider implements AccountApi {
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, phoneDTO.getPhone());
 			boolean accountFlag = accountService.checkUserByPhone(phoneDTO.getPhone(), phoneDTO.getAppId());
-			// 用户不存在就根据参与者信息创建正常用户
+
+			// 手机号不存在就根据参与者信息创建正常用户
 			if (!accountFlag) {
+
+				// 兼容老用户没有手机号的情况
+				UserAccount account = accountService.getUserAccountByUserId(phoneDTO.getUserId());
+				if (account != null && StringUtils.isBlank(account.getUserPhone())) {
+					accountService.bindPhone(phoneDTO.getUserId(), phoneDTO.getPhone(), null);
+					logger.info("[user_bindPhone]:userId:{},bindType:thirdLoginOldUserBindPhone,oldPhone:,newPhone:{}",
+							phoneDTO.getUserId(), account.getUserPhone());
+					return ResponseUtils.returnObjectSuccess(true);
+				}
+
 				accountService.mergeActivityUser(phoneDTO.getUserId(), phoneDTO.getPhone());
 			} else {
 				throw QuanhuException.busiError("该用户已存在");
@@ -1117,7 +1132,12 @@ public class AccountProvider implements AccountApi {
 	}
 
 	/**
-	 * 根据用户id和token类型得到登录返回信息
+	 * 根据用户id和token类型得到登录返回信息<br/>
+	 * 1.获取登录方设备类型<br/>
+	 * 2.安卓、IOS端每次登录都会token、refreshToken都会更新<br/>
+	 * 3.WEB、WAP端token在重复登录情况下不会更新，但缓存会过期<br/>
+	 * 4.如果存在参与者信息，就用参与者信息返回，否则使用正常用户信息返回<br/>
+	 * 5.保存登录日志
 	 * 
 	 * @param userId
 	 * @param tokenType
@@ -1203,6 +1223,11 @@ public class AccountProvider implements AccountApi {
 		if (codeDTO.getUserId() == null) {
 			if (StringUtils.isBlank(codeDTO.getPhone()) || !PhoneUtils.checkPhone(codeDTO.getPhone())) {
 				throw QuanhuException.busiError("手机号不合法");
+			}
+		}
+		if (StringUtils.isBlank(codeDTO.getPhone()) || !PhoneUtils.checkPhone(codeDTO.getPhone())) {
+			if (codeDTO.getUserId() == null || codeDTO.getUserId() == 0l) {
+				throw QuanhuException.busiError("用户id不能为空");
 			}
 		}
 		if (StringUtils.isBlank(codeDTO.getCode())) {

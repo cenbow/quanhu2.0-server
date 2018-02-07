@@ -2,6 +2,8 @@ package com.yryz.quanhu.message.push.web;
 
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.appinfo.AppInfo;
+import com.yryz.common.appinfo.AppInfoUtils;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -34,6 +36,11 @@ public class PushAPIimpl implements PushAPI {
 
     @Override
     public Response<Boolean> commonSendAlias(PushReqVo reqVo) {
+        AppInfo appInfo = AppInfoUtils.getAppInfo();
+        if (StringUtils.isBlank(appInfo.getAppId())) {
+            return ResponseUtils.returnCommonException("请传入appId");
+        }
+
         if (reqVo == null || reqVo.getPushType() == null || StringUtils.isBlank(reqVo.getMsg())
                 ) {
             return ResponseUtils.returnCommonException("reqVo pushType msg can not be null");
@@ -69,8 +76,20 @@ public class PushAPIimpl implements PushAPI {
         }
     }
 
+    private void checkAppInfo() {
+        AppInfo appInfo = AppInfoUtils.getAppInfo();
+        if (StringUtils.isBlank(appInfo.getAppId())) {
+            throw QuanhuException.busiError("请传入appId");
+        }
+    }
+
     @Override
     public Response<List<PushReceived>> getReceived(List<String> msgIds) {
+        AppInfo appInfo = AppInfoUtils.getAppInfo();
+        if (StringUtils.isBlank(appInfo.getAppId())) {
+            return ResponseUtils.returnCommonException("请传入appId");
+        }
+
         if (CollectionUtils.isEmpty(msgIds)) {
             return ResponseUtils.returnCommonException("msgIds can not be null");
         }

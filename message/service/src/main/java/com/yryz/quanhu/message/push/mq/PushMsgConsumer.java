@@ -60,7 +60,7 @@ public class PushMsgConsumer {
 					key = AmqpConstants.JPUSH_QUANHU_DIRECT_QUEUE)
 	)
 	public void onMessage(String data) {
-		logger.info("get exchange mq: {}", data);
+		logger.info("get push mq: {}", data);
 		PushParamsDTO paramsDTO = GsonUtils.json2Obj(data, PushParamsDTO.class);
 		if (StringUtils.isEmpty(paramsDTO.getTo()) || StringUtils.isEmpty(paramsDTO.getPushType())
 				|| StringUtils.isEmpty(paramsDTO.getMsg()) || StringUtils.isEmpty(paramsDTO.getAppKey())

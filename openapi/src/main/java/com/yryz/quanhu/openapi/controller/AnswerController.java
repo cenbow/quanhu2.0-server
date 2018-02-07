@@ -31,9 +31,10 @@ public class AnswerController {
     @ApiOperation("圈主发布回答")
     @ApiImplicitParams(
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-                    @ApiImplicitParam(name = "userId", paramType = "header", required = true)
+                    @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+                    @ApiImplicitParam(name = "token", paramType = "header", required = true)
             })
-    @UserBehaviorValidation(event = "圈主发布回答",illegalWords = true,login = false)
+    @UserBehaviorValidation(event = "圈主发布回答",illegalWords = true,login = true,mute = true)
     @UserBehaviorArgs(contexts={"object.QuestionDto.content","object.QuestionDto.contentSource"})
     @PostMapping(value = "/services/app/{version}/coterie/answer/add")
     public Response<AnswerVo> saveAnswer(@RequestBody AnswerDto answerDto, HttpServletRequest request) {
@@ -46,8 +47,10 @@ public class AnswerController {
     @ApiOperation("查询回答详情")
     @ApiImplicitParams(
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-                    @ApiImplicitParam(name = "userId", paramType = "header", required = true)
+                    @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+                    @ApiImplicitParam(name = "token", paramType = "header", required = true)
             })
+    @UserBehaviorValidation(event = "回答详情",login = true)
     @GetMapping(value = "/services/app/{version}/coterie/answer/single")
     public Response<AnswerVo> saveAnswer(Long kid, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);

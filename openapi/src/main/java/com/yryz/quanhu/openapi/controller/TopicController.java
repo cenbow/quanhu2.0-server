@@ -60,9 +60,10 @@ public class TopicController {
 	@ApiOperation("删除话题")
 	@ApiImplicitParams(
 			{@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-					@ApiImplicitParam(name = "userId", paramType = "header", required = true)
+					@ApiImplicitParam(name = "userId", paramType = "header", required = true),
+					@ApiImplicitParam(name = "token", paramType = "header", required = true)
 			})
-	@UserBehaviorValidation(event = "删除话题", login = false)
+	@UserBehaviorValidation(event = "删除话题", login = true)
 	@PostMapping(value = "/services/app/{version}/topic/single/delete")
 	public Response<Integer> deleteTopic(@RequestBody TopicDto dto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
@@ -72,10 +73,4 @@ public class TopicController {
 		}
 		return topicApi.deleteTopic(dto.getKid(),Long.valueOf(userId));
 	}
-
-
-
-
-
-
 }

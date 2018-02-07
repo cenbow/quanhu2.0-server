@@ -142,7 +142,7 @@ public enum MessageConstant {
     /**
      * 转发
      */
-    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_FORWARD, "转发提示", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
+    TRANSMIT_CONTENT_POST(MessageType.INTERACTIVE_TYPE, MessageLabel.INTERACTIVE_FORWARD, "被转发", "", MessageViewCode.INTERACTIVE_MESSAGE, MessageActionCode.COMMON_DETAIL),
 
     /**
      * 付费参加活动
