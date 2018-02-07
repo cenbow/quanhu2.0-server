@@ -101,6 +101,7 @@ public class CommentProvider implements CommentApi {
             }
             comment.setShelveFlag((byte) 10);
             comment.setDelFlag((byte) 10);
+            comment.setCreateDate(new Date());
             int count = commentService.accretion(comment);
             if (count > 0) {
                 map.put("result", 1);

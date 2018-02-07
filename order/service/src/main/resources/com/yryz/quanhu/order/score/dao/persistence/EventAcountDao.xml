@@ -54,10 +54,10 @@
 		UPDATE event_acount 
 		<trim prefix="set" prefixOverrides=",">
 			<if test="score != null">
-				score = score + #{score},
+				score =  #{score},
 			</if>
 			<if test="grow != null">
-				grow = grow + #{grow},
+				grow =  #{grow},
 			</if>
 			<if test="growLevel != null">
 				grow_level = #{growLevel},
