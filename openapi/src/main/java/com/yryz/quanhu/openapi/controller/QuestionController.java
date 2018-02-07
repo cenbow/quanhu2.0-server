@@ -43,7 +43,7 @@ public class QuestionController {
 	@PostMapping(value = "/services/app/{version}/coterie/question/add")
 	@UserBehaviorValidation(event = "提问发布", blacklist = true, illegalWords = true,login = false,isCoterieMute =true)
 	@UserBehaviorArgs(
-			sourceContexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
+			contexts={"object.QuestionDto.content","object.QuestionDto.contentSource"},
 			coterieId="object.QuestionDto.coterieId" ,sourceUserId="object.QuestionDto.targetId")
 	public Response<QuestionVo> saveQuestion(@RequestBody QuestionDto questionDto, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);

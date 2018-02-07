@@ -9,8 +9,10 @@ package com.yryz.quanhu.message.push.mq;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
+import com.yryz.common.message.MessageVo;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.message.message.mongo.MessageMongo;
 import com.yryz.quanhu.message.push.entity.PushReqVo.CommonPushType;
 import com.yryz.quanhu.message.push.constants.AmqpConstants;
 import com.yryz.quanhu.message.push.entity.PushParamsDTO;
@@ -24,6 +26,7 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +41,9 @@ import java.util.List;
 public class PushMsgConsumer {
 
 	private static final Logger logger = LoggerFactory.getLogger(PushMsgConsumer.class);
+
+	@Autowired
+	private MessageMongo messageMongo;
 
 	/**
 	 * QueueBinding: exchange和queue的绑定
@@ -98,20 +104,22 @@ public class PushMsgConsumer {
 		msg_id = JPushService.sendPushMessage(paramsDTO, to);
 		logger.info("push message params:{}, msg_id:{}  ", JsonUtils.toFastJson(paramsDTO), msg_id);
 
-		/*try {
-			MessageVo messageVo = JsonUtils.fromJson(paramsDTO.getMsg(), new TypeReference<MessageVo>() {
-			});
+
+		try {
+			MessageVo messageVo = JsonUtils.fromJson(paramsDTO.getMsg(), new TypeReference<MessageVo>() {});
 			if (messageVo != null && StringUtils.isNotBlank(messageVo.getMessageId())) {
-				MessageVo vo = messageService.get(messageVo.getMessageId());
+				logger.info("start update push message status");
+				MessageVo vo = messageMongo.get(messageVo.getMessageId());
 				if (vo != null && StringUtils.isNotBlank(vo.getJpId())) {
-					MessageVo messageVo2 = new MessageVo(messageVo.getMessageId());
-					messageVo2.setJpId(msg_id);
-					messageService.update(messageVo2);
+					MessageVo toUpdate = new MessageVo(messageVo.getMessageId());
+					toUpdate.setJpId(msg_id);
+					messageMongo.update(toUpdate);
+					logger.info("finish update push message status");
 				}
 			}
-		} catch (Exception e) {
-
-		}*/
+		} catch (Throwable e) {
+			logger.error("update message status error", e);
+		}
 
 	}
 

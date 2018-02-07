@@ -372,7 +372,7 @@ public class DraftProvider implements DraftApi {
 //            record.setShelveFlag(CommonConstants.SHELVE_YES);
 
             Assert.isNull(record.getCoterieId(), "平台文章发布 没有：CoterieId");
-            Assert.isNull(record.getKid(), "平台文章发布 没有：Kid");
+            Assert.notNull(record.getKid(), "平台文章发布 没有：Kid");
             Assert.isTrue(null == record.getContentPrice() || record.getContentPrice() == 0L,
                     "平台文章发布 不能设置付费：ContentPrice");
 

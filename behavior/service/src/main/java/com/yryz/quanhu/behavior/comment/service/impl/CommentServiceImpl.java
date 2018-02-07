@@ -75,7 +75,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public int accretion(Comment comment) {
         RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
-        comment.setModuleEnum(ModuleContants.COMMENT);
         int count = commentDao.accretion(comment);
         if (count > 0) {
             Comment commentRedis = commentDao.querySingleCommentById(comment.getId());

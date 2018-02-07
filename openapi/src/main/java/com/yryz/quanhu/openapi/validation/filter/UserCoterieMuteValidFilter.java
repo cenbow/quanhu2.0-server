@@ -1,21 +1,18 @@
 package com.yryz.quanhu.openapi.validation.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.openapi.validation.BehaviorArgsBuild;
 import com.yryz.quanhu.openapi.validation.BehaviorValidFilterChain;
 import com.yryz.quanhu.openapi.validation.IBehaviorValidFilter;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -48,7 +45,7 @@ public class UserCoterieMuteValidFilter implements IBehaviorValidFilter {
         Object objValue = behaviorArgsBuild.getParameterValue(filterChain.getUserBehaviorArgs().coterieId(),
                 filterChain.getJoinPoint().getArgs());
         if(objValue==null){
-            throw new QuanhuException("","","缺少私圈参数ID");
+            throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
         }
 
         long coterieId = Long.valueOf(String.valueOf(objValue));
@@ -57,7 +54,7 @@ public class UserCoterieMuteValidFilter implements IBehaviorValidFilter {
             //执行下一个
             filterChain.execute();
         }else{
-            throw new QuanhuException("","","您已被圈主禁言，不允许操作");
+            throw new QuanhuException(ExceptionEnum.COTERIE_USER_NO_TALK);
         }
     }
 
