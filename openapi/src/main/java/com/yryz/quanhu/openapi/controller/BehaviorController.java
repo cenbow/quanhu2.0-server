@@ -1,7 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
@@ -34,7 +34,7 @@ public class BehaviorController {
     @Reference(check = false)
     private CountFlagApi countFlagApi;
 
-    @NotLogin
+    
     @ApiOperation("查询计数")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/behavior/getCount")
@@ -42,7 +42,7 @@ public class BehaviorController {
         return countApi.getCount(countType, kid, null);
     }
 
-    @NotLogin
+    
     @ApiOperation("提交事件")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/behavior/commitCount")
@@ -50,7 +50,7 @@ public class BehaviorController {
         return countApi.commitCount(BehaviorEnum.Read, new Long(map.get("kid").toString()), "", 20L);
     }
 
-    @NotLogin
+    
     @ApiOperation("查询统计以及状态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/behavior/getCountFlag")

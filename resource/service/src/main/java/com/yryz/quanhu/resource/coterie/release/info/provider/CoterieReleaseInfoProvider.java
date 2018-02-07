@@ -15,6 +15,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
@@ -177,21 +178,31 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
 
             Byte canReadFlag = ReleaseConstants.CanReadType.NO;
 
-            // 付费文章 设置可读标识
-            if (infoVo.getContentPrice() == 0L) {
-                canReadFlag = ReleaseConstants.CanReadType.YES;
-            } else if (null != headerUserId) {
+            /** 非登录用户：免费文章可读
+                        登录用户：圈主可读、免费文章圈粉可读、付费文章购买过可读*/
+            if (null == headerUserId) {
+                if (infoVo.getContentPrice() == 0L) {
+                    canReadFlag = ReleaseConstants.CanReadType.YES;
+                }
+            } else {
                 // 访问用户在私圈角色
                 Integer headerUserRole = ResponseUtils
                         .getResponseData(coterieMemberAPI.permission(headerUserId, vo.getCoterieId()));
-                // 圈主可直接访问
+                // 圈主可读
                 if (MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)) {
                     canReadFlag = ReleaseConstants.CanReadType.YES;
                 }
-                // 付费文章,圈粉查询购买记录
-                else if (MemberConstant.Permission.MEMBER.getStatus().equals(headerUserRole)) {
-                    // 查询 购买记录
-                    if (orderSDK.isBuyOrderSuccess(BranchFeesEnum.READ.toString(), headerUserId, kid)) {
+                // 非圈主
+                else {
+                    // 免费文章圈粉可读
+                    if (infoVo.getContentPrice() == 0L) {
+                        if (!MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)
+                                && !MemberConstant.Permission.MEMBER.getStatus().equals(headerUserRole)) {
+                            throw new QuanhuException(ExceptionEnum.COTERIE_NOT_MEMBER);
+                        }
+                    }
+                    // 付费文章购买过可读
+                    else if (orderSDK.isBuyOrderSuccess(BranchFeesEnum.READ.toString(), headerUserId, kid)) {
                         canReadFlag = ReleaseConstants.CanReadType.YES;
                     }
                 }
@@ -283,7 +294,9 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             }
 
             resourceTotal.setCreateDate(DateUtils.getString(Calendar.getInstance().getTime()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(releaseInfo));
+            CoterieReleaseInfoVo coterieReleaseInfoVo = new CoterieReleaseInfoVo();
+            BeanUtils.copyProperties(coterieReleaseInfoVo,releaseInfo);
+            resourceTotal.setExtJson(JsonUtils.toFastJson(coterieReleaseInfoVo));
             resourceTotal.setModuleEnum(NumberUtils.toInt(ModuleContants.RELEASE));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(releaseInfo.getKid());

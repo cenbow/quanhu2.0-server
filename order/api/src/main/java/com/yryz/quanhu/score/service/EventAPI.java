@@ -28,8 +28,8 @@ public interface EventAPI {
     
     
     /**
-     *查询积分流水表
-     * @param list
+     * 积分统计查询
+     * @param EventReportVo
      */
     Response<EventReportVo> getScoreFlowList(EventInfo log); 
 

@@ -38,7 +38,7 @@ public class ActivityBody implements Body {
 	 * 私圈名称
 	 */
 	private String coterieName;
-	
+
 	/**
 	 * @param circleId
 	 * @param circleName

@@ -1,5 +1,11 @@
 package com.yryz.quanhu.openapi.validation.filter;
 
+import org.apache.commons.lang.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
@@ -8,10 +14,6 @@ import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.openapi.validation.BehaviorArgsBuild;
 import com.yryz.quanhu.openapi.validation.BehaviorValidFilterChain;
 import com.yryz.quanhu.openapi.validation.IBehaviorValidFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -43,14 +45,16 @@ public class UserCoterieMemberValidFilter implements IBehaviorValidFilter{
         //私圈ID
         String coterieKey = filterChain.getUserBehaviorArgs().coterieId();
         Object coterieValue = behaviorArgsBuild.getParameterValue(coterieKey,filterChain.getJoinPoint().getArgs());
+        
+        // 根据业务场景，若入参中有私圈ID，就做私圈成员鉴权
         if(coterieValue==null){
-            throw new QuanhuException("","","私圈参数非法");
+            return;
         }
-
-        /**
-         * 验证
-         */
-        long coterieId = Long.parseLong(String.valueOf(coterieValue));
+        long coterieId = NumberUtils.toLong(coterieValue.toString());
+        if(coterieId <= 0 ){
+            return;
+        }
+        
         Response<Integer> rpc = coterieMemberAPI.permission(userId,coterieId);
         int status = rpc.getData().intValue();
         logger.info("权限状态：{}",status);

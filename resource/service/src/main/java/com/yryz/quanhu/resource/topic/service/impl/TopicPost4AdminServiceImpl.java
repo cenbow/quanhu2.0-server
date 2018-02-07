@@ -69,7 +69,6 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
      */
     @Override
     public TopicPostVo getDetail(Long kid, Long userId) {
-        TopicAndPostVo topicAndPostVo = new TopicAndPostVo();
         /**
          * 检验参数
          */
@@ -120,6 +119,12 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
         if (com.yryz.common.utils.StringUtils.isNotBlank(dto.getStartTime()) && com.yryz.common.utils.StringUtils.isNotBlank(dto.getEndTime())) {
             criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
+        }
+        if(dto.getKid()!=null){
+            criteria.andKidEqualTo(dto.getKid());
+        }
+        if(dto.getTopicId()!=null){
+            criteria.andTopicIdEqualTo(dto.getTopicId());
         }
         if (dto.getShelveFlag() != null) {
             criteria.andShelveFlagEqualTo(dto.getShelveFlag());

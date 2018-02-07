@@ -38,7 +38,6 @@ import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.contants.LoginType;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsType;
-import com.yryz.quanhu.user.contants.ThirdConstants;
 import com.yryz.quanhu.user.contants.UserAccountStatus;
 import com.yryz.quanhu.user.contants.UserIdentity;
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;

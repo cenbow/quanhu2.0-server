@@ -8,6 +8,7 @@
 package com.yryz.quanhu.user.dao;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -102,13 +103,13 @@ public class AuthRedisDao {
 	 * @param devType
 	 * @return
 	 */
-	public long getRefreshFlag(Long userId,String appId,DevType devType,long expireAt){
+	public long getRefreshFlag(Long userId,String appId,DevType devType,long expireTime){
 		String key = AuthApi.refreshFlagKey(userId, appId, devType);
 		try {
 			RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
 			long flag = redisTemplate.opsForValue().increment(key, 1);
 			if(redisTemplate.getExpire(key) < 0){
-				redisTemplate.expireAt(key, new Date(expireAt));
+				redisTemplate.expire(key, expireTime,TimeUnit.SECONDS);
 			}
 			return flag;
 		} catch (Exception e) {

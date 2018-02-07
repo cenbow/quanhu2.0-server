@@ -1,27 +1,20 @@
 package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Lists;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.common.utils.PageModel;
 import com.yryz.quanhu.dymaic.service.ElasticsearchService;
 import com.yryz.quanhu.user.dao.UserStarAuthDao;
-import com.yryz.quanhu.user.dao.UserTagDao;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
-import com.yryz.quanhu.user.dto.UserStarAuthDto;
 import com.yryz.quanhu.user.dto.UserStarAuthDto;
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import com.yryz.quanhu.user.entity.UserStarAuth;
-import com.yryz.quanhu.user.entity.UserTag;
 import com.yryz.quanhu.user.service.UserStarForAdminService;
 import com.yryz.quanhu.user.service.UserTagService;
+import com.yryz.quanhu.user.vo.EventAccountVO;
 import com.yryz.quanhu.user.vo.StarAuthInfoVO;
 import com.yryz.quanhu.user.vo.UserInfoVO;
-import com.yryz.quanhu.user.vo.UserTagVO;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +45,6 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
     @Value("${appId}")
     private String appId;
-
     @Override
     public Boolean updateAuth(UserStarAuthDto dto) {
         /**
@@ -73,14 +65,22 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
     public Boolean updateRecmd(UserStarAuthDto dto,boolean isTop) {
 
         UserStarAuth starAuth = new UserStarAuth();
-        starAuth.setRecommendStatus(dto.getRecommendStatus());
-        starAuth.setRecommendHeight(dto.getRecommendHeight());
-        starAuth.setRecommendOperate(dto.getRecommendOperate());
-        starAuth.setRecommendDesc(dto.getRecommendDesc());
+        starAuth.setKid(dto.getKid());
+        starAuth.setRecommendStatus(dto.getRecommendStatus());          //状态
+        starAuth.setRecommendHeight(dto.getRecommendHeight());          //权重值
+        starAuth.setRecommendOperate(dto.getRecommendOperate());        //推荐人
+        starAuth.setRecommendDesc(dto.getRecommendDesc());              //推荐语
+        starAuth.setLastUpdateUserId(dto.getLastUpdateUserId());        //操作人
+        starAuth.setOperational(dto.getOperational());                  //推荐人名称
+
+
+        if(starAuth.getRecommendHeight()==null){
+            starAuth.setRecommendHeight(0);
+        }
 
         //置顶  计算推荐权重最大值
         if(isTop){
-            int maxRecmdNum = userStarAuthDao.getStarMaxWeight();
+            int maxRecmdNum = userStarAuthDao.getMaxHeight();
             maxRecmdNum++;
             starAuth.setRecommendHeight(maxRecmdNum);
         }
@@ -98,18 +98,23 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
          * 查询用户信息
          */
         UserStarAuth starAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+        if(starAuth==null){
+            throw new RuntimeException("达人查询记录不存在");
+        }
         /**
          * 查询标签信息
          */
-        List<Long> userId = Lists.newArrayList(starAuth.getUserId());
-        Map<Long, List<UserTagVO>>  outMap = userTagService.getUserTags(userId);
-
-        return outArray;
+        return userTagService.getUserTags(starAuth.getUserId());
     }
 
     @Override
     public Boolean updateTags(UserStarAuthDto dto) {
 
+        //查询UserId
+        UserStarAuth entity = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+        if(entity==null){
+            throw new RuntimeException("达人查询记录不存在");
+        }
         Set<Long> tags = dto.getTagIds();
         Iterator<Long> iterator = tags.iterator();
         StringBuffer tagIdsBuffer = new StringBuffer();
@@ -121,7 +126,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         }
 
         UserTagDTO userTagDTO = new UserTagDTO();
-        userTagDTO.setUserId(dto.getUserId());
+        userTagDTO.setUserId(entity.getUserId());
         userTagDTO.setTagIds(tagIdsBuffer.toString());
         userTagDTO.setUpdateUserId(dto.getLastUpdateUserId());
         userTagDTO.setTagType((byte) 11);       //统一为运营设置标签
@@ -205,13 +210,19 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
      * @return
      */
     private PageList<UserStarAuthDto> executeElasticQuery(AdminUserInfoDTO admin){
+
+
+        PageList<UserStarAuthDto> pageList = new PageList<>();
+
         List<UserStarAuthDto> returnArray = new ArrayList<>();
         try{
             Response<PageList<UserInfoVO>> rpc = elasticsearchService.adminSearchUser(admin);
             List<UserInfoVO> esArray = rpc.getData().getEntities();
+
             for(int i = 0 ; i < esArray.size() ; i++){
                 UserInfoVO infoVo = esArray.get(i);
                 StarAuthInfoVO auth = infoVo.getUserStarInfo();
+                EventAccountVO event = infoVo.getEventAccountInfo();
                 if(auth==null){
                     continue;
                 }
@@ -224,13 +235,19 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
                 authDto.setUserId(Long.parseLong(auth.getUserId()));
                 authDto.setAuthTime(auth.getAuthTime());
                 authDto.setCreateDate(infoVo.getUserBaseInfo().getCreateDate());
-
+                if(event!=null){
+                    authDto.setUserLevel(Integer.parseInt(event.getGrowLevel()));
+                }
                 returnArray.add(authDto);
             }
+            pageList.setEntities(returnArray);
+            pageList.setPageSize(rpc.getData().getPageSize());
+            pageList.setCurrentPage(rpc.getData().getCurrentPage());
+            pageList.setCount(rpc.getData().getCount());
         }catch (Exception e){
             throw new QuanhuException("","","ES查询失败",e);
         }
-        return new PageModel<UserStarAuthDto>().getPageList(returnArray);
+        return pageList;
     }
 
 

@@ -7,9 +7,8 @@
  */
 package com.yryz.quanhu.user.service;
 
-import java.util.List;
-
 import com.github.pagehelper.Page;
+import com.yryz.quanhu.user.dto.UserImgAuditDTO;
 import com.yryz.quanhu.user.entity.UserImgAudit;
 
 /**
@@ -23,7 +22,7 @@ public interface UserImgAuditService {
 	 * 审核用户头像审核信息
 	 * 
 	 * @param record
-	 * @param aduitActionStatus 0:初始化 1:通过 2:拒绝
+	 * @param aduitActionStatus 10:初始化 11:通过 12:拒绝
 	 * @return
 	 */
 	int auditImg(UserImgAudit record,Integer aduitActionStatus);
@@ -31,17 +30,16 @@ public interface UserImgAuditService {
 	/**
 	 * 批量审核用户头像审核信息
 	 * 
-	 * @param record
-	 * @param aduitActionStatus 1:通过 2:拒绝
+	 * @param auditDTO
 	 * @return
 	 */
-	int batchAuditImg(List<UserImgAudit> record,Integer aduitActionStatus);
+	int batchAuditImg(UserImgAuditDTO auditDTO);
 	/**
 	 * 查询头像审核信息
 	 * @param pageNo
 	 * @param pageSize
 	 * @param userId
-	 * @param auditStatus 0:待审核 1:通过 2:拒绝
+	 * @param auditStatus 10:待审核 11:通过 12:拒绝
 	 * @return
 	 */
 	Page<UserImgAudit> listByUserId(Integer pageNo,Integer pageSize,Long userId, Integer auditStatus);
