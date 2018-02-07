@@ -52,8 +52,8 @@ public class PushMsgSender {
 	/**
 	 * mq不通，先直接调用，后续删除
 	 */
-//	@Autowired
-//	private PushMsgConsumer pushMsgConsumer;
+	@Autowired
+	private PushMsgConsumer pushMsgConsumer;
 
 	/**
 	 * 消息推送
@@ -62,8 +62,8 @@ public class PushMsgSender {
 	public void pushMessage(PushParamsDTO paramsDTO) {
 		if (null != paramsDTO) {
 			String body = GsonUtils.parseJson(paramsDTO);
-			this.directSend(body);
-//			pushMsgConsumer.exceute(paramsDTO);
+//			this.directSend(body);
+			pushMsgConsumer.exceute(paramsDTO);
 		}
 	}
 }
