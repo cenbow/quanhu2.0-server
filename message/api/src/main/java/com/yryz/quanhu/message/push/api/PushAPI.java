@@ -24,6 +24,7 @@ public interface PushAPI {
 	 * 支持custId别名、tag群推、registrationId设备号推送，custId别名设备号混合推送<br/>
 	 * 选择设备号推送时，存在设备号就按设备号推送，否则不推送<br/>
 	 * 只有选择设备号和别名同时推送时，优先按设备号推送，设备号不存在时，用别名推送
+	 * 注意rpc context传入appId
 	 * @param reqVo
 	 * @throws
 	 */

@@ -159,9 +159,6 @@ public class PushServiceImpl implements PushService {
 	 */
 	private PushConfigDTO getPushConfig(String appId) {
 		PushConfigDTO configDTO = null;
-		if (StringUtils.isBlank(appId)) {
-			appId = Context.getProperty("appId.default");
-		}
 		configDTO = configRemote.getPushConfig(appId);
 		/*
 		if (StringUtils.isNotEmpty(appId)) {
