@@ -1,11 +1,14 @@
 package com.yryz.quanhu.user.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.entity.UserStarAuth;
 import com.yryz.quanhu.user.entity.UserStarAuthLog;
+import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
 /**
  * 达人业务
@@ -97,4 +100,10 @@ public interface UserStarService {
      * @return
      */
     Integer countStar();
+    /**
+     * 查询达人简要信息
+     * @param userIds
+     * @return
+     */
+    Map<String,UserStarSimpleVo> getStarSimple(Set<String> userIds);
 }

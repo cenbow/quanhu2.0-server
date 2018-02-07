@@ -101,6 +101,7 @@ public class CommentProvider implements CommentApi {
             }
             comment.setShelveFlag((byte) 10);
             comment.setDelFlag((byte) 10);
+            comment.setCreateDate(new Date());
             int count = commentService.accretion(comment);
             if (count > 0) {
                 map.put("result", 1);
@@ -129,41 +130,16 @@ public class CommentProvider implements CommentApi {
             int count = commentService.delComment(comment);
             if (count > 0) {
                 map.put("result", 1);
+                if(comment.getTopId()==0){
+                    this.delBatch(comment);
+                }
                 Comment comments = new Comment();
                 comments.setKid(comment.getKid());
                 Comment commentStr = commentService.querySingleComment(comments);
-
-                if (comment.getTopId() == 0) {
-                    CommentFrontDTO commenFront = new CommentFrontDTO();
-                    commenFront.setTopId(commentStr.getKid());
-                    commenFront.setResourceId(commentStr.getResourceId());
-                    List<CommentVO> commentVOS = commentService.queryComments(commenFront).getEntities();
-                    List<Comment> commentsBatch = new ArrayList<Comment>();
-                    for (CommentVO commentVO : commentVOS) {
-                        Comment commentSingle = new Comment();
-                        commentSingle.setKid(commentVO.getKid());
-                        commentSingle.setResourceId(commentVO.getResourceId());
-                        commentSingle.setCreateUserId(commentVO.getCreateUserId());
-                        commentsBatch.add(commentSingle);
-                        try{
-                            stringRedisTemplate.delete("COMMENT:" + commentVO.getModuleEnum() + ":" + commentVO.getKid() + "_" + commentVO.getTopId() + "_" + commentVO.getResourceId());
-                        }catch (Exception e){
-                            logger.info("批量删除Redis评论失败");
-                        }
-
-                    }
-                    try{
-                       int batchCount = commentService.updownBatch(commentsBatch);
-                       if(batchCount>0){
-                            logger.info("批量删除评论成功");
-                       }
-                    }catch (Exception e){
-                        logger.info("批量删除评论失败"+e);
-                    }
-
-                }
                 try {
-                    stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
+                    if(null!=commentStr){
+                        stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
+                    }
                 } catch (Exception e) {
                     logger.info("从redis中移除评论数据失败" + e);
                 }
@@ -237,13 +213,64 @@ public class CommentProvider implements CommentApi {
     @Override
     public Response<Integer> updownSingle(Comment comment) {
         try {
-            return ResponseUtils.returnObjectSuccess(commentService.updownSingle(comment));
+
+            int count = commentService.updownSingle(comment);
+            if (count > 0) {
+                if(comment.getTopId()==0){
+                    this.delBatch(comment);
+                }
+                Comment comments = new Comment();
+                comments.setKid(comment.getKid());
+                Comment commentStr = commentService.querySingleComment(comments);
+                try {
+                    if(null!=commentStr){
+                        stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
+                    }
+                } catch (Exception e) {
+                    logger.info("从redis中移除评论数据失败" + e);
+                }
+            }
+            return ResponseUtils.returnObjectSuccess(count);
         } catch (Exception e) {
             logger.error("", e);
             return ResponseUtils.returnException(e);
         }
     }
 
+    public void delBatch(Comment comment) {
+        Comment comments = new Comment();
+        comments.setKid(comment.getKid());
+        Comment commentStr = commentService.querySingleComment(comments);
+        if (comment.getTopId() == 0) {
+            CommentFrontDTO commenFront = new CommentFrontDTO();
+            commenFront.setTopId(commentStr.getKid());
+            commenFront.setResourceId(commentStr.getResourceId());
+            List<CommentVO> commentVOS = commentService.queryComments(commenFront).getEntities();
+            List<Comment> commentsBatch = new ArrayList<Comment>();
+            if (null != commentVOS && commentVOS.size() > 0) {
+                for (CommentVO commentVO : commentVOS) {
+                    Comment commentSingle = new Comment();
+                    commentSingle.setKid(commentVO.getKid());
+                    commentSingle.setResourceId(commentVO.getResourceId());
+                    commentSingle.setCreateUserId(commentVO.getCreateUserId());
+                    commentsBatch.add(commentSingle);
+                    try {
+                        stringRedisTemplate.delete("COMMENT:" + commentVO.getModuleEnum() + ":" + commentVO.getKid() + "_" + commentVO.getTopId() + "_" + commentVO.getResourceId());
+                    } catch (Exception e) {
+                        logger.info("批量删除Redis评论失败");
+                    }
+                }
+                try {
+                    int batchCount = commentService.updownBatch(commentsBatch);
+                    if (batchCount > 0) {
+                        logger.info("批量删除评论成功");
+                    }
+                } catch (Exception e) {
+                    logger.info("批量删除评论失败" + e);
+                }
+            }
+        }
+    }
 
     public void switchSend(Comment comment) {
         UserSimpleVO userSimpleVO = userApi.getUserSimple(comment.getCreateUserId()).getData();

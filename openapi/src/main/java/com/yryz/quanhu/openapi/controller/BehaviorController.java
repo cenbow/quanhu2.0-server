@@ -43,12 +43,12 @@ public class BehaviorController {
     }
 
     
-    @ApiOperation("提交事件")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/behavior/commitCount")
-    public Response<Object> countCommit(@RequestBody Map<String, Object> map) {
-        return countApi.commitCount(BehaviorEnum.Read, new Long(map.get("kid").toString()), "", 20L);
-    }
+//    @ApiOperation("提交事件")
+//    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+//    @PostMapping(value = "/services/app/{version}/behavior/commitCount")
+//    public Response<Object> countCommit(@RequestBody Map<String, Object> map) {
+//        return countApi.commitCount(BehaviorEnum.Read, new Long(map.get("kid").toString()), "", 20L);
+//    }
 
     
     @ApiOperation("查询统计以及状态")

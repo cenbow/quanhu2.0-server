@@ -126,22 +126,35 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 			if (existsLevel.compareTo(growLevel) >= 0) {
 				return 0;
 			}
-			int grow = gl.getLevelStart();
+			int growLevelStart  = gl.getLevelStart();
+			
+//			if ( followers.compareTo("20")<0){
+//				growLevel = "4";
+//				growLevelStart = 500;
+//			}
+//			if ( followers.compareTo("20")>=0){
+//				growLevel = "5";
+//				growLevelStart = 500;
+//			}
 			// 之前的累计成长值
 			long lastGrow = ea.getGrow();
-			int newGrow = (int) Math.abs(grow - lastGrow);
-			GrowFlow gf = new GrowFlow(userId, eventCode, newGrow);
-			gf.setAllGrow(grow + 0L);
-			gf.setCreateTime(now);
-			gf.setUpdateTime(now);
-			growFlowService.save(gf);
-
-			ea.setGrow(newGrow + 0L);
-			ea.setGrowLevel(growLevel);
-			ea.setUpdateTime(now);
-			ea.setScore(null);
-			eventAcountService.update(ea);
-			return 1;
+//			//判断当前成长值是否小于等级开始区间
+//			if (lastGrow > growLevelStart) {
+//				return 0;
+//			}
+				int newGrow = (int) Math.abs(growLevelStart  - lastGrow);
+				GrowFlow gf = new GrowFlow(userId, eventCode, newGrow);
+				gf.setAllGrow(growLevelStart  + 0L);
+				gf.setCreateTime(now);
+				gf.setUpdateTime(now);
+				growFlowService.save(gf);
+	
+				ea.setGrow(growLevelStart  + 0L);
+				ea.setGrowLevel(growLevel);
+				ea.setUpdateTime(now);
+				ea.setScore(null);
+				eventAcountService.update(ea);
+				return 1;
 		}
 		//事件账户中还没有个人记录
 		GrowFlow gf = new GrowFlow(userId, eventCode, gl.getLevelStart());

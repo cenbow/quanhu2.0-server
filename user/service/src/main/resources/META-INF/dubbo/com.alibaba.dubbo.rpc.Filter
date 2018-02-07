@@ -1,1 +1,2 @@
 providerDemo=com.yryz.common.interceptor.ProviderDemoFilter
+consumerCommonFilter=com.yryz.common.interceptor.ConsumerCommonFilter

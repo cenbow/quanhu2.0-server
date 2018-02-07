@@ -37,7 +37,7 @@ public interface UserStarAuthDao extends BaseDao{
      * @param userIds
      * @return
      */
-    List<UserStarAuth> getByUserIds(@Param("userIds")List<String> userIds);
+    List<UserStarAuth> getByUserIds(@Param("userIds")List<String> userIds,@Param("auditStatus")Byte auditStatus);
     
     /**
      * 更新达人认证信息
