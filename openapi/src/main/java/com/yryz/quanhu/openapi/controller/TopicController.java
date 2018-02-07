@@ -72,10 +72,4 @@ public class TopicController {
 		}
 		return topicApi.deleteTopic(dto.getKid(),Long.valueOf(userId));
 	}
-
-
-
-
-
-
 }
