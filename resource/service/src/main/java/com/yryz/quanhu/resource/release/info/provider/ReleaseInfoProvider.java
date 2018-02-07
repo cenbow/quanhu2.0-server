@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.common.utils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -318,7 +319,9 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             }
 
             resourceTotal.setCreateDate(DateUtils.getString(Calendar.getInstance().getTime()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(releaseInfo));
+            ReleaseInfoVo releaseInfoVo = new ReleaseInfoVo();
+            BeanUtils.copyProperties(releaseInfoVo,releaseInfo);
+            resourceTotal.setExtJson(JsonUtils.toFastJson(releaseInfoVo));
             resourceTotal.setModuleEnum(NumberUtils.toInt(ModuleContants.RELEASE));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(releaseInfo.getKid());

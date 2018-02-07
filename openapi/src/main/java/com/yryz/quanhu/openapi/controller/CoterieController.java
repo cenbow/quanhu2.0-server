@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -59,6 +60,7 @@ public class CoterieController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @GetMapping(value = "/{version}/coterieInfo/count")
+    @UserBehaviorValidation(event = "我创建的和加入的私圈数量和", login = true)
     public Response<Integer> getMyCoterieCount(@RequestHeader Long userId, HttpServletRequest request) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
@@ -72,6 +74,7 @@ public class CoterieController {
             @ApiImplicitParam(name = "info", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @PostMapping(value = "/{version}/coterieInfo/create")
+    @UserBehaviorValidation(event = "发布私圈", login = true)
     public Response<CoterieInfo> publish(@RequestHeader Long userId, @RequestBody CoterieBasicInfo info, HttpServletRequest request) {
         info.setOwnerId(userId.toString());
         if(info.getJoinFee()!=null && info.getJoinFee()!=0){//收费一定不审核
@@ -86,6 +89,7 @@ public class CoterieController {
             @ApiImplicitParam(name = "config", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @PostMapping(value = "/{version}/coterieInfo/config")
+    @UserBehaviorValidation(event = "设置私圈", login = true)
     public Response<CoterieInfo> config(@RequestHeader Long userId, @RequestBody CoterieBasicInfo config, HttpServletRequest request) {
         Integer permission = ResponseUtils.getResponseData(coterieMemberAPI.permission(userId, config.getCoterieId()));
 
@@ -143,6 +147,7 @@ public class CoterieController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @GetMapping(value = "/{version}/coterieInfo/creator")
+    @UserBehaviorValidation(event = "我创建的私圈列表", login = true)
     public Response<List<CoterieInfo>> getMyCreateCoterie(@RequestHeader Long userId,Integer currentPage, Integer pageSize) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
@@ -187,6 +192,7 @@ public class CoterieController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @GetMapping(value = "/{version}/coterieInfo/list/join")
+    @UserBehaviorValidation(event = "我加入的私圈列表", login = true)
     public Response<List<CoterieInfo>> getMyJoinCoterie(@RequestHeader Long userId,Integer pageNum,Integer pageSize) {
     	if(userId==null){
     		return ResponseUtils.returnCommonException("参数错误");
@@ -200,11 +206,6 @@ public class CoterieController {
         return coterieApi.getMyJoinCoterie(userId.toString(),pageNum,pageSize);
     }
     
-    /**
-     * 获取我加入的私圈详情
-     *
-     * @return
-     */
     @ApiOperation("个人主页加入的私圈列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),

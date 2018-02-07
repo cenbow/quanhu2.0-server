@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -45,7 +45,8 @@ public class ReleaseInfoController {
             @ApiImplicitParam(name = "record", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
             @ApiImplicitParam(name = "token", paramType = "header", required = true) })
-    @UserBehaviorValidation(event = "文章发布", login = true, mute = true)
+    @UserBehaviorValidation(event = "文章发布", login = true, mute = true, illegalWords = true)
+    @UserBehaviorArgs(contexts={"object.ReleaseInfo.title","object.ReleaseInfo.content"}, contentSources={"object.ReleaseInfo.contentSource"})
     @PostMapping(value = "{version}/release/info/single")
     public Response<ReleaseInfo> release(HttpServletRequest request, @RequestBody ReleaseInfo record,
             @RequestHeader("userId") Long headerUserId) {
@@ -55,7 +56,7 @@ public class ReleaseInfoController {
         return releaseInfoApi.release(record);
     }
 
-    @NotLogin
+    
     @ApiOperation("文章详情")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),

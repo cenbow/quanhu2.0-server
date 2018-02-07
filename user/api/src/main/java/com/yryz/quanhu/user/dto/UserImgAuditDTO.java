@@ -1,6 +1,9 @@
 package com.yryz.quanhu.user.dto;
 
+import java.util.List;
+
 import com.yryz.common.entity.GenericEntity;
+import com.yryz.quanhu.user.contants.Constants.ImgAuditStatus;
 
 /**
  * 用户头像审核
@@ -10,44 +13,65 @@ import com.yryz.common.entity.GenericEntity;
 @SuppressWarnings("serial")
 public class UserImgAuditDTO extends GenericEntity{
     /**
-     * 用户id
+     * kid集合
      */
-    private String userId;
-
+    private List<Long> kids;
     /**
-     * 用户头像
+     * 用户id集合
      */
-    private String userImg;
-
-    public String getUserImg() {
-		return userImg;
+    private List<Long> userIds;
+    /**
+     * 审核状态 {@link ImgAuditStatus}
+     */
+    private Byte auditStatus;
+    /**
+     * 操作人名称
+     */
+    private String operational;
+	public Byte getAuditStatus() {
+		return auditStatus;
 	}
 
-	public void setUserImg(String userImg) {
-		this.userImg = userImg;
+	public void setAuditStatus(Byte auditStatus) {
+		this.auditStatus = auditStatus;
 	}
 
-	public String getUserId() {
-		return userId;
+	public List<Long> getUserIds() {
+		return userIds;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserIds(List<Long> userIds) {
+		this.userIds = userIds;
+	}
+
+	public String getOperational() {
+		return operational;
+	}
+
+	public void setOperational(String operational) {
+		this.operational = operational;
 	}
 
 	public UserImgAuditDTO() {
 		super();
 	}
-	/**
-	 * 批量头像审核
-	 * @param userId
-	 * @param userImg
-	 */
-	public UserImgAuditDTO(String userId, String userImg) {
+
+	public UserImgAuditDTO(List<Long> kids, List<Long> userIds, Byte auditStatus, String operational) {
 		super();
-		this.userId = userId;
-		this.userImg = userImg;
+		this.kids = kids;
+		this.userIds = userIds;
+		this.auditStatus = auditStatus;
+		this.operational = operational;
 	}
+
+	public List<Long> getKids() {
+		return kids;
+	}
+
+	public void setKids(List<Long> kids) {
+		this.kids = kids;
+	}
+
 
 
 }

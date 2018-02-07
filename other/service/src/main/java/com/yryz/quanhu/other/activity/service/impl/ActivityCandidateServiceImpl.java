@@ -229,7 +229,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             String key = ActivityCandidateConstants.getKeyId(activityVoteDto.getActivityInfoId());
             if(!stringRedisTemplate.hasKey(key)) {
                 this.setList(activityVoteDto.getActivityInfoId());
-                this.setRank(activityVoteDto.getActivityInfoId());
+//                this.setRank(activityVoteDto.getActivityInfoId());
             }
             long pageNo = ActivityPageConstants.getCurrentPage(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());
             long pageSize = ActivityPageConstants.getPageSize(activityVoteDto.getCurrentPage(), activityVoteDto.getPageSize());

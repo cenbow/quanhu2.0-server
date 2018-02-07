@@ -1,11 +1,8 @@
 package com.yryz.quanhu.user.provider;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.user.vo.UserTagVO;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +12,12 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import com.yryz.quanhu.user.service.UserTagApi;
 import com.yryz.quanhu.user.service.UserTagService;
+import com.yryz.quanhu.user.vo.UserTagVO;
 
 @Service(interfaceClass=UserTagApi.class)
 public class UserTagProvider implements UserTagApi{
