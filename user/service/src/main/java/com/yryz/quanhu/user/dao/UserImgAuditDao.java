@@ -7,7 +7,6 @@
  */
 package com.yryz.quanhu.user.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -47,7 +46,7 @@ public interface UserImgAuditDao {
 	 * @param id
 	 * @return
 	 */
-	List<UserImgAudit> listByUserId(@Param("userId") Long userId, @Param("auditStatus") Integer auditStatus);
+	List<UserImgAudit> listByUserId(@Param("userId") String userId, @Param("auditStatus") Integer auditStatus);
 
 	/**
 	 * 更新头像审核信息

@@ -9,7 +9,7 @@ public class UserImgAuditFindDTO implements Serializable {
 	
 	private Integer pageNo = 1;
 	private Integer pageSize = 10;
-	private Long userId;
+	private String userId;
 	/**
 	 * 审核状态 {@link ImgAuditStatus}
 	 */
@@ -26,10 +26,10 @@ public class UserImgAuditFindDTO implements Serializable {
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
 	}
-	public Long getUserId() {
+	public String getUserId() {
 		return userId;
 	}
-	public void setUserId(Long userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 	public Integer getAuditStatus() {
@@ -41,7 +41,7 @@ public class UserImgAuditFindDTO implements Serializable {
 	public UserImgAuditFindDTO() {
 		super();
 	}
-	public UserImgAuditFindDTO(Integer pageNo, Integer pageSize, Long userId, Integer auditStatus) {
+	public UserImgAuditFindDTO(Integer pageNo, Integer pageSize, String userId, Integer auditStatus) {
 		super();
 		this.pageNo = pageNo;
 		this.pageSize = pageSize;

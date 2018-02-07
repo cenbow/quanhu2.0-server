@@ -42,7 +42,7 @@ public interface UserImgAuditService {
 	 * @param auditStatus 10:待审核 11:通过 12:拒绝
 	 * @return
 	 */
-	Page<UserImgAudit> listByUserId(Integer pageNo,Integer pageSize,Long userId, Integer auditStatus);
+	Page<UserImgAudit> listByUserId(Integer pageNo,Integer pageSize,String userId, Integer auditStatus);
 	
 	/**
 	 * 更新头像审核信息
