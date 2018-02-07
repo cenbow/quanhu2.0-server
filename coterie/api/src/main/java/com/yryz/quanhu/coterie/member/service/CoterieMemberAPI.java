@@ -89,4 +89,13 @@ public interface CoterieMemberAPI {
 	 * @return
 	 */
 	public Response<PageList<CoterieMemberApplyVo>> queryMemberApplyList(Long coterieId, Integer pageNum, Integer pageSize);
+
+
+	/**
+	 * 用户是否被禁言(包括用户禁言与私圈禁言)
+	 * @param coterieId
+	 * @param userId
+	 * @return
+	 */
+	public Response<Integer> banSpeakStatus(Long userId, Long coterieId);
 }

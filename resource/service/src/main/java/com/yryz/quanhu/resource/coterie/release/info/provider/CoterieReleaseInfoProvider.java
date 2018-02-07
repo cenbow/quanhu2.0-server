@@ -15,7 +15,6 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
@@ -179,7 +178,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             Byte canReadFlag = ReleaseConstants.CanReadType.NO;
 
             /** 非登录用户：免费文章可读
-                        登录用户：圈主可读、免费文章圈粉可读、付费文章购买过可读*/
+                        登录用户：圈主可读、免费文章圈粉/路人可看、付费文章购买过可读*/
             if (null == headerUserId) {
                 if (infoVo.getContentPrice() == 0L) {
                     canReadFlag = ReleaseConstants.CanReadType.YES;
@@ -194,12 +193,13 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
                 }
                 // 非圈主
                 else {
-                    // 免费文章圈粉可读
+                    // 免费文章圈粉/路人可看
                     if (infoVo.getContentPrice() == 0L) {
-                        if (!MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)
+                        /**if (!MemberConstant.Permission.OWNER.getStatus().equals(headerUserRole)
                                 && !MemberConstant.Permission.MEMBER.getStatus().equals(headerUserRole)) {
                             throw new QuanhuException(ExceptionEnum.COTERIE_NOT_MEMBER);
-                        }
+                        }*/
+                        canReadFlag = ReleaseConstants.CanReadType.YES;
                     }
                     // 付费文章购买过可读
                     else if (orderSDK.isBuyOrderSuccess(BranchFeesEnum.READ.toString(), headerUserId, kid)) {
