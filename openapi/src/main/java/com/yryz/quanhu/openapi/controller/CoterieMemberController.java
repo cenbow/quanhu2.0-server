@@ -1,6 +1,7 @@
 package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -28,6 +29,7 @@ public class CoterieMemberController {
     private CoterieMemberAPI coterieMemberAPI;
 
     @ApiOperation("用户申请加入私圈")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
@@ -38,6 +40,7 @@ public class CoterieMemberController {
     }
 
     @ApiOperation("圈主踢出私圈成员")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
@@ -49,6 +52,7 @@ public class CoterieMemberController {
     }
 
     @ApiOperation("圈粉退出私圈")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
@@ -59,6 +63,7 @@ public class CoterieMemberController {
     }
 
     @ApiOperation("设置禁言/取消禁言")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
@@ -81,7 +86,22 @@ public class CoterieMemberController {
 
     }
 
+
+
+    @ApiOperation("获取用户禁言或私圈内禁言的权限")
+    @UserBehaviorValidation(login = true)
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/services/app/{version}/coterie/member/coterieBanSpeak")
+    public Response coterieBanSpeak(@RequestHeader("userId") Long userId, Long coterieId) {
+
+        CoterieMemberVoForPermission permissionResult = new CoterieMemberVoForPermission();
+        permissionResult.setPermission(ResponseUtils.getResponseData(coterieMemberAPI.banSpeakStatus(userId, coterieId)));
+        return new Response<>(permissionResult);
+
+    }
+
     @ApiOperation("成员申请加入私圈的审批")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParams({
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
     @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
@@ -95,6 +115,7 @@ public class CoterieMemberController {
     }
 
     @ApiOperation("私圈新审请的成员数量")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/newMemberNum")
     public Response<CoterieMemberVoForNewMemberCount> newMemberNum(Long coterieId) {
@@ -106,6 +127,7 @@ public class CoterieMemberController {
     }
 
     @ApiOperation("申请加入私圈列表")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/applyList")
     public Response applyList(Long coterieId, Integer currentPage, Integer pageSize) {
@@ -115,6 +137,7 @@ public class CoterieMemberController {
     }
 
     @ApiOperation("私圈成员列表")
+    @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/list")
     public Response list(Long coterieId, Integer pageNo, Integer pageSize) {

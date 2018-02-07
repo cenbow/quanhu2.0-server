@@ -30,8 +30,8 @@ public class RemoteResourceUtils {
         if (null != resourceVo) {
             RemoteResource remoteResource = new RemoteResource();
             remoteResource.setModuleEnum(resourceVo.getModuleEnum());
-            remoteResource.setResourceId(Long.valueOf(resourceVo.getResourceId()));
-            remoteResource.setCoterieId(Long.valueOf(resourceVo.getCoterieId()));
+            remoteResource.setResourceId(resourceVo.getResourceId() == null ? null : Long.valueOf(resourceVo.getResourceId()));
+            remoteResource.setCoterieId(resourceVo.getCoterieId() == null ? null : Long.valueOf(resourceVo.getCoterieId()));
             remoteResource.setDelFlag(resourceVo.getDelFlag());
             if (ModuleContants.RELEASE.equals(resourceVo.getModuleEnum())) {
                 ReleaseInfo releaseInfo = JSON.parseObject(resourceVo.getExtJson(), ReleaseInfo.class);
