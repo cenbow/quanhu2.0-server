@@ -1,7 +1,10 @@
 package com.yryz.quanhu.message;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.quanhu.message.common.im.yunxin.YunxinConfig;
 import com.yryz.quanhu.message.im.api.ImAPI;
 import com.yryz.quanhu.message.im.entity.BlackAndMuteListVo;
 import com.yryz.quanhu.message.im.entity.ImRelation;
@@ -27,7 +30,7 @@ import java.util.List;
 @SpringBootTest
 public class ImTest {
 
-    @Autowired
+    @Reference(retries = 0)
     ImAPI imAPI;
 
     @Test
