@@ -135,7 +135,7 @@ public class UserStarAuthDto extends GenericEntity{
 
     private Set<Long> tagIds;
 
-    private Set<String> tagNames;
+    private String tagNames;
 
     private int pageNo;
 
@@ -155,11 +155,11 @@ public class UserStarAuthDto extends GenericEntity{
         this.tagIds = tagIds;
     }
 
-    public Set<String> getTagNames() {
+    public String getTagNames() {
         return tagNames;
     }
 
-    public void setTagNames(Set<String> tagNames) {
+    public void setTagNames(String tagNames) {
         this.tagNames = tagNames;
     }
 
