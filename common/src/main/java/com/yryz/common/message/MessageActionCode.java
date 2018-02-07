@@ -78,10 +78,10 @@ public class MessageActionCode {
     /**
      * 悬赏详情页
      */
-    public static final String REWARD_DETAIL = "8003";
+    //public static final String REWARD_DETAIL = "8003";
 
     /**
-     * 普通详情页
+     * 详情页(2.0所有详情页)
      */
     public static final String COMMON_DETAIL = "8004";
 
@@ -93,17 +93,17 @@ public class MessageActionCode {
     /**
      * 活动，报名页
      */
-    public static final String ACTIVITY_SIGNUP = "8006";
+    //public static final String ACTIVITY_SIGNUP = "8006";
 
     /**
      * 活动，投票页
      */
-    public static final String ACTIVITY_VOTE = "8007";
+    //public static final String ACTIVITY_VOTE = "8007";
 
     /**
      * 活动，中奖结果页
      */
-    public static final String ACTIVITY_RESULT = "8008";
+    //public static final String ACTIVITY_RESULT = "8008";
 
     /**
      * 动态
