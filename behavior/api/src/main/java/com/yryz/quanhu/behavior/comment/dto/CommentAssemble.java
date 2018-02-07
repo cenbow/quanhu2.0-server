@@ -14,6 +14,33 @@ public class CommentAssemble {
     private String link;
     private long targetUserId;
     private Byte viewCode;
+    private String moduleEnum;
+    private long resourceId;
+    private long coterieId;
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
+    }
+
+    public long getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(long resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public long getCoterieId() {
+        return coterieId;
+    }
+
+    public void setCoterieId(long coterieId) {
+        this.coterieId = coterieId;
+    }
 
     public Byte getViewCode() {
         return viewCode;
