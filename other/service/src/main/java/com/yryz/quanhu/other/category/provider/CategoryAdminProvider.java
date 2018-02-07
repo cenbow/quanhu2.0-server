@@ -41,6 +41,11 @@ public class CategoryAdminProvider implements CategoryAdminAPI{
     }
 
     @Override
+    public Response<List<CategoryAdminVo>> findAllCategory() {
+        return ResponseUtils.returnObjectSuccess(categoryAdminService.findAllCategory());
+    }
+
+    @Override
     public Response<PageList<CategoryAdminVo>> findCategoryBySearch(CategorySearchAdminVo search) {
         return ResponseUtils.returnObjectSuccess(categoryAdminService.findCategoryBySearch(search));
     }

@@ -103,11 +103,15 @@ public class AccountServiceImpl implements AccountService {
 		if (registerDTO.getIsVest() == 11) {
 			regChannel = Constants.ADMIN_REG_VEST_CHANNEL;
 		}
+
 		UserRegLogDTO logDTO = new UserRegLogDTO(regChannel, regChannel, registerDTO.getAppId(), regChannel);
-		// 在上层据手机号判断根用户是否已存在避免不必要的事务回滚
-		createUser(new RegisterDTO(regChannel, registerDTO.getUserNickName(), registerDTO.getUserPhone(),
+		RegisterDTO dto = new RegisterDTO(regChannel, registerDTO.getUserNickName(), registerDTO.getUserPhone(),
 				registerDTO.getUserPwd(), registerDTO.getIsVest(), registerDTO.getUserImg(), registerDTO.getUserDesc(),
-				registerDTO.getUserSignature(), logDTO), null);
+				registerDTO.getUserSignature(), logDTO);
+		dto.setUserGenders(registerDTO.getUserGenders());
+		dto.setUserDesc(registerDTO.getUserDesc());
+		dto.setUserLocation(registerDTO.getUserLocation());
+		createUser(dto, null);
 	}
 
 	@Override
@@ -155,7 +159,7 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError("该用户不存在");
 		}
 		if (!StringUtils.equals(account.getUserPwd(), loginDTO.getPassword())) {
-			logger.info("[user_login]:params:{},appId:{},result:登录密码错误",JSON.toJSON(loginDTO),appId);
+			logger.info("[user_login]:params:{},appId:{},result:登录密码错误", JSON.toJSON(loginDTO), appId);
 			throw QuanhuException.busiError(ExceptionEnum.USER_LOGIN_PWD_ERROR);
 		}
 		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
@@ -532,11 +536,14 @@ public class AccountServiceImpl implements AccountService {
 		account.setAppId(registerDTO.getRegLogDTO().getAppId());
 		account.setCreateDate(new Date());
 		insert(account);
-		// 创建用户基础信息
-		userService.createUser(new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(),
+		UserBaseInfo baseInfo = new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(),
 				registerDTO.getUserNickName(), registerDTO.getUserImg(), registerDTO.getUserSign(),
 				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getDeviceId(),
-				registerDTO.getCityCode(), registerDTO.getIsVest() == null ? null : registerDTO.getIsVest().byteValue(), registerDTO.getUserDesc()));
+				registerDTO.getCityCode(), registerDTO.getIsVest() == null ? null : registerDTO.getIsVest().byteValue(),
+				registerDTO.getUserDesc());
+		baseInfo.setUserGenders(registerDTO.getUserGenders() == null ? null : registerDTO.getUserGenders().byteValue());
+		// 创建用户基础信息
+		userService.createUser(baseInfo);
 		registerDTO.getRegLogDTO().setUserId(userId);
 
 		// 异步处理

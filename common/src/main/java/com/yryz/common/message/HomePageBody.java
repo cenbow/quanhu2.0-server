@@ -19,29 +19,25 @@ public class HomePageBody implements Body{
 	 * 
 	 */
 	private static final long serialVersionUID = -3082664056469603703L;
-	
-	private String custId;
 
 	/**
-	 * 
-	 * @exception 
+	 * 用户id
+	 */
+	private Long userId;
+
+	/**
+	 *
+	 * @exception
 	 */
 	public HomePageBody() {
 		super();
 	}
 
-	/**
-	 * @return the custId
-	 */
-	public String getCustId() {
-		return custId;
+	public Long getUserId() {
+		return userId;
 	}
 
-	/**
-	 * @param custId the custId to set
-	 */
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
-	
 }

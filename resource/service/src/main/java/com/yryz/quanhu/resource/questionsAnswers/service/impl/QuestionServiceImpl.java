@@ -382,7 +382,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        Question question = this.questionDao.selectByPrimaryKey(kid);
+        Question question = this.queryAvailableQuestionByKid(kid);
         if (null == question) {
             throw QuanhuException.busiError("","圈主拒接回答的问题不存在","圈主拒接回答的问题不存在");
         }
@@ -390,6 +390,11 @@ public class QuestionServiceImpl implements QuestionService {
         if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) != 0) {
             throw QuanhuException.busiError("","该问题未付费成功，无法拒绝","该问题未付费成功，无法拒绝");
         }
+
+        if (QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(question.getAnswerdFlag())!=0) {
+            throw QuanhuException.busiError("","问题在未回答状态，才能操作拒绝。","问题在未回答状态，才能操作拒绝。");
+        }
+
         String targetId = question.getTargetId();
         if (!String.valueOf(userId).equals(targetId)) {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREJECT);

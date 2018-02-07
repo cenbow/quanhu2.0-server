@@ -20,6 +20,8 @@ public interface ICategoryAdminService {
 	 */
 	List<CategoryTreeAdminVo> findCategoryTree(CategoryAdminVo search);
 
+	List<CategoryAdminVo> findAllCategory();
+
 	/**
 	 *  分类标签列表
 	 *

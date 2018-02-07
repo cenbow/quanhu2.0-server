@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.PageList;

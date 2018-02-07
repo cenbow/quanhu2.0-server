@@ -573,6 +573,10 @@ public class CommentServiceImpl implements CommentService {
     public int updownSingle(Comment comment) {
         int count = commentDao.updownSingle(comment);
         if (count > 0) {
+            Comment commentSingle = commentDao.querySingleComment(comment);
+            if(null!=commentSingle){
+                stringRedisTemplate.delete("COMMENT:"+commentSingle.getModuleEnum()+":"+commentSingle.getKid()+ "_" + commentSingle.getTopId() + "_" + commentSingle.getResourceId());
+            }
             this.sendMessage(comment.getTargetUserId(), "您的评论有违纪嫌疑,已被管理员下架!");
         }
         return count;

@@ -72,8 +72,27 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
         return categoryTrees;
     }
 
+    @Override
+    public List<CategoryAdminVo> findAllCategory() {
+
+        List<Category> categories = categoryDao.findAll();
+
+        List<CategoryAdminVo> categoryList = categories.stream().map(category -> {
+
+            CategoryAdminVo categoryAdminVo = new CategoryAdminVo();
+            BeanUtils.copyProperties(category, categoryAdminVo);
+
+            return categoryAdminVo;
+
+        }).collect(Collectors.toList());
+
+
+        return categoryList;
+    }
+
     /**
      * 获取分类标签
+     *
      * @param search
      * @return
      */
@@ -82,8 +101,8 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
 
         if (null != search.getCurrentPage() && null != search.getPageSize()) {
 
-        search.setStart((search.getCurrentPage() - 1) * search.getPageSize());
-        search.setLimit(search.getPageSize());
+            search.setStart((search.getCurrentPage() - 1) * search.getPageSize());
+            search.setLimit(search.getPageSize());
         }
 
         Integer count = categoryDao.selectCountBySearch(search);

@@ -20,6 +20,10 @@ public class AgentRegisterDTO implements Serializable{
 	 */
 	private String userNickName;
 	/**
+	 * 性别
+	 */
+	private Integer userGenders;
+	/**
 	 * 手机号
 	 */
 	private String userPhone;
@@ -100,6 +104,12 @@ public class AgentRegisterDTO implements Serializable{
 	}
 	public void setAppId(String appId) {
 		this.appId = appId;
+	}
+	public Integer getUserGenders() {
+		return userGenders;
+	}
+	public void setUserGenders(Integer userGenders) {
+		this.userGenders = userGenders;
 	}
 	/**
 	 * 

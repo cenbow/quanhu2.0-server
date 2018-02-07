@@ -18,6 +18,7 @@ public interface CategoryAdminAPI {
 	 * @return
 	 */
 	Response<List<CategoryTreeAdminVo>> findCategoryTree(CategoryAdminVo search);
+	Response<List<CategoryAdminVo>> findAllCategory();
 
 	/**
 	 * 一级分类列表

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.annotation.NotLogin;
+
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.resource.release.config.api.ReleaseConfigApi;
@@ -32,7 +32,7 @@ public class ReleaseConfigController {
     @Reference(lazy = true, check = false, timeout = 10000)
     ReleaseConfigApi releaseConfigApi;
 
-    @NotLogin
+    
     @ApiOperation("平台发布文章模板")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "{version}/release/config/template/app")
@@ -40,7 +40,7 @@ public class ReleaseConfigController {
         return releaseConfigApi.getTemplate(ReleaseConstants.APP_DEFAULT_CLASSIFY_ID);
     }
 
-    @NotLogin
+    
     @ApiOperation("私圈发布文章模板")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "{version}/release/config/template/coterie")
@@ -48,7 +48,7 @@ public class ReleaseConfigController {
         return releaseConfigApi.getTemplate(ReleaseConstants.COTERIE_DEFAULT_CLASSIFY_ID);
     }
 
-    @NotLogin
+    
     @ApiOperation("发布文章模板")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
