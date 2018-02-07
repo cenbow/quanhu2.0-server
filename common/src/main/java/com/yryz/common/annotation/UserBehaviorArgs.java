@@ -57,7 +57,7 @@ public @interface UserBehaviorArgs {
      * 操作资源内容：纯文字
      * @return
      */
-    String[] sourceContexts() default {};
+    String[] contexts() default {};
     
     /**
      * 操作资源：富文本content_source

@@ -8,6 +8,7 @@
 package com.yryz.quanhu.user.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import com.yryz.quanhu.user.dto.UserTagDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -51,10 +52,18 @@ public interface UserTagDao {
 
 
     /**
-     * 批量查询
+     * 查询用户标签集合，带标签名
      * @param userId
      * @return
      */
     List<UserTagDTO> getUserUnionTags(@Param("userId") Long userId);
+
+    /**
+     * 查询用户标签，格式化标签组合，用于管理端显示
+     * @param userIds
+     * @return
+     */
+    List<UserTagDTO> getUserGroupConcatTags(@Param("userIds") Set<Long> userIds);
+
 
 }

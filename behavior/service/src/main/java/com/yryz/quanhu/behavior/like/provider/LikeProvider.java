@@ -122,7 +122,7 @@ public class LikeProvider implements LikeApi {
                         } catch (Exception e) {
                             logger.info("调用用户接口失败:" + e);
                         }
-                        map.put("userId", likeVO.getUserId());
+                        map.put("userId", String.valueOf(likeVO.getUserId()));
                         map.put("createDate", likeVO.getCreateDate());
                     }
                     try {
@@ -317,10 +317,10 @@ public class LikeProvider implements LikeApi {
             nickName = userSimpleVO.getUserNickName();
         }
         if (like.getModuleEnum().equals(ModuleContants.RELEASE)) {
-            this.releasePush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您发布的内容。");
+            this.releasePush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您发布的内容。",like.getModuleEnum(),like.getCoterieId());
         }
         if (like.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
-            this.topicPostPush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您发布的帖子。");
+            this.topicPostPush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您发布的帖子。",like.getModuleEnum(),like.getCoterieId());
         }
         if (like.getCoterieId() != 0) {
             if (like.getModuleEnum().equals(ModuleContants.ANSWER)) {
@@ -334,6 +334,9 @@ public class LikeProvider implements LikeApi {
                 likeAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
                 likeAssembleAnswer.setLink("");
                 likeAssembleAnswer.setContent(nickName+"点赞了您的问答");
+                likeAssembleAnswer.setModuleEnum(answerVo.getModuleEnum());
+                likeAssembleAnswer.setResourceId(answerVo.getKid());
+                likeAssembleAnswer.setCoterieId(answerVo.getCoterieId());
                 this.sendMessage(likeAssembleAnswer);
                 Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
                 LikeAssemble likeAssembleQuestion = new LikeAssemble();
@@ -341,17 +344,20 @@ public class LikeProvider implements LikeApi {
                 likeAssembleQuestion.setContent(nickName+"点赞了您的问答");
                 likeAssembleQuestion.setTitle(question.getTitle());
                 likeAssembleQuestion.setLink("");
+                likeAssembleQuestion.setModuleEnum(ModuleContants.QUESTION);
+                likeAssembleQuestion.setResourceId(question.getKid());
+                likeAssembleQuestion.setCoterieId(question.getCoterieId());
                 this.sendMessage(likeAssembleQuestion);
             }
         }
         if (like.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
-            this.dynamicPush(like.getResourceId(),nickName + "点赞了您发布的动态。");
+            this.dynamicPush(like.getResourceId(),nickName + "点赞了您发布的动态。",like.getModuleEnum(),like.getCoterieId());
         }
         if (like.getModuleEnum().equals(ModuleContants.COMMENT)) {
-            this.releasePush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您的评论。");
-            this.topicPostPush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您的评论。");
+            this.releasePush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您的评论。",like.getModuleEnum(),like.getCoterieId());
+            this.topicPostPush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您的评论。",like.getModuleEnum(),like.getCoterieId());
             if(like.getCoterieId()==0){
-                this.dynamicPush(like.getResourceId(),nickName + "点赞了您的评论。");
+                this.dynamicPush(like.getResourceId(),nickName + "点赞了您的评论。",like.getModuleEnum(),like.getCoterieId());
             }
 
         }
@@ -359,7 +365,7 @@ public class LikeProvider implements LikeApi {
     }
 
 
-    public void releasePush(long resourceId, long resourceUserId,String contentStr){
+    public void releasePush(long resourceId, long resourceUserId,String contentStr,String moduleEnum,long coterieId){
         LikeAssemble likeAssemble=new LikeAssemble();
         try {
             ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
@@ -371,13 +377,16 @@ public class LikeProvider implements LikeApi {
             }
             likeAssemble.setContent(contentStr);
             likeAssemble.setLink("");
+            likeAssemble.setModuleEnum(moduleEnum);
+            likeAssemble.setResourceId(resourceId);
+            likeAssemble.setCoterieId(coterieId);
             this.sendMessage(likeAssemble);
         } catch (Exception e) {
             logger.info("调用文章出现异常" + e);
         }
     }
 
-    public void topicPostPush(long resourceId, long resourceUserId,String contentStr){
+    public void topicPostPush(long resourceId, long resourceUserId,String contentStr,String moduleEnum,long coterieId){
         LikeAssemble likeAssemble=new LikeAssemble();
         try {
             TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
@@ -393,13 +402,16 @@ public class LikeProvider implements LikeApi {
             }
             likeAssemble.setContent(contentStr);
             likeAssemble.setLink("");
+            likeAssemble.setModuleEnum(moduleEnum);
+            likeAssemble.setResourceId(resourceId);
+            likeAssemble.setCoterieId(coterieId);
             this.sendMessage(likeAssemble);
         } catch (Exception e) {
             logger.info("调用帖子出现异常" + e);
         }
     }
 
-    public void dynamicPush(long resourceId,String contentPushStr){
+    public void dynamicPush(long resourceId,String contentPushStr,String moduleEnum,long coterieId){
         LikeAssemble likeAssemble=new LikeAssemble();
         try{
           /*  Dymaic dymaic = dymaicService.get(resourceId).getData();
@@ -421,6 +433,9 @@ public class LikeProvider implements LikeApi {
                 }
                 likeAssemble.setContent(contentPushStr);
                 likeAssemble.setLink("");
+                likeAssemble.setModuleEnum(moduleEnum);
+                likeAssemble.setResourceId(resourceId);
+                likeAssemble.setCoterieId(coterieId);
                 this.sendMessage(likeAssemble);
             }*/
         }catch (Exception e){
@@ -441,6 +456,9 @@ public class LikeProvider implements LikeApi {
         messageVo.setToCust(String.valueOf(likeAssemble.getTargetUserId()));
         messageVo.setType(MessageType.INTERACTIVE_TYPE);
         messageVo.setCreateTime(DateUtils.getDateTime());
+        messageVo.setModuleEnum(likeAssemble.getModuleEnum());
+        messageVo.setCoterieId(String.valueOf(likeAssemble.getCoterieId()));
+        messageVo.setResourceId(String.valueOf(likeAssemble.getResourceId()));
         messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_2);
         try {
             messageAPI.sendMessage(messageVo, true);

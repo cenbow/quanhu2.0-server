@@ -40,7 +40,7 @@ public class MyBehaviorController {
 
 
     @UserBehaviorValidation(event = "资源发布", blacklist = false, illegalWords = true,login = true,mute = false,isCoterieMute = false,isCoterieMember = false)
-    @UserBehaviorArgs(sourceContexts = {"map.title","map.contentSource"},sourceUserId = "map.createUserId",coterieId = "map.coterieId")
+    @UserBehaviorArgs(contexts = {"map.title","map.contentSource"},sourceUserId = "map.createUserId",coterieId = "map.coterieId")
 
     @RequestMapping("/map")
     public Response<String> testMap(@RequestBody Map<String,Object> map){
@@ -50,7 +50,7 @@ public class MyBehaviorController {
 
 
     @UserBehaviorValidation(event = "资源发布", illegalWords = true)
-    @UserBehaviorArgs(sourceContexts = {"object.ReleaseInfo.title","object.ReleaseInfo.contentSource"})
+    @UserBehaviorArgs(contexts = {"object.ReleaseInfo.title","object.ReleaseInfo.contentSource"})
     @RequestMapping("/info")
     public Response<String> testInfo(HttpServletRequest request, @RequestBody ReleaseInfo info){
         logger.info("comment:"+ JSON.toJSONString(info));
@@ -58,7 +58,7 @@ public class MyBehaviorController {
     }
 
     @UserBehaviorValidation(event = "发表评论", illegalWords = true, blacklist = true)
-    @UserBehaviorArgs(sourceUserId = "object.Comment.targetUserId",sourceContexts = {"object.Comment.contentComment"})
+    @UserBehaviorArgs(sourceUserId = "object.Comment.targetUserId",contexts = {"object.Comment.contentComment"})
 
     @RequestMapping("/dto")
     public Response<String> testDto(HttpServletRequest request, @RequestBody Comment comment){

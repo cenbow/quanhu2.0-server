@@ -39,7 +39,18 @@ public class UserTagDTO implements Serializable{
 	/**
 	 * 操作人id
 	 */
+	private String tagNames;
+
 	private Long updateUserId;
+
+	public String getTagNames() {
+		return tagNames;
+	}
+
+	public void setTagNames(String tagNames) {
+		this.tagNames = tagNames;
+	}
+
 	public Long getUserId() {
 		return userId;
 	}
