@@ -1,5 +1,16 @@
 package com.yryz.quanhu.behavior.reward.service.impl;
 
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.common.utils.Assert;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
@@ -35,16 +46,6 @@ import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author wangheng
@@ -94,17 +95,18 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
     @Override
     public void notify(OutputOrder outputOrder) {
         RewardInfo info = JsonUtils.fromJson(outputOrder.getBizContent(), RewardInfo.class);
-        logger.debug("资源打赏 订单回调，RewardInfo==>>" + outputOrder.getBizContent());
+        logger.info("资源打赏 订单回调，RewardInfo==>>" + outputOrder.getBizContent());
         Assert.notNull(info, "回调订单 RewardInfo is null ！");
 
         // 更新 打赏记录
         RewardInfo upInfo = new RewardInfo();
         // 受赏 金额【存入 分费后的金额】
         Long rewardedPrice = info.getGiftNum() * info.getGiftPrice() * BranchFeesEnum.REWARD.getFee().get(1).getFee() / 100L;
+        upInfo.setKid(info.getKid());
         upInfo.setRewardPrice(rewardedPrice);
         upInfo.setRewardStatus(RewardConstants.reward_status_pay_success);
-
         rewardInfoService.updateByKid(upInfo);
+        logger.info("资源打赏 订单回调，更新打賞狀態,kid==>>" + info.getKid());
 
         // 更新打赏者 统计
         RewardCount uCount = new RewardCount();
@@ -113,6 +115,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         uCount.setTotalRewardAmount(info.getGiftNum() * info.getGiftPrice());
         uCount.setTotalRewardCount(1);
         rewardCountService.addCountByTargetId(uCount);
+        logger.info("资源打赏 订单回调，更新打赏者 统计,TargetId==>>" + info.getCreateUserId());
 
         // 更新被打赏者 统计
         RewardCount uBeCount = new RewardCount();
@@ -121,6 +124,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         uBeCount.setTotalRewardedAmount(rewardedPrice);
         uBeCount.setTotalRewardedCount(1);
         rewardCountService.addCountByTargetId(uCount);
+        logger.info("资源打赏 订单回调，更新被打赏者 统计,TargetId==>>" + info.getToUserId());
 
         // 更新资源被打赏 统计
         RewardCount rCount = new RewardCount();
@@ -129,6 +133,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         rCount.setTotalRewardedAmount(info.getGiftNum() * info.getGiftPrice());
         rCount.setTotalRewardedCount(1);
         rewardCountService.addCountByTargetId(uCount);
+        logger.info("资源打赏 订单回调，更新资源被打赏 统计,TargetId==>>" + info.getResourceId());
 
         // 给打赏者、被打赏者 发送消息
         sendMessage(info, rewardedPrice);
@@ -163,9 +168,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
                             remoteResource.getQuestion().getContent();
                 }
             }
-            // 查询私圈信息
-            Long coterieId = info.getCoterieId();
-            CoterieInfo coterieInfo = ResponseUtils.getResponseData(coterieApi.queryCoterieInfo(coterieId));
+            
             //查询礼物信息
             Long giftId = info.getGiftId();
             GiftInfo giftInfo = ResponseUtils.getResponseData(giftInfoApi.selectByKid(giftId));
@@ -173,8 +176,15 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             SystemBody systemBody = new SystemBody();
             systemBody.setBodyImg(bodyImg);
             systemBody.setBodyTitle(bodyTitle);
-            systemBody.setCoterieId(String.valueOf(coterieId));
-            systemBody.setCoterieName(coterieInfo.getName());
+            
+            // 查询私圈信息
+            Long coterieId = info.getCoterieId();
+            if(null != coterieId && coterieId != 0L){
+                CoterieInfo coterieInfo = ResponseUtils.getResponseData(coterieApi.queryCoterieInfo(coterieId));
+                systemBody.setCoterieId(String.valueOf(coterieId));
+                systemBody.setCoterieName(coterieInfo.getName());
+            }
+            
 
             //给打赏者发持久化消息
             MessageVo messageVo = MessageUtils.buildMessage(MessageConstant.REWARD_ACCOUNT,
@@ -185,7 +195,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
                 messageVo.setViewCode(MessageViewCode.ORDER_MESSAGE);
             }
             commitMessage(messageVo, false);
-            logger.info("send reward message, data:{}", JsonUtils.toFastJson(messageVo));
+            logger.info("给打赏者send reward message, data:{}", JsonUtils.toFastJson(messageVo));
             //给打赏者推送极光消息
             PushReqVo reqVo = new PushReqVo();
             reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getCreateUserId())));
@@ -206,7 +216,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
                 messageVo.setViewCode(MessageViewCode.ORDER_MESSAGE);
             }
             commitMessage(messageVo, false);
-            logger.info("send rewarded message, data:{}", JsonUtils.toFastJson(messageVo));
+            logger.info("给被打赏者send rewarded message, data:{}", JsonUtils.toFastJson(messageVo));
             //给被打赏者推送极光消息
             reqVo = new PushReqVo();
             reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getToUserId())));
@@ -216,6 +226,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
                     userSimpleVO.getUserNickName(), giftInfo.getGiftName(), formatMoney(rewardedPrice)));
             reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
             pushAPI.commonSendAlias(reqVo);
+            logger.info("给被打赏者推送极光消息, data:{}", JsonUtils.toFastJson(messageVo));
         } catch (Exception e) {
             logger.error("打赏发送消息失败", e);
         }
