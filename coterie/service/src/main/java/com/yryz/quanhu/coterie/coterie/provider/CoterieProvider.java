@@ -34,8 +34,10 @@ import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.until.ImageUtils;
 import com.yryz.quanhu.coterie.coterie.until.ZxingHandler;
+import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import com.yryz.quanhu.score.vo.EventReportVo;
@@ -62,6 +64,9 @@ public class CoterieProvider implements CoterieApi {
 	
 	@Reference
 	private EventAPI eventAPI;
+	
+	@Reference
+	private UserRelationApi userRelationApi;
 	
 	/**
 	 * 查询私圈信息列表
@@ -201,8 +206,16 @@ public class CoterieProvider implements CoterieApi {
 			level=Integer.valueOf(vo.getGrowLevel());
 		}
 		if(level<5){
-			String msg="当前用户等级为"+level+",5级以上才能创建私圈";
+			String msg="等级达到LV5才能创建私圈";
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,msg);
+		}
+		
+		UserRelationCountDto countDto=ResponseUtils.getResponseData(userRelationApi.totalBy(info.getOwnerId(), info.getOwnerId()));
+		if(countDto!=null){
+			if(countDto.getFollowCount()<20){
+				String msg="关注人数需达到20人才能创建私圈";
+				throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,msg);
+			}
 		}
 	}
 	/**
