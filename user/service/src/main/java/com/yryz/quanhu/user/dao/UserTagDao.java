@@ -8,6 +8,7 @@
 package com.yryz.quanhu.user.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.yryz.quanhu.user.dto.UserTagDTO;
@@ -65,5 +66,5 @@ public interface UserTagDao {
      */
     List<UserTagDTO> getUserGroupConcatTags(@Param("userIds") Set<Long> userIds);
 
-
+    List<Map<String, Long>> getTagCountByUser(@Param("tagIds") Set<String> tagIds);
 }

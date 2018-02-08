@@ -20,20 +20,15 @@ public class CoterieSearchParam implements Serializable{
 	private Byte status;
 	
 	/**
-	 * 是否推荐，0否，1是 
+	 * 是否推荐，0否，1是
 	 */
 	private Byte recommend;
 	
 	/**
-	 * 圈子名称
+	 * 手机号
 	 */
-	private String circleName;
-	
-	/**
-	 * 圈子ID
-	 */
-	private String circleId;
-	
+	private String phone;
+
 	/**
 	 * 私圈名称
 	 */
@@ -44,7 +39,7 @@ public class CoterieSearchParam implements Serializable{
 	 */
 	@Deprecated
 	private String ownerName;
-	
+
 	/**
 	 * 圈主ID
 	 */
@@ -59,12 +54,7 @@ public class CoterieSearchParam implements Serializable{
 	 * 申请时间 止,格式yyyy-MM-dd
 	 */
 	private String endTime;
-	
-	/**
-	 * 特定 私圈里搜索（推荐等）
-	 */
-	private List<Integer> coterieIdList;
-	
+
 	/**
 	 * 页码 ，默认为1
 	 */
@@ -86,14 +76,6 @@ public class CoterieSearchParam implements Serializable{
 
 	public void setStatus(Byte status) {
 		this.status = status;
-	}
-
-	public String getCircleName() {
-		return circleName;
-	}
-
-	public void setCircleName(String circleName) {
-		this.circleName = circleName;
 	}
 
 	public String getOwnerName() {
@@ -134,22 +116,6 @@ public class CoterieSearchParam implements Serializable{
 
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
-	}
-
-	public String getCircleId() {
-		return circleId;
-	}
-
-	public void setCircleId(String circleId) {
-		this.circleId = circleId;
-	}
-
-	public List<Integer> getCoterieIdList() {
-		return coterieIdList;
-	}
-
-	public void setCoterieIdList(List<Integer> coterieIdList) {
-		this.coterieIdList = coterieIdList;
 	}
 
 	public String getSortValue() {
