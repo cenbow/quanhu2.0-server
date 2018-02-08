@@ -154,7 +154,9 @@ public class TopicPostServiceImpl implements TopicPostService {
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
 
         //提交讨论数
-        Response<Object> data=countApi.commitCount(BehaviorEnum.TALK,topic.getKid(),null,1L);
+        countApi.commitCount(BehaviorEnum.TALK,topic.getKid(),null,1L);
+        //提交发布数
+        countApi.commitCount(BehaviorEnum.Release,post.getCreateUserId(),null,1L);
         return result;
     }
 
