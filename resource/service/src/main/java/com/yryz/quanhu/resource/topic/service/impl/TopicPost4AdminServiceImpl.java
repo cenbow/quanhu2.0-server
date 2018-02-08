@@ -174,20 +174,22 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
              * 帖子下线通知
              */
             TopicPostWithBLOBs topicPostWithBLOBs = this.topicPostDao.selectByPrimaryKey(kid);
-            MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-            messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
-            messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
-            messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
-            messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
-            messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
-            messageBusinessVo.setIsAnonymity(null);
-            messageBusinessVo.setCoterieId(null);
-            sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, true);
+            if(null!=topicPostWithBLOBs) {
+                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+                messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
+                messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
+                messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
+                messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
+                messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
+                messageBusinessVo.setIsAnonymity(null);
+                messageBusinessVo.setCoterieId(null);
+                sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, true);
 
-            //提交讨论数
-            countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
-            //提交发布数
-            countApi.commitCount(BehaviorEnum.Release, topicPostWithBLOBs.getCreateUserId(), null, -1L);
+                //提交讨论数
+                countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
+                //提交发布数
+                countApi.commitCount(BehaviorEnum.Release, topicPostWithBLOBs.getCreateUserId(), null, -1L);
+            }
         }
         return flag;
     }

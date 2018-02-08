@@ -64,6 +64,7 @@ public class BasicConfigServiceImpl implements BasicConfigService {
             if(dto!=null){
                 //更新缓存
                 this.setRedisValue(dto.getConfigKey(),dto.getConfigValue());
+                value = dto.getConfigValue();
             }
         }
         return value;

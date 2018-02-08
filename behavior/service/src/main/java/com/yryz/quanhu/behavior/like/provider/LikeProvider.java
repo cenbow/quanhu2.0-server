@@ -11,6 +11,8 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.quanhu.behavior.comment.dto.CommentAssemble;
+import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
@@ -133,7 +135,7 @@ public class LikeProvider implements LikeApi {
 
                     try {
 
-                        GrowFlowQuery gfq=new GrowFlowQuery();
+                        GrowFlowQuery gfq = new GrowFlowQuery();
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         gfq.setStartTime(sdf.format(startOfTodDay()));
                         gfq.setEndTime(sdf.format(endOfTodDay()));
@@ -153,12 +155,12 @@ public class LikeProvider implements LikeApi {
                         eventInfo.setCircleId("");
                         gfq.setEventCode("13");
                         gfq.setUserId(String.valueOf(like.getUserId()));
-                        List<GrowFlowReportVo> growFlowQueries=eventAcountApiService.getGrowFlowAll(gfq).getData();
-                        int currentCount=0;
-                        for(GrowFlowReportVo growFlowReportVo:growFlowQueries){
-                            currentCount+=growFlowReportVo.getNewGrow();
+                        List<GrowFlowReportVo> growFlowQueries = eventAcountApiService.getGrowFlowAll(gfq).getData();
+                        int currentCount = 0;
+                        for (GrowFlowReportVo growFlowReportVo : growFlowQueries) {
+                            currentCount += growFlowReportVo.getNewGrow();
                         }
-                        if(currentCount<10){
+                        if (currentCount < 10) {
                             eventInfos.add(eventInfo);
                         }
                         //被点赞
@@ -175,12 +177,12 @@ public class LikeProvider implements LikeApi {
                         eventInfo_.setCircleId("");
                         gfq.setEventCode("10");
                         gfq.setUserId(String.valueOf(like.getResourceUserId()));
-                        List<GrowFlowReportVo> growFlowQueries_=eventAcountApiService.getGrowFlowAll(gfq).getData();
-                        int currentCount_=0;
-                        for(GrowFlowReportVo growFlowReportVo:growFlowQueries_){
-                            currentCount_+=growFlowReportVo.getNewGrow();
+                        List<GrowFlowReportVo> growFlowQueries_ = eventAcountApiService.getGrowFlowAll(gfq).getData();
+                        int currentCount_ = 0;
+                        for (GrowFlowReportVo growFlowReportVo : growFlowQueries_) {
+                            currentCount_ += growFlowReportVo.getNewGrow();
                         }
-                        if(currentCount_<10){
+                        if (currentCount_ < 10) {
                             eventInfos.add(eventInfo_);
                         }
                         eventAPI.commit(eventInfos);
@@ -224,6 +226,7 @@ public class LikeProvider implements LikeApi {
 
     /**
      * 当天的开始时间
+     *
      * @return
      */
     public static long startOfTodDay() {
@@ -232,11 +235,13 @@ public class LikeProvider implements LikeApi {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        Date date=calendar.getTime();
+        Date date = calendar.getTime();
         return date.getTime();
     }
+
     /**
      * 当天的结束时间
+     *
      * @return
      */
     public static long endOfTodDay() {
@@ -245,7 +250,7 @@ public class LikeProvider implements LikeApi {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         calendar.set(Calendar.MILLISECOND, 999);
-        Date date=calendar.getTime();
+        Date date = calendar.getTime();
         return date.getTime();
     }
 
@@ -311,114 +316,189 @@ public class LikeProvider implements LikeApi {
 
     public void switchSend(Like like) {
         UserSimpleVO userSimpleVO = userApi.getUserSimple(like.getUserId()).getData();
-        LikeAssemble likeAssemble = new LikeAssemble();
         String nickName = "";
         if (null != userSimpleVO) {
             nickName = userSimpleVO.getUserNickName();
         }
         if (like.getModuleEnum().equals(ModuleContants.RELEASE)) {
-            this.releasePush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您发布的内容。",like.getModuleEnum(),like.getCoterieId());
+            String contentStr = nickName + "点赞了您发布的内容。";
+            LikeAssemble likeAssemble = getLikeAssemble(like, contentStr);
+            likeAssemble.setUserImg(userSimpleVO.getUserImg());
+            likeAssemble.setUserNickName(userSimpleVO.getUserNickName());
+            this.releasePush(likeAssemble);
         }
         if (like.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
-            this.topicPostPush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您发布的帖子。",like.getModuleEnum(),like.getCoterieId());
+            String contentStr = nickName + "点赞了您发布的帖子。";
+            LikeAssemble likeAssemble = getLikeAssemble(like, contentStr);
+            likeAssemble.setUserImg(userSimpleVO.getUserImg());
+            likeAssemble.setUserNickName(userSimpleVO.getUserNickName());
+            this.topicPostPush(likeAssemble);
         }
-        if (like.getCoterieId() != 0) {
-            if (like.getModuleEnum().equals(ModuleContants.ANSWER)) {
-                AnswerVo answerVo = answerApi.getDetail(like.getResourceId()).getData();
-                LikeAssemble likeAssembleAnswer = new LikeAssemble();
-                if(null!=likeAssembleAnswer.getContent()&&likeAssembleAnswer.getContent().length()>20){
-                    likeAssembleAnswer.setTitle(answerVo.getContent().substring(0,20));
-                }else{
-                    likeAssembleAnswer.setTitle(answerVo.getContent());
-                }
-                likeAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
-                likeAssembleAnswer.setLink("");
-                likeAssembleAnswer.setContent(nickName+"点赞了您的问答");
-                likeAssembleAnswer.setModuleEnum(answerVo.getModuleEnum());
-                likeAssembleAnswer.setResourceId(answerVo.getKid());
-                likeAssembleAnswer.setCoterieId(answerVo.getCoterieId());
-                this.sendMessage(likeAssembleAnswer);
-                Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
-                LikeAssemble likeAssembleQuestion = new LikeAssemble();
-                likeAssembleQuestion.setTargetUserId(question.getCreateUserId());
-                likeAssembleQuestion.setContent(nickName+"点赞了您的问答");
-                likeAssembleQuestion.setTitle(question.getTitle());
-                likeAssembleQuestion.setLink("");
-                likeAssembleQuestion.setModuleEnum(ModuleContants.QUESTION);
-                likeAssembleQuestion.setResourceId(question.getKid());
-                likeAssembleQuestion.setCoterieId(question.getCoterieId());
-                this.sendMessage(likeAssembleQuestion);
+        if (like.getModuleEnum().equals(ModuleContants.ANSWER)) {
+            AnswerVo answerVo = answerApi.getDetail(like.getResourceId()).getData();
+            LikeAssemble likeAssembleAnswer = new LikeAssemble();
+            if (null != likeAssembleAnswer.getContent() && likeAssembleAnswer.getContent().length() > 20) {
+                likeAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
+            } else {
+                likeAssembleAnswer.setTitle(answerVo.getContent());
             }
+            likeAssembleAnswer.setTargetUserId(answerVo.getCreateUserId());
+            likeAssembleAnswer.setLink("");
+            likeAssembleAnswer.setContent(nickName + "点赞了您的问答");
+            likeAssembleAnswer.setModuleEnum(answerVo.getModuleEnum());
+            likeAssembleAnswer.setResourceId(answerVo.getKid());
+            likeAssembleAnswer.setCoterieId(answerVo.getCoterieId());
+            likeAssembleAnswer.setUserNickName(userSimpleVO.getUserNickName());
+            likeAssembleAnswer.setUserImg(userSimpleVO.getUserImg());
+            if (answerVo.getCoterieId() != 0) {
+                if (null != answerVo.getContent() && answerVo.getContent().length() > 7) {
+                    likeAssembleAnswer.setCoterieName(answerVo.getContent().substring(0, 7));
+                } else {
+                    likeAssembleAnswer.setCoterieName(answerVo.getContent());
+                }
+                if (!answerVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(answerVo.getImgUrl());
+                    likeAssembleAnswer.setBodyImg(img);
+                }
+                if (null != answerVo.getContent() && answerVo.getContent().length() > 20) {
+                    likeAssembleAnswer.setBodyTitle(answerVo.getContent().substring(0, 20));
+                } else {
+                    likeAssembleAnswer.setBodyTitle(answerVo.getContent());
+                }
+            }
+            this.sendMessage(likeAssembleAnswer);
+            Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
+            LikeAssemble likeAssembleQuestion = new LikeAssemble();
+            likeAssembleQuestion.setTargetUserId(question.getCreateUserId());
+            likeAssembleQuestion.setContent(nickName + "点赞了您的问答");
+            likeAssembleQuestion.setTitle(question.getTitle());
+            likeAssembleQuestion.setLink("");
+            likeAssembleQuestion.setModuleEnum(ModuleContants.QUESTION);
+            likeAssembleQuestion.setResourceId(question.getKid());
+            likeAssembleQuestion.setCoterieId(question.getCoterieId());
+            likeAssembleQuestion.setUserImg(userSimpleVO.getUserImg());
+            likeAssembleQuestion.setUserNickName(userSimpleVO.getUserNickName());
+            if (likeAssembleQuestion.getCoterieId() != 0) {
+                if (null != question.getContent() && question.getContent().length() > 7) {
+                    likeAssembleQuestion.setCoterieName(question.getContent().substring(0, 7));
+                } else {
+                    likeAssembleQuestion.setCoterieName(question.getContent());
+                }
+                likeAssembleQuestion.setBodyImg("");
+                if (null != question.getContent() && question.getContent().length() > 20) {
+                    likeAssembleQuestion.setBodyTitle(question.getContent().substring(0, 20));
+                } else {
+                    likeAssembleQuestion.setBodyTitle(question.getContent());
+                }
+            }
+
+            this.sendMessage(likeAssembleQuestion);
         }
         if (like.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
-            this.dynamicPush(like.getResourceId(),nickName + "点赞了您发布的动态。",like.getModuleEnum(),like.getCoterieId());
+            String contentStr = nickName + "点赞了您发布的动态。";
+            LikeAssemble likeAssemble = getLikeAssemble(like, contentStr);
+            likeAssemble.setUserImg(userSimpleVO.getUserImg());
+            likeAssemble.setUserNickName(userSimpleVO.getUserNickName());
+            like.setResourceUserId(0);
+            this.dynamicPush(likeAssemble);
         }
         if (like.getModuleEnum().equals(ModuleContants.COMMENT)) {
-            this.releasePush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您的评论。",like.getModuleEnum(),like.getCoterieId());
-            this.topicPostPush(like.getResourceId(),like.getResourceUserId(),nickName + "点赞了您的评论。",like.getModuleEnum(),like.getCoterieId());
-            if(like.getCoterieId()==0){
-                this.dynamicPush(like.getResourceId(),nickName + "点赞了您的评论。",like.getModuleEnum(),like.getCoterieId());
+            String contentStr = nickName + "点赞了您的评论。";
+            LikeAssemble likeAssemble = getLikeAssemble(like, contentStr);
+            likeAssemble.setUserImg(userSimpleVO.getUserImg());
+            likeAssemble.setUserNickName(userSimpleVO.getUserNickName());
+            this.releasePush(likeAssemble);
+            this.topicPostPush(likeAssemble);
+            if (like.getCoterieId() == 0) {
+                like.setResourceUserId(0);
+                this.dynamicPush(likeAssemble);
             }
 
         }
 
     }
 
+    public static LikeAssemble getLikeAssemble(Like like, String contentStr) {
+        LikeAssemble likeAssemble = new LikeAssemble();
+        likeAssemble.setResourceId(like.getResourceId());
+        likeAssemble.setModuleEnum(like.getModuleEnum());
+        likeAssemble.setResourceUserId(like.getResourceUserId());
+        likeAssemble.setContent(contentStr);
+        return likeAssemble;
+    }
 
-    public void releasePush(long resourceId, long resourceUserId,String contentStr,String moduleEnum,long coterieId){
-        LikeAssemble likeAssemble=new LikeAssemble();
+    public void releasePush(LikeAssemble likeAssemble) {
         try {
-            ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
+            ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()).getData();
             likeAssemble.setTitle(releaseInfoVo.getTitle());
             likeAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
             if (!releaseInfoVo.getImgUrl().equals("")) {
                 String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
                 likeAssemble.setImg(img);
             }
-            likeAssemble.setContent(contentStr);
-            likeAssemble.setLink("");
-            likeAssemble.setModuleEnum(moduleEnum);
-            likeAssemble.setResourceId(resourceId);
-            likeAssemble.setCoterieId(coterieId);
+            if (releaseInfoVo.getCoterieId() != 0 && null != releaseInfoVo.getTitle()) {
+                if (releaseInfoVo.getTitle().length() > 7) {
+                    likeAssemble.setCoterieName(releaseInfoVo.getTitle().substring(0, 7));
+                } else {
+                    likeAssemble.setCoterieName(releaseInfoVo.getTitle());
+                }
+                if (!releaseInfoVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
+                    likeAssemble.setBodyImg(img);
+                }
+                if (releaseInfoVo.getTitle().length() > 20) {
+                    likeAssemble.setBodyTitle(releaseInfoVo.getTitle().substring(0, 20));
+                } else {
+                    likeAssemble.setBodyTitle(releaseInfoVo.getTitle());
+                }
+                likeAssemble.setCoterieId(releaseInfoVo.getCoterieId());
+            }
             this.sendMessage(likeAssemble);
         } catch (Exception e) {
             logger.info("调用文章出现异常" + e);
         }
     }
 
-    public void topicPostPush(long resourceId, long resourceUserId,String contentStr,String moduleEnum,long coterieId){
-        LikeAssemble likeAssemble=new LikeAssemble();
+    public void topicPostPush(LikeAssemble likeAssemble) {
         try {
-            TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
+            TopicPostVo topicPostVo = topicPostApi.quetyDetail(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()).getData();
             likeAssemble.setTargetUserId(topicPostVo.getUser().getUserId());
-            if (null!=topicPostVo.getContent()&&topicPostVo.getContent().length()>20) {
+            if (null != topicPostVo.getContent() && topicPostVo.getContent().length() > 20) {
                 likeAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
-            }else{
+            } else {
                 likeAssemble.setTitle(topicPostVo.getContent());
             }
             if (!topicPostVo.getImgUrl().equals("")) {
                 String img = getImgFirstUrl(topicPostVo.getImgUrl());
                 likeAssemble.setImg(img);
             }
-            likeAssemble.setContent(contentStr);
-            likeAssemble.setLink("");
-            likeAssemble.setModuleEnum(moduleEnum);
-            likeAssemble.setResourceId(resourceId);
-            likeAssemble.setCoterieId(coterieId);
+            if (topicPostVo.getCoterieId() != 0 && null != topicPostVo.getContent()) {
+                if (topicPostVo.getContent().length() > 7) {
+                    likeAssemble.setCoterieName(topicPostVo.getContent().substring(0, 7));
+                } else {
+                    likeAssemble.setCoterieName(topicPostVo.getContent());
+                }
+                if (!topicPostVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(topicPostVo.getImgUrl());
+                    likeAssemble.setBodyImg(img);
+                }
+                likeAssemble.setBodyTitle(topicPostVo.getContent());
+                likeAssemble.setCoterieId(topicPostVo.getCoterieId());
+            }
             this.sendMessage(likeAssemble);
         } catch (Exception e) {
             logger.info("调用帖子出现异常" + e);
         }
     }
 
-    public void dynamicPush(long resourceId,String contentPushStr,String moduleEnum,long coterieId){
-        LikeAssemble likeAssemble=new LikeAssemble();
-        try{
-          /*  Dymaic dymaic = dymaicService.get(resourceId).getData();
+    public void dynamicPush(LikeAssemble likeAssemble) {
+       /* try {
+            Dymaic dymaic = dymaicService.get(likeAssemble.getResourceId()).getData();
             if (!dymaic.getExtJson().equals("")) {
                 Map maps = (Map) JSONObject.parse(dymaic.getExtJson());
                 String title = maps.get("title").toString();
                 String image = maps.get("imgUrl").toString();
+                String coterieId= maps.get("coterieId").toString();
                 String imgUrl = "";
                 if (!image.equals("")) {
                     imgUrl = getImgFirstUrl(image);
@@ -431,16 +511,40 @@ public class LikeProvider implements LikeApi {
                 if (title.equals("") && !content.equals("")) {
                     likeAssemble.setTitle(content.substring(0, 20));
                 }
-                likeAssemble.setContent(contentPushStr);
-                likeAssemble.setLink("");
-                likeAssemble.setModuleEnum(moduleEnum);
-                likeAssemble.setResourceId(resourceId);
-                likeAssemble.setCoterieId(coterieId);
+                if (!coterieId.equals("0")) {
+                    if (!title.equals("") && title.length() > 7) {
+                        likeAssemble.setCoterieName(title.substring(0, 7));
+                    } else {
+                        likeAssemble.setCoterieName(title);
+                    }
+                    if(!title.equals("") && title.length() > 20){
+                        likeAssemble.setBodyTitle(content.substring(0,20));
+                    }else{
+                        likeAssemble.setBodyTitle(title);
+                    }
+                    if (title.equals("") && !content.equals("")) {
+                        if (content.length() > 7) {
+                            likeAssemble.setCoterieName(content.substring(0, 7));
+                        } else {
+                            likeAssemble.setCoterieName(content);
+                        }
+                        if(content.length()>20){
+                            likeAssemble.setBodyTitle(content.substring(0,20));
+                        }else{
+                            likeAssemble.setBodyTitle(content);
+                        }
+                    }
+                    if (!image.equals("")) {
+                        String imgUrls = getImgFirstUrl(image);
+                        likeAssemble.setBodyImg(imgUrls);
+                    }
+                    likeAssemble.setCoterieId(Long.valueOf(coterieId));
+                }
                 this.sendMessage(likeAssemble);
-            }*/
-        }catch (Exception e){
+            }
+        } catch (Exception e) {
             logger.info("调用动态出现异常" + e);
-        }
+        }*/
     }
 
 
@@ -459,9 +563,16 @@ public class LikeProvider implements LikeApi {
         messageVo.setModuleEnum(likeAssemble.getModuleEnum());
         messageVo.setCoterieId(String.valueOf(likeAssemble.getCoterieId()));
         messageVo.setResourceId(String.valueOf(likeAssemble.getResourceId()));
-        messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_2);
+        messageVo.setViewCode(MessageViewCode.INTERACTIVE_MESSAGE);
+        InteractiveBody body = new InteractiveBody();
+        body.setUserImg(likeAssemble.getUserImg());
+        body.setUserNickName(likeAssemble.getUserNickName());
+        body.setCoterieId(String.valueOf(likeAssemble.getCoterieId()));
+        body.setCoterieName(likeAssemble.getCoterieName());
+        body.setBodyImg(likeAssemble.getBodyImg());
+        body.setBodyTitle(likeAssemble.getBodyTitle());
         try {
-            messageAPI.sendMessage(messageVo, true);
+            messageAPI.sendMessage(messageVo, false);
         } catch (Exception e) {
             logger.info("持久化消息失败:" + e);
         }

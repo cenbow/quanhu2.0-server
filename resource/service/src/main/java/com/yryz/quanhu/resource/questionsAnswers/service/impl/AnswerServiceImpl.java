@@ -191,7 +191,7 @@ public class AnswerServiceImpl implements AnswerService {
          * 资源聚合
          */
         ResourceTotal resourceTotal=new ResourceTotal();
-        resourceTotal.setCreateDate(DateUtils.getDate());
+        resourceTotal.setCreateDate(DateUtils.getDateTime());
         QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
         QuestionVo questionVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
         AnswerVo answerVo1=this.answerService.queryAnswerVoByquestionId(questionId);
@@ -216,7 +216,7 @@ public class AnswerServiceImpl implements AnswerService {
          * 私圈信息 聚合
          */
         ResourceTotal resourceTotalCoterie=new ResourceTotal();
-        resourceTotalCoterie.setCreateDate(DateUtils.getDate());
+        resourceTotalCoterie.setCreateDate(DateUtils.getDateTime());
         resourceTotalCoterie.setCoterieId(String.valueOf(coterieId));
         CoterieInfo coterieInfo=this.apIservice.getCoterieinfo(questionCheck.getCoterieId());
         if(null!=coterieInfo) {
