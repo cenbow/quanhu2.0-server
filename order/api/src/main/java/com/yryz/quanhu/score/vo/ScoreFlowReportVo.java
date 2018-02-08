@@ -2,6 +2,9 @@ package com.yryz.quanhu.score.vo;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * @author syc on 2018/1/22.
  */
@@ -11,7 +14,8 @@ public class ScoreFlowReportVo implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -3577121435443411098L;
-
+	
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
 	private int consumeFlag;
