@@ -6,8 +6,7 @@ import com.yryz.common.utils.PageModel;
 import com.yryz.quanhu.support.config.dao.BasicConfigDao;
 import com.yryz.quanhu.support.config.dto.BasicConfigDto;
 import com.yryz.quanhu.support.config.service.BasicConfigService;
-import com.yryz.quanhu.support.id.service.IIdService;
-import com.yryz.quanhu.support.id.service.impl.IdServiceImpl;
+import com.yryz.quanhu.support.id.bufferedid.service.IIdService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +64,7 @@ public class BasicConfigServiceImpl implements BasicConfigService {
             if(dto!=null){
                 //更新缓存
                 this.setRedisValue(dto.getConfigKey(),dto.getConfigValue());
+                value = dto.getConfigValue();
             }
         }
         return value;
