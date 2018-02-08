@@ -87,9 +87,13 @@ public class CountProvider implements CountApi {
                     } catch (Exception e) {
                         logger.error("get coterie count error", e);
                     }
-                } else if(BehaviorEnum.Activity.getCode().equals(behaviorEnum.getCode())){
-                    count = ResponseUtils.getResponseData(activityInfoApi.myListCount(kid)).longValue();
-                }else {
+                } else if (BehaviorEnum.Activity.getCode().equals(behaviorEnum.getCode())) {
+                    try {
+                        count = ResponseUtils.getResponseData(activityInfoApi.myListCount(kid)).longValue();
+                    } catch (Exception e) {
+                        logger.error("get activity count error", e);
+                    }
+                } else {
                     count = countService.getCount(kid.toString(), behaviorEnum.getCode(), page);
                 }
                 map.put(behaviorEnum.getKey(), count);
