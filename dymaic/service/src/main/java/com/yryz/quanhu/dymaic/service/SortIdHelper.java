@@ -46,7 +46,7 @@ public class SortIdHelper {
         Long result = redisTemplate.opsForValue().get(cacheKey);
 
         if (result != null && result > INIT) {
-            return result;
+            return redisTemplate.opsForValue().increment(cacheKey, 1L);
         }
 
         // init
