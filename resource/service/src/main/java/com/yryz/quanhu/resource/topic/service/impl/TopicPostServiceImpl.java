@@ -11,11 +11,13 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
@@ -138,20 +140,23 @@ public class TopicPostServiceImpl implements TopicPostService {
          * 资源聚合
          */
         ResourceTotal resourceTotal=new ResourceTotal();
-        resourceTotal.setCreateDate(DateUtils.getDate());
+        resourceTotal.setCreateDate(DateUtils.getDateTime());
         TopicPostWithBLOBs post=this.topicPostDao.selectByPrimaryKey(topicPost.getKid());
         TopicPostVo topicPostVo=new TopicPostVo();
         if(post!=null) {
             BeanUtils.copyProperties(post, topicPostVo);
-            resourceTotal.setExtJson(JSON.toJSONString(topicPostVo));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(topicPostVo));
         }
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(post.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC_POST));
         resourceTotal.setUserId(topicPost.getCreateUserId());
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
 
         //提交讨论数
-        Response<Object> data=countApi.commitCount(BehaviorEnum.TALK,topic.getKid(),null,1L);
+        countApi.commitCount(BehaviorEnum.TALK,topic.getKid(),null,1L);
+        //提交发布数
+        countApi.commitCount(BehaviorEnum.Release,post.getCreateUserId(),null,1L);
         return result;
     }
 

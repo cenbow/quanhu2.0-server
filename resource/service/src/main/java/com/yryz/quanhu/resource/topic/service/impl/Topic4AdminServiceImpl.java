@@ -8,18 +8,18 @@ import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
-import com.yryz.quanhu.resource.topic.entity.Topic;
-import com.yryz.quanhu.resource.topic.entity.TopicExample;
-import com.yryz.quanhu.resource.topic.entity.TopicPost;
-import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
+import com.yryz.quanhu.resource.topic.entity.*;
 import com.yryz.quanhu.resource.topic.service.Topic4AdminService;
+import com.yryz.quanhu.resource.topic.service.TopicPost4AdminService;
 import com.yryz.quanhu.resource.topic.service.TopicPostService;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
 import com.yryz.quanhu.resource.topic.vo.TopicVo;
@@ -49,7 +49,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
     private ReadApi readApi;
 
     @Autowired
-    private TopicPostService topicPostService;
+    private TopicPost4AdminService topicPost4AdminService;
 
     @Reference
     private ResourceDymaicApi resourceDymaicApi;
@@ -87,8 +87,9 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
              * 资源聚合
              */
             ResourceTotal resourceTotal=new ResourceTotal();
-            resourceTotal.setCreateDate(DateUtils.getDate());
-            resourceTotal.setExtJson(JSON.toJSONString(vo));
+            resourceTotal.setCreateDate(DateUtils.getDateTime());
+            resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(vo.getKid());
             resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC));
             resourceTotal.setUserId(vo.getCreateUserId());
@@ -117,8 +118,6 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         TopicExample example=new TopicExample();
         TopicExample.Criteria criteria=example.createCriteria();
         criteria.andKidEqualTo(kid);
-     //   criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
 
         List<Topic> topics = this.topicDao.selectByExample(example);
         if (null == topics || topics.isEmpty()) {
@@ -132,9 +131,6 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         if (null != createUserId) {
             topicVo.setUser(apIservice.getUser(createUserId));
         }
-        Long replyCount=this.topicPostService.countPostByTopicId(topicVo.getKid());
-        topicVo.setReplyCount(replyCount);
-        topicVo.setModuleEnum(ModuleContants.TOPIC);
 
         //虚拟阅读数
         readApi.read(kid,topicVo.getCreateUserId());
@@ -229,10 +225,10 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         /**
          * 话题下架，同时下架话题下的帖子
          */
-        TopicPost topicPost=new TopicPost();
+        TopicPostWithBLOBs topicPost=new TopicPostWithBLOBs();
         topicPost.setTopicId(kid);
         topicPost.setDelFlag(CommonConstants.DELETE_YES);
-        this.topicPostDao.deleteByTipocId(topicPost);
+        this.topicPostDao.updateByPrimaryKeySelective(topicPost);
         return  result;
     }
 
@@ -241,7 +237,22 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         Topic topic=new Topic();
         topic.setKid(kid);
         topic.setShelveFlag(shalveFlag);
-        return this.topicDao.updateByPrimaryKeySelective(topic);
+        int result=this.topicDao.updateByPrimaryKeySelective(topic);
+
+        /**
+         * 话题下架的同时话题对应的帖子也下架
+         */
+        TopicPostExample example=new TopicPostExample();
+        TopicPostExample.Criteria criteria=example.createCriteria();
+        criteria.andTopicIdEqualTo(kid);
+       List<TopicPost> topicPosts= this.topicPostDao.selectByExample(example);
+       if(topicPosts!=null){
+           for(TopicPost topicPost:topicPosts){
+               this.topicPost4AdminService.shelve(topicPost.getKid(),CommonConstants.SHELVE_NO);
+           }
+       }
+
+        return result;
     }
 
     @Override

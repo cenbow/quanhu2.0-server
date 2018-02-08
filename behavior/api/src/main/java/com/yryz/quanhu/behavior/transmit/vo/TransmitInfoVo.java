@@ -18,11 +18,13 @@ public class TransmitInfoVo implements Serializable {
     /**
      * 原文ID或动态ID
      * */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long parentId;
 
     /**
      * 资源ID
      * */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long resourceId;
 
     /**
@@ -38,6 +40,7 @@ public class TransmitInfoVo implements Serializable {
     /**
      * 创建用户ID
      * */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long createUserId;
 
     /**

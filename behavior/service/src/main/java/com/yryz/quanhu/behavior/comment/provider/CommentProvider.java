@@ -77,7 +77,7 @@ public class CommentProvider implements CommentApi {
     @Reference(check = false)
     private TopicPostApi topicPostApi;
 
-  /*  @Reference(check = false)
+    /*@Reference(check = false)
     private DymaicService dymaicService;*/
 
     @Reference(check = false)
@@ -130,14 +130,14 @@ public class CommentProvider implements CommentApi {
             int count = commentService.delComment(comment);
             if (count > 0) {
                 map.put("result", 1);
-                if(comment.getTopId()==0){
+                if (comment.getTopId() == 0) {
                     this.delBatch(comment);
                 }
                 Comment comments = new Comment();
                 comments.setKid(comment.getKid());
                 Comment commentStr = commentService.querySingleComment(comments);
                 try {
-                    if(null!=commentStr){
+                    if (null != commentStr) {
                         stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
                     }
                 } catch (Exception e) {
@@ -216,14 +216,14 @@ public class CommentProvider implements CommentApi {
 
             int count = commentService.updownSingle(comment);
             if (count > 0) {
-                if(comment.getTopId()==0){
+                if (comment.getTopId() == 0) {
                     this.delBatch(comment);
                 }
                 Comment comments = new Comment();
                 comments.setKid(comment.getKid());
                 Comment commentStr = commentService.querySingleComment(comments);
                 try {
-                    if(null!=commentStr){
+                    if (null != commentStr) {
                         stringRedisTemplate.delete("COMMENT:" + commentStr.getModuleEnum() + ":" + commentStr.getKid() + "_" + commentStr.getTopId() + "_" + commentStr.getResourceId());
                     }
                 } catch (Exception e) {
@@ -290,7 +290,8 @@ public class CommentProvider implements CommentApi {
                 contentStr = nickName + "回复了您的评论。";
                 pingContent = this.getBePingComment(comment.getParentId());
             }
-            this.releasePush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent, comment.getModuleEnum(), comment.getCoterieId());
+            CommentAssemble commentAssemble = getCommentAssemble(comment, contentStr);
+            this.releasePush(commentAssemble, contentType, pingContent);
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.TOPIC_POST)) {
@@ -304,7 +305,8 @@ public class CommentProvider implements CommentApi {
                 contentStr = nickName + "回复了您的评论。";
                 pingContent = this.getBePingComment(comment.getParentId());
             }
-            this.topicPostPush(comment.getResourceId(), comment.getTargetUserId(), contentStr, contentType, pingContent, comment.getModuleEnum(), comment.getCoterieId());
+            CommentAssemble commentAssemble = getCommentAssemble(comment, contentStr);
+            this.topicPostPush(commentAssemble, contentType, pingContent);
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
@@ -318,7 +320,9 @@ public class CommentProvider implements CommentApi {
                 contentStr = nickName + "回复了您的评论。";
                 pingContent = this.getBePingComment(comment.getParentId());
             }
-            this.dynamicPush(comment.getResourceId(), contentStr, contentType, pingContent, comment.getModuleEnum(), comment.getCoterieId());
+            CommentAssemble commentAssemble = getCommentAssemble(comment, contentStr);
+            commentAssemble.setTargetUserId(0);
+            this.dynamicPush(commentAssemble, contentType, pingContent);
         }
 
         if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
@@ -335,6 +339,24 @@ public class CommentProvider implements CommentApi {
             commentAssembleAnswer.setModuleEnum(answerVo.getModuleEnum());
             commentAssembleAnswer.setCoterieId(answerVo.getCoterieId());
             commentAssembleAnswer.setContent(nickName + "评论了您的问题。");
+            commentAssembleAnswer.setUserImg(comment.getUserImg());
+            commentAssembleAnswer.setUserNickName(comment.getNickName());
+            if (commentAssembleAnswer.getCoterieId() != 0) {
+                if(null!=answerVo.getContent()&&answerVo.getContent().length()>7){
+                    commentAssembleAnswer.setCoterieName(answerVo.getContent().substring(0,7));
+                }else{
+                    commentAssembleAnswer.setCoterieName(answerVo.getContent());
+                }
+                if (!answerVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(answerVo.getImgUrl());
+                    commentAssembleAnswer.setBodyImg(img);
+                }
+                if(null!=answerVo.getContent()&&answerVo.getContent().length()>20){
+                    commentAssembleAnswer.setBodyTitle(answerVo.getContent().substring(0,20));
+                }else{
+                    commentAssembleAnswer.setBodyTitle(answerVo.getContent());
+                }
+            }
             this.sendMessage(commentAssembleAnswer);
             Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
             CommentAssemble commentAssembleQuestion = new CommentAssemble();
@@ -345,10 +367,35 @@ public class CommentProvider implements CommentApi {
             commentAssembleQuestion.setResourceId(question.getKid());
             commentAssembleQuestion.setModuleEnum(ModuleContants.QUESTION);
             commentAssembleQuestion.setCoterieId(question.getCoterieId());
+            commentAssembleQuestion.setUserImg(comment.getUserImg());
+            commentAssembleQuestion.setUserNickName(comment.getNickName());
+            if (commentAssembleQuestion.getCoterieId() != 0) {
+                if(null!=question.getContent()&&question.getContent().length()>7){
+                    commentAssembleQuestion.setCoterieName(question.getContent().substring(0,7));
+                }else{
+                    commentAssembleQuestion.setCoterieName(question.getContent());
+                }
+                commentAssembleQuestion.setBodyImg("");
+                if(null!=question.getContent()&&question.getContent().length()>20){
+                    commentAssembleQuestion.setBodyTitle(question.getContent().substring(0,20));
+                }else{
+                    commentAssembleQuestion.setBodyTitle(question.getContent());
+                }
+            }
             this.sendMessage(commentAssembleQuestion);
         }
+    }
 
-
+    public static CommentAssemble getCommentAssemble(Comment comment, String contentStr) {
+        CommentAssemble commentAssemble = new CommentAssemble();
+        commentAssemble.setResourceId(comment.getResourceId());
+        commentAssemble.setModuleEnum(comment.getModuleEnum());
+        commentAssemble.setCoterieId(comment.getCoterieId());
+        commentAssemble.setContent(contentStr);
+        commentAssemble.setTargetUserId(comment.getTargetUserId());
+        commentAssemble.setUserImg(comment.getUserImg());
+        commentAssemble.setUserNickName(comment.getNickName());
+        return commentAssemble;
     }
 
     public String getBePingComment(Long kid) {
@@ -367,10 +414,10 @@ public class CommentProvider implements CommentApi {
         return pingContent;
     }
 
-    public void topicPostPush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent, String moduleEnum, long coterieId) {
-        CommentAssemble commentAssemble = new CommentAssemble();
+    public void topicPostPush(CommentAssemble commentAssemble, long contentType, String bePingContent) {
+
         try {
-            TopicPostVo topicPostVo = topicPostApi.quetyDetail(resourceId, resourceUserId).getData();
+            TopicPostVo topicPostVo = topicPostApi.quetyDetail(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()).getData();
             if (contentType == 0) {
                 if (!topicPostVo.getImgUrl().equals("")) {
                     String img = getImgFirstUrl(topicPostVo.getImgUrl());
@@ -381,32 +428,38 @@ public class CommentProvider implements CommentApi {
                 } else {
                     commentAssemble.setTitle(topicPostVo.getContent());
                 }
-
             }
             if (contentType != 0) {
                 commentAssemble.setViewCode((byte) 1);
                 //截取被回复的评论内容
                 commentAssemble.setTitle(bePingContent);
             }
-            commentAssemble.setContent(contentStr);
-            commentAssemble.setLink("");
-            commentAssemble.setResourceId(resourceId);
-            commentAssemble.setModuleEnum(moduleEnum);
-            commentAssemble.setCoterieId(coterieId);
+            if (commentAssemble.getCoterieId() != 0 && null != topicPostVo.getContent()) {
+                if (topicPostVo.getContent().length() > 7) {
+                    commentAssemble.setCoterieName(topicPostVo.getContent().substring(0, 7));
+                } else {
+                    commentAssemble.setCoterieName(topicPostVo.getContent());
+                }
+                if (!topicPostVo.getImgUrl().equals("")) {
+                    String img = getImgFirstUrl(topicPostVo.getImgUrl());
+                    commentAssemble.setBodyImg(img);
+                }
+                commentAssemble.setBodyTitle(topicPostVo.getContent());
+            }
             this.sendMessage(commentAssemble);
         } catch (Exception e) {
             logger.error("调用文章出现异常", e);
         }
     }
 
-    public void releasePush(long resourceId, long resourceUserId, String contentStr, long contentType, String bePingContent, String moduleEnum, long coterieId) {
-        CommentAssemble commentAssemble = new CommentAssemble();
+    public void releasePush(CommentAssemble commentAssemble, long contentType, String bePingContent) {
         try {
-            ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(resourceId, resourceUserId).getData();
+            ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()).getData();
             commentAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
+            String img = "";
             if (contentType == 0) {
                 if (!releaseInfoVo.getImgUrl().equals("")) {
-                    String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
+                    img = getImgFirstUrl(releaseInfoVo.getImgUrl());
                     commentAssemble.setImg(img);
                 }
                 commentAssemble.setTitle(releaseInfoVo.getTitle());
@@ -417,25 +470,36 @@ public class CommentProvider implements CommentApi {
                 //截取被回复的评论内容
                 commentAssemble.setTitle(bePingContent);
             }
-            commentAssemble.setContent(contentStr);
-            commentAssemble.setLink("");
-            commentAssemble.setResourceId(resourceId);
-            commentAssemble.setModuleEnum(moduleEnum);
-            commentAssemble.setCoterieId(coterieId);
+            if (commentAssemble.getCoterieId() != 0 && null != releaseInfoVo.getTitle()) {
+                if (releaseInfoVo.getTitle().length() > 7) {
+                    commentAssemble.setCoterieName(releaseInfoVo.getTitle().substring(0, 7));
+                } else {
+                    commentAssemble.setCoterieName(releaseInfoVo.getTitle());
+                }
+                if (!releaseInfoVo.getImgUrl().equals("")) {
+                    img = getImgFirstUrl(releaseInfoVo.getImgUrl());
+                    commentAssemble.setBodyImg(img);
+                }
+                if (releaseInfoVo.getTitle().length() > 20) {
+                    commentAssemble.setBodyTitle(releaseInfoVo.getTitle().substring(0, 20));
+                } else {
+                    commentAssemble.setBodyTitle(releaseInfoVo.getTitle());
+                }
+            }
             this.sendMessage(commentAssemble);
         } catch (Exception e) {
             logger.error("调用文章出现异常", e);
         }
     }
 
-    public void dynamicPush(long resourceId, String contentPushStr, long contentType, String bePingContent, String moduleEnum, long coterieId) {
-        CommentAssemble commentAssemble = new CommentAssemble();
-        try {
-           /* Dymaic dymaic = dymaicService.get(resourceId).getData();
+    public void dynamicPush(CommentAssemble commentAssemble, long contentType, String bePingContent) {
+       /* try {
+            Dymaic dymaic = dymaicService.get(commentAssemble.getResourceId()).getData();
             if (!dymaic.getExtJson().equals("")) {
                 Map maps = (Map) JSONObject.parse(dymaic.getExtJson());
                 String title = maps.get("title").toString();
                 String image = maps.get("imgUrl").toString();
+                String content = "";
                 if (contentType == 0) {
                     String imgUrl = "";
                     if (!image.equals("")) {
@@ -445,7 +509,7 @@ public class CommentProvider implements CommentApi {
                     if (!title.equals("")) {
                         commentAssemble.setTitle(title);
                     }
-                    String content = maps.get("content").toString();
+                    content = maps.get("content").toString();
                     if (title.equals("") && !content.equals("")) {
                         commentAssemble.setTitle(content.substring(0, 20));
                     }
@@ -456,16 +520,39 @@ public class CommentProvider implements CommentApi {
                     //截取被回复的评论内容
                     commentAssemble.setTitle(bePingContent);
                 }
-                commentAssemble.setContent(contentPushStr);
-                commentAssemble.setLink("");
-                commentAssemble.setResourceId(resourceId);
-                commentAssemble.setModuleEnum(moduleEnum);
-                commentAssemble.setCoterieId(coterieId);
+                if (commentAssemble.getCoterieId() != 0) {
+                    if (!title.equals("") && title.length() > 7) {
+                        commentAssemble.setCoterieName(title.substring(0, 7));
+                    } else {
+                        commentAssemble.setCoterieName(title);
+                    }
+                    if(!title.equals("") && title.length() > 20){
+                        commentAssemble.setBodyTitle(content.substring(0,20));
+                    }else{
+                        commentAssemble.setBodyTitle(title);
+                    }
+                    if (title.equals("") && !content.equals("")) {
+                        if (content.length() > 7) {
+                            commentAssemble.setCoterieName(content.substring(0, 7));
+                        } else {
+                            commentAssemble.setCoterieName(content);
+                        }
+                        if(content.length()>20){
+                            commentAssemble.setBodyTitle(content.substring(0,20));
+                        }else{
+                            commentAssemble.setBodyTitle(content);
+                        }
+                    }
+                    if (!image.equals("")) {
+                        String imgUrl = getImgFirstUrl(image);
+                        commentAssemble.setBodyImg(imgUrl);
+                    }
+                }
                 this.sendMessage(commentAssemble);
-            }*/
+            }
         } catch (Exception e) {
             logger.info("调用动态出现异常" + e);
-        }
+        }*/
     }
 
     public void sendMessage(CommentAssemble commentAssemble) {
@@ -483,11 +570,14 @@ public class CommentProvider implements CommentApi {
         messageVo.setCoterieId(String.valueOf(commentAssemble.getCoterieId()));
         messageVo.setResourceId(String.valueOf(commentAssemble.getResourceId()));
         messageVo.setCreateTime(DateUtils.getDateTime());
-        if (commentAssemble.getViewCode() == 2) {
-            messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_2);
-        } else {
-            messageVo.setViewCode(MessageViewCode.SYSTEM_MESSAGE_1);
-        }
+        messageVo.setViewCode(MessageViewCode.INTERACTIVE_MESSAGE);
+        InteractiveBody body = new InteractiveBody();
+        body.setUserImg(commentAssemble.getUserImg());
+        body.setUserNickName(commentAssemble.getUserNickName());
+        body.setCoterieId(String.valueOf(commentAssemble.getCoterieId()));
+        body.setCoterieName(commentAssemble.getCoterieName());
+        body.setBodyImg(commentAssemble.getBodyImg());
+        body.setBodyTitle(commentAssemble.getBodyTitle());
         try {
             messageAPI.sendMessage(messageVo, true);
         } catch (Exception e) {

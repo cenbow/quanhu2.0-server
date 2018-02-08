@@ -8,6 +8,7 @@ import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
@@ -190,16 +191,21 @@ public class AnswerServiceImpl implements AnswerService {
          * 资源聚合
          */
         ResourceTotal resourceTotal=new ResourceTotal();
-        resourceTotal.setCreateDate(DateUtils.getDate());
+        resourceTotal.setCreateDate(DateUtils.getDateTime());
         QuestionAnswerVo questionAnswerVo=new QuestionAnswerVo();
         QuestionVo questionVo=this.questionService.getDetail(questionId,questionCheck.getCreateUserId());
         AnswerVo answerVo1=this.answerService.queryAnswerVoByquestionId(questionId);
         questionAnswerVo.setQuestion(questionVo);
         questionAnswerVo.setAnswer(answerVo1);
         if(questionAnswerVo!=null) {
-            resourceTotal.setExtJson(JSON.toJSONString(questionAnswerVo));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(questionAnswerVo));
         }
-        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+        if(QuestionAnswerConstants.showType.ONESELF.compareTo(questionVo.getIsOnlyShowMe())==0){
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_TRUE);
+        }else{
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
+        }
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceTotal.setResourceId(answerVo1.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.ANSWER));
         resourceTotal.setUserId(answerVo1.getCreateUserId());
@@ -210,11 +216,12 @@ public class AnswerServiceImpl implements AnswerService {
          * 私圈信息 聚合
          */
         ResourceTotal resourceTotalCoterie=new ResourceTotal();
-        resourceTotalCoterie.setCreateDate(DateUtils.getDate());
+        resourceTotalCoterie.setCreateDate(DateUtils.getDateTime());
         resourceTotalCoterie.setCoterieId(String.valueOf(coterieId));
         CoterieInfo coterieInfo=this.apIservice.getCoterieinfo(questionCheck.getCoterieId());
         if(null!=coterieInfo) {
-            resourceTotalCoterie.setExtJson(JSON.toJSONString(coterieInfo));
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
+            resourceTotalCoterie.setExtJson(JsonUtils.toFastJson(coterieInfo));
             resourceTotalCoterie.setResourceId(coterieInfo.getCoterieId());
             resourceTotalCoterie.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
             resourceTotalCoterie.setUserId(Long.valueOf(coterieInfo.getOwnerId()));

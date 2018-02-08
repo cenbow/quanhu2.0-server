@@ -24,6 +24,7 @@ public class ActivityCoterieBody implements Body{
 	 * 圈子ID
 	 */
 	private String circleId;
+
 	/**
 	 * 圈子名称
 	 */

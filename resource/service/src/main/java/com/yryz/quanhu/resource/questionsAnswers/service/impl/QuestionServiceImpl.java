@@ -11,6 +11,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
@@ -25,6 +26,7 @@ import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.vo.UserAccount;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
@@ -226,13 +228,19 @@ public class QuestionServiceImpl implements QuestionService {
          * 资源聚合
          */
         ResourceTotal resourceTotal = new ResourceTotal();
-        resourceTotal.setCreateDate(DateUtils.getDate());
+        resourceTotal.setCreateDate(DateUtils.getDateTime());
         Question questionQuery = this.questionDao.selectByPrimaryKey(question.getKid());
         QuestionVo vo = new QuestionVo();
         if (questionQuery != null) {
             BeanUtils.copyProperties(questionQuery, vo);
-            resourceTotal.setExtJson(JSON.toJSONString(vo));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
         }
+        if(QuestionAnswerConstants.showType.ONESELF.compareTo(questionQuery.getIsOnlyShowMe())==0){
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_TRUE);
+        }else{
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
+        }
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceTotal.setResourceId(question.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionQuery.getCreateUserId());
@@ -269,6 +277,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         questionBySearch.setDelFlag(CommonConstants.DELETE_YES);
+
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
@@ -278,7 +287,6 @@ public class QuestionServiceImpl implements QuestionService {
             if (null != orderId) {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
                 questionBySearch.setRefundOrderId(String.valueOf(orderId));
-
 
                 //发送通知消息
                 MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
@@ -299,7 +307,7 @@ public class QuestionServiceImpl implements QuestionService {
                 questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
             }
         }
-        return this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+        return  this.questionDao.updateByPrimaryKeySelective(questionBySearch);
     }
 
 
@@ -336,7 +344,7 @@ public class QuestionServiceImpl implements QuestionService {
         Long createUserId = questionBysearch.getCreateUserId();
         Long targetId = Long.valueOf(questionBysearch.getTargetId());
         if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
-            if (createUserId.compareTo(userId) != 0) {
+            if (createUserId.compareTo(userId) != 0 && targetId.compareTo(userId)!=0) {
                 throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREAD);
             }
         }
@@ -418,17 +426,24 @@ public class QuestionServiceImpl implements QuestionService {
             }
         }
 
-        MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-        messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
-        messageBusinessVo.setIsAnonymity(null);
-        messageBusinessVo.setKid(question.getKid());
-        messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-        messageBusinessVo.setFromUserId(question.getCreateUserId());
-        messageBusinessVo.setTitle(question.getContent());
-        messageBusinessVo.setTosendUserId(question.getCreateUserId());
-        messageBusinessVo.setAmount(question.getChargeAmount());
-        questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_REJECT, false);
+
         int result = this.questionDao.updateByPrimaryKeySelective(question);
+
+        /**
+         * 发送消息
+         */
+        if(result>0) {
+            MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+            messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+            messageBusinessVo.setIsAnonymity(null);
+            messageBusinessVo.setKid(question.getKid());
+            messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
+            messageBusinessVo.setFromUserId(question.getCreateUserId());
+            messageBusinessVo.setTitle(question.getContent());
+            messageBusinessVo.setTosendUserId(question.getCreateUserId());
+            messageBusinessVo.setAmount(question.getChargeAmount());
+            questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_REJECT, false);
+        }
         return result;
     }
 

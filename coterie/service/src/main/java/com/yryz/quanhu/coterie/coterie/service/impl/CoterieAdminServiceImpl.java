@@ -15,7 +15,7 @@ import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminService;
 import com.yryz.quanhu.coterie.coterie.vo.*;
 import com.yryz.quanhu.coterie.member.event.CoterieEventManager;
-import com.yryz.quanhu.coterie.member.event.CoterieMemberMessageManager;
+import com.yryz.quanhu.coterie.member.event.CoterieMessageManager;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -47,7 +47,7 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
     private UserApi userApi;
 
     @Resource
-    private CoterieMemberMessageManager coterieMemberMessageManager;
+    private CoterieMessageManager coterieMessageManager;
 
     @Resource
     private CoterieEventManager coterieEventManager;
@@ -77,22 +77,38 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
     @Override
     public Response<String> audit(CoterieUpdateAdmin coterie) {
         try {
+            if (null == coterie.getStatus()) {
+
+                throw QuanhuException.busiError("审核时审核状态不能为空");
+            }
+
             Integer result = coterieMapper.updateCoterieAdmin(coterie);
             if (result > 0) {
                 Coterie coterieDb = coterieMapper.selectByCoterieId(coterie.getCoterieId());
 
-                //dynamic
-                ResourceTotal resourceTotal = new ResourceTotal();
-                resourceTotal.setCreateDate(DateUtils.getDate());
-                resourceTotal.setExtJson(JSON.toJSONString(coterieDb));
-                resourceTotal.setResourceId(coterie.getCoterieId());
-                resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
-                resourceTotal.setUserId(NumberUtils.toLong(coterieDb.getOwnerId()));
-                resourceTotal.setCoterieId(String.valueOf(coterie.getCoterieId()));
-                resourceDymaicApi.commitResourceDymaic(resourceTotal);
+                if (coterie.getStatus() == 11) {
 
-                //event
-                coterieEventManager.createCoterieEvent(coterie.getCoterieId());
+                    //dynamic
+                    ResourceTotal resourceTotal = new ResourceTotal();
+                    resourceTotal.setCreateDate(DateUtils.getDate());
+                    resourceTotal.setExtJson(JSON.toJSONString(coterieDb));
+                    resourceTotal.setResourceId(coterie.getCoterieId());
+                    resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
+                    resourceTotal.setUserId(NumberUtils.toLong(coterieDb.getOwnerId()));
+                    resourceTotal.setCoterieId(String.valueOf(coterie.getCoterieId()));
+                    resourceDymaicApi.commitResourceDymaic(resourceTotal);
+
+                    //event
+                    coterieEventManager.createCoterieEvent(coterie.getCoterieId());
+
+                    //msg
+                    coterieMessageManager.agreeMessage(coterie.getCoterieId());
+
+
+                } else {
+                    //msg
+                    coterieMessageManager.disagreeMessage(coterie.getCoterieId(), coterie.getAuditRemark());
+                }
 
             }
             return ResponseUtils.returnSuccess();

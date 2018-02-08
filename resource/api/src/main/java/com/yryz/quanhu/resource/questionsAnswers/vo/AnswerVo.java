@@ -9,8 +9,10 @@ import java.util.Date;
 
 public class AnswerVo  implements Serializable {
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long questionId;
 
     private String imgUrl;
@@ -21,6 +23,7 @@ public class AnswerVo  implements Serializable {
 
     private Date createDate;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long createUserId;
 
     private Integer revision;
@@ -31,6 +34,7 @@ public class AnswerVo  implements Serializable {
 
     private String answerAudio;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long coterieId;
 
     private Long audioLength;
@@ -43,7 +47,7 @@ public class AnswerVo  implements Serializable {
 
     private String moduleEnum;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+
     public Long getKid() {
         return kid;
     }
@@ -52,7 +56,7 @@ public class AnswerVo  implements Serializable {
         this.kid = kid;
     }
 
-    @JsonSerialize(using = ToStringSerializer.class)
+
     public Long getQuestionId() {
         return questionId;
     }

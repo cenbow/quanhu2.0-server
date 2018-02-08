@@ -2,7 +2,9 @@ package com.yryz.quanhu.user.provider;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,20 @@ public class UserTagProvider implements UserTagApi{
 			return ResponseUtils.returnObjectSuccess(userTags);
 		} catch (Exception e) {
 			logger.error("getUserTags error", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
+	@Override
+	public Response<Map<String, Long>> getTagCountByUser(Set<String> tagIds) {
+		try {
+			logger.info("getTagCountByUser start: {}", JSON.toJSON(tagIds));
+
+			Map<String,Long> tagMap = tagService.getTagCountByUser(tagIds);
+			logger.info("getTagCountByUser finish: {}", JSON.toJSON(tagMap));
+			return ResponseUtils.returnObjectSuccess(tagMap);
+		} catch (Exception e) {
+			logger.error("getTagCountByUser error", e);
 			return ResponseUtils.returnException(e);
 		}
 	}

@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Enumeration;  
 import java.util.Iterator;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -397,6 +399,7 @@ public class JsonUtils {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 			return mapper.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
 			 log.warn("目标对象 " + obj.getClass().getName()  

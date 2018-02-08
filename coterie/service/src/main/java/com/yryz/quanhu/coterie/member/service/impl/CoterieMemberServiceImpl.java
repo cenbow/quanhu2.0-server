@@ -107,7 +107,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         }
 
         //收费时,直接加入,返回orderId
-        //todo  付费加入
         if (coterie.getJoinFee() > 0) {
             CoterieMemberNotify coterieMemberNotify = new CoterieMemberNotify();
 
@@ -121,7 +120,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             String extJson = JsonUtils.toFastJson(coterieMemberNotify);
 
-            //todo order
             InputOrder inputOrder = new InputOrder();
             inputOrder.setCreateUserId(userId);
             inputOrder.setCost(coterie.getJoinFee().longValue());
@@ -156,7 +154,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
 
             //如果没有拉黑则自动关注圈主
-            //todo
             Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
             if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
                 //再入成员表
@@ -177,8 +174,16 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             if (null == memberApply) {
                 //insert member apply
                 saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
-                //todo msg
+
+                //msg
                 coterieMemberMessageManager.joinMessage(userId, coterieId, reason);
+
+                //设置红点
+                CoterieInfo coterieInfo = new CoterieInfo();
+                coterieInfo.setCoterieId(coterieId);
+                coterieInfo.setRedDot(11);
+                coterieService.modify(coterieInfo);
+
             } else {
 
                 throw QuanhuException.busiError("用户已是待审核或审核通过");
@@ -278,6 +283,11 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     public Integer permission(Long userId, Long coterieId) {
 
         try {
+
+            if (userId == null ) {
+                return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
+            }
+
             CoterieInfo coterie = coterieService.find(coterieId);
             Long ownerId = Long.parseLong(coterie.getOwnerId());
 
@@ -333,6 +343,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
 
+            String reason = "";
+
+            if (null != memberApply) {
+               reason = memberApply.getReason();
+            }
+
             if (memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
                 saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
 
@@ -342,7 +358,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 //todo
                 Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
                 if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
-                    saveOrUpdateMember(userId, coterieId, memberApply.getReason(), joinType);
+                    saveOrUpdateMember(userId, coterieId, reason, joinType);
                 }
 
                 //todo event
@@ -458,6 +474,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             applyVos.add(vo);
 
         }
+
+        //取消红点
+        CoterieInfo coterie = new CoterieInfo();
+        coterie.setCoterieId(coterieId);
+        coterie.setRedDot(10);
+        coterieService.modify(coterie);
 
         PageList<CoterieMemberApplyVo> pageList = new PageList<>(pageNo, pageSize, applyVos);
 

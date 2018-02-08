@@ -32,4 +32,12 @@ public interface UserTagApi {
 	 * @return
 	 */
 	Response<Map<Long, List<UserTagVO>>> getUserTags(List<Long> userIds);
+
+	/**
+	 * 批量获取标签下用户数量
+	 * @param tagIds
+	 * @return
+	 */
+	Response<Map<String,Long>> getTagCountByUser(Set<String> tagIds);
+
 }

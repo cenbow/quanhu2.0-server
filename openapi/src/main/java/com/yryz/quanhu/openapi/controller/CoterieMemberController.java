@@ -86,8 +86,6 @@ public class CoterieMemberController {
 
     }
 
-
-
     @ApiOperation("获取用户禁言或私圈内禁言的权限")
     @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -140,8 +138,8 @@ public class CoterieMemberController {
     @UserBehaviorValidation(login = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/list")
-    public Response list(Long coterieId, Integer pageNo, Integer pageSize) {
+    public Response list(Long coterieId, Integer currentPage, Integer pageSize) {
 
-        return coterieMemberAPI.queryMemberList(coterieId, pageNo, pageSize);
+        return coterieMemberAPI.queryMemberList(coterieId, currentPage, pageSize);
     }
 }

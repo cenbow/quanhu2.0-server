@@ -194,6 +194,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
             for (Long tagId : tagIds) {
                 tagBoolQusery.should(QueryBuilders.matchQuery(ESConstants.USER_TAG_ID, tagId));
             }
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_TAG_ONlINE, 10));
             boolQueryBuilder.must(tagBoolQusery);
         }
         if(userStatus != null){

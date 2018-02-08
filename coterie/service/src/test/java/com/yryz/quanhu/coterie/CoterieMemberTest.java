@@ -59,18 +59,14 @@ public class CoterieMemberTest {
     }
 
     /**
-     * @param @throws JsonProcessingException
-     * @return void
-     * @throws
-     * @Description: 订单回调执行
-     * @author wangheng
+     * 订单回调执行
      */
     @Test
     public void test021_auditPay() {
         OutputOrder outputOrder = new OutputOrder();
 
 //        {"userId":737251236811898880,"coterieId":233665981858,"reason":"我要加入,要审核的","coterieName":"think","icon":"icon","owner":"727909974996672512","amount":10000}
-        outputOrder.setBizContent("{\"userId\":737251236811898880,\"coterieId\":233665981858,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
+        outputOrder.setBizContent("{\"userId\":738941340803252224,\"coterieId\":233665981858,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
 
         outputOrder.setOrderId(20180207164695L);
         outputOrder.setPayType(10);
@@ -79,7 +75,7 @@ public class CoterieMemberTest {
         outputOrder.setModuleEnum(ModuleContants.COTERIE);
         outputOrder.setCreateDate(new Date());
         outputOrder.setCoterieId(233665981858L);
-        outputOrder.setCreateUserId(737251236811898880L);
+        outputOrder.setCreateUserId(738941340803252224L);
         service.notify(outputOrder);
     }
 
