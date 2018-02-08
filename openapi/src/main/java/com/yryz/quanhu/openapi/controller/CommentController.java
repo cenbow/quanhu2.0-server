@@ -2,6 +2,7 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 
+import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -34,6 +35,7 @@ public class CommentController {
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
+    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId")
     @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/accretion")

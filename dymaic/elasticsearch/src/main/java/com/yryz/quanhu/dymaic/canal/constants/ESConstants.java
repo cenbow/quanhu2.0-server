@@ -27,6 +27,7 @@ public class ESConstants {
 
     //标签
     public static final String USER_TAG_ID = "userTagInfo.userTagInfoList.tagId";
+    public static final String USER_TAG_ONlINE = "userTagInfo.userTagInfoList.delFlag";
 
 
 
