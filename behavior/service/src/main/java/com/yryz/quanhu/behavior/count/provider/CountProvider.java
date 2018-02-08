@@ -17,6 +17,7 @@ import com.yryz.quanhu.behavior.count.service.CountService;
 import com.yryz.quanhu.behavior.count.service.CountStatisticsService;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.other.activity.api.ActivityInfoApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class CountProvider implements CountApi {
 
     @Reference
     private CoterieApi coterieApi;
+
+    @Reference
+    private ActivityInfoApi activityInfoApi;
 
     @Override
     public Response<Object> commitCount(BehaviorEnum behaviorEnum, Long kid, String page, Long count) {
@@ -83,7 +87,9 @@ public class CountProvider implements CountApi {
                     } catch (Exception e) {
                         logger.error("get coterie count error", e);
                     }
-                } else {
+                } else if(BehaviorEnum.Activity.getCode().equals(behaviorEnum.getCode())){
+                    count = ResponseUtils.getResponseData(activityInfoApi.myListCount(kid)).longValue();
+                }else {
                     count = countService.getCount(kid.toString(), behaviorEnum.getCode(), page);
                 }
                 map.put(behaviorEnum.getKey(), count);

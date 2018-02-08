@@ -272,7 +272,7 @@
 		select   id,kid, title, cover_plan,activity_type,create_date,module_enum from (
 		select  t.id,t.kid, t.title, t.cover_plan,t.activity_type,R.create_date,t.module_enum
 		from qh_activity_info T,qh_activity_record R
-		where t.id=R.activity_info_id and t.shelve_flag=10
+		where t.kid=R.activity_info_id and t.shelve_flag=10
 		<![CDATA[
   	and t.online_time<=NOW() 
   	]]>
@@ -280,7 +280,7 @@
 		UNION
 		select  t.id,t.kid, t.title, t.cover_plan,t.activity_type,D.create_date,t.module_enum
 		from qh_activity_info T,qh_activity_vote_detail D
-		where t.id=D.activity_info_id and t.shelve_flag=10
+		where t.kid=D.activity_info_id and t.shelve_flag=10
 		<![CDATA[
   	and t.online_time<=NOW() 
   	]]>
@@ -292,7 +292,7 @@
 		select  count(1) from (
 		select  t.id, t.title, t.cover_plan,t.activity_type,R.create_date
 		from qh_activity_info T,qh_activity_record R
-		where t.id=R.activity_info_id and t.shelve_flag=10
+		where t.kid=R.activity_info_id and t.shelve_flag=10
 		<![CDATA[
   	and t.online_time<=NOW() 
   	]]>
@@ -300,7 +300,7 @@
 		UNION
 		select  t.id, t.title, t.cover_plan,t.activity_type,D.create_date
 		from qh_activity_info T,qh_activity_vote_detail D
-		where t.id=D.activity_info_id and t.shelve_flag=10
+		where t.kid=D.activity_info_id and t.shelve_flag=10
 		<![CDATA[
   	and t.online_time<=NOW()
   	]]>
