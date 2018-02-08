@@ -73,7 +73,7 @@ public class SendMessageServiceImpl implements SendMessageService {
         InteractiveBody interactiveBody = new InteractiveBody();
         interactiveBody.setBodyTitle(title);
         interactiveBody.setBodyImg(imgUrl == null ? "" : imgUrl);
-        interactiveBody.setCircleId(String.valueOf(coterieId));
+        interactiveBody.setCoterieId(coterieId);
         if (coterieInfo != null) {
             interactiveBody.setCoterieName(coterieInfo.getName());
         }
