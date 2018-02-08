@@ -143,4 +143,29 @@ public class UserTagServiceImpl implements UserTagService {
 		return mysqlDao.getUserGroupConcatTags(userIds);
 	}
 
+	@Override
+	public Map<String, Long> getTagCountByUser(Set<String> tagIds) {
+
+		List<Map<String, Long>> coutArray = mysqlDao.getTagCountByUser(tagIds);
+		if(CollectionUtils.isEmpty(coutArray)){
+			coutArray = new ArrayList<>();
+		}
+
+		Map<String,Long> outMap = new LinkedHashMap<>();
+		//遍历转换
+		Iterator<String> iterator = tagIds.iterator();
+		while (iterator.hasNext()){
+			String key = iterator.next();
+			long defaultCount = 0;
+			for (Map<String,Long> map : coutArray){
+				if(key.equalsIgnoreCase(String.valueOf(map.get("tagId")))){
+					defaultCount = map.get("totalCount");
+					break;
+				}
+			}
+			outMap.put(key,defaultCount);
+		}
+		return outMap;
+	}
+
 }

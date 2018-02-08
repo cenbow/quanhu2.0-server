@@ -4,7 +4,9 @@
 package com.yryz.quanhu.score.vo;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -18,10 +20,12 @@ public class EventReportVo implements Serializable {
 
 	private String moduleEnum;
 
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long infoId;
 
 	/** 用户id */
     @ApiModelProperty(value = "用户id")
+    @JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
     
 	/** 积分增减标志（0-增加，1-减少） */
@@ -30,7 +34,8 @@ public class EventReportVo implements Serializable {
     
 	/** 用户id */
     @ApiModelProperty(value = "用户id")
-    private String userId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long userId;
     
 	/** 事件编码 */
     @ApiModelProperty(value = "事件编码")
@@ -60,6 +65,15 @@ public class EventReportVo implements Serializable {
     @ApiModelProperty(value = "成长级别")
 	private String growLevel;
     
+    
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
     public Long getGrow() {
 		return grow;
 	}
@@ -115,13 +129,7 @@ public class EventReportVo implements Serializable {
 		this.consumeFlag = consumeFlag;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
 
 	public String getEventCode() {
 		return eventCode;

@@ -8,9 +8,11 @@ import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
@@ -88,7 +90,8 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
              */
             ResourceTotal resourceTotal=new ResourceTotal();
             resourceTotal.setCreateDate(DateUtils.getDate());
-            resourceTotal.setExtJson(JSON.toJSONString(vo));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
             resourceTotal.setResourceId(vo.getKid());
             resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC));
             resourceTotal.setUserId(vo.getCreateUserId());

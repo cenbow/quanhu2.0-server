@@ -28,6 +28,7 @@ public class TopicVo implements Serializable {
 
     private Long replyCount;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long coterieId;
 
     private String contentSource;
@@ -38,6 +39,7 @@ public class TopicVo implements Serializable {
 
     private String moduleEnum;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long createUserId;
 
     /**
@@ -117,7 +119,6 @@ public class TopicVo implements Serializable {
         this.replyCount = replyCount;
     }
 
-    @JsonSerialize(using = ToStringSerializer.class)
     public Long  getCoterieId() {
         return coterieId;
     }

@@ -1121,7 +1121,12 @@ public class AccountProvider implements AccountApi {
 	private ThirdLoginConfigVO getThirdLoginConfig(String appId) {
 		String configName = String.format("%s.%s", Constants.THIRD_LOGIN_CONFIG_NAME, appId);
 		logger.info("[thirdLogin getConfig]:configName:{},appId:{}", configName, appId);
-		String configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		String configValue = null;
+		try {
+			configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		} catch (Exception e) {
+			logger.error("[thirdLogin getConfig]",e);
+		}
 		logger.info("[thirdLogin getConfig]:configName:{},appId:{},configValue:{}", configName, appId, configValue);
 		ThirdLoginConfigVO rangeConfig = JSON.parseObject(configValue, new TypeReference<ThirdLoginConfigVO>() {
 		});

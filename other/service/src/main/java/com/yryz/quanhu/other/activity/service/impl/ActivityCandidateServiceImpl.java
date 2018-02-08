@@ -16,7 +16,6 @@ import com.yryz.quanhu.other.activity.constants.ActivityPageConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityRedisConstants;
 import com.yryz.quanhu.other.activity.constants.ActivityVoteConstants;
 import com.yryz.quanhu.other.activity.dao.ActivityInfoDao;
-import com.yryz.quanhu.other.activity.dao.ActivityVoteConfigDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteDetailDao;
 import com.yryz.quanhu.other.activity.dao.ActivityVoteRecordDao;
 import com.yryz.quanhu.other.activity.dto.ActivityVoteDto;
@@ -69,9 +68,6 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
 
     @Autowired
     ActivityVoteService activityVoteService;
-
-    @Autowired
-    ActivityVoteConfigDao activityVoteConfigDao;
 
     @Reference(check = false, timeout = 30000)
     UserApi userApi;

@@ -217,7 +217,12 @@ public class AuthServiceImpl implements AuthService {
 	 */
 	private AuthConfig getAuthConfig(String appId) {
 		String configName = String.format("%s.%s", Constants.AUTH_CONFIG_NAME, appId);
-		String configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		String configValue = null;
+		try {
+			configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		} catch (Exception e) {
+			logger.error("[getAuthConfig]",e);
+		}
 		logger.info("[getAuthConfig]:configName:{},configValue:{}", configName, configValue);
 		AuthConfig config = JSON.parseObject(configValue, new TypeReference<AuthConfig>() {
 		});
