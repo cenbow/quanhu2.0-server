@@ -34,7 +34,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List">
-		a.user_id, a.organization_name, a.real_name, a.id_card, a.location,
+		a.id,a.kid,a.user_id, a.organization_name, a.real_name, a.id_card, a.location,
 		a.trade_field, a.owner_app_id,
 		a.resource_desc, a.contact_call, a.organization_paper, a.auth_type, a.auth_way,
 		a.audit_status,

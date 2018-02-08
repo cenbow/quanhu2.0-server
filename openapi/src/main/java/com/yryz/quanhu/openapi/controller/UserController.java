@@ -139,13 +139,13 @@ public class UserController {
 		if(StringUtils.isNotBlank(infoDTO.getUserNickName())){
 			Set<String> set = ResponseUtils.getResponseData(wordApi.matchIllegalWords(infoDTO.getUserNickName()));
 			if(CollectionUtils.isNotEmpty(set)){
-				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "昵称存在敏感词:"+getStringBySet(set), ExceptionEnum.BusiException.getErrorMsg());
+				return ResponseUtils.returnCommonException("昵称存在敏感词:"+getStringBySet(set));
 			}
 		}
 		if(StringUtils.isNotBlank(infoDTO.getUserDesc())){
 			Set<String> set = ResponseUtils.getResponseData(wordApi.matchIllegalWords(infoDTO.getUserDesc()));
 			if(CollectionUtils.isNotEmpty(set)){
-				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "个人简介存在敏感词:"+getStringBySet(set), ExceptionEnum.BusiException.getErrorMsg());
+				return ResponseUtils.returnCommonException("昵称存在敏感词:"+getStringBySet(set));
 			}
 		}
 		Boolean result = ResponseUtils.getResponseData(userApi.updateUserInfo(infoDTO));
@@ -160,7 +160,7 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		String[] phoneArray = StringUtils.split(phones, ",");
 		if(ArrayUtils.isEmpty(phoneArray)){
-			throw QuanhuException.busiError("手机号为空");
+			return ResponseUtils.returnCommonException("手机号为空");
 		}
 		List<Map<String,String>> maps = ResponseUtils.getResponseData(accountApi.getUserAccountByPhone(Sets.newHashSet(phoneArray), header.getAppId()));
 		return ResponseUtils.returnApiObjectSuccess(maps);

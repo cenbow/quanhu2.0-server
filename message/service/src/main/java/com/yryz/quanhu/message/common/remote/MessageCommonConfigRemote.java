@@ -18,8 +18,13 @@ public class MessageCommonConfigRemote {
 	public String getConfig(String configName,String appId){
 		logger.info("[messageService getConfig]:configName:{},appId:{}",configName,appId);
 		configName = String.format("%s.%s", configName,appId);
-		String configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
-		logger.info("[messageService getConfig]:configName:{},appId:{},configValue:{}",configName,appId,configValue);
+		String configValue = null;
+		try {
+			ResponseUtils.getResponseData(configApi.getValue(configName));
+			logger.info("[messageService getConfig]:configName:{},appId:{},configValue:{}",configName,appId,configValue);
+		} catch (Exception e) {
+			logger.error("[messageService getConfig]",e);
+		}
 		return configValue;
 	}
 }
