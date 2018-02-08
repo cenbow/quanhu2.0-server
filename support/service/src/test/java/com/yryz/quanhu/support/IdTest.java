@@ -84,5 +84,13 @@ public class IdTest {
 
     }
 
+    @Test
+    public void getSnowflakeIdTest() {
+        for (int i = 1; i <= 1201; i++) {
+            Response<Long> snowflakeId = idAPI.getSnowflakeId();
+            System.out.println(snowflakeId.getData());
+        }
+
+    }
 
 }

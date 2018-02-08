@@ -168,7 +168,7 @@ public class AnswerServiceImpl implements AnswerService {
                   messageBusinessVo.setTosendUserId(answerWithBLOBs.getCreateUserId());
                   messageBusinessVo.setTitle(answerWithBLOBs.getContent());
                   messageBusinessVo.setAmount(questionCheck.getChargeAmount());
-                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_PAYED,true);
+                  questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.ANSWER_PAYED,true);
               }
             }
         }
@@ -182,7 +182,7 @@ public class AnswerServiceImpl implements AnswerService {
         messageBusinessVo.setModuleEnum(ModuleContants.ANSWER);
         messageBusinessVo.setFromUserId(answerWithBLOBs.getCreateUserId());
         messageBusinessVo.setTosendUserId(questionCheck.getCreateUserId());
-        messageBusinessVo.setTitle(answerWithBLOBs.getContent());
+        messageBusinessVo.setTitle(questionCheck.getContent());
         messageBusinessVo.setAmount(questionCheck.getChargeAmount());
         questionMessageService.sendNotify4Question(messageBusinessVo,MessageConstant.QUESTION_HAVE_ANSWERED,true);
 

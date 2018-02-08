@@ -150,7 +150,12 @@ public class ScoreTest {
 	System.out.println(" VO.getData().getGrowLevel(): "+VO.getData().getGrowLevel());
          
 	}
-
+	
+	@Test
+	public void promoteGrowLevel(){
+	int i = 	growAPI.promoteGrowLevel("737469249351843840", "5", "19");
+	System.out.println("i "+i);
+	}
 
 	
 }

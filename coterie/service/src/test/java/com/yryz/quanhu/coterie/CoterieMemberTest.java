@@ -1,23 +1,23 @@
 package com.yryz.quanhu.coterie;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
-import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.JsonUtils;
-import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
-import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
+import com.yryz.quanhu.coterie.member.service.impl.CoterieMemberOrderNotifyServiceImpl;
+import com.yryz.quanhu.order.sdk.dto.OutputOrder;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.Resource;
+import java.util.Date;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -26,16 +26,15 @@ public class CoterieMemberTest {
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
 
-
-    @Resource
-    private CoterieMemberService coterieMemberService;
+    @Autowired
+    CoterieMemberOrderNotifyServiceImpl service;
 
     private static Long memberId = 730941139577331712L;
     private static Long userId = 737251236811898880L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
-    private static Long coterieId = 9382818189L;
+    private static Long coterieId = 233665981858L;
 
     @Test
     public void test010_Join() {
@@ -59,21 +58,25 @@ public class CoterieMemberTest {
         }
     }
 
+    /**
+     * 订单回调执行
+     */
     @Test
     public void test021_auditPay() {
+        OutputOrder outputOrder = new OutputOrder();
 
-        try {
+//        {"userId":737251236811898880,"coterieId":233665981858,"reason":"我要加入,要审核的","coterieName":"think","icon":"icon","owner":"727909974996672512","amount":10000}
+        outputOrder.setBizContent("{\"userId\":738941340803252224,\"coterieId\":233665981858,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
 
-            coterieMemberService.audit(750245248050151424L, 750263218193317888L,
-                    MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
-
-        } catch (QuanhuException e) {
-            e.getMsg();
-            e.getErrorMsg();
-            System.out.println(JsonUtils.toFastJson(e));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        outputOrder.setOrderId(20180207164695L);
+        outputOrder.setPayType(10);
+        outputOrder.setResourceId(233665981858L);
+        outputOrder.setCost(1000L);
+        outputOrder.setModuleEnum(ModuleContants.COTERIE);
+        outputOrder.setCreateDate(new Date());
+        outputOrder.setCoterieId(233665981858L);
+        outputOrder.setCreateUserId(738941340803252224L);
+        service.notify(outputOrder);
     }
 
     @Test

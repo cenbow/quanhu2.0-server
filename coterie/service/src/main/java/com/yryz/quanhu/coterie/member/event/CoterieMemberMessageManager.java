@@ -13,6 +13,7 @@ import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberNotify;
 import com.yryz.quanhu.message.message.api.MessageAPI;
+import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import com.yryz.quanhu.order.sdk.constant.FeeDetail;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -84,9 +86,9 @@ public class CoterieMemberMessageManager {
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
-            body.setCustId(userId.toString());
-            body.setCustImg(user.getUserImg());
-            body.setCustName(user.getUserNickName());
+            body.setUserId(userId.toString());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             message.setBody(body);
             messageAPI.sendMessage(message, true);
         } catch (Exception e) {
@@ -130,9 +132,9 @@ public class CoterieMemberMessageManager {
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
-            body.setCustId(coterie.getOwnerId());
-            body.setCustImg(user.getUserImg());
-            body.setCustName(user.getUserNickName());
+            body.setUserId(coterie.getOwnerId());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             message.setBody(body);
             messageAPI.sendMessage(message, true);
         } catch (Exception e) {
@@ -178,9 +180,9 @@ public class CoterieMemberMessageManager {
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
-            body.setCustId(coterie.getOwnerId());
-            body.setCustImg(user.getUserImg());
-            body.setCustName(user.getUserNickName());
+            body.setUserId(coterie.getOwnerId());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             message.setBody(body);
             messageAPI.sendMessage(message, true);
         } catch (Exception e) {
@@ -284,18 +286,27 @@ public class CoterieMemberMessageManager {
         //todo 90%
         logger.info("处理推送消息里的抽成后的金额开始");
         //todo 处理推送消息里的抽成后的金额
-//        FeeDetail feeDetail = BranchFeesConstant.JOIN_COTERIE.getFee().get(1);
-//        logger.info("原始金额是 : " + coterieMemberNotify.getAmount() + ", 抽成规则是 : " + feeDetail.getFee());
-//        Double cost = (coterieMemberNotify.getAmount() / 100.00) * (feeDetail.getFee() / 100);
-//        logger.info("抽成后金额是 : " + cost.toString());
-//        DecimalFormat df   = new DecimalFormat("#0.00");
-//        String money = df.format(cost);
-//        logger.info("保留两位小数后 : " + money);
-//        logger.info("处理推送消息里的抽成后的金额完成 money : " + money);
-//
-//        if (null != coterieMemberNotify.getAmount()) {
-//            content = content.replaceAll("\\{money\\}", money);
-//        }
+        FeeDetail feeDetail = BranchFeesEnum.JOIN_COTERIE.getFee().get(1);
+        logger.info("原始金额是 : " + coterieMemberNotify.getAmount() + ", 抽成规则是 : " + feeDetail.getFee());
+
+
+        Double cost = (coterieMemberNotify.getAmount() / 100.00) * (feeDetail.getFee() / 100);
+        logger.info("抽成后金额是 : " + cost.toString());
+        DecimalFormat df   = new DecimalFormat("#0.00");
+        String money;
+        if (null == feeDetail) {
+            money = df.format(new BigDecimal(coterieMemberNotify.getAmount()).divide(new BigDecimal(100)));
+        } else {
+            money = df.format(new BigDecimal(coterieMemberNotify.getAmount()).divide(new BigDecimal(100))
+                    .multiply(new BigDecimal(feeDetail.getFee()).divide(new BigDecimal(100))));
+        }
+
+        logger.info("保留两位小数后 : " + money);
+        logger.info("处理推送消息里的抽成后的金额完成 money : " + money);
+
+        if (null != coterieMemberNotify.getAmount()) {
+            content = content.replaceAll("\\{money\\}", money);
+        }
         messageVo.setContent(content);
         messageVo.setCreateTime(DateUtils.getDateTime());
         messageVo.setLabel(constant.getLabel());

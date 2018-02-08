@@ -159,13 +159,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     public Response<Integer> permission(Long userId, Long coterieId) {
 
         try {
-            Assert.notNull(userId, "userId is null !");
             Assert.notNull(coterieId, "coterieId is null !");
-
-            //用户是否存在
-            if (!isExistUser(userId)) {
-                throw new QuanhuException(ExceptionEnum.USER_MISSING);
-            }
 
             //圈子是否存在
             if (!isExistCoterie(coterieId)) {

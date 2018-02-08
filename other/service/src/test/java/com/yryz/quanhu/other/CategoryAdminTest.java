@@ -55,9 +55,9 @@ public class CategoryAdminTest {
     @Test
     public void update() {
         CategoryAdminVo category = new CategoryAdminVo();
-        category.setKid(1L);
-        category.setCategoryStatus(11);
-        category.setRecommend(10);
+        category.setKid(3L);
+        category.setCategoryStatus(20);
+//        category.setRecommend(10);
         category.setLastUpdateUserId(10L);
         category.setLastUpdateDate(new Date());
 
