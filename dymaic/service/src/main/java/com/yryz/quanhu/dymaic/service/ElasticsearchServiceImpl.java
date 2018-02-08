@@ -661,10 +661,8 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			Map<Long, UserRegLogVO> regLogVOMap = regLogResponse.getData();
 			UserRegLogVO regLogVO = regLogVOMap.get(userInfo.getUserId());
 			if (regLogVO != null) {
-				UserRegLog userRegLog = new UserRegLog();
-				com.yryz.common.utils.BeanUtils.copyProperties(userRegLog, regLogVO);
+				UserRegLog userRegLog = GsonUtils.parseObj(regLogVO, UserRegLog.class);
 				userInfo.setUserRegLog(userRegLog);
-
 			}
 		}
 	}
@@ -674,8 +672,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			Map<Long, EventAcount> eventAcountMap = eventAcountResponse.getData();
 			EventAcount eventAcount = eventAcountMap.get(userInfo.getUserId());
 			if (eventAcount != null) {
-				EventAccountInfo eventAccountInfo = new EventAccountInfo();
-				com.yryz.common.utils.BeanUtils.copyProperties(eventAccountInfo, eventAcount);
+				EventAccountInfo eventAccountInfo = GsonUtils.parseObj(eventAcount, EventAccountInfo.class);
 				userInfo.setEventAccountInfo(eventAccountInfo);
 			}
 		}
@@ -689,8 +686,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 				UserTagInfo userTagInfo = new UserTagInfo();
 				List<TagInfo> tagInfoList = Lists.newArrayList();
 				for (UserTagVO userTagVO : userTagVOS) {
-					TagInfo tagInfo = new TagInfo();
-					com.yryz.common.utils.BeanUtils.copyProperties(tagInfo, userTagVO);
+					TagInfo tagInfo = GsonUtils.parseObj(userTagVO, TagInfo.class);
 					tagInfoList.add(tagInfo);
 				}
 				userTagInfo.setUserTagInfoList(tagInfoList);
@@ -705,8 +701,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			Map<String, StarAuthInfo> authInfoMap = starResponse.getData();
 			StarAuthInfo starAuthInfo = authInfoMap.get(userInfo.getUserId().toString());
 			if (starAuthInfo != null) {
-				UserStarInfo userStarInfo = new UserStarInfo();
-				com.yryz.common.utils.BeanUtils.copyProperties(userStarInfo, starAuthInfo);
+				UserStarInfo userStarInfo = GsonUtils.parseObj(starAuthInfo, UserStarInfo.class);
 				userInfo.setUserStarInfo(userStarInfo);
 			}
 		}
