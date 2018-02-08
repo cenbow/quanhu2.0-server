@@ -11,11 +11,13 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.message.message.entity.Message;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
@@ -143,8 +145,9 @@ public class TopicPostServiceImpl implements TopicPostService {
         TopicPostVo topicPostVo=new TopicPostVo();
         if(post!=null) {
             BeanUtils.copyProperties(post, topicPostVo);
-            resourceTotal.setExtJson(JSON.toJSONString(topicPostVo));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(topicPostVo));
         }
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(post.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC_POST));
         resourceTotal.setUserId(topicPost.getCreateUserId());

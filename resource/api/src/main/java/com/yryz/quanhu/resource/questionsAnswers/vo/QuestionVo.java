@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class QuestionVo  implements Serializable {
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     private String title;
@@ -25,6 +26,7 @@ public class QuestionVo  implements Serializable {
 
     private Date createDate;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long coterieId;
 
     private Long chargeAmount;
@@ -52,7 +54,6 @@ public class QuestionVo  implements Serializable {
 
     private  UserSimpleVO targetUser;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
     }
@@ -109,7 +110,6 @@ public class QuestionVo  implements Serializable {
         this.createDate = createDate;
     }
 
-    @JsonSerialize(using = ToStringSerializer.class)
     public Long getCoterieId() {
         return coterieId;
     }

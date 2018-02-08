@@ -164,6 +164,9 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
         topicPost.setKid(kid);
         topicPost.setShelveFlag(shelveFlag);
 
+        /**
+         * 帖子下线通知
+         */
         TopicPostWithBLOBs topicPostWithBLOBs =this.topicPostDao.selectByPrimaryKey(kid);
         MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
         messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
