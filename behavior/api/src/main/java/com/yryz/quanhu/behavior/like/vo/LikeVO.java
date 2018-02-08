@@ -1,7 +1,7 @@
 package com.yryz.quanhu.behavior.like.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 import java.io.Serializable;
 
@@ -17,13 +17,13 @@ public class LikeVO implements Serializable{
     /**
      * 业务ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long kid;
 
     /**
      * 资源ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long resourceId;
 
     /**
@@ -34,7 +34,7 @@ public class LikeVO implements Serializable{
     /**
      * 用户ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long userId;
 
     /**

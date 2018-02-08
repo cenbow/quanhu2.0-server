@@ -3,8 +3,8 @@ package com.yryz.quanhu.score.vo;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,7 +22,7 @@ public class EventSign implements Serializable{
 
 	/** id */
     @ApiModelProperty(value = "id")
-    @JsonSerialize(using = ToStringSerializer.class)
+    
 	private Long id;
 	
 	/** 用户ID */

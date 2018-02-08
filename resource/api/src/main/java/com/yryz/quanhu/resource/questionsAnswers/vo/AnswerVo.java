@@ -1,7 +1,7 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -9,10 +9,10 @@ import java.util.Date;
 
 public class AnswerVo  implements Serializable {
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long questionId;
 
     private String imgUrl;
@@ -23,7 +23,7 @@ public class AnswerVo  implements Serializable {
 
     private Date createDate;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long createUserId;
 
     private Integer revision;
@@ -34,7 +34,7 @@ public class AnswerVo  implements Serializable {
 
     private String answerAudio;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long coterieId;
 
     private Long audioLength;
@@ -141,7 +141,7 @@ public class AnswerVo  implements Serializable {
         return coterieId;
     }
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     public void setCoterieId(Long coterieId) {
         this.coterieId = coterieId;
     }

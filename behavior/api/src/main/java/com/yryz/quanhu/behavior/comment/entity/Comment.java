@@ -1,7 +1,7 @@
 package com.yryz.quanhu.behavior.comment.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.common.entity.GenericEntity;
 
 
@@ -16,19 +16,19 @@ public class Comment extends GenericEntity {
     /**
      * 根评论ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long topId;
 
     /**
      * 父级评论ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long parentId;
 
     /**
      * 父级评论用户ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long parentUserId;
 
     /**
@@ -39,19 +39,19 @@ public class Comment extends GenericEntity {
     /**
      * 私圈ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long coterieId;
 
     /**
      * 目标源/资源Id
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long resourceId;
 
     /**
      * 目标源用户ID
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long targetUserId;
 
     /**

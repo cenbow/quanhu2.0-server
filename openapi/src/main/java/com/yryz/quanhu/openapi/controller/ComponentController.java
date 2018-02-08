@@ -18,7 +18,6 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.entity.RequestHeader;
-import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
@@ -102,7 +101,7 @@ public class ComponentController {
 			if(simpleVO != null){
 				phone = simpleVO.getUserPhone();
 				if(StringUtils.isBlank(phone)){
-					throw QuanhuException.busiError("手机号不存在");
+					return ResponseUtils.returnCommonException("手机号不存在");
 				}
 				codeDTO.setPhone(phone);
 			}

@@ -2,8 +2,8 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 /**
  * 达人认证简化信息
  * @author danshiyu
@@ -20,7 +20,7 @@ public class UserStarSimpleVo implements Serializable {
 	/**
 	 * 用户id
 	 */
-	@JsonSerialize(using = ToStringSerializer.class)
+	
 	private Long userId;
 
 	/**

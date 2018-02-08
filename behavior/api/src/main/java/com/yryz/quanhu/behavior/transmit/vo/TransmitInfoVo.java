@@ -1,7 +1,7 @@
 package com.yryz.quanhu.behavior.transmit.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -12,19 +12,19 @@ public class TransmitInfoVo implements Serializable {
     /**
      * 唯一id
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
     /**
      * 原文ID或动态ID
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long parentId;
 
     /**
      * 资源ID
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long resourceId;
 
     /**
@@ -40,7 +40,7 @@ public class TransmitInfoVo implements Serializable {
     /**
      * 创建用户ID
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long createUserId;
 
     /**

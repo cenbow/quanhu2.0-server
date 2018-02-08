@@ -1,7 +1,7 @@
 package com.yryz.quanhu.behavior.like.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 /**
  * @Author:sun
@@ -15,13 +15,68 @@ public class LikeAssemble {
     private String img;
     private String title;
     private String link;
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long targetUserId;
     private String moduleEnum;
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long resourceId;
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long coterieId;
+    private String coterieName;
+    private String userNickName;
+    private String userImg;
+    
+    private long resourceUserId;
+    private String bodyImg;
+    private String bodyTitle;
+
+    public String getCoterieName() {
+        return coterieName;
+    }
+
+    public void setCoterieName(String coterieName) {
+        this.coterieName = coterieName;
+    }
+
+    public String getUserNickName() {
+        return userNickName;
+    }
+
+    public void setUserNickName(String userNickName) {
+        this.userNickName = userNickName;
+    }
+
+    public String getUserImg() {
+        return userImg;
+    }
+
+    public void setUserImg(String userImg) {
+        this.userImg = userImg;
+    }
+
+    public long getResourceUserId() {
+        return resourceUserId;
+    }
+
+    public void setResourceUserId(long resourceUserId) {
+        this.resourceUserId = resourceUserId;
+    }
+
+    public String getBodyImg() {
+        return bodyImg;
+    }
+
+    public void setBodyImg(String bodyImg) {
+        this.bodyImg = bodyImg;
+    }
+
+    public String getBodyTitle() {
+        return bodyTitle;
+    }
+
+    public void setBodyTitle(String bodyTitle) {
+        this.bodyTitle = bodyTitle;
+    }
 
     public String getModuleEnum() {
         return moduleEnum;

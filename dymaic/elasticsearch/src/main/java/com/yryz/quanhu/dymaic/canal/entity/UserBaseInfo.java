@@ -2,8 +2,8 @@ package com.yryz.quanhu.dymaic.canal.entity;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
@@ -13,7 +13,7 @@ public class UserBaseInfo {
 	/**
 	 * 用户账户id
 	 */
-	@JsonSerialize(using = ToStringSerializer.class)
+	
 	private Long userId;
 
 	/**

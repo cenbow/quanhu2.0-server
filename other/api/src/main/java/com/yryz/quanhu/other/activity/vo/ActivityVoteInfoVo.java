@@ -1,7 +1,7 @@
 package com.yryz.quanhu.other.activity.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,7 +11,7 @@ public class ActivityVoteInfoVo implements Serializable {
     /**
      * 唯一id
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
     /**
