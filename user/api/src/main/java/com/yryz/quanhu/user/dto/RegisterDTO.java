@@ -22,6 +22,10 @@ public class RegisterDTO implements Serializable {
 	 */
 	private String cityCode;
 	/**
+	 * 极光设备id（用于极光registrationId推送）（非必填）
+	 */
+	private String registrationId;
+	/**
 	 * 	注册渠道
 	 */
 	private String userChannel;
@@ -54,7 +58,7 @@ public class RegisterDTO implements Serializable {
 	 */
 	private String veriCode;
 	/**
-	 * 推送设备号
+	 * 用户设备号（暂不使用）
 	 */
 	private String deviceId;
 	
@@ -187,6 +191,12 @@ public class RegisterDTO implements Serializable {
 	}
 	public void setUserGenders(Integer userGenders) {
 		this.userGenders = userGenders;
+	}
+	public String getRegistrationId() {
+		return registrationId;
+	}
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
 	}
 	/**
 	 * 

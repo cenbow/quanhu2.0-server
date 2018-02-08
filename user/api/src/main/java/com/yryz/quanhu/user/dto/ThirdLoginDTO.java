@@ -20,6 +20,10 @@ import com.yryz.common.constant.DevType;
 @SuppressWarnings("serial")
 public class ThirdLoginDTO implements Serializable {
 	/**
+	 * 极光设备id（用于极光registrationId推送）（非必填）
+	 */
+	private String registrationId;
+	/**
 	 * 第三方令牌
 	 */
 	private String accessToken;
@@ -137,6 +141,12 @@ public class ThirdLoginDTO implements Serializable {
 	}
 	public void setLocation(String location) {
 		this.location = location;
+	}
+	public String getRegistrationId() {
+		return registrationId;
+	}
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
 	}
 	@Override
 	public String toString() {
