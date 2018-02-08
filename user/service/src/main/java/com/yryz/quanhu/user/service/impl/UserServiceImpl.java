@@ -174,7 +174,10 @@ public class UserServiceImpl implements UserService {
 		if (simpleVO.getUserRole() == UserRole.STAR.getRole()) {
 			Map<String, UserStarSimpleVo> starMap = starService.getStarSimple(Sets.newHashSet(friendId.toString()));
 			if (MapUtils.isNotEmpty(starMap)) {
-				starTradeField = StringUtils.toString(starMap.get(friendId).getTradeField(), "");
+				UserStarSimpleVo starSimpleVo = starMap.get(friendId.toString());
+				if(starSimpleVo != null){
+					starTradeField = StringUtils.toString(starSimpleVo.getTradeField(), "");
+				}
 			}
 		}
 		simpleVO.setStarTradeField(starTradeField);
