@@ -1,6 +1,9 @@
 package com.yryz.quanhu.dymaic.service;
 
+import com.yryz.common.constant.ExceptionEnum;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
+import com.yryz.framework.core.lock.DistributedLockManager;
 import com.yryz.quanhu.dymaic.dao.DymaicDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,28 +29,50 @@ public class SortIdHelper {
     @Autowired
     private RedisTemplateBuilder redisTemplateBuilder;
 
+    @Autowired
+    private DistributedLockManager lockManager;
+
+    private final String LockPrefix = "dymaic";
+    private final String LockName = "id";
+
     /**
      * 获取有序ID
      * @return
      */
     public Long getKid() {
-        Long result;
 
-        //from cache
+        // from cache
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
-        result = redisTemplate.opsForValue().get(cacheKey);
+        Long result = redisTemplate.opsForValue().get(cacheKey);
 
-        if (result == null || result < 1) {
-            //from db
-            Long maxKid = dymaicDao.getMaxKid();
-            if (maxKid == null || maxKid < 1) {
-                result = INIT;
+        if (result != null && result > INIT) {
+            return result;
+        }
+
+        // init
+        try {
+            lockManager.lock(LockPrefix, LockName);
+
+            //double check
+            result = redisTemplate.opsForValue().get(cacheKey);
+
+            if (result == null || result < 1) {
+                //from db
+                Long maxKid = dymaicDao.getMaxKid();
+                if (maxKid == null || maxKid < 1) {
+                    result = INIT;
+                } else {
+                    result = maxKid + 1;
+                }
+                redisTemplate.opsForValue().set(cacheKey, result);
             } else {
-                result = maxKid + 1;
+                result = redisTemplate.opsForValue().increment(cacheKey, 1L);
             }
-            redisTemplate.opsForValue().set(cacheKey, result);
-        } else {
-            result = redisTemplate.opsForValue().increment(cacheKey, 1L);
+
+            lockManager.unlock(LockPrefix, LockName);
+        } catch (Exception e) {
+            lockManager.unlock(LockPrefix, LockName);
+            throw new QuanhuException(ExceptionEnum.LockException);
         }
 
         return result;
