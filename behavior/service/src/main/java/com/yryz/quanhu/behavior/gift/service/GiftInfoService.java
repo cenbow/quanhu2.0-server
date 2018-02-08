@@ -20,7 +20,7 @@ public interface GiftInfoService {
 
     List<GiftInfo> selectByKids(Set<Long> kids);
 
-    GiftInfo selectByKid(Long id);
+    GiftInfo selectByKid(Long kid);
 
     int updateByKid(GiftInfo record);
 }
