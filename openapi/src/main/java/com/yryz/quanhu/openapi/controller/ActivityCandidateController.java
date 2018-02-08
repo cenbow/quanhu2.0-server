@@ -50,13 +50,6 @@ public class ActivityCandidateController {
         Assert.hasText(userId, "userId不能为空");
         activityVoteDto.setCreateUserId(Long.valueOf(userId));
         Response<Map<String, Object>> response = activityCandidateApi.join(activityVoteDto);
-        if(response.success()){
-            try {
-                countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId), ActivityCountConstant.ACTIVITY_RECORD_COUNT,ActivityCountConstant.ACTIVITY_COUNT);
-            } catch (Exception e) {
-                logger.error("接入记数异常:", e);
-            }
-        }
         return response;
     }
 

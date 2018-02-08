@@ -40,10 +40,9 @@ public class IdTest {
         }
 
 
-        /*long timestampBits = 29;
+        long timestampBits = 29;
         long workerIdBits = 10;
         long sequenceBits = 13;
-        System.out.println("====***====" + (int)Math.pow(2, 53));
 
         // initialize max value
         long maxDeltaSeconds = ~(-1L << timestampBits);
@@ -74,7 +73,7 @@ public class IdTest {
                 break;
 //            throw new UidGenerateException("Timestamp bits is exhausted. Refusing UID generate. Now: " + currentSecond);
             }
-            long num = ((deltaSeconds << timestampShift) | (5 << workerIdShift) | 128);
+            long num = ((deltaSeconds << timestampShift) | (24 << workerIdShift) | 25);
 //            System.out.println("num====" + num);
 
             if (num > jsMax || num < 0) {
@@ -83,7 +82,7 @@ public class IdTest {
                 break;
             }
             sum++;
-        }*/
+        }
 
 
     }
