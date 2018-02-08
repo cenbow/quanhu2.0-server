@@ -15,6 +15,8 @@ import java.util.Date;
  */
 public class UserStarInfo {
 
+    @Field(type=FieldType.Long)
+    private Long kid;
     /**
      * 用户id
      */
@@ -165,6 +167,13 @@ public class UserStarInfo {
     @Field(type = FieldType.Date)
     private Date recommendCancelTime;
 
+    public Long getKid() {
+        return kid;
+    }
+
+    public void setKid(Long kid) {
+        this.kid = kid;
+    }
 
     public Long getUserId() {
         return userId;
