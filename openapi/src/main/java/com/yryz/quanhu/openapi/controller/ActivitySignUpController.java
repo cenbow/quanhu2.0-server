@@ -61,13 +61,6 @@ public class ActivitySignUpController {
         Assert.notNull(activityRecord, "activityRecord is null");
         Assert.notNull(userId, "userId is null");
         Response<ActivityRecord> activityRecordResponse = activitySignUpApi.activitySignUpSubmit(activityRecord, userId);
-        if(activityRecordResponse.success()){
-            try {
-                countApi.commitCount(BehaviorEnum.Activity,Long.valueOf(userId),ActivityCountConstant.ACTIVITY_RECORD_COUNT,ActivityCountConstant.ACTIVITY_COUNT);
-            } catch (Exception e) {
-                logger.error("接入记数异常:",e);
-            }
-        }
         return activityRecordResponse;
     }
     @UserBehaviorValidation(login = true)

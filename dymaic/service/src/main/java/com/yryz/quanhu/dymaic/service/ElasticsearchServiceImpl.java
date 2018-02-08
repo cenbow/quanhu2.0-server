@@ -438,7 +438,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			if (BooleanUtils.isTrue(adminUserDTO.getNeedIntegral())) {
 				setUserOrderIntegral(pageList.getEntities());
 			}
-			logger.info("adminSearchUser result: {}", GsonUtils.parseJson(pageList));
+			//logger.info("adminSearchUser result: {}", GsonUtils.parseJson(pageList));
 			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (Exception e) {
 			logger.error("adminSearchUser error", e);
