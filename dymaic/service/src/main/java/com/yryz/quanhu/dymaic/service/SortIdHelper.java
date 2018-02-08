@@ -40,13 +40,20 @@ public class SortIdHelper {
      * @return
      */
     public Long getKid() {
-        Long result = null;
 
+        // from cache
+        RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+        Long result = redisTemplate.opsForValue().get(cacheKey);
+
+        if (result != null && result > INIT) {
+            return result;
+        }
+
+        // init
         try {
             lockManager.lock(LockPrefix, LockName);
 
-            //from cache
-            RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+            //double check
             result = redisTemplate.opsForValue().get(cacheKey);
 
             if (result == null || result < 1) {
