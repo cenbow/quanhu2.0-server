@@ -254,7 +254,7 @@ public class TransmitServiceImpl implements TransmitService {
 
     private void sendMessage(Long userId, TransmitInfo transmitInfo, ResourceVo resourceVo) {
         try {
-            Response<UserSimpleVO> userSimple = userApi.getUserSimple(userId);
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(transmitInfo.getCreateUserId());
             if(!userSimple.success() || userSimple.getData() == null) {
                 throw new QuanhuException(ExceptionEnum.SysException);
             }
@@ -296,6 +296,9 @@ public class TransmitServiceImpl implements TransmitService {
                     title = title.substring(0, 20);
                 }
             }
+            body.setUserId(user.getUserId().toString());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             body.setBodyTitle(title);
             RemoteResource convert = RemoteResourceUtils.convert(resourceVo);
             body.setBodyImg(convert != null ? convert.getImgUrl() : null);

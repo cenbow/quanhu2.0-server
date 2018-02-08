@@ -1,6 +1,7 @@
 package com.yryz.quanhu.behavior.collection.vo;
 
-import com.yryz.quanhu.behavior.collection.entity.CollectionInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -17,11 +18,13 @@ public class CollectionInfoVo implements Serializable {
     /**
      * 唯一id
      * */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
     /**
      * 资源ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private  Long resourceId;
 
     /**
@@ -32,6 +35,7 @@ public class CollectionInfoVo implements Serializable {
     /**
      * 私圈Id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private  Long coterieId;
 
     /**
@@ -42,6 +46,7 @@ public class CollectionInfoVo implements Serializable {
     /**
      * 发布用户id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private  Long userId;
 
     /**
