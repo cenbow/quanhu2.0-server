@@ -1,7 +1,7 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class QuestionVo  implements Serializable {
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
     private String title;
@@ -26,7 +26,7 @@ public class QuestionVo  implements Serializable {
 
     private Date createDate;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long coterieId;
 
     private Long chargeAmount;

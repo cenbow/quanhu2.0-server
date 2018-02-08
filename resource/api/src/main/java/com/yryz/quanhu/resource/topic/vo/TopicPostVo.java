@@ -1,7 +1,7 @@
 package com.yryz.quanhu.resource.topic.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class TopicPostVo  implements Serializable {
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long topicId;
 
     private String videoUrl;
@@ -39,7 +39,7 @@ public class TopicPostVo  implements Serializable {
 
     private UserSimpleVO user;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long coterieId;
 
     private String moduleEnum;

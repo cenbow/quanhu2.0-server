@@ -1,7 +1,7 @@
 package com.yryz.quanhu.dymaic.canal.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
@@ -20,7 +20,7 @@ public class UserStarInfo {
     /**
      * 用户id
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long userId;
 
     /**

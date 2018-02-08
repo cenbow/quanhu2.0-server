@@ -2,13 +2,13 @@ package com.yryz.quanhu.dymaic.canal.entity;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 public class TopicPostInfo {
-	@JsonSerialize(using = ToStringSerializer.class)
+	
 	private Long kid;
-	@JsonSerialize(using = ToStringSerializer.class)
+	
 	private Long topicId;
 	private String content;
 	private String contentSource;

@@ -5,8 +5,8 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 @Document(indexName = "quanhu-v2-resourceinfo", type = "resourceInfo", refreshInterval = "-1")
 public class ResourceInfo {
@@ -15,7 +15,7 @@ public class ResourceInfo {
 	private TopicPostInfo topicPostInfo;
 	private ReleaseInfo releaseInfo;
 	@Id
-	@JsonSerialize(using = ToStringSerializer.class)//18位long es丢精度
+	//18位long es丢精度
 	private Long kid;//文章或话题或帖子的kid
 	// 1话题，2帖子，3文章
 	private Integer resourceType;

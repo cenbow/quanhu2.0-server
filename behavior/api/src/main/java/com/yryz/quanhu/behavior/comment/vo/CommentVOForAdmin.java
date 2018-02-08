@@ -1,7 +1,7 @@
 package com.yryz.quanhu.behavior.comment.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.common.entity.GenericEntity;
 
 /**
@@ -23,7 +23,7 @@ public class CommentVOForAdmin extends GenericEntity {
     private byte shelveFlag;
 
     private String nickName;
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long resourceId;
 
     private String moduleEnum;
@@ -31,7 +31,7 @@ public class CommentVOForAdmin extends GenericEntity {
     private String createDateStr;
 
     private String updateDateStr;
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long targetUserId;
 
     public Long getTargetUserId() {

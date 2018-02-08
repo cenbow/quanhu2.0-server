@@ -1,7 +1,7 @@
 package com.yryz.quanhu.message.message.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 import java.io.Serializable;
 
@@ -18,7 +18,7 @@ public class MessageDto implements Serializable {
     /**
      * 用户id
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long userId;
 
     /**

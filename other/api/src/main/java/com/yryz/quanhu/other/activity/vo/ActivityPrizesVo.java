@@ -1,7 +1,7 @@
 package com.yryz.quanhu.other.activity.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,13 +16,13 @@ public class ActivityPrizesVo implements Serializable {
     /**
      * 唯一di
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
     /**
      * 活动id
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private  Long activityInfoId;
 
     /**

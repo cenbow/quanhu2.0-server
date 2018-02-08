@@ -2,8 +2,8 @@ package com.yryz.quanhu.user.vo;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 /**
  * 达人审核参数
@@ -15,7 +15,7 @@ public class StarAuthAuditVo implements Serializable{
 	/**
 	 * 用户id
 	 */
-	@JsonSerialize(using = ToStringSerializer.class)
+	
 	private Long userId;
 	/**
 	 * 审核状态 {@link #UserStarContants.StarAuditStatus}
