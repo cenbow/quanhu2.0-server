@@ -172,12 +172,10 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
         if (CommonConstant.EventType.OPT_UPDATE.equals(msg.getEventType())) {
             Optional<UserInfo> uinfo = userRepository.findById(starInfoBefore.getUserId());
             if (uinfo.isPresent()) {
+                //更新
                 UserInfo userInfo = uinfo.get();
-                //UserStarInfo userStarInfo = userInfo.getUserStarInfo();
-                //if (userStarInfo != null && starInfoAfter.getKid().equals(userStarInfo.getKid())) {
                 userInfo.setUserStarInfo(starInfoAfter);
                 userRepository.save(userInfo);
-                //}
             }
         } else if (CommonConstant.EventType.OPT_DELETE.equals(msg.getEventType())) {
             //删除
@@ -185,7 +183,7 @@ public class UserInfoEsHandlerImpl implements SyncHandler {
             if (uinfo.isPresent()) {
                 UserInfo userInfo = uinfo.get();
                 UserStarInfo userStarInfo = userInfo.getUserStarInfo();
-                if (userStarInfo != null && starInfoBefore.getKid().equals(userStarInfo.getKid())) {
+                if (userStarInfo != null) {
                     userInfo.setUserStarInfo(null);
                     userRepository.save(userInfo);
                 }
