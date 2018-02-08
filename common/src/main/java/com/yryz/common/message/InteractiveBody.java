@@ -21,24 +21,25 @@ public class InteractiveBody implements Body {
 	private static final long serialVersionUID = 7842463828127800992L;
 
 	/**
-	 * 互动人
+	 * 互动人id
 	 */
-	private String custId;
+	private String userId;
 	
 	/**
 	 * 互动人头像
 	 */
-	private String custImg;
+	private String userImg;
 	
 	/**
 	 * 互动人昵称
 	 */
-	private String custName;
+	private String userNickName;
 	
 	/**
 	 * 圈子ID
 	 */
 	private String circleId;
+
 	/**
 	 * 圈子名称
 	 */
@@ -72,22 +73,10 @@ public class InteractiveBody implements Body {
 		super();
 	}
 
-	/**
-	 * @param custId
-	 * @param custImg
-	 * @param circleId
-	 * @param circleName
-	 * @param coterieId
-	 * @param coterieName
-	 * @param bodyImg
-	 * @param bodyTitle
-	 * @exception 
-	 */
-	public InteractiveBody(String custId, String custImg, String circleId, String circleName, String coterieId,
-			String coterieName, String bodyImg, String bodyTitle) {
-		super();
-		this.custId = custId;
-		this.custImg = custImg;
+	public InteractiveBody(String userId, String userImg, String userNickName, String circleId, String circleName, String coterieId, String coterieName, String bodyImg, String bodyTitle) {
+		this.userId = userId;
+		this.userImg = userImg;
+		this.userNickName = userNickName;
 		this.circleId = circleId;
 		this.circleName = circleName;
 		this.coterieId = coterieId;
@@ -96,46 +85,28 @@ public class InteractiveBody implements Body {
 		this.bodyTitle = bodyTitle;
 	}
 
-	/**
-	 * @return the custId
-	 */
-	public String getCustId() {
-		return custId;
+	public String getUserId() {
+		return userId;
 	}
 
-	/**
-	 * @param custId the custId to set
-	 */
-	public void setCustId(String custId) {
-		this.custId = custId;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
-	/**
-	 * @return the custImg
-	 */
-	public String getCustImg() {
-		return custImg;
+	public String getUserImg() {
+		return userImg;
 	}
 
-	/**
-	 * @param custImg the custImg to set
-	 */
-	public void setCustImg(String custImg) {
-		this.custImg = custImg;
-	}
-	
-	/**
-	 * @return the custName
-	 */
-	public String getCustName() {
-		return custName;
+	public void setUserImg(String userImg) {
+		this.userImg = userImg;
 	}
 
-	/**
-	 * @param custName the custName to set
-	 */
-	public void setCustName(String custName) {
-		this.custName = custName;
+	public String getUserNickName() {
+		return userNickName;
+	}
+
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName;
 	}
 
 	/**

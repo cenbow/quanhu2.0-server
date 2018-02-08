@@ -7,6 +7,9 @@
  */
 package com.yryz.common.message;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 /**
  * @author yehao
  * @version 1.0
@@ -23,6 +26,7 @@ public class HomePageBody implements Body{
 	/**
 	 * 用户id
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long userId;
 
 	/**

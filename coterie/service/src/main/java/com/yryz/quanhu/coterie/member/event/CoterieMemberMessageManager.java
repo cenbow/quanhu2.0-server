@@ -86,9 +86,9 @@ public class CoterieMemberMessageManager {
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
-            body.setCustId(userId.toString());
-            body.setCustImg(user.getUserImg());
-            body.setCustName(user.getUserNickName());
+            body.setUserId(userId.toString());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             message.setBody(body);
             messageAPI.sendMessage(message, true);
         } catch (Exception e) {
@@ -132,9 +132,9 @@ public class CoterieMemberMessageManager {
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
-            body.setCustId(coterie.getOwnerId());
-            body.setCustImg(user.getUserImg());
-            body.setCustName(user.getUserNickName());
+            body.setUserId(coterie.getOwnerId());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             message.setBody(body);
             messageAPI.sendMessage(message, true);
         } catch (Exception e) {
@@ -180,9 +180,9 @@ public class CoterieMemberMessageManager {
             body.setCoterieId(coterie.getCoterieId().toString());
             body.setCoterieName(coterie.getName());
 
-            body.setCustId(coterie.getOwnerId());
-            body.setCustImg(user.getUserImg());
-            body.setCustName(user.getUserNickName());
+            body.setUserId(coterie.getOwnerId());
+            body.setUserImg(user.getUserImg());
+            body.setUserNickName(user.getUserNickName());
             message.setBody(body);
             messageAPI.sendMessage(message, true);
         } catch (Exception e) {
