@@ -220,6 +220,8 @@ public class AuthServiceImpl implements AuthService {
 		String configValue = null;
 		try {
 			configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		} catch (RuntimeException e) {
+			logger.error("[getAuthConfig]",e);
 		} catch (Exception e) {
 			logger.error("[getAuthConfig]",e);
 		}
