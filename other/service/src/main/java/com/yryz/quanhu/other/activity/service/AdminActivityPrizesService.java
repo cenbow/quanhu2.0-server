@@ -29,14 +29,4 @@ public interface AdminActivityPrizesService {
 	 * @throws Exception
 	 */
 	int updateBatchUsed(Long[] ids)	throws	Exception;
-	
-	 /**
-	   * 读取Excel里面客户的信息
-	   * @param wb
-	   * @return
-	   */
-/*
-	List<String> readExcelValue(Workbook wb);
-*/
-
 }

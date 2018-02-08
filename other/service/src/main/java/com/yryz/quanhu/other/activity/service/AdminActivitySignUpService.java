@@ -36,20 +36,6 @@ public interface AdminActivitySignUpService {
 	 * @return
 	 */
 	ActivityInfoAndEnrolConfig getActivitySignUpDetail(String id);
-	/**
-	 *  后台编辑报名类活动
-	 * @param activityInfoAndEnrolConfig
-	 * @param request
-	 * @return
-	 */
-	//void activitySignEdit(ActivityInfoAndEnrolConfig activityInfoAndEnrolConfig);
-	/**
-	 *  后台修改备注、下线操作
-	 * @param activityInfo
-	 * @param request
-	 * @return
-	 */
-	//void operationEdit(ActivityInfo activityInfo);
 
 	/**
 	 * 根据活动ID获取活动主表详情
@@ -66,10 +52,6 @@ public interface AdminActivitySignUpService {
 	 * (后台)所有上线的活动列表
 	 * */
 	PageList<AdminActivityInfoVo> adminAllSharelist(Integer pageNo, Integer pageSize, AdminActivityInfoDto adminActivityInfoDto);
-	/**
-	 * 修改活动顺序（后台管理）
-	 */
-	//void updateActivitySortBatch(Long[] idsArr, String custId);
 	/**
 	 *  后台编辑活动
 	 * @param activityInfoAndEnrolConfig
