@@ -2,12 +2,11 @@ package com.yryz.quanhu.support.id.provider;
 
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.yryz.common.constant.IdConstants;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
-import com.yryz.quanhu.support.id.service.DefaultUidService;
-import com.yryz.quanhu.support.id.service.IIdService;
+import com.yryz.quanhu.support.id.snowflake.service.DefaultUidService;
+import com.yryz.quanhu.support.id.bufferedid.service.IIdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

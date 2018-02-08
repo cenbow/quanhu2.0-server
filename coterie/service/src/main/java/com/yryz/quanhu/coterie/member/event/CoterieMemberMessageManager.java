@@ -2,7 +2,6 @@ package com.yryz.quanhu.coterie.member.event;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Sets;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.*;
@@ -20,14 +19,14 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * 私圈成员消息
@@ -67,7 +66,6 @@ public class CoterieMemberMessageManager {
                 }
             }
 
-//			fillCircleInfo(Arrays.asList(coterie));
             MessageVo message = new MessageVo();
             message.setType(MessageType.INTERACTIVE_TYPE);
             message.setLabel(MessageLabel.INTERACTIVE_COTERIE);
@@ -114,7 +112,6 @@ public class CoterieMemberMessageManager {
                 }
             }
 
-//			fillCircleInfo(Arrays.asList(coterie));
             MessageVo message = new MessageVo();
             message.setType(MessageType.INTERACTIVE_TYPE);
             message.setLabel(MessageLabel.INTERACTIVE_COTERIE);
@@ -161,7 +158,6 @@ public class CoterieMemberMessageManager {
                 }
             }
 
-//			fillCircleInfo(Arrays.asList(coterie));
             MessageVo message = new MessageVo();
             message.setType(MessageType.INTERACTIVE_TYPE);
             message.setLabel(MessageLabel.INTERACTIVE_COTERIE);
@@ -189,35 +185,6 @@ public class CoterieMemberMessageManager {
             logger.error("notice Exception", e);
         }
     }
-
-//	private void fillCircleInfo(List<CoterieInfo> infoList){
-//		if(infoList==null || infoList.isEmpty()){
-//			return;
-//		}
-//		Set<String> circleIdSet=Sets.newHashSet();
-//		for (int i = 0; i < infoList.size(); i++) {
-//			String circleId=infoList.get(i).getCircleId();
-//			if(StringUtils.isNotEmpty(circleId)){
-//				circleIdSet.add(circleId);
-//			}
-//		}
-//		if(circleIdSet.isEmpty()){
-//			return;
-//		}
-//
-//		Map<String,CircleInfo > maps=circleAPI.getCircle(circleIdSet, false);
-//		for (int i = 0; i < infoList.size(); i++) {
-//			CoterieInfo o=infoList.get(i);
-//			CircleInfo circle=maps.get(o.getCircleId());
-//			if(circle!=null){
-//				o.setCircleName(circle.getCircleName());
-//				o.setCircleRoute(circle.getCircleRoute());
-//			}
-//		}
-//	}
-
-
-
 
     public void sendMessageToJoinCoteriePayed(CoterieMemberNotify coterieMemberNotify, MessageConstant constant) {
 

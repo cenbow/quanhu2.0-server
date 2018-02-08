@@ -153,4 +153,24 @@
 
   </select>
 
+
+  <select id="getTagCountByUser" resultType="java.util.Map" >
+    SELECT tag_id AS tagId ,COUNT(1) AS totalCount
+    FROM qh_user_tag WHERE del_flag = 10
+    <choose>
+      <when test="tagIds != null and tagIds.size > 0">
+        AND tag_id IN
+        <foreach collection="tagIds" item="tagId" index="index" open="(" separator="," close=")">
+          #{tagId,jdbcType=BIGINT}
+        </foreach>
+      </when>
+      <otherwise>
+        AND  FALSE
+      </otherwise>
+    </choose>
+    GROUP BY tag_id
+  </select>
+
+
+
 </mapper>
