@@ -77,10 +77,10 @@ public class SendMessageServiceImpl implements SendMessageService {
         if (coterieInfo != null) {
             interactiveBody.setCoterieName(coterieInfo.getName());
         }
-        interactiveBody.setCustImg(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity) ? null : fromUser.getUserImg());
-        interactiveBody.setCustName(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity)
+        interactiveBody.setUserImg(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity) ? null : fromUser.getUserImg());
+        interactiveBody.setUserNickName(QuestionAnswerConstants.anonymityType.YES.equals(isAnonymity)
                 ? QuestionAnswerConstants.ANONYMOUS_USER_NAME : fromUser.getUserNickName());
-        interactiveBody.setCustId(String.valueOf(fromUser.getUserId()));
+        interactiveBody.setUserId(String.valueOf(fromUser.getUserId()));
         interactiveBody.setCoterieId(coterieId);
 
         /**

@@ -37,6 +37,7 @@ public class MessageAdminVo implements Serializable{
      * 消息枚举类型 ，唯一
      */
     private String msgEnumType;
+
     /**
      * 目标用户ID
      */
