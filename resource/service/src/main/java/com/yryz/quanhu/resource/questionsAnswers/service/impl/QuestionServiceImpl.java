@@ -344,7 +344,7 @@ public class QuestionServiceImpl implements QuestionService {
         Long createUserId = questionBysearch.getCreateUserId();
         Long targetId = Long.valueOf(questionBysearch.getTargetId());
         if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
-            if (createUserId.compareTo(userId) != 0) {
+            if (createUserId.compareTo(userId) != 0 && targetId.compareTo(userId)!=0) {
                 throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREAD);
             }
         }
