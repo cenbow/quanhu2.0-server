@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2018-2019 Wuhan Yryz Network Company LTD.
  * All rights reserved.
- * 
+ *
  * Created on 2018年1月20日
  * Id: OrderController.java, 2018年1月20日 上午11:04:02 yehao
  */
@@ -64,15 +64,15 @@ import java.util.*;
 @RestController
 @RequestMapping(value = "/services/app")
 public class OrderController {
-	
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@Reference
 	private OrderApi orderApi;
-	
+
 	@Reference
 	private UserApi userApi;
-	
+
 	@Reference
 	private CommonSafeApi commonSafeApi;
 
@@ -133,7 +133,7 @@ public class OrderController {
 //		return orderApi.dealUserPhy(userPhy);
 		return ResponseUtils.returnCommonException("接口已下线");
 	}
-    
+
     /**
      * 找回支付密码
      * @param appId
@@ -175,7 +175,7 @@ public class OrderController {
 		userPhy.setPayPassword("");
 		return orderApi.dealUserPhy(userPhy);
 	}
-    
+
     /**
      * 积分兑换
      * @param appId
@@ -193,7 +193,7 @@ public class OrderController {
 									   @RequestBody PointsToAccountDTO pointsToAccountDTO ) {
     	Long cost = pointsToAccountDTO.getCost();
     	String payPassword = pointsToAccountDTO.getPayPassword();
-    	
+
     	if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
@@ -249,7 +249,7 @@ public class OrderController {
 //		}
 		return response;
 	}
-    
+
     /**
      * 获取账户信息
      * @param userId
@@ -292,13 +292,15 @@ public class OrderController {
 		WithdrawCashConfig withdrawCashConfig = new WithdrawCashConfig();
 		try {
 			String value = ResponseUtils.getResponseData(basicConfigApi.getValue("account.nopass.pay"));
-			withdrawCashConfig = JSON.parseObject(value,WithdrawCashConfig.class);
+			if(StringUtils.isNotBlank(value)){
+                withdrawCashConfig = JSON.parseObject(value,WithdrawCashConfig.class);
+            }
 		}catch (Exception e){
 			logger.error("获取资金-提现配置失败", e);
 		}
 		return withdrawCashConfig;
 	}
-    
+
     /**
      * 用户提现
      * @param appId
@@ -340,12 +342,12 @@ public class OrderController {
 		}
 		//添加提现控制开关
 		WithdrawCashConfig withdrawCashConfig = getWithdrawCashConfig();
-		if(WithdrawCashConfig.NOT_ALLOWED == withdrawCashConfig.getAllowFlag()){
+		if(null != withdrawCashConfig && WithdrawCashConfig.NOT_ALLOWED == withdrawCashConfig.getAllowFlag()){
 			return ResponseUtils.returnCommonException(withdrawCashConfig.getMsg());
 		}
 		return payService.getCash(appId , userId, cost, cust2BankId, payPassword);
 	}
-	
+
     /**
      * 计算充值手续费
      * @return
@@ -361,7 +363,7 @@ public class OrderController {
 		List<Map<String, Object>> list = DataEnum.getPayCharge();
 		return ResponseUtils.returnListSuccess(list);
 	}
-    
+
     /**
      * 绑定银行卡
      * @param userId
@@ -379,7 +381,7 @@ public class OrderController {
     	String bankCardNo = bindBankCardDTO.getBankCardNo();
     	String name = bindBankCardDTO.getName();
     	String bankCode = bindBankCardDTO.getBankCode();
-    	
+
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
@@ -389,7 +391,7 @@ public class OrderController {
 		if (StringUtils.isEmpty(name)) {
 			return ResponseUtils.returnCommonException("用户真实姓名name必填");
 		}
-		
+
 		bankCode = BankUtil.getSimpleNameOfBank(bankCardNo.replace(" ", ""));
 
 		UserBankDTO userBankDTO = new UserBankDTO();
@@ -438,8 +440,8 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("服务器正在打盹...");
 		}
 	}
-    
-    
+
+
     /**
      * 设置默认卡
      * @param userId
@@ -474,8 +476,8 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("设置失败，请重试");
 		}
 	}
-    
-    
+
+
     /**
      * 解绑银行卡
      * @param unbindBankCardDTO
@@ -522,7 +524,7 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("解绑失败，请重试");
 		}
 	}
-    
+
     /**
      * 设置小额免密
      * @param userId
@@ -564,7 +566,7 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("设置失败，请重试");
 		}
 	}
-    
+
     /**
      * 获取最低充值金额
      * @return
@@ -580,7 +582,7 @@ public class OrderController {
 		Map<String, Object> map = DataEnum.getMinChargeAmount();
 		return ResponseUtils.returnObjectSuccess(map);
 	}
-    
+
     /**
      * 创建充值订单
      * @param userId
@@ -620,7 +622,7 @@ public class OrderController {
 		long fee = DataEnum.countFee(payWay, orderAmount);
 		return payService.getNewPayFlowId(userId, payWay, orderSrc, orderAmount, fee, currency, ipAddress);
 	}
-	
+
     /**
      * 阿里支付回调
      * @param request
@@ -658,7 +660,7 @@ public class OrderController {
 		}
 		logger.info("支付宝回调结束");
 	}
-    
+
     /**
      * 微信支付回调
      * @param request
@@ -695,10 +697,10 @@ public class OrderController {
 			}
 		}
     }
-    
+
     /**
 	 * 获取请求参数中所有的信息
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
@@ -720,7 +722,7 @@ public class OrderController {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * 获取安全信息
 	 * @param userId
@@ -774,7 +776,7 @@ public class OrderController {
 		}
 		return new String(chars);
 	}
-	
+
 	/**
 	 * 获取订单列表
 	 * @param userId
@@ -814,7 +816,24 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("无数据");
 		}
 	}
-    
+
+	/**
+	 * 获取IOS沙箱配置
+	 * @return
+	 */
+	private IosSandboxConfig getIosSandboxConfig(){
+		IosSandboxConfig iosSandboxConfig = new IosSandboxConfig();
+		try {
+			String value = ResponseUtils.getResponseData(basicConfigApi.getValue("account.ios.sandbox"));
+			if(StringUtils.isNotBlank(value)){
+				iosSandboxConfig = JSON.parseObject(value, IosSandboxConfig.class);
+			}
+		}catch (Exception e){
+			logger.error("获取资金-IOS沙箱配置失败", e);
+		}
+		return iosSandboxConfig;
+	}
+
     /**
      * 苹果内购
      * @param userId
@@ -832,15 +851,21 @@ public class OrderController {
 		String orderId = checkIOSPayDTO.getOrderId();
 		Long orderAmount = checkIOSPayDTO.getOrderAmount();
 		String receipt = checkIOSPayDTO.getReceipt();
+		if(StringUtils.isBlank(userId)){
+            return ResponseUtils.returnCommonException("用户ID不能为空");
+        }
 		if (orderAmount == null || orderAmount.intValue() < 100 || orderAmount.intValue() % 100 != 0) {
 			return ResponseUtils.returnCommonException("请输入正常的兑换金额");
 		}
-		
-		boolean isSandbox = false;
-		if ("575155838165196903".equals(userId)) {
-			isSandbox = true;
-		}
 
+        boolean isSandbox = false;
+		//获取IOS沙箱配置
+        IosSandboxConfig iosSandboxConfig = getIosSandboxConfig();
+		if(null != iosSandboxConfig && IosSandboxConfig.OPEN == iosSandboxConfig.getOpenFlag()){
+            if (userId.equals(iosSandboxConfig.getUserId())) {
+                isSandbox = true;
+            }
+        }
 		String result = IosVerify.verifyReceipt(receipt, isSandbox);
 		logger.info("ios check receipt : " + result);
 		logger.info("ios check receive result : " + result);
@@ -867,7 +892,7 @@ public class OrderController {
 			return ResponseUtils.returnException(e);
 		}
 	}
-    
+
     /**
      * 获取统计信息
      * @param userId
@@ -912,8 +937,8 @@ public class OrderController {
 //		response.getWriter().println(requestHtml);
 //		response.getWriter().flush();
 	}
-	
-    
+
+
     /**
      * 执行异步订单
      * @param userId
@@ -943,7 +968,7 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("未知异常");
 		}
 	}
-    
+
     /**
      * 查询订单状态
      * @param orderId
@@ -974,7 +999,7 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("未知异常");
 		}
 	}
-	
-    
-	
+
+
+
 }
