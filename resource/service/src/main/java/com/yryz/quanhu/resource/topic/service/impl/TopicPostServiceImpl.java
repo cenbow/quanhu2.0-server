@@ -140,7 +140,7 @@ public class TopicPostServiceImpl implements TopicPostService {
          * 资源聚合
          */
         ResourceTotal resourceTotal=new ResourceTotal();
-        resourceTotal.setCreateDate(DateUtils.getDate());
+        resourceTotal.setCreateDate(DateUtils.getDateTime());
         TopicPostWithBLOBs post=this.topicPostDao.selectByPrimaryKey(topicPost.getKid());
         TopicPostVo topicPostVo=new TopicPostVo();
         if(post!=null) {

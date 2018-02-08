@@ -228,7 +228,7 @@ public class QuestionServiceImpl implements QuestionService {
          * 资源聚合
          */
         ResourceTotal resourceTotal = new ResourceTotal();
-        resourceTotal.setCreateDate(DateUtils.getDate());
+        resourceTotal.setCreateDate(DateUtils.getDateTime());
         Question questionQuery = this.questionDao.selectByPrimaryKey(question.getKid());
         QuestionVo vo = new QuestionVo();
         if (questionQuery != null) {
