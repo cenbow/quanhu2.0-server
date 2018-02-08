@@ -11,8 +11,10 @@ import java.util.Map;
 
 public class TopicPostVo  implements Serializable {
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long kid;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long topicId;
 
     private String videoUrl;
@@ -37,6 +39,7 @@ public class TopicPostVo  implements Serializable {
 
     private UserSimpleVO user;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long coterieId;
 
     private String moduleEnum;
@@ -47,7 +50,6 @@ public class TopicPostVo  implements Serializable {
 
     private Map<String, Long> statistics;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     public Long getKid() {
         return kid;
     }
@@ -56,7 +58,6 @@ public class TopicPostVo  implements Serializable {
         this.kid = kid;
     }
 
-    @JsonSerialize(using = ToStringSerializer.class)
     public Long getTopicId() {
         return topicId;
     }

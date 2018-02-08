@@ -49,7 +49,6 @@ import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserBaseInfo.UserRole;
 import com.yryz.quanhu.user.entity.UserImgAudit;
-import com.yryz.quanhu.user.entity.UserStarAuth;
 import com.yryz.quanhu.user.manager.EventManager;
 import com.yryz.quanhu.user.mq.UserSender;
 import com.yryz.quanhu.user.service.ActivityTempUserService;
@@ -118,7 +117,7 @@ public class UserServiceImpl implements UserService {
 			}
 			// 昵称已存在
 			if (existByName != null) {
-				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(),"该昵称已存在","该昵称已存在");
+				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(), "该昵称已存在", "该昵称已存在");
 			}
 		}
 
@@ -135,9 +134,9 @@ public class UserServiceImpl implements UserService {
 
 		int result = custbaseinfoDao.update(baseInfo);
 
-		//删除缓存用户信息
+		// 删除缓存用户信息
 		baseInfoRedisDao.deleteUserInfo(baseInfo.getUserId());
-		
+
 		// 删除旧的用户手机号信息
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfoRedisDao.deleteUserPhoneInfo(user.getUserPhone(), user.getAppId());
@@ -147,35 +146,36 @@ public class UserServiceImpl implements UserService {
 
 		// 同步im
 		mqSender.userUpdate(baseInfo);
-		
-		//更新后的用户信息
+
+		// 更新后的用户信息
 		UserBaseInfo baseInfo2 = getUser(baseInfo.getUserId());
 		// 提交资料完善事件
 		eventManager.userDataImprove(baseInfo2, user);
-		
+
 		return result;
 	}
-	
-	
+
 	@Override
-	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId){
+	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId) {
 		return getUserLoginSimpleVO(null, userId);
 	}
-	
+
 	@Override
-	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId,Long friendId) {
+	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId, Long friendId) {
 		UserBaseInfo baseInfo = getUser(friendId);
-		if(baseInfo == null){
+		if (baseInfo == null) {
 			return new UserLoginSimpleVO();
 		}
 		String starTradeField = "";
-		
+
 		UserLoginSimpleVO simpleVO = UserBaseInfo.getUserLoginSimpleVO(baseInfo);
-		
-		//聚合达人行业数据
-		if(simpleVO.getUserRole() == UserRole.STAR.getRole()){
-			UserStarAuth starAuth = starService.get(friendId.toString(), null);
-			starTradeField = starAuth != null ? starAuth.getTradeField() : "";
+
+		// 聚合达人行业数据
+		if (simpleVO.getUserRole() == UserRole.STAR.getRole()) {
+			Map<String, UserStarSimpleVo> starMap = starService.getStarSimple(Sets.newHashSet(friendId.toString()));
+			if (MapUtils.isNotEmpty(starMap)) {
+				starTradeField = StringUtils.toString(starMap.get(friendId).getTradeField(), "");
+			}
 		}
 		simpleVO.setStarTradeField(starTradeField);
 		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
@@ -212,10 +212,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserSimpleVO getUserSimple(Long userId, Long friendId) {
 		Map<String, UserSimpleVO> map = getUserSimple(userId, Sets.newHashSet(friendId.toString()));
-		if(MapUtils.isEmpty(map)){
+		if (MapUtils.isEmpty(map)) {
 			return new UserSimpleVO();
 		}
-		return map.get(friendId);
+		return map.get(friendId.toString());
 	}
 
 	@Override
@@ -225,13 +225,21 @@ public class UserServiceImpl implements UserService {
 		}
 		List<UserBaseInfo> list = getUserInfo(friendIds);
 		Map<String, UserSimpleVO> map = new HashMap<String, UserSimpleVO>();
-		//聚合达人信息
-		Map<String, UserStarSimpleVo> starMap = starService.getStarSimple(friendIds);
-		Map<String, UserRelationDto> relationMap = null;
+		
+		// 聚合达人信息
+		Set<String> starUserIds = getStarUserId(list);
+		Map<String, UserStarSimpleVo> starMap = null;
+		if(CollectionUtils.isNotEmpty(starUserIds)){
+			starMap = starService.getStarSimple(starUserIds);
+		}
+		
+		
 		// 聚合关系数据
+		Map<String, UserRelationDto> relationMap = null;
 		if (userId != null && userId != 0L) {
 			relationMap = getRelation(userId, friendIds);
 		}
+		
 		if (list != null) {
 			for (UserBaseInfo vo : list) {
 				UserSimpleVO simpleVO = UserBaseInfo.getUserSimpleVo(vo);
@@ -240,11 +248,13 @@ public class UserServiceImpl implements UserService {
 					simpleVO.setNameNotes(dto.getUserRemarkName());
 					simpleVO.setRelationStatus(dto.getRelationStatus());
 				}
-				//聚合达人信息
-				if(MapUtils.isNotEmpty(starMap) && simpleVO.getUserRole() == UserRole.STAR.getRole()){
-					UserStarSimpleVo starSimpleVo = starMap.get(simpleVO.getUserId().toString());
-					simpleVO.setTradeField(starSimpleVo.getTradeField());
-					simpleVO.setRecommendDesc(starSimpleVo.getRecommendDesc());
+				// 聚合达人信息
+				if (simpleVO.getUserRole() == UserRole.STAR.getRole()) {
+					if(MapUtils.isNotEmpty(starMap)){
+						UserStarSimpleVo starSimpleVo = starMap.get(simpleVO.getUserId().toString());
+						simpleVO.setTradeField(starSimpleVo.getTradeField());
+						simpleVO.setRecommendDesc(starSimpleVo.getRecommendDesc());
+					}
 				}
 				map.put(vo.getUserId().toString(), simpleVO);
 			}
@@ -339,9 +349,9 @@ public class UserServiceImpl implements UserService {
 		}
 		return map;
 	}
-	
+
 	@Override
-	public Map<String,UserBaseInfoVO> getActivityUser(Set<String> userIds){
+	public Map<String, UserBaseInfoVO> getActivityUser(Set<String> userIds) {
 		if (CollectionUtils.isEmpty(userIds)) {
 			return new HashMap<>();
 		}
@@ -360,12 +370,12 @@ public class UserServiceImpl implements UserService {
 				tempUserIds.add(userId.toString());
 			}
 		}
-		if(CollectionUtils.isEmpty(list)){
+		if (CollectionUtils.isEmpty(list)) {
 			list = new ArrayList<>(userIds.size());
 		}
-		//查询观察者
+		// 查询观察者
 		List<UserBaseInfo> tempUsers = tempUserService.getUserBaseInfoByTempUser(tempUserIds);
-		if(CollectionUtils.isNotEmpty(tempUsers)){
+		if (CollectionUtils.isNotEmpty(tempUsers)) {
 			list.addAll(tempUsers);
 		}
 		Map<String, UserBaseInfoVO> map = new HashMap<>(list.size());
@@ -377,7 +387,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * 根据昵称获取用户信息
 	 * 
@@ -386,7 +396,7 @@ public class UserServiceImpl implements UserService {
 	 * @return
 	 */
 	@Override
-	public  UserBaseInfo getUserByNickName(String appId, String nickName) {
+	public UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
 
@@ -412,7 +422,7 @@ public class UserServiceImpl implements UserService {
 				nullUserId.add(userId.toString());
 			}
 		}
-		if(CollectionUtils.isEmpty(infos)){
+		if (CollectionUtils.isEmpty(infos)) {
 			infos = new ArrayList<>(userIds.size());
 		}
 		if (CollectionUtils.isEmpty(nullUserId)) {
@@ -453,7 +463,7 @@ public class UserServiceImpl implements UserService {
 				nullPhone.add(phone);
 			}
 		}
-		if(CollectionUtils.isEmpty(infos)){
+		if (CollectionUtils.isEmpty(infos)) {
 			infos = new ArrayList<>(phones.size());
 		}
 		if (CollectionUtils.isEmpty(nullPhone)) {
@@ -461,8 +471,8 @@ public class UserServiceImpl implements UserService {
 		}
 		// 查询mysql
 		List<UserBaseInfo> mysqlInfos = custbaseinfoDao.getByPhones(Lists.newArrayList(phones), appId);
-		//保存缓存
-		if(CollectionUtils.isNotEmpty(mysqlInfos)){
+		// 保存缓存
+		if (CollectionUtils.isNotEmpty(mysqlInfos)) {
 			baseInfoRedisDao.saveUserPhoneInfo(mysqlInfos);
 		}
 		// 合并缓存的用户
@@ -626,5 +636,27 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		return map;
+	}
+	
+	/**
+	 * 获取达人用户Id
+	 * @param list
+	 * @return
+	 */
+	private Set<String> getStarUserId(List<UserBaseInfo> list){
+		Set<String> starUserIds = null;
+		if(CollectionUtils.isNotEmpty(list)){
+			int userLength = list.size();
+			starUserIds = new HashSet<>(userLength);
+			for(int i = 0 ; i < userLength;i++){
+				UserBaseInfo baseInfo = list.get(i);
+				if(baseInfo.getUserRole() == UserRole.STAR.getRole()){
+					starUserIds.add(baseInfo.getUserId().toString());
+				}else{
+					continue;
+				}
+			}
+		}
+		return starUserIds;
 	}
 }

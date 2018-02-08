@@ -129,26 +129,25 @@ public class UserDiffHandler implements DiffHandler {
         }
     }
 
-    private void setRegLogInfo(UserInfo userInfo, Response<Map<Long, UserRegLogVO>> regLogResponse) {
-        if (regLogResponse.success() && MapUtils.isNotEmpty(regLogResponse.getData())) {
-            Map<Long, UserRegLogVO> regLogVOMap = regLogResponse.getData();
-            UserRegLogVO regLogVO = regLogVOMap.get(userInfo.getUserId());
-            if (regLogVO != null) {
-                UserRegLog userRegLog = new UserRegLog();
-                BeanUtils.copyProperties(userRegLog, regLogVO);
-                userInfo.setUserRegLog(userRegLog);
-            }
-        }
-    }
 
     private void setEventInfo(UserInfo userInfo, Response<Map<Long, EventAcount>> eventAcountResponse) {
         if (eventAcountResponse.success() && MapUtils.isNotEmpty(eventAcountResponse.getData())) {
             Map<Long, EventAcount> eventAcountMap = eventAcountResponse.getData();
             EventAcount eventAcount = eventAcountMap.get(userInfo.getUserId());
             if (eventAcount != null) {
-                EventAccountInfo eventAccountInfo = new EventAccountInfo();
-                BeanUtils.copyProperties(eventAccountInfo, eventAcount);
+                EventAccountInfo eventAccountInfo = GsonUtils.parseObj(eventAcount, EventAccountInfo.class);
                 userInfo.setEventAccountInfo(eventAccountInfo);
+            }
+        }
+    }
+
+    private void setRegLogInfo(UserInfo userInfo, Response<Map<Long, UserRegLogVO>> regLogResponse) {
+        if (regLogResponse.success() && MapUtils.isNotEmpty(regLogResponse.getData())) {
+            Map<Long, UserRegLogVO> regLogVOMap = regLogResponse.getData();
+            UserRegLogVO regLogVO = regLogVOMap.get(userInfo.getUserId());
+            if (regLogVO != null) {
+                UserRegLog userRegLog = GsonUtils.parseObj(regLogVO, UserRegLog.class);
+                userInfo.setUserRegLog(userRegLog);
             }
         }
     }
@@ -161,8 +160,7 @@ public class UserDiffHandler implements DiffHandler {
                 UserTagInfo userTagInfo = new UserTagInfo();
                 List<TagInfo> tagInfoList = Lists.newArrayList();
                 for (UserTagVO userTagVO : userTagVOS) {
-                    TagInfo tagInfo = new TagInfo();
-                    BeanUtils.copyProperties(tagInfo, userTagVO);
+                    TagInfo tagInfo = GsonUtils.parseObj(userTagVO, TagInfo.class);
                     tagInfoList.add(tagInfo);
                 }
                 userTagInfo.setUserTagInfoList(tagInfoList);
@@ -177,8 +175,7 @@ public class UserDiffHandler implements DiffHandler {
             Map<String, StarAuthInfo> authInfoMap = starResponse.getData();
             StarAuthInfo starAuthInfo = authInfoMap.get(userInfo.getUserId().toString());
             if (starAuthInfo != null) {
-                UserStarInfo userStarInfo = new UserStarInfo();
-                BeanUtils.copyProperties(userStarInfo, starAuthInfo);
+                UserStarInfo userStarInfo = GsonUtils.parseObj(starAuthInfo, UserStarInfo.class);
                 userInfo.setUserStarInfo(userStarInfo);
             }
         }

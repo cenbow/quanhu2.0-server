@@ -161,13 +161,13 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if(!StringUtils.isBlank(realName)){
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_REALNAME, "*" + realName + "*"));
         }
-        if (StringUtils.isNoneBlank(nickName)) {
+        if (StringUtils.isNotBlank(nickName)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
         }
-        if (StringUtils.isNoneBlank(phone)) {
+        if (StringUtils.isNotBlank(phone)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_PHONE, "*" + phone + "*"));
         }
-        if (StringUtils.isNoneBlank(channelCode)) {
+        if (StringUtils.isNotBlank(channelCode)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_ACTIVITYCHANNELCODE, "*" + channelCode + "*"));
         }
         if (auditStatus != null) {
@@ -194,6 +194,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
             for (Long tagId : tagIds) {
                 tagBoolQusery.should(QueryBuilders.matchQuery(ESConstants.USER_TAG_ID, tagId));
             }
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_TAG_ONlINE, 10));
             boolQueryBuilder.must(tagBoolQusery);
         }
         if(userStatus != null){

@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 /**
  * @author chengyunfei
  */
-@Service(value = "coterieMemberOrderNotifyServiceImpl")
+@Service
 public class CoterieMemberOrderNotifyServiceImpl implements IOrderNotifyService {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

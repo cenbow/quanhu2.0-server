@@ -12,6 +12,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
@@ -55,6 +56,9 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     @Reference
     private ReadApi readApi;
+
+    @Reference
+    private CountApi countApi;
 
     @Autowired
     private SendMessageService sendMessageService;
@@ -120,10 +124,10 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
         if (com.yryz.common.utils.StringUtils.isNotBlank(dto.getStartTime()) && com.yryz.common.utils.StringUtils.isNotBlank(dto.getEndTime())) {
             criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
         }
-        if(dto.getKid()!=null){
+        if (dto.getKid() != null) {
             criteria.andKidEqualTo(dto.getKid());
         }
-        if(dto.getTopicId()!=null){
+        if (dto.getTopicId() != null) {
             criteria.andTopicIdEqualTo(dto.getTopicId());
         }
         if (dto.getShelveFlag() != null) {
@@ -144,9 +148,9 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
                 vo.setUser(apIservice.getUser(createUserId));
             }
 
-           Topic topic= this.topicDao.selectByPrimaryKey(topicPost.getTopicId());
-            if(null!=topic){
-               vo.setTitle(topic.getTitle());
+            Topic topic = this.topicDao.selectByPrimaryKey(topicPost.getTopicId());
+            if (null != topic) {
+                vo.setTitle(topic.getTitle());
             }
             vo.setModuleEnum(ModuleContants.TOPIC_POST);
             list.add(vo);
@@ -160,22 +164,32 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     @Override
     public Integer shelve(Long kid, Byte shelveFlag) {
-        TopicPostWithBLOBs topicPost=new TopicPostWithBLOBs();
+        TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         topicPost.setKid(kid);
         topicPost.setShelveFlag(shelveFlag);
 
-        TopicPostWithBLOBs topicPostWithBLOBs =this.topicPostDao.selectByPrimaryKey(kid);
-        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
-        messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
-        messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
-        messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
-        messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
-        messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
-        messageBusinessVo.setIsAnonymity(null);
-        messageBusinessVo.setCoterieId(null);
-        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON,true);
+        Integer flag = this.topicPostDao.updateByPrimaryKeySelective(topicPost);
+        if (flag > 0) {
+            /**
+             * 帖子下线通知
+             */
+            TopicPostWithBLOBs topicPostWithBLOBs = this.topicPostDao.selectByPrimaryKey(kid);
+            MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+            messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
+            messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
+            messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
+            messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
+            messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
+            messageBusinessVo.setIsAnonymity(null);
+            messageBusinessVo.setCoterieId(null);
+            sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, true);
 
-        return this.topicPostDao.updateByPrimaryKeySelective(topicPost);
+            //提交讨论数
+            countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
+            //提交发布数
+            countApi.commitCount(BehaviorEnum.Release, topicPostWithBLOBs.getCreateUserId(), null, -1L);
+        }
+        return flag;
     }
 
 }

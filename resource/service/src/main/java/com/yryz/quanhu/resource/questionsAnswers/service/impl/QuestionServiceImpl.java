@@ -11,6 +11,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
@@ -25,6 +26,7 @@ import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.vo.UserAccount;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
@@ -231,8 +233,14 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionVo vo = new QuestionVo();
         if (questionQuery != null) {
             BeanUtils.copyProperties(questionQuery, vo);
-            resourceTotal.setExtJson(JSON.toJSONString(vo));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
         }
+        if(QuestionAnswerConstants.showType.ONESELF.compareTo(questionQuery.getIsOnlyShowMe())==0){
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_TRUE);
+        }else{
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
+        }
+        resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceTotal.setResourceId(question.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));
         resourceTotal.setUserId(questionQuery.getCreateUserId());
