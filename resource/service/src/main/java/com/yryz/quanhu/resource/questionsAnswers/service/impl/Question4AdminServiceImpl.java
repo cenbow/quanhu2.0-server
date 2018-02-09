@@ -232,29 +232,32 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         Question question=new Question();
         question.setKid(kid);
         question.setShelveFlag(CommonConstants.SHELVE_NO);
-
+        //执行下架数据库操作
+        int result=this.questionDao.updateByPrimaryKeySelective(question);
         /**
          * 问题下线通知
          */
-       Question questionByQuery=this.questionDao.selectByPrimaryKey(kid);
-       if(null!=questionByQuery) {
-           MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-           messageBusinessVo.setCoterieId(String.valueOf(questionByQuery.getCoterieId()));
-           messageBusinessVo.setIsAnonymity(null);
-           messageBusinessVo.setKid(questionByQuery.getKid());
-           messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-           messageBusinessVo.setFromUserId(questionByQuery.getCreateUserId());
-           messageBusinessVo.setTitle(questionByQuery.getContent());
-           messageBusinessVo.setTosendUserId(questionByQuery.getCreateUserId());
-           messageBusinessVo.setAmount(questionByQuery.getChargeAmount());
-           questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTIONANSWER_HAVE_SHALVEDWON, false);
+        if(result>0) {
+            Question questionByQuery = this.questionDao.selectByPrimaryKey(kid);
+            if (null != questionByQuery) {
+                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+                messageBusinessVo.setCoterieId(String.valueOf(questionByQuery.getCoterieId()));
+                messageBusinessVo.setIsAnonymity(null);
+                messageBusinessVo.setKid(questionByQuery.getKid());
+                messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
+                messageBusinessVo.setFromUserId(questionByQuery.getCreateUserId());
+                messageBusinessVo.setTitle(questionByQuery.getContent());
+                messageBusinessVo.setTosendUserId(questionByQuery.getCreateUserId());
+                messageBusinessVo.setAmount(questionByQuery.getChargeAmount());
+                questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTIONANSWER_HAVE_SHALVEDWON, false);
 
-           if(QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(questionByQuery.getAnswerdFlag())==0){
-               messageBusinessVo.setTosendUserId(Long.valueOf(questionByQuery.getTargetId()));
-               questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTIONANSWER_HAVE_SHALVEDWON, false);
-           }
-       }
-        return  this.questionDao.updateByPrimaryKeySelective(question);
+                if (QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(questionByQuery.getAnswerdFlag()) == 0) {
+                    messageBusinessVo.setTosendUserId(Long.valueOf(questionByQuery.getTargetId()));
+                    questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTIONANSWER_HAVE_SHALVEDWON, false);
+                }
+            }
+        }
+        return  result;
     }
 
 

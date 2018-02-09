@@ -127,6 +127,7 @@ public class AccountServiceImpl implements AccountService {
 			RegisterDTO registerDTO = new RegisterDTO();
 			registerDTO.setUserChannel(String.format("wap_%s", RegType.WEIXIN_OAUTH.getText()));
 			registerDTO.setUserNickName(tempUser.getNickName());
+			registerDTO.setUserImg(tempUser.getHeadImg());
 			registerDTO.setUserLocation("");
 			registerDTO.setDeviceId("");
 			registerDTO.setUserPhone(phone);
@@ -156,15 +157,15 @@ public class AccountServiceImpl implements AccountService {
 	public Long login(LoginDTO loginDTO, String appId) {
 		UserAccount account = selectOne(null, loginDTO.getPhone(), appId);
 		if (account == null) {
-			throw QuanhuException.busiError("该用户不存在");
+			throw QuanhuException.busiShowError("该手机号未注册","该手机号码未注册");
 		}
 		if (!StringUtils.equals(account.getUserPwd(), loginDTO.getPassword())) {
 			logger.info("[user_login]:params:{},appId:{},result:登录密码错误", JSON.toJSON(loginDTO), appId);
 			throw QuanhuException.busiError(ExceptionEnum.USER_LOGIN_PWD_ERROR);
 		}
-		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
+		if (StringUtils.isNotBlank(loginDTO.getRegistrationId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));
+			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getRegistrationId(), null));
 			;
 		}
 
@@ -190,9 +191,9 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
-		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
+		if (StringUtils.isNotBlank(registerDTO.getRegistrationId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getDeviceId(), null));
+			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getRegistrationId(), null));
 		}
 		return account.getKid();
 	}
@@ -211,8 +212,8 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号
-		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
-			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getDeviceId(), null));
+		if (StringUtils.isNotBlank(loginDTO.getRegistrationId())) {
+			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getRegistrationId(), null));
 		}
 		return userId;
 	}
@@ -223,6 +224,7 @@ public class AccountServiceImpl implements AccountService {
 		RegisterDTO registerDTO = new RegisterDTO();
 		registerDTO.setUserChannel(String.format("app_%s", RegType.getEnumByTye(loginDTO.getType()).getText()));
 		registerDTO.setUserNickName(getThirdNickName(loginDTO.getRegLogDTO().getAppId(), thirdUser.getNickName()));
+		registerDTO.setUserImg(thirdUser.getHeadImg());
 		registerDTO.setUserLocation(thirdUser.getLocation());
 		registerDTO.setDeviceId(loginDTO.getDeviceId());
 		registerDTO.setRegLogDTO(loginDTO.getRegLogDTO());
@@ -307,6 +309,7 @@ public class AccountServiceImpl implements AccountService {
 		RegisterDTO registerDTO = new RegisterDTO();
 		registerDTO.setUserChannel(String.format("web_%s", loginType));
 		registerDTO.setUserNickName(thirdUser.getNickName());
+		registerDTO.setUserImg(thirdUser.getHeadImg());
 		registerDTO.setUserLocation(thirdUser.getLocation());
 		Long userId = createUser(registerDTO, null);
 		// 创建第三方账户
@@ -362,7 +365,7 @@ public class AccountServiceImpl implements AccountService {
 		// 判断用户手机号是否都为空？
 		UserAccount account = selectOne(thirdLogin.getUserId(), null, null);
 		if (StringUtils.isBlank(account.getUserPhone())) {
-			throw QuanhuException.busiError("主账号没有其他登录方式，不能解绑第三方");
+			throw QuanhuException.busiShowError("主账号没有其他登录方式，不能解绑第三方","主账号没有其他登录方式，不能解绑第三方");
 		}
 		thirdLoginService.delete(userId, thirdId);
 	}
@@ -374,7 +377,7 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError("用户不存在");
 		}
 		if (!StringUtils.equals(oldPassword, account.getUserPwd())) {
-			throw QuanhuException.busiError("旧密码不正确");
+			throw QuanhuException.busiShowError("旧密码不正确","旧密码不正确");
 		}
 		account.setDelFlag(null);
 		account.setId(null);
@@ -395,7 +398,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public void forgotPasswordByPhone(String phone, String password, String verifyCode, String appId) {
 		if (!smsService.checkVerifyCode(phone, verifyCode, SmsType.CODE_FIND_PWD, appId)) {
-			throw QuanhuException.busiError("验证码错误");
+			throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		UserAccount account = selectOne(null, phone, appId);
 		if (account == null) {
@@ -539,7 +542,7 @@ public class AccountServiceImpl implements AccountService {
 		insert(account);
 		UserBaseInfo baseInfo = new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(),
 				registerDTO.getUserNickName(), registerDTO.getUserImg(), registerDTO.getUserSign(),
-				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getDeviceId(),
+				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getRegistrationId(),
 				registerDTO.getCityCode(), registerDTO.getIsVest() == null ? null : registerDTO.getIsVest().byteValue(),
 				registerDTO.getUserDesc());
 		baseInfo.setUserGenders(registerDTO.getUserGenders() == null ? null : registerDTO.getUserGenders().byteValue());

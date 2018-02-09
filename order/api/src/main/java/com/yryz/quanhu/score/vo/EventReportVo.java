@@ -5,8 +5,8 @@ package com.yryz.quanhu.score.vo;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -20,12 +20,12 @@ public class EventReportVo implements Serializable {
 
 	private String moduleEnum;
 
-	@JsonSerialize(using = ToStringSerializer.class)
+	
 	private Long infoId;
 
 	/** 用户id */
     @ApiModelProperty(value = "用户id")
-    @JsonSerialize(using = ToStringSerializer.class)
+    
 	private Long id;
     
 	/** 积分增减标志（0-增加，1-减少） */
@@ -34,7 +34,7 @@ public class EventReportVo implements Serializable {
     
 	/** 用户id */
     @ApiModelProperty(value = "用户id")
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long userId;
     
 	/** 事件编码 */

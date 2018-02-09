@@ -1,7 +1,7 @@
 package com.yryz.quanhu.behavior.report.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.common.entity.GenericEntity;
 
 /**
@@ -15,7 +15,7 @@ public class Report extends GenericEntity {
     //资源类型
     private String moduleEnum;
     //资源ID
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long resourceId;
     //举报类型
     private String informTypeName;
@@ -24,10 +24,10 @@ public class Report extends GenericEntity {
     //处理状态(10待处理，11已处理)
     private byte informStatus;
     //举报人
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long reportUserId;
     //被举报人
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private long beReportUserId;
     //处理时间
     private String disposeTime;

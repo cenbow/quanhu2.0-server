@@ -66,7 +66,6 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     /**
      * 查询帖子详情
-     *
      * @param kid
      * @param userId
      * @return
@@ -104,7 +103,6 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     /**
      * 帖子列表查询
-     *
      * @param dto
      * @return
      */
@@ -181,6 +179,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
                 messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
                 messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
                 messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
+                messageBusinessVo.setFromUserId(topicPostWithBLOBs.getCreateUserId());
                 messageBusinessVo.setIsAnonymity(null);
                 messageBusinessVo.setCoterieId(null);
                 sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, true);

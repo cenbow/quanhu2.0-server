@@ -2,8 +2,8 @@ package com.yryz.quanhu.other.activity.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -19,13 +19,13 @@ public class ActivityVoteDetailVo implements Serializable {
     /**
      * 唯一id
      * */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long kid;
 
     /**
      * 活动id
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private  Long activityInfoId;
 
     /**
@@ -152,7 +152,7 @@ public class ActivityVoteDetailVo implements Serializable {
      */
     private Integer userRollFlag;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     private Long createUserId;
 
     private Date createDate;

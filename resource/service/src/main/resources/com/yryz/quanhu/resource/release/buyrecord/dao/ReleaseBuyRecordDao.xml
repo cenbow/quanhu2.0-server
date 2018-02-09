@@ -8,16 +8,23 @@
     </sql>
 
     <insert id="insert" parameterType="com.yryz.quanhu.resource.release.buyrecord.entity.ReleaseBuyRecord">
-
-        <selectKey resultType="long" keyProperty="id" order="AFTER">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
-
         INSERT INTO qh_release_buy_record
-        (<include refid="Base_Column_List"/>)
+        (
+        kid,
+        order_id,
+        coterie_id,
+        resource_id,
+        amount,
+        pay_type,
+        buy_type,
+        remark,
+        create_user_id,
+        create_date,
+        last_update_user_id,
+        last_update_date
+        )
         VALUES
         (
-        #{id,jdbcType=BIGINT},
         #{kid,jdbcType=BIGINT},
         #{orderId,jdbcType=BIGINT},
         #{coterieId,jdbcType=BIGINT},

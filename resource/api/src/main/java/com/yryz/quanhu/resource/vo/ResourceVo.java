@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
@@ -38,13 +38,13 @@ public class ResourceVo implements Serializable {
     /**
      * 动态ID
      */
-	@JsonSerialize(using = ToStringSerializer.class)
+	
     private Long kid;
 
     /**
      * 用户ID
      */
-	@JsonSerialize(using = ToStringSerializer.class)
+	
     private Long userId;
 
     /**

@@ -219,7 +219,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
 
         SearchQuery query = queryBuilder.build();
-        logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
+//        logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
         AggregatedPage<UserInfo> page = elasticsearchTemplate.queryForPage(query, UserInfo.class);
         List<UserInfo> userInfoList = page.getContent();
         List<UserInfoVO> userInfoVOS = Lists.newArrayList();
@@ -231,7 +231,6 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         pageList.setPageSize(pageSize);
         pageList.setEntities(userInfoVOS);
         pageList.setCount(page.getTotalElements());
-//        logger.info("elasticsearchTemplate page result: {}", GsonUtils.parseJson(page));
         return pageList;
     }
 

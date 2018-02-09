@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -189,11 +190,11 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 
 			// 动态数据
 			Set<Long> dynamicUserIds = getNeedDynamicUserIds(list);
-			Map<Long, Dymaic> dymaicMap = null;
+			Map<Long, Dymaic> dymaicMap = Maps.newHashMap();
 			if (CollectionUtils.isNotEmpty(dynamicUserIds)) {
 				try {
 					dymaicMap = dymaicService.getLastSend(dynamicUserIds);
-					logger.info("dymaicService.getLastSend result: {}", GsonUtils.parseJson(dymaicMap));
+					logger.info("dymaicService.getLastSend result size: {}", dymaicMap.size());
 				} catch (Exception e) {
 					logger.error("dymaicService getLastSend error", e);
 				}
@@ -218,7 +219,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		}
 
 		PageList<StarInfoVO> pageList = new PageModel<StarInfoVO>().getPageList(starInfoVOList);
-		logger.info("searchStarUser result, pageList: {}", GsonUtils.parseJson(pageList));
+		logger.info("searchStarUser result starInfoVOList size: {}", starInfoVOList.size());
 		return ResponseUtils.returnObjectSuccess(pageList);
 	}
 
@@ -438,7 +439,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 			if (BooleanUtils.isTrue(adminUserDTO.getNeedIntegral())) {
 				setUserOrderIntegral(pageList.getEntities());
 			}
-			logger.info("adminSearchUser result: {}", GsonUtils.parseJson(pageList));
+			//logger.info("adminSearchUser result: {}", GsonUtils.parseJson(pageList));
 			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (Exception e) {
 			logger.error("adminSearchUser error", e);

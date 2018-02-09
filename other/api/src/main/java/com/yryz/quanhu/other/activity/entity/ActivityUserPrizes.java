@@ -1,7 +1,7 @@
 package com.yryz.quanhu.other.activity.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.common.entity.GenericEntity;
 
 import java.util.Date;
@@ -74,7 +74,7 @@ public class ActivityUserPrizes extends GenericEntity{
 	/**
 	 * 活动id
 	 */
-	@JsonSerialize(using = ToStringSerializer.class)
+	
     private  Long activityInfoId;
     
 

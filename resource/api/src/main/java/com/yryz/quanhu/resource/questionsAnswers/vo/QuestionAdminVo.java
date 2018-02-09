@@ -1,8 +1,8 @@
 package com.yryz.quanhu.resource.questionsAnswers.vo;
 
 import com.alibaba.druid.util.DaemonThreadFactory;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+
 import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
@@ -55,7 +55,7 @@ public class QuestionAdminVo implements Serializable {
 
     private Byte orderFlag;
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     public Long getKid() {
         return kid;
     }
@@ -112,7 +112,7 @@ public class QuestionAdminVo implements Serializable {
         this.createDate = createDate;
     }
 
-    @JsonSerialize(using = ToStringSerializer.class)
+    
     public String getCoterieId() {
         return coterieId;
     }
