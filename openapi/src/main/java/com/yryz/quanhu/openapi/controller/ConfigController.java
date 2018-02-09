@@ -15,10 +15,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -81,4 +78,13 @@ public class ConfigController {
         return ResponseUtils.returnObjectSuccess(map);
     }
 
+    @ApiOperation("获取配置接口")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/{version}/config/getConfig")
+    public Response<Map<String, String>> forceUpgrade(@RequestParam String configKey, HttpServletRequest request) {
+        String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(configKey));
+        Map<String, String> map = Maps.newHashMap();
+        map.put(configKey, configStr);
+        return ResponseUtils.returnObjectSuccess(map);
+    }
 }
