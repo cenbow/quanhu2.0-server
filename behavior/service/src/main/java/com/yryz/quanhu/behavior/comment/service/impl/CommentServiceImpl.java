@@ -194,7 +194,13 @@ public class CommentServiceImpl implements CommentService {
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
         PageHelper.startPage(commentFrontDTO.getCurrentPage().intValue(), commentFrontDTO.getPageSize().intValue());
         PageList pageList = new PageList();
-        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
+        String zhan="";
+        if(commentFrontDTO.getCheckType()==1){
+            zhan=String.valueOf(commentFrontDTO.getTopId());
+        }else{
+            zhan="*";
+        }
+        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":"+zhan+"_0_" + commentFrontDTO.getResourceId());
         if(setKeys.size()>0){
             logger.info("redis查到了相应的key"+"COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
         }
@@ -463,8 +469,12 @@ public class CommentServiceImpl implements CommentService {
                 commentInfoVO.setCoterieId(comment.getCoterieId());
                 commentInfoVO.setDelFlag(comment.getDelFlag());
                 commentInfoVO.setKids(comment.getKids());
+                //接点赞返回值 一级返回状态
+
                 commentInfoVO.setLikeCount(comment.getLikeCount());
                 commentInfoVO.setLikeFlag(comment.getLikeFlag());
+
+
                 commentInfoVO.setNickName(comment.getNickName());
                 commentInfoVO.setParentUserId(comment.getParentUserId());
                 commentInfoVO.setRecommend(comment.getRecommend());

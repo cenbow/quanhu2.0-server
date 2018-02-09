@@ -25,6 +25,15 @@ public class CommentFrontDTO extends PageList implements Serializable {
     private byte shelveFlag;
     
     private long createUserId;
+    private long checkType;
+
+    public long getCheckType() {
+        return checkType;
+    }
+
+    public void setCheckType(long checkType) {
+        this.checkType = checkType;
+    }
 
     public long getTopId() {
         return topId;

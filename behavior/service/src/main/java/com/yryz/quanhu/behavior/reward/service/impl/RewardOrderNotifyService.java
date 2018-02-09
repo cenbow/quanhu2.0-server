@@ -116,7 +116,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         // 接入资源打赏计数
         try {
             // 接入阅读统计计数
-            countApi.commitCount(BehaviorEnum.Reward, info.getKid(), null, 1L);
+            countApi.commitCount(BehaviorEnum.Reward, info.getResourceId(), null, 1L);
         } catch (Exception e) {
             logger.error("资源打赏计数 接入异常！", e);
         }
