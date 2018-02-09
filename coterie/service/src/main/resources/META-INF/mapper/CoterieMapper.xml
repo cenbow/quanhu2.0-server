@@ -495,7 +495,12 @@
     s.recommend,
     s.is_expert isExpert,
     s.icon,
+    s.state status,
+    s.shelve_flag,
     s.member_num memberNum,
+    s.process_time,
+    s.audit_user_id,
+    s.audit_remark,
     s.heat
     FROM `qh_coterie` s
     WHERE 1=1

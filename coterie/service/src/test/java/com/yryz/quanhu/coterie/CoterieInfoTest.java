@@ -4,9 +4,11 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
+import com.yryz.quanhu.coterie.coterie.vo.Coterie;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 
+import org.assertj.core.util.Lists;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,4 +91,15 @@ public class CoterieInfoTest {
     	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getCreateCoterie("729669966696603648", 1, 10));
     	System.out.println(list);
     }
+    
+    @Test
+    public void getByKids() {
+    	List<Long> kidList=Lists.newArrayList();
+    	kidList.add(367337454723072L);
+    	kidList.add(367784315871232L);
+    	kidList.add(367787629371392L);
+    	List<Coterie> list=ResponseUtils.getResponseData(coterieApi.getByKids(kidList));
+    	System.out.println(list.size());
+    }
+    
 }

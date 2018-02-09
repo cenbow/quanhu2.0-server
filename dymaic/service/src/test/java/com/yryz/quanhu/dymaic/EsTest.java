@@ -24,10 +24,10 @@ public class EsTest {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-//    @Test
+    @Test
     public void searchStarUserTest() {
         StarInfoDTO starInfoDTO = new StarInfoDTO();
-        starInfoDTO.setTagId(12L);
+        starInfoDTO.setTagId(14L);
         starInfoDTO.setCurrentPage(1);
         starInfoDTO.setPageSize(200);
         Response<PageList<StarInfoVO>> pageListResponse = elasticsearchService.searchStarUser(starInfoDTO);

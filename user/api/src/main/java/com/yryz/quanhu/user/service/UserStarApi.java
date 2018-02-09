@@ -3,11 +3,10 @@ package com.yryz.quanhu.user.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.aliyun.oss.ServiceException;
+import com.yryz.common.context.Context;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
 import com.yryz.quanhu.user.dto.StarAuthQueryDTO;
@@ -19,7 +18,7 @@ import com.yryz.quanhu.user.vo.StarInfoVO;
 
 public interface UserStarApi {
 	static String getCacheKey(String userId){
-		return String.format("%s.%s", RedisConstants.USER_STAR_INFO,userId);
+		return String.format("%s:%s", Context.getProperty("user.star.info"),userId);
 	}
 	/**
 	 * 达人认证提交
