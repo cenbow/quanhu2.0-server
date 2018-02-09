@@ -98,6 +98,7 @@ public class LogInterceptor extends HandlerInterceptorAdapter implements Handler
         if (ex != null) {
             requestLog.setErrorMessage(getExceptionAllinformation(ex));
         }
+        logger.info(GsonUtils.parseJson(requestLog));
         try {
             requestLogService.executeLog(requestLog);
         } catch (Exception e) {
