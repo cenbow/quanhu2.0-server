@@ -8,7 +8,6 @@
 package com.yryz.quanhu.user.dao;
 
 import java.util.Date;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -165,7 +164,7 @@ public class AuthRedisDao {
 		String key = AuthApi.cacheTempKey(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
 		try {
 			RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
-			redisTemplate.opsForSet().add(key, refreshDTO.getToken());
+			redisTemplate.opsForValue().set(key, refreshDTO.getToken());
 			redisTemplate.expire(key, expireTime,TimeUnit.HOURS);
 		} catch (Exception e) {
 			logger.error("TokenRedis.pushOldToken", e);
@@ -178,12 +177,11 @@ public class AuthRedisDao {
 	 * @param refreshDTO
 	 * @return
 	 */
-	public Set<String> getAllOldToken(Long userId,String appId,DevType devType){
+	public String getAllOldToken(Long userId,String appId,DevType devType){
 		String key = AuthApi.cacheTempKey(userId, appId, devType);
 		try {
 			RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
-			Set<String> set = redisTemplate.opsForSet().members(key);
-			return set;
+			return redisTemplate.opsForValue().get(key);
 		} catch (Exception e) {
 			logger.error("TokenRedis.getAllOldToken", e);
 			throw new RedisOptException("[TokenRedis.getAllOldToken]", e.getCause());

@@ -30,6 +30,11 @@ public class RewardInfoDto extends RewardInfo {
     */
     private Byte queryType;
 
+    /**  
+    * @Fields orderType : 排序类型 (1:时间最新,2:时间最早)
+    */
+    private Byte orderType;
+    
     public Integer getCurrentPage() {
         return currentPage;
     }
@@ -68,5 +73,13 @@ public class RewardInfoDto extends RewardInfo {
 
     public void setQueryType(Byte queryType) {
         this.queryType = queryType;
+    }
+
+    public Byte getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(Byte orderType) {
+        this.orderType = orderType;
     }
 }

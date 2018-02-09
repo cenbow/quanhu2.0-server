@@ -15,12 +15,17 @@ public class CoterieSearchParam implements Serializable{
 	private static final long serialVersionUID = 7520811012527140155L;
 
 	/**
-	 * 圈子状态 ：0待审核，2审批未通过，3上架，4下架 
+	 * 审核状态 ：10待审核，11审批通过，12审批未通过
 	 */
 	private Byte status;
-	
+
 	/**
-	 * 是否推荐，0否，1是
+	 * 上下架状态 ：10上架，11下架
+	 */
+	private Byte shelveFlag;
+
+	/**
+	 * 是否推荐，10否，11是
 	 */
 	private Byte recommend;
 	
@@ -148,5 +153,21 @@ public class CoterieSearchParam implements Serializable{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public Byte getShelveFlag() {
+		return shelveFlag;
+	}
+
+	public void setShelveFlag(Byte shelveFlag) {
+		this.shelveFlag = shelveFlag;
 	}
 }

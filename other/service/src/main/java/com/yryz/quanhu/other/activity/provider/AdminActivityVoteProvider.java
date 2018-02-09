@@ -39,7 +39,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			pageList = adminActivityVoteService.adminlist(param);
 		} catch (Exception e) {
-			logger.error("查询失败:"+ JsonUtils.toFastJson(param));
+			logger.error("查询失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(pageList);
@@ -51,7 +51,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			count = adminActivityVoteService.activityRelease(activity,config,prizes);
 		} catch (Exception e) {
-			logger.error("后台发布活动失败:"+ JsonUtils.toFastJson(activity)+JsonUtils.toFastJson(config)+JsonUtils.toFastJson(prizes));
+			logger.error("后台发布活动失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);
@@ -63,7 +63,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			activityInfo = adminActivityVoteService.getActivityDetail(id);
 		} catch (Exception e) {
-			logger.error("后台获取活动失败:"+ id);
+			logger.error("后台获取活动失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(activityInfo);
@@ -75,7 +75,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			activityVoteConfig = adminActivityVoteService.getConfigDetailByActivityId(activityId);
 		} catch (Exception e) {
-			logger.error("后台获取活动失败:"+ activityId);
+			logger.error("后台获取活动失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(activityVoteConfig);
@@ -87,7 +87,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			list = adminActivityVoteService.getPrizesListByActivityId(activityId);
 		} catch (Exception e) {
-			logger.error("活动getPrizesListByActivityId异常:"+ activityId);
+			logger.error("活动getPrizesListByActivityId异常:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);
@@ -99,7 +99,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			pageList = adminActivityVoteService.selectRankList(adminActivityVoteDetailDto);
 		} catch (Exception e) {
-			logger.error("查询selectRankList失败:"+ JsonUtils.toFastJson(adminActivityVoteDetailDto));
+			logger.error("查询selectRankList失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(pageList);
@@ -111,7 +111,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			count = adminActivityVoteService.sendMessageVote(activityInfo);
 		} catch (Exception e) {
-			logger.error("活动sendMessageVote异常:"+ JsonUtils.toFastJson(activityInfo));
+			logger.error("活动sendMessageVote异常:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);
@@ -122,7 +122,7 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 		try {
 			count = adminActivityVoteService.updateSave(activity);
 		} catch (Exception e) {
-			logger.error("活动updateSave异常:"+ JsonUtils.toFastJson(activity));
+			logger.error("活动updateSave异常:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);

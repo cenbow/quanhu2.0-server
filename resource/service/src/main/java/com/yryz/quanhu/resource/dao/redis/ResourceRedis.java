@@ -7,13 +7,17 @@
  */
 package com.yryz.quanhu.resource.dao.redis;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.ls.LSInput;
 
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
@@ -85,6 +89,22 @@ public class ResourceRedis {
 			return GsonUtils.json2Obj(val, ResourceModel.class);
 		}
 		return null;
+	}
+	
+	public List<ResourceModel> get(Set<String> resourceIds){
+		List<String> keys = new ArrayList<>();
+		for (String resourceId : resourceIds) {
+			keys.add(RedisConstant.getResourceModelKey(resourceId));
+		}
+		List<String> result = redisTemplate.opsForValue().multiGet(keys);
+		List<ResourceModel> resources = new ArrayList<>();
+		for (String val : result) {
+			if(StringUtils.isNotEmpty(val)){
+				ResourceModel resourceModel = GsonUtils.json2Obj(val, ResourceModel.class);
+				resources.add(resourceModel);
+			}
+		}
+		return resources;
 	}
 
 }

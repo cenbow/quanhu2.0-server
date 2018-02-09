@@ -134,6 +134,16 @@
 		, gift_num * gift_price reward_amount
 		from qh_reward
 		<include refid="condition_where_sql" />
+		<choose>
+            <when test="orderType == null">
+            </when>
+            <when test="orderType == 1">
+                order by create_date DESC, id DESC
+            </when>
+            <when test="orderType == 2">
+                order by create_date ASC, id ASC
+            </when>
+        </choose>
 	</select>
 
 	<select id="countByCondition" parameterType="com.yryz.quanhu.behavior.reward.dto.RewardInfoDto" resultType="java.lang.Long">
@@ -278,6 +288,6 @@
 			OR to_user_id = #{userId}
 		)
 		ORDER BY
-			CREATE_DATE DESC
+			CREATE_DATE DESC,ID DESC
 	</select>
 </mapper>

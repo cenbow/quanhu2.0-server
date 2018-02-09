@@ -153,6 +153,11 @@ public class CountServiceImpl implements CountService {
     }
 
     @Override
+    public List<Long> getCount(List<Long> kids, String code, String page) {
+        return countRedisDao.getCount(kids, code, page);
+    }
+
+    @Override
     public void excuteCountSyncMongoJob() {
         List<CountModel> list = Lists.newArrayList();
         try {

@@ -14,7 +14,9 @@ import com.yryz.quanhu.behavior.comment.service.CommentService;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
+import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
@@ -55,6 +57,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Reference(check = false)
     private CountFlagApi countFlagApi;
+
+    @Reference(check = false)
+    private CountApi countApi;
 
     @Reference(check = false)
     private PushAPI pushAPI;
@@ -194,7 +199,13 @@ public class CommentServiceImpl implements CommentService {
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
         PageHelper.startPage(commentFrontDTO.getCurrentPage().intValue(), commentFrontDTO.getPageSize().intValue());
         PageList pageList = new PageList();
-        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
+        String zhan="";
+        if(commentFrontDTO.getCheckType()==1){
+            zhan=String.valueOf(commentFrontDTO.getTopId());
+        }else{
+            zhan="*";
+        }
+        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":"+zhan+"_0_" + commentFrontDTO.getResourceId());
         if(setKeys.size()>0){
             logger.info("redis查到了相应的key"+"COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
         }
@@ -241,6 +252,7 @@ public class CommentServiceImpl implements CommentService {
         List<CommentVO> commentVOS_ = new ArrayList<CommentVO>();//null
         List<Comment> commentsnew = null;
         for (CommentVO commentVO : commentVOS) {
+            logger.debug("foreach commentList :"+commentVO.toString());
             CommentFrontDTO commentFrontDTOnew = new CommentFrontDTO();
             commentFrontDTOnew.setTopId(commentVO.getKid());
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
@@ -334,11 +346,11 @@ public class CommentServiceImpl implements CommentService {
 
             Map<String, Long> maps = null;
             try {
-                maps = countFlagApi.getAllCountFlag("11", commentVO.getResourceId(), "", map).getData();
+                maps = countApi.getCountFlag(BehaviorEnum.Like.getCode(), commentVO.getKid(), "",commentFrontDTO.getCreateUserId()).getData();
             } catch (Exception e) {
                 logger.info("调用统计信息失败:" + e);
             }
-            commentVO.setLikeCount(maps.get("likeCount").intValue());
+            commentVO.setLikeCount(maps.get(BehaviorEnum.Like.getKey()).intValue());
             commentVO.setLikeFlag(maps.get("likeFlag").byteValue());
             commentVO.setCommentCount(commentVOS_.size());
             commentVO.setChildrenComments(commentsnew);
@@ -365,6 +377,7 @@ public class CommentServiceImpl implements CommentService {
             pageList.setEntities(commentVOS.subList(fromIndex, toIndex));
         } else {
             logger.info("走原始分页");
+            logger.debug("commentList final value:"+commentVOS.toString());
             pageList.setEntities(commentVOS);
         }
         return pageList;
@@ -463,8 +476,12 @@ public class CommentServiceImpl implements CommentService {
                 commentInfoVO.setCoterieId(comment.getCoterieId());
                 commentInfoVO.setDelFlag(comment.getDelFlag());
                 commentInfoVO.setKids(comment.getKids());
+                //接点赞返回值 一级返回状态
+
                 commentInfoVO.setLikeCount(comment.getLikeCount());
                 commentInfoVO.setLikeFlag(comment.getLikeFlag());
+
+
                 commentInfoVO.setNickName(comment.getNickName());
                 commentInfoVO.setParentUserId(comment.getParentUserId());
                 commentInfoVO.setRecommend(comment.getRecommend());

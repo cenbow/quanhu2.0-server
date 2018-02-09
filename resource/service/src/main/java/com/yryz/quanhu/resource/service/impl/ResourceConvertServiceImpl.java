@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -99,20 +101,40 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 		return null;
 	}
 	
+	/**
+	 * 添加统计数(批量)
+	 * @param list
+	 * @return
+	 * @see com.yryz.quanhu.resource.service.ResourceConvertService#addCount(java.util.List)
+	 */
 	public List<ResourceVo> addCount(List<ResourceVo> list){
+		
 		if(CollectionUtils.isNotEmpty(list)){
+			List<Long> resourceIds = new ArrayList<>();
 			for (ResourceVo resourceVo : list) {
-				Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
-				if(map != null){
-					resourceVo.setStatistics(map);
-				} else {
-					resourceVo.setStatistics(new HashMap<>());
+				resourceIds.add(Long.parseLong(resourceVo.getResourceId()));
+			}
+			Response<Map<Long,Map<String, Long>>> response = countApi.getCount(BehaviorEnum.Read.getCode(), resourceIds, null);
+			if(response.success()){
+				Map<Long, Map<String, Long>> map = response.getData();
+				for (ResourceVo resourceVo : list) {
+					Map<String, Long> statistics = map.get(Long.parseLong(resourceVo.getResourceId()));
+					if(statistics != null){
+						resourceVo.setStatistics(statistics);
+					} else {
+						resourceVo.setStatistics(new HashMap<>());
+					}
 				}
 			}
 		}
 		return list;
 	}
 	
+	/**
+	 * 添加统计数(单个)
+	 * @param resourceVo
+	 * @return
+	 */
 	public ResourceVo addCount(ResourceVo resourceVo){
 		Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
 		if(map != null){
@@ -130,10 +152,19 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 */
 	public List<ResourceVo> addCoterie(List<ResourceVo> list){
 		if(CollectionUtils.isNotEmpty(list)){
+			List<String> ids = new ArrayList<>();
 			for (ResourceVo resourceVo : list) {
 				if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
-					CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
-					resourceVo.setCoterie(coterieInfo);
+					String cterieId = resourceVo.getCoterieId();
+					ids.add(cterieId);
+				}
+			}
+			List<Coterie> coteries = new ArrayList<>();
+			Map<Long, Coterie> map = coteries.stream().collect(Collectors.toMap(Coterie :: getCoterieId, Function.identity()));
+			for (ResourceVo resourceVo : list) {
+				if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
+					Coterie coterie = map.get(Long.parseLong(resourceVo.getCoterieId()));
+					resourceVo.setCoterie(coterie);
 				}
 			}
 		}
@@ -147,8 +178,12 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 */
 	public ResourceVo addCoterie(ResourceVo resourceVo){
 		if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
-			CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
-			resourceVo.setCoterie(coterieInfo);
+			List<ResourceVo> list = new ArrayList<>();
+			list.add(resourceVo);
+			list = addCoterie(list);
+			if(list != null && list.size() == 1){
+				return list.get(0);
+			} 
 		}
 		return resourceVo;
 	}

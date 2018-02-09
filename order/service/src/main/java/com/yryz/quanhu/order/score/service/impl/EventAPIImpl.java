@@ -7,7 +7,6 @@
  */
 package com.yryz.quanhu.order.score.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -24,6 +23,8 @@ import com.yryz.quanhu.order.score.service.EventService;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
+
+import net.sf.json.JSONObject;
 
 /**
  * @author xiepeng
@@ -43,6 +44,8 @@ public class EventAPIImpl implements EventAPI {
     public void commit(EventInfo event) {
     	event.setEventId( IdGen.uuid() );
     	event.setCreateTime(  DateUtils.getDate("yyyy-MM-dd HH:mm:ss") );
+		JSONObject obj = JSONObject.fromObject(event);
+		logger.info("积分事件提交={}" + obj );
         eventService.processEvent(event);
     }
 
@@ -56,7 +59,8 @@ public class EventAPIImpl implements EventAPI {
 	    
 	@Override
 	public   Response<EventReportVo> getScoreFlowList(EventInfo log) {
-		logger.info("Response<EventReportVo> getScoreFlowList: " + log );
+		JSONObject obj = JSONObject.fromObject(log);
+		logger.info("积分统计查询={}",obj);
 	try {
 		EventReportVo list = eventService.getScoreFlowList(log);
 		return ResponseUtils.returnObjectSuccess(list);

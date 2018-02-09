@@ -423,8 +423,9 @@ public class CoterieProvider implements CoterieApi {
                     o.setUser(new User());
                 }
 				o.getUser().setHeadImg(cust.getUserImg());
-				o.getUser().setAuthStatus(cust.getAuthStatus().toString());
+				o.getUser().setAuthStatus(cust.getAuthStatus());
 				o.getUser().setNickName(cust.getUserNickName());
+				o.getUser().setUserRole(cust.getUserRole());
 			}
 		}
 	}
@@ -457,72 +458,74 @@ public class CoterieProvider implements CoterieApi {
 	 */
 	@Override
 	public Response<String> regroupQr(Long coterieId) {
-		String result = null;
-
-		if (null == coterieId) {
-			return ResponseUtils.returnCommonException("coterieId 不能为空");
-		}
-		CoterieInfo info=coterieService.find(coterieId);
-		if(info==null){
-			return ResponseUtils.returnCommonException("私圈（"+coterieId+"）不存在");
-		}
-		Set<String> set = new HashSet<String>();
-		set.add(info.getOwnerId());
-		Map<String,UserBaseInfoVO> cust=ResponseUtils.getResponseData(userApi.getUser(set));
-		UserBaseInfoVO user = cust.get(info.getOwnerId());
-		if(user==null){
-			return ResponseUtils.returnCommonException("用户（"+info.getOwnerId()+"）不存在");
-		}
-		try {
-			BufferedImage base = ImageUtils.createBaseImage(300, 400, Color.WHITE);
-
-			String frontend =coterieQrUrl+coterieId;
-			ByteArrayOutputStream frontendQrOS = new ByteArrayOutputStream();
-			ZxingHandler.encode2(frontend, 200, 200, frontendQrOS);
-			BufferedImage i1 = ImageIO.read(new ByteArrayInputStream(frontendQrOS.toByteArray()));
-			ImageUtils.overlapMiddleImage(base, i1);
-			if (StringUtils.isNotBlank(user.getUserImg())) {
-				try {
-					BufferedImage i2 = ImageUtils.loadImageUrl(user.getUserImg());
-					ImageUtils.overlapImage(base, ImageUtils.resize(i2, 45, 45), (base.getWidth() - 45) / 2, 280);
-				} catch (Exception e) {
-					logger.error("组装私圈二维码，添加用户头像异常", e);
-				}
-			}
-			ImageUtils.middleAddText(base, info.getName(), 100, 20);
-
-			ImageUtils.middleAddText(base, user.getUserNickName(), 350, 16);
-			//ImageUtils.writeImageLocal("F:/合成123.png", base);
-
-			// 转流
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(base, "png", os);
-			InputStream is = new ByteArrayInputStream(os.toByteArray());
-			// 文件上传至 oss服务器
-			/**UploadResultDetail uploadResult = UploadUtil.uploadImg(is, new File(info.getQrUrl()).getName(),
-			 AppRuntimeContext.getAppEnv().getAppName() + "/coterie", false);
-			 if (null != uploadResult && "success".equals(uploadResult.getMsg())) {
-			 result = uploadResult.getResouceUrl();
-			 log.debug("重组私圈二维码图片成功，地址：" + uploadResult.getMsg() + result);
-			 }*/
-
-			// 生成的文件输出为 base64
-			// in.available()返回文件的字节长度
-			byte[] bytes = new byte[is.available()];
-			// 将文件中的内容读入到数组中
-			try {
-				is.read(bytes);
-			} finally {
-				is.close();
-			}
-
-			// 将图片字节流数组转换为base64
-			result = "data:image/png;base64," + new String(Base64.encodeBase64(bytes));
-			//Base64Util.encodeToString(bytes);
-		} catch (Exception e) {
-			logger.error("组装私圈二维码图片异常！", e);
-			return ResponseUtils.returnCommonException("组装私圈二维码图片异常！");
-		}
+//		String result = null;
+//
+//		if (null == coterieId) {
+//			return ResponseUtils.returnCommonException("coterieId 不能为空");
+//		}
+//		CoterieInfo info=coterieService.find(coterieId);
+//		if(info==null){
+//			return ResponseUtils.returnCommonException("私圈（"+coterieId+"）不存在");
+//		}
+//		Set<String> set = new HashSet<String>();
+//		set.add(info.getOwnerId());
+//		Map<String,UserBaseInfoVO> cust=ResponseUtils.getResponseData(userApi.getUser(set));
+//		UserBaseInfoVO user = cust.get(info.getOwnerId());
+//		if(user==null){
+//			return ResponseUtils.returnCommonException("用户（"+info.getOwnerId()+"）不存在");
+//		}
+//		try {
+//			BufferedImage base = ImageUtils.createBaseImage(300, 400, Color.WHITE);
+//
+//			String frontend =coterieQrUrl+coterieId;
+//			ByteArrayOutputStream frontendQrOS = new ByteArrayOutputStream();
+//			ZxingHandler.encode2(frontend, 200, 200, frontendQrOS);
+//			BufferedImage i1 = ImageIO.read(new ByteArrayInputStream(frontendQrOS.toByteArray()));
+//			ImageUtils.overlapMiddleImage(base, i1);
+//			if (StringUtils.isNotBlank(user.getUserImg())) {
+//				try {
+//					BufferedImage i2 = ImageUtils.loadImageUrl(user.getUserImg());
+//					ImageUtils.overlapImage(base, ImageUtils.resize(i2, 45, 45), (base.getWidth() - 45) / 2, 280);
+//				} catch (Exception e) {
+//					logger.error("组装私圈二维码，添加用户头像异常", e);
+//				}
+//			}
+//			ImageUtils.middleAddText(base, info.getName(), 100, 20);
+//
+//			ImageUtils.middleAddText(base, user.getUserNickName(), 350, 16);
+//			//ImageUtils.writeImageLocal("F:/合成123.png", base);
+//
+//			// 转流
+//			ByteArrayOutputStream os = new ByteArrayOutputStream();
+//			ImageIO.write(base, "png", os);
+//			InputStream is = new ByteArrayInputStream(os.toByteArray());
+//			// 文件上传至 oss服务器
+//			/**UploadResultDetail uploadResult = UploadUtil.uploadImg(is, new File(info.getQrUrl()).getName(),
+//			 AppRuntimeContext.getAppEnv().getAppName() + "/coterie", false);
+//			 if (null != uploadResult && "success".equals(uploadResult.getMsg())) {
+//			 result = uploadResult.getResouceUrl();
+//			 log.debug("重组私圈二维码图片成功，地址：" + uploadResult.getMsg() + result);
+//			 }*/
+//
+//			// 生成的文件输出为 base64
+//			// in.available()返回文件的字节长度
+//			byte[] bytes = new byte[is.available()];
+//			// 将文件中的内容读入到数组中
+//			try {
+//				is.read(bytes);
+//			} finally {
+//				is.close();
+//			}
+//
+//			// 将图片字节流数组转换为base64
+//			result = "data:image/png;base64," + new String(Base64.encodeBase64(bytes));
+//			//Base64Util.encodeToString(bytes);
+//		} catch (Exception e) {
+//			logger.error("组装私圈二维码图片异常！", e);
+//			return ResponseUtils.returnCommonException("组装私圈二维码图片异常！");
+//		}
+		//直接返回 跳转地址
+		String result=coterieQrUrl+coterieId;
 		return ResponseUtils.returnObjectSuccess(result);
 	}
 
@@ -579,4 +582,41 @@ public class CoterieProvider implements CoterieApi {
 		}
 	}
 
+	@Override
+	public Response<Boolean> createCoteriePermission(Long userId) {
+		if (userId==null) {
+			return ResponseUtils.returnCommonException("参数错误");
+		}
+		Integer count=coterieService.findMyCreateCoterieCount(userId+"");
+		if(count>=10)
+		{
+			return ResponseUtils.returnCommonException("最多只能申请10个私圈");
+		}
+		UserSimpleVO cust=ResponseUtils.getResponseData(userApi.getUserSimple(Long.valueOf(userId)));
+		if(cust==null){
+			return ResponseUtils.returnCommonException("用户不存在");
+		}
+		EventInfo param=new EventInfo();
+		param.setUserId(userId+"");
+		EventReportVo vo=ResponseUtils.getResponseData(eventAPI.getScoreFlowList(param));
+		int level=1;
+		if(vo==null){
+			level=1;
+		}else{
+			level=Integer.valueOf(vo.getGrowLevel());
+		}
+		if(level<5){
+			String msg="等级达到LV5才能创建私圈";
+			return ResponseUtils.returnCommonException(msg);
+		}
+		
+		UserRelationCountDto countDto=ResponseUtils.getResponseData(userRelationApi.totalBy(userId+"", userId+""));
+		if(countDto!=null){
+			if(countDto.getFollowCount()<20){
+				String msg="关注人数需达到20人才能创建私圈";
+				return ResponseUtils.returnCommonException(msg);
+			}
+		}
+		return ResponseUtils.returnObjectSuccess(true);
+	}
 }

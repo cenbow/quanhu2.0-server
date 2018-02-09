@@ -138,4 +138,11 @@ public interface CoterieApi {
 	 * @return
 	 */
 	Response<List<Coterie>> getByKids(List<Long> kidList);
+	
+	/**
+	 * 检查能否创建私圈
+	 * @param userId
+	 * @return
+	 */
+	Response<Boolean> createCoteriePermission(Long userId);
 }

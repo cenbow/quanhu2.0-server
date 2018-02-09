@@ -46,4 +46,11 @@ public interface LikeApi {
      */
     Response<Long> getLikeFlag(Map<String,Object> map);
 
+    /**
+     * 批量获取点赞状态
+     * @param userId
+     * @return
+     */
+    Response<Map<String,Integer>> getLikeFlagBatch(List<Long> resourceIds, long userId);
+
 }

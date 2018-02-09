@@ -34,7 +34,7 @@ public class ActivitySignUpProvider implements ActivitySignUpApi {
         try {
             activitySignUpHomeAppVo = activitySignUpService.getActivitySignUpHome(activityInfoId, custId);
         } catch (Exception e) {
-            logger.error("查询获取报名活动首页信息失败");
+            logger.error("查询获取报名活动首页信息失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(activitySignUpHomeAppVo);
@@ -53,7 +53,7 @@ public class ActivitySignUpProvider implements ActivitySignUpApi {
         try {
             activityEnrolConfig = activitySignUpService.getActivitySignUpFrom(activityInfoId, custId);
         } catch (Exception e) {
-            logger.error("查询活动id:"+activityInfoId+"配置信息失败");
+            logger.error("查询活动配置信息失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(activityEnrolConfig);
@@ -71,7 +71,7 @@ public class ActivitySignUpProvider implements ActivitySignUpApi {
         try {
             activityRecord = activitySignUpService.activitySignUpSubmit(activityRecord, custId);
         } catch (Exception e) {
-            logger.error("提交报名信息失败,用户id:"+custId+",activityRecord:"+activityRecord);
+            logger.error("提交报名信息失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(activityRecord);
@@ -89,7 +89,7 @@ public class ActivitySignUpProvider implements ActivitySignUpApi {
         try {
             map.put("activitySignUpStatus",activitySignUpService.getEnrolStatusByCustId(custId,activityInfoId,null));
         } catch (Exception e) {
-            logger.error("查询报名状态失败,活动Id:"+activityInfoId+",用户id:"+custId);
+            logger.error("查询报名状态失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(map);

@@ -127,6 +127,11 @@ public class CommentProvider implements CommentApi {
             int count = commentService.delComment(comment);
             if (count > 0) {
                 map.put("result", 1);
+                try {
+                    countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "",-1L);
+                } catch (Exception e) {
+                    logger.info("进入统计系统失败" + e);
+                }
                 if (comment.getTopId() == 0) {
                     this.delBatch(comment);
                 }
@@ -246,9 +251,11 @@ public class CommentProvider implements CommentApi {
             commenFront.setTopId(commentStr.getKid());
             commenFront.setResourceId(commentStr.getResourceId());
             commenFront.setModuleEnum(commentStr.getModuleEnum());
+            commenFront.setCheckType(1L);
             List<CommentVO> commentVOS = commentService.queryComments(commenFront).getEntities();
-            List<Comment> commentsBatch = new ArrayList<Comment>();
+            List<Comment> commentsBatch = null;
             if (null != commentVOS && commentVOS.size() > 0) {
+                commentsBatch = new ArrayList<Comment>();
                 for (CommentVO commentVO : commentVOS) {
                     Comment commentSingle = new Comment();
                     commentSingle.setKid(commentVO.getKid());
@@ -297,6 +304,11 @@ public class CommentProvider implements CommentApi {
                     logger.info("批量删除评论失败" + e);
                 }
             }
+
+
+
+
+
         }
     }
 

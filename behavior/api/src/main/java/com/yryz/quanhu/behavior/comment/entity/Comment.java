@@ -265,4 +265,29 @@ public class Comment extends GenericEntity {
     public void setLikeFlag(byte likeFlag) {
         this.likeFlag = likeFlag;
     }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "topId=" + topId +
+                ", parentId=" + parentId +
+                ", parentUserId=" + parentUserId +
+                ", moduleEnum='" + moduleEnum + '\'' +
+                ", coterieId=" + coterieId +
+                ", resourceId=" + resourceId +
+                ", targetUserId=" + targetUserId +
+                ", contentComment='" + contentComment + '\'' +
+                ", shelveFlag=" + shelveFlag +
+                ", delFlag=" + delFlag +
+                ", recommend=" + recommend +
+                ", tenantId='" + tenantId + '\'' +
+                ", revision=" + revision +
+                ", nickName='" + nickName + '\'' +
+                ", userImg='" + userImg + '\'' +
+                ", likeCount=" + likeCount +
+                ", likeFlag=" + likeFlag +
+                ", targetUserNickName='" + targetUserNickName + '\'' +
+                ", kids='" + kids + '\'' +
+                '}';
+    }
 }
