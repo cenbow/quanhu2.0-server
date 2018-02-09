@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author:sun
@@ -129,6 +130,7 @@ public class LikeProvider implements LikeApi {
                     }
                     try {
                         redisTemplate.opsForValue().set("LIKE:" + like.getResourceId() + "_" + like.getUserId(), 11L);
+                        redisTemplate.expire("LIKE:" + like.getResourceId() + "_" + like.getUserId(),24, TimeUnit.HOURS);
                     } catch (Exception e) {
                         logger.info("同步点赞数据到redis出现异常:" + e);
                     }
