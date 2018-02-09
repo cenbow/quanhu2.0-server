@@ -252,6 +252,7 @@ public class CommentServiceImpl implements CommentService {
         List<CommentVO> commentVOS_ = new ArrayList<CommentVO>();//null
         List<Comment> commentsnew = null;
         for (CommentVO commentVO : commentVOS) {
+            logger.debug("foreach commentList :"+commentVO.toString());
             CommentFrontDTO commentFrontDTOnew = new CommentFrontDTO();
             commentFrontDTOnew.setTopId(commentVO.getKid());
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
@@ -376,6 +377,7 @@ public class CommentServiceImpl implements CommentService {
             pageList.setEntities(commentVOS.subList(fromIndex, toIndex));
         } else {
             logger.info("走原始分页");
+            logger.debug("commentList final value:"+commentVOS.toString());
             pageList.setEntities(commentVOS);
         }
         return pageList;

@@ -37,4 +37,12 @@ public class CommentVO extends Comment {
     public void setChildrenComments(List<Comment> childrenComments) {
         this.childrenComments = childrenComments;
     }
+
+    @Override
+    public String toString() {
+        return "CommentVO{" +
+                "commentCount=" + commentCount +
+                ", childrenComments=" + childrenComments +
+                '}';
+    }
 }
