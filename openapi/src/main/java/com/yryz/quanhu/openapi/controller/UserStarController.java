@@ -157,6 +157,7 @@ public class UserStarController {
     @GetMapping(value = "/{version}/star/label/list")
     public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
+        logger.info("star label list request");
         /*StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 
@@ -176,6 +177,7 @@ public class UserStarController {
 
         PageList<StarInfoVO> pageList = ResponseUtils.getResponseData(elasticsearchService.searchStarUser(starInfoDTO));
 //        logger.info("labelStarList result: {}", GsonUtils.parseJson(pageList.));
+        logger.info("star label list success");
         return ResponseUtils.returnApiObjectSuccess(pageList);
     }
 
