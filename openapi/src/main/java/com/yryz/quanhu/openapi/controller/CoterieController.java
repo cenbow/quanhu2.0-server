@@ -286,4 +286,23 @@ public class CoterieController {
     	}
         return coterieApi.regroupQr(coterieId);
     }
+    
+    /**
+     * 是否能创建私圈
+     *
+     * @param
+     * @return
+     */
+    @ApiOperation("是否能创建私圈")
+    @GetMapping(value = "/{version}/coterieInfo/createPermission")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+        @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+	@UserBehaviorValidation(event = "是否能创建私圈", login = true)
+    public Response<Boolean> createPermission(@RequestHeader Long userId, HttpServletRequest request) {
+    	if(userId==null){
+    		return ResponseUtils.returnCommonException("参数错误");
+    	}
+        return coterieApi.createCoteriePermission(userId);
+    }
 }

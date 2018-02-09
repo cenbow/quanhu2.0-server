@@ -246,9 +246,11 @@ public class CommentProvider implements CommentApi {
             commenFront.setTopId(commentStr.getKid());
             commenFront.setResourceId(commentStr.getResourceId());
             commenFront.setModuleEnum(commentStr.getModuleEnum());
+            commenFront.setCheckType(1L);
             List<CommentVO> commentVOS = commentService.queryComments(commenFront).getEntities();
-            List<Comment> commentsBatch = new ArrayList<Comment>();
+            List<Comment> commentsBatch = null;
             if (null != commentVOS && commentVOS.size() > 0) {
+                commentsBatch = new ArrayList<Comment>();
                 for (CommentVO commentVO : commentVOS) {
                     Comment commentSingle = new Comment();
                     commentSingle.setKid(commentVO.getKid());
@@ -297,6 +299,11 @@ public class CommentProvider implements CommentApi {
                     logger.info("批量删除评论失败" + e);
                 }
             }
+
+
+
+
+
         }
     }
 

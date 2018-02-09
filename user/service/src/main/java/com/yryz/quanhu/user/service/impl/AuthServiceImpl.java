@@ -158,7 +158,7 @@ public class AuthServiceImpl implements AuthService {
 		tokenVO = redisDao.getToken(refreshDTO);
 		
 		//旧的token信息，token刷新时放入临时队列容错
-		String oldToken = tokenVO.getToken();
+		String oldToken = tokenVO == null ? null : tokenVO.getToken();
 		
 		logger.info("[getToken_begin]:refreshDTO:{},tokenVO:{}", JsonUtils.toFastJson(refreshDTO),
 				JsonUtils.toFastJson(tokenVO));
@@ -259,6 +259,9 @@ public class AuthServiceImpl implements AuthService {
 	 * @param expireTime
 	 */
 	private void pushOldTokenToTemp(AuthRefreshDTO refreshDTO,String token,Integer expireTime){
+		if(StringUtils.isBlank(token)){
+			return;
+		}
 		refreshDTO.setToken(token);
 		try {
 			redisDao.pushOldToken(refreshDTO, expireTime);
