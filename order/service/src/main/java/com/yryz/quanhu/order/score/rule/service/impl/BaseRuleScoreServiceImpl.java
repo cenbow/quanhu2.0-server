@@ -6,12 +6,15 @@ import java.util.GregorianCalendar;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.quanhu.order.score.consumer.ScoreEventConsumer;
 import com.yryz.quanhu.order.score.rule.service.RuleScoreService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
@@ -28,6 +31,9 @@ import com.yryz.quanhu.score.vo.EventAcount;
 @Transactional
 @Service
 public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(BaseRuleScoreServiceImpl.class);
 
 	@Autowired
 	ScoreFlowService scoreFlowService;
@@ -104,8 +110,11 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 			ea.setUpdateTime(now);
 			eventAcountService.save(ea);
 		} else {
+			logger.info("-------处理积分运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
+			logger.info("-------处理积分运算事件，每次触发传入数据：newScore" + newScore);
+			logger.info("-------处理积分运算事件，每次触发传入数据：allScore" + allScore);
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
-			allScore = ea.getScore() + newScore;
+			allScore = Math.abs(ea.getScore() + newScore);
 			//ea.setScore(Math.abs(newScore + 0L));
 			ea.setScore(allScore);
 			ea.setUpdateTime(now);
