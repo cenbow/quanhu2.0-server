@@ -2,6 +2,7 @@ package com.yryz.quanhu.user.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.im.api.ImAPI;
@@ -59,13 +60,13 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
              * 自己不允许对自己设置备注
              */
             if(sourceUserId.equalsIgnoreCase(targetUserId)){
-                throw new QuanhuException("","您不能对自己设置备注名","您不能对自己设置备注名");
+                throw new QuanhuException(ExceptionEnum.USER_REMARK_TO_SELF_ERROR);
             }
 
             //查询是否有关注关系
             UserRelationDto dto = userRelationDao.selectUser(UserRelationDto.class,sourceUserId,targetUserId);
             if(dto==null||dto.getRelationStatus()!=FRIEND.getCode()){
-                throw new QuanhuException("","您和目标用户暂不是好友关系","您和目标用户暂不是好友关系");
+                throw new QuanhuException(ExceptionEnum.USER_NOT_FRIEND_ERROR);
             }
 
             /**
@@ -101,7 +102,7 @@ public class UserRelationRemarkServiceImpl implements UserRelationRemarkService{
                 logger.info("im friend remark={} start", JSON.toJSON(imFriend));
                 imAPI.addFriend(imFriend);
             }catch (Exception e){
-                throw new QuanhuException("","设置好友备注名失败","设置好友备注名失败",e);
+                throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"设置好友备注名失败",ExceptionEnum.BusiException.getErrorMsg(),e);
             }finally {
                 logger.info("im friend remark={} finish", JSON.toJSON(imFriend));
             }

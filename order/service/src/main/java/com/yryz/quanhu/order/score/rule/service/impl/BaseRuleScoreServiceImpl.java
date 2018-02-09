@@ -106,7 +106,8 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		} else {
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
 			allScore = ea.getScore() + newScore;
-			ea.setScore(Math.abs(newScore + 0L));
+			//ea.setScore(Math.abs(newScore + 0L));
+			ea.setScore(allScore);
 			ea.setUpdateTime(now);
 			ea.setGrow(null);
 			ea.setGrowLevel(null);
