@@ -70,7 +70,7 @@ public class BehaviorController {
     @PostMapping(value = "/services/app/{version}/behavior/preverify")
 
     @UserBehaviorValidation(validClass = UnifyParameterValidHandler.class)
-    @UserBehaviorArgs(contexts = {"map.login","map.mute","map.blacklist","map.isCoterieMember","map.isCoterieMute"},
+    @UserBehaviorArgs(contexts = {"map.login","map.mute","map.blacklist","map.coterieMember","map.coterieMute"},
             sourceUserId = "map.sourceUserId",coterieId = "map.coterieId")
     public Response<Boolean> behaviorPreVerify(HttpServletRequest request, @RequestBody Map<String,Object> map){
         /**
