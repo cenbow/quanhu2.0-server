@@ -68,7 +68,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
          */
         String content = topicDto.getContent();
         String title = topicDto.getTitle();
-        if (StringUtils.isBlank(content) || StringUtils.isBlank(title)) {
+        if (StringUtils.isBlank(title)) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
         Topic topic = new Topic();
