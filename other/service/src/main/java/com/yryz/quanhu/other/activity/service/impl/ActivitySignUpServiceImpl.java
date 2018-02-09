@@ -231,7 +231,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 if (stats != ActivityConstant.ACTIVITY_ENROL_STATUS_TAKE_JOIN) {
                     throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "已支付完成，请勿重复报名!", "已支付完成，请勿重复报名!");
                 }
-                //TODO 数据提交至订单模块
+                //数据提交至订单模块
                 // 创建订单
                 String orderNo = null;
                 try {
@@ -244,7 +244,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
                 return activityRecord;
             case 12:
                 int flag = 0;
-                // TODO 支付积分
+                //支付积分
                 try {
                     Assert.notNull(activityEnrolConfig.getAmount(), "积分支付失败！");
                     flag = scoreAPI.consumeScore(custId, activityEnrolConfig.getAmount().intValue(), EventEnum.CONSUME_SCORE.getCode());

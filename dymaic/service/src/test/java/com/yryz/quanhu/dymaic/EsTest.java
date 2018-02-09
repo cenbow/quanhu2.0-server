@@ -24,10 +24,10 @@ public class EsTest {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-//    @Test
+    @Test
     public void searchStarUserTest() {
         StarInfoDTO starInfoDTO = new StarInfoDTO();
-        starInfoDTO.setTagId(12L);
+        starInfoDTO.setTagId(14L);
         starInfoDTO.setCurrentPage(1);
         starInfoDTO.setPageSize(200);
         Response<PageList<StarInfoVO>> pageListResponse = elasticsearchService.searchStarUser(starInfoDTO);
@@ -51,7 +51,7 @@ public class EsTest {
 //        dto.setNickName("q");
 //        dto.setAuditStatus((byte) 11);
 //        dto.setGrowLevel("5");
-        dto.setNickName("bt00");
+        dto.setNickName("呵");
         Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
         System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }

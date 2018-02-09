@@ -24,7 +24,7 @@ public class CategoryAdminVo implements Serializable {
     /**
      * 下属达人数
      */
-    private Integer starNum;
+    private Long starNum;
 
     private Long createUserId;
     /**
@@ -132,11 +132,11 @@ public class CategoryAdminVo implements Serializable {
         this.subordinateNum = subordinateNum;
     }
 
-    public Integer getStarNum() {
+    public Long getStarNum() {
         return starNum;
     }
 
-    public void setStarNum(Integer starNum) {
+    public void setStarNum(Long starNum) {
         this.starNum = starNum;
     }
 

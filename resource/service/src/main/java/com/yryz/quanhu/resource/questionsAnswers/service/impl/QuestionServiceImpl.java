@@ -69,7 +69,6 @@ public class QuestionServiceImpl implements QuestionService {
     private static final Integer CONTENT_SPLIT_LENGTH = 100;
 
 
-
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
@@ -132,12 +131,11 @@ public class QuestionServiceImpl implements QuestionService {
          *校验私圈是否合法
          */
         if (targetId.equals(String.valueOf(createUserId))) {
-            throw QuanhuException.busiError("","不能向自己提问。","不能向自己提问。");
+            throw QuanhuException.busiError("", "不能向自己提问。", "不能向自己提问。");
         }
         CoterieInfo coterieInfo = apIservice.getCoterieinfo(citeriaId);
-        if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || COTERIE_STATUS_UP.compareTo(coterieInfo.getStatus()) != 0)
-        {
-            throw QuanhuException.busiError("","提问的私圈不存在。","提问的私圈不存在。");
+        if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || COTERIE_STATUS_UP.compareTo(coterieInfo.getStatus()) != 0) {
+            throw QuanhuException.busiError("", "提问的私圈不存在。", "提问的私圈不存在。");
         }
         Integer consultingFee = coterieInfo.getConsultingFee() == null ? 0 : coterieInfo.getConsultingFee();
         //保存提问费用
@@ -145,20 +143,20 @@ public class QuestionServiceImpl implements QuestionService {
 
         //圈主10 成员20 路人未审请30 路人待审核40
         if (!checkIdentity(createUserId, Long.valueOf(citeriaId), MemberConstant.Permission.MEMBER)) {
-            throw QuanhuException.busiError("","您还不是该私圈成员，请先加入私圈","您还不是该私圈成员，请先加入私圈");
+            throw QuanhuException.busiError("", "您还不是该私圈成员，请先加入私圈", "您还不是该私圈成员，请先加入私圈");
         }
 
         if (!checkIdentity(Long.valueOf(targetId), Long.valueOf(citeriaId), MemberConstant.Permission.OWNER)) {
-            throw QuanhuException.busiError("","不能向非圈主用户提问.","不能向非圈主用户提问.");
+            throw QuanhuException.busiError("", "不能向非圈主用户提问.", "不能向非圈主用户提问.");
         }
 
         if (StringUtils.isBlank(content) || content.length() > CONTENT_LENGTH_MAX || content.length() < CONTENT_LENGTH_MIN) {
-            throw QuanhuException.busiError("","提问正文只能输入文字,10到300字.","提问正文只能输入文字,10到300字.");
+            throw QuanhuException.busiError("", "提问正文只能输入文字,10到300字.", "提问正文只能输入文字,10到300字.");
         }
         if (consultingFee > 0) {
             UserAccount userAccount = orderSDK.getUserAccount(createUserId);
             if (userAccount == null) {
-                throw QuanhuException.busiError("","提问者没有账户信息.","提问者没有账户信息.");
+                throw QuanhuException.busiError("", "提问者没有账户信息.", "提问者没有账户信息.");
             }
             Long accountSum = userAccount.getAccountSum() == null ? 0L : userAccount.getAccountSum();
             if (consultingFee > accountSum) {
@@ -235,9 +233,9 @@ public class QuestionServiceImpl implements QuestionService {
             BeanUtils.copyProperties(questionQuery, vo);
             resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
         }
-        if(QuestionAnswerConstants.showType.ONESELF.compareTo(questionQuery.getIsOnlyShowMe())==0){
+        if (QuestionAnswerConstants.showType.ONESELF.compareTo(questionQuery.getIsOnlyShowMe()) == 0) {
             resourceTotal.setIntimate(ResourceEnum.INTIMATE_TRUE);
-        }else{
+        } else {
             resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
         }
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
@@ -270,44 +268,51 @@ public class QuestionServiceImpl implements QuestionService {
          */
         Question questionBySearch = this.questionDao.selectByPrimaryKey(kid);
         if (null == questionBySearch) {
-            throw QuanhuException.busiError("","删除的问题不存在","删除的问题不存在");
+            throw QuanhuException.busiError("", "删除的问题不存在", "删除的问题不存在");
         }
         if (userId.compareTo(questionBySearch.getCreateUserId()) != 0) {
-            throw QuanhuException.busiError("","非本人不能删除问题","非本人不能删除问题");
+            throw QuanhuException.busiError("", "非本人不能删除问题", "非本人不能删除问题");
         }
 
         questionBySearch.setDelFlag(CommonConstants.DELETE_YES);
 
+        //问题进行标记删除
+        int result = this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+
         /**
          * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
          */
-        if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag())==0
-                && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionBySearch.getAnswerdFlag())==0) {
-            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
-            if (null != orderId) {
-                questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
-                questionBySearch.setRefundOrderId(String.valueOf(orderId));
+        if (result > 0) {
+            if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag()) == 0
+                    && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionBySearch.getAnswerdFlag()) == 0) {
+                Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
+                if (null != orderId) {
+                    questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
+                    questionBySearch.setRefundOrderId(String.valueOf(orderId));
 
-                //发送通知消息
-                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-                messageBusinessVo.setAmount(questionBySearch.getChargeAmount());
-                messageBusinessVo.setCoterieId(String.valueOf(questionBySearch.getCoterieId()));
-                messageBusinessVo.setIsAnonymity(questionBySearch.getIsAnonymity());
-                messageBusinessVo.setKid(questionBySearch.getKid());
-                messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-                messageBusinessVo.setFromUserId(questionBySearch.getCreateUserId());
-                messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
-                messageBusinessVo.setTitle(questionBySearch.getContent());
-                messageBusinessVo.setImgUrl("");
-                Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE, true);
-                if (!sendResult) {
-                    logger.info("提问被删除，发送消息失败");
+                    //发送通知消息
+                    MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+                    messageBusinessVo.setAmount(questionBySearch.getChargeAmount());
+                    messageBusinessVo.setCoterieId(String.valueOf(questionBySearch.getCoterieId()));
+                    messageBusinessVo.setIsAnonymity(questionBySearch.getIsAnonymity());
+                    messageBusinessVo.setKid(questionBySearch.getKid());
+                    messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
+                    messageBusinessVo.setFromUserId(questionBySearch.getCreateUserId());
+                    messageBusinessVo.setTosendUserId(questionBySearch.getCreateUserId());
+                    messageBusinessVo.setTitle(questionBySearch.getContent());
+                    messageBusinessVo.setImgUrl("");
+                    Boolean sendResult = questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_DELETE, true);
+                    if (!sendResult) {
+                        logger.info("提问被删除，发送消息失败");
+                    }
+                } else {
+                    questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
                 }
-            } else {
-                questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
+
+               result= this.questionDao.updateByPrimaryKeySelective(questionBySearch);
             }
         }
-        return  this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+        return result;
     }
 
 
@@ -344,7 +349,7 @@ public class QuestionServiceImpl implements QuestionService {
         Long createUserId = questionBysearch.getCreateUserId();
         Long targetId = Long.valueOf(questionBysearch.getTargetId());
         if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
-            if (createUserId.compareTo(userId) != 0 && targetId.compareTo(userId)!=0) {
+            if (createUserId.compareTo(userId) != 0 && targetId.compareTo(userId) != 0) {
                 throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREAD);
             }
         }
@@ -396,15 +401,15 @@ public class QuestionServiceImpl implements QuestionService {
 
         Question question = this.queryAvailableQuestionByKid(kid);
         if (null == question) {
-            throw QuanhuException.busiError("","圈主拒接回答的问题不存在","圈主拒接回答的问题不存在");
+            throw QuanhuException.busiError("", "圈主拒接回答的问题不存在", "圈主拒接回答的问题不存在");
         }
 
         if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) != 0) {
-            throw QuanhuException.busiError("","该问题未付费成功，无法拒绝","该问题未付费成功，无法拒绝");
+            throw QuanhuException.busiError("", "该问题未付费成功，无法拒绝", "该问题未付费成功，无法拒绝");
         }
 
-        if (QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(question.getAnswerdFlag())!=0) {
-            throw QuanhuException.busiError("","问题在未回答状态，才能操作拒绝。","问题在未回答状态，才能操作拒绝。");
+        if (QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(question.getAnswerdFlag()) != 0) {
+            throw QuanhuException.busiError("", "问题在未回答状态，才能操作拒绝。", "问题在未回答状态，才能操作拒绝。");
         }
 
         String targetId = question.getTargetId();
@@ -413,36 +418,44 @@ public class QuestionServiceImpl implements QuestionService {
         }
         question.setAnswerdFlag(QuestionAnswerConstants.AnswerdFlag.REJECT_ANSWERED);
 
-        /**
-         * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
-         */
-        if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) == 0) {
-            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
-            if (null != orderId) {
-                question.setRefundOrderId(String.valueOf(orderId));
-                question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
-            } else {
-                question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
-            }
-        }
-
 
         int result = this.questionDao.updateByPrimaryKeySelective(question);
 
-        /**
-         * 发送消息
-         */
-        if(result>0) {
+
+        if (result > 0) {
             MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-            messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
-            messageBusinessVo.setIsAnonymity(null);
-            messageBusinessVo.setKid(question.getKid());
-            messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-            messageBusinessVo.setFromUserId(question.getCreateUserId());
-            messageBusinessVo.setTitle(question.getContent());
-            messageBusinessVo.setTosendUserId(question.getCreateUserId());
-            messageBusinessVo.setAmount(question.getChargeAmount());
-            questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_REJECT, false);
+            /**
+             * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
+             */
+            if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) == 0) {
+                Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
+                if (null != orderId) {
+                    question.setRefundOrderId(String.valueOf(orderId));
+                    question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
+
+                    /**
+                     * 退款消息
+                     */
+                    messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+                    messageBusinessVo.setIsAnonymity(null);
+                    messageBusinessVo.setKid(question.getKid());
+                    messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
+                    messageBusinessVo.setFromUserId(question.getCreateUserId());
+                    messageBusinessVo.setTitle(question.getContent());
+                    messageBusinessVo.setTosendUserId(question.getCreateUserId());
+                    messageBusinessVo.setAmount(question.getChargeAmount());
+                    questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_REJECT_REFUND, true);
+                } else {
+                    question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
+                }
+                //更新退款状态
+                result = this.questionDao.updateByPrimaryKeySelective(question);
+            }
+
+            /**
+             * 发送消息
+             */
+            questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_TO_BE_REJECT, true);
         }
         return result;
     }
@@ -490,11 +503,11 @@ public class QuestionServiceImpl implements QuestionService {
             example.setOrderByClause("create_date desc");
         }
 
-        return this.queryListByQuestionExample(example,currentPage,pageSize);
+        return this.queryListByQuestionExample(example, currentPage, pageSize);
     }
 
 
-    private PageList<QuestionAnswerVo>  queryListByQuestionExample(QuestionExample example,Integer currentPage,Integer pageSize){
+    private PageList<QuestionAnswerVo> queryListByQuestionExample(QuestionExample example, Integer currentPage, Integer pageSize) {
         List<Question> list = this.questionDao.selectByExampleWithBLOBs(example);
         List<QuestionAnswerVo> questionAnswerVos = new ArrayList<>();
         for (Question question : list) {
@@ -517,9 +530,9 @@ public class QuestionServiceImpl implements QuestionService {
                 questionVo.setStatistics(count);
             }
 
-            String questionContent=questionVo.getContent();
-            if(questionContent.length()>CONTENT_SPLIT_LENGTH){
-                String subQuestionContetn=questionContent.substring(0,CONTENT_SPLIT_LENGTH-1);
+            String questionContent = questionVo.getContent();
+            if (questionContent.length() > CONTENT_SPLIT_LENGTH) {
+                String subQuestionContetn = questionContent.substring(0, CONTENT_SPLIT_LENGTH - 1);
                 questionVo.setContent(subQuestionContetn);
             }
 
@@ -529,10 +542,10 @@ public class QuestionServiceImpl implements QuestionService {
             if (QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag()) == 0) {
                 AnswerVo answerVo =
                         this.answerService.queryAnswerVoByquestionId(question.getKid());
-                if(null!=answerVo && answerVo.getContent()!=null){
-                    String content=answerVo.getContent();
-                    if(content.length()>CONTENT_SPLIT_LENGTH){
-                        answerVo.setContent(content.substring(0,CONTENT_SPLIT_LENGTH-1));
+                if (null != answerVo && answerVo.getContent() != null) {
+                    String content = answerVo.getContent();
+                    if (content.length() > CONTENT_SPLIT_LENGTH) {
+                        answerVo.setContent(content.substring(0, CONTENT_SPLIT_LENGTH - 1));
                     }
                 }
                 questionAnswerVo.setAnswer(answerVo);

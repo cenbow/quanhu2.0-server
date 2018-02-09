@@ -180,12 +180,9 @@ public class TopicPostServiceImpl implements TopicPostService {
 
         TopicPostExample example=new TopicPostExample();
         TopicPostExample.Criteria criteria=example.createCriteria();
-       // criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-       // criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andKidEqualTo(kid);
         List<TopicPostWithBLOBs> topicPostWithBLOBsList = this.topicPostDao.selectByExampleWithBLOBs(example);
         if (null == topicPostWithBLOBsList || topicPostWithBLOBsList.isEmpty()) {
-            //throw QuanhuException.busiError("查询的帖子不存在");
             return null;
         }
         TopicPostWithBLOBs topicPostWithBLOBs=topicPostWithBLOBsList.get(0);
@@ -291,19 +288,6 @@ public class TopicPostServiceImpl implements TopicPostService {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
         }
         topicPost.setDelFlag(CommonConstants.DELETE_YES);
-
-        /**
-         * 发送消息
-        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
-        messageBusinessVo.setImgUrl(topicPost.getImgUrl());
-        messageBusinessVo.setTitle(topicPost.getContent());
-        messageBusinessVo.setTosendUserId(topicPost.getCreateUserId());
-        messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
-        messageBusinessVo.setKid(topicPost.getKid());
-        messageBusinessVo.setIsAnonymity(null);
-        messageBusinessVo.setCoterieId(null);
-        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST,true);
-         */
         return this.topicPostDao.updateByPrimaryKey(topicPost);
     }
 

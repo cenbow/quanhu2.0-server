@@ -23,8 +23,11 @@ public class CoterieInfo implements Serializable{
 	@ApiModelProperty("用户图标")
     private String custIcon;
     
+	@ApiModelProperty("电话")
+    private String phone;
+
 	@ApiModelProperty("姓名")
-    private String ownerName;
+	private String ownerName;
 
 	@ApiModelProperty("个人简介")
     private String ownerIntro;
@@ -55,7 +58,7 @@ public class CoterieInfo implements Serializable{
 	
 	@ApiModelProperty("审批时间")
 	private Date processTime;
-	
+
 	@ApiModelProperty("热度值")
 	private Long heat;
 	
@@ -322,6 +325,13 @@ public class CoterieInfo implements Serializable{
 	public void setMaxMemberNum(Integer maxMemberNum) {
 		this.maxMemberNum = maxMemberNum;
 	}
-	
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 }
 

@@ -34,7 +34,7 @@ public class CoterieMemberTest {
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
-    private static Long coterieId = 233665981858L;
+    private static Long coterieId = 367337454723072L;
 
     @Test
     public void test010_Join() {

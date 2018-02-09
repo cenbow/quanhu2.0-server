@@ -66,7 +66,6 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     /**
      * 查询帖子详情
-     *
      * @param kid
      * @param userId
      * @return
@@ -104,7 +103,6 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     /**
      * 帖子列表查询
-     *
      * @param dto
      * @return
      */

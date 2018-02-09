@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.pagehelper.Page;
+import com.yryz.common.context.Context;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -25,7 +24,7 @@ public interface UserApi {
 	 * @return
 	 */
 	static String userInfoKey(Long userId){
-		return String.format("%s.%s", RedisConstants.USER_INFO,userId);
+		return String.format("%s:%s", Context.getProperty("user.baseinfo"),userId);
 	}
 	/**
 	 * 用户手机号缓存key
@@ -34,7 +33,7 @@ public interface UserApi {
 	 * @return
 	 */
 	static String userPhoneKey(String phone,String appId){
-		return String.format("%s.%s.%s", RedisConstants.USER_PHONE_INFO,phone,appId);
+		return String.format("%s:%s:%s", Context.getProperty("user.phone.userId"),phone,appId);
 	}
 	/**
 	 * 查询用户简要信息

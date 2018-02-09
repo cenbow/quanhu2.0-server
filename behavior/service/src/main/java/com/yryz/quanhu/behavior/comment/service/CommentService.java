@@ -20,7 +20,7 @@ import java.util.List;
  */
 public interface CommentService {
 
-    int accretion(Comment comment);
+    Comment accretion(Comment comment);
 
     Comment querySingleComment(Comment comment);
 

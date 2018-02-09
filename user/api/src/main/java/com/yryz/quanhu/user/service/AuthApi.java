@@ -8,8 +8,8 @@
 package com.yryz.quanhu.user.service;
 
 import com.yryz.common.constant.DevType;
+import com.yryz.common.context.Context;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.AuthTokenDTO;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
@@ -29,18 +29,29 @@ public interface AuthApi {
 	 * @return
 	 */
 	static String cacheKey(Long userId, String appId, DevType devType){
-		return String.format("%s.%s.%s.%s", RedisConstants.AUTH_TOKEN,userId.toString(),appId,devType.getLabel());
+		return String.format("%s:%s:%s:%s", Context.getProperty("user.auth.token"),userId.toString(),appId,devType.getLabel());
 	};
 	/**
-	 * refreshToken刷新标志位，在token有效期内只允许刷新一次
+	 * refreshToken刷新标志位，在token有效期内允许刷新的限制
 	 * @param userId
 	 * @param appId
 	 * @param devType
 	 * @return
 	 */
 	static String refreshFlagKey(Long userId,String appId,DevType devType){
-		return String.format("%s.%s.%s.%s", RedisConstants.AUTH_REFRESH_FLAG,userId.toString(),appId,devType.getLabel());
+		return String.format("%s:%s:%s:%s", Context.getProperty("user.auth.refresh.flag"),userId.toString(),appId,devType.getLabel());
 	}
+	/**
+	 * 旧token临时队列缓存key
+	 * @param userId 用户id
+	 * @param appId 应用id
+	 * @param devType 客户端设备类型
+	 * @return
+	 */
+	static String cacheTempKey(Long userId, String appId, DevType devType){
+		return String.format("%s:%s:%s:%s",Context.getProperty("user.auth.temp.old.token"),userId.toString(),appId,devType.getLabel());
+	};
+	
 	/**
 	 * 检查web端token
 	 * @param tokenDTO
