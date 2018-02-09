@@ -275,7 +275,7 @@ public class CoterieController {
      * @param
      * @return
      */
-    @ApiOperation("获取私圈二维码base64 ")
+    @ApiOperation("获取私圈二维码扫描后的跳转url ")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/{version}/coterieInfo/qr")
     public Response<String> getQrurl(Long coterieId, HttpServletRequest request) {
