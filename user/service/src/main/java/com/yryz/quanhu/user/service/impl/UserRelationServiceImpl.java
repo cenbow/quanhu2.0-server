@@ -383,20 +383,12 @@ public class UserRelationServiceImpl implements UserRelationService{
             _dto.setUserName(info.getUserNickName());
             _dto.setUserHeadImg(info.getUserImg());
             _dto.setUserSummary(info.getUserSignature());
+            _dto.setUserStarFlag(info.getUserRole());
         }else{
             _dto=null;      //用户集合查询不到，则不返回
         }
     }
 
-    private void mergeUserStar(List<UserStarAuth> list,UserRelationDto _dto){
-        for(int i = 0 ; i < list.size() ;i++){
-            UserStarAuth auth = list.get(i);
-            if(String.valueOf(auth.getUserId()).equalsIgnoreCase(_dto.getTargetUserId())){
-                _dto.setUserStarFlag(auth.getAuditStatus());
-                break;
-            }
-        }
-    }
     private void mergeUserRemark(List<UserRelationRemarkDto> list,UserRelationDto _dto){
         for (int i = 0 ; i < list.size() ; i++){
             UserRelationRemarkDto remarkDto = list.get(i);
@@ -455,9 +447,6 @@ public class UserRelationServiceImpl implements UserRelationService{
             if(newDto==null){
                 continue;
             }
-
-            //合并用户达人信息
-            this.mergeUserStar(starAuths,newDto);
             //合并关系
             this.mergeRelation(userAlls,newDto);
             //合并备注信息
