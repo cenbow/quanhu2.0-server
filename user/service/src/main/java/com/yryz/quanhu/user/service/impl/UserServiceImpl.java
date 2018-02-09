@@ -255,8 +255,10 @@ public class UserServiceImpl implements UserService {
 				if (simpleVO.getUserRole() == UserRole.STAR.getRole()) {
 					if(MapUtils.isNotEmpty(starMap)){
 						UserStarSimpleVo starSimpleVo = starMap.get(simpleVO.getUserId().toString());
-						simpleVO.setTradeField(starSimpleVo.getTradeField());
-						simpleVO.setRecommendDesc(starSimpleVo.getRecommendDesc());
+						if(starSimpleVo != null){
+							simpleVO.setTradeField(starSimpleVo.getTradeField());
+							simpleVO.setRecommendDesc(starSimpleVo.getRecommendDesc());
+						}
 					}
 				}
 				map.put(vo.getUserId().toString(), simpleVO);

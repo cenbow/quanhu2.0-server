@@ -3,8 +3,8 @@ package com.yryz.quanhu.user.service;
 import java.util.List;
 
 import com.aliyun.oss.ServiceException;
+import com.yryz.common.context.Context;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.vo.ViolationInfo;
 
 /**
@@ -21,7 +21,7 @@ public interface ViolationApi {
 	 * @return
 	 */
 	static String warnTimesKey(String userId) {
-		return String.format("%s.%s", RedisConstants.USER_WARN_TIMES, userId);
+		return String.format("%s:%s", Context.getProperty("user.warn.times"), userId);
 	}
 
 	/**

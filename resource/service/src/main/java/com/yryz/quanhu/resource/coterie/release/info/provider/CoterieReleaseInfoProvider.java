@@ -298,7 +298,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             BeanUtils.copyProperties(coterieReleaseInfoVo,releaseInfo);
             resourceTotal.setExtJson(JsonUtils.toFastJson(coterieReleaseInfoVo));
             resourceTotal.setModuleEnum(NumberUtils.toInt(ModuleContants.RELEASE));
-            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+            resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
             resourceTotal.setResourceId(releaseInfo.getKid());
 
             // 设置达人标识 createUser

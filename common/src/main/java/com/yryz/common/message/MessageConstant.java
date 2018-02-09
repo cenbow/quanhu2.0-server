@@ -120,6 +120,11 @@ public enum MessageConstant {
     QUESTION_INVALID(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "系统退款", "您向{coterieName}圈主提问，圈主回复超时，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
 
     /**
+     * 圈主拒绝回答，退款通知
+     */
+    QUESTION_REJECT_REFUND(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "系统退款", "{coterieName}圈主拒绝了您的提问，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),
+
+    /**
      * 删除未回答的付费提问
      */
     QUESTION_DELETE(MessageType.ORDER_TYPE, MessageLabel.ORDER_RETURN, "系统退款", "您删除了向{coterieName}圈主提问，所付金额退回{money}悠然币。", MessageViewCode.ORDER_MESSAGE, MessageActionCode.ACCOUNT),

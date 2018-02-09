@@ -50,6 +50,8 @@ public class Coterie implements Serializable {
 	 */
 	private String ownerId;
 
+	private String phone;
+
 	/**
 	 * 加入私圈金额(悠然币)，0表示免费
 	 */
@@ -89,7 +91,7 @@ public class Coterie implements Serializable {
 	 * 上下架
 	 */
 	private Integer shelveFlag;
-	
+
 	/**
 	 * 0:未删除，1：删除
 	 */
@@ -332,5 +334,13 @@ public class Coterie implements Serializable {
 
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 }

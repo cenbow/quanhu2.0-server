@@ -8,6 +8,7 @@
 package com.yryz.quanhu.user.dao;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -38,7 +39,7 @@ public class AuthRedisDao {
 
 	@Resource
 	private RedisTemplateBuilder redisTemplateBuilder;
-
+	
 	/**
 	 * web端token设置
 	 * 
@@ -57,6 +58,8 @@ public class AuthRedisDao {
 			throw new RedisOptException("[TokenRedis.addToken]", e.getCause());
 		}
 	}
+	
+	
 	
 	/**
 	 * auth2.0 token设置
@@ -153,4 +156,53 @@ public class AuthRedisDao {
 		} 
 	}
 
+	/**
+	 * 把旧的token推到临时队列中
+	 * @param refreshDTO
+	 * @param expireTime /小时
+	 */
+	public void pushOldToken(AuthRefreshDTO refreshDTO,Integer expireTime){
+		String key = AuthApi.cacheTempKey(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
+		try {
+			RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
+			redisTemplate.opsForSet().add(key, refreshDTO.getToken());
+			redisTemplate.expire(key, expireTime,TimeUnit.HOURS);
+		} catch (Exception e) {
+			logger.error("TokenRedis.pushOldToken", e);
+			throw new RedisOptException("[TokenRedis.pushOldToken]", e.getCause());
+		}
+	}
+	
+	/**
+	 * 查询临时旧token队列
+	 * @param refreshDTO
+	 * @return
+	 */
+	public Set<String> getAllOldToken(Long userId,String appId,DevType devType){
+		String key = AuthApi.cacheTempKey(userId, appId, devType);
+		try {
+			RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
+			Set<String> set = redisTemplate.opsForSet().members(key);
+			return set;
+		} catch (Exception e) {
+			logger.error("TokenRedis.getAllOldToken", e);
+			throw new RedisOptException("[TokenRedis.getAllOldToken]", e.getCause());
+		}
+	}
+	
+	/**
+	 * 清理临时旧token队列
+	 * @param refreshDTO
+	 * @return
+	 */
+	public void clearOldToken(Long userId,String appId,DevType devType){
+		String key = AuthApi.cacheTempKey(userId, appId, devType);
+		try {
+			RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
+			redisTemplate.delete(key);
+		} catch (Exception e) {
+			logger.error("TokenRedis.clearOldToken", e);
+			throw new RedisOptException("[TokenRedis.clearOldToken]", e.getCause());
+		}
+	}
 }

@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.common.context.Context;
 import com.yryz.common.entity.RequestHeader;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.user.contants.RedisConstants;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
@@ -39,7 +39,7 @@ public interface AccountApi {
 		if(userId == null || userId == 0l){
 			return null;
 		}
-		return String.format("%s.%s", RedisConstants.ACCOUNT_USER,userId);
+		return String.format("%s:%s", Context.getProperty("user.account"),userId);
 	}
 	/**
 	 * 手机号账户缓存key
@@ -51,7 +51,7 @@ public interface AccountApi {
 		if(StringUtils.isBlank(phone) || StringUtils.isBlank(appId)){
 			return null;
 		}
-		return String.format("%s.p.%s", RedisConstants.ACCOUNT_USER,phone,appId);
+		return String.format("%s:%s", Context.getProperty("user.account.phone"),phone,appId);
 	}
 	/**
 	 * 第三方账户缓存key
@@ -64,7 +64,7 @@ public interface AccountApi {
 		if(StringUtils.isBlank(thirdId) || StringUtils.isBlank(appId)){
 			return null;
 		}
-		return String.format("%s.third.%s.%s", RedisConstants.ACCOUNT_USER,thirdId,appId,type);
+		return String.format("%s:%s:%s:%s", Context.getProperty("user.account.third"),thirdId,appId,type);
 	}
 	/**
 	 * 用户登录方式
@@ -75,7 +75,7 @@ public interface AccountApi {
 		if(userId == null || userId == 0l){
 			return null;
 		}
-		return String.format("%s.%s", RedisConstants.USER_LOGIN_METHOD,userId);
+		return String.format("%s:%s", Context.getProperty("user.login.method"),userId);
 	}
 	
 	/**
