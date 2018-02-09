@@ -39,7 +39,7 @@ public class AdminActivityPrizesProvider implements AdminActivityPrizesApi {
 		try {
 			pageList = adminActivityPrizesService.listPrizes(inActivityPrizes);
 		} catch (Exception e) {
-			logger.error("查询奖品列表失败");
+			logger.error("查询奖品列表失败",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(pageList);
@@ -57,17 +57,9 @@ public class AdminActivityPrizesProvider implements AdminActivityPrizesApi {
 		try {
 			count = adminActivityPrizesService.updateBatchUsed(ids);
 		} catch (Exception e) {
-			logger.error("批量修改失败:"+ids);
+			logger.error("批量修改失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);
 	}
-	
-	 /**
-	   * 读取Excel里面客户的信息
-	   * @param wb
-	   * @return
-	   */
-	 //Response<List<String>> readExcelValue(Workbook wb);
-
 }
