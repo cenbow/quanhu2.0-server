@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -130,10 +131,19 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 */
 	public List<ResourceVo> addCoterie(List<ResourceVo> list){
 		if(CollectionUtils.isNotEmpty(list)){
+			List<String> ids = new ArrayList<>();
 			for (ResourceVo resourceVo : list) {
 				if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
-					CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
-					resourceVo.setCoterie(coterieInfo);
+					String cterieId = resourceVo.getCoterieId();
+					ids.add(cterieId);
+				}
+			}
+			List<Coterie> coteries = new ArrayList<>();
+			Map<Long, Coterie> map = coteries.stream().collect(Collectors.toMap(Coterie :: getCoterieId, coterie -> coterie));
+			for (ResourceVo resourceVo : list) {
+				if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
+					Coterie coterie = map.get(Long.parseLong(resourceVo.getCoterieId()));
+					resourceVo.setCoterie(coterie);
 				}
 			}
 		}
@@ -147,8 +157,12 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 */
 	public ResourceVo addCoterie(ResourceVo resourceVo){
 		if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
-			CoterieInfo coterieInfo = coterieApi.queryCoterieInfo(Long.parseLong(resourceVo.getCoterieId())).getData();
-			resourceVo.setCoterie(coterieInfo);
+			List<ResourceVo> list = new ArrayList<>();
+			list.add(resourceVo);
+			list = addCoterie(list);
+			if(list != null && list.size() == 1){
+				return list.get(0);
+			} 
 		}
 		return resourceVo;
 	}

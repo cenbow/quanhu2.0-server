@@ -156,10 +156,16 @@ public class ResourceServiceImpl implements ResourceService {
 	public Map<String, ResourceModel> getResources(Set<String> resourceIds) {
 		Map<String, ResourceModel> map = new HashMap<>();
 		if(CollectionUtils.isNotEmpty(resourceIds)){
-			for (String resourceId : resourceIds) {
-				ResourceModel resource = resourceMongo.get(resourceId);
-				if(resource != null){
-					map.put(resourceId, resource);
+			List<ResourceModel> list = resourceRedis.get(resourceIds);
+			for (ResourceModel resourceModel : list) {
+				map.put(resourceModel.getResourceId(), resourceModel);
+			}
+			if(map.size() < resourceIds.size()){ //如果数组长度不够
+				for (String resourceId : resourceIds) {
+					if(!map.containsKey(resourceId)){
+						ResourceModel resource = get(resourceId);
+						map.put(resourceId, resource);
+					}
 				}
 			}
 		}

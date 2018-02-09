@@ -1,9 +1,5 @@
 package com.yryz.common.utils;
 
-import com.yryz.common.exception.ParseDatesException;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -13,6 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+
+import com.yryz.common.exception.ParseDatesException;
 
 /**
  * @version 1.0
@@ -142,5 +143,33 @@ public class BeanUtils {
         return null;
     }
 
+    /**
+     * 得到Object 属性不为NULL,值的分割 串（缓存key，使用）
+     * @param source
+     * @return
+     */
+    public static String getNotNullPropertyValue(Object source, String split) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        for (java.beans.PropertyDescriptor pd : pds) {
+            if("class".equals(pd.getName())){
+                continue;
+            }
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue != null) {
+                if (i != 0) {
+                    sb.append(split);
+                }
+                sb.append(srcValue.toString());
+                ++i;
+            }
+        }
+        if (StringUtils.isNotBlank(sb.toString())) {
+            return sb.toString();
+        }
 
+        return null;
+    }
 }

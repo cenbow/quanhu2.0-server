@@ -89,4 +89,8 @@ public class CommonConstants {
 	public static final Byte recommend_NO = 10;
 
 
+	/**  
+	* @Fields : 服務名
+	*/
+	public static final String SPRING_APPLICATION_NAME = "spring.application.name";
 }

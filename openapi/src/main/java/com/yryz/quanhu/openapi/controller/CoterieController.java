@@ -71,11 +71,10 @@ public class CoterieController {
     @ApiOperation("发布私圈")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "info", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @PostMapping(value = "/{version}/coterieInfo/create")
     @UserBehaviorValidation(event = "发布私圈", login = true)
-    public Response<CoterieInfo> publish(@RequestHeader Long userId, @RequestBody CoterieBasicInfo info, HttpServletRequest request) {
+    public Response<CoterieInfo> publish(@RequestHeader Long userId,@RequestBody CoterieBasicInfo info) {
         info.setOwnerId(userId.toString());
         if(info.getJoinFee()!=null && info.getJoinFee()!=0){//收费一定不审核
         	info.setJoinCheck(10);
@@ -86,7 +85,6 @@ public class CoterieController {
     @ApiOperation("设置私圈， 更新圈子的数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-            @ApiImplicitParam(name = "config", paramType = "body", required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
     @PostMapping(value = "/{version}/coterieInfo/config")
     @UserBehaviorValidation(event = "设置私圈", login = true)

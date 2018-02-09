@@ -29,7 +29,7 @@ public class AdminActivityEnrolConfigProvider implements AdminActivityEnrolConfi
 		try {
 			activityEnrolConfig = adminActivityEnrolConfigService.getActivityEnrolConfigByActId(activityId);
 		} catch (Exception e) {
-			logger.error("查询活动id:"+activityId+"配置信息失败");
+			logger.error("查询活动配置信息失败",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(activityEnrolConfig);
