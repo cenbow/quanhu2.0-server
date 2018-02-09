@@ -33,7 +33,7 @@ public class ActivityInfoProvider implements ActivityInfoApi {
         try {
             pageList = activityInfoService.getActivityInfoMyAppListVoPageList(pageNum, pageSize,custId);
         } catch (Exception e) {
-            logger.error("查询用户:"+custId+"活动列表失败");
+            logger.error("查询用户的活动列表失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(pageList);
@@ -49,7 +49,7 @@ public class ActivityInfoProvider implements ActivityInfoApi {
         try {
             return ResponseUtils.returnObjectSuccess(activityInfoService.selectMylistCount(custId));
         } catch (Exception e) {
-            logger.error("查询用户:"+custId+"活动数失败");
+            logger.error("查询用户活动数失败",e);
             return ResponseUtils.returnException(e);
         }
     }
@@ -67,7 +67,7 @@ public class ActivityInfoProvider implements ActivityInfoApi {
         try {
             pageList = activityInfoService.getActivityInfoAppListVoPageList(pageNum, pageSize, type);
         } catch (Exception e) {
-            logger.error("查询活动列表失败");
+            logger.error("查询活动列表失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(pageList);
@@ -85,7 +85,7 @@ public class ActivityInfoProvider implements ActivityInfoApi {
         try {
             activityInfoVo1 = activityInfoService.getActivityInfoVo(kid, type);
         } catch (Exception e) {
-            logger.error("查询活动id:"+kid+"基本信息失败");
+            logger.error("查询活动基本信息失败",e);
             return ResponseUtils.returnException(e);
         }
         return ResponseUtils.returnObjectSuccess(activityInfoVo1);
@@ -102,7 +102,7 @@ public class ActivityInfoProvider implements ActivityInfoApi {
         try {
             pageList = activityInfoService.getActivityInfoAppListVoPageList(1, type==2?2:5, type);
         } catch (Exception e) {
-            logger.error("查询活动列表失败");
+            logger.error("查询活动列表失败",e);
             return ResponseUtils.returnException(e);
         }
         for(ActivityInfoAppListVo activityInfoAppListVo:pageList.getEntities()){

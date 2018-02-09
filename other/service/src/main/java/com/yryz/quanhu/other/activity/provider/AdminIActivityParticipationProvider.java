@@ -40,7 +40,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			adminActivityInfoVo1 = adminIActivityParticipationService.detail(id);
 		} catch (Exception e) {
-			logger.error("后台获取活动失败:"+ id);
+			logger.error("后台获取活动失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(adminActivityInfoVo1);
@@ -55,7 +55,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			list = adminIActivityParticipationService.list(adminActivityVoteDetailDto);
 		} catch (Exception e) {
-			logger.error("参与活动列表异常:"+ adminActivityVoteDetailDto);
+			logger.error("参与活动列表异常:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);
@@ -70,7 +70,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			count1 = adminIActivityParticipationService.addVote(id,count);
 		} catch (Exception e) {
-			logger.error("后台增加票数失败");
+			logger.error("后台增加票数失败",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count1);
@@ -82,13 +82,11 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			count = adminIActivityParticipationService.updateStatus(id,status);
 		} catch (Exception e) {
-			logger.error("后台更改状态失败");
+			logger.error("后台更改状态失败",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);
 	}
-
-	//public ListPage<CustInfo> selectUser(String type, String nickName, String circle, Integer pageNo, Integer pageSize);
 
 	@Override
 	public Response<AdminConfigObjectDto> getVoteConfig(Long infoId){
@@ -96,7 +94,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			adminConfigObjectDto = adminIActivityParticipationService.getVoteConfig(infoId);
 		} catch (Exception e) {
-			logger.error("后台获取活动配置失败:"+ infoId);
+			logger.error("后台获取活动配置失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(adminConfigObjectDto);
@@ -108,7 +106,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			str = adminIActivityParticipationService.saveVoteDetail(voteDetailDto);
 		} catch (Exception e) {
-			logger.error("后台发布作品失败:"+ voteDetailDto);
+			logger.error("后台发布作品失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(str);
@@ -123,7 +121,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			list = adminIActivityParticipationService.adminlist(adminActivityVoteRecordDto);
 		} catch (Exception e) {
-			logger.error("投票用户数据异常:"+ adminActivityVoteRecordDto);
+			logger.error("投票用户数据异常:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);
@@ -135,7 +133,7 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 		try {
 			list = adminIActivityParticipationService.selectUser(custInfoDTO, pageNo, pageSize);
 		} catch (Exception e) {
-			logger.error("用户数据异常:"+ custInfoDTO);
+			logger.error("用户数据异常:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);
