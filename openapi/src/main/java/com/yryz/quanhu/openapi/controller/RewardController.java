@@ -125,6 +125,16 @@ public class RewardController {
     @GetMapping(value = "{version}/reward/amount")
     public Response<RewardCount> amountCount(HttpServletRequest request, @RequestHeader("userId") Long headerUserId) {
         RewardCount rewardCount = ResponseUtils.getResponseData(rewardCountApi.selectByTargetId(headerUserId));
+        if(null == rewardCount){
+            rewardCount = new RewardCount();
+            rewardCount.setTargetId(headerUserId);
+            rewardCount.setTargetType(RewardConstants.target_type_user);
+            rewardCount.setTotalRewardAmount(0L);
+            rewardCount.setTotalRewardCount(0);
+            rewardCount.setTotalRewardedAmount(0L);
+            rewardCount.setTotalRewardedCount(0);
+        }
+        
         return ResponseUtils.returnObjectSuccess(rewardCount);
     }
 
