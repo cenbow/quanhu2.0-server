@@ -127,6 +127,11 @@ public class CommentProvider implements CommentApi {
             int count = commentService.delComment(comment);
             if (count > 0) {
                 map.put("result", 1);
+                try {
+                    countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "",-1L);
+                } catch (Exception e) {
+                    logger.info("进入统计系统失败" + e);
+                }
                 if (comment.getTopId() == 0) {
                     this.delBatch(comment);
                 }
