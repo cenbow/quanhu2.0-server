@@ -155,7 +155,7 @@ public class ResourceVo implements Serializable {
      */
     private UserSimpleVO user;
     
-    private CoterieInfo coterie;
+    private Coterie coterie;
 
 	/**
 	 * 
@@ -490,14 +490,14 @@ public class ResourceVo implements Serializable {
 	/**
 	 * @return the coterie
 	 */
-	public CoterieInfo getCoterie() {
+	public Coterie getCoterie() {
 		return coterie;
 	}
 
 	/**
 	 * @param coterie the coterie to set
 	 */
-	public void setCoterie(CoterieInfo coterie) {
+	public void setCoterie(Coterie coterie) {
 		this.coterie = coterie;
 	}
 	

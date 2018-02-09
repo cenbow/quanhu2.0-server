@@ -18,12 +18,12 @@ public class RedisConstant {
 	/**
 	 * APP首页的redis的key
 	 */
-	public static final String APP_RECOMMEND = "RESOURCE:APPRECOMMEND";
+	public static final String APP_RECOMMEND = "QUANHU:RESOURCE:APPRECOMMEND";
 	
 	/**
 	 * 资源缓存的key
 	 */
-	public static final String RESOURCE_MODEL = "RESOURCE:MODEL";
+	public static final String RESOURCE_MODEL = "QUANHU:RESOURCE:MODEL";
 	
 	public static String getResourceModelKey(String resourceId){
 		return RESOURCE_MODEL + ":" + resourceId;
