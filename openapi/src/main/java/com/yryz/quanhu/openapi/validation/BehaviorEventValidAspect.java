@@ -13,9 +13,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -135,11 +132,11 @@ public class BehaviorEventValidAspect {
             filterChain.addFilter(userBlacklistValidFilter);
         }
         //是否校验私圈成员
-        if(validation.isCoterieMember()){
+        if(validation.coterieMember()){
             filterChain.addFilter(userCoterieMemberValidFilter);
         }
         //是否校验私圈禁言
-        if(validation.isCoterieMute()){
+        if(validation.coterieMute()){
             filterChain.addFilter(userCoterieMuteValidFilter);
         }
         //是否校验敏感词

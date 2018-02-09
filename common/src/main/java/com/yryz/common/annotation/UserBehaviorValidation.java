@@ -75,7 +75,7 @@ public @interface UserBehaviorValidation {
      * @return boolean
      * @throws  
      */
-    boolean isCoterieMember() default false;
+    boolean coterieMember() default false;
 
     /**  
     * @Description: 私圈禁言
@@ -84,5 +84,5 @@ public @interface UserBehaviorValidation {
     * @return boolean
     * @throws  
     */
-    boolean isCoterieMute() default false;
+    boolean coterieMute() default false;
 }

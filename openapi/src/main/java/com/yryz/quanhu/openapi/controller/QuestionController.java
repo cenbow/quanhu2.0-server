@@ -7,7 +7,6 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -44,7 +43,7 @@ public class QuestionController {
                     @ApiImplicitParam(name = "token", paramType = "header", required = true)
             })
     @PostMapping(value = "/services/app/{version}/coterie/question/add")
-    @UserBehaviorValidation(event = "提问发布", mute = true, blacklist = true, illegalWords = true, login = true, isCoterieMute = true)
+    @UserBehaviorValidation(event = "提问发布", mute = true, blacklist = true, illegalWords = true, login = true, coterieMute = true)
     @UserBehaviorArgs(
             contexts = {"object.QuestionDto.content", "object.QuestionDto.contentSource"},
             coterieId = "object.QuestionDto.coterieId", sourceUserId = "object.QuestionDto.targetId")
