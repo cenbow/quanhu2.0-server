@@ -7,10 +7,6 @@
  */
 package com.yryz.quanhu.user.service.impl;
 
-import java.util.Iterator;
-import java.util.Set;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -287,7 +283,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 	
 	/**
-	 * 比对当前token是否在临时旧token队列中，
+	 * 比对当前token是否在临时旧token队列中	
 	 * @param userId
 	 * @param appId
 	 * @param devType
@@ -295,21 +291,18 @@ public class AuthServiceImpl implements AuthService {
 	 * @return
 	 */
 	private boolean checkOldTokenExpire(Long userId,String appId,DevType devType,String token){
-		Set<String> tempTokens = null;
+		String tempToken = null;
 		try {
-			tempTokens = redisDao.getAllOldToken(userId, appId, devType);
+			tempToken = redisDao.getAllOldToken(userId, appId, devType);
 		} catch (Exception e) {
 			logger.error("[checkOldTokenExpire]",e);
 			return false;
 		}
-		if(CollectionUtils.isEmpty(tempTokens)){
+		if(StringUtils.isBlank(tempToken)){
 			return false;
 		}
-		for(Iterator<String> iterator = tempTokens.iterator();iterator.hasNext();){
-			String oldToken = iterator.next();
-			if(StringUtils.equals(oldToken, token)){
-				return true;
-			}
+		if(StringUtils.equals(token, tempToken)){
+			return true;
 		}
 		return false;
 	}

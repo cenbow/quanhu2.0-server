@@ -26,13 +26,17 @@ public class VerifyCodeConfigVO implements Serializable {
 	private Integer normalCodeExpireTime = 600;
 	
 	/**
-	 * 普通验证码获取间隔时间 /秒
+	 * 每个手机号或者ip普通验证码获取间隔时间/ip/phone /秒
 	 */
 	private Integer normalCodeDelayTime = 60;
 	/**
-	 * 普通验证码每天获取总量限制
+	 * 普通验证码每个ip每天获取总量限制
 	 */
-	private Integer normalCodeTotal = 1000;
+	private Integer normalIpCodeTotal = 1000;
+	/**
+	 *  普通验证码每个手机号每天获取总量限制
+	 */
+	private Integer normalCodeTotal =10;
 	
 	/**
 	 * 图形验证码过期时间 /秒
@@ -95,6 +99,14 @@ public class VerifyCodeConfigVO implements Serializable {
 
 	public void setNormalCodeTotal(Integer normalCodeTotal) {
 		this.normalCodeTotal = normalCodeTotal;
+	}
+
+	public Integer getNormalIpCodeTotal() {
+		return normalIpCodeTotal;
+	}
+
+	public void setNormalIpCodeTotal(Integer normalIpCodeTotal) {
+		this.normalIpCodeTotal = normalIpCodeTotal;
 	}
 
 	public VerifyCodeConfigVO() {

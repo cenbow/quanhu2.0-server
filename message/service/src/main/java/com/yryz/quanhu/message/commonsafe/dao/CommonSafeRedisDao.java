@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -300,17 +299,17 @@ public class CommonSafeRedisDao {
 	 * @param appId
 	 */
 	public void saveVerifyCodeTime(String key,String appId){
-		String redisKey = CommonSafeApi.getVerifyCodeTimeKey(key, appId);
+		String totalKey = CommonSafeApi.getVerifyCodeLimitTotalKey(key, appId);
+		String timeKey = CommonSafeApi.getVerifyCodeLimitTimeKey(key, appId);
 		try {
-			RedisTemplate<String, String> template = templateBuilder.buildRedisTemplate(String.class);
-			template.opsForHash().increment(redisKey, RedisConstants.VERIFY_CODE_TOTAL, 1);
-			template.opsForHash().put(redisKey, RedisConstants.VERIFY_CODE_LASTTIME, String.valueOf(System.currentTimeMillis()));
-			Map<String,String> map = new HashMap<>();
-			map.put(RedisConstants.VERIFY_CODE_TOTAL, String.valueOf(1));
-			map.put(RedisConstants.VERIFY_CODE_LASTTIME, String.valueOf(System.currentTimeMillis()));
-			template.opsForHash().putAll(redisKey, map);
-			if(template.getExpire(redisKey) < 0){
-				template.expire(redisKey, DateUtils.getNowToNextDayTime(), TimeUnit.SECONDS);
+			RedisTemplate<String, Long> template = templateBuilder.buildRedisTemplate(Long.class);
+			template.opsForValue().increment(totalKey, 1);
+			template.opsForValue().set(timeKey,System.currentTimeMillis());
+			if(template.getExpire(totalKey) < 0){
+				template.expire(totalKey, DateUtils.getNowToNextDayTime(), TimeUnit.SECONDS);
+			}
+			if(template.getExpire(timeKey) < 0){
+				template.expire(timeKey, DateUtils.getNowToNextDayTime(), TimeUnit.SECONDS);
 			}
 		} catch (Exception e) {
 			logger.error("[saveVerifyCodeTime]", e);
@@ -323,13 +322,16 @@ public class CommonSafeRedisDao {
 	 * @param key  验证码载体 例如:邮箱、手机号
 	 * @param appId
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<String,String> getVerifyCodeTime(String key,String appId){
-		String redisKey = CommonSafeApi.getVerifyCodeTimeKey(key, appId);
+	public Map<String,Long> getVerifyCodeTime(String key,String appId){
+		String totalKey = CommonSafeApi.getVerifyCodeLimitTotalKey(key, appId);
+		String timeKey = CommonSafeApi.getVerifyCodeLimitTimeKey(key, appId);
 		try {
-			RedisTemplate<String,String> template = templateBuilder.buildRedisTemplate(String.class);
-			@SuppressWarnings("rawtypes")
-			Map map = template.opsForHash().entries(redisKey);
+			RedisTemplate<String,Long> template = templateBuilder.buildRedisTemplate(Long.class);
+			Map<String,Long> map = new HashMap<>(2);
+			Long total = template.opsForValue().get(totalKey);
+			Long lastTime = template.opsForValue().get(timeKey);
+			map.put(RedisConstants.VERIFY_CODE_TOTAL, total);
+			map.put(RedisConstants.VERIFY_CODE_LASTTIME, lastTime);
 			return map;
 		} catch (Exception e) {
 			logger.error("[getVerifyCodeTime]", e);
