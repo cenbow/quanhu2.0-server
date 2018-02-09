@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.quanhu.order.grow.entity.GrowLevel;
 import com.yryz.quanhu.order.score.consumer.ScoreEventConsumer;
 import com.yryz.quanhu.order.score.rule.service.RuleScoreService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
@@ -114,9 +115,8 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 			logger.info("-------处理积分运算事件，每次触发传入数据：newScore" + newScore);
 			logger.info("-------处理积分运算事件，每次触发传入数据：allScore" + allScore);
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
-			allScore = Math.abs(ea.getScore() + newScore);
-			//ea.setScore(Math.abs(newScore + 0L));
-			ea.setScore(allScore);
+			allScore = ea.getScore() + newScore;
+			ea.setScore(Math.abs(allScore + 0L));
 			ea.setUpdateTime(now);
 			ea.setGrow(null);
 			ea.setGrowLevel(null);
