@@ -202,7 +202,10 @@ public class CommentProvider implements CommentApi {
     public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO) {
         try {
             CommentInfoVO commentInfoVO = commentService.querySingleCommentInfo(commentSubDTO);
-            commentInfoVO.setCommentEnties(commentService.querySubCommentsInfo(commentSubDTO));
+            PageList<CommentVO> pageList = commentService.querySubCommentsInfo(commentSubDTO);
+            if(null!=commentInfoVO&&null!=pageList){
+                commentInfoVO.setCommentEnties(pageList);
+            }
             return ResponseUtils.returnObjectSuccess(commentInfoVO);
         } catch (Exception e) {
             logger.error("", e);
@@ -245,6 +248,7 @@ public class CommentProvider implements CommentApi {
             CommentFrontDTO commenFront = new CommentFrontDTO();
             commenFront.setTopId(commentStr.getKid());
             commenFront.setResourceId(commentStr.getResourceId());
+            commenFront.setModuleEnum(commentStr.getModuleEnum());
             List<CommentVO> commentVOS = commentService.queryComments(commenFront).getEntities();
             List<Comment> commentsBatch = new ArrayList<Comment>();
             if (null != commentVOS && commentVOS.size() > 0) {
@@ -253,11 +257,33 @@ public class CommentProvider implements CommentApi {
                     commentSingle.setKid(commentVO.getKid());
                     commentSingle.setResourceId(commentVO.getResourceId());
                     commentSingle.setCreateUserId(commentVO.getCreateUserId());
+                    commentSingle.setShelveFlag((byte) 11);
+                    commentSingle.setLastUpdateDate(new Date());
+                    commentSingle.setLastUpdateUserId(commentVO.getCreateUserId());
+                    List<Comment> commentsChildren = commentVO.getChildrenComments();
+                    if(null!=commentsChildren&&commentsChildren.size()>0){
+                        for (Comment commentChild : commentsChildren) {
+                            Comment commentChilds=new Comment();
+                            commentChilds.setKid(commentChild.getKid());
+                            commentChilds.setResourceId(commentChild.getResourceId());
+                            commentChilds.setCreateUserId(commentChild.getCreateUserId());
+                            commentChilds.setShelveFlag((byte) 11);
+                            commentChilds.setLastUpdateDate(new Date());
+                            commentChilds.setLastUpdateUserId(commentChild.getCreateUserId());
+                            commentsBatch.add(commentChilds);
+                            try {
+                                stringRedisTemplate.delete("COMMENT:" + commentChild.getModuleEnum() + ":" + commentChild.getKid() + "_" + commentChild.getTopId() + "_" + commentChild.getResourceId());
+                            } catch (Exception e) {
+                                logger.info("批量删除Redis子评论失败");
+                            }
+                        }
+                    }
+
                     commentsBatch.add(commentSingle);
                     try {
                         stringRedisTemplate.delete("COMMENT:" + commentVO.getModuleEnum() + ":" + commentVO.getKid() + "_" + commentVO.getTopId() + "_" + commentVO.getResourceId());
                     } catch (Exception e) {
-                        logger.info("批量删除Redis评论失败");
+                        logger.info("删除Redis一级评论失败");
                     }
                 }
                 try {
@@ -342,18 +368,18 @@ public class CommentProvider implements CommentApi {
             commentAssembleAnswer.setUserImg(comment.getUserImg());
             commentAssembleAnswer.setUserNickName(comment.getNickName());
             if (commentAssembleAnswer.getCoterieId() != 0) {
-                if(null!=answerVo.getContent()&&answerVo.getContent().length()>7){
-                    commentAssembleAnswer.setCoterieName(answerVo.getContent().substring(0,7));
-                }else{
+                if (null != answerVo.getContent() && answerVo.getContent().length() > 7) {
+                    commentAssembleAnswer.setCoterieName(answerVo.getContent().substring(0, 7));
+                } else {
                     commentAssembleAnswer.setCoterieName(answerVo.getContent());
                 }
                 if (!answerVo.getImgUrl().equals("")) {
                     String img = getImgFirstUrl(answerVo.getImgUrl());
                     commentAssembleAnswer.setBodyImg(img);
                 }
-                if(null!=answerVo.getContent()&&answerVo.getContent().length()>20){
-                    commentAssembleAnswer.setBodyTitle(answerVo.getContent().substring(0,20));
-                }else{
+                if (null != answerVo.getContent() && answerVo.getContent().length() > 20) {
+                    commentAssembleAnswer.setBodyTitle(answerVo.getContent().substring(0, 20));
+                } else {
                     commentAssembleAnswer.setBodyTitle(answerVo.getContent());
                 }
             }
@@ -370,15 +396,15 @@ public class CommentProvider implements CommentApi {
             commentAssembleQuestion.setUserImg(comment.getUserImg());
             commentAssembleQuestion.setUserNickName(comment.getNickName());
             if (commentAssembleQuestion.getCoterieId() != 0) {
-                if(null!=question.getContent()&&question.getContent().length()>7){
-                    commentAssembleQuestion.setCoterieName(question.getContent().substring(0,7));
-                }else{
+                if (null != question.getContent() && question.getContent().length() > 7) {
+                    commentAssembleQuestion.setCoterieName(question.getContent().substring(0, 7));
+                } else {
                     commentAssembleQuestion.setCoterieName(question.getContent());
                 }
                 commentAssembleQuestion.setBodyImg("");
-                if(null!=question.getContent()&&question.getContent().length()>20){
-                    commentAssembleQuestion.setBodyTitle(question.getContent().substring(0,20));
-                }else{
+                if (null != question.getContent() && question.getContent().length() > 20) {
+                    commentAssembleQuestion.setBodyTitle(question.getContent().substring(0, 20));
+                } else {
                     commentAssembleQuestion.setBodyTitle(question.getContent());
                 }
             }
