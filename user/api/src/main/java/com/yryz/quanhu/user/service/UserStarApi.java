@@ -78,6 +78,7 @@ public interface UserStarApi {
      * @return
      * @throws ServiceException
      */
+    @Deprecated
     public Response<PageList<StarAuthInfo>> listByAuth(Integer pageNo,Integer pageSize,StarAuthQueryDTO paramDTO);
     /**
      * 后台达人推荐信息列表
@@ -87,6 +88,7 @@ public interface UserStarApi {
      * @return
      * @throws ServiceException
      */
+    @Deprecated
     public Response<PageList<StarAuthInfo>> listByRecommend(Integer pageNo,Integer pageSize,StarRecommendQueryDTO paramDTO);
      
     /**
