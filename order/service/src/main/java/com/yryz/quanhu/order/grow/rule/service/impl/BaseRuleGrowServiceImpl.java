@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import com.yryz.quanhu.order.grow.entity.GrowLevel;
 import com.yryz.quanhu.order.grow.manage.service.GrowLevelManageService;
 import com.yryz.quanhu.order.grow.rule.service.RuleGrowService;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
+import com.yryz.quanhu.order.score.rule.service.impl.BaseRuleScoreServiceImpl;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.score.vo.EventAcount;
 
@@ -29,6 +32,8 @@ import redis.clients.jedis.ShardedJedis;
 @Transactional
 @Service
 public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(BaseRuleGrowServiceImpl.class);
 
 	@Autowired
 	GrowFlowService growFlowService;
@@ -95,9 +100,13 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			eventAcountService.save(ea);
 		} else {
 			// 同积分总账更新方式，更新成长值时，可能会覆盖积分值
+			logger.info("-------处理成长值运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
+			logger.info("-------处理成长值运算事件，每次触发传入数据：newGrow" + newGrow);
+			logger.info("-------处理成长值运算事件，每次触发传入数据：allGrow" + allGrow);
+			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
 			allGrow = ea.getGrow() + newGrow;
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
-			ea.setGrow(Math.abs(newGrow + 0L));
+			ea.setGrow(Math.abs(allGrow + 0L));
 			ea.setGrowLevel(level.getLevel());
 			ea.setUpdateTime(now);
 			ea.setScore(null);
