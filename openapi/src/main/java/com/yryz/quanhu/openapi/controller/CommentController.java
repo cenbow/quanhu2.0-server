@@ -48,7 +48,8 @@ public class CommentController {
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/comment/list")
-    public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO){
+    public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO,@RequestHeader Long userId){
+        commentFrontDTO.setCreateUserId(userId);
         return commentApi.queryComments(commentFrontDTO);
     }
 
