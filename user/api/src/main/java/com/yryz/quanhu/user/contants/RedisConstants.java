@@ -23,6 +23,10 @@ public class RedisConstants {
 	 */
 	public static final String AUTH_REFRESH_FLAG = "TOKENREFEF";
 	/**
+	 * 临时旧token队列
+	 */
+	public static final String AUTH_TEMP_TOKEN = "TEMPTOEKN";
+	/**
 	 * 用户账户
 	 */
 	public static final String ACCOUNT_USER = "ACUSER";

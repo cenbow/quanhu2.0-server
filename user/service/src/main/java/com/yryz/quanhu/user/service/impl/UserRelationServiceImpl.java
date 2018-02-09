@@ -474,11 +474,28 @@ public class UserRelationServiceImpl implements UserRelationService{
          * 先查询缓存，再查询数据库
          */
         UserRelationCountDto dto = userRelationCacheDao.getCacheTotalCount(targetUserId);
-        if(dto!=null){
-            return dto;
+        if(dto==null){
+
+            //从数据库查询
+            dto = userRelationCacheDao.selectTotalCount(targetUserId);
+            if(dto==null){
+                return dto;
+            }
+
+            //刷新至缓存
+            userRelationCacheDao.refreshCacheCount(targetUserId,dto);
         }
-        //从数据库查询
-        return userRelationCacheDao.selectTotalCount(targetUserId);
+        /**
+         * 判断用户是否当前用户，如果不是，则把其他关系数量设置0，不对外可见
+         * 拉黑，被拉黑，互相拉黑，好友，不对外可见
+         */
+        if(!sourceUserId.equalsIgnoreCase(targetUserId)){
+            dto.setBothBlackCount(0);
+            dto.setFromBlackCount(0);
+            dto.setToBlackCount(0);
+            dto.setFriendCount(0);
+        }
+        return dto;
     }
 
     @Override

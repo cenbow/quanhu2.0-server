@@ -7,6 +7,10 @@
  */
 package com.yryz.quanhu.user.service.impl;
 
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +85,11 @@ public class AuthServiceImpl implements AuthService {
 		if (tokenVO == null) {
 			return TokenCheckEnum.NO_TOKEN;
 		}
+		//比对临时旧token队列 ,存在就返回过期，否则继续往下
+		if(checkOldTokenExpire(tokenDTO.getUserId(),tokenDTO.getAppId(), tokenDTO.getType(), token)){
+			return TokenCheckEnum.EXPIRE;
+		}
+		
 		// 校验短期token
 		if (!StringUtils.equals(token, tokenVO.getToken())) {
 			return TokenCheckEnum.ERROR;
@@ -147,6 +156,10 @@ public class AuthServiceImpl implements AuthService {
 		AuthTokenVO tokenVO;
 
 		tokenVO = redisDao.getToken(refreshDTO);
+		
+		//旧的token信息，token刷新时放入临时队列容错
+		String oldToken = tokenVO.getToken();
+		
 		logger.info("[getToken_begin]:refreshDTO:{},tokenVO:{}", JsonUtils.toFastJson(refreshDTO),
 				JsonUtils.toFastJson(tokenVO));
 		// 长期token过期或者设置登录刷新token都重新获取新token
@@ -160,6 +173,9 @@ public class AuthServiceImpl implements AuthService {
 			redisDao.setToken(refreshDTO, expireAt, refreshExpireAt);
 			// 只要登录操作就删除刷新标识
 			redisDao.deleteRefreshFlag(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
+			
+			//清理旧token临时队列
+			redisDao.clearOldToken(refreshDTO.getUserId(), refreshDTO.getAppId(), refreshDTO.getType());
 		} else {
 			token = tokenVO.getToken();
 			// 刷新短期token，分两种情况
@@ -171,7 +187,7 @@ public class AuthServiceImpl implements AuthService {
 				refreshDTO.setRefreshToken(tokenVO.getRefreshToken());
 
 				// 满足更新refreshToken的条件,更新refreshToken和过期时间并返回
-				if (checkRefreshTokenDelayUpdate(tokenVO, rangeConfig)) {
+				if (checkRefreshTokenDelayUpdate(tokenVO.getRefreshExpireAt(), rangeConfig)) {
 					refreshToken = TokenUtils.constructToken(refreshDTO.getUserId().toString());
 					refreshDTO.setRefreshToken(refreshToken);
 					tokenVO.setRefreshToken(refreshToken);
@@ -181,6 +197,8 @@ public class AuthServiceImpl implements AuthService {
 					refreshExpireAt = tokenVO.getRefreshExpireAt();
 				}
 				redisDao.setToken(refreshDTO, expireAt, refreshExpireAt);
+				
+				pushOldTokenToTemp(refreshDTO, oldToken, rangeConfig.getTempTokenExpireTime());
 			}
 			refreshToken = tokenVO.getRefreshToken();
 		}
@@ -208,7 +226,7 @@ public class AuthServiceImpl implements AuthService {
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WAP, appId));
 		redisDao.delToken(new AuthTokenDTO(userId, DevType.WEB, appId));
 	}
-
+	
 	/**
 	 * 获取用户认证配置
 	 * 
@@ -233,7 +251,22 @@ public class AuthServiceImpl implements AuthService {
 		}
 		return config;
 	}
-
+	
+	/**
+	 * 把旧token推到临时队列
+	 * @param refreshDTO
+	 * @param token
+	 * @param expireTime
+	 */
+	private void pushOldTokenToTemp(AuthRefreshDTO refreshDTO,String token,Integer expireTime){
+		refreshDTO.setToken(token);
+		try {
+			redisDao.pushOldToken(refreshDTO, expireTime);
+		} catch (Exception e) {
+			logger.error("[pushOldTokenToTemp]",e);
+		}
+	}
+	
 	/**
 	 * 检查refreshToken是否满足延期更新的条件
 	 * 
@@ -241,8 +274,7 @@ public class AuthServiceImpl implements AuthService {
 	 * @param config
 	 * @return
 	 */
-	private boolean checkRefreshTokenDelayUpdate(AuthTokenVO tokenVO, AuthConfig config) {
-		long refreshExpireAt = tokenVO.getRefreshExpireAt();
+	private boolean checkRefreshTokenDelayUpdate(Long refreshExpireAt, AuthConfig config) {
 		long refreshTokenDelayExpireTime = config.getRefreshTokenDelayExpireTime() * 3600 * 1000;
 		long nowTime = System.currentTimeMillis();
 		if (refreshTokenDelayExpireTime >= refreshExpireAt - nowTime) {
@@ -250,5 +282,32 @@ public class AuthServiceImpl implements AuthService {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 比对当前token是否在临时旧token队列中，
+	 * @param userId
+	 * @param appId
+	 * @param devType
+	 * @param token
+	 * @return
+	 */
+	private boolean checkOldTokenExpire(Long userId,String appId,DevType devType,String token){
+		Set<String> tempTokens = null;
+		try {
+			tempTokens = redisDao.getAllOldToken(userId, appId, devType);
+		} catch (Exception e) {
+			logger.error("[checkOldTokenExpire]",e);
+			return false;
+		}
+		if(CollectionUtils.isEmpty(tempTokens)){
+			return false;
+		}
+		for(Iterator<String> iterator = tempTokens.iterator();iterator.hasNext();){
+			String oldToken = iterator.next();
+			if(StringUtils.equals(oldToken, token)){
+				return true;
+			}
+		}
+		return false;
+	}
 }
