@@ -1,11 +1,13 @@
 package com.yryz.quanhu.behavior.like.service;
 
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author:sun
@@ -24,4 +26,6 @@ public interface LikeService {
     PageList<LikeVO> queryLikers(LikeFrontDTO likeFrontDTO);
 
     LikeVO querySingleLiker(Like like);
+
+    Map<String,Integer> getLikeFlagBatch(List<Long> resourceIds, long userId);
 }

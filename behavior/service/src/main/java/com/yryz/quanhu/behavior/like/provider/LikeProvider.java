@@ -314,6 +314,17 @@ public class LikeProvider implements LikeApi {
 
     }
 
+    @Override
+    public Response<Map<String,Integer>> getLikeFlagBatch(List<Long> resourceIds, long userId) {
+        try{
+            return ResponseUtils.returnObjectSuccess(likeService.getLikeFlagBatch(resourceIds,userId));
+        }catch (Exception e){
+            logger.error("", e);
+            return ResponseUtils.returnException(e);
+        }
+
+    }
+
     public void switchSend(Like like) {
         UserSimpleVO userSimpleVO = userApi.getUserSimple(like.getUserId()).getData();
         String nickName = "";
