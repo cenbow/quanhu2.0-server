@@ -7,6 +7,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
+import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.entity.CoterieSearch;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
@@ -16,11 +17,16 @@ import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 私圈服务实现
@@ -40,6 +46,8 @@ public class CoterieServiceImpl implements CoterieService {
 	private EventAPI eventAPI;
 	@Reference(check = false)
 	private UserApi userApi;
+	@Autowired
+	private CoterieRedis coterieRedis;
 
 	@Override
 	public CoterieInfo save(CoterieBasicInfo info) {
@@ -61,6 +69,7 @@ public class CoterieServiceImpl implements CoterieService {
 		coterie.setIsExpert(user.getUserRole());
 		coterie.setRedDot(10);
 		coterieMapper.insertSelective(coterie);
+		updateCache(coterie.getCoterieId());
 		return (CoterieInfo) GsonUtils.parseObj(coterie, CoterieInfo.class);
 	}
 
@@ -68,6 +77,7 @@ public class CoterieServiceImpl implements CoterieService {
 	public void modify(CoterieInfo info) {
 		Coterie coterie = (Coterie) GsonUtils.parseObj(info, Coterie.class);
 		coterieMapper.updateByCoterieIdSelective(coterie);
+		updateCache(coterie.getCoterieId());
 	}
 
 	@Override
@@ -76,12 +86,15 @@ public class CoterieServiceImpl implements CoterieService {
 		coterie.setCoterieId(coterieId);
 		coterie.setDeleted((byte) 1);
 		coterieMapper.updateByCoterieIdSelective(coterie);
+		updateCache(coterie.getCoterieId());
 	}
 
 	@Override
 	public CoterieInfo find(Long coterieId) {
-		Coterie info = null;
-		info = coterieMapper.selectByCoterieId(coterieId);
+		Coterie info = coterieRedis.get(coterieId);
+		if(info==null){
+			info = coterieMapper.selectByCoterieId(coterieId);
+		}
 		return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 	}
 
@@ -148,11 +161,17 @@ public class CoterieServiceImpl implements CoterieService {
 	@Override
 	public void recommendCoterie(List<Long> coterieIdList) {
 		coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.YES.getStatus());
+		for (int i = 0; i < coterieIdList.size(); i++) {
+			updateCache(coterieIdList.get(i));
+		}
 	}
 
 	@Override
 	public void cancelRecommendCoterie(List<Long> coterieIdList) {
 		coterieMapper.updateRecommend(coterieIdList, CoterieConstant.Recommend.NO.getStatus());
+		for (int i = 0; i < coterieIdList.size(); i++) {
+			updateCache(coterieIdList.get(i));
+		}
 	}
 
 	@Override
@@ -162,7 +181,9 @@ public class CoterieServiceImpl implements CoterieService {
 
 	@Override
 	public int updateMemberNum(Long coterieId, Integer newMemberNum, Integer oldMemberNum) {
-		return coterieMapper.updateMemberNum(coterieId, newMemberNum, oldMemberNum);
+		int c=coterieMapper.updateMemberNum(coterieId, newMemberNum, oldMemberNum);
+		updateCache(coterieId);
+		return c;
 	}
 
 	@Override
@@ -172,7 +193,31 @@ public class CoterieServiceImpl implements CoterieService {
 
 	@Override
 	public List<Coterie> getByKids(List<Long> kidList) {
-		return coterieMapper.selectByKids(kidList);
+		Map<Long,Coterie> coteries = coterieRedis.multiGet(kidList);
+		List<Coterie> result=Lists.newArrayList();
+		result.addAll(coteries.values());
+        if(coteries.size()==kidList.size()){
+        	return result;
+        }
+        
+        List<Long> nullIdList = new ArrayList<>();
+        for (int i = 0; i < kidList.size(); i++) {
+        	if(coteries.get(kidList.get(i))==null){
+        		nullIdList.add(kidList.get(i));
+        	}
+		}
+
+        if (!nullIdList.isEmpty()) {
+            List<Coterie> cList = coterieMapper.selectByKids(nullIdList);
+            // 合并进返回list
+            for (int i=0;i<cList.size();i++) {
+            	Coterie model=cList.get(i);
+            	result.add(model);
+                coterieRedis.save(model);
+            }
+        }
+
+        return result;
 	}
 
 	@Override
@@ -202,5 +247,15 @@ public class CoterieServiceImpl implements CoterieService {
 		int start=(pageNum-1)*pageSize;
 		List<Coterie> list = coterieMapper.selectCreateCoterie(custId, start, pageSize);
 		return GsonUtils.parseList(list, CoterieInfo.class);
+	}
+	
+	/**
+	 * 更新redis缓存
+	 */
+	private void updateCache(Long coterieId){
+		Coterie model = coterieMapper.selectByCoterieId(coterieId);
+		if(model != null){
+			coterieRedis.save(model);
+		}
 	}
 }

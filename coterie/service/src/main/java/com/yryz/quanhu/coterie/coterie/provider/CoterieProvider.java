@@ -579,4 +579,41 @@ public class CoterieProvider implements CoterieApi {
 		}
 	}
 
+	@Override
+	public Response<Boolean> createCoteriePermission(Long userId) {
+		if (userId==null) {
+			return ResponseUtils.returnCommonException("参数错误");
+		}
+		Integer count=coterieService.findMyCreateCoterieCount(userId+"");
+		if(count>=10)
+		{
+			return ResponseUtils.returnCommonException("最多只能申请10个私圈");
+		}
+		UserSimpleVO cust=ResponseUtils.getResponseData(userApi.getUserSimple(Long.valueOf(userId)));
+		if(cust==null){
+			return ResponseUtils.returnCommonException("用户不存在");
+		}
+		EventInfo param=new EventInfo();
+		param.setUserId(userId+"");
+		EventReportVo vo=ResponseUtils.getResponseData(eventAPI.getScoreFlowList(param));
+		int level=1;
+		if(vo==null){
+			level=1;
+		}else{
+			level=Integer.valueOf(vo.getGrowLevel());
+		}
+		if(level<5){
+			String msg="等级达到LV5才能创建私圈";
+			return ResponseUtils.returnCommonException(msg);
+		}
+		
+		UserRelationCountDto countDto=ResponseUtils.getResponseData(userRelationApi.totalBy(userId+"", userId+""));
+		if(countDto!=null){
+			if(countDto.getFollowCount()<20){
+				String msg="关注人数需达到20人才能创建私圈";
+				return ResponseUtils.returnCommonException(msg);
+			}
+		}
+		return ResponseUtils.returnObjectSuccess(true);
+	}
 }
