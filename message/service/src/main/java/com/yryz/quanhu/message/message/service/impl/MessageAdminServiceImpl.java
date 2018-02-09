@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.common.utils.*;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.constants.MessageContants;
@@ -106,8 +107,7 @@ public class MessageAdminServiceImpl implements MessageAdminService {
             }
         } catch (Exception e) {
             LOGGER.error("==========处理管理后台推送消息异常！============", e);
-            messageAdminVo.setPushStatus(MessageContants.PUSH_STATUS_FAILURE);
-            messageAdminMongo.update(messageAdminVo);
+            updatePushStatus(messageAdminVo, MessageContants.PUSH_STATUS_FAILURE);
             throw QuanhuException.busiError("处理管理后台推送消息异常" + e);
         }
     }
@@ -116,9 +116,6 @@ public class MessageAdminServiceImpl implements MessageAdminService {
         if (messageAdminVo.getPersistentType().equals(MessageContants.NOT_PERSISTENT)) {
             //不持久化：直接推送极光
             pushMessage(messageAdminVo);
-
-            messageAdminVo.setPushStatus(MessageContants.PUSH_STATUS_END);
-            messageAdminMongo.update(messageAdminVo);
 
         } else if (messageAdminVo.getPersistentType().equals(MessageContants.PERSISTENT)) {
             //持久化：先插库，再推极光
@@ -135,22 +132,41 @@ public class MessageAdminServiceImpl implements MessageAdminService {
                 );
 
                 pushMessage(messageAdminVo);
-
-                messageAdminVo.setPushStatus(MessageContants.PUSH_STATUS_END);
-                messageAdminMongo.update(messageAdminVo);
             }
         }
     }
 
     private void pushMessage(MessageAdminVo messageAdminVo) {
+        MessageVo messageVo = new MessageVo();
+        BeanUtils.copyProperties(messageVo, messageAdminVo);
         PushReqVo reqVo = new PushReqVo();
         reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIASS);
         reqVo.setCustIds(messageAdminVo.getPushUserIds());
         reqVo.setNotification(messageAdminVo.getTitle());
-        reqVo.setMsg(JsonUtils.toFastJson(messageAdminVo));
+        reqVo.setMsg(JsonUtils.toFastJson(messageVo));
         LOGGER.info("=================开始推送管理后台消息！=================");
-        pushAPI.commonSendAlias(reqVo);
-        LOGGER.info("=================推送管理后台消息完成！=================");
+        try {
+            Response<Boolean> booleanResponse = pushAPI.commonSendAlias(reqVo);
+            if (!booleanResponse.success()) {
+
+                LOGGER.info("=================推送管理后台消息失败！=================");
+                updatePushStatus(messageAdminVo, MessageContants.PUSH_STATUS_FAILURE);
+            } else {
+
+                LOGGER.info("=================推送管理后台消息成功！=================");
+                updatePushStatus(messageAdminVo, MessageContants.PUSH_STATUS_END);
+            }
+        } catch (Exception e) {
+
+            LOGGER.error("=================推送管理后台消息异常！=================", e);
+            updatePushStatus(messageAdminVo, MessageContants.PUSH_STATUS_FAILURE);
+            throw QuanhuException.busiError("处理管理后台推送消息异常" + e);
+        }
+    }
+
+    private void updatePushStatus(MessageAdminVo messageAdminVo, Integer pushStatus) {
+        messageAdminVo.setPushStatus(pushStatus);
+        messageAdminMongo.update(messageAdminVo);
     }
 
     private void timePushMessage(MessageAdminVo messageAdminVo) {

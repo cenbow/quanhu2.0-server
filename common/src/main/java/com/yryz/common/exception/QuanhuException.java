@@ -39,7 +39,11 @@ public class QuanhuException extends IllegalArgumentException {
     public static QuanhuException busiError(String errorMsg) {
         return busiError(null, errorMsg);
     }
-
+    
+    public static QuanhuException busiShowError(String showMsg,String errorMsg) {
+        return busiError(null, showMsg, errorMsg);
+    }
+    
     public static QuanhuException busiError(String code, String errorMsg) {
         if (StringUtils.isBlank(errorMsg)) {
         	errorMsg = ExceptionEnum.BusiException.getShowMsg();

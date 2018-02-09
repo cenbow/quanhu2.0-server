@@ -417,7 +417,7 @@
     SELECT c.*
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=11 and c.shelve_flag=10 and c.deleted=10
+    AND c.state=11 and c.shelve_flag=10 and c.deleted=10 and m.kick_status=20 and m.del_flag=10 
     AND m.user_id=#{custId}
     ORDER BY m.create_date DESC
   </select>
@@ -426,7 +426,7 @@
     SELECT c.*
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=11 and c.shelve_flag=10 and c.deleted=10
+    AND c.state=11 and c.shelve_flag=10 and c.deleted=10 and m.kick_status=20 and m.del_flag=10 
     AND m.user_id=#{custId}
     ORDER BY m.create_date DESC
     limit #{start},#{pageSize}
@@ -436,7 +436,7 @@
     SELECT count(*)
     FROM `qh_coterie` c, `qh_coterie_member` m
     WHERE c.kid=m.coterie_id
-    AND c.state=11 and c.shelve_flag=10 and c.deleted=10
+    AND c.state=11 and c.shelve_flag=10 and c.deleted=10 and m.kick_status=20 and m.del_flag=10 
     AND m.user_id=#{custId}
   </select>
 

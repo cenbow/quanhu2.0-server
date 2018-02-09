@@ -133,7 +133,7 @@ public class AccountProvider implements AccountApi {
 
 			boolean flag = accountService.checkUserByPhone(registerDTO.getUserPhone(), header.getAppId());
 			if (flag) {
-				throw QuanhuException.busiError("该用户已存在");
+				return ResponseUtils.returnCommonException("该用户已存在");
 			}
 
 			Long userId = accountService.register(registerDTO);
@@ -161,7 +161,7 @@ public class AccountProvider implements AccountApi {
 			}
 			boolean flag = accountService.checkUserByPhone(registerDTO.getUserPhone(), registerDTO.getAppId());
 			if (flag) {
-				throw QuanhuException.busiError("该用户已存在");
+				return ResponseUtils.returnCommonException("该用户已存在");
 			}
 			accountService.agentRegister(registerDTO);
 			return ResponseUtils.returnObjectSuccess(true);
@@ -287,7 +287,7 @@ public class AccountProvider implements AccountApi {
 
 			boolean accountFlag = accountService.checkUserByPhone(loginDTO.getPhone(), header.getAppId());
 			if (accountFlag) {
-				throw QuanhuException.busiError("该手机号已存在");
+				return ResponseUtils.returnCommonException("该手机号已存在");
 			}
 
 			Long userId = null;
@@ -306,7 +306,7 @@ public class AccountProvider implements AccountApi {
 							login.getUserId(), loginDTO.getPhone());
 					userId = account.getKid();
 				} else {
-					throw QuanhuException.busiError("该用户已存在");
+					return ResponseUtils.returnCommonException("该用户已存在");
 				}
 			}
 			// 老用户不存在需要继续走第三方绑定手机号流程
@@ -515,14 +515,14 @@ public class AccountProvider implements AccountApi {
 			checkBindPhoneDTO(phoneDTO);
 			if (!smsManager.checkVerifyCode(phoneDTO.getPhone(), phoneDTO.getVerifyCode(), SmsType.CODE_CHANGE_PHONE,
 					phoneDTO.getAppId())) {
-				throw QuanhuException.busiError("验证码错误");
+				throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 			}
 			// 手机号加锁
 			lockManager.lock(Constants.BIND_PHONE, phoneDTO.getPhone());
 
 			boolean accountFlag = accountService.checkUserByPhone(phoneDTO.getPhone(), phoneDTO.getAppId());
 			if (accountFlag) {
-				throw QuanhuException.busiError("手机号已存在");
+				return ResponseUtils.returnCommonException("手机号已存在");
 			}
 			accountService.bindPhone(phoneDTO.getUserId(), phoneDTO.getPhone(), null);
 			return ResponseUtils.returnObjectSuccess(true);
@@ -562,7 +562,7 @@ public class AccountProvider implements AccountApi {
 
 				accountService.mergeActivityUser(phoneDTO.getUserId(), phoneDTO.getPhone());
 			} else {
-				throw QuanhuException.busiError("该用户已存在");
+				return ResponseUtils.returnCommonException("该手机号已存在");
 			}
 			return ResponseUtils.returnObjectSuccess(true);
 		} catch (QuanhuException e) {
@@ -588,11 +588,11 @@ public class AccountProvider implements AccountApi {
 			UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdUser.getThirdId(), thirdDTO.getAppId(),
 					thirdDTO.getThirdType());
 			if (thirdLogin != null) {
-				throw QuanhuException.busiError("第三方账户已存在");
+				return ResponseUtils.returnCommonException("第三方账户已存在");
 			}
 			ActivityTempUser tempUser = tempService.get(null, thirdUser.getThirdId(), thirdDTO.getAppId());
 			if (tempUser != null) {
-				throw QuanhuException.busiError("第三方账户已存在");
+				return ResponseUtils.returnCommonException("第三方账户已存在");
 			}
 			accountService.bindThird(thirdDTO.getUserId(), thirdUser, thirdDTO.getThirdType(), thirdDTO.getAppId());
 		} catch (QuanhuException e) {
