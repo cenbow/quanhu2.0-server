@@ -131,7 +131,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 		activityInfoDao.insertByPrimaryKeySelective(activity);
 		config.setKid(idAPI.getSnowflakeId().getData());
 		config.setActivityInfoId(activity.getKid());
-		activityVoteConfigDao.insert(config);
+		activityVoteConfigDao.insertByPrimaryKeySelective(config);
 
 		for (ActivityPrizes activityPrizes : prizes) {
 			activityPrizes.setKid(idAPI.getSnowflakeId().getData());
