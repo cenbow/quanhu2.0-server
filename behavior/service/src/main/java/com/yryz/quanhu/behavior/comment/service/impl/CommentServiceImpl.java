@@ -73,11 +73,12 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public int accretion(Comment comment) {
+    public Comment accretion(Comment comment) {
         RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
         int count = commentDao.accretion(comment);
+        Comment commentRedis = null;
         if (count > 0) {
-            Comment commentRedis = commentDao.querySingleCommentById(comment.getId());
+            commentRedis = commentDao.querySingleCommentById(comment.getId());
             if (null != commentRedis) {
                 try {
                     redisTemplate.opsForValue().set("COMMENT:" + commentRedis.getModuleEnum()+ ":" + commentRedis.getKid() + "_" + commentRedis.getTopId() + "_" + commentRedis.getResourceId(), commentRedis);
@@ -146,7 +147,7 @@ public class CommentServiceImpl implements CommentService {
         } catch (Exception e) {
             logger.info("评论接入积分系统出现异常:" + e);
         }
-        return count;
+        return commentRedis;
     }
 
     /**

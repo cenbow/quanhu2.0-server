@@ -101,9 +101,8 @@ public class CommentProvider implements CommentApi {
             }
             comment.setShelveFlag((byte) 10);
             comment.setDelFlag((byte) 10);
-            comment.setCreateDate(new Date());
-            int count = commentService.accretion(comment);
-            if (count > 0) {
+            Comment commentSuccess = commentService.accretion(comment);
+            if (null!=commentSuccess) {
                 map.put("result", 1);
                 if (comment.getTopId() == 0) {
                     try {
@@ -116,7 +115,7 @@ public class CommentProvider implements CommentApi {
                 map.put("result", 0);
             }
 
-            return ResponseUtils.returnObjectSuccess(comment);
+            return ResponseUtils.returnObjectSuccess(commentSuccess);
         } catch (Exception e) {
             logger.error("", e);
             return ResponseUtils.returnException(e);
