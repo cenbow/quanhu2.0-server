@@ -72,10 +72,11 @@ public class UnifyParameterValidHandler {
     private boolean getBoolean(String key,JoinPoint joinPoint){
         Object val = behaviorArgsBuild.getParameterValue(key,joinPoint.getArgs());
         if(val != null){
-            return Boolean.valueOf(String.valueOf(val));
-        }else {
-            return false;
+            if("1".equalsIgnoreCase(String.valueOf(val))){
+                return true;
+            }
         }
+        return false;
     }
 
     public Map<String,Object> getAnnotationValue(InvocationHandler handler){
