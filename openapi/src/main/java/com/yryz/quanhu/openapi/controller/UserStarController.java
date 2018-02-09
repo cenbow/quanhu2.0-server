@@ -175,7 +175,7 @@ public class UserStarController {
         starInfoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 
         PageList<StarInfoVO> pageList = ResponseUtils.getResponseData(elasticsearchService.searchStarUser(starInfoDTO));
-        logger.info("labelStarList result: {}", GsonUtils.parseJson(pageList));
+//        logger.info("labelStarList result: {}", GsonUtils.parseJson(pageList.));
         return ResponseUtils.returnApiObjectSuccess(pageList);
     }
 
