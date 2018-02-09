@@ -11,14 +11,14 @@ import com.yryz.quanhu.other.category.vo.CategoryAdminVo;
 import com.yryz.quanhu.other.category.vo.CategorySearchAdminVo;
 import com.yryz.quanhu.other.category.vo.CategoryTreeAdminVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import com.yryz.quanhu.user.service.UserTagApi;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +35,9 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
 
     @Reference
     private IdAPI idAPI;
+
+    @Reference
+    private UserTagApi userTagApi;
 
     @Override
     public List<CategoryTreeAdminVo> findCategoryTree(CategoryAdminVo search) {
@@ -120,9 +123,13 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
                 vo.setParentKid(category.getKid());
                 Integer num = categoryDao.selectCountBySearch(search);
                 categoryAdminVo.setSubordinateNum(num);
-                //todo
+
                 //下属达人数
-                //创建人
+                Set<String> tagIds = new HashSet<>();
+                tagIds.add(category.getKid().toString());
+                Response<Map<String, Long>> rpc = userTagApi.getTagCountByUser(tagIds);
+                Map<String, Long> countMap = rpc.getData();
+                categoryAdminVo.setStarNum(countMap.get(category.getKid().toString()));
             }
 
             return categoryAdminVo;
