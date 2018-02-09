@@ -28,6 +28,7 @@ import org.assertj.core.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +57,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
 
     /**
      * 发布话题
+     *
      * @param topicDto
      * @return
      */
@@ -86,7 +88,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
             /**
              * 资源聚合
              */
-            ResourceTotal resourceTotal=new ResourceTotal();
+            ResourceTotal resourceTotal = new ResourceTotal();
             resourceTotal.setCreateDate(DateUtils.getDateTime());
             resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
@@ -115,8 +117,8 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        TopicExample example=new TopicExample();
-        TopicExample.Criteria criteria=example.createCriteria();
+        TopicExample example = new TopicExample();
+        TopicExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
 
         List<Topic> topics = this.topicDao.selectByExample(example);
@@ -124,7 +126,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
             //throw QuanhuException.busiError("查询的话题不存在");
             return null;
         }
-        Topic topic=topics.get(0);
+        Topic topic = topics.get(0);
         TopicVo topicVo = new TopicVo();
         BeanUtils.copyProperties(topic, topicVo);
         Long createUserId = topic.getCreateUserId();
@@ -133,7 +135,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         }
 
         //虚拟阅读数
-        readApi.read(kid,topicVo.getCreateUserId());
+        readApi.read(kid, topicVo.getCreateUserId());
 
         return topicVo;
     }
@@ -158,22 +160,39 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         example.setOrderByClause(orderBy);
 
 
-        TopicExample.Criteria criteria=example.createCriteria();
-        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        if(StringUtils.isNotBlank(dto.getStartTime()) && StringUtils.isNotBlank(dto.getEndTime())){
-            criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
+        TopicExample.Criteria criteria = example.createCriteria();
+        TopicExample.Criteria criteriaOr=null;
+        if (StringUtils.isNotBlank(dto.getTitle())) {
+            criteriaOr=example.or();
+            criteria.andContentLike("%" + dto.getTitle() + "%");
+            criteriaOr.andTitleLike("%" + dto.getTitle() + "%");
         }
-        if(dto.getRecommend()!=null){
-            criteria.andRecommendEqualTo(dto.getRecommend());
-        }
-        if(dto.getShelveFlag()!=null){
-            criteria.andShelveFlagEqualTo(dto.getShelveFlag());
-        }
-       if(StringUtils.isNotBlank(dto.getTitle())){
-           criteria.andTitleLike("%"+dto.getTitle()+"%");
-       }
 
-        Long count=this.topicDao.countByExample(example);
+        criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        if(criteriaOr!=null){
+            criteriaOr.andDelFlagEqualTo(CommonConstants.DELETE_NO);
+        }
+        if (StringUtils.isNotBlank(dto.getStartTime()) && StringUtils.isNotBlank(dto.getEndTime())) {
+            criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
+            if(criteriaOr!=null) {
+                criteriaOr.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
+            }
+        }
+        if (dto.getRecommend() != null) {
+            criteria.andRecommendEqualTo(dto.getRecommend());
+            if(criteriaOr!=null) {
+                criteriaOr.andRecommendEqualTo(dto.getRecommend());
+            }
+        }
+        if (dto.getShelveFlag() != null) {
+            criteria.andShelveFlagEqualTo(dto.getShelveFlag());
+            if(criteriaOr!=null) {
+                criteriaOr.andShelveFlagEqualTo(dto.getShelveFlag());
+            }
+        }
+
+
+        Long count = this.topicDao.countByExample(example);
         List<Topic> list = this.topicDao.selectByExampleWithBLOBs(example);
         List<TopicVo> topicVos = new ArrayList<>();
         for (Topic topic : list) {
@@ -220,44 +239,44 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         Topic topicParam = new Topic();
         topicParam.setKid(kid);
         topicParam.setDelFlag(CommonConstants.DELETE_YES);
-        int result= this.topicDao.updateByPrimaryKeySelective(topicParam);
+        int result = this.topicDao.updateByPrimaryKeySelective(topicParam);
 
         /**
          * 话题下架，同时下架话题下的帖子
          */
-        TopicPostWithBLOBs topicPost=new TopicPostWithBLOBs();
+        TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         topicPost.setTopicId(kid);
         topicPost.setDelFlag(CommonConstants.DELETE_YES);
         this.topicPostDao.updateByPrimaryKeySelective(topicPost);
-        return  result;
+        return result;
     }
 
     @Override
     public Integer shalve(Long kid, Byte shalveFlag) {
-        Topic topic=new Topic();
+        Topic topic = new Topic();
         topic.setKid(kid);
         topic.setShelveFlag(shalveFlag);
-        int result=this.topicDao.updateByPrimaryKeySelective(topic);
+        int result = this.topicDao.updateByPrimaryKeySelective(topic);
 
         /**
          * 话题下架的同时话题对应的帖子也下架
          */
-        TopicPostExample example=new TopicPostExample();
-        TopicPostExample.Criteria criteria=example.createCriteria();
+        TopicPostExample example = new TopicPostExample();
+        TopicPostExample.Criteria criteria = example.createCriteria();
         criteria.andTopicIdEqualTo(kid);
-       List<TopicPost> topicPosts= this.topicPostDao.selectByExample(example);
-       if(topicPosts!=null){
-           for(TopicPost topicPost:topicPosts){
-               this.topicPost4AdminService.shelve(topicPost.getKid(),CommonConstants.SHELVE_NO);
-           }
-       }
+        List<TopicPost> topicPosts = this.topicPostDao.selectByExample(example);
+        if (topicPosts != null) {
+            for (TopicPost topicPost : topicPosts) {
+                this.topicPost4AdminService.shelve(topicPost.getKid(), CommonConstants.SHELVE_NO);
+            }
+        }
 
         return result;
     }
 
     @Override
     public Integer recommond(Long kid, Byte recommondFlag) {
-        Topic topic=new Topic();
+        Topic topic = new Topic();
         topic.setKid(kid);
         topic.setRecommend(recommondFlag);
         return this.topicDao.updateByPrimaryKeySelective(topic);
