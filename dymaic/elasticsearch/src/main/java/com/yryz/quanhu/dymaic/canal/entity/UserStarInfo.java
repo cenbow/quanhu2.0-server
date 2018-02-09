@@ -32,7 +32,7 @@ public class UserStarInfo {
     /**
      * 真实姓名或者运营者姓名
      */
-    @Field(type = FieldType.text, analyzer = "whitespace")
+    @Field(type = FieldType.text)
     private String realName;
 
     /**

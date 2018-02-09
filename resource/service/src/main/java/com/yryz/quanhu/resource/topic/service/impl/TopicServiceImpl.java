@@ -107,12 +107,8 @@ public class TopicServiceImpl implements TopicService {
         TopicExample example=new TopicExample();
         TopicExample.Criteria criteria=example.createCriteria();
         criteria.andKidEqualTo(kid);
-     //   criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
-
         List<Topic> topics = this.topicDao.selectByExample(example);
         if (null == topics || topics.isEmpty()) {
-            //throw QuanhuException.busiError("查询的话题不存在");
             return null;
         }
         Topic topic=topics.get(0);
@@ -144,7 +140,6 @@ public class TopicServiceImpl implements TopicService {
         Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
         Integer pageStartIndex = (pageNum - 1) * pageSize;
-        // Byte recommend =dto.getRecommend()==null?CommonConstants.recommend_YES:dto.getRecommend();
         String orderBy = StringUtils.isBlank(dto.getOrderBy()) ? "recommend desc ,create_date desc " : dto.getOrderBy();
         TopicExample example = new TopicExample();
         TopicExample.Criteria criteria=example.createCriteria();

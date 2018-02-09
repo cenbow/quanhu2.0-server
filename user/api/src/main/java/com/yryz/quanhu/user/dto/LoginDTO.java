@@ -20,6 +20,10 @@ import com.yryz.common.constant.DevType;
 @SuppressWarnings("serial")
 public class LoginDTO implements Serializable {
 	/**
+	 * 极光设备id（用于极光registrationId推送）（非必填）
+	 */
+	private String registrationId;
+	/**
 	 * 手机号
 	 */
 	private String phone;
@@ -109,6 +113,12 @@ public class LoginDTO implements Serializable {
 	}
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+	public String getRegistrationId() {
+		return registrationId;
+	}
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
 	}
 	@Override
 	public String toString() {

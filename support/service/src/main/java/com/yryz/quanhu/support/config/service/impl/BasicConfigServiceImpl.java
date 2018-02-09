@@ -199,7 +199,20 @@ public class BasicConfigServiceImpl implements BasicConfigService {
 
     @Override
     public BasicConfigDto get(BasicConfigDto dto) {
-        dto = basicConfigDao.selectByKid(BasicConfigDto.class,dto.getKid());
+        /**
+         * 适配多种查询 kid,configKey
+         *
+         * 优先kid查询，如果为空则，使用configKey查询
+         */
+        if(dto.getKid() != null){
+            dto = basicConfigDao.selectByKid(BasicConfigDto.class,dto.getKid());
+        }else{
+
+            if(!StringUtils.isBlank(dto.getConfigKey())){
+                dto = basicConfigDao.selectByKey(BasicConfigDto.class,dto.getConfigKey());
+            }
+        }
+
         if(dto!=null){
             BasicConfigDto parentDto = basicConfigDao.selectByKid(BasicConfigDto.class,dto.getParentKid());
             if(parentDto!=null){

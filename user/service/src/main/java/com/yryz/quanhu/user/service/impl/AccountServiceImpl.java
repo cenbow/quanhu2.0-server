@@ -163,9 +163,9 @@ public class AccountServiceImpl implements AccountService {
 			logger.info("[user_login]:params:{},appId:{},result:登录密码错误", JSON.toJSON(loginDTO), appId);
 			throw QuanhuException.busiError(ExceptionEnum.USER_LOGIN_PWD_ERROR);
 		}
-		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
+		if (StringUtils.isNotBlank(loginDTO.getRegistrationId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getDeviceId(), null));
+			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getRegistrationId(), null));
 			;
 		}
 
@@ -191,9 +191,9 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError(ExceptionEnum.SMS_VERIFY_CODE_ERROR);
 		}
 		// 更新设备号
-		if (StringUtils.isNotBlank(registerDTO.getDeviceId())) {
+		if (StringUtils.isNotBlank(registerDTO.getRegistrationId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getDeviceId(), null));
+			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getRegistrationId(), null));
 		}
 		return account.getKid();
 	}
@@ -212,8 +212,8 @@ public class AccountServiceImpl implements AccountService {
 			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号
-		if (StringUtils.isNotBlank(loginDTO.getDeviceId())) {
-			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getDeviceId(), null));
+		if (StringUtils.isNotBlank(loginDTO.getRegistrationId())) {
+			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getRegistrationId(), null));
 		}
 		return userId;
 	}
@@ -542,7 +542,7 @@ public class AccountServiceImpl implements AccountService {
 		insert(account);
 		UserBaseInfo baseInfo = new UserBaseInfo(userId, registerDTO.getRegLogDTO().getAppId(),
 				registerDTO.getUserNickName(), registerDTO.getUserImg(), registerDTO.getUserSign(),
-				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getDeviceId(),
+				registerDTO.getUserPhone(), registerDTO.getUserLocation(), registerDTO.getRegistrationId(),
 				registerDTO.getCityCode(), registerDTO.getIsVest() == null ? null : registerDTO.getIsVest().byteValue(),
 				registerDTO.getUserDesc());
 		baseInfo.setUserGenders(registerDTO.getUserGenders() == null ? null : registerDTO.getUserGenders().byteValue());

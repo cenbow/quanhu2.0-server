@@ -73,11 +73,12 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public int accretion(Comment comment) {
+    public Comment accretion(Comment comment) {
         RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
         int count = commentDao.accretion(comment);
+        Comment commentRedis = null;
         if (count > 0) {
-            Comment commentRedis = commentDao.querySingleCommentById(comment.getId());
+            commentRedis = commentDao.querySingleCommentById(comment.getId());
             if (null != commentRedis) {
                 try {
                     redisTemplate.opsForValue().set("COMMENT:" + commentRedis.getModuleEnum()+ ":" + commentRedis.getKid() + "_" + commentRedis.getTopId() + "_" + commentRedis.getResourceId(), commentRedis);
@@ -146,7 +147,7 @@ public class CommentServiceImpl implements CommentService {
         } catch (Exception e) {
             logger.info("评论接入积分系统出现异常:" + e);
         }
-        return count;
+        return commentRedis;
     }
 
     /**
@@ -193,10 +194,9 @@ public class CommentServiceImpl implements CommentService {
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
         PageHelper.startPage(commentFrontDTO.getCurrentPage().intValue(), commentFrontDTO.getPageSize().intValue());
         PageList pageList = new PageList();
-        Set<String> setKeys = null;
-        if (null != stringRedisTemplate) {
-            setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
-            logger.info("先走redis查值1");
+        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
+        if(setKeys.size()>0){
+            logger.info("redis查到了相应的key"+"COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
         }
         List<CommentVO> commentVOS = null;
         if (setKeys.size() <= 0) {
@@ -244,10 +244,9 @@ public class CommentServiceImpl implements CommentService {
             CommentFrontDTO commentFrontDTOnew = new CommentFrontDTO();
             commentFrontDTOnew.setTopId(commentVO.getKid());
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
-            Set<String> setSubKey = null;
-            if (null != stringRedisTemplate) {
-                setSubKey = stringRedisTemplate.keys("COMMENT:"+commentVO.getModuleEnum()+":*_" + commentVO.getKid() + "_" + commentVO.getResourceId());
-                logger.info("先走redis查4");
+            Set<String> setSubKey =stringRedisTemplate.keys("COMMENT:"+commentVO.getModuleEnum()+":*_" + commentVO.getKid() + "_" + commentVO.getResourceId());
+            if(setSubKey.size()>0){
+                logger.info("查到了redis数据");
             }
             if (setSubKey.size() <= 0) {
                 commentVOS_ = commentDao.queryComments(commentFrontDTOnew);
@@ -473,7 +472,14 @@ public class CommentServiceImpl implements CommentService {
                 commentInfoVO.setRevision(comment.getRevision());
                 commentInfoVO.setShelveFlag(comment.getShelveFlag());
                 commentInfoVO.setTargetUserId(comment.getTargetUserId());
-                commentInfoVO.setTargetUserNickName(comment.getTargetUserNickName());
+                try{
+                    UserSimpleVO userSimpleVO=userApi.getUserSimple(comment.getTargetUserId()).getData();
+                    if(null!=userSimpleVO){
+                        commentInfoVO.setTargetUserNickName(userSimpleVO.getUserNickName());
+                    }
+                }catch (Exception e){
+                    logger.info("远程调用用户接口出现异常:"+e);
+                }
                 commentInfoVO.setTenantId(comment.getTenantId());
                 commentInfoVO.setUserImg(comment.getUserImg());
                 commentInfoVO.setCreateDate(comment.getCreateDate());

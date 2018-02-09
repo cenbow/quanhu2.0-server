@@ -175,9 +175,8 @@
     </select>
 
     <update id="delComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
-        UPDATE qh_comment_info
-        SET del_flag=11
-        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT} AND create_user_id=#{createUserId,jdbcType=BIGINT} AND last_update_date=now()
+        UPDATE qh_comment_info SET del_flag=11
+        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT} AND create_user_id=#{createUserId,jdbcType=BIGINT}
     </update>
 
 
@@ -247,7 +246,7 @@
     <update id="updownBatch" parameterType="java.util.List">
         <foreach close="" collection="list" index="index" item="item" open="" separator=";">
             UPDATE qh_comment_info SET
-            shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
+            shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now(),del_flag=11
             where kid=#{item.kid,jdbcType=BIGINT}
         </foreach>
     </update>
