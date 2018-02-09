@@ -104,13 +104,11 @@ public class CommentProvider implements CommentApi {
             Comment commentSuccess = commentService.accretion(comment);
             if (null!=commentSuccess) {
                 map.put("result", 1);
-                if (comment.getTopId() == 0) {
                     try {
                         countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", 1L);
                     } catch (Exception e) {
                         logger.info("进入统计系统失败" + e);
                     }
-                }
             } else {
                 map.put("result", 0);
             }
@@ -288,6 +286,11 @@ public class CommentProvider implements CommentApi {
                 try {
                     int batchCount = commentService.updownBatch(commentsBatch);
                     if (batchCount > 0) {
+                        try {
+                            countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", Long.valueOf(-commentsBatch.size()));
+                        } catch (Exception e) {
+                            logger.info("进入统计系统失败" + e);
+                        }
                         logger.info("批量删除评论成功");
                     }
                 } catch (Exception e) {
