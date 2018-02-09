@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +106,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		}
 		redisDao.saveVerifyCode(codeDTO.getVerifyKey(), codeDTO.getAppId(), codeDTO.getServiceCode(), code,
 				rangeConfigVo);
+		redisDao.saveVerifyCodeTime(codeDTO.getVerifyKey(), codeDTO.getAppId());
 		// 发送短信验证码
 		if (CommonServiceType.PHONE_VERIFYCODE_SEND.getName().equals(codeDTO.getCommonServiceType())) {
 			Map<String, Object> params = new HashMap<>();
@@ -183,6 +183,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public boolean checkIpLimit(IpLimitDTO dto) {
+		
 		/*
 		 * IpLimitConfigVO configVO = null;//getIpLimitConfig(dto.getAppId(),
 		 * dto.getServiceType()); int total = redisDao.getIpCount(dto.getIp(),
@@ -262,14 +263,14 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	 * @param codeDTO
 	 */
 	private VerifyStatus checkVerifyCodeSendTime(VerifyCodeConfigVO configVO, VerifyCodeDTO codeDTO) {
-		Map<String, String> verifyCodeTime = redisDao.getVerifyCodeTime(codeDTO.getVerifyKey(), codeDTO.getAppId());
+		Map<String, Long> verifyCodeTime = redisDao.getVerifyCodeTime(codeDTO.getVerifyKey(), codeDTO.getAppId());
 		if (MapUtils.isNotEmpty(verifyCodeTime)) {
-			int total = NumberUtils.toInt(verifyCodeTime.get(RedisConstants.VERIFY_CODE_TOTAL));
-			long lastTime = NumberUtils.toLong(verifyCodeTime.get(RedisConstants.VERIFY_CODE_LASTTIME));
-			if (configVO.getNormalCodeTotal() < total) {
+			Long total = verifyCodeTime.get(RedisConstants.VERIFY_CODE_TOTAL);
+			Long lastTime = verifyCodeTime.get(RedisConstants.VERIFY_CODE_LASTTIME);
+			if (total != null && configVO.getNormalCodeTotal() < total) {
 				return VerifyStatus.MORETHAN_LIMIT;
 			}
-			if (lastTime - System.currentTimeMillis() < configVO.getNormalCodeDelayTime()) {
+			if (lastTime != null && lastTime - System.currentTimeMillis() < configVO.getNormalCodeDelayTime()) {
 				return VerifyStatus.TOO_FAST;
 			}
 		}
@@ -291,8 +292,15 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 
 	@Override
 	public boolean checkSmsSlipCode(VerifyCodeDTO verifyCodeDTO, AfsCheckRequest afsCheckReq) {
+		VerifyCodeConfigVO rangeConfigVo = JSON.parseObject(
+				configService.getConfig(ConfigConstants.VERIFY_CODE_CONFIG_NAME, verifyCodeDTO.getAppId()),
+				new TypeReference<VerifyCodeConfigVO>() {
+				});
+		if(rangeConfigVo == null){
+			rangeConfigVo = configVO;
+		}
 		// 不需要验证码直接成功
-		if ((afsCheckReq == null) && !checkNeedSlipCode(configVO, verifyCodeDTO)) {
+		if ((afsCheckReq == null) && !checkNeedSlipCode(rangeConfigVo, verifyCodeDTO)) {
 			return true;
 		}
 		// 图形码为空直接返回false
