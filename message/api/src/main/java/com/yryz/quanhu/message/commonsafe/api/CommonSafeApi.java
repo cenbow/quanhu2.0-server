@@ -7,6 +7,7 @@
  */
 package com.yryz.quanhu.message.commonsafe.api;
 
+import com.yryz.common.context.Context;
 import com.yryz.common.entity.AfsCheckRequest;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.message.commonsafe.constants.RedisConstants;
@@ -30,7 +31,7 @@ public interface CommonSafeApi {
 	 * @return
 	 */
 	public static String getIpLimitKey(String ip,String appId,String serviceType){
-		return String.format("%s.%s.%s", RedisConstants.IP_LIMIT,ip,appId,serviceType);
+		return String.format("%s:%s:%s", Context.getProperty("ip.limit.total"),ip,appId,serviceType);
 	}
 	/**
 	 * 获取ip限制key
@@ -40,7 +41,7 @@ public interface CommonSafeApi {
 	 * @return
 	 */
 	public static String getIpRunTimeKey(String ip,String appId,String serviceType){
-		return String.format("%s.%s.%s", RedisConstants.IP_RUN_TIME,ip,appId,serviceType);
+		return String.format("%s:%s:%s", Context.getProperty("ip.limit.time"),ip,appId,serviceType);
 	}
 	
     /**
@@ -49,17 +50,18 @@ public interface CommonSafeApi {
      * @param appId 
      * @return
      */
+	@Deprecated
     public static String getImgCode(String key,String appId){
-    	return String.format("%s.%s.%s",RedisConstants.IMG_VERIFY_CODE, key,appId);
+    	return String.format("%s:%s:%s",RedisConstants.IMG_VERIFY_CODE, key,appId);
     }
     /**
-     * 图形验证码验证次数key
+     * 图形验证码/滑动验证码不验证次数key
      * @param key 例如手机号、邮箱
      * @param appId 
      * @return
      */
     public static String getImgCodeCount(String key,String appId){
-    	return String.format("%s.%s.%s",RedisConstants.IMG_CHECK_COUNT, key,appId);
+    	return String.format("%s:%s:%s",Context.getProperty("taobao.splip.code.no.check.times"), key,appId);
     }
     /**
      * 获取普通验证码key
@@ -69,18 +71,30 @@ public interface CommonSafeApi {
      * @return
      */
 	public static String getVerifyCodeKey(String key,String appId,int serviceCode){
-		return String.format("%s.%s.%s.%s", RedisConstants.VERIFY_CODE,key,appId,serviceCode);
+		return String.format("%s:%s:%s:%s", Context.getProperty("verify.code"),key,appId,serviceCode);
 	}
 	
 	/**
-	 * 获取普通验证码发送时间key
+	 * 获取普通验证码风控cache key
 	 * @param key  例如手机号、邮箱
 	 * @param appId
 	 * @return
 	 */
-	public static String getVerifyCodeTimeKey(String key,String appId){
-		return String.format("%s.%s.%s", RedisConstants.VERIFY_CODE_TIME,key,appId);
+	public static String getVerifyCodeLimitTotalKey(String key,String appId){
+		return String.format("%s:%s:%s", Context.getProperty("verify.code.limit.total"),key,appId);
 	}
+	
+	/**
+	 * 获取普通验证码风控cache key
+	 * @param key  例如手机号、邮箱
+	 * @param appId
+	 * @return
+	 */
+	public static String getVerifyCodeLimitTimeKey(String key,String appId){
+		return String.format("%s:%s:%s", Context.getProperty("verify.code.limit.lastTime"),key,appId);
+	}
+	
+	
 	/**
 	 * 根据业务类型获取普通(手机、邮箱)验证码
 	 * @param codeDTO {@link VerifyCodeDTO}

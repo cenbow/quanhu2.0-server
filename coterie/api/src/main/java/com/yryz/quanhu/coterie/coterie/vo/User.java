@@ -10,8 +10,11 @@ import io.swagger.annotations.ApiModelProperty;
 public class User implements Serializable{
 	private static final long serialVersionUID = -886802207285084885L;
 
-	@ApiModelProperty("是否达人 : 10未认证，11认证")
-    private String   authStatus	;
+	@ApiModelProperty("认证状态 10-未认证 11-已认证")
+    private Byte authStatus	;
+	
+	@ApiModelProperty("是否达人 : 10:普通用户 11:达人")
+	private Byte userRole;
 	
 	@ApiModelProperty("头像")
     private String headImg;	
@@ -19,11 +22,11 @@ public class User implements Serializable{
 	@ApiModelProperty("昵称")
     private String nickName;
 	
-    public String getAuthStatus() {
+    public Byte getAuthStatus() {
         return authStatus;
     }
 
-    public void setAuthStatus(String authStatus) {
+    public void setAuthStatus(Byte authStatus) {
         this.authStatus = authStatus;
     }
 
@@ -43,5 +46,12 @@ public class User implements Serializable{
         this.nickName = nickName;
     }
 
+	public Byte getUserRole() {
+		return userRole;
+	}
+
+	public void setUserRole(Byte userRole) {
+		this.userRole = userRole;
+	}
 
 }
