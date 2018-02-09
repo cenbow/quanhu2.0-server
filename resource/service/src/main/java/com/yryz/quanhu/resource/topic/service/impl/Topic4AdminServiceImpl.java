@@ -136,7 +136,6 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
 
         //虚拟阅读数
         readApi.read(kid, topicVo.getCreateUserId());
-
         return topicVo;
     }
 

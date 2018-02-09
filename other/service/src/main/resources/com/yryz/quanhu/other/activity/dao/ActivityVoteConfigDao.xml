@@ -52,6 +52,9 @@
     <insert id="insertByPrimaryKeySelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.yryz.quanhu.other.activity.entity.ActivityVoteConfig">
 	    insert into qh_activity_vote_config 
 	    <trim prefix="(" suffix=")" suffixOverrides=",">
+		<if test="kid != null and kid != ''">
+			kid,
+		</if>
         <if test="activityInfoId != null">
 			activity_info_id,
 	    </if>
@@ -114,6 +117,9 @@
 	    </if>
 	    </trim>
 	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="kid != null and kid != ''">
+			#{kid,jdbcType=BIGINT},
+		</if>
         <if test="activityInfoId != null">
 			#{activityInfoId,jdbcType=BIGINT},
 	    </if>

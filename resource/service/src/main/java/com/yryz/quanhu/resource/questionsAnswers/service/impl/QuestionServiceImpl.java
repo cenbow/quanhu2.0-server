@@ -308,9 +308,11 @@ public class QuestionServiceImpl implements QuestionService {
                 } else {
                     questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
                 }
+
+               result= this.questionDao.updateByPrimaryKeySelective(questionBySearch);
             }
         }
-        return this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+        return result;
     }
 
 
