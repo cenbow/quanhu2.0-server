@@ -29,8 +29,8 @@ public class CoterieMemberTest {
     @Autowired
     CoterieMemberOrderNotifyServiceImpl service;
 
-    private static Long memberId = 730941139577331712L;
-    private static Long userId = 737251236811898880L;
+    private static Long memberId = 356399032434688L;
+    private static Long userId = 356367633866752L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
@@ -39,7 +39,7 @@ public class CoterieMemberTest {
     @Test
     public void test010_Join() {
 //        Response response = coterieMemberAPI.join(730941139577331712L,5536534415L,"我要加入,不审核的");
-        Response response = coterieMemberAPI.join(userId, coterieId, "我要加入,要审核的");
+        Response response = coterieMemberAPI.join(memberId, coterieId, "我要加入,要审核的");
         System.out.println(JsonUtils.toFastJson(response));
     }
 
@@ -47,7 +47,7 @@ public class CoterieMemberTest {
     public void test020_audit() {
 
         try {
-            Response response = coterieMemberAPI.audit(750245248050151424L, 750572971234705408L, 750263218193317888L, null);
+            Response response = coterieMemberAPI.audit(userId, memberId, coterieId, null);
             System.out.println(JsonUtils.toFastJson(response));
         } catch (QuanhuException e) {
             e.getMsg();
