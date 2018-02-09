@@ -76,20 +76,19 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         Integer pageSize = starInfoDTO.getPageSize();
         Long userId = starInfoDTO.getUserId();
 
-        QueryBuilder queryTagId = QueryBuilders.termQuery("userTagInfo.userTagInfoList.tagId", tagId);
-        QueryBuilder queryTagOnLine = QueryBuilders.termQuery("userTagInfo.userTagInfoList.delFlag", 10);
-        QueryBuilder queryUserRole = QueryBuilders.termQuery("userBaseInfo.userRole", 11);
+        QueryBuilder queryTagId = QueryBuilders.termQuery(ESConstants.USER_TAG_ID, tagId);
+        QueryBuilder queryTagOnLine = QueryBuilders.termQuery(ESConstants.USER_TAG_ONlINE, 10);
+        QueryBuilder queryUserRole = QueryBuilders.termQuery(ESConstants.USER_ROLE, 11);
         SearchQuery query = null;
 
         //分页信息
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize,
-                Sort.by(Direction.DESC, "userStarInfo.recommendHeight", "userStarInfo.recommendTime",
-                        "userStarInfo.authTime", "userBaseInfo.lastHeat"));
+                Sort.by(Direction.DESC, ESConstants.STAR_RECOMMEND_HEIGHT, ESConstants.STAR_RECOMMEND_TIME,
+                        ESConstants.STAR_AUTHTIME, ESConstants.USER_LASTHEAT));
         if (userId != null) {
             //当前用户
-            QueryBuilder queryMyself = QueryBuilders.termQuery("userId", userId.toString());
+            QueryBuilder queryMyself = QueryBuilders.termQuery(ESConstants.USER_ID_KEY, userId.toString());
             query = new NativeSearchQueryBuilder()
-                    //.withSort(SortBuilders.fieldSort("userStarInfo.recommendTime").unmappedType("integer").order(SortOrder.DESC))
                     .withFilter(QueryBuilders.boolQuery()
                             .must(queryTagId)
                             .must(queryTagOnLine)
@@ -106,7 +105,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
                     .build();
         }
 
-        logger.debug("searchStarUser query: {}", GsonUtils.parseJson(query));
+//        logger.debug("searchStarUser query: {}", GsonUtils.parseJson(query));
         return elasticsearchTemplate.queryForList(query, UserInfo.class);
     }
 
@@ -213,7 +212,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         queryBuilder.withFilter(boolQueryBuilder)
                 .withPageable(pageable);
-        List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder();
+        List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder(adminUserDTO);
         for (FieldSortBuilder sortBuilder : sortBuilders) {
             queryBuilder.withSort(sortBuilder);
         }
@@ -234,10 +233,13 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         return pageList;
     }
 
-    private List<FieldSortBuilder> getAdminUserSortBuilder() {
+    private List<FieldSortBuilder> getAdminUserSortBuilder(AdminUserInfoDTO adminUserDTO) {
         List<FieldSortBuilder> sortBuilders = new ArrayList<>();
-        FieldSortBuilder sort = SortBuilders.fieldSort(USER_CREATEDATE).order(SortOrder.DESC);
-        sortBuilders.add(sort);
+        Integer userRole = adminUserDTO.getUserRole();
+        if (userRole != null && userRole.equals(ESConstants.USER_ROLE_STAR)) {
+            sortBuilders.add(SortBuilders.fieldSort(ESConstants.STAR_AUTHTIME).order(SortOrder.DESC));
+        }
+        sortBuilders.add(SortBuilders.fieldSort(ESConstants.USER_CREATEDATE).order(SortOrder.DESC));
         return sortBuilders;
     }
 
