@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -13,6 +14,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.context.Context;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.resource.release.config.dao.ReleaseConfigDao;
 import com.yryz.quanhu.resource.release.config.entity.ReleaseConfig;
@@ -41,7 +44,7 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
     }
     
     public String getCacheKey(Object key) {
-        return "QH:ReleaseConfigVo:template_" + key;
+        return Context.getProperty(CommonConstants.SPRING_APPLICATION_NAME) + ":ReleaseConfigVo:template_" + key;
     }
     
     public ReleaseConfigDao getDao() {
@@ -63,7 +66,7 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
         }
 
         // 查询数据后，放置缓存
-        redisTemplate.opsForValue().set(this.getCacheKey(classifyId), vo);
+        redisTemplate.opsForValue().set(this.getCacheKey(classifyId), vo, 30, TimeUnit.DAYS);
         return vo;
     }
 
@@ -78,13 +81,15 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
             if (null == cfg || null == cfg.getClassifyId() || null == cfg.getPropertyKey()) {
                 continue;
             }
-            this.updateByUkSelective(cfg);
-            classifyIds.add(cfg.getClassifyId());
+            int upRow = this.updateByUkSelective(cfg);
+            if (upRow > 0) {
+                classifyIds.add(cfg.getClassifyId());
+            }
             result++;
         }
-        
+
         // 更新数据后，处理缓存
-        for(Long classifyId:classifyIds){
+        for (Long classifyId : classifyIds) {
             redisTemplate.delete(this.getCacheKey(classifyId));
         }
         return result;

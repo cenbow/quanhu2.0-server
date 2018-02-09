@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -76,7 +77,9 @@ public class RewardInfoProvider implements RewardInfoApi {
             GiftInfo giftInfo = giftInfoService.selectByKid(record.getGiftId());
             Assert.notNull(giftInfo, "打赏礼物不存在，giftId：" + record.getGiftId());
             Assert.isTrue(giftInfo.getGiftPrice().equals(record.getGiftPrice()), "打赏礼物价值与系统初始化礼物价值 不同！");
-            Assert.isTrue(!record.getCreateUserId().equals(record.getToUserId()), "打赏人不允许 打赏自己的资源！");
+            if(record.getCreateUserId().equals(record.getToUserId())){
+                throw new QuanhuException(ExceptionEnum.NOT_TO_PLAY_REWARD);
+            }
             
             record.setRewardStatus(RewardConstants.reward_status_pay_not);
             record.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));
@@ -129,6 +132,9 @@ public class RewardInfoProvider implements RewardInfoApi {
 
             // 只返回 打赏成功的记录
             dto.setRewardStatus(RewardConstants.reward_status_pay_success);
+            if(null == dto.getOrderType()){
+                dto.setOrderType(RewardConstants.OrderType.time_new);
+            }
             PageList<RewardInfoVo> pageList = rewardInfoService.pageByCondition(dto, isCount);
             if (null == pageList || CollectionUtils.isEmpty(pageList.getEntities()) || null == dto.getQueryType()) {
                 return ResponseUtils.returnObjectSuccess(pageList);

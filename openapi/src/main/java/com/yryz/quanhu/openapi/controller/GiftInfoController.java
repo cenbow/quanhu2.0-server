@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.behavior.gift.api.GiftInfoApi;
@@ -52,6 +53,7 @@ public class GiftInfoController {
             @ApiImplicitParam(name = "giftName", paramType = "query", required = true),
             @ApiImplicitParam(name = "giftImage", paramType = "query", required = true),
             @ApiImplicitParam(name = "giftPrice", paramType = "query", required = true) })
+    @UserBehaviorValidation(event = "礼物更新", login = true)
     @PostMapping(value = "{version}/gift/info")
     public Response<Integer> update(@RequestParam Long kid, @RequestParam String giftName,
             @RequestParam String giftImage, @RequestParam Long giftPrice) {

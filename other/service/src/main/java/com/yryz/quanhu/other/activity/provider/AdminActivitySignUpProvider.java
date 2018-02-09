@@ -42,7 +42,7 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			count = adminActivitySignUpService.activityRelease(activityInfoAndEnrolConfig);
 		} catch (Exception e) {
-			logger.error("后台发布报名类活动失败:"+ JsonUtils.toFastJson(activityInfoAndEnrolConfig));
+			logger.error("后台发布报名类活动失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);
@@ -61,7 +61,7 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			pageList = adminActivitySignUpService.adminlist(pageNo,pageSize,adminActivityInfoSignUpDto);
 		} catch (Exception e) {
-			logger.error("查询(后台)报名活动列表失败:"+ JsonUtils.toFastJson(adminActivityInfoSignUpDto));
+			logger.error("查询(后台)报名活动列表失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(pageList);
@@ -77,25 +77,11 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			activityInfoAndEnrolConfig = adminActivitySignUpService.getActivitySignUpDetail(id);
 		} catch (Exception e) {
-			logger.error("（后台）获取报名类活动详情失败:"+ JsonUtils.toFastJson(id));
+			logger.error("（后台）获取报名类活动详情失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(activityInfoAndEnrolConfig);
 	}
-	/**
-	 *  后台编辑报名类活动
-	 * @param activityInfoAndEnrolConfig
-	 * @param request
-	 * @return
-	 */
-	//void activitySignEdit(ActivityInfoAndEnrolConfig activityInfoAndEnrolConfig);
-	/**
-	 *  后台修改备注、下线操作
-	 * @param activityInfo
-	 * @param request
-	 * @return
-	 */
-	//void operationEdit(ActivityInfo activityInfo);
 
 	/**
 	 * 根据活动ID获取活动主表详情
@@ -108,7 +94,7 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			activityInfo = adminActivitySignUpService.getActivityDetail(id);
 		} catch (Exception e) {
-			logger.error("根据活动ID获取活动主表详情失败:"+ JsonUtils.toFastJson(id));
+			logger.error("根据活动ID获取活动主表详情失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(activityInfo);
@@ -123,7 +109,7 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			pageList = adminActivitySignUpService.attendlist(pageNo,pageSize,adminActivityRecordVo);
 		} catch (Exception e) {
-			logger.error("(后台)报名人员列表失败:"+ JsonUtils.toFastJson(adminActivityRecordVo));
+			logger.error("(后台)报名人员列表失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(pageList);
@@ -137,15 +123,11 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			pageList = adminActivitySignUpService.adminAllSharelist(pageNo,pageSize,adminActivityInfoDto);
 		} catch (Exception e) {
-			logger.error("(后台)所有上线的活动列表失败:"+ JsonUtils.toFastJson(adminActivityInfoDto));
+			logger.error("(后台)所有上线的活动列表失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(pageList);
 	}
-	/**
-	 * 修改活动顺序（后台管理）
-	 */
-	//void updateActivitySortBatch(Long[] idsArr, String custId);
 	/**
 	 *  后台编辑活动
 	 * @param activityInfoAndEnrolConfig
@@ -158,7 +140,7 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			count = adminActivitySignUpService.activityInfoEdit(activityInfo);
 		} catch (Exception e) {
-			logger.error("后台编辑活动失败:"+ JsonUtils.toFastJson(activityInfo));
+			logger.error("后台编辑活动失败:",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(count);
@@ -174,12 +156,9 @@ public class AdminActivitySignUpProvider implements AdminActivitySignUpApi {
 		try {
 			list = adminActivitySignUpService.adminAllSharelistNoPage();
 		} catch (Exception e) {
-			logger.error("(后台)所有上线的活动列表+不分页失败");
+			logger.error("(后台)所有上线的活动列表+不分页失败",e);
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);
 	}
-	
-	
-
 }

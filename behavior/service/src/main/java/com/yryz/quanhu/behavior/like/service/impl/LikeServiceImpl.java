@@ -11,7 +11,9 @@ import com.yryz.quanhu.behavior.like.vo.LikeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author:sun
@@ -55,5 +57,24 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeVO querySingleLiker(Like like) {
         return likeDao.querySingleLiker(like);
+    }
+
+    @Override
+    public Map<String, Integer> getLikeFlagBatch(List<Long> resourceIds, long userId) {
+        Map<String,Integer> maps=new HashMap<String, Integer>();
+        if(null!=resourceIds&&resourceIds.size()>0){
+            for(Long resourceId:resourceIds){
+                Like like=new Like();
+                like.setResourceId(resourceId);
+                like.setUserId(userId);
+                int count = likeDao.isLike(like);
+                if(count>0){
+                    maps.put(String.valueOf(resourceId),10);
+                }else{
+                    maps.put(String.valueOf(resourceId),11);
+                }
+            }
+        }
+        return maps;
     }
 }

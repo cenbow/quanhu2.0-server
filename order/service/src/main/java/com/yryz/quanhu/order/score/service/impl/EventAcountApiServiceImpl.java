@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.google.gson.JsonObject;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -25,6 +26,8 @@ import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventSign;
 import com.yryz.quanhu.score.vo.GrowFlowReportVo;
 import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
+
+import net.sf.json.JSONObject;
 
 
 /**
@@ -49,6 +52,7 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	
 	@Override
 	public EventAcount getEventAcount(String userId) {
+		logger.info("获取用户事件账户记录=userId:"+userId);
 		return eventAcountAPI.getEventAcount(userId);
 	}
 	
@@ -72,6 +76,13 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 
 	@Override
 	public EventSign getEventSign(String userId, String eventCode) {
+		JsonObject object=new JsonObject();
+		object.addProperty("userId", userId);
+		object.addProperty("eventCode", eventCode);
+//		 Map<String, Object> result = new HashMap<>();
+//		 result.put("userId", userId);
+//		 result.put("eventCode", eventCode);
+		logger.info("获取签到状态={}" ,object);
 		return eventAcountAPI.getEventSign(userId, eventCode);
 	}
 
@@ -122,6 +133,8 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	@Override
 	public Response<List<ScoreFlowReportVo>> getScoreFlowAll(ScoreFlowQuery sfq) {
 		 try {
+				JSONObject obj = JSONObject.fromObject(sfq);
+				logger.info("获取全部积分明细={}" , obj );
 			  List<ScoreFlowReportVo> list =  scoreAPI.getScoreFlowAll(sfq);
 		      return ResponseUtils.returnListSuccess(list);
 	        } catch (QuanhuException e) {
@@ -134,7 +147,8 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	@Override
 	public Response<PageList<ScoreFlowReportVo>> getScoreFlow(ScoreFlowQuery sfq) {
 		try {
-			
+			JSONObject obj = JSONObject.fromObject(sfq);
+			logger.info("获取积分明细={}" , obj );
 			PageList<ScoreFlowReportVo> pageList = scoreAPI.getScoreFlowPage(sfq);
 			return ResponseUtils.returnObjectSuccess(pageList);
 		} catch (QuanhuException e) {
@@ -150,6 +164,8 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	@Override
 	public Response<PageList<GrowFlowReportVo>> getGrowFlow(GrowFlowQuery gfq ) {
 		  try {
+				JSONObject obj = JSONObject.fromObject(gfq);
+				logger.info("获取成长值明细={}" , obj );
 			  PageList<GrowFlowReportVo> pageList =  growAPI.getGrowFlowPage(gfq);
 		      return ResponseUtils.returnObjectSuccess(pageList);
 	        } catch (QuanhuException e) {
@@ -164,6 +180,8 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	@Override
 	public Response<List<GrowFlowReportVo>> getGrowFlowAll(GrowFlowQuery gfq) {
 		 try {
+				JSONObject obj = JSONObject.fromObject(gfq);
+				logger.info("获取全部成长明细={}" , obj );
 			  List<GrowFlowReportVo> list =  growAPI.getGrowFlowAll(gfq);
 		      return ResponseUtils.returnListSuccess(list);
 	        } catch (QuanhuException e) {

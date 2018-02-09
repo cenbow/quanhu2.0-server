@@ -14,7 +14,9 @@ import com.yryz.quanhu.behavior.comment.service.CommentService;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
+import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
@@ -55,6 +57,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Reference(check = false)
     private CountFlagApi countFlagApi;
+
+    @Reference(check = false)
+    private CountApi countApi;
 
     @Reference(check = false)
     private PushAPI pushAPI;
@@ -340,11 +345,11 @@ public class CommentServiceImpl implements CommentService {
 
             Map<String, Long> maps = null;
             try {
-                maps = countFlagApi.getAllCountFlag("11", commentVO.getResourceId(), "", map).getData();
+                maps = countApi.getCountFlag(BehaviorEnum.Like.getCode(), commentVO.getKid(), "",commentFrontDTO.getCreateUserId()).getData();
             } catch (Exception e) {
                 logger.info("调用统计信息失败:" + e);
             }
-            commentVO.setLikeCount(maps.get("likeCount").intValue());
+            commentVO.setLikeCount(maps.get(BehaviorEnum.Like.getKey()).intValue());
             commentVO.setLikeFlag(maps.get("likeFlag").byteValue());
             commentVO.setCommentCount(commentVOS_.size());
             commentVO.setChildrenComments(commentsnew);

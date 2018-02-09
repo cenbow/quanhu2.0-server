@@ -8,7 +8,10 @@
 package com.yryz.quanhu.resource;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,7 @@ import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.dao.canal.ResourceCanalDao;
+import com.yryz.quanhu.resource.entity.ResourceModel;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.hotspot.service.CalculationService;
 import com.yryz.quanhu.resource.service.ResourceService;
@@ -105,8 +109,17 @@ public class ResourceTest {
 //		resource.setTitle("title");
 //		resource.setModuleEnum(ResourceTypeEnum.RELEASE + "," + ResourceTypeEnum.TOPIC );
 		resource.setCoterieId("1");
-		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "orderby", 0, 10, "2018-1-17 1:1:1", "2018-2-17 14:1:1");
+		Response<List<ResourceVo>> resonse = resourceApi.getResources(resource, "", 0, 10, "2018-2-1 1:1:1", "2018-2-17 14:1:1");
 		System.out.println(GsonUtils.parseJson(resonse.getData()));
+	}
+	
+	@Test
+	public void getMap(){
+		Set<String> ids = new HashSet<>();
+		ids.add("367280144269312");
+		Map<String, ResourceModel> map = resourceService.getResources(ids);
+		System.out.println(GsonUtils.parseJson(map));
+		System.out.println("");
 	}
 	
 	@Test

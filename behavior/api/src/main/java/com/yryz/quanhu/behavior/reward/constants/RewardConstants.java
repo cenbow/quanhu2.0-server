@@ -44,4 +44,23 @@ public final class RewardConstants {
     * @Fields : 打赏统计目标类型（11：资源）
     */
     public static final Byte target_type_resource = 11;
+    
+
+    /**  
+    * @Description: 列表排序类型
+    * @author wangheng
+    * @date 2018年1月22日 下午5:09:03  
+    *    
+    */
+    public static final class OrderType {
+        /**  
+        * @Fields newest : 时间最新
+        */
+        public static final byte time_new = 1;
+
+        /**  
+        * @Fields first : 时间最早
+        */
+        public static final byte time_old = 2;
+    }
 }
