@@ -78,13 +78,13 @@ public class ConfigController {
         return ResponseUtils.returnObjectSuccess(map);
     }
 
-    @ApiOperation("获取配置接口")
+    @ApiOperation("获取广告时长配置接口")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/{version}/config/getConfig")
-    public Response<Map<String, String>> forceUpgrade(@RequestParam String configKey, HttpServletRequest request) {
-        String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue(configKey));
+    @GetMapping(value = "/{version}/config/adTime")
+    public Response<Map<String, String>> forceUpgrade(HttpServletRequest request) {
+        String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue("adTime"));
         Map<String, String> map = Maps.newHashMap();
-        map.put(configKey, configStr);
+        map.put("adTime", configStr);
         return ResponseUtils.returnObjectSuccess(map);
     }
 }
