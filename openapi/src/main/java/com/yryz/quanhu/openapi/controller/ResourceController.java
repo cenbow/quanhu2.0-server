@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
-import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -34,8 +35,6 @@ import com.yryz.quanhu.resource.vo.ResourceVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-
-import java.util.List;
 
 /**
  * @author yehao
@@ -106,7 +105,6 @@ public class ResourceController {
         return ResponseUtils.returnObjectSuccess(pageList);
     }
 
-    @UserBehaviorValidation(login = true)
     @ApiOperation("我的发布/他人个人主页发布")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/myRelease")

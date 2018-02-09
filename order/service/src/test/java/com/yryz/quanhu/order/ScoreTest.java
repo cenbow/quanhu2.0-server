@@ -25,6 +25,7 @@ import com.yryz.quanhu.order.grow.service.GrowFlowService;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
+import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
 import com.yryz.quanhu.score.vo.EventSign;
@@ -47,6 +48,10 @@ public class ScoreTest {
 
 	@Reference
 	private static EventAPI eventAPI;
+	
+	
+	@Reference
+	private static ScoreAPI scoreAPI;
 	
 	
 	@Reference
@@ -155,6 +160,14 @@ public class ScoreTest {
 	public void promoteGrowLevel(){
 	int i = 	growAPI.promoteGrowLevel("737469249351843840", "5", "19");
 	System.out.println("i "+i);
+	}
+	
+	
+	@Test
+	public void consumeScore(){
+		scoreAPI.consumeScore("359985349648384", 200, "36");
+//	int i = 	growAPI.promoteGrowLevel("737469249351843840", "5", "19");
+//	System.out.println("i "+i);
 	}
 
 	

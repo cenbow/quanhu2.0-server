@@ -1,5 +1,13 @@
 package com.yryz.quanhu.resource.topic.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.assertj.core.util.DateUtil;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
@@ -10,7 +18,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
-import com.yryz.quanhu.behavior.read.api.ReadApi;;
+import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
@@ -22,15 +30,6 @@ import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.service.TopicPost4AdminService;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
-import org.assertj.core.util.DateUtil;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {

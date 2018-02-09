@@ -132,6 +132,9 @@ public class RewardInfoProvider implements RewardInfoApi {
 
             // 只返回 打赏成功的记录
             dto.setRewardStatus(RewardConstants.reward_status_pay_success);
+            if(null == dto.getOrderType()){
+                dto.setOrderType(RewardConstants.OrderType.time_new);
+            }
             PageList<RewardInfoVo> pageList = rewardInfoService.pageByCondition(dto, isCount);
             if (null == pageList || CollectionUtils.isEmpty(pageList.getEntities()) || null == dto.getQueryType()) {
                 return ResponseUtils.returnObjectSuccess(pageList);
