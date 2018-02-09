@@ -88,7 +88,8 @@ public class CoterieInfo implements Serializable{
 	
 	@ApiModelProperty("审批人")
 	private Integer auditUserId;
-	
+	private String auditCreator;
+
 	@ApiModelProperty("审批备注")
 	private String auditRemark;
 
@@ -97,7 +98,7 @@ public class CoterieInfo implements Serializable{
 	
 	@ApiModelProperty("最大成员数")
 	private Integer maxMemberNum=2000;
-	
+
 	@ApiModelProperty("圈主信息")
     private  User  user;
 	
@@ -332,6 +333,14 @@ public class CoterieInfo implements Serializable{
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getAuditCreator() {
+		return auditCreator;
+	}
+
+	public void setAuditCreator(String auditCreator) {
+		this.auditCreator = auditCreator;
 	}
 }
 

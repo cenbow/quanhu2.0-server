@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
 					JsonUtils.toFastJson(baseInfo));
 		}
 
-		// 同步im
+		// 昵称、头像修改时同步im
 		mqSender.userUpdate(baseInfo);
 
 		// 更新后的用户信息

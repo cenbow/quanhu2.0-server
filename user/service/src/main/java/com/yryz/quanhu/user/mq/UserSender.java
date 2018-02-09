@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.user.dto.RegisterDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
 
@@ -36,6 +37,9 @@ public class UserSender {
 	 * direct exchange 单一消息指定发送，需同时指定exchange-key和queue的routing-key
 	 */
 	public void userUpdate(UserBaseInfo baseInfo){
+		if(baseInfo == null || (StringUtils.isBlank(baseInfo.getUserImg()) && StringUtils.isBlank(baseInfo.getUserNickName()))){
+			return;
+		}
 		String msg = JsonUtils.toFastJson(baseInfo);
 		logger.info("[UserSender.userUpdate.sendMQ]={} start",msg);
 		rabbitTemplate.setExchange(MqConstants.USER_DIRECT_EXCHANGE);

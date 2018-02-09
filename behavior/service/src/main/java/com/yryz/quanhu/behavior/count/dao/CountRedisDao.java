@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -97,4 +98,41 @@ public class CountRedisDao {
         return count;
     }
 
+    /**
+     * 从redis里查询count值
+     *
+     * @param kids
+     * @param code
+     * @return
+     */
+    public List<Long> getCount(List<Long> kids, String code, String page) {
+        List<String> keys = Lists.newArrayList();
+        for (Long kid : kids) {
+            if (kid == null) {
+                keys.add(RedisContants.getReadCountKey("", code, page));
+                continue;
+            }
+            keys.add(RedisContants.getReadCountKey(kid.toString(), code, page));
+        }
+        RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
+        //批量查询redis的keys
+        List<Long> list = redisTemplate.opsForValue().multiGet(keys);
+        //补redis查不到值
+        for (int i = 0; i < list.size(); i++) {
+            Long count = list.get(i);
+            //count=null表示未从redis中查询到值
+            if (count == null) {
+                String kid = kids.get(i).toString();
+                //redis中不存在key，从mongodb中查询
+                CountModel countModel = countMongoDao.getLastData(code, kid, "");
+                if (countModel != null) {
+                    count = countModel.getCount();
+                }
+                redisTemplate.opsForValue().increment(RedisContants.getReadCountKey(kid, code, page), count);
+                redisTemplate.expire(RedisContants.getReadCountKey(kid, code, page), RedisContants.READ_COUNT_KEY_EXPIRE, TimeUnit.MINUTES);
+            }
+            list.set(i, count);
+        }
+        return list;
+    }
 }
