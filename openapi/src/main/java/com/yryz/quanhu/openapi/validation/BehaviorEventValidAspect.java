@@ -2,7 +2,9 @@ package com.yryz.quanhu.openapi.validation;
 
 import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
+import com.yryz.common.context.SpringContextHelper;
 import com.yryz.quanhu.openapi.validation.filter.*;
+import com.yryz.quanhu.openapi.validation.valid.UnifyParameterValidHandler;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -11,11 +13,16 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.yryz.common.context.SpringContextHelper.getBean;
 
 /**
  * Copyright (c) 2017-2018 Wuhan Yryz Network Company LTD.
@@ -66,11 +73,14 @@ public class BehaviorEventValidAspect {
     @Before("behaviorValid()")
     public void beforeValid(JoinPoint joinPoint){
 
-        logger.info("[用户数据权限认证]-------------★start★-------------");
+        logger.debug("[用户数据权限认证]-------------★start★-------------");
 
         //获取注解参数
         MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
         Method method = methodSignature.getMethod();
+
+        //取值方式{注解中都用占位符标识，这需要通过切面方法参数中获取指定值}
+        UserBehaviorArgs args = method.getDeclaredAnnotation(UserBehaviorArgs.class);
 
         //校验规则
         UserBehaviorValidation validation = method.getDeclaredAnnotation(UserBehaviorValidation.class);
@@ -78,16 +88,20 @@ public class BehaviorEventValidAspect {
             return;
         }
 
-        logger.info("[用户说明]------------★["+validation.event()+"]★-------------");
+        //重写校验规则
+        if(validation.getClass() != null){
+            UnifyParameterValidHandler  handler = (UnifyParameterValidHandler)SpringContextHelper.getBean(validation.validClass());
+            //重新设置
+            handler.rebuild(validation,args,joinPoint);
+        }
 
-        //取值方式{注解中都用占位符标识，这需要通过切面方法参数中获取指定值}
-        UserBehaviorArgs args = method.getDeclaredAnnotation(UserBehaviorArgs.class);
+        logger.debug("[用户说明]------------★["+validation.event()+"]★-------------");
 
         //获取必要参数
         Object [] joinPointArgs = joinPoint.getArgs();
 
         //装载filterChain 循环验证
-        BehaviorValidFilterChain filterChain = new BehaviorValidFilterChain();
+        BehaviorValidFilterChain filterChain = this.initFilterChain(validation);
 
         //初始化相关公共参数
         Map<String,Object> context = this.initFilterContext(args,joinPointArgs);
@@ -97,6 +111,16 @@ public class BehaviorEventValidAspect {
         filterChain.setJoinPoint(joinPoint);
         filterChain.setUserBehaviorArgs(args);
         filterChain.setUserBehaviorValidation(validation);
+
+        //执行
+        filterChain.execute();
+
+        logger.debug("[用户数据权限认证]-------------★finish★-------------");
+    }
+
+    private BehaviorValidFilterChain initFilterChain(UserBehaviorValidation validation){
+
+        BehaviorValidFilterChain filterChain = new BehaviorValidFilterChain();
 
         //是否校验登录
         if (validation.login()){
@@ -122,10 +146,8 @@ public class BehaviorEventValidAspect {
         if(validation.illegalWords()){
             filterChain.addFilter(userIllegalWordsFilter);
         }
-        //执行
-        filterChain.execute();
 
-        logger.info("[用户数据权限认证]-------------★finish★-------------");
+        return filterChain;
     }
 
 
