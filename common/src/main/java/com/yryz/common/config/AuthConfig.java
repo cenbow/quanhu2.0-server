@@ -41,6 +41,11 @@ public class AuthConfig implements Serializable{
 	 * refreshToken过期时间后延条件的时间点，即距离refreshExpire过期前的时间范围/小时
 	 */
 	private Integer refreshTokenDelayExpireTime = 24;
+	
+	/**
+	 * 保存临时旧token的过期时间/小时
+	 */
+	private Integer tempTokenExpireTime = 4;
 	public Integer getWebTokenExpire() {
 		return webTokenExpire;
 	}
@@ -70,6 +75,12 @@ public class AuthConfig implements Serializable{
 	}
 	public void setTokenRefreshTimes(Integer tokenRefreshTimes) {
 		this.tokenRefreshTimes = tokenRefreshTimes;
+	}
+	public Integer getTempTokenExpireTime() {
+		return tempTokenExpireTime;
+	}
+	public void setTempTokenExpireTime(Integer tempTokenExpireTime) {
+		this.tempTokenExpireTime = tempTokenExpireTime;
 	}
 	/**
 	 * 

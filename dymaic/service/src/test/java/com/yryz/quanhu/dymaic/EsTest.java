@@ -51,7 +51,7 @@ public class EsTest {
 //        dto.setNickName("q");
 //        dto.setAuditStatus((byte) 11);
 //        dto.setGrowLevel("5");
-        dto.setNickName("bt00");
+        dto.setNickName("呵");
         Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
         System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }
