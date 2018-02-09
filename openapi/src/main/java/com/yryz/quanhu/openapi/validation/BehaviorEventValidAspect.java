@@ -86,11 +86,12 @@ public class BehaviorEventValidAspect {
         }
 
         //重写校验规则
+        if(validation.validClass().isAssignableFrom(UnifyParameterValidHandler.class)){
 
-        if(validation.getClass()!=null){
-
+            UnifyParameterValidHandler  handler = (UnifyParameterValidHandler)SpringContextHelper.getBean(validation.validClass());
+            //重新设置
+            handler.rebuild(validation,args,joinPoint);
         }
-
 
         logger.debug("[用户说明]------------★["+validation.event()+"]★-------------");
 
