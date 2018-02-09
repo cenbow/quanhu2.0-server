@@ -262,8 +262,6 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerExample example=new AnswerExample();
         AnswerExample.Criteria criteria=example.createCriteria();
         criteria.andQuestionIdEqualTo(kid);
-       // criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-      //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
         if(answerWithBLOBsList==null || answerWithBLOBsList.isEmpty()){
             return null;
@@ -292,7 +290,6 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerExample example = new AnswerExample();
         AnswerExample.Criteria criteria = example.createCriteria();
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-     //   criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         criteria.andQuestionIdEqualTo(kid);
         List<AnswerWithBLOBs> answerWithBLOBsList = this.answerDao.selectByExampleWithBLOBs(example);
         if (!answerWithBLOBsList.isEmpty()) {
