@@ -15,10 +15,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -81,4 +78,13 @@ public class ConfigController {
         return ResponseUtils.returnObjectSuccess(map);
     }
 
+    @ApiOperation("获取广告时长配置接口")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/{version}/config/adTime")
+    public Response<Map<String, String>> forceUpgrade(HttpServletRequest request) {
+        String configStr = ResponseUtils.getResponseData(basicConfigApi.getValue("adTime"));
+        Map<String, String> map = Maps.newHashMap();
+        map.put("adTime", configStr);
+        return ResponseUtils.returnObjectSuccess(map);
+    }
 }

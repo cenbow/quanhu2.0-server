@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.common.constant.ExceptionEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -178,7 +179,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
 
         if(sourceUserId.equalsIgnoreCase(targetUserId)){
-            throw new QuanhuException("","不允许与自己设置关系:"+sourceUserId,"不允许与自己设置关系");
+            throw new QuanhuException(ExceptionEnum.USER_RELATION_TO_SELF_ERROR);
         }
         /**
          * 判断关注人数是否已达到上线
@@ -187,7 +188,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         Long friendCount = userRelationDao.selectCount(sourceUserId,FRIEND.getCode());
 
         if((followCount+friendCount)>=maxFollowCount){
-            throw new QuanhuException("","您已添加最大关注人数: "+followCount,"您已添加最大关注人数: "+maxFollowCount);
+            throw new QuanhuException(ExceptionEnum.USER_FOLLOW_MAX_COUNT_ERROR);
         }
         /**
          * 判断目标用户是否存在
@@ -199,7 +200,7 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
         UserBaseInfo targetUser =userService.getUser(Long.parseLong(targetUserId));
         if(null == targetUser){
-            throw new QuanhuException("","目标用户不存在或已注销："+targetUserId,"目标用户不存在或已注销");
+            throw new QuanhuException(ExceptionEnum.USER_MISSING.getCode(),"目标用户不存在或已注销："+targetUserId,"目标用户不存在或已注销");
         }
         return false;
     }
@@ -219,12 +220,12 @@ public class UserRelationServiceImpl implements UserRelationService{
          */
         if(TO_BLACK.getCode() == sourceDto.getRelationStatus()){
             if(UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException("","你已将该用户加入黑名单","你已将该用户加入黑名单");
+                throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单","你已将该用户加入黑名单");
             }
 
         }else if(FROM_BLACK.getCode() == sourceDto.getRelationStatus()){
             if(UserRelationConstant.EVENT.SET_BLACK != event&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException("","对方已将你加入黑名单","对方已将你加入黑名单");
+                throw new QuanhuException(ExceptionEnum.TARGETUSER_BLACK_USER_ERROR.getCode(),"对方已将你加入黑名单","对方已将你加入黑名单");
             }
         }
         return true;
@@ -285,7 +286,7 @@ public class UserRelationServiceImpl implements UserRelationService{
                 ss = NONE;ts = NONE;
             }
         }else{
-            throw new QuanhuException("","系统参数异常:"+event,"系统参数异常");
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),"系统参数异常:"+event,"系统参数异常");
         }
         //根据target状态判断逻辑
         source.setRelationStatus(ss.getCode());
@@ -309,12 +310,12 @@ public class UserRelationServiceImpl implements UserRelationService{
         if(sourceUserId.equalsIgnoreCase(targetUserId)){
             //查看本人
             if(FANS!=status && FRIEND!=status && FOLLOW!=status && TO_BLACK!=status){
-                throw new QuanhuException("","查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
+                throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),"查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
             }
         }else{
             //查看他人
             if(FANS!=status && FOLLOW!=status){
-                throw new QuanhuException("","查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
+                throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),"查询参数非法,不允许操作："+status,"查询参数非法,不允许操作");
             }
         }
     }
@@ -382,20 +383,12 @@ public class UserRelationServiceImpl implements UserRelationService{
             _dto.setUserName(info.getUserNickName());
             _dto.setUserHeadImg(info.getUserImg());
             _dto.setUserSummary(info.getUserSignature());
+            _dto.setUserStarFlag(info.getUserRole());
         }else{
             _dto=null;      //用户集合查询不到，则不返回
         }
     }
 
-    private void mergeUserStar(List<UserStarAuth> list,UserRelationDto _dto){
-        for(int i = 0 ; i < list.size() ;i++){
-            UserStarAuth auth = list.get(i);
-            if(String.valueOf(auth.getUserId()).equalsIgnoreCase(_dto.getTargetUserId())){
-                _dto.setUserStarFlag(auth.getAuditStatus());
-                break;
-            }
-        }
-    }
     private void mergeUserRemark(List<UserRelationRemarkDto> list,UserRelationDto _dto){
         for (int i = 0 ; i < list.size() ; i++){
             UserRelationRemarkDto remarkDto = list.get(i);
@@ -454,9 +447,6 @@ public class UserRelationServiceImpl implements UserRelationService{
             if(newDto==null){
                 continue;
             }
-
-            //合并用户达人信息
-            this.mergeUserStar(starAuths,newDto);
             //合并关系
             this.mergeRelation(userAlls,newDto);
             //合并备注信息

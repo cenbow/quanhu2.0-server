@@ -18,7 +18,11 @@ public enum ExceptionEnum {
     
     USER_BLACK_TARGETUSER_ERROR("1011","您已把该资源作者拉黑，不允许操作","您已把该资源作者拉黑"),
     TARGETUSER_BLACK_USER_ERROR("1012","该资源作者已将您拉黑，不允许操作","该资源作者已将您拉黑"),
-    
+    USER_FOLLOW_MAX_COUNT_ERROR("1013","您的关注人数已达到上限，不允许操作","您的关注人数已达到上限"),
+    USER_RELATION_TO_SELF_ERROR("1014","无法对您自己添加关系，不允许操作","不允许对自己设置任何关系"),
+    USER_REMARK_TO_SELF_ERROR("1015","无法对您自己添加备注，不允许操作","不允许对自己设置备注信息"),
+    USER_NOT_FRIEND_ERROR("1016","该用户和您暂不是好友关系，不允许操作","该用户和您暂不是好友关系"),
+
     USER_NO_RIGHT_TOREAD("1020", "您无权去查看。", "你无权执行此操作"),
     USER_NO_RIGHT_TODELETE("1021", "您无权执行删除操作。", "您无权执行删除操作。"),
     USER_NO_RIGHT_TOREJECT("1022", "您无权执行拒接回答操作。", "您无权执行拒接回答操作。"),
@@ -42,6 +46,9 @@ public enum ExceptionEnum {
     RPC_RESPONSE_EXCEPTION("2006", "网络开小差了，请稍候再试！", "RpcResponse对象为空！"),
 
     TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！");
+
+
+
 
     private String code;
 
