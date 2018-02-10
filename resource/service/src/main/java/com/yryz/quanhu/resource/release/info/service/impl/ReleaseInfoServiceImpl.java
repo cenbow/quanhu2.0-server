@@ -36,7 +36,7 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
     Logger logger = LoggerFactory.getLogger(ReleaseInfoServiceImpl.class);
 
     @Autowired
-    ReleaseInfoDao releaseInfoDao;
+    private ReleaseInfoDao releaseInfoDao;
 
     private ReleaseInfoDao getDao() {
         return this.releaseInfoDao;
