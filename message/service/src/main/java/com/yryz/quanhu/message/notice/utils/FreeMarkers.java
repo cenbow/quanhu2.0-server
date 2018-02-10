@@ -71,7 +71,7 @@ public class FreeMarkers {
 			logger.info("%%%%%%%%%%%%%%%%%%" + file.getAbsolutePath() + "%%%%%%%%%%%%%%%%%%");
 			Configuration cfg1 = new Configuration();
 			cfg1.setDirectoryForTemplateLoading(file);
-			cfg1.getTemplate(fileName + ".ftl", "utf-8");
+            template = cfg1.getTemplate(fileName + ".ftl", "utf-8");
 		}
 		SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMddHHmmss");
 		String date = myFmt.format(new Date());
