@@ -119,46 +119,17 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         //用户
         String nickName = adminUserDTO.getNickName();
         String phone = adminUserDTO.getPhone();
-
         //注册渠道
         String channelCode = adminUserDTO.getActivityChannelCode();
-        //达人认证信息
-        Byte auditStatus = adminUserDTO.getAuditStatus();
-        Byte authType = adminUserDTO.getAuthType();
-        Byte authWay = adminUserDTO.getAuthWay();
-        String growLevel = adminUserDTO.getGrowLevel();
+
         Integer userStatus = adminUserDTO.getUserStatus();
         String appId = adminUserDTO.getAppId();
         Integer userRole = adminUserDTO.getUserRole();
-        Byte recommendStatus = adminUserDTO.getRecommendStatus();
-        Set<Long> tagIds = adminUserDTO.getTagIds();
 
-        String contactCall= adminUserDTO.getContactCall();
-        String realName = adminUserDTO.getRealName();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if(userRole!=null){
-            /**
-             * 判断普通用户，或者达人
-             */
-            if(userRole.intValue() == 10){
-                //普通用户
-                boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
-            }else if(userRole.intValue() == 11){
-                //达人  不要通过userRole查询，因为审核中或者取消审核会为普通用户，所以通过达人申请表所有状态查询
-                BoolQueryBuilder starBoolQusery = QueryBuilders.boolQuery();
-                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 10));
-                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 11));
-                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 12));
-                starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 13));
-                boolQueryBuilder.must(starBoolQusery);
-            }
-        }
-        if(!StringUtils.isBlank(contactCall)){
-            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_CONTACTCALL, "*" + contactCall + "*"));
-        }
-        if(!StringUtils.isBlank(realName)){
-            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_REALNAME, "*" + realName + "*"));
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
         }
         if (StringUtils.isNotBlank(nickName)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
@@ -169,32 +140,8 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if (StringUtils.isNotBlank(channelCode)) {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_ACTIVITYCHANNELCODE, "*" + channelCode + "*"));
         }
-        if (auditStatus != null) {
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUDITSTATUS, auditStatus));
-        }
-        if (authType != null) {
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHTYPE, authType));
-        }
-        if (authWay != null) {
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHWAY, authWay));
-        }
-        if (recommendStatus!=null){
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_RECOMMENDSTATUS, recommendStatus));
-        }
-        if (growLevel != null) {
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
-        }
         if(StringUtils.isNotBlank(appId)){
         	boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
-        }
-
-        if (CollectionUtils.isNotEmpty(tagIds)) {
-            BoolQueryBuilder tagBoolQusery = QueryBuilders.boolQuery();
-            for (Long tagId : tagIds) {
-                tagBoolQusery.should(QueryBuilders.matchQuery(ESConstants.USER_TAG_ID, tagId));
-            }
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_TAG_ONlINE, 10));
-            boolQueryBuilder.must(tagBoolQusery);
         }
         if(userStatus != null){
         	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
@@ -210,12 +157,10 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
-        queryBuilder.withFilter(boolQueryBuilder)
-                .withPageable(pageable);
-        List<FieldSortBuilder> sortBuilders = getAdminUserSortBuilder(adminUserDTO);
-        for (FieldSortBuilder sortBuilder : sortBuilders) {
-            queryBuilder.withSort(sortBuilder);
-        }
+        queryBuilder.withFilter(boolQueryBuilder).withPageable(pageable);
+
+        //排序
+        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.USER_CREATEDATE).order(SortOrder.DESC));
 
         SearchQuery query = queryBuilder.build();
 //        logger.info("adminSearchUser query: {}", GsonUtils.parseJson(query));
@@ -233,15 +178,109 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         return pageList;
     }
 
-    private List<FieldSortBuilder> getAdminUserSortBuilder(AdminUserInfoDTO adminUserDTO) {
-        List<FieldSortBuilder> sortBuilders = new ArrayList<>();
+
+    /**
+     * 基本条件搜索：用户名称，联系电话，申请认证时间，审核状态，认证类型，认证方式，用户等级，用户标签
+     * 排序方式：认证时间排序，推荐时间排序
+     *
+     * @param adminUserDTO
+     * @return
+     */
+    @Override
+    public PageList<UserInfoVO> searchStarUserForAdmin(AdminUserInfoDTO adminUserDTO) {
+
+        Integer pageNo = adminUserDTO.getPageNo();
+        Integer pageSize = adminUserDTO.getPageSize();
+        String startDateStr = adminUserDTO.getApplyAuthBeginDate();
+        String endDateStr = adminUserDTO.getApplyAuthEndDate();
+
+        //查询条件
+        Byte auditStatus = adminUserDTO.getAuditStatus();
+        Byte authType = adminUserDTO.getAuthType();
+        Byte authWay = adminUserDTO.getAuthWay();
+        String growLevel = adminUserDTO.getGrowLevel();
+        String appId = adminUserDTO.getAppId();
         Integer userRole = adminUserDTO.getUserRole();
-        if (userRole != null && userRole.equals(ESConstants.USER_ROLE_STAR)) {
-            sortBuilders.add(SortBuilders.fieldSort(ESConstants.STAR_AUTHTIME).order(SortOrder.DESC));
+        Byte recommendStatus = adminUserDTO.getRecommendStatus();
+        Set<Long> tagIds = adminUserDTO.getTagIds();
+        String contactCall= adminUserDTO.getContactCall();
+        String realName = adminUserDTO.getRealName();
+
+        //判断条件
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        //达人  不要通过userRole查询，因为审核中或者取消审核会为普通用户，所以通过达人申请表所有状态查询
+        BoolQueryBuilder starBoolQusery = QueryBuilders.boolQuery();
+        starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 10));
+        starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 11));
+        starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 12));
+        starBoolQusery.should(QueryBuilders.matchQuery(ESConstants.STAR_AUDITSTATUS, 13));
+        boolQueryBuilder.must(starBoolQusery);
+
+        if(userRole!=null){
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
         }
-        sortBuilders.add(SortBuilders.fieldSort(ESConstants.USER_CREATEDATE).order(SortOrder.DESC));
-        return sortBuilders;
+        if(StringUtils.isNotBlank(appId)){
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
+        }
+        if (auditStatus != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUDITSTATUS, auditStatus));
+        }
+        if (authType != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHTYPE, authType));
+        }
+        if (authWay != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_AUTHWAY, authWay));
+        }
+        if (recommendStatus!=null){
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.STAR_RECOMMENDSTATUS, recommendStatus));
+        }
+        if (growLevel != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.EVENT_GROWLEVEL, growLevel));
+        }
+        if(!StringUtils.isBlank(contactCall)){
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_CONTACTCALL, "*" + contactCall + "*"));
+        }
+        if(!StringUtils.isBlank(realName)){
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.STAR_REALNAME, "*" + realName + "*"));
+        }
+        if (CollectionUtils.isNotEmpty(tagIds)) {
+            BoolQueryBuilder tagBoolQusery = QueryBuilders.boolQuery();
+            for (Long tagId : tagIds) {
+                tagBoolQusery.should(QueryBuilders.matchQuery(ESConstants.USER_TAG_ID, tagId));
+            }
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_TAG_ONlINE, 10));
+            boolQueryBuilder.must(tagBoolQusery);
+        }
+        if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
+            long startDate = DateUtils.parseDate(startDateStr).getTime();
+            long endDate = DateUtils.parseDate(endDateStr).getTime();
+            boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.STAR_AUTHTIME).gte(startDate).lte(endDate));
+        }
+        //es查询对象
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        queryBuilder.withFilter(boolQueryBuilder).withPageable(pageable);
+
+        //排序
+
+        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_AUTHTIME).order(SortOrder.DESC));
+
+        //执行查询
+        SearchQuery query = queryBuilder.build();
+        AggregatedPage<UserInfo> page = elasticsearchTemplate.queryForPage(query, UserInfo.class);
+
+        //重构实体对象
+        List<UserInfo> userInfoList = page.getContent();
+        List<UserInfoVO> userInfoVOS = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(userInfoList)) {
+            userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
+        }
+        PageList<UserInfoVO> pageList = new PageList<>();
+        pageList.setCurrentPage(pageNo);
+        pageList.setPageSize(pageSize);
+        pageList.setEntities(userInfoVOS);
+        pageList.setCount(page.getTotalElements());
+        return pageList;
     }
-
-
 }

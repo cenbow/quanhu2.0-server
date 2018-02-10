@@ -62,6 +62,9 @@
         <if test="reason!= null">
             ,reason= #{reason}
         </if>
+        <if test=" amount != null">
+            ,amount= #{amount}
+        </if>
         <if test="processTime!= null">
             ,process_time= #{processTime}
         </if>
