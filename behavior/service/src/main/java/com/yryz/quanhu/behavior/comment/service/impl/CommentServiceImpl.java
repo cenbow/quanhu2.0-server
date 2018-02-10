@@ -2,7 +2,9 @@ package com.yryz.quanhu.behavior.comment.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.JsonUtils;
@@ -82,6 +84,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment accretion(Comment comment) {
         RedisTemplate<String, Comment> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Comment.class);
+        //检测被回复的内容是否被删除
+        if (null != comment && comment.getParentId() != 0) {
+            Comment commentSingle = new Comment();
+            commentSingle.setKid(comment.getParentId());
+            Comment commentCheck = commentDao.querySingleComment(commentSingle);
+            if (null != commentCheck && commentCheck.getDelFlag() == 11) {
+                logger.info("当前用户评论的内容已被删除");
+                throw new QuanhuException(ExceptionEnum.COMMENT_CHECK_ERROR);
+            }
+        }
         int count = commentDao.accretion(comment);
         Comment commentRedis = null;
         if (count > 0) {

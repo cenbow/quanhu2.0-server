@@ -13,6 +13,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
+import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminService;
 import com.yryz.quanhu.coterie.coterie.vo.*;
@@ -27,6 +28,7 @@ import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ScheduledExecutorTask;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +63,9 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
 
     @Resource
     private CoterieEventManager coterieEventManager;
+
+    @Autowired
+    private CoterieRedis coterieRedis;
 
 
     @Override
@@ -116,7 +121,9 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
 
             Integer result = coterieMapper.updateCoterieAdmin(coterie);
             if (result > 0) {
+
                 Coterie coterieDb = coterieMapper.selectByCoterieId(coterie.getCoterieId());
+                coterieRedis.save(coterieDb);
 
                 if (coterie.getStatus() == 11) {
 
