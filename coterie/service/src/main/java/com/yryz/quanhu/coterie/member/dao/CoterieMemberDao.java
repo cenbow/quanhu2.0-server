@@ -27,24 +27,19 @@ public interface CoterieMemberDao {
 
     CoterieMember selectByCoterieIdAndUserId(@Param("coterieId") Long coterieId, @Param("userId") Long userId);
 
-
-
-
-    int deleteByPrimaryKey(Long kid);
-    
-    int deleteByUserIdAndCoterieId(@Param("userId") Long userId, @Param("coterieId") Long coterieId, @Param("reason") String reason);
-
-//    int insertSelective(CoterieMember record);
-
-    CoterieMember selectByPrimaryKey(Long kid);
-
-    int updateByPrimaryKeySelective(CoterieMember record);
-
-    int updateByPrimaryKey(CoterieMember record);
-
     List<CoterieMember> selectPageByCoterieId(@Param("coterieId") Long coterieId, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
 
+//    int selectCountByCoterieId(Long coterieId);
+//
+//    int deleteByPrimaryKey(Long kid);
+//
+//    int deleteByUserIdAndCoterieId(@Param("userId") Long userId, @Param("coterieId") Long coterieId, @Param("reason") String reason);
+//
+//    CoterieMember selectByPrimaryKey(Long kid);
+//
+//    int updateByPrimaryKeySelective(CoterieMember record);
+//
+//    int updateByPrimaryKey(CoterieMember record);
+//
 
-    int selectCountByCoterieId(Long coterieId);
-    
 }

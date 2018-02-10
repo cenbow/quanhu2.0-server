@@ -71,10 +71,7 @@ public class UserIllegalWordsFilter implements IBehaviorValidFilter {
             }
         }catch (Exception e){
             logger.warn("敏感词纯文字过滤，校验异常！",e);
-        }finally {
-            filterChain.execute();
         }
-        
         // 敏感词contentSource富文本过滤
         try{
             String [] css = args.contentSources();

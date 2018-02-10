@@ -2,6 +2,8 @@ package com.yryz.quanhu.openapi.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 
+import com.yryz.common.annotation.UserBehaviorArgs;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
@@ -10,6 +12,7 @@ import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.api.CountFlagApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.validation.valid.UnifyParameterValidHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -59,6 +62,21 @@ public class BehaviorController {
             return ResponseUtils.returnException(QuanhuException.busiError("用户ID为空"));
         }
         return countApi.getCountFlag(countType, kid, "", userId);
+    }
+
+
+    @ApiOperation("行为预校验")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @PostMapping(value = "/services/app/{version}/behavior/preverify")
+
+    @UserBehaviorValidation(validClass = UnifyParameterValidHandler.class)
+    @UserBehaviorArgs(contexts = {"map.login","map.mute","map.blacklist","map.coterieMember","map.coterieMute"},
+            sourceUserId = "map.sourceUserId",coterieId = "map.coterieId")
+    public Response<Boolean> behaviorPreVerify(HttpServletRequest request, @RequestBody Map<String,Object> map){
+        /**
+         * 校验在切面校验通过后，直接返回true
+         */
+        return ResponseUtils.returnObjectSuccess(true);
     }
 
 

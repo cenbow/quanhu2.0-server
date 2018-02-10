@@ -42,7 +42,7 @@ public class CollectionInfoController {
      * @param collectionInfoDto
      * @return
      */
-    @UserBehaviorValidation(login = true, isCoterieMember = true)
+    @UserBehaviorValidation(login = true, coterieMember = true)
     @UserBehaviorArgs(coterieId = "object.CollectionInfo.coterieId")
     @ApiOperation("收藏")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)

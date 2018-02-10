@@ -198,7 +198,13 @@ public class CoterieProvider implements CoterieApi {
 		}
 		EventInfo param=new EventInfo();
 		param.setUserId(info.getOwnerId());
-		EventReportVo vo=ResponseUtils.getResponseData(eventAPI.getScoreFlowList(param));
+		EventReportVo vo= null;
+		try {
+			vo = ResponseUtils.getResponseData(eventAPI.getScoreFlowList(param));
+		} catch (Exception e) {
+			logger.error("积分统计查询失败",e);
+			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "未知错误","积分统计查询失败");
+		}
 		int level=1;
 		if(vo==null){
 			level=1;
