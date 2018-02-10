@@ -58,7 +58,7 @@ public class AdvertUtil {
 		String folderPath = AdvertUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
 		if (folderPath.indexOf("target/classes") > 0) {
-			folderPath = folderPath.substring(0, folderPath.indexOf("target/classes")) + "src/main/assembly";
+			folderPath = folderPath.substring(0, folderPath.indexOf("target/classes")) + "src/main/resources";
 		}
 		return folderPath;
 	}
