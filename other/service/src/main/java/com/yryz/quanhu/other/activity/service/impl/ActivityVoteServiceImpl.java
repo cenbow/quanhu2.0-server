@@ -93,7 +93,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
     public ActivityVoteInfoVo detail(Long kid, Long userId) {
         ActivityVoteInfoVo activityInfoVo = this.getVoteInfo(kid);
         if(activityInfoVo == null) {
-            throw QuanhuException.busiError("活动已关闭或不存在");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动已关闭或不存在","活动已关闭或不存在");
         }
         if(userId != null) {
             //获取当前用户是否参与此活动
@@ -190,7 +190,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         //获取活动配置信息
         ActivityVoteConfig activityVoteConfig = activityVoteConfigDao.selectByActivityInfoId(activityVoteInfoVo.getKid());
         if(activityVoteConfig == null) {
-            throw QuanhuException.busiError("活动已关闭或不存在");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动已关闭或不存在","活动已关闭或不存在");
         }
         Integer voteConfig = null;
         Integer voteType = null;
@@ -203,7 +203,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         }
         if(voteType == null || voteConfig == null) {
             logger.error("voteType : " + voteType + " voteConfig : " + voteConfig);
-            throw QuanhuException.busiError("活动已关闭或不存在");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动已关闭或不存在","活动已关闭或不存在");
         }
         //用户的投票数
         int count = activityVoteRecordDao.voteRecordCount(activityVoteInfoVo.getKid(),
@@ -213,7 +213,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         if(voteConfig <= count) {
             int flag = activityUserPrizesDao.updateUserRoll(record.getCreateUserId());
             if(flag == 0) {
-                throw QuanhuException.busiError("无可用的投票券");
+                throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"无可用的投票券","无可用的投票券");
             }
             record.setFreeVoteFlag(ActivityVoteConstants.NO_FREE_VOTE);
             activityUserPrizesDao.updateStatus(record.getCreateUserId());
@@ -221,7 +221,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         //更新参与者的票数
         int votoDetailCount = activityVoteDetailDao.updateVoteCount(record.getCandidateId(), activityVoteInfoVo.getKid());
         if(votoDetailCount == 0){
-            throw QuanhuException.busiError("参与者不存在");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"参与者不存在","参与者不存在");
         }
         //生成投票编号
         Response<Long> result = idAPI.getSnowflakeId();
@@ -274,7 +274,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         //用户的投票数
         int count = activityVoteRecordDao.voteRecordCount(activityInfoId, userId, 1, "fixed");
         if(count == 0) {
-            throw QuanhuException.busiError("未在当前活动中投票，不能领取奖品");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"未在当前活动中投票，不能领取奖品","未在当前活动中投票，不能领取奖品");
         }
         ActivityUserPrizesVo result = new ActivityUserPrizesVo();
         List<ActivityUserPrizes> resultList = new ArrayList<>();
@@ -397,23 +397,23 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 
     private void validateActivity(ActivityVoteInfoVo activityVoteInfoVo) {
         if(activityVoteInfoVo == null) {
-            throw QuanhuException.busiError("活动已关闭或不存在");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动已关闭或不存在","活动已关闭或不存在");
         }
         Date now = new Date();
         if(now.compareTo(activityVoteInfoVo.getBeginTime()) == -1) {
-            throw QuanhuException.busiError("活动未开始");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动未开始","活动未开始");
         }
         if(now.compareTo(activityVoteInfoVo.getEndTime()) == 1) {
-            throw QuanhuException.busiError("活动已结束");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动已结束","活动已结束");
         }
         if(!Integer.valueOf(10).equals(activityVoteInfoVo.getShelveFlag()) ) {
-            throw QuanhuException.busiError("活动已下线");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动已下线","活动已下线");
         }
         if(now.compareTo(activityVoteInfoVo.getActivityVoteBegin()) == -1 ) {
-            throw QuanhuException.busiError("该活动还未进入投票阶段");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"该活动还未进入投票阶段","该活动还未进入投票阶段");
         }
         if(now.compareTo(activityVoteInfoVo.getActivityVoteEnd()) == 1 ) {
-            throw QuanhuException.busiError("该活动投票阶段已结束");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"该活动投票阶段已结束","该活动投票阶段已结束");
         }
     }
 

@@ -47,10 +47,10 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(value = "/services/app")
 public class ResourceController {
 
-    @Reference(check = false)
+    @Reference
     private ResourceApi resourceApi;
 
-    @Reference(check = false)
+    @Reference
     private CoterieMemberAPI coterieMemberAPI;
 
 

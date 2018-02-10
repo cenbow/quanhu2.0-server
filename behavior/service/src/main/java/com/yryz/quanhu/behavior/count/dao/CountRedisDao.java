@@ -128,7 +128,7 @@ public class CountRedisDao {
                 if (countModel != null) {
                     count = countModel.getCount();
                 }
-                redisTemplate.opsForValue().increment(RedisContants.getReadCountKey(kid, code, page), count);
+                redisTemplate.opsForValue().increment(RedisContants.getReadCountKey(kid, code, page), count == null ? 0 : count);
                 redisTemplate.expire(RedisContants.getReadCountKey(kid, code, page), RedisContants.READ_COUNT_KEY_EXPIRE, TimeUnit.MINUTES);
             }
             list.set(i, count);
