@@ -5,6 +5,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.context.Context;
 import com.yryz.common.exception.QuanhuException;
@@ -389,7 +390,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         //增加已参与人数
         int flag = activityInfoDao.updateJoinCount(voteDetailDto.getActivityInfoId(), config.getUserNum());
         if(flag == 0) {
-            throw QuanhuException.busiError("参加人数已满");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"参加人数已满","参加人数已满");
         }
         //在一个活动里一个用户只能参与一次
         List<AdminActivityVoteDetailVo> voteDetailVos = activityParticipationDao.selectByParam(voteDetailDto);
