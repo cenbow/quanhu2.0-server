@@ -45,9 +45,9 @@ public enum ExceptionEnum {
     PUSH_MESSAGE_EXCEPTION("2005", "推送消息出错！", "推送消息出错！"),
     RPC_RESPONSE_EXCEPTION("2006", "网络开小差了，请稍候再试！", "RpcResponse对象为空！"),
 
-    TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！");
+    TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！"),
 
-
+    COMMENT_CHECK_ERROR("2060","被评论的内容已删除,回复评论失败！","被评论的内容已删除,回复评论失败！");
 
 
     private String code;
