@@ -58,6 +58,7 @@ public class FreeMarkers {
 
 	public static String createFile(String fileName, Map<String, String> model) throws IOException {
 		String path = AdvertUtil.getRealPath();
+		logger.info("ftl模板文件路径" + path);
 		Configuration cfg = FreeMarkers.buildConfiguration(path);
 		Template template = cfg.getTemplate(fileName + ".ftl", "utf-8");
 		SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMddHHmmss");

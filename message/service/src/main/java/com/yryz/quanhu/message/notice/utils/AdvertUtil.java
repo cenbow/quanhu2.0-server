@@ -55,11 +55,15 @@ public class AdvertUtil {
 	 * @return
 	 */
 	public static String getRealPath() {
+		logger.info("==================获取模板文件地址=======================");
 		String folderPath = AdvertUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		logger.info("~~~~~~~~~~~~~~~~~~获取模板文件地址~~~~~~~~~~~~~~~~~~folderPath = " +  folderPath);
 
 		if (folderPath.indexOf("target/classes") > 0) {
-			folderPath = folderPath.substring(0, folderPath.indexOf("target/classes")) + "src/main/assembly";
+			folderPath = folderPath.substring(0, folderPath.indexOf("target/classes")) + "src/main/resources";
+			logger.info("+++++++++++++++++++获取模板文件地址++++++++++++++++folderPath = " +  folderPath);
 		}
+		logger.info("######################获取模板文件地址##################folderPath = " +  folderPath);
 		return folderPath;
 	}
 
