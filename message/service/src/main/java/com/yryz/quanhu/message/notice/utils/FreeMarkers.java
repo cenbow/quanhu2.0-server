@@ -60,7 +60,19 @@ public class FreeMarkers {
 		String path = AdvertUtil.getRealPath();
 		logger.info("ftl模板文件路径" + path);
 		Configuration cfg = FreeMarkers.buildConfiguration(path);
-		Template template = cfg.getTemplate(fileName + ".ftl", "utf-8");
+		Template template = null;
+		try {
+			template = cfg.getTemplate(fileName + ".ftl", "utf-8");
+		} catch (IOException e) {
+			logger.error("未找到模板", e);
+			InputStream inputStream = FreeMarkers.class.getClassLoader().getResourceAsStream("notice.ftl");
+			File file = new File("notice.ftl");
+			inputstreamtofile(inputStream, file);
+			logger.info("%%%%%%%%%%%%%%%%%%" + file.getAbsolutePath() + "%%%%%%%%%%%%%%%%%%");
+			Configuration cfg1 = new Configuration();
+			cfg1.setDirectoryForTemplateLoading(file);
+			cfg1.getTemplate(fileName + ".ftl", "utf-8");
+		}
 		SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMddHHmmss");
 		String date = myFmt.format(new Date());
 
@@ -85,6 +97,17 @@ public class FreeMarkers {
 		out.flush();
 		out.close();
 		return new StringBuffer(fileName).append("_").append(date).append(".html").toString();
+	}
+
+	public static void inputstreamtofile(InputStream ins,File file) throws IOException {
+		OutputStream os = new FileOutputStream(file);
+		int bytesRead = 0;
+		byte[] buffer = new byte[8192];
+		while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+			os.write(buffer, 0, bytesRead);
+		}
+		os.close();
+		ins.close();
 	}
 
 	public static void main(String[] args) throws IOException {
