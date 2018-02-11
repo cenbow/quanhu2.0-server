@@ -354,8 +354,10 @@ public class CommentServiceImpl implements CommentService {
                 comment.setLastUpdateUserId(commentVOsnew.getLastUpdateUserId());
                 comment.setLastUpdateDate(commentVOsnew.getLastUpdateDate());
                 commentsnew.add(comment);
-                if (i >= 3) {
-                    break;
+                if(commentFrontDTO.getCheckType()!=1L){
+                    if (i >= 3) {
+                        break;
+                    }
                 }
             }
 

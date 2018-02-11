@@ -116,7 +116,7 @@ public class SmsServiceImpl implements SmsService {
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), msg,
 					ExceptionEnum.BusiException.getErrorMsg());
 		}
-		result = this.smsManager.sendCode(codeDTO.getPhone(), smsType, codeDTO.getAppId());
+		result = this.smsManager.sendCode(codeDTO.getPhone(), smsType, codeDTO.getAppId(),codeDTO.getIp());
 		return result;
 	}
 

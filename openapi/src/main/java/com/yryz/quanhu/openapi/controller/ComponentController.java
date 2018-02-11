@@ -63,6 +63,7 @@ public class ComponentController {
 	public Response<SmsVerifyCodeVO> sendVerifyCode(@RequestBody SmsVerifyCodeDTO codeDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
+		codeDTO.setIp(WebUtil.getClientIP(request));
 		//没有手机号需要验证token
 		if(StringUtils.isBlank(codeDTO.getPhone())){
 			authService.checkToken(request);
@@ -123,6 +124,7 @@ public class ComponentController {
 		logger.info("sendVerifyCodeForSlip request, codeDTO: {}", GsonUtils.parseJson(codeDTO));
 		RequestHeader header = WebUtil.getHeader(request);
 		codeDTO.setAppId(header.getAppId());
+		codeDTO.setIp(WebUtil.getClientIP(request));
 		VerifyCodeDTO verifyCodeDTO = new VerifyCodeDTO(NumberUtils.toInt(codeDTO.getCode()),
 				CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), codeDTO.getPhone(), header.getAppId(),
 				codeDTO.getVeriCode(), false);

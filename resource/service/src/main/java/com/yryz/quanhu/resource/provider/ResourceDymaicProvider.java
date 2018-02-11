@@ -4,7 +4,9 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
+import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
 import com.yryz.quanhu.resource.release.info.provider.ReleaseInfoProvider;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
@@ -29,6 +31,9 @@ public class ResourceDymaicProvider implements ResourceDymaicApi {
 
     @Override
     public Response<Object> commitResourceDymaic(ResourceTotal resourceTotal) {
+        if(StringUtils.isEmpty(resourceTotal.getIntimate())){
+            resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
+        }
         String msg = GsonUtils.parseJson(resourceTotal);
         logger.debug("commitResourceDymaic msg :" + msg);
         rabbitTemplate.setExchange("RESOURCE_DYNAMIC_FANOUT_EXCHANGE");
