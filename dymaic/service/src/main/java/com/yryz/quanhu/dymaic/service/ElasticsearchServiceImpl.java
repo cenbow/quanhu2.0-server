@@ -346,15 +346,19 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 				CoterieInfoVo vo = new CoterieInfoVo();
 				BeanUtils.copyProperties(info, vo);
 				rstList.add(vo);
-				if (vo.getCreateUserId() == null) {
+				if(vo.getMemberNum()!=null){//圈主也算成员
+					vo.setMemberNum(vo.getMemberNum()+1);
+				}
+				if (vo.getOwnerId() == null) {
 					continue;
 				}
 
-				Optional<UserInfo> user = userRepository.findById(vo.getCreateUserId());
+				Optional<UserInfo> user = userRepository.findById(Long.valueOf(vo.getOwnerId()));
 				if (user.isPresent()) {
 					UserSimpleVo userVo = new UserSimpleVo();
 					BeanUtils.copyProperties(user.get(), userVo);
 					vo.setUser(userVo);
+					vo.setIsExpert(userVo.getUserRole());
 				}
 			}
 			PageList<CoterieInfoVo> pageList = new PageList<CoterieInfoVo>();
