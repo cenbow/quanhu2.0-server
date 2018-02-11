@@ -144,6 +144,8 @@ public class TopicPostServiceImpl implements TopicPostService {
             BeanUtils.copyProperties(post, topicPostVo);
             resourceTotal.setExtJson(JsonUtils.toFastJson(topicPostVo));
         }
+        resourceTotal.setTitle(topicPost.getContent());
+        resourceTotal.setContent(topicPost.getContent());
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
         resourceTotal.setResourceId(post.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC_POST));

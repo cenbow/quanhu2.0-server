@@ -139,6 +139,11 @@ public class UserStarInfo {
     private String auditFailReason;
 
     /**
+     * 申请日期
+     */
+    @Field(type = FieldType.Date)
+    private Date createDate;
+    /**
      * 认证通过时间
      */
     @Field(type = FieldType.Date)
@@ -166,6 +171,14 @@ public class UserStarInfo {
      */
     @Field(type = FieldType.Date)
     private Date recommendCancelTime;
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
     public Long getKid() {
         return kid;

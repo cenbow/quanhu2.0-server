@@ -151,6 +151,8 @@ public class RewardInfoProvider implements RewardInfoApi {
                     continue;
                 }
                 if (RewardConstants.QueryType.my_reward_resource_list.equals(dto.getQueryType())) {
+                    // 展示打赏者信息，我打赏的资源列表，打赏人都是自己（根据需求原型需要）
+                    userIds.add(String.valueOf(info.getCreateUserId()));
                     resourceIds.add(String.valueOf(info.getResourceId()));
                 } else if (RewardConstants.QueryType.my_reward_user_list.equals(dto.getQueryType())) {
                     userIds.add(String.valueOf(info.getToUserId()));
@@ -198,7 +200,7 @@ public class RewardInfoProvider implements RewardInfoApi {
                 }
             }
             // 资源信息
-            else if (CollectionUtils.isNotEmpty(resourceIds)) {
+            if (CollectionUtils.isNotEmpty(resourceIds)) {
                 Map<String, ResourceVo> resourceMap = ResponseUtils
                         .getResponseData(resourceApi.getResourcesByIds(resourceIds));
                 if (null != resourceMap) {

@@ -209,6 +209,8 @@ public class AnswerServiceImpl implements AnswerService {
         }else{
             resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
         }
+        resourceTotal.setContent(answerVo1.getContent());
+        resourceTotal.setTitle(answerVo1.getContent());
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceTotal.setResourceId(answerVo1.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.ANSWER));
@@ -229,6 +231,8 @@ public class AnswerServiceImpl implements AnswerService {
             resourceTotalCoterie.setResourceId(coterieInfo.getCoterieId());
             resourceTotalCoterie.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
             resourceTotalCoterie.setUserId(Long.valueOf(coterieInfo.getOwnerId()));
+            resourceTotalCoterie.setContent(coterieInfo.getIntro());
+            resourceTotalCoterie.setTitle(coterieInfo.getName());
             resourceDymaicApi.commitResourceDymaic(resourceTotalCoterie);
         }
         return answerVo;
