@@ -124,10 +124,6 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         return pageList;
     }
 
-    private Integer getCount(String date, Integer preCount) {
-
-    }
-
     /**
      * 获取活动统计数量总和
      * @param   adminActivityCountDto
