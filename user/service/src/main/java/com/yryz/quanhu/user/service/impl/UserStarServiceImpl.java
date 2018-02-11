@@ -21,6 +21,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.ResponseUtils;
@@ -108,13 +109,22 @@ public class UserStarServiceImpl implements UserStarService {
 	}
 
 	@Override
-	public UserStarAuth get(String custId, String idCard) {
+	public UserStarAuth get(String userId, String idCard) {
+		List<UserStarAuth> auths = redisDao.getStarInfo(Sets.newHashSet(userId));
+		if(CollectionUtils.isNotEmpty(auths)){
+			return auths.get(0);
+		}
+		UserStarAuth auth = null;
 		try {
-			return persistenceDao.get(custId, idCard, null);
+			auth = persistenceDao.get(userId, idCard, null);
 		} catch (Exception e) {
 			logger.error("[UserStarAuthDao.get]", e);
 			throw new MysqlOptException(e);
 		}
+		if(auth != null){
+			redisDao.save(auth);
+		}
+		return auth;
 	}
 
 	@Override

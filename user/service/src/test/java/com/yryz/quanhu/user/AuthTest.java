@@ -27,10 +27,11 @@ public class AuthTest {
 	 * @param custId
 	 * @param token
 	 */
+	@Test
 	public void checkToken() {
 		final String name = "4, checkToken";
 		try {
-			AuthTokenDTO tokenDTO = new AuthTokenDTO(0L, DevType.ANDROID, "vebff12m1762","");
+			AuthTokenDTO tokenDTO = new AuthTokenDTO(354933849825280L, DevType.ANDROID, "vebff12m1762","");
 			AuthRefreshDTO refreshDTO = new AuthRefreshDTO("uW77hO3yyWXSKuunF5esIL1nKAc8WbokgS0unW//QLwOMEblYctjEg==", false);
 			refreshDTO.setAppId(tokenDTO.getAppId());
 			refreshDTO.setUserId(tokenDTO.getUserId());
@@ -43,7 +44,7 @@ public class AuthTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void refreshToken(){
 		final String name = "2, refreshToken";
 		try {

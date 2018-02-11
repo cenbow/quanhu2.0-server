@@ -36,6 +36,7 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.openapi.service.AuthService;
+import com.yryz.quanhu.openapi.utils.CommonUtils;
 import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.support.illegalWord.api.IllegalWordsApi;
@@ -115,11 +116,13 @@ public class UserController {
 		RequestHeader header = WebUtil.getHeader(request);
 		UserLoginSimpleVO simpleVO = null;
 		if (userId == null) {
+			authService.checkToken(request);
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
 		} else if(userId != null && StringUtils.isBlank(header.getUserId())){
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(userId));
+			simpleVO.setUserPhone(CommonUtils.getPhone(simpleVO.getUserPhone()));
 		}//用户登录的情况下
 		else {
 			authService.checkToken(request);

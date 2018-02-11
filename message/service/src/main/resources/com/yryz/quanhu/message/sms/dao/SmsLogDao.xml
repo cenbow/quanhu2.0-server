@@ -9,12 +9,13 @@
     <result column="app_key" property="appKey" jdbcType="VARCHAR" />
     <result column="sms_channel" property="smsChannel" jdbcType="VARCHAR" />
     <result column="sms_sign" property="smsSign" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
     <result column="sms_template_code" property="smsTemplateCode" jdbcType="VARCHAR" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, kid, phone, sms_type, app_key, sms_channel, sms_sign, sms_template_code, create_date, 
+    id, kid, phone,ip, sms_type, app_key, sms_channel, sms_sign, sms_template_code, create_date, 
     last_update_date
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -51,6 +52,9 @@
       <if test="smsTemplateCode != null" >
         sms_template_code,
       </if>
+      <if test="ip != null">
+      	ip,
+      </if>
       <if test="createDate != null" >
         create_date,
       </if>
@@ -82,6 +86,9 @@
       </if>
       <if test="smsTemplateCode != null" >
         #{smsTemplateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+      	#{ip},
       </if>
       <if test="createDate != null" >
         #{createDate,jdbcType=TIMESTAMP},
