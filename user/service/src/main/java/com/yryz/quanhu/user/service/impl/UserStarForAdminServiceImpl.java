@@ -451,7 +451,8 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
                 authDto.setKid(auth.getKid());
                 authDto.setUserId(Long.parseLong(auth.getUserId()));
                 authDto.setAuthTime(auth.getAuthTime());
-                authDto.setCreateDate(infoVo.getUserBaseInfo().getCreateDate());
+                authDto.setCreateDate(infoVo.getUserStarInfo().getCreateDate());
+                authDto.setRegisterDate(infoVo.getUserBaseInfo().getCreateDate());
                 if(event!=null&&event.getGrowLevel()!=null){
                     authDto.setUserLevel(Integer.parseInt(event.getGrowLevel()));
                 }

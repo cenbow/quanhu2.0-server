@@ -12,9 +12,11 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yryz.quanhu.behavior.reward.api.RewardInfoApi;
+import com.yryz.quanhu.behavior.reward.constants.RewardConstants;
 import com.yryz.quanhu.behavior.reward.constants.RewardConstants.QueryType;
 import com.yryz.quanhu.behavior.reward.dto.RewardInfoDto;
 import com.yryz.quanhu.behavior.reward.entity.RewardInfo;
+import com.yryz.quanhu.behavior.reward.service.RewardInfoService;
 import com.yryz.quanhu.behavior.reward.service.impl.RewardOrderNotifyService;
 import com.yryz.quanhu.order.sdk.dto.OutputOrder;
 
@@ -31,6 +33,9 @@ public class RewardTest {
 
     @Autowired
     RewardOrderNotifyService rewardOrderNotifyService;
+    
+    @Autowired
+    private RewardInfoService rewardInfoService;
     
     /**  
     * @Description: 打赏发起
@@ -77,9 +82,13 @@ public class RewardTest {
         // 我打赏的-人-列表
         // dto.setQueryType(QueryType.my_reward_user_list);
 
-        // 我打赏的-资源-列表
+        /*// 我打赏的-资源-列表
         dto.setQueryType(QueryType.my_reward_resource_list);
-        dto.setCreateUserId(360712374173696L);
+        dto.setCreateUserId(360712374173696L);*/
+        
+        // 我打赏的-资源-列表
+        dto.setQueryType(QueryType.reward_my_resource_list);
+        dto.setToUserId(356393596608512L);
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoApi.pageByCondition(dto, true)));
     }
     
@@ -104,5 +113,37 @@ public class RewardTest {
         outputOrder.setCost(100L);
         outputOrder.setPayType(10);
         rewardOrderNotifyService.notify(outputOrder);
+    }
+    
+    /**  
+     * @Description: 打赏、收到打赏流水
+     * @author wangheng
+     * @param @throws JsonProcessingException
+     * @return void
+     * @throws  
+     */
+     @Test
+     public void test004() throws JsonProcessingException {
+         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoService.selectRewardFlow(356393596608512L, 1, 30)));
+     }
+     
+     /**  
+      * @Description: 打赏成功 更新狀態
+      * @author wangheng
+      * @param @throws JsonProcessingException
+      * @return void
+      * @throws  
+      */
+      @Test
+    public void test005() throws JsonProcessingException {
+        RewardInfo upInfo = new RewardInfo();
+        upInfo.setKid(368003988348928L);
+        //upInfo.setRewardPrice(rewardedPrice);
+        upInfo.setRewardStatus(RewardConstants.reward_status_pay_success);
+        // 为用户打赏/收益明细 缓存预留用户参数，DB实际不更新
+        upInfo.setCreateUserId(360712374173696L);
+        upInfo.setToUserId(356903405871104L);
+
+        System.out.println(new ObjectMapper().writeValueAsString(rewardInfoService.updateByKid(upInfo)));
     }
 }
