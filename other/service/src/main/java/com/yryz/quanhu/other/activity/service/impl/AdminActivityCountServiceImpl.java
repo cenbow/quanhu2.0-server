@@ -91,7 +91,7 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
                     Integer count = mapPage.get(adminActivityCountVo.getDate()) == null
                             ? 0 : mapPage.get(adminActivityCountVo.getDate()).intValue();
                     if(count != 0) {
-                        adminActivityCountVo.setDetailCount(count - preCount);
+                        adminActivityCountVo.setDetailCount(count - preCount > 0 ? count - preCount : 0);
                         preCount = count;
                     } else {
                         adminActivityCountVo.setDetailCount(count);
@@ -101,7 +101,7 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
                     Integer count = mapPageCandidate.get(adminActivityCountVo.getDate()) == null
                             ? 0 : mapPageCandidate.get(adminActivityCountVo.getDate()).intValue();
                     if(count != 0) {
-                        adminActivityCountVo.setCandidateDetailCount(count - preCandidateCount);
+                        adminActivityCountVo.setCandidateDetailCount(count - preCandidateCount > 0 ? count - preCandidateCount : 0);
                         preCandidateCount = count;
                     } else {
                         adminActivityCountVo.setCandidateDetailCount(count);
