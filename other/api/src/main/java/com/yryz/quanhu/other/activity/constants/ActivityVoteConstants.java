@@ -25,13 +25,11 @@ public class ActivityVoteConstants {
     public static Integer NO_FREE_VOTE = 1;
 
 
-    public static String ACTIVITY_VOTE = "ACTIVITY_VOTE_";
+    public static String ACTIVITY_VOTE = "activity:vote:";
 
-    public static String ACTIVITY_CONFIG = "_ACTIVITY_CONFIG";
+    public static String ACTIVITY_CONFIG = "config:";
 
-    public static String ACTIVITY_RECORD = "ACTIVITY_RECORD";
-
-    public static String ACTIVITY_VOTE_NO = "ACTIVITY_VOTE_NO";
+    public static String ACTIVITY_VOTE_NO = "activity:vote:no";
 
     public static String getKeyInfo(Long activityId) {
         StringBuffer stringBuffer = new StringBuffer("activity:vote:info:");
@@ -41,8 +39,8 @@ public class ActivityVoteConstants {
 
     public static String getKeyConfig(Long activityId) {
         StringBuffer stringBuffer = new StringBuffer(ActivityVoteConstants.ACTIVITY_VOTE);
-        stringBuffer.append(activityId);
         stringBuffer.append(ActivityVoteConstants.ACTIVITY_CONFIG);
+        stringBuffer.append(activityId);
         return stringBuffer.toString();
     }
 

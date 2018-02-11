@@ -75,11 +75,11 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
             }
         } catch (Exception e) {
             logger.error("获取资源失败", e);
-            throw QuanhuException.busiError("资源不存在或者已删除");
+            throw new QuanhuException(ExceptionEnum.COLLECTION_EXIST_ERROR);
         }
         ResourceVo resourceVo = result.getData();
         if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
-            throw QuanhuException.busiError("资源不存在或者已删除");
+            throw new QuanhuException(ExceptionEnum.COLLECTION_EXIST_ERROR);
         }
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
@@ -94,7 +94,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         collectionInfo.setCreateUserId(collectionInfoDto.getCreateUserId());
         collectionInfo.setDelFlag(ResourceEnum.DEL_FLAG_FALSE);
         if(collectionInfoDao.insertByPrimaryKeySelective(collectionInfo) == 0) {
-            throw QuanhuException.busiError("已收藏不能重复收藏");
+            throw new QuanhuException(ExceptionEnum.COLLECTION_ALREADY_ERROR);
         }
         //提交事件
         this.sendEvent(collectionInfo, resourceVo);
@@ -126,7 +126,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
                 logger.error("递减收藏数 失败", e);
             }
         } else {
-            throw QuanhuException.busiError("未收藏不能取消收藏");
+            throw new QuanhuException(ExceptionEnum.COLLECTION_NOT_ERROR);
         }
     }
 

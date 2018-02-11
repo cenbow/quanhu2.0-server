@@ -45,6 +45,10 @@ public enum ExceptionEnum {
     PUSH_MESSAGE_EXCEPTION("2005", "推送消息出错！", "推送消息出错！"),
     RPC_RESPONSE_EXCEPTION("2006", "网络开小差了，请稍候再试！", "RpcResponse对象为空！"),
 
+    COLLECTION_EXIST_ERROR("2040", "收藏失败，内容已被删除", "收藏失败，内容已被删除"),
+    COLLECTION_ALREADY_ERROR("2041", "已收藏不能重复收藏", "已收藏不能重复收藏"),
+    COLLECTION_NOT_ERROR("2042", "未收藏不能取消收藏", "未收藏不能取消收藏"),
+
     TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！"),
     TRANSMIT_EXIST_ERROR("2051", "源内容或动态已被删除", "源内容或动态已被删除"),
 

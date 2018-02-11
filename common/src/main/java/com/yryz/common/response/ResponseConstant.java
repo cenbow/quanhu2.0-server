@@ -37,7 +37,7 @@ public enum ResponseConstant {
 	 * 
 	 * @exception 
 	 */
-	ResponseConstant(String code, String showMsg, String errorMsg) {
+	ResponseConstant(String code, String errorMsg,String showMsg) {
 		this.code = code;
 		this.showMsg = showMsg;
 		this.errorMsg = errorMsg;

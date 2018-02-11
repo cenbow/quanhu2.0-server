@@ -6,14 +6,14 @@ public class ActivityCandidateConstants {
 
     public static Integer PAGESIZE = 1000;
 
-    public static String ACTIVITY_CANDIDATE = "ACTIVITY_CANDIDATE_";
+    public static String ACTIVITY_CANDIDATE = "activity:candidate:";
 
-    public static String ACTIVITY_RANK = "_ACTIVITY_RANK";
+    public static String ACTIVITY_RANK = "rank:";
 
-    public static String ACTIVITY_ID = "_ACTIVITY_ID";
+    public static String ACTIVITY_ID = "id:";
 
     public static String getKeyInfo(Long activityId, Long candidateId) {
-        StringBuffer stringBuffer = new StringBuffer("activity:candidate:");
+        StringBuffer stringBuffer = new StringBuffer(ActivityCandidateConstants.ACTIVITY_CANDIDATE);
         stringBuffer.append(activityId);
         stringBuffer.append(":");
         stringBuffer.append(candidateId);
@@ -22,15 +22,15 @@ public class ActivityCandidateConstants {
 
     public static String getKeyRank(Long activityId) {
         StringBuffer stringBuffer = new StringBuffer(ActivityCandidateConstants.ACTIVITY_CANDIDATE);
-        stringBuffer.append(activityId);
         stringBuffer.append(ActivityCandidateConstants.ACTIVITY_RANK);
+        stringBuffer.append(activityId);
         return stringBuffer.toString();
     }
 
     public static String getKeyId(Long activityId) {
         StringBuffer stringBuffer = new StringBuffer(ActivityCandidateConstants.ACTIVITY_CANDIDATE);
-        stringBuffer.append(activityId);
         stringBuffer.append(ActivityCandidateConstants.ACTIVITY_ID);
+        stringBuffer.append(activityId);
         return stringBuffer.toString();
     }
 

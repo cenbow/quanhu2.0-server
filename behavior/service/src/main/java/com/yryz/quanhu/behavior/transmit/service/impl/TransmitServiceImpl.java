@@ -101,7 +101,7 @@ public class TransmitServiceImpl implements TransmitService {
             }
             CoterieInfo coterieInfo = coterieInfoResponse.getData();
             if(coterieInfo == null || !Integer.valueOf(CommonConstants.SHELVE_YES).equals(coterieInfo.getShelveFlag()) ) {
-                throw QuanhuException.busiError("私圈不存在或者已下架");
+                throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
             }
             extJson = JsonUtils.toFastJson(coterieInfo);
         } else {
