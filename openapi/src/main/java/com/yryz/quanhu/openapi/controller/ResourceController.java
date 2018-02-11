@@ -96,7 +96,8 @@ public class ResourceController {
         } else if (MemberConstant.Permission.OWNER.getStatus() == permiss || MemberConstant.Permission.MEMBER.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + "," + ModuleContants.ANSWER + "," + ModuleContants.ACTIVITY_COTERIE);
         }
-        resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+      //  resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE);
+        resourceVo.setIntimate(ResourceEnum.INTIMATE_FALSE);
         resourceVo.setCoterieId(coterieId);
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);
