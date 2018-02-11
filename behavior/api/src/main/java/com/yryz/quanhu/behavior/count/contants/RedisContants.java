@@ -1,5 +1,8 @@
 package com.yryz.quanhu.behavior.count.contants;
 
+import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.context.Context;
+
 /**
  * @Author:liupan
  * @Path: com.yryz.quanhu.behavior.count.contants
@@ -8,9 +11,9 @@ package com.yryz.quanhu.behavior.count.contants;
  */
 public class RedisContants {
 
-    public static final String READ_COUNT_KEY = "QH_COUNT_READ_";
+    public static final String READ_COUNT_KEY = Context.getProperty(CommonConstants.SPRING_APPLICATION_NAME)+":COUNT:READ:";
 
-    public static final String WRITE_COUNT_KEY = "QH_COUNT_WRITE_";
+    public static final String WRITE_COUNT_KEY = Context.getProperty(CommonConstants.SPRING_APPLICATION_NAME)+":COUNT:WRITE:";
 
     /**
      * 读key的失效时间
@@ -30,7 +33,7 @@ public class RedisContants {
      * @return
      */
     public static String getReadCountKey(String kid, String code, String page) {
-        return READ_COUNT_KEY + kid + "_" + code + "_" + page;
+        return READ_COUNT_KEY + kid + ":" + code + "_" + page;
     }
 
     /**
@@ -41,6 +44,6 @@ public class RedisContants {
      * @return
      */
     public static String getWriteCountKey(String kid, String code, String page) {
-        return WRITE_COUNT_KEY + kid + "_" + code + "_" + page;
+        return WRITE_COUNT_KEY + kid + ":" + code + "_" + page;
     }
 }

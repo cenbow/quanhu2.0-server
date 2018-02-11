@@ -31,6 +31,8 @@ public class ESConstants {
     public static final String STAR_REALNAME = "userStarInfo.realName.keyword";
     public static final String STAR_CONTACTCALL = "userStarInfo.contactCall";
     public static final String STAR_AUTHTIME = "userStarInfo.authTime";
+    public static final String STAR_APPLYTIME = "userStarInfo.createDate";
+
 
     public static final String STAR_RECOMMEND_HEIGHT = "userStarInfo.recommendHeight";
     public static final String STAR_RECOMMEND_TIME = "userStarInfo.recommendTime";
@@ -47,3 +49,4 @@ public class ESConstants {
     public static final String USER_ACTIVITYCHANNELCODE = "userRegLog.activityChannelCode";
 
 }
+

@@ -89,6 +89,8 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
             resourceTotal.setCreateDate(DateUtils.getDateTime());
             resourceTotal.setExtJson(JsonUtils.toFastJson(vo));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
+            resourceTotal.setTitle(vo.getTitle());
+            resourceTotal.setContent(vo.getContent());
             resourceTotal.setResourceId(vo.getKid());
             resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.TOPIC));
             resourceTotal.setUserId(vo.getCreateUserId());

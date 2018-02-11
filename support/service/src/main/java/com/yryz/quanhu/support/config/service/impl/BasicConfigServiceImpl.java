@@ -265,7 +265,7 @@ public class BasicConfigServiceImpl implements BasicConfigService {
     }
 
     private String buildRedisKey(String key){
-        return redisPrefix+"."+appId+"."+key;
+        return redisPrefix+key;
     }
 
 }
