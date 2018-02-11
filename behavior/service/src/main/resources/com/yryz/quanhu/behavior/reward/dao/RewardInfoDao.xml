@@ -135,15 +135,15 @@
 		from qh_reward
 		<include refid="condition_where_sql" />
 		<choose>
-            <when test="orderType == null">
-            </when>
-            <when test="orderType == 1">
-                order by create_date DESC, id DESC
-            </when>
-            <when test="orderType == 2">
-                order by create_date ASC, id ASC
-            </when>
-        </choose>
+			<when test="orderType == null">
+			</when>
+			<when test="orderType == 1">
+				order by create_date DESC, id DESC
+			</when>
+			<when test="orderType == 2">
+				order by create_date ASC, id ASC
+			</when>
+		</choose>
 	</select>
 
 	<select id="countByCondition" parameterType="com.yryz.quanhu.behavior.reward.dto.RewardInfoDto" resultType="java.lang.Long">
@@ -205,23 +205,11 @@
 	<update id="updateByKid" parameterType="com.yryz.quanhu.behavior.reward.entity.RewardInfo">
 		update qh_reward
 		<set>
-			<if test="kid != null">
-				kid = #{kid,jdbcType=BIGINT},
-			</if>
 			<if test="rewardPrice != null">
 				reward_price = #{rewardPrice,jdbcType=BIGINT},
 			</if>
 			<if test="rewardStatus != null">
 				reward_status = #{rewardStatus,jdbcType=TINYINT},
-			</if>
-			<if test="giftId != null">
-				gift_id = #{giftId,jdbcType=BIGINT},
-			</if>
-			<if test="giftNum != null">
-				gift_num = #{giftNum,jdbcType=INTEGER},
-			</if>
-			<if test="giftPrice != null">
-				gift_price = #{giftPrice,jdbcType=BIGINT},
 			</if>
 			<if test="orderId != null">
 				order_id = #{orderId,jdbcType=BIGINT},
@@ -235,21 +223,31 @@
 			<if test="coterieId != null">
 				coterie_id = #{coterieId,jdbcType=BIGINT},
 			</if>
+			<if test="lastUpdateUserId != null">
+				last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
+			</if>
+			last_update_date = NOW(),
+			<!-- <if test="kid != null">
+				kid = #{kid,jdbcType=BIGINT},
+			</if>
+			<if test="giftId != null">
+				gift_id = #{giftId,jdbcType=BIGINT},
+			</if>
+			<if test="giftNum != null">
+				gift_num = #{giftNum,jdbcType=INTEGER},
+			</if>
+			<if test="giftPrice != null">
+				gift_price = #{giftPrice,jdbcType=BIGINT},
+			</if>
 			<if test="createUserId != null">
 				create_user_id = #{createUserId,jdbcType=BIGINT},
 			</if>
 			<if test="createDate != null">
 				create_date = #{createDate,jdbcType=TIMESTAMP},
 			</if>
-			<if test="lastUpdateUserId != null">
-				last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
-			</if>
-			<if test="lastUpdateDate != null">
-				last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
-			</if>
 			<if test="toUserId != null">
 				to_user_id = #{toUserId,jdbcType=BIGINT},
-			</if>
+			</if> -->
 			<if test="appId != null">
 				app_id = #{appId,jdbcType=VARCHAR},
 			</if>
@@ -262,32 +260,32 @@
 
 	<select id="selectRewardFlow" parameterType="java.lang.Long" resultType="com.yryz.quanhu.behavior.reward.vo.RewardFlowVo">
 		SELECT
-			create_date AS createDate,
-			(
-				CASE
-				WHEN create_user_id = #{userId} THEN
-					gift_price * gift_num * -1
-				ELSE
-					reward_price
-				END
-			) AS amount,
-			(
-				CASE
-				WHEN create_user_id = #{userId} THEN
-					'打赏'
-				ELSE
-					'被打赏'
-				END
-			) AS rewardDesc
+		create_date AS createDate,
+		(
+		CASE
+		WHEN create_user_id = #{userId} THEN
+		gift_price * gift_num * -1
+		ELSE
+		reward_price
+		END
+		) AS amount,
+		(
+		CASE
+		WHEN create_user_id = #{userId} THEN
+		'打赏'
+		ELSE
+		'被打赏'
+		END
+		) AS rewardDesc
 		FROM
-			qh_reward
+		qh_reward
 		WHERE
-			reward_status = 11
+		reward_status = 11
 		AND (
-			create_user_id = #{userId}
-			OR to_user_id = #{userId}
+		create_user_id = #{userId}
+		OR to_user_id = #{userId}
 		)
 		ORDER BY
-			CREATE_DATE DESC,ID DESC
+		CREATE_DATE DESC,ID DESC
 	</select>
 </mapper>
