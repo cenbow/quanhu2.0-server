@@ -109,15 +109,15 @@ public class TransmitServiceImpl implements TransmitService {
                 //判断是否在资源库中存在
                 Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
                 if(!result.success()) {
-                    throw QuanhuException.busiError("资源不存在或者已删除");
+                    throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
                 }
                 resourceVo = result.getData();
                 if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
-                    throw QuanhuException.busiError("资源不存在或者已删除");
+                    throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
                 }
             } catch (Exception e) {
                 logger.error("获取资源失败", e);
-                throw QuanhuException.busiError("资源不存在或者已删除");
+                throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
             }
             if(StringUtils.isNotBlank(resourceVo.getCoterieId())) {
                 throw QuanhuException.busiError("私圈内的资源不能转发");
@@ -130,18 +130,18 @@ public class TransmitServiceImpl implements TransmitService {
             if(!transmitInfo.getResourceId().equals(transmitInfo.getParentId()) ) {
                 Response<Dymaic> dymaicResponse = dymaicService.get(transmitInfo.getParentId());
                 if(!dymaicResponse.success()) {
-                    throw QuanhuException.busiError("资源不存在或者已删除");
+                    throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
                 }
                 Dymaic dymaic = dymaicResponse.getData();
                 if(dymaic == null
                         || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
                         || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
-                    throw QuanhuException.busiError("资源不存在或者已删除");
+                    throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
                 }
             }
         } catch (Exception e) {
             logger.error("资源不存在或者已删除", e);
-            throw QuanhuException.busiError("资源不存在或者已删除");
+            throw QuanhuException.busiError(ExceptionEnum.TRANSMIT_EXIST_ERROR);
         }
 
         Response<Long> idResult = idAPI.getSnowflakeId();
