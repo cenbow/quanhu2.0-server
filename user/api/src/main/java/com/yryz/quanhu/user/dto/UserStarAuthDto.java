@@ -133,6 +133,11 @@ public class UserStarAuthDto extends GenericEntity{
      */
     private Date recommendCancelTime;
 
+    /**
+     * 注册时间
+     */
+    private Date registerDate;
+
     private Set<Long> tagIds;
 
     private String tagNames;
@@ -146,6 +151,14 @@ public class UserStarAuthDto extends GenericEntity{
     private String endDate;
 
     private Integer userLevel;
+
+    public Date getRegisterDate() {
+        return registerDate;
+    }
+
+    public void setRegisterDate(Date registerDate) {
+        this.registerDate = registerDate;
+    }
 
     public Set<Long> getTagIds() {
         return tagIds;
