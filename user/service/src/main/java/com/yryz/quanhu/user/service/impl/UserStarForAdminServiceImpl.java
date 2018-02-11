@@ -336,7 +336,6 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         AdminUserInfoDTO admin = new AdminUserInfoDTO();
         admin.setPhone(dto.getContactCall());                        //手机号
         admin.setRealName(dto.getRealName());                        //真实姓名
-        admin.setUserRole(11);                                       //达人
         admin.setContactCall(dto.getContactCall());                  //联系方式
         admin.setAuthType(dto.getAuthType());                        //认证类型
         admin.setAuthWay(dto.getAuthWay());                          //认证方式
@@ -377,6 +376,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         admin.setRealName(dto.getRealName());                       //真实姓名
         admin.setContactCall(dto.getContactCall());                 //联系方式
         admin.setRecommendStatus(dto.getRecommendStatus());         //推荐状态
+        admin.setAuditStatus((byte) 11);                            //审核通过
         admin.setTagIds(dto.getTagIds());                           //标签查询
         admin.setAppId(appId);
         admin.setPageNo(dto.getPageNo());
@@ -431,7 +431,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
 
         List<UserStarAuthDto> returnArray = new ArrayList<>();
         try{
-            Response<PageList<UserInfoVO>> rpc = elasticsearchService.adminSearchUser(admin);
+            Response<PageList<UserInfoVO>> rpc = elasticsearchService.searchStarUserForAdmin(admin);
             List<UserInfoVO> esArray = rpc.getData().getEntities();
 
             logger.info("elasticsearchService result entities:{} , pageCount:{}",esArray.size(),rpc.getData().getCount());

@@ -158,9 +158,9 @@ public class MemberConstant {
 		 */
 		MEMBER(20,"成员"),
 		/**
-		 * 路人未审核
+		 * 路人未申请
 		 */
-		STRANGER_NON_CHECK(30,"路人未审核"),
+		STRANGER_NON_CHECK(30,"路人未申请"),
 		/**
 		 * 路人待审核
 		 */

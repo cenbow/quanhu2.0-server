@@ -87,19 +87,18 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 		if(rangeConfigVo == null){
 			rangeConfigVo = configVO;
 		}
+		status = checkVerifyCodeSendTime(rangeConfigVo, codeDTO);
+		if(status != VerifyStatus.SUCCESS){
+			throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(),status.getMsg(),ExceptionEnum.BusiException.getErrorMsg());
+		}
 		try {
-			status = checkVerifyCodeSendTime(rangeConfigVo, codeDTO);
-			if(status != VerifyStatus.SUCCESS){
-				throw QuanhuException.busiError(ExceptionEnum.BusiException.getCode(),status.getMsg(),ExceptionEnum.BusiException.getErrorMsg());
-			}
+			
 			code = CommonUtils.getRandomNum(rangeConfigVo.getCodeNum());
 			VerifyCode infoModel = new VerifyCode(codeDTO.getVerifyKey(),
 					String.format("%s.%s", codeDTO.getCommonServiceType(), codeDTO.getAppId()), code,
 					codeDTO.getServiceCode().byteValue(), new Date());
 			infoModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_VERIFY_CODE)));
 			persistenceDao.insert(infoModel);
-		} catch (QuanhuException e) {
-			throw new MysqlOptException(e);
 		} catch (Exception e) {
 			Logger.error("getVerifyCode", e);
 			throw new MysqlOptException(e);
@@ -270,7 +269,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			if (total != null && configVO.getNormalCodeTotal() < total) {
 				return VerifyStatus.MORETHAN_LIMIT;
 			}
-			if (lastTime != null && lastTime - System.currentTimeMillis() < configVO.getNormalCodeDelayTime()) {
+			if (lastTime != null && System.currentTimeMillis() - lastTime < configVO.getNormalCodeDelayTime()) {
 				return VerifyStatus.TOO_FAST;
 			}
 		}

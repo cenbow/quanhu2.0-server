@@ -2,8 +2,12 @@ package com.yryz.quanhu.behavior.comment.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.github.pagehelper.PageHelper;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.BeanUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.behavior.comment.dao.CommentDao;
 import com.yryz.quanhu.behavior.comment.dto.CommentDTO;
@@ -79,14 +83,24 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment accretion(Comment comment) {
-        RedisTemplate<String, Object> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Object.class);
+        RedisTemplate<String, Comment> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Comment.class);
+        //检测被回复的内容是否被删除
+        if (null != comment && comment.getParentId() != 0) {
+            Comment commentSingle = new Comment();
+            commentSingle.setKid(comment.getParentId());
+            Comment commentCheck = commentDao.querySingleComment(commentSingle);
+            if (null != commentCheck && commentCheck.getDelFlag() == 11) {
+                logger.info("当前用户评论的内容已被删除");
+                throw new QuanhuException(ExceptionEnum.COMMENT_CHECK_ERROR);
+            }
+        }
         int count = commentDao.accretion(comment);
         Comment commentRedis = null;
         if (count > 0) {
             commentRedis = commentDao.querySingleCommentById(comment.getId());
             if (null != commentRedis) {
                 try {
-                    redisTemplate.opsForValue().set("COMMENT:" + commentRedis.getModuleEnum()+ ":" + commentRedis.getKid() + "_" + commentRedis.getTopId() + "_" + commentRedis.getResourceId(), commentRedis);
+                    redisTemplate.opsForValue().set("COMMENT:" + commentRedis.getModuleEnum() + ":" + commentRedis.getKid() + "_" + commentRedis.getTopId() + "_" + commentRedis.getResourceId(), commentRedis);
                 } catch (Exception e) {
                     logger.info("同步评论数据到redis中失败" + e);
                 }
@@ -199,15 +213,16 @@ public class CommentServiceImpl implements CommentService {
     public PageList<CommentVO> queryComments(CommentFrontDTO commentFrontDTO) {
         PageHelper.startPage(commentFrontDTO.getCurrentPage().intValue(), commentFrontDTO.getPageSize().intValue());
         PageList pageList = new PageList();
-        String zhan="";
-        if(commentFrontDTO.getCheckType()==1){
-            zhan=String.valueOf(commentFrontDTO.getTopId());
-        }else{
-            zhan="*";
+        String zhan = "";
+        RedisTemplate<String, Comment> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Comment.class);
+        if (commentFrontDTO.getCheckType() == 1) {
+            zhan = String.valueOf(commentFrontDTO.getTopId());
+        } else {
+            zhan = "*";
         }
-        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":"+zhan+"_0_" + commentFrontDTO.getResourceId());
-        if(setKeys.size()>0){
-            logger.info("redis查到了相应的key"+"COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
+        Set<String> setKeys = stringRedisTemplate.keys("COMMENT:" + commentFrontDTO.getModuleEnum() + ":" + zhan + "_0_" + commentFrontDTO.getResourceId());
+        if (setKeys.size() > 0) {
+            logger.info("redis查到了相应的key" + "COMMENT:" + commentFrontDTO.getModuleEnum() + ":*_0_" + commentFrontDTO.getResourceId());
         }
         List<CommentVO> commentVOS = null;
         if (setKeys.size() <= 0) {
@@ -217,59 +232,59 @@ public class CommentServiceImpl implements CommentService {
             logger.info("redis查到了,走redis3");
             commentVOS = new ArrayList<CommentVO>();
             for (String strKey : setKeys) {
-                String stringRedis = stringRedisTemplate.opsForValue().get(strKey);
                 CommentVO commentVO = new CommentVO();
-                JSONObject obj = new JSONObject().fromObject(stringRedis);
-                Comment comment = (Comment) JSONObject.toBean(obj, Comment.class);
-                commentVO.setContentComment(comment.getContentComment());
-                commentVO.setParentId(comment.getParentId());
-                commentVO.setTopId(comment.getTopId());
-                commentVO.setModuleEnum(comment.getModuleEnum());
-                commentVO.setCreateUserId(comment.getCreateUserId());
-                commentVO.setKid(comment.getKid());
-                commentVO.setCoterieId(comment.getCoterieId());
-                commentVO.setDelFlag(comment.getDelFlag());
-                commentVO.setKids(comment.getKids());
-                commentVO.setLikeCount(comment.getLikeCount());
-                commentVO.setLikeFlag(comment.getLikeFlag());
-                commentVO.setNickName(comment.getNickName());
-                commentVO.setParentUserId(comment.getParentUserId());
-                commentVO.setRecommend(comment.getRecommend());
-                commentVO.setResourceId(comment.getResourceId());
-                commentVO.setRevision(comment.getRevision());
-                commentVO.setShelveFlag(comment.getShelveFlag());
-                commentVO.setTargetUserId(comment.getTargetUserId());
-                commentVO.setTargetUserNickName(comment.getTargetUserNickName());
-                commentVO.setTenantId(comment.getTenantId());
-                commentVO.setUserImg(comment.getUserImg());
-                commentVO.setCreateDate(comment.getCreateDate());
-                commentVO.setId(comment.getId());
-                commentVO.setLastUpdateDate(comment.getLastUpdateDate());
-                commentVO.setLastUpdateUserId(comment.getLastUpdateUserId());
-                commentVOS.add(commentVO);
+                Comment comment = redisTemplate.opsForValue().get(strKey);
+                if (null != comment) {
+                    commentVO.setContentComment(comment.getContentComment());
+                    commentVO.setParentId(comment.getParentId());
+                    commentVO.setTopId(comment.getTopId());
+                    commentVO.setModuleEnum(comment.getModuleEnum());
+                    commentVO.setCreateUserId(comment.getCreateUserId());
+                    commentVO.setKid(comment.getKid());
+                    commentVO.setCoterieId(comment.getCoterieId());
+                    commentVO.setDelFlag(comment.getDelFlag());
+                    commentVO.setKids(comment.getKids());
+                    commentVO.setLikeCount(comment.getLikeCount());
+                    commentVO.setLikeFlag(comment.getLikeFlag());
+                    commentVO.setNickName(comment.getNickName());
+                    commentVO.setParentUserId(comment.getParentUserId());
+                    commentVO.setRecommend(comment.getRecommend());
+                    commentVO.setResourceId(comment.getResourceId());
+                    commentVO.setRevision(comment.getRevision());
+                    commentVO.setShelveFlag(comment.getShelveFlag());
+                    commentVO.setTargetUserId(comment.getTargetUserId());
+                    commentVO.setTargetUserNickName(comment.getTargetUserNickName());
+                    commentVO.setTenantId(comment.getTenantId());
+                    commentVO.setUserImg(comment.getUserImg());
+                    commentVO.setCreateDate(comment.getCreateDate());
+                    commentVO.setId(comment.getId());
+                    commentVO.setLastUpdateDate(comment.getLastUpdateDate());
+                    commentVO.setLastUpdateUserId(comment.getLastUpdateUserId());
+                    commentVOS.add(commentVO);
+                }
+
             }
         }
         List<CommentVO> commentVOS_ = new ArrayList<CommentVO>();//null
         List<Comment> commentsnew = null;
         for (CommentVO commentVO : commentVOS) {
+            logger.debug("foreach commentList :" + commentVO.toString());
             CommentFrontDTO commentFrontDTOnew = new CommentFrontDTO();
             commentFrontDTOnew.setTopId(commentVO.getKid());
             commentFrontDTOnew.setResourceId(commentVO.getResourceId());
-            Set<String> setSubKey =stringRedisTemplate.keys("COMMENT:"+commentVO.getModuleEnum()+":*_" + commentVO.getKid() + "_" + commentVO.getResourceId());
-            if(setSubKey.size()>0){
+            Set<String> setSubKey = stringRedisTemplate.keys("COMMENT:" + commentVO.getModuleEnum() + ":*_" + commentVO.getKid() + "_" + commentVO.getResourceId());
+            if (setSubKey.size() > 0) {
                 logger.info("查到了redis数据");
             }
             if (setSubKey.size() <= 0) {
                 commentVOS_ = commentDao.queryComments(commentFrontDTOnew);
-                logger.info("redis查不到走数据库5"+"size:"+setSubKey.size() );
+                logger.info("redis查不到走数据库5" + "size:" + setSubKey.size());
             } else {
                 logger.info("redis查到了走redis6");
                 for (String strSub : setSubKey) {
-                    String onekeyStr = stringRedisTemplate.opsForValue().get(strSub);
-                    if (null != onekeyStr && !onekeyStr.equals("")) {
-                        CommentVO commentVO_ = new CommentVO();
-                        JSONObject obj = new JSONObject().fromObject(onekeyStr);
-                        Comment comment = (Comment) JSONObject.toBean(obj, Comment.class);
+                    CommentVO commentVO_ = new CommentVO();
+                    Comment comment = redisTemplate.opsForValue().get(strSub);
+                    if (null != comment) {
                         commentVO_.setContentComment(comment.getContentComment());
                         commentVO_.setParentId(comment.getParentId());
                         commentVO_.setTopId(comment.getTopId());
@@ -301,6 +316,7 @@ public class CommentServiceImpl implements CommentService {
 
                     }
                 }
+
             }
             commentsnew = new ArrayList<Comment>();
             int i = 0;
@@ -345,7 +361,7 @@ public class CommentServiceImpl implements CommentService {
 
             Map<String, Long> maps = null;
             try {
-                maps = countApi.getCountFlag(BehaviorEnum.Like.getCode(), commentVO.getKid(), "",commentFrontDTO.getCreateUserId()).getData();
+                maps = countApi.getCountFlag(BehaviorEnum.Like.getCode(), commentVO.getKid(), "", commentFrontDTO.getCreateUserId()).getData();
             } catch (Exception e) {
                 logger.info("调用统计信息失败:" + e);
             }
@@ -376,6 +392,7 @@ public class CommentServiceImpl implements CommentService {
             pageList.setEntities(commentVOS.subList(fromIndex, toIndex));
         } else {
             logger.info("走原始分页");
+            logger.debug("commentList final value:" + commentVOS.toString());
             pageList.setEntities(commentVOS);
         }
         return pageList;
@@ -411,40 +428,41 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO) {
+        RedisTemplate<String, Comment> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Comment.class);
         CommentInfoVO commentInfoVO = new CommentInfoVO();
-        Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_"+commentSubDTO.getResourceId());
+        Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_" + commentSubDTO.getResourceId());
         if (strKey.size() > 0) {
             logger.info("评论详情走redis1");
             for (String str : strKey) {
-                String commentRedisSingleStr = stringRedisTemplate.opsForValue().get(str);
-                JSONObject obj = new JSONObject().fromObject(commentRedisSingleStr);
-                Comment comment = (Comment) JSONObject.toBean(obj, Comment.class);
-                commentInfoVO.setContentComment(comment.getContentComment());
-                commentInfoVO.setParentId(comment.getParentId());
-                commentInfoVO.setTopId(comment.getTopId());
-                commentInfoVO.setModuleEnum(comment.getModuleEnum());
-                commentInfoVO.setCreateUserId(comment.getCreateUserId());
-                commentInfoVO.setKid(comment.getKid());
-                commentInfoVO.setCoterieId(comment.getCoterieId());
-                commentInfoVO.setDelFlag(comment.getDelFlag());
-                commentInfoVO.setKids(comment.getKids());
-                commentInfoVO.setLikeCount(comment.getLikeCount());
-                commentInfoVO.setLikeFlag(comment.getLikeFlag());
-                commentInfoVO.setNickName(comment.getNickName());
-                commentInfoVO.setParentUserId(comment.getParentUserId());
-                commentInfoVO.setRecommend(comment.getRecommend());
-                commentInfoVO.setResourceId(comment.getResourceId());
-                commentInfoVO.setRevision(comment.getRevision());
-                commentInfoVO.setShelveFlag(comment.getShelveFlag());
-                commentInfoVO.setTargetUserId(comment.getTargetUserId());
-                commentInfoVO.setTargetUserNickName(comment.getTargetUserNickName());
-                commentInfoVO.setTenantId(comment.getTenantId());
-                commentInfoVO.setUserImg(comment.getUserImg());
-                commentInfoVO.setCreateDate(comment.getCreateDate());
-                commentInfoVO.setId(comment.getId());
-                commentInfoVO.setLastUpdateDate(comment.getLastUpdateDate());
-                commentInfoVO.setLastUpdateUserId(comment.getLastUpdateUserId());
-                commentInfoVO.setCommentEnties(null);
+                Comment comment = redisTemplate.opsForValue().get(str);
+                if (null != comment) {
+                    commentInfoVO.setContentComment(comment.getContentComment());
+                    commentInfoVO.setParentId(comment.getParentId());
+                    commentInfoVO.setTopId(comment.getTopId());
+                    commentInfoVO.setModuleEnum(comment.getModuleEnum());
+                    commentInfoVO.setCreateUserId(comment.getCreateUserId());
+                    commentInfoVO.setKid(comment.getKid());
+                    commentInfoVO.setCoterieId(comment.getCoterieId());
+                    commentInfoVO.setDelFlag(comment.getDelFlag());
+                    commentInfoVO.setKids(comment.getKids());
+                    commentInfoVO.setLikeCount(comment.getLikeCount());
+                    commentInfoVO.setLikeFlag(comment.getLikeFlag());
+                    commentInfoVO.setNickName(comment.getNickName());
+                    commentInfoVO.setParentUserId(comment.getParentUserId());
+                    commentInfoVO.setRecommend(comment.getRecommend());
+                    commentInfoVO.setResourceId(comment.getResourceId());
+                    commentInfoVO.setRevision(comment.getRevision());
+                    commentInfoVO.setShelveFlag(comment.getShelveFlag());
+                    commentInfoVO.setTargetUserId(comment.getTargetUserId());
+                    commentInfoVO.setTargetUserNickName(comment.getTargetUserNickName());
+                    commentInfoVO.setTenantId(comment.getTenantId());
+                    commentInfoVO.setUserImg(comment.getUserImg());
+                    commentInfoVO.setCreateDate(comment.getCreateDate());
+                    commentInfoVO.setId(comment.getId());
+                    commentInfoVO.setLastUpdateDate(comment.getLastUpdateDate());
+                    commentInfoVO.setLastUpdateUserId(comment.getLastUpdateUserId());
+                    commentInfoVO.setCommentEnties(null);
+                }
             }
         } else {
             logger.info("评论详情走数据库2");
@@ -455,53 +473,50 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageList<CommentVO> querySubCommentsInfo(CommentSubDTO commentSubDTO) {
+        RedisTemplate<String, Comment> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Comment.class);
         CommentSubDTO commentSubDTO_ = new CommentSubDTO();
         commentSubDTO_.setKid(commentSubDTO.getKid());
         CommentInfoVO commentInfoVO = new CommentInfoVO();
-        Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_"+commentSubDTO.getResourceId());
+        Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_" + commentSubDTO.getResourceId());
         if (strKey.size() > 0) {
             logger.info("评论详情走redis1");
             for (String str : strKey) {
-                String commentRedisSingleStr = stringRedisTemplate.opsForValue().get(str);
-                JSONObject obj = new JSONObject().fromObject(commentRedisSingleStr);
-                Comment comment = (Comment) JSONObject.toBean(obj, Comment.class);
-                commentInfoVO.setContentComment(comment.getContentComment());
-                commentInfoVO.setParentId(comment.getParentId());
-                commentInfoVO.setTopId(comment.getTopId());
-                commentInfoVO.setModuleEnum(comment.getModuleEnum());
-                commentInfoVO.setCreateUserId(comment.getCreateUserId());
-                commentInfoVO.setKid(comment.getKid());
-                commentInfoVO.setCoterieId(comment.getCoterieId());
-                commentInfoVO.setDelFlag(comment.getDelFlag());
-                commentInfoVO.setKids(comment.getKids());
-                //接点赞返回值 一级返回状态
-
-                commentInfoVO.setLikeCount(comment.getLikeCount());
-                commentInfoVO.setLikeFlag(comment.getLikeFlag());
-
-
-                commentInfoVO.setNickName(comment.getNickName());
-                commentInfoVO.setParentUserId(comment.getParentUserId());
-                commentInfoVO.setRecommend(comment.getRecommend());
-                commentInfoVO.setResourceId(comment.getResourceId());
-                commentInfoVO.setRevision(comment.getRevision());
-                commentInfoVO.setShelveFlag(comment.getShelveFlag());
-                commentInfoVO.setTargetUserId(comment.getTargetUserId());
-                try{
-                    UserSimpleVO userSimpleVO=userApi.getUserSimple(comment.getTargetUserId()).getData();
-                    if(null!=userSimpleVO){
-                        commentInfoVO.setTargetUserNickName(userSimpleVO.getUserNickName());
+                Comment comment = redisTemplate.opsForValue().get(str);
+                if (null != comment) {
+                    commentInfoVO.setContentComment(comment.getContentComment());
+                    commentInfoVO.setParentId(comment.getParentId());
+                    commentInfoVO.setTopId(comment.getTopId());
+                    commentInfoVO.setModuleEnum(comment.getModuleEnum());
+                    commentInfoVO.setCreateUserId(comment.getCreateUserId());
+                    commentInfoVO.setKid(comment.getKid());
+                    commentInfoVO.setCoterieId(comment.getCoterieId());
+                    commentInfoVO.setDelFlag(comment.getDelFlag());
+                    commentInfoVO.setKids(comment.getKids());
+                    commentInfoVO.setLikeCount(comment.getLikeCount());
+                    commentInfoVO.setLikeFlag(comment.getLikeFlag());
+                    commentInfoVO.setNickName(comment.getNickName());
+                    commentInfoVO.setParentUserId(comment.getParentUserId());
+                    commentInfoVO.setRecommend(comment.getRecommend());
+                    commentInfoVO.setResourceId(comment.getResourceId());
+                    commentInfoVO.setRevision(comment.getRevision());
+                    commentInfoVO.setShelveFlag(comment.getShelveFlag());
+                    commentInfoVO.setTargetUserId(comment.getTargetUserId());
+                    try {
+                        UserSimpleVO userSimpleVO = userApi.getUserSimple(comment.getTargetUserId()).getData();
+                        if (null != userSimpleVO) {
+                            commentInfoVO.setTargetUserNickName(userSimpleVO.getUserNickName());
+                        }
+                    } catch (Exception e) {
+                        logger.info("远程调用用户接口出现异常:" + e);
                     }
-                }catch (Exception e){
-                    logger.info("远程调用用户接口出现异常:"+e);
+                    commentInfoVO.setTenantId(comment.getTenantId());
+                    commentInfoVO.setUserImg(comment.getUserImg());
+                    commentInfoVO.setCreateDate(comment.getCreateDate());
+                    commentInfoVO.setId(comment.getId());
+                    commentInfoVO.setLastUpdateDate(comment.getLastUpdateDate());
+                    commentInfoVO.setLastUpdateUserId(comment.getLastUpdateUserId());
+                    commentInfoVO.setCommentEnties(null);
                 }
-                commentInfoVO.setTenantId(comment.getTenantId());
-                commentInfoVO.setUserImg(comment.getUserImg());
-                commentInfoVO.setCreateDate(comment.getCreateDate());
-                commentInfoVO.setId(comment.getId());
-                commentInfoVO.setLastUpdateDate(comment.getLastUpdateDate());
-                commentInfoVO.setLastUpdateUserId(comment.getLastUpdateUserId());
-                commentInfoVO.setCommentEnties(null);
             }
         } else {
             logger.info("评论详情走数据库2");
@@ -519,40 +534,40 @@ public class CommentServiceImpl implements CommentService {
         pageList.setCurrentPage(commentSubDTO.getCurrentPage());
         pageList.setPageSize(commentSubDTO.getPageSize());
         List<CommentVO> commentVOS = new ArrayList<CommentVO>();
-        Set<String> setSubKey = stringRedisTemplate.keys("COMMENT:*:*_" + commentFrontDTO.getTopId() + "_"+commentSubDTO.getResourceId());
+        Set<String> setSubKey = stringRedisTemplate.keys("COMMENT:*:*_" + commentFrontDTO.getTopId() + "_" + commentSubDTO.getResourceId());
         if (setSubKey.size() > 0) {
             logger.info("评论详情走redis3");
             for (String strkey : setSubKey) {
                 CommentVO commentVO = new CommentVO();
-                String commentSubSingle = stringRedisTemplate.opsForValue().get(strkey);
-                JSONObject obj = new JSONObject().fromObject(commentSubSingle);
-                Comment comment = (Comment) JSONObject.toBean(obj, Comment.class);
-                commentVO.setContentComment(comment.getContentComment());
-                commentVO.setParentId(comment.getParentId());
-                commentVO.setTopId(comment.getTopId());
-                commentVO.setModuleEnum(comment.getModuleEnum());
-                commentVO.setCreateUserId(comment.getCreateUserId());
-                commentVO.setKid(comment.getKid());
-                commentVO.setCoterieId(comment.getCoterieId());
-                commentVO.setDelFlag(comment.getDelFlag());
-                commentVO.setKids(comment.getKids());
-                commentVO.setLikeCount(comment.getLikeCount());
-                commentVO.setLikeFlag(comment.getLikeFlag());
-                commentVO.setNickName(comment.getNickName());
-                commentVO.setParentUserId(comment.getParentUserId());
-                commentVO.setRecommend(comment.getRecommend());
-                commentVO.setResourceId(comment.getResourceId());
-                commentVO.setRevision(comment.getRevision());
-                commentVO.setShelveFlag(comment.getShelveFlag());
-                commentVO.setTargetUserId(comment.getTargetUserId());
-                commentVO.setTargetUserNickName(comment.getTargetUserNickName());
-                commentVO.setTenantId(comment.getTenantId());
-                commentVO.setUserImg(comment.getUserImg());
-                commentVO.setCreateDate(comment.getCreateDate());
-                commentVO.setId(comment.getId());
-                commentVO.setLastUpdateDate(comment.getLastUpdateDate());
-                commentVO.setLastUpdateUserId(comment.getLastUpdateUserId());
-                commentVOS.add(commentVO);
+                Comment comment = redisTemplate.opsForValue().get(strkey);
+                if (null != comment) {
+                    commentVO.setContentComment(comment.getContentComment());
+                    commentVO.setParentId(comment.getParentId());
+                    commentVO.setTopId(comment.getTopId());
+                    commentVO.setModuleEnum(comment.getModuleEnum());
+                    commentVO.setCreateUserId(comment.getCreateUserId());
+                    commentVO.setKid(comment.getKid());
+                    commentVO.setCoterieId(comment.getCoterieId());
+                    commentVO.setDelFlag(comment.getDelFlag());
+                    commentVO.setKids(comment.getKids());
+                    commentVO.setLikeCount(comment.getLikeCount());
+                    commentVO.setLikeFlag(comment.getLikeFlag());
+                    commentVO.setNickName(comment.getNickName());
+                    commentVO.setParentUserId(comment.getParentUserId());
+                    commentVO.setRecommend(comment.getRecommend());
+                    commentVO.setResourceId(comment.getResourceId());
+                    commentVO.setRevision(comment.getRevision());
+                    commentVO.setShelveFlag(comment.getShelveFlag());
+                    commentVO.setTargetUserId(comment.getTargetUserId());
+                    commentVO.setTargetUserNickName(comment.getTargetUserNickName());
+                    commentVO.setTenantId(comment.getTenantId());
+                    commentVO.setUserImg(comment.getUserImg());
+                    commentVO.setCreateDate(comment.getCreateDate());
+                    commentVO.setId(comment.getId());
+                    commentVO.setLastUpdateDate(comment.getLastUpdateDate());
+                    commentVO.setLastUpdateUserId(comment.getLastUpdateUserId());
+                    commentVOS.add(commentVO);
+                }
             }
         } else {
             logger.info("评论详情走数据库4");
@@ -594,8 +609,8 @@ public class CommentServiceImpl implements CommentService {
         int count = commentDao.updownSingle(comment);
         if (count > 0) {
             Comment commentSingle = commentDao.querySingleComment(comment);
-            if(null!=commentSingle){
-                stringRedisTemplate.delete("COMMENT:"+commentSingle.getModuleEnum()+":"+commentSingle.getKid()+ "_" + commentSingle.getTopId() + "_" + commentSingle.getResourceId());
+            if (null != commentSingle) {
+                stringRedisTemplate.delete("COMMENT:" + commentSingle.getModuleEnum() + ":" + commentSingle.getKid() + "_" + commentSingle.getTopId() + "_" + commentSingle.getResourceId());
             }
             this.sendMessage(comment.getTargetUserId(), "您的评论有违纪嫌疑,已被管理员下架!");
         }

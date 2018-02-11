@@ -14,7 +14,6 @@ import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.count.service.CountService;
-import com.yryz.quanhu.behavior.count.service.CountStatisticsService;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.other.activity.api.ActivityInfoApi;
@@ -189,5 +188,73 @@ public class CountProvider implements CountApi {
             }
         }
         return list;
+    }
+
+    @Override
+    public Response<Map<Long, Map<String, Long>>> getCount(String countType, List<Long> kids, String page) {
+        try {
+            if (StringUtils.isEmpty(page)) {
+                page = "-1";
+            }
+            if (kids == null || kids.size() == 0) {
+                throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+            }
+            List<BehaviorEnum> list = getBehaviorEnumList(countType);
+            Map<Long, Map<String, Long>> map = Maps.newConcurrentMap();
+            //根据kids初始化返回map集合
+            for (Long kid : kids) {
+                if (kid == null) {
+                    //不允许kids存在空值
+                    logger.error("kids list has null!");
+                    return ResponseUtils.returnObjectSuccess(map);
+                }
+                map.put(kid, Maps.newHashMap());
+            }
+            //循环查询不同类型的数据
+            for (BehaviorEnum behaviorEnum : list) {
+                List<Long> counts = countService.getCount(kids, behaviorEnum.getCode(), page);
+                for (int i = 0; i < counts.size(); i++) {
+                    Long count = counts.get(i);
+                    Long kid = kids.get(i);
+                    map.get(kid).put(behaviorEnum.getKey(), count);
+                }
+            }
+            return ResponseUtils.returnObjectSuccess(map);
+        } catch (Exception e) {
+            logger.error("getCount falid! ", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<Map<Long, Map<String, Long>>> getCountFlag(String countType, List<Long> kids, String page, Long userId) {
+        Map<Long, Map<String, Long>> map = ResponseUtils.getResponseData(getCount(countType, kids, page));
+        try {
+            // 如果查点赞数或者收藏数，自动拼装点赞状态和收藏状态
+            for (String code : countType.split(",")) {
+                switch (code) {
+                    case "11":
+                        //点赞状态
+                        Map<String, Integer> likeMap = ResponseUtils.getResponseData(likeApi.getLikeFlagBatch(kids, userId));
+                        for (Long kid : map.keySet()) {
+                            map.get(kid).put("likeFlag", likeMap.get(kid.toString()).longValue());
+                        }
+                        break;
+//                    case "15":
+//                        //收藏状态
+//                        CollectionInfoDto collectionInfoDto = new CollectionInfoDto();
+//                        collectionInfoDto.setResourceId(kid);
+//                        collectionInfoDto.setCreateUserId(userId);
+//                        Integer collectionFlag = ResponseUtils.getResponseData(collectionInfoApi.collectionStatus(collectionInfoDto));
+//                        if (collectionFlag != null) {
+//                            map.put("collectionFlag", collectionFlag.longValue());
+//                        }
+//                        break;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("getCountFlag error!", e);
+        }
+        return ResponseUtils.returnObjectSuccess(map);
     }
 }

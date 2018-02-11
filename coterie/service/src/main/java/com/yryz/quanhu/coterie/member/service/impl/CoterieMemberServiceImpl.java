@@ -15,6 +15,7 @@ import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
+import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
@@ -24,6 +25,7 @@ import com.yryz.quanhu.coterie.coterie.vo.MemberSearchParam;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dao.CoterieApplyDao;
 import com.yryz.quanhu.coterie.member.dao.CoterieMemberDao;
+import com.yryz.quanhu.coterie.member.dao.CoterieMemberRedis;
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.entity.CoterieMember;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
@@ -92,6 +94,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Resource
     private CoterieEventManager coterieEventManager;
 
+    @Autowired
+    private CoterieMemberRedis coterieMemberRedis;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CoterieMemberVoForJoin join(Long userId, Long coterieId, String reason) {
@@ -148,10 +153,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 //insert member apply
                 saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.PASS.getStatus());
             } else {
-
                 throw QuanhuException.busiError("用户已申请加入私圈!");
             }
-
 
             //如果没有拉黑则自动关注圈主
             Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
@@ -162,6 +165,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
                 throw QuanhuException.busiError("添加关注关系异常");
             }
+
+            //permission cache
+            coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.MEMBER.getStatus());
 
             result.setStatus((byte) 20);
             return result;
@@ -188,6 +194,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
                 throw QuanhuException.busiError("用户已是待审核或审核通过");
             }
+
+            //permission cache
+            coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus());
+
             result.setStatus((byte) 30);
             return result;
         }
@@ -224,6 +234,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             }
             //todo msg
             coterieMemberMessageManager.kickMessage(userId, coterieId, reason);
+
+            //permission cache
+            coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -252,6 +265,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                     //更新私圈成员数
                     coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
                 }
+
+                //permission cache
+                coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
             }
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -288,28 +304,13 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
             }
 
-            CoterieInfo coterie = coterieService.find(coterieId);
-            Long ownerId = Long.parseLong(coterie.getOwnerId());
-
-            //是否为圈主
-            if (userId.longValue() == ownerId.longValue()) {
-                return MemberConstant.Permission.OWNER.getStatus();
+            Integer permission = coterieMemberRedis.getPermission(coterieId, userId);
+            if (null == permission) {
+               permission = getPermissionByDb(coterieId, userId);
+               coterieMemberRedis.savePermission(coterieId, userId, permission);
             }
+            return permission;
 
-            //是否为成员
-            CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
-            if (null != member && member.getDelFlag().equals(MemberConstant.DelFlag.NORMAL.getStatus())) {
-                return MemberConstant.Permission.MEMBER.getStatus();
-            }
-
-            //路人
-            CoterieMemberApply apply = coterieApplyDao.selectWaitingByCoterieIdAndUserId(coterieId, userId);
-
-            if (null != apply) {
-                return MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus();
-            } else {
-                return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
-            }
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -363,11 +364,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
                 //todo event
                 coterieEventManager.joinCoterieEvent(coterieId);
+
+                //permission cache
+                coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.MEMBER.getStatus());
             } else {
                 saveOrUpdateApply(userId, coterieId, "", memberStatus);
             }
-
-
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -582,5 +584,41 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             throw QuanhuException.busiError("保存或更新私圈成员异常");
         }
         return true;
+    }
+
+    private Integer getPermissionByDb(Long coterieId, Long userId) {
+
+        CoterieInfo coterie = coterieService.find(coterieId);
+        Long ownerId = Long.parseLong(coterie.getOwnerId());
+
+        //是否为圈主
+        if (userId.longValue() == ownerId.longValue()) {
+            return MemberConstant.Permission.OWNER.getStatus();
+        }
+
+        //是否为成员
+        CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
+        if (null != member && member.getDelFlag().equals(MemberConstant.DelFlag.NORMAL.getStatus())) {
+            return MemberConstant.Permission.MEMBER.getStatus();
+        }
+
+        //路人
+        CoterieMemberApply apply = coterieApplyDao.selectWaitingByCoterieIdAndUserId(coterieId, userId);
+
+        if (null != apply) {
+            return MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus();
+        } else {
+            return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
+        }
+    }
+
+    /**
+     * 更新redis缓存
+     */
+    private void updateMemberModelCache(Long coterieId, Long userId){
+        CoterieMember model = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
+        if(model != null){
+            coterieMemberRedis.saveCoterieMember(model);
+        }
     }
 }

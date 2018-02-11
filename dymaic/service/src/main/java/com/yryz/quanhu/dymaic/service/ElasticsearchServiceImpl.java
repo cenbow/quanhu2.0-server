@@ -448,6 +448,18 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 
 	}
 
+	@Override
+	public Response<PageList<UserInfoVO>> searchStarUserForAdmin(AdminUserInfoDTO adminUserDTO) {
+		try {
+			logger.info("searchStarUserForAdmin request, adminUserDTO: {}", GsonUtils.parseJson(adminUserDTO));
+			PageList<UserInfoVO> pageList = userRepository.searchStarUserForAdmin(adminUserDTO);
+			return ResponseUtils.returnObjectSuccess(pageList);
+		} catch (Exception e) {
+			logger.error("searchStarUserForAdmin error", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+
 	private void checkAdminParam(AdminUserInfoDTO adminUserDTO) {
 		if (adminUserDTO == null) {
 			throw QuanhuException.busiError("adminUserDTO null");

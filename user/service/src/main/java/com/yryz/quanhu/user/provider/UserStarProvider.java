@@ -89,7 +89,7 @@ public class UserStarProvider implements UserStarApi {
 						&& StringUtils.isNotBlank(info.getIdCard())) {
 					UserStarAuth authModel2 = userStarService.get(null, info.getIdCard());
 					if (authModel2 != null && authModel2.getAuditStatus() < StarAuditStatus.AUDIT_FAIL.getStatus()) {
-						throw QuanhuException.busiError("身份证信息已存在");
+						throw QuanhuException.busiShowError("身份证信息已存在","身份证信息已存在");
 					}
 				}
 				userStarService.save(model);
@@ -174,7 +174,7 @@ public class UserStarProvider implements UserStarApi {
 					UserStarAuth authModel2 = userStarService.get(null, info.getIdCard());
 					if (authModel2 != null && !info.getUserId().equals(authModel2.getUserId())
 							&& authModel2.getAuditStatus() < StarAuditStatus.AUDIT_FAIL.getStatus()) {
-						throw QuanhuException.busiError("身份证信息已存在");
+						throw QuanhuException.busiShowError("身份证信息已存在","身份证信息已存在");
 					}
 				}
 			}

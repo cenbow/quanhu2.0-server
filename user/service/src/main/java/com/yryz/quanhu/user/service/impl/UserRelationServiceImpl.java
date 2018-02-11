@@ -376,7 +376,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         }
     }
 
-    private void mergeUserInfo(Map<String,UserBaseInfoVO> map,UserRelationDto _dto){
+    private boolean mergeUserInfo(Map<String,UserBaseInfoVO> map,UserRelationDto _dto){
         UserBaseInfoVO info = map.get(_dto.getTargetUserId());
         if(info!=null){
             _dto.setUserId(_dto.getTargetUserId());
@@ -384,8 +384,9 @@ public class UserRelationServiceImpl implements UserRelationService{
             _dto.setUserHeadImg(info.getUserImg());
             _dto.setUserSummary(info.getUserSignature());
             _dto.setUserStarFlag(info.getUserRole());
+            return true;
         }else{
-            _dto=null;      //用户集合查询不到，则不返回
+            return false;
         }
     }
 
@@ -443,10 +444,10 @@ public class UserRelationServiceImpl implements UserRelationService{
             newDto.setTargetUserId(_targetUserId);
 
             //合并用户基本信息
-            this.mergeUserInfo(userMaps,newDto);
-            if(newDto==null){
+            if(!this.mergeUserInfo(userMaps,newDto)){
                 continue;
             }
+
             //合并关系
             this.mergeRelation(userAlls,newDto);
             //合并备注信息

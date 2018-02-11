@@ -6,7 +6,7 @@ public enum ExceptionEnum {
     BusiException("500", "业务逻辑异常", "网络开小差了，请稍候再试！"),
     Exception("1000", "未知错误", "网络开小差了，请稍后再试"),
     NEEDTOKEN("1001", "用户未登录或者被挤掉了", "请重新登录"),
-    TOKEN_EXPIRE("1002", "短期token过期", "请重新登录"),
+    TOKEN_EXPIRE("1002", "短期token过期", "网络开小差了，请稍候再试！"),
     TOKEN_INVALID("1003", "无效token", "请重新登录"),
     NO_TOKEN("1004", "token被后台清掉了", "请重新登录"),
     NEED_PHONE("1005", "需要绑定手机号", "需要绑定手机号"),
@@ -45,9 +45,9 @@ public enum ExceptionEnum {
     PUSH_MESSAGE_EXCEPTION("2005", "推送消息出错！", "推送消息出错！"),
     RPC_RESPONSE_EXCEPTION("2006", "网络开小差了，请稍候再试！", "RpcResponse对象为空！"),
 
-    TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！");
+    TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！"),
 
-
+    COMMENT_CHECK_ERROR("2060","被评论的内容已删除,回复评论失败！","被评论的内容已删除,回复评论失败！");
 
 
     private String code;
