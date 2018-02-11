@@ -148,11 +148,11 @@ public class UserRelationCacheDao {
 
 
     public String getCacheKey(String sourceUserId,String targetUserId){
-        return relation_prefix+"."+sourceUserId+"."+targetUserId;
+        return relation_prefix+sourceUserId+"."+targetUserId;
     }
 
     public String getCacheTotalCountKey(String userId){
-        return relation_count_prefix+"."+userId;
+        return relation_count_prefix+userId;
     }
 
     public UserRelationCountDto getCacheTotalCount(String userId){

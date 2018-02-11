@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.yryz.common.utils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +22,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
@@ -225,10 +225,11 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             upInfo.setDelFlag(CommonConstants.DELETE_YES);
 
             // 校验记录是否存在
+            Assert.notNull(upInfo.getKid(), "Kid is null !");
             ReleaseInfo info = releaseInfoService.selectByKid(upInfo.getKid());
             Assert.notNull(info, "文章资源不存在，kid：" + upInfo.getKid());
-
             Assert.isTrue(info.getCreateUserId().equals(upInfo.getLastUpdateUserId()), "操作用户非作者不能删除！");
+            Assert.isTrue(!CommonConstants.DELETE_YES.equals(info.getDelFlag()), "当前文章已删除，禁止重复操作！");
 
             int result = releaseInfoService.updateByUkSelective(upInfo);
             Assert.isTrue(result > 0, "作者删除文章失败！");
