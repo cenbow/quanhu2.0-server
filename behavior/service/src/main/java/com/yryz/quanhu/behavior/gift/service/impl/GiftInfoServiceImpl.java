@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.context.Context;
 import com.yryz.common.response.PageList;
@@ -68,11 +69,12 @@ public class GiftInfoServiceImpl implements GiftInfoService {
         return this.getDao().selectByCondition(dto);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public PageList<GiftInfo> pageByCondition(GiftInfoDto dto, boolean isCount) {
         // 优先取缓存数据
-        RedisTemplate<String, PageList> redisTemplateP = redisTemplateBuilder.buildRedisTemplate(PageList.class);
+        RedisTemplate<String, PageList<GiftInfo>> redisTemplateP = redisTemplateBuilder
+                .buildRedisTemplate(new TypeReference<PageList<GiftInfo>>() {
+                });
         final String cacheKey = this
                 .getCacheKey("pageByCondition:" + BeanUtils.getNotNullPropertyValue(dto, "_") + "_" + isCount);
         PageList<GiftInfo> pageList = redisTemplateP.opsForValue().get(cacheKey);
@@ -108,7 +110,6 @@ public class GiftInfoServiceImpl implements GiftInfoService {
     * @param @return
     * @throws  
     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public List<GiftInfo> selectByKids(Set<Long> kids) {
         List<GiftInfo> result = new ArrayList<>();
@@ -117,7 +118,7 @@ public class GiftInfoServiceImpl implements GiftInfoService {
         }
 
         // 优先从缓存中取，没有再从数据库查
-        RedisTemplate<String, List> redisTemplateL = redisTemplateBuilder.buildRedisTemplate(List.class);
+        RedisTemplate<String, List<GiftInfo>> redisTemplateL = redisTemplateBuilder.buildRedisTemplate(new TypeReference<List<GiftInfo>>() {});
         final String cacheKey = this.getCacheKey("kids:" + StringUtils.join(kids, ","));
         result = redisTemplateL.opsForValue().get(cacheKey);
         if (CollectionUtils.isNotEmpty(result)) {

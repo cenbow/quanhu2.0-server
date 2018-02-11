@@ -1,19 +1,28 @@
 package com.yryz.quanhu.resource.release.info.service.impl;
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import com.yryz.common.constant.CommonConstants;
+import com.yryz.common.context.Context;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.PageUtils;
+import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.resource.release.config.entity.ReleaseConfig;
 import com.yryz.quanhu.resource.release.config.vo.ReleaseConfigVo;
 import com.yryz.quanhu.resource.release.constants.ReleaseConstants;
@@ -42,6 +51,20 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
         return this.releaseInfoDao;
     }
 
+    private RedisTemplate<String, ReleaseInfoVo> redisTemplate;
+
+    @Autowired
+    private RedisTemplateBuilder redisTemplateBuilder;
+
+    @PostConstruct
+    public void init() {
+        redisTemplate = redisTemplateBuilder.buildRedisTemplate(ReleaseInfoVo.class);
+    }
+
+    private String getCacheKey(Object key) {
+        return Context.getProperty(CommonConstants.SPRING_APPLICATION_NAME) + ":ReleaseInfo:Key_" + key;
+    }
+
     @Override
     public int insertSelective(ReleaseInfo record) {
         return this.getDao().insertSelective(record);
@@ -49,7 +72,17 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
 
     @Override
     public ReleaseInfoVo selectByKid(Long kid) {
-        return this.getDao().selectByKid(kid);
+        // 优先取缓存
+        String cacheKey = this.getCacheKey("kid:" + kid);
+        ReleaseInfoVo vo = redisTemplate.opsForValue().get(cacheKey);
+        if (null != vo) {
+            return vo;
+        }
+
+        // 取db
+        vo = this.getDao().selectByKid(kid);
+        redisTemplate.opsForValue().set(cacheKey, vo, 24, TimeUnit.HOURS);
+        return vo;
     }
 
     @Override
@@ -78,19 +111,33 @@ public class ReleaseInfoServiceImpl implements ReleaseInfoService {
             pageList.setCount(this.countByCondition(dto));
         }
 
-        // TODO 缓存添加
-
         return pageList;
     }
 
     @Override
     public int updateByUkSelective(ReleaseInfo record) {
-        return this.getDao().updateByUkSelective(record);
+        int upRow = this.getDao().updateByUkSelective(record);
+        // 清理缓存
+        if (upRow > 0) {
+            redisTemplate.delete(this.getCacheKey("kid:" + record.getKid()));
+        }
+        return upRow;
     }
 
     @Override
     public int updateByCondition(ReleaseInfo record, ReleaseInfoDto dto) {
-        return this.getDao().updateByCondition(record, dto);
+        Assert.isTrue(null != dto.getKids() && dto.getKids().length > 0, "dto.getKids() is null !");
+        int upRow = this.getDao().updateByCondition(record, dto);
+        // 清理缓存
+        if (upRow > 0) {
+            Set<String> keys = new HashSet<>();
+            for (Long kid : dto.getKids()) {
+                keys.add(this.getCacheKey("kid:" + kid));
+            }
+            redisTemplate.delete(keys);
+        }
+
+        return upRow;
     }
 
     /**  
