@@ -186,6 +186,17 @@ public class ResourceMongo extends AbsBaseMongoDAO<ResourceModel> {
 				criteria = Criteria.where("coterieId").is(resourceModel.getCoterieId()).andOperator(criteria);
 			}
 			
+			if(null != resourceModel.getPrice()){
+				long price = resourceModel.getPrice().longValue();
+				if(price == 0L){ //为0，只看免费的
+					criteria = Criteria.where("price").is(price).andOperator(criteria);
+				} else if(price == -1L){ //为-1，只看收费的
+					criteria = Criteria.where("price").gte(0L).andOperator(criteria);
+				} else { //大于0，则表示是小于等于当前值
+					criteria = Criteria.where("price").lte(resourceModel.getPrice()).andOperator(criteria);
+				}
+			}
+			
 			//标题，正文，简介模糊匹配
 			if(StringUtils.isNotEmpty(resourceModel.getTitle())){
 				criteria = Criteria.where("title").regex(resourceModel.getTitle()).andOperator(criteria);
