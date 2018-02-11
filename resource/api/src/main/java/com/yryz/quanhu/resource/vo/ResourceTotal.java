@@ -57,6 +57,11 @@ public class ResourceTotal implements Serializable {
      * 动态正文
      */
     private String content;
+    
+    /**
+     * 价格
+     */
+    private Long price;
 
     /**
      * 发布时间
@@ -217,6 +222,20 @@ public class ResourceTotal implements Serializable {
 	 */
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	/**
+	 * @return the price
+	 */
+	public Long getPrice() {
+		return price;
+	}
+
+	/**
+	 * @param price the price to set
+	 */
+	public void setPrice(Long price) {
+		this.price = price;
 	}
 
 	/**
