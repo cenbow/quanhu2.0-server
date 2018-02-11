@@ -10,6 +10,7 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
@@ -45,6 +46,9 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
 
     @Reference
     private ReadApi readApi;
+
+    @Reference
+    private ResourceApi resourceApi;
 
     @Autowired
     private TopicPost4AdminService topicPost4AdminService;
@@ -259,14 +263,18 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         /**
          * 话题下架的同时话题对应的帖子也下架
          */
-        TopicPostExample example = new TopicPostExample();
-        TopicPostExample.Criteria criteria = example.createCriteria();
-        criteria.andTopicIdEqualTo(kid);
-        List<TopicPost> topicPosts = this.topicPostDao.selectByExample(example);
-        if (topicPosts != null) {
-            for (TopicPost topicPost : topicPosts) {
-                this.topicPost4AdminService.shelve(topicPost.getKid(), CommonConstants.SHELVE_NO);
+        if(result>0) {
+            TopicPostExample example = new TopicPostExample();
+            TopicPostExample.Criteria criteria = example.createCriteria();
+            criteria.andTopicIdEqualTo(kid);
+            List<TopicPost> topicPosts = this.topicPostDao.selectByExample(example);
+            if (topicPosts != null) {
+                for (TopicPost topicPost : topicPosts) {
+                    this.topicPost4AdminService.shelve(topicPost.getKid(), CommonConstants.SHELVE_NO);
+                }
             }
+
+            resourceApi.deleteResourceById(String.valueOf(kid));
         }
 
         return result;

@@ -3,6 +3,7 @@ package com.yryz.quanhu.resource.topic.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yryz.quanhu.resource.api.ResourceApi;
 import org.assertj.core.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     @Reference
     private CountApi countApi;
+
+    @Reference
+    private ResourceApi resourceApi;
 
     @Autowired
     private SendMessageService sendMessageService;
@@ -177,8 +181,11 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
                 countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
                 //提交发布数
                 countApi.commitCount(BehaviorEnum.Release, topicPostWithBLOBs.getCreateUserId(), null, -1L);
+                //删除提交的帖子资源
+                resourceApi.deleteResourceById(String.valueOf(topicPostWithBLOBs.getKid()));
             }
         }
+
         return flag;
     }
 
