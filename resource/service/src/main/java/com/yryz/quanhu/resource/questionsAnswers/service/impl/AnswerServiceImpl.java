@@ -87,9 +87,14 @@ public class AnswerServiceImpl implements AnswerService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        if(StringUtils.isNotBlank(content) && StringUtils.isNotBlank(answerAudio)){
-            throw  QuanhuException.busiError("","音频回答和文字回答互斥","音频回答和文字回答互斥");
+        if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(content) && StringUtils.isBlank(answerAudio)){
+            throw  QuanhuException.busiError("","音频回答和图文回答不能都为空","音频回答和图文回答不能都为空");
         }
+
+        if((StringUtils.isNotBlank(imgUrl) || StringUtils.isNotBlank(content)) && StringUtils.isNotBlank(answerAudio)){
+            throw  QuanhuException.busiError("","音频回答和图文回答互斥","音频回答和图片、文字回答只能选一方式回答");
+        }
+
 
         if(StringUtils.isNotBlank(answerAudio) && (audioLength.longValue()<AUDIOLENGTH_MIN || audioLength>AUDIOLENGTH_MAX)){
             throw  QuanhuException.busiError("","有音频回答，音频时长最少1秒最多180秒","有音频回答，音频时长最少1秒最多180秒");
