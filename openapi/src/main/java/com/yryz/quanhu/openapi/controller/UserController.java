@@ -119,7 +119,7 @@ public class UserController {
 			authService.checkToken(request);
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
-		} else if(userId != null && StringUtils.isBlank(header.getUserId())){
+		} else if(userId != null && !StringUtils.equals(header.getUserId(),userId.toString())){
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(userId));
 			simpleVO.setUserPhone(CommonUtils.getPhone(simpleVO.getUserPhone()));
