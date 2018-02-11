@@ -28,7 +28,7 @@ public class TransmitProvider implements TransmitApi {
      * */
     public Response single(TransmitInfo transmitInfo) {
         try {
-            Assert.notNull(transmitInfo.getModuleEnum(), "moduleEnum不能为空");
+            Assert.hasText(transmitInfo.getModuleEnum(), "moduleEnum不能为空");
             Assert.notNull(transmitInfo.getParentId(), "parentId不能为空");
             Assert.notNull(transmitInfo.getResourceId(), "resourceId不能为空");
             Assert.notNull(transmitInfo.getTargetUserId(), "targetUserId不能为空");
@@ -47,7 +47,7 @@ public class TransmitProvider implements TransmitApi {
      * */
     public Response<PageList<TransmitInfoVo>> list(TransmitInfoDto transmitInfoDto) {
         try {
-            Assert.notNull(transmitInfoDto.getModuleEnum(), "moduleEnum不能为空");
+            Assert.hasText(transmitInfoDto.getModuleEnum(), "moduleEnum不能为空");
             Assert.notNull(transmitInfoDto.getParentId(), "parentId不能为空");
             return ResponseUtils.returnObjectSuccess(transmitService.list(transmitInfoDto));
         } catch (Exception e) {
