@@ -60,12 +60,9 @@ import java.util.*;
 public class QuestionServiceImpl implements QuestionService {
 
     private static final Byte COTERIE_STATUS_UP = 11;
-
     private static final Integer CONTENT_LENGTH_MAX = 300;
     private static final Integer CONTENT_LENGTH_MIN = 10;
-
     private static final Integer CONTENT_SPLIT_LENGTH = 100;
-
 
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
