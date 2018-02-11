@@ -11,13 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.AppConstants;
 import com.yryz.common.context.Context;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.support.config.api.BasicConfigApi;
+import com.yryz.quanhu.user.contants.Constants;
 import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserOperateService;
 import com.yryz.quanhu.user.vo.MyInviterVO;
@@ -30,6 +34,8 @@ public class UserOperateProvider implements UserOperateApi {
 	
 	@Autowired
 	private UserOperateService operateService;
+	@Reference
+	private BasicConfigApi configApi;
 	
 	@Override
 	public Response<UserRegInviterLinkVO> getInviterLinkByUserId(Long userId) {
@@ -38,7 +44,7 @@ public class UserOperateProvider implements UserOperateApi {
 				throw QuanhuException.busiError("用户id不能为空");
 			}
 			String inviterCode = operateService.selectInviterByUserId(userId);
-			String inviterUrl = Context.getProperty("reg_inviter_url");
+			String inviterUrl = getInviterConfig();
 			return ResponseUtils.returnObjectSuccess(new UserRegInviterLinkVO(inviterCode, String.format("%s?inviter=%s", inviterUrl, inviterCode)));
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -94,5 +100,18 @@ public class UserOperateProvider implements UserOperateApi {
 			return ResponseUtils.returnException(e);
 		}
 	}
-
+	
+	private String getInviterConfig(){
+		String configName = String.format("%s.%s", Constants.INVITER_CONFIG_NAME,Context.getProperty(AppConstants.APP_ID));
+		String configValue = null;
+		try {
+			configValue = ResponseUtils.getResponseData(configApi.getValue(configName));
+		} catch (Exception e) {
+			logger.error("[getInviterConfig]",e);
+		}
+		if (configValue == null) {
+			configValue = Context.getProperty("reg_inviter_url");
+		}
+		return configValue;
+	}
 }
