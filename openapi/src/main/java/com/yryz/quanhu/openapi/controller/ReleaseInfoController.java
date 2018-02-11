@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
-import com.yryz.common.entity.GenericEntity;
+import com.yryz.common.entity.KidEntity;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
@@ -74,13 +74,13 @@ public class ReleaseInfoController {
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "userId", paramType = "header", required = true),
             @ApiImplicitParam(name = "token", paramType = "header", required = true),
-            @ApiImplicitParam(name = "ge", paramType = "body", required = true) })
+            @ApiImplicitParam(name = "kidEntity", paramType = "body", required = true) })
     @UserBehaviorValidation(event = "文章删除", login = true)
     @PostMapping(value = "{version}/release/info/delete")
-    public Response<Integer> deleteBykid(HttpServletRequest request, @RequestBody GenericEntity ge,
+    public Response<Integer> deleteBykid(HttpServletRequest request, @RequestBody KidEntity kidEntity,
             @RequestHeader("userId") Long headerUserId) {
         ReleaseInfo upInfo = new ReleaseInfo();
-        upInfo.setKid(ge.getKid());
+        upInfo.setKid(kidEntity.getKid());
         upInfo.setLastUpdateUserId(headerUserId);
 
         return releaseInfoApi.deleteBykid(upInfo);
