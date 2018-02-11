@@ -141,6 +141,7 @@ public class TransmitServiceImpl implements TransmitService {
             }
         } catch (Exception e) {
             logger.error("资源不存在或者已删除", e);
+            throw QuanhuException.busiError("资源不存在或者已删除");
         }
 
         Response<Long> idResult = idAPI.getSnowflakeId();
