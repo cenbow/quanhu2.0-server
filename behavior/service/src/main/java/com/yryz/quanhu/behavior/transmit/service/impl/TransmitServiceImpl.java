@@ -106,19 +106,6 @@ public class TransmitServiceImpl implements TransmitService {
             extJson = JsonUtils.toFastJson(coterieInfo);
         } else {
             try {
-                //如果转发的是动态，判断动态对应的状态是否正常
-                if(!transmitInfo.getResourceId().equals(transmitInfo.getParentId()) ) {
-                    Response<Dymaic> dymaicResponse = dymaicService.get(transmitInfo.getParentId());
-                    if(!dymaicResponse.success()) {
-                        throw QuanhuException.busiError("资源不存在或者已删除");
-                    }
-                    Dymaic dymaic = dymaicResponse.getData();
-                    if(dymaic == null
-                            || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
-                            || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
-                        throw QuanhuException.busiError("资源不存在或者已删除");
-                    }
-                }
                 //判断是否在资源库中存在
                 Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
                 if(!result.success()) {
@@ -137,6 +124,25 @@ public class TransmitServiceImpl implements TransmitService {
             }
             extJson = resourceVo.getExtJson();
         }
+
+        try {
+            //如果转发的是动态，判断动态对应的状态是否正常
+            if(!transmitInfo.getResourceId().equals(transmitInfo.getParentId()) ) {
+                Response<Dymaic> dymaicResponse = dymaicService.get(transmitInfo.getParentId());
+                if(!dymaicResponse.success()) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
+                Dymaic dymaic = dymaicResponse.getData();
+                if(dymaic == null
+                        || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
+                        || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
+            }
+        } catch (Exception e) {
+            logger.error("资源不存在或者已删除", e);
+        }
+
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
             throw new QuanhuException(ExceptionEnum.SysException);
