@@ -54,9 +54,9 @@ public class CountStatisticsServiceImpl implements CountStatisticsService {
                         resultMap.put(d, c);
                     }
                 }
+                resultMap.put("count", list.get(0).getCount());
             }
         }
-        resultMap.put("count", count);
 
         return resultMap;
     }

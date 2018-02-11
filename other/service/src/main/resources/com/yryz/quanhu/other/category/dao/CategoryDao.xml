@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yryz.quanhu.other.category.dao.CategoryDao" >
   <select id="selectByPid"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
-    select * from qh_category where parent_kid= #{pid}
+    select * from qh_category where parent_kid= #{pid} and category_status = 10
     <if test="limit > 0 ">
       limit #{limit}
     </if>
@@ -14,7 +14,7 @@
   </select>
 
   <select id="selectByRecommend"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
-    select * from qh_category where recommend = 10;
+    select * from qh_category where recommend = 10 and category_status = 10;
   </select>
 
 

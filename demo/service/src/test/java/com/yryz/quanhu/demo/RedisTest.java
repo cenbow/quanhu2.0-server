@@ -7,14 +7,25 @@
  */
 package com.yryz.quanhu.demo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.yryz.common.response.PageList;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.demo.elasticsearch.entity.User;
+import com.yryz.quanhu.demo.redis.PageRedis;
 import com.yryz.quanhu.demo.redis.UserRedis;
 
 /**
@@ -30,6 +41,9 @@ public class RedisTest {
 	@Autowired
 	UserRedis userRedis;
 	
+	@Autowired
+	PageRedis pageRedis;
+	
 	@Test
 	public void set(){
 		User user = new User();
@@ -43,5 +57,24 @@ public class RedisTest {
 		User user = userRedis.get("yehao-test");
 		System.out.println(GsonUtils.parseJson(user));
 	}
-
+	
+	@Test
+	public void setPage(){
+		User user = new User();
+		user.setCreateTime(DateUtils.currentDatetime());
+		user.setRealName("hello");
+		List<User> list = new ArrayList<>();
+		list.add(user);
+		List<List<User>> list1 = new ArrayList<>();
+		list1.add(list);
+		PageList<List<User>> pageList = new PageList<>();
+		pageList.setEntities(list1);
+		pageRedis.saveRE(pageList);
+	}
+	
+	@Test
+	public void getPage(){
+		PageList<List<User>> pageList = pageRedis.getRE();
+		System.out.println(GsonUtils.parseJson(pageList));
+	}
 }

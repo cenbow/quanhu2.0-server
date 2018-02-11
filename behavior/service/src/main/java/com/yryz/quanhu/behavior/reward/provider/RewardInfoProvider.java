@@ -72,6 +72,7 @@ public class RewardInfoProvider implements RewardInfoApi {
             Assert.notNull(record.getResourceId(), "打赏资源Id，为NULL！ ");
             Assert.isTrue(null != record.getGiftNum() && record.getGiftNum() > 0, "打赏礼物数量，为NULL！ ");
             Assert.notNull(record.getModuleEnum(), "打赏资源ModuleEnum，为NULL！ ");
+            Assert.notNull(record.getCreateUserId(), "打赏资源CreateUserId，为NULL！ ");
             Assert.notNull(record.getToUserId(), "打赏资源ToUserId，为NULL！ ");
             // 打赏礼物 校验
             GiftInfo giftInfo = giftInfoService.selectByKid(record.getGiftId());

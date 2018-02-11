@@ -14,9 +14,12 @@ import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.AdminActivityCountVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -32,6 +35,8 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
     @Autowired
     ActivityVoteRecordDao activityVoteRecordDao;
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminActivityCountServiceImpl.class);
+
     /**
      * 获取活动统计数量
      * @param   adminActivityCountDto
@@ -42,11 +47,19 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
             AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
             if(activityDetail == null) {
                 adminActivityCountDto.setStartDate(new Date());
+            } else {
+                adminActivityCountDto.setStartDate(activityDetail.getOnlineTime());
             }
-            adminActivityCountDto.setStartDate(activityDetail.getBeginTime());
         }
         if(adminActivityCountDto.getEndDate() == null) {
             adminActivityCountDto.setEndDate(new Date());
+        }
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            adminActivityCountDto.setStartDate(sdf.parse(sdf.format(adminActivityCountDto.getStartDate())));
+            adminActivityCountDto.setEndDate(sdf.parse(sdf.format(adminActivityCountDto.getEndDate())));
+        } catch (ParseException e) {
+            logger.error("时间转换异常",e);
         }
         Map<String, Long> recordMap = new HashMap<>();
         //获取活动投票数
@@ -81,19 +94,31 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         }
         List<AdminActivityCountVo> list = this.getDate(countStatisticsDto.getStartDate(), countStatisticsDto.getEndDate());
         if(!CollectionUtils.isEmpty(list)) {
-            for(int i=0; i<list.size(); i++) {
+            Integer preCount = 0;
+            Integer preCandidateCount = 0;
+            for(int i=list.size()-1; i>-1; i--) {
                 AdminActivityCountVo adminActivityCountVo = list.get(i);
                 adminActivityCountVo.setTotalNo(recordMap.get(adminActivityCountVo.getDate()) == null
                         ? 0 : recordMap.get(adminActivityCountVo.getDate()).intValue());
                 if(mapPage != null) {
                     Integer count = mapPage.get(adminActivityCountVo.getDate()) == null
                             ? 0 : mapPage.get(adminActivityCountVo.getDate()).intValue();
-                    adminActivityCountVo.setDetailCount(count);
+                    if(count != 0) {
+                        adminActivityCountVo.setDetailCount(count - preCount > 0 ? count - preCount : 0);
+                        preCount = count;
+                    } else {
+                        adminActivityCountVo.setDetailCount(count);
+                    }
                 }
                 if(mapPageCandidate != null) {
                     Integer count = mapPageCandidate.get(adminActivityCountVo.getDate()) == null
                             ? 0 : mapPageCandidate.get(adminActivityCountVo.getDate()).intValue();
-                    adminActivityCountVo.setCandidateDetailCount(count);
+                    if(count != 0) {
+                        adminActivityCountVo.setCandidateDetailCount(count - preCandidateCount > 0 ? count - preCandidateCount : 0);
+                        preCandidateCount = count;
+                    } else {
+                        adminActivityCountVo.setCandidateDetailCount(count);
+                    }
                 }
             }
         }
@@ -160,15 +185,15 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         }
         if(mapPage != null) {
             Long pageCount = 0L;
-            for(Map.Entry<String, Long> entry : mapPage.entrySet()){
-                pageCount = entry.getValue() + pageCount;
+            if(mapPage.get("count") != null) {
+                pageCount = mapPage.get("count");
             }
             adminActivityCountVo.setDetailCount(pageCount.intValue());
         }
         if(mapPageCandidate != null) {
             Long pageCandidateCount = 0L;
-            for(Map.Entry<String, Long> entry : mapPageCandidate.entrySet()){
-                pageCandidateCount = entry.getValue() + pageCandidateCount;
+            if(mapPageCandidate.get("count") != null) {
+                pageCandidateCount = mapPageCandidate.get("count");
             }
             adminActivityCountVo.setCandidateDetailCount(pageCandidateCount.intValue());
         }

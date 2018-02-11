@@ -33,40 +33,40 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
     @Autowired
     private ReleaseConfigDao ReleaseConfigDao;
 
-    protected RedisTemplate<String, ReleaseConfigVo> redisTemplate;
-    
+    private RedisTemplate<String, ReleaseConfigVo> redisTemplate;
+
     @Autowired
-    protected RedisTemplateBuilder redisTemplateBuilder;
-    
+    private RedisTemplateBuilder redisTemplateBuilder;
+
     @PostConstruct
-    public void init(){
+    public void init() {
         redisTemplate = redisTemplateBuilder.buildRedisTemplate(ReleaseConfigVo.class);
     }
-    
-    public String getCacheKey(Object key) {
+
+    private String getCacheKey(Object key) {
         return Context.getProperty(CommonConstants.SPRING_APPLICATION_NAME) + ":ReleaseConfigVo:template_" + key;
     }
-    
-    public ReleaseConfigDao getDao() {
+
+    private ReleaseConfigDao getDao() {
         return this.ReleaseConfigDao;
     }
 
     @Override
     public ReleaseConfigVo getTemplate(Long classifyId) {
         // 查询缓存，若有直接返回
-        ReleaseConfigVo rsObj = redisTemplate.opsForValue().get(this.getCacheKey(classifyId));
-        if (null != rsObj) {
-            return rsObj;
+        final String cacheKey = this.getCacheKey(classifyId);
+        ReleaseConfigVo vo = redisTemplate.opsForValue().get(cacheKey);
+        if (null != vo) {
+            return vo;
         }
 
-        ReleaseConfigVo vo = null;
         List<ReleaseConfig> cfgList = this.selectByClassifyId(classifyId);
         if (CollectionUtils.isNotEmpty(cfgList)) {
             vo = this.listToCfgVo(cfgList);
         }
 
         // 查询数据后，放置缓存
-        redisTemplate.opsForValue().set(this.getCacheKey(classifyId), vo, 30, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(cacheKey, vo, 30, TimeUnit.DAYS);
         return vo;
     }
 
@@ -89,8 +89,12 @@ public class ReleaseConfigServiceImpl implements ReleaseConfigService {
         }
 
         // 更新数据后，处理缓存
-        for (Long classifyId : classifyIds) {
-            redisTemplate.delete(this.getCacheKey(classifyId));
+        if (CollectionUtils.isNotEmpty(classifyIds)) {
+            Set<String> keys = new HashSet<>();
+            for (Long classifyId : classifyIds) {
+                keys.add(this.getCacheKey(classifyId));
+            }
+            redisTemplate.delete(keys);
         }
         return result;
     }

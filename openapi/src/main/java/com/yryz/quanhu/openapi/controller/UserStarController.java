@@ -10,6 +10,7 @@ import com.yryz.quanhu.dymaic.service.ElasticsearchService;
 import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.vo.UserDynamicVO;
+import io.swagger.annotations.ApiImplicitParams;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -59,6 +60,10 @@ public class UserStarController {
 
     @Reference(check = false)
     private ElasticsearchService elasticsearchService;
+
+    private static final int MAX_PAGE_NO = 5000;
+    private static final int MAX_PAGE_SIZE = 100;
+
 
     /**
      * 达人申请
@@ -153,11 +158,22 @@ public class UserStarController {
      */
     @ApiOperation("某一标签下的达人列表")
     @UserBehaviorValidation(login = false)
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "categoryId", paramType = "query", required = true),
+            @ApiImplicitParam(name = "currentPage", paramType = "query", required = true),
+            @ApiImplicitParam(name = "pageSize", paramType = "query", required = true)
+    })
     @GetMapping(value = "/{version}/star/label/list")
     public Response<PageList<StarInfoVO>> labelStarList(Long categoryId, Integer pageSize, Integer currentPage, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         logger.info("star label list request");
+        if (currentPage == null || currentPage < 1 || currentPage > MAX_PAGE_NO) {
+            currentPage = 1;
+        }
+        if (pageSize == null || pageSize < 1 || pageSize > MAX_PAGE_SIZE) {
+            pageSize = 10;
+        }
         /*StarAuthParamDTO paramDTO = new StarAuthParamDTO();
         paramDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 
