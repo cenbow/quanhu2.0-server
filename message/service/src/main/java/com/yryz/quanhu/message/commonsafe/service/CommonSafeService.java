@@ -69,5 +69,5 @@ public interface CommonSafeService {
 	 * @param ip
 	 * @return
 	 */
-	boolean checkIpLimit(IpLimitDTO dto);
+	void checkIpLimit(IpLimitDTO dto);
 }

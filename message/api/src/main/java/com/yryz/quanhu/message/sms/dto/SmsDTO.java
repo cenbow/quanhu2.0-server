@@ -26,6 +26,10 @@ public class SmsDTO implements Serializable {
 	 */
 	private Long msgTemplateId;
 	/**
+	 * ip地址
+	 */
+	private String ip;
+	/**
 	 * 短信模板传参，根据实际申请的模板内容来设置
 	 */
 	private Map<String,Object> smsParams;
@@ -62,6 +66,14 @@ public class SmsDTO implements Serializable {
 		this.smsParams = smsParams;
 	}
 	
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
 	public String getAppId() {
 		return appId;
 	}
@@ -80,12 +92,13 @@ public class SmsDTO implements Serializable {
 	 * @param smsType
 	 * @param smsParams
 	 */
-	public SmsDTO(String phone,String appId, SmsType smsType, Map<String, Object> smsParams) {
+	public SmsDTO(String phone,String appId, SmsType smsType, Map<String, Object> smsParams,String ip) {
 		super();
 		this.phone = phone;
 		this.appId = appId;
 		this.smsType = smsType;
 		this.smsParams = smsParams;
+		this.ip = ip;
 	}
 	/**
 	 * 短信通知

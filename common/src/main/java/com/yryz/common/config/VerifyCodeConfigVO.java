@@ -11,6 +11,8 @@ import java.io.Serializable;
 
 import org.springframework.context.annotation.Configuration;
 
+import com.yryz.common.utils.JsonUtils;
+
 /**
  * 验证码配置
  * @author danshiyu
@@ -52,7 +54,10 @@ public class VerifyCodeConfigVO implements Serializable {
 	 * 验证码位数
 	 */
 	private Integer codeNum = 4;
-	
+	/**
+	 * ip风控开关
+	 */
+	private Boolean ipLimitFlag = true;
 	public Integer getNormalCodeExpireTime() {
 		return normalCodeExpireTime;
 	}
@@ -107,6 +112,14 @@ public class VerifyCodeConfigVO implements Serializable {
 
 	public void setNormalIpCodeTotal(Integer normalIpCodeTotal) {
 		this.normalIpCodeTotal = normalIpCodeTotal;
+	}
+
+	public Boolean getIpLimitFlag() {
+		return ipLimitFlag;
+	}
+
+	public void setIpLimitFlag(Boolean ipLimitFlag) {
+		this.ipLimitFlag = ipLimitFlag;
 	}
 
 	public VerifyCodeConfigVO() {
@@ -174,4 +187,7 @@ public class VerifyCodeConfigVO implements Serializable {
 				+ imgCodeExpireTime + ", imgCodeNumLimit=" + imgCodeNumLimit + ", codeNum=" + codeNum + "]";
 	}
 	
+	public static void main(String[] args){
+		System.out.println(JsonUtils.toFastJson(new VerifyCodeConfigVO()));
+	}
 }

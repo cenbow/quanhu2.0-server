@@ -352,13 +352,15 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
         Page<ActivityVoteDetailVo> page = PageHelper.startPage(ActivityCandidateConstants.CURRENTPAGE, ActivityCandidateConstants.PAGESIZE);
         List<ActivityVoteDetailVo> list = activityVoteDetailDao.selectVoteList(activityInfoId, null);
         if(!CollectionUtils.isEmpty(list)) {
-            BigDecimal total = new BigDecimal(page.getTotal());
-            BigDecimal pageSize = new BigDecimal(ActivityCandidateConstants.PAGESIZE);
-            if (total.compareTo(pageSize) == 1) {
-                int c = total.divide(pageSize).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+            Integer total = new Integer(String.valueOf(page.getTotal()));
+            if(total > ActivityCandidateConstants.PAGESIZE) {
+                int c = total/ActivityCandidateConstants.PAGESIZE;
                 for (int i = 0; i < c; i++) {
                     PageHelper.startPage(i + 2, ActivityCandidateConstants.PAGESIZE);
-                    list.addAll(activityVoteDetailDao.selectVoteList(activityInfoId, null));
+                    List<ActivityVoteDetailVo> activityVoteDetailVos = activityVoteDetailDao.selectVoteList(activityInfoId, null);
+                    if(!CollectionUtils.isEmpty(activityVoteDetailVos)) {
+                        list.addAll(activityVoteDetailVos);
+                    }
                 }
             }
         }

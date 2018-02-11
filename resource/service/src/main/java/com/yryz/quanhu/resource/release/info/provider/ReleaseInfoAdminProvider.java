@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +33,10 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
-* @Description: 文章 管理后台
-* @author wangheng
-* @date 2018年2月2日 上午11:34:31
-*/
+ * @author wangheng
+ * @Description: 文章 管理后台
+ * @date 2018年2月2日 上午11:34:31
+ */
 @Service(interfaceClass = ReleaseInfoAdminApi.class)
 public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
 
@@ -45,7 +47,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
 
     @Autowired
     private ReleaseInfoProvider releaseInfoProvider;
-    
+
     @Autowired
     private CoterieReleaseInfoProvider coterieReleaseInfoProvider;
 
@@ -57,6 +59,9 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
 
     @Reference(lazy = true, check = false, timeout = 10000)
     private MessageAPI messageAPI;
+
+    @Reference(lazy = true, check = false, timeout = 10000)
+    private CountApi countApi;
 
     @Override
     public Response<ReleaseInfo> release(ReleaseInfo record) {
@@ -130,7 +135,7 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
             kidList.removeAll(sheKids);
             kidList.removeAll(delKids);
 
-            Long[] targetKids = kidList.toArray(new Long[] {});
+            Long[] targetKids = kidList.toArray(new Long[]{});
             logger.debug("平文章，批量上下架操作。处理后kids：" + targetKids + ", shelveFlag :" + shelveFlag);
 
             if (targetKids.length < 1) {
@@ -172,6 +177,13 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
 
                     // 推送下架消息
                     this.shelveSendMessage(releaseInfoVo);
+
+                    try {
+                        // 发布数减一
+                        countApi.commitCount(BehaviorEnum.Release, releaseInfoVo.getCreateUserId(), null, -1L);
+                    } catch (Exception e) {
+                        logger.error("我的发布数更新异常！", e);
+                    }
                 } else if (CommonConstants.SHELVE_YES.equals(shelveFlag)) {
 
                     // 创建者用户
@@ -190,6 +202,12 @@ public class ReleaseInfoAdminProvider implements ReleaseInfoAdminApi {
                         }
                     } catch (Exception e) {
                         logger.error("资源聚合上架接入异常！", e);
+                    }
+                    try {
+                        // 发布数加一
+                        countApi.commitCount(BehaviorEnum.Release, releaseInfoVo.getCreateUserId(), null, 1L);
+                    } catch (Exception e) {
+                        logger.error("我的发布数更新异常！", e);
                     }
                 }
             }

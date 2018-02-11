@@ -11,7 +11,6 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.yryz.common.config.SmsConfigVO;
-import com.yryz.common.config.VerifyCodeConfigVO;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
@@ -66,6 +65,7 @@ public class SmsServiceImpl implements SmsService {
 					channel.getSmsChannelName(), sign.getSmsSign(), template.getSmsTemplateCode());
 			log.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_SMS_LOG)));
 			log.setCreateDate(new Date());
+			log.setIp(smsDTO.getIp());
 			logDao.insert(log);
 		} catch (Exception e) {
 			logger.error("[sms_log_save]",e);
