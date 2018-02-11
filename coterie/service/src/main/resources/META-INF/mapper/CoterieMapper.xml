@@ -444,7 +444,7 @@
     select
     <include refid="Base_Column_List" />
     from qh_coterie
-    WHERE  coterie_name=#{name}
+    WHERE  coterie_name=#{name} and state!=12
   </select>
 
   <select id="selectKidByCreateDate" resultType="java.lang.Long">
