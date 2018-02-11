@@ -42,8 +42,9 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
             AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
             if(activityDetail == null) {
                 adminActivityCountDto.setStartDate(new Date());
+            } else {
+                adminActivityCountDto.setStartDate(activityDetail.getOnlineTime());
             }
-            adminActivityCountDto.setStartDate(activityDetail.getBeginTime());
         }
         if(adminActivityCountDto.getEndDate() == null) {
             adminActivityCountDto.setEndDate(new Date());
