@@ -1,7 +1,6 @@
 package com.yryz.quanhu.dymaic.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -25,6 +23,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -254,6 +253,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		try {
 			List<ResourceInfo> list = resourceInfoRepository.searchTopicInfo(keyWord, page, size);
 			List<ResourceInfoVo> rstList = new ArrayList<>();
+			List<Long> topicPostKids = new ArrayList<>();
 			for (int i = 0; i < list.size(); i++) {
 				ResourceInfo info = list.get(i);
 				ResourceInfoVo vo = GsonUtils.parseObj(info, ResourceInfoVo.class);
@@ -279,18 +279,24 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
                             vo.setCreateUserInfo(userVo);
                         }
                     }
-
-                    // 帖子浏览数
-                    Map<String, Long> statistics = new HashMap<>();
-                    try {
-                        String countType = BehaviorEnum.Read.getCode();
-                        statistics = ResponseUtils.getResponseData(countApi.getCount(countType, info.getKid(), null));
-                    } catch (Exception e) {
-                        logger.warn("cannot get statics cause: " + e.getMessage());
-                    }
-                    vo.setStatistics(statistics);
+                    topicPostKids.add(info.getKid());
                 }
 			}
+			
+			// 批量设置 帖子浏览数
+            if (CollectionUtils.isNotEmpty(rstList) && CollectionUtils.isNotEmpty(topicPostKids)) {
+                Map<Long, Map<String, Long>> countMap = ResponseUtils
+                        .getResponseData(countApi.getCount(BehaviorEnum.Read.getCode(), topicPostKids, null));
+                if (MapUtils.isNotEmpty(countMap)) {
+                    for (ResourceInfoVo vo : rstList) {
+                        if (vo.getResourceType() == 2 && vo.getTopicPostInfo() != null) {
+                            // 帖子浏览数
+                            vo.setStatistics(countMap.get(vo.getTopicPostInfo().getKid()));
+                        }
+                    }
+                }
+            }
+			
 
 			PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
 			pageList.setEntities(rstList);
@@ -305,36 +311,52 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	}
 
 	@Override
-	public Response<PageList<ResourceInfoVo>> searchReleaseInfo(String keyWord, Integer page, Integer size) {
-		try {
-			List<ResourceInfo> list = resourceInfoRepository.searchReleaseInfo(keyWord, page, size);
-			List<ResourceInfoVo> rstList = new ArrayList<>();
-			for (int i = 0; i < list.size(); i++) {
-				ResourceInfo info = list.get(i);
-				ResourceInfoVo vo = GsonUtils.parseObj(info, ResourceInfoVo.class);
-				rstList.add(vo);
+    public Response<PageList<ResourceInfoVo>> searchReleaseInfo(String keyWord, Integer page, Integer size) {
+        try {
+            List<ResourceInfo> list = resourceInfoRepository.searchReleaseInfo(keyWord, page, size);
+            List<ResourceInfoVo> rstList = new ArrayList<>();
+            List<Long> targetKids = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                ResourceInfo info = list.get(i);
+                ResourceInfoVo vo = GsonUtils.parseObj(info, ResourceInfoVo.class);
+                rstList.add(vo);
 
-				if (info.getReleaseInfo() != null && info.getReleaseInfo().getCreateUserId() != null) {
-					Optional<UserInfo> user = userRepository.findById(info.getReleaseInfo().getCreateUserId());
-					if (user.isPresent()) {
-						UserSimpleVo userVo = new UserSimpleVo();
-						BeanUtils.copyProperties(user.get(), userVo);
-						vo.setCreateUserInfo(userVo);
-					}
-				}
-			}
+                if (info.getReleaseInfo() != null && info.getReleaseInfo().getCreateUserId() != null) {
+                    Optional<UserInfo> user = userRepository.findById(info.getReleaseInfo().getCreateUserId());
+                    if (user.isPresent()) {
+                        UserSimpleVo userVo = new UserSimpleVo();
+                        BeanUtils.copyProperties(user.get(), userVo);
+                        vo.setCreateUserInfo(userVo);
+                    }
+                }
+                targetKids.add(info.getKid());
+            }
 
-			PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
-			pageList.setEntities(rstList);
-			pageList.setCount(null);
-			pageList.setCurrentPage(page);
-			pageList.setPageSize(size);
-			return ResponseUtils.returnObjectSuccess(pageList);
-		} catch (Exception e) {
-			logger.error("searchUser", e);
-			return ResponseUtils.returnException(e);
-		}
-	}
+            // 批量设置 文章浏览数
+            if (CollectionUtils.isNotEmpty(rstList) && CollectionUtils.isNotEmpty(targetKids)) {
+                Map<Long, Map<String, Long>> countMap = ResponseUtils
+                        .getResponseData(countApi.getCount(BehaviorEnum.Read.getCode(), targetKids, null));
+                if (MapUtils.isNotEmpty(countMap)) {
+                    for (ResourceInfoVo vo : rstList) {
+                        if (vo.getReleaseInfo() != null) {
+                            // 帖子浏览数
+                            vo.setStatistics(countMap.get(vo.getReleaseInfo().getKid()));
+                        }
+                    }
+                }
+            }
+
+            PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
+            pageList.setEntities(rstList);
+            pageList.setCount(null);
+            pageList.setCurrentPage(page);
+            pageList.setPageSize(size);
+            return ResponseUtils.returnObjectSuccess(pageList);
+        } catch (Exception e) {
+            logger.error("searchUser", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
 
 	@Override
 	public Response<PageList<CoterieInfoVo>> searchCoterieInfo(String keyWord, Integer page, Integer size) {
