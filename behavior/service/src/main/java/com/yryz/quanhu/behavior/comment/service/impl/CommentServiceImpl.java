@@ -431,6 +431,7 @@ public class CommentServiceImpl implements CommentService {
         RedisTemplate<String, Comment> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Comment.class);
         CommentInfoVO commentInfoVO = new CommentInfoVO();
         Set<String> strKey = stringRedisTemplate.keys("COMMENT:*:" + commentSubDTO.getKid() + "_0_" + commentSubDTO.getResourceId());
+        Map<String, Long> maps = null;
         if (strKey.size() > 0) {
             logger.info("评论详情走redis1");
             for (String str : strKey) {
@@ -464,9 +465,19 @@ public class CommentServiceImpl implements CommentService {
                     commentInfoVO.setCommentEnties(null);
                 }
             }
+            try {
+                maps = countApi.getCountFlag(BehaviorEnum.Like.getCode(), commentInfoVO.getKid(), "", commentInfoVO.getCreateUserId()).getData();
+
+            } catch (Exception e) {
+                logger.info("调用统计信息失败:" + e);
+            }
         } else {
             logger.info("评论详情走数据库2");
             commentInfoVO = commentDao.querySingleCommentInfo(commentSubDTO);
+        }
+        if(maps.size()>0){
+            commentInfoVO.setLikeCount(maps.get(BehaviorEnum.Like.getKey()).intValue());
+            commentInfoVO.setLikeFlag(maps.get("likeFlag").byteValue());
         }
         return commentInfoVO;
     }
