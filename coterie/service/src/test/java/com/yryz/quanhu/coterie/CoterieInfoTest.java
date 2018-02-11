@@ -52,7 +52,7 @@ public class CoterieInfoTest {
     
     @Test
     public void getMyCreateCoterie() {
-    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getMyCreateCoterie("729669966696603648",1,10));
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.getMyCreateCoterie("365768348024832",1,10));
     	System.out.println(list);
     }
     
