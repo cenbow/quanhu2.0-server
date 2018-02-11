@@ -1,7 +1,8 @@
 package com.yryz.common.exception;
 
-import com.yryz.common.constant.ExceptionEnum;
 import org.apache.commons.lang3.StringUtils;
+
+import com.yryz.common.constant.ExceptionEnum;
 
 @SuppressWarnings("serial")
 public class QuanhuException extends IllegalArgumentException {
@@ -15,6 +16,16 @@ public class QuanhuException extends IllegalArgumentException {
             this.code = exceptionEnum.getCode();
             this.msg = exceptionEnum.getShowMsg();
             this.errorMsg = exceptionEnum.getErrorMsg();
+        }
+    }
+    
+    public QuanhuException(ExceptionEnum exceptionEnum, String errorMsg) {
+        if (exceptionEnum != null) {
+            this.code = exceptionEnum.getCode();
+            this.msg = exceptionEnum.getShowMsg();
+            this.errorMsg = exceptionEnum.getErrorMsg() + " | " + errorMsg;
+        } else {
+            this.errorMsg = errorMsg;
         }
     }
 

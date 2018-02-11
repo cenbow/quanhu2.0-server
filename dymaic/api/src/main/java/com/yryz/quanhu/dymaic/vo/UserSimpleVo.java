@@ -2,31 +2,26 @@ package com.yryz.quanhu.dymaic.vo;
 
 import java.io.Serializable;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class UserSimpleVo implements Serializable{
 	private static final long serialVersionUID = 8315586242856230666L;
-	/**
-	 * 用户账户id
-	 */
+	@ApiModelProperty("用户账户id")
 	private Long userId;
-	/**
-	 * 昵称
-	 */
+	
+	@ApiModelProperty("昵称")
 	private String userNickName;
-	/**
-	 * 头像
-	 */
+	
+	@ApiModelProperty("头像")
 	private String userImg;
-	/**
-	 * 用户签名
-	 */
+	
+	@ApiModelProperty("用户签名")
 	private String userSignature;
-	/**
-	 * 用户简介
-	 */
+	
+	@ApiModelProperty("用户简介")
 	private String userDesc;
-	/**
-	 * 用户角色 0:普通用户 1:实名用户
-	 */
+	
+	@ApiModelProperty("是否达人 : 10:普通用户 11:达人")
 	private Byte userRole;
 
 	public Long getUserId() {

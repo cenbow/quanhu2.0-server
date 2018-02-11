@@ -10,6 +10,8 @@ package com.yryz.quanhu.dymaic.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 私圈
  * 
@@ -20,126 +22,79 @@ import java.util.Date;
 public class CoterieInfoVo implements Serializable {
 	private static final long serialVersionUID = -4602962422209178907L;
 
-	/**
-	 * 私圈id
-	 */
+	@ApiModelProperty("私圈id")
 	private Long kid;
 	
-	/**
-	 * 私圈名称
-	 */
+	@ApiModelProperty("私圈名称")
 	private String coterieName;
 	
-	/**
-	 * 封面图
-	 */
+	@ApiModelProperty("封面图")
 	private String icon;
 
-	/**
-	 * 圈子简介
-	 */
+	@ApiModelProperty("私圈简介")
 	private String intro;
 
-	/**
-	 * 私圈名片(二维码)
-	 */
-	private String qrUrl;
-	
-	/**
-	 * 用户ID
-	 */
+	@ApiModelProperty("圈主id")
 	private String ownerId;
 
-	/**
-	 * 圈主姓名
-	 */
+	@ApiModelProperty("圈主姓名")
 	private String ownerName;
 
-	/**
-	 * 个人简介
-	 */
+	@ApiModelProperty("个人简介")
 	private String ownerIntro;
 
-	/**
-	 * 加入私圈金额(悠然币)，0表示免费
-	 */
+	@ApiModelProperty("加入私圈金额(悠然币)，0表示免费")
 	private Integer joinFee;
 
-	/**
-	 * 咨询费，0表示免费
-	 */
+	@ApiModelProperty("咨询费，0表示免费")
 	private Integer consultingFee;
 
-	/**
-	 * 成员加入是否需要审核（0不审核，1审核）
-	 */
+	@ApiModelProperty("成员加入是否需要审核（10不审核，11审核）")
 	private Byte joinCheck;
 
-	/**
-	 * 成员数量
-	 */
+	@ApiModelProperty("成员数量")
 	private Integer memberNum;
 
-	/**
-	 * 审核状态
-	 */
+	@ApiModelProperty("审核状态")
 	private Byte state;
 
-	/**
-	 * 审批时间
-	 */
+	@ApiModelProperty("审批时间")
 	private Date processTime;
 	
+	@ApiModelProperty("审批人id")
 	private Long auditUserId;
 	
+	@ApiModelProperty("审批备注")
 	private String auditRemark;
 	
-	/**
-	 * 热度值
-	 */
+	@ApiModelProperty("热度值")
 	private Long heat;
+	
+	@ApiModelProperty("上下架状态(10：上架,11：下架)")
 	private Byte shelveFlag;
 	
-	/**
-	 * 0:未删除，1：删除
-	 */
+	@ApiModelProperty("删除状态(10：未删除,11：删除)")
 	private Byte deleted;
-	private Integer sort;
 	
-	/**
-	 * 创建时间
-	 */
+	@ApiModelProperty("创建时间")
 	private Date createDate;
-	private Long createUserId;
 
-	/**
-	 * 更新时间
-	 */
+	@ApiModelProperty("更新时间")
 	private Date lastUpdateDate;
-	private Long lastUpdateUserId;
 	
-	private String moduleEnum;
-	
-	private String tenantId;
-	
+	@ApiModelProperty("版本")
 	private Integer revision;
 	
-	/**
-	 * 是否达人
-	 */
+	@ApiModelProperty("备用")
 	private Byte isExpert;
 
-	/**
-	 * 是否推荐
-	 */
+	@ApiModelProperty("是否推荐，10否，11是")
 	private Byte recommend;
-
-	/**
-	 * 最后更新文章时间
-	 */
-	private Date lastInfoTime;
 	
+	@ApiModelProperty("圈主最后访问时间")
 	private Date masterLastViewTime;
+	
+	@ApiModelProperty("圈主信息")
 	private UserSimpleVo user;
 	
 	public Long getKid() {
@@ -189,14 +144,6 @@ public class CoterieInfoVo implements Serializable {
 
 	public void setIntro(String intro) {
 		this.intro = intro == null ? null : intro.trim();
-	}
-
-	public String getQrUrl() {
-		return qrUrl;
-	}
-
-	public void setQrUrl(String qrUrl) {
-		this.qrUrl = qrUrl == null ? null : qrUrl.trim();
 	}
 
 	public Integer getJoinFee() {
@@ -287,14 +234,6 @@ public class CoterieInfoVo implements Serializable {
 		this.recommend = recommend;
 	}
 
-	public Date getLastInfoTime() {
-		return lastInfoTime;
-	}
-
-	public void setLastInfoTime(Date lastInfoTime) {
-		this.lastInfoTime = lastInfoTime;
-	}
-
 	public String getCoterieName() {
 		return coterieName;
 	}
@@ -335,46 +274,6 @@ public class CoterieInfoVo implements Serializable {
 		this.shelveFlag = shelveFlag;
 	}
 
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
-
-	public Long getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(Long createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Long getLastUpdateUserId() {
-		return lastUpdateUserId;
-	}
-
-	public void setLastUpdateUserId(Long lastUpdateUserId) {
-		this.lastUpdateUserId = lastUpdateUserId;
-	}
-
-	public String getModuleEnum() {
-		return moduleEnum;
-	}
-
-	public void setModuleEnum(String moduleEnum) {
-		this.moduleEnum = moduleEnum;
-	}
-
-	public String getTenantId() {
-		return tenantId;
-	}
-
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
-
 	public Integer getRevision() {
 		return revision;
 	}
@@ -401,15 +300,13 @@ public class CoterieInfoVo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "CoterieInfo [kid=" + kid + ", coterieName=" + coterieName + ", icon=" + icon + ", intro=" + intro
-				+ ", qrUrl=" + qrUrl + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", ownerIntro="
-				+ ownerIntro + ", joinFee=" + joinFee + ", consultingFee=" + consultingFee + ", joinCheck=" + joinCheck
-				+ ", memberNum=" + memberNum + ", state=" + state + ", processTime=" + processTime + ", auditUserId="
-				+ auditUserId + ", auditRemark=" + auditRemark + ", heat=" + heat + ", shelveFlag=" + shelveFlag
-				+ ", deleted=" + deleted + ", sort=" + sort + ", createDate=" + createDate + ", createUserId="
-				+ createUserId + ", lastUpdateDate=" + lastUpdateDate + ", lastUpdateUserId=" + lastUpdateUserId
-				+ ", moduleEnum=" + moduleEnum + ", tenantId=" + tenantId + ", revision=" + revision + ", isExpert="
-				+ isExpert + ", recommend=" + recommend + ", lastInfoTime=" + lastInfoTime + ", masterLastViewTime="
-				+ masterLastViewTime + "]";
+		return "CoterieInfoVo [kid=" + kid + ", coterieName=" + coterieName + ", icon=" + icon + ", intro=" + intro
+				+ ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", ownerIntro=" + ownerIntro + ", joinFee="
+				+ joinFee + ", consultingFee=" + consultingFee + ", joinCheck=" + joinCheck + ", memberNum=" + memberNum
+				+ ", state=" + state + ", processTime=" + processTime + ", auditUserId=" + auditUserId
+				+ ", auditRemark=" + auditRemark + ", heat=" + heat + ", shelveFlag=" + shelveFlag + ", deleted="
+				+ deleted + ", createDate=" + createDate + ", lastUpdateDate=" + lastUpdateDate + ", revision="
+				+ revision + ", isExpert=" + isExpert + ", recommend=" + recommend + ", masterLastViewTime="
+				+ masterLastViewTime + ", user=" + user + "]";
 	}
 }

@@ -79,7 +79,7 @@ public class RewardTest {
 
         // 我打赏的-资源-列表
         dto.setQueryType(QueryType.my_reward_resource_list);
-        dto.setCreateUserId(727447149320273920L);
+        dto.setCreateUserId(360712374173696L);
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoApi.pageByCondition(dto, true)));
     }
     

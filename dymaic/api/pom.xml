@@ -19,6 +19,12 @@
             <artifactId>quanhu-common</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.yryz.quanhu</groupId>

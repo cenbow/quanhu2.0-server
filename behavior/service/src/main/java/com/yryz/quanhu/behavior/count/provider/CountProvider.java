@@ -1,5 +1,13 @@
 package com.yryz.quanhu.behavior.count.provider;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.google.common.collect.Lists;
@@ -17,12 +25,6 @@ import com.yryz.quanhu.behavior.count.service.CountService;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.other.activity.api.ActivityInfoApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -107,6 +109,10 @@ public class CountProvider implements CountApi {
     @Override
     public Response<Map<String, Long>> getCountFlag(String countType, Long kid, String page, Long userId) {
         Map<String, Long> map = ResponseUtils.getResponseData(getCount(countType, kid, page));
+        if (MapUtils.isEmpty(map) || userId == null) {
+            return ResponseUtils.returnObjectSuccess(map);
+        }
+        
         try {
             // 如果查点赞数或者收藏数，自动拼装点赞状态和收藏状态
             for (String code : countType.split(",")) {

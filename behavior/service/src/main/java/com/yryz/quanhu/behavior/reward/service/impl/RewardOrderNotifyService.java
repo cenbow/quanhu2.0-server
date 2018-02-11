@@ -110,6 +110,9 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         upInfo.setKid(info.getKid());
         upInfo.setRewardPrice(rewardedPrice);
         upInfo.setRewardStatus(RewardConstants.reward_status_pay_success);
+        // 为用户打赏/收益明细 缓存预留用户参数，DB实际不更新
+        upInfo.setCreateUserId(info.getCreateUserId());
+        upInfo.setToUserId(info.getToUserId());
         rewardInfoService.updateByKid(upInfo);
         logger.info("资源打赏 订单回调，更新打賞狀態,kid==>>" + info.getKid());
 
