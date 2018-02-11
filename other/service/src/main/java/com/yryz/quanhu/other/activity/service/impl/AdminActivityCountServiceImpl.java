@@ -14,9 +14,12 @@ import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.AdminActivityCountVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,6 +34,8 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
 
     @Autowired
     ActivityVoteRecordDao activityVoteRecordDao;
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminActivityCountServiceImpl.class);
 
     /**
      * 获取活动统计数量
@@ -48,6 +53,13 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         }
         if(adminActivityCountDto.getEndDate() == null) {
             adminActivityCountDto.setEndDate(new Date());
+        }
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            adminActivityCountDto.setStartDate(sdf.parse(sdf.format(adminActivityCountDto.getStartDate())));
+            adminActivityCountDto.setEndDate(sdf.parse(sdf.format(adminActivityCountDto.getEndDate())));
+        } catch (ParseException e) {
+            logger.error("时间转换异常",e);
         }
         Map<String, Long> recordMap = new HashMap<>();
         //获取活动投票数

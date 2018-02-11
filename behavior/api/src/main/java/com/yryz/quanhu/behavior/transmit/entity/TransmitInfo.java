@@ -23,7 +23,7 @@ public class TransmitInfo implements Serializable {
     /**
      * 资源类型
      * */
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     /**
      * 内容
@@ -76,11 +76,11 @@ public class TransmitInfo implements Serializable {
         this.resourceId = resourceId;
     }
 
-    public Integer getModuleEnum() {
+    public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public void setModuleEnum(Integer moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
     }
 

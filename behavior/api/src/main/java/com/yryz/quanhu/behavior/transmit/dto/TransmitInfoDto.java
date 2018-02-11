@@ -13,7 +13,7 @@ public class TransmitInfoDto implements Serializable {
 
     private Long resourceId;
 
-    private Integer moduleEnum;
+    private String moduleEnum;
 
     private String content;
 
@@ -51,11 +51,11 @@ public class TransmitInfoDto implements Serializable {
         this.resourceId = resourceId;
     }
 
-    public Integer getModuleEnum() {
+    public String getModuleEnum() {
         return moduleEnum;
     }
 
-    public void setModuleEnum(Integer moduleEnum) {
+    public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
     }
 

@@ -94,7 +94,7 @@ public class TransmitServiceImpl implements TransmitService {
     public void single(TransmitInfo transmitInfo) {
         String extJson = "";
         ResourceVo resourceVo = null;
-        if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
+        if(ModuleContants.COTERIE.equals(transmitInfo.getModuleEnum())) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
             if(!coterieInfoResponse.success()) {
                 throw new QuanhuException(ExceptionEnum.SysException);
@@ -106,19 +106,6 @@ public class TransmitServiceImpl implements TransmitService {
             extJson = JsonUtils.toFastJson(coterieInfo);
         } else {
             try {
-                //如果转发的是动态，判断动态对应的状态是否正常
-                if(!transmitInfo.getResourceId().equals(transmitInfo.getParentId()) ) {
-                    Response<Dymaic> dymaicResponse = dymaicService.get(transmitInfo.getParentId());
-                    if(!dymaicResponse.success()) {
-                        throw QuanhuException.busiError("资源不存在或者已删除");
-                    }
-                    Dymaic dymaic = dymaicResponse.getData();
-                    if(dymaic == null
-                            || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
-                            || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
-                        throw QuanhuException.busiError("资源不存在或者已删除");
-                    }
-                }
                 //判断是否在资源库中存在
                 Response<ResourceVo> result = resourceApi.getResourcesById(transmitInfo.getResourceId().toString());
                 if(!result.success()) {
@@ -137,6 +124,26 @@ public class TransmitServiceImpl implements TransmitService {
             }
             extJson = resourceVo.getExtJson();
         }
+
+        try {
+            //如果转发的是动态，判断动态对应的状态是否正常
+            if(!transmitInfo.getResourceId().equals(transmitInfo.getParentId()) ) {
+                Response<Dymaic> dymaicResponse = dymaicService.get(transmitInfo.getParentId());
+                if(!dymaicResponse.success()) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
+                Dymaic dymaic = dymaicResponse.getData();
+                if(dymaic == null
+                        || ResourceEnum.DEL_FLAG_TRUE.equals(dymaic.getDelFlag())
+                        || Integer.valueOf(CommonConstants.SHELVE_NO.intValue()).equals(dymaic.getShelveFlag()) ) {
+                    throw QuanhuException.busiError("资源不存在或者已删除");
+                }
+            }
+        } catch (Exception e) {
+            logger.error("资源不存在或者已删除", e);
+            throw QuanhuException.busiError("资源不存在或者已删除");
+        }
+
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -228,7 +235,7 @@ public class TransmitServiceImpl implements TransmitService {
         resourceTotal.setResourceId(transmitInfo.getResourceId());
         resourceTotal.setExtJson(extJson);
         resourceTotal.setTransmitNote(transmitInfo.getContent());
-        resourceTotal.setTransmitType(transmitInfo.getModuleEnum());
+        resourceTotal.setTransmitType(Integer.valueOf(transmitInfo.getModuleEnum()));
         resourceTotal.setTransmitId(transmitInfo.getKid());
 
         try {
@@ -267,9 +274,9 @@ public class TransmitServiceImpl implements TransmitService {
             boolean isPush = true;
             String moduleEnum = resourceVo.getModuleEnum();
             String resourceId = resourceVo.getResourceId();
-            if(Integer.valueOf(ModuleContants.RELEASE).equals(transmitInfo.getModuleEnum()) ) {
+            if(ModuleContants.RELEASE.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的内容。";
-            } else if(Integer.valueOf(ModuleContants.TOPIC_POST).equals(transmitInfo.getModuleEnum()) ) {
+            } else if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的帖子。";
             } else {
                 //如果parentId与resourceId不相等，属于动态

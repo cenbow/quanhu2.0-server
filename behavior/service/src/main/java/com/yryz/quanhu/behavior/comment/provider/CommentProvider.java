@@ -102,13 +102,17 @@ public class CommentProvider implements CommentApi {
             comment.setShelveFlag((byte) 10);
             comment.setDelFlag((byte) 10);
             Comment commentSuccess = commentService.accretion(comment);
-            if (null!=commentSuccess) {
+            if (null != commentSuccess) {
+                UserSimpleVO userBase = userApi.getUserSimple(comment.getTargetUserId()).getData();
                 map.put("result", 1);
-                    try {
-                        countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", 1L);
-                    } catch (Exception e) {
-                        logger.info("进入统计系统失败" + e);
-                    }
+                try {
+                    countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", 1L);
+                } catch (Exception e) {
+                    logger.info("进入统计系统失败" + e);
+                }
+                if (null != userBase) {
+                    commentSuccess.setTargetUserNickName(userBase.getUserNickName());
+                }
             } else {
                 map.put("result", 0);
             }
@@ -127,13 +131,14 @@ public class CommentProvider implements CommentApi {
             int count = commentService.delComment(comment);
             if (count > 0) {
                 map.put("result", 1);
-                try {
-                    countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "",-1L);
-                } catch (Exception e) {
-                    logger.info("进入统计系统失败" + e);
-                }
                 if (comment.getTopId() == 0) {
                     this.delBatch(comment);
+                } else {
+                    try {
+                        countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", -1L);
+                    } catch (Exception e) {
+                        logger.info("进入统计系统失败" + e);
+                    }
                 }
                 Comment comments = new Comment();
                 comments.setKid(comment.getKid());
@@ -205,7 +210,7 @@ public class CommentProvider implements CommentApi {
         try {
             CommentInfoVO commentInfoVO = commentService.querySingleCommentInfo(commentSubDTO);
             PageList<CommentVO> pageList = commentService.querySubCommentsInfo(commentSubDTO);
-            if(null!=commentInfoVO&&null!=pageList){
+            if (null != commentInfoVO && null != pageList) {
                 commentInfoVO.setCommentEnties(pageList);
             }
             return ResponseUtils.returnObjectSuccess(commentInfoVO);
@@ -265,9 +270,9 @@ public class CommentProvider implements CommentApi {
                     commentSingle.setLastUpdateDate(new Date());
                     commentSingle.setLastUpdateUserId(commentVO.getCreateUserId());
                     List<Comment> commentsChildren = commentVO.getChildrenComments();
-                    if(null!=commentsChildren&&commentsChildren.size()>0){
+                    if (null != commentsChildren && commentsChildren.size() > 0) {
                         for (Comment commentChild : commentsChildren) {
-                            Comment commentChilds=new Comment();
+                            Comment commentChilds = new Comment();
                             commentChilds.setKid(commentChild.getKid());
                             commentChilds.setResourceId(commentChild.getResourceId());
                             commentChilds.setCreateUserId(commentChild.getCreateUserId());
@@ -304,11 +309,6 @@ public class CommentProvider implements CommentApi {
                     logger.info("批量删除评论失败" + e);
                 }
             }
-
-
-
-
-
         }
     }
 

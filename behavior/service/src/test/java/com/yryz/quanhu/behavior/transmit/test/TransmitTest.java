@@ -21,7 +21,7 @@ public class TransmitTest {
     public void single() {
         TransmitInfo transmitInfo = new TransmitInfo();
         transmitInfo.setContent("转发JTets");
-        transmitInfo.setModuleEnum(1003);
+        transmitInfo.setModuleEnum("1003");
         transmitInfo.setParentId(749172760356601856L);
         transmitInfo.setResourceId(749172760356601856L);
         transmitInfo.setTargetUserId(738839567258206208L);
@@ -32,7 +32,7 @@ public class TransmitTest {
     public void list() {
         TransmitInfoDto transmitInfoDto = new TransmitInfoDto();
         transmitInfoDto.setParentId(737325677185073152L);
-        transmitInfoDto.setModuleEnum(1003);
+        transmitInfoDto.setModuleEnum("1003");
         System.out.println(JSON.toJSONString(transmitApi.list(transmitInfoDto)));
     }
 
