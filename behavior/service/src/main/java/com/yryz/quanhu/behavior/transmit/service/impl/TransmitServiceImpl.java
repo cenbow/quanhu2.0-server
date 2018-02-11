@@ -94,7 +94,7 @@ public class TransmitServiceImpl implements TransmitService {
     public void single(TransmitInfo transmitInfo) {
         String extJson = "";
         ResourceVo resourceVo = null;
-        if(ModuleContants.COTERIE.equals(String.valueOf(transmitInfo.getModuleEnum()))) {
+        if(ModuleContants.COTERIE.equals(transmitInfo.getModuleEnum())) {
             Response<CoterieInfo> coterieInfoResponse = coterieApi.queryCoterieInfo(transmitInfo.getResourceId());
             if(!coterieInfoResponse.success()) {
                 throw new QuanhuException(ExceptionEnum.SysException);
@@ -228,7 +228,7 @@ public class TransmitServiceImpl implements TransmitService {
         resourceTotal.setResourceId(transmitInfo.getResourceId());
         resourceTotal.setExtJson(extJson);
         resourceTotal.setTransmitNote(transmitInfo.getContent());
-        resourceTotal.setTransmitType(transmitInfo.getModuleEnum());
+        resourceTotal.setTransmitType(Integer.valueOf(transmitInfo.getModuleEnum()));
         resourceTotal.setTransmitId(transmitInfo.getKid());
 
         try {
@@ -267,9 +267,9 @@ public class TransmitServiceImpl implements TransmitService {
             boolean isPush = true;
             String moduleEnum = resourceVo.getModuleEnum();
             String resourceId = resourceVo.getResourceId();
-            if(Integer.valueOf(ModuleContants.RELEASE).equals(transmitInfo.getModuleEnum()) ) {
+            if(ModuleContants.RELEASE.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的内容。";
-            } else if(Integer.valueOf(ModuleContants.TOPIC_POST).equals(transmitInfo.getModuleEnum()) ) {
+            } else if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的帖子。";
             } else {
                 //如果parentId与resourceId不相等，属于动态
