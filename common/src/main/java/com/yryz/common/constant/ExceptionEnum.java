@@ -46,6 +46,7 @@ public enum ExceptionEnum {
     RPC_RESPONSE_EXCEPTION("2006", "网络开小差了，请稍候再试！", "RpcResponse对象为空！"),
 
     TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！"),
+    TRANSMIT_EXIST_ERROR("2051", "源内容或动态已被删除", "源内容或动态已被删除"),
 
     COMMENT_CHECK_ERROR("2060","原评论已被删除,回复失败！","原评论已被删除,回复失败！");
 

@@ -255,7 +255,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if (StringUtils.isNoneBlank(startDateStr) && StringUtils.isNoneBlank(endDateStr)) {
             long startDate = DateUtils.parseDate(startDateStr).getTime();
             long endDate = DateUtils.parseDate(endDateStr).getTime();
-            boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.STAR_AUTHTIME).gte(startDate).lte(endDate));
+            boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.STAR_APPLYTIME).gte(startDate).lte(endDate));
         }
         //es查询对象
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
@@ -263,8 +263,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         queryBuilder.withFilter(boolQueryBuilder).withPageable(pageable);
 
         //排序
-
-        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_AUTHTIME).order(SortOrder.DESC));
+        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_APPLYTIME).order(SortOrder.DESC));
 
         //执行查询
         SearchQuery query = queryBuilder.build();

@@ -284,16 +284,26 @@ public class DymaicServiceImpl {
      * @return
      */
     public List<DymaicVo> getTimeLine(Long userId, Long kid, Long limit) {
+
+        final Long start = System.currentTimeMillis();
+
         Set<Long> kids = dymaicCache.rangeTimeLine(userId, kid, limit);
         if (logger.isDebugEnabled()) {
-            logger.info("[dymaic] getTimeLine dymaicId " + (kids == null ? 0 : kids.size()) + ", userId " + userId);
+            logger.debug("[dymaic] getTimeLine userId " + userId + ", result" + (kids == null ? 0 : kids.size()) + ", userId " + userId);
         }
+
+        final Long kidEnd = System.currentTimeMillis();
 
         List<DymaicVo> result;
         if (kids == null || kids.isEmpty()) {
             result = new ArrayList<>();
         } else {
             result = this.mergeDymaicVo(userId, kids);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.info("total " + (System.currentTimeMillis() - start)
+                    + "    kids" + (kidEnd-start));
         }
 
         return result;
@@ -446,13 +456,16 @@ public class DymaicServiceImpl {
     private List<DymaicVo> mergeDymaicVo(Long userId, Set<Long> kids) {
         List<DymaicVo> result = new ArrayList<>();
 
+        final Long start = System.currentTimeMillis();
+
         //1 查询动态摘要
         List<Long> kidList = new ArrayList<>(kids);
         Map<Long, Dymaic> dymaicMap = this.get(kidList);
+        final Long dymaicEnd = System.currentTimeMillis();
 
         //2 查询用户信息
         Map<String, UserSimpleVO> users = null;
-        if (dymaicMap != null) {
+        if (dymaicMap != null && !dymaicMap.isEmpty()) {
             Set<String> userIds = new HashSet<>();
             for (Dymaic dymaic : dymaicMap.values()) {
                 if (dymaic.getUserId() != null) {
@@ -464,8 +477,17 @@ public class DymaicServiceImpl {
                 users = ResponseUtils.getResponseData(rsp);
             }
         }
+        final Long userEnd = System.currentTimeMillis();
 
-        //3, 聚合动态、用户、统计信息
+        //3 查询统计数据
+        Map<Long, Map<String, Long>> statics = null;
+        if (kidList != null && !kidList.isEmpty()) {
+            statics = invokeStatics(kidList);
+        }
+        final Long staticsEnd = System.currentTimeMillis();
+
+
+        //4, 聚合动态、用户、统计信息
         if (dymaicMap != null) {
             for (Long kid : kids) {
                 Dymaic dymaic = dymaicMap.get(kid);
@@ -480,12 +502,23 @@ public class DymaicServiceImpl {
                         vo.setUser(new UserSimpleVO());
                     }
 
-                    //评论数，点赞数，转发数, ignore exception
-                    vo.setStatistics(invokeStatics(kid, userId));
+
+                    if (statics != null && statics.containsKey(kid)) {
+                        vo.setStatistics(statics.get(kid));
+                    } else {
+                        statics = new HashMap<>();
+                    }
 
                     result.add(vo);
                 }
             }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.info("dymaicMap " + (dymaicEnd - start)
+                    + "   invoke user " + (userEnd - dymaicEnd)
+                    + "   invoke statistics " + (staticsEnd - userEnd)
+                    + "   merge " + (System.currentTimeMillis() - staticsEnd));
         }
 
         return result;
@@ -533,6 +566,24 @@ public class DymaicServiceImpl {
         statistics = (statistics == null) ? new HashMap<>() : statistics;
 
         return statistics;
+    }
+
+    /**
+     * 批量查询统计数
+     * @param kids
+     * @return
+     */
+    private Map<Long, Map<String, Long>> invokeStatics(List<Long> kids) {
+        Map<Long, Map<String, Long>> statics = null;
+        try {
+            String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
+            Response<Map<Long,Map<String, Long>>> response = countApi.getCount(countType, kids, null);
+            statics = response.getData();
+        } catch (Exception e) {
+            logger.warn("cannot get statics cause: " + e.getMessage());
+        }
+
+        return statics;
     }
 
     /**

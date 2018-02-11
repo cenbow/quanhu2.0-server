@@ -31,7 +31,7 @@ import com.yryz.quanhu.user.vo.SmsVerifyCodeVO;
 public class SmsManager {
 	private static final Logger logger = LoggerFactory.getLogger(SmsManager.class);
 
-	@Reference(retries=1,cluster="failfast")
+	@Reference(retries = 1, cluster = "failfast")
 	private CommonSafeApi commonSafeApi;
 
 	/**
@@ -43,20 +43,20 @@ public class SmsManager {
 	 * @return
 	 * @Description
 	 */
-	public SmsVerifyCodeVO sendCode(String phone, SmsType smsType, String appId) {
+	public SmsVerifyCodeVO sendCode(String phone, SmsType smsType, String appId, String ip) {
 		try {
-			VerifyCodeVO codeVO = ResponseUtils.getResponseData(commonSafeApi.getVerifyCode(new VerifyCodeDTO(smsType.getType(),
-					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId)));
+			VerifyCodeDTO codeDTO = new VerifyCodeDTO(smsType.getType(),
+					CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId);
+			codeDTO.setIp(ip);
+			VerifyCodeVO codeVO = ResponseUtils.getResponseData(commonSafeApi.getVerifyCode(codeDTO));
 			return new SmsVerifyCodeVO(String.valueOf(smsType.getType()), phone, String.valueOf(codeVO.getExpireAt()));
 		} catch (QuanhuException e) {
 			logger.error("[SmsAPI.sendCode]", e);
-			logger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null,
-					smsType.getType());
-			throw QuanhuException.busiError("验证码发送失败");
+			logger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null, smsType.getType());
+			throw QuanhuException.busiError(e);
 		} catch (Exception e) {
 			logger.error("[SmsAPI.sendCode]", e);
-			logger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null,
-					smsType.getType());
+			logger.info("[send_verifyCode]:phone->{},code->{},type->{},status->fail", phone, null, smsType.getType());
 			throw QuanhuException.busiError("验证码发送失败");
 		}
 	}
@@ -74,10 +74,9 @@ public class SmsManager {
 	public boolean checkVerifyCode(String phone, String code, String type, String appId, boolean needDelete) {
 		try {
 			logger.info("[check_verifyCode]:phone->{},code->{},type->{},status->success", phone, code, type);
-			int result = ResponseUtils.getResponseData(commonSafeApi
-					.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(type),
-							CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId, code, needDelete))
-					);
+			int result = ResponseUtils
+					.getResponseData(commonSafeApi.checkVerifyCode(new VerifyCodeDTO(NumberUtils.toInt(type),
+							CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), phone, appId, code, needDelete)));
 			if (result != 0) {
 				return false;
 			}
