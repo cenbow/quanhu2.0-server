@@ -160,15 +160,15 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         }
         if(mapPage != null) {
             Long pageCount = 0L;
-            for(Map.Entry<String, Long> entry : mapPage.entrySet()){
-                pageCount = entry.getValue() + pageCount;
+            if(mapPage.get("count") != null) {
+                pageCount = mapPage.get("count");
             }
             adminActivityCountVo.setDetailCount(pageCount.intValue());
         }
         if(mapPageCandidate != null) {
             Long pageCandidateCount = 0L;
-            for(Map.Entry<String, Long> entry : mapPageCandidate.entrySet()){
-                pageCandidateCount = entry.getValue() + pageCandidateCount;
+            if(mapPageCandidate.get("count") != null) {
+                pageCandidateCount = mapPageCandidate.get("count");
             }
             adminActivityCountVo.setCandidateDetailCount(pageCandidateCount.intValue());
         }
