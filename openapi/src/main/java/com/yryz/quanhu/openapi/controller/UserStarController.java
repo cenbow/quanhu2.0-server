@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +44,7 @@ public class UserStarController {
 
     @Reference(check = false)
     private UserStarApi starApi;
-    @Reference
+    @Autowired
     private AuthService authService;
 //    @Reference
 //    private DymaicService dymaicService;
