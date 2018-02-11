@@ -65,6 +65,7 @@ public class SmsServiceImpl implements SmsService {
 					channel.getSmsChannelName(), sign.getSmsSign(), template.getSmsTemplateCode());
 			log.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_SMS_LOG)));
 			log.setCreateDate(new Date());
+			log.setIp(smsDTO.getIp());
 			logDao.insert(log);
 		} catch (Exception e) {
 			logger.error("[sms_log_save]",e);

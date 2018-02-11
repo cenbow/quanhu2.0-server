@@ -25,7 +25,7 @@ public class CommonSafeTest {
 	 @Test
 	 public void sendVerifyCode(){
 		 VerifyCodeDTO codeDTO = new VerifyCodeDTO(1, CommonServiceType.PHONE_VERIFYCODE_SEND.getName(), "16789571544", "vebff12m1762");
-		 
+		 codeDTO.setIp("127.0.0.1");
 		 VerifyCodeVO codeVO = safeApi.getVerifyCode(codeDTO).getData();
 		 System.out.println(JsonUtils.toFastJson(codeVO));
 	 }

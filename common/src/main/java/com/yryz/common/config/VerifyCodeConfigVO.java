@@ -11,6 +11,8 @@ import java.io.Serializable;
 
 import org.springframework.context.annotation.Configuration;
 
+import com.yryz.common.utils.JsonUtils;
+
 /**
  * 验证码配置
  * @author danshiyu
@@ -185,4 +187,7 @@ public class VerifyCodeConfigVO implements Serializable {
 				+ imgCodeExpireTime + ", imgCodeNumLimit=" + imgCodeNumLimit + ", codeNum=" + codeNum + "]";
 	}
 	
+	public static void main(String[] args){
+		System.out.println(JsonUtils.toFastJson(new VerifyCodeConfigVO()));
+	}
 }

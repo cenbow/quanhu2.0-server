@@ -92,12 +92,13 @@ public class SmsDTO implements Serializable {
 	 * @param smsType
 	 * @param smsParams
 	 */
-	public SmsDTO(String phone,String appId, SmsType smsType, Map<String, Object> smsParams) {
+	public SmsDTO(String phone,String appId, SmsType smsType, Map<String, Object> smsParams,String ip) {
 		super();
 		this.phone = phone;
 		this.appId = appId;
 		this.smsType = smsType;
 		this.smsParams = smsParams;
+		this.ip = ip;
 	}
 	/**
 	 * 短信通知
