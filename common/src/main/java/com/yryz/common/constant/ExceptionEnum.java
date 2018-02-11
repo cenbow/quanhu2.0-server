@@ -47,7 +47,7 @@ public enum ExceptionEnum {
 
     TRANSMIT_CONTENT_ERROR("2050", "您输入的转发心得超长，请修改！", "您输入的转发心得超长，请修改！"),
 
-    COMMENT_CHECK_ERROR("2060","被评论的内容已删除,回复评论失败！","被评论的内容已删除,回复评论失败！");
+    COMMENT_CHECK_ERROR("2060","原评论已被删除,回复失败！","原评论已被删除,回复失败！");
 
 
     private String code;
