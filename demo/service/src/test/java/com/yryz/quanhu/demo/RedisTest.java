@@ -8,8 +8,13 @@
 package com.yryz.quanhu.demo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,15 +65,16 @@ public class RedisTest {
 		user.setRealName("hello");
 		List<User> list = new ArrayList<>();
 		list.add(user);
-		PageList<User> pageList = new PageList<>();
-		pageList.setEntities(list);
-		pageRedis.save(pageList);
+		List<List<User>> list1 = new ArrayList<>();
+		list1.add(list);
+		PageList<List<User>> pageList = new PageList<>();
+		pageList.setEntities(list1);
+		pageRedis.saveRE(pageList);
 	}
 	
 	@Test
 	public void getPage(){
-		PageList<User> pageList = pageRedis.get();
+		PageList<List<User>> pageList = pageRedis.getRE();
 		System.out.println(GsonUtils.parseJson(pageList));
 	}
-
 }
