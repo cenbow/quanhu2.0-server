@@ -103,11 +103,15 @@ public class CommentProvider implements CommentApi {
             comment.setDelFlag((byte) 10);
             Comment commentSuccess = commentService.accretion(comment);
             if (null!=commentSuccess) {
+              UserSimpleVO userBase =  userApi.getUserSimple(comment.getTargetUserId()).getData();
                 map.put("result", 1);
                     try {
                         countApi.commitCount(BehaviorEnum.Comment, comment.getResourceId(), "", 1L);
                     } catch (Exception e) {
                         logger.info("进入统计系统失败" + e);
+                    }
+                    if(null!=userBase){
+                        commentSuccess.setTargetUserNickName(userBase.getUserNickName());
                     }
             } else {
                 map.put("result", 0);
