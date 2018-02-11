@@ -319,7 +319,15 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Override
     public Boolean isBanSpeak(Long userId, Long coterieId) {
 
+        if (permission(userId, coterieId) == MemberConstant.Permission.OWNER.getStatus()) {
+           return false;
+        }
+
         CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
+
+        if (null == member) {
+            return true;
+        }
 
         if (member.getDelFlag().equals(MemberConstant.DelFlag.NORMAL.getStatus()) && member.getBanSpeak() == MemberConstant.BanSpeak.BANSPEAK.getStatus()) {
             return true;

@@ -380,7 +380,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     private Boolean isExistUser(Long userId) {
         Response<UserSimpleVO> response = userApi.getUserSimple(userId);
         if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
-            if (response.getData() != null) {
+            if (response.getData() != null && response.getData().getUserId() == userId) {
                 return true;
             } else {
                 return false;
