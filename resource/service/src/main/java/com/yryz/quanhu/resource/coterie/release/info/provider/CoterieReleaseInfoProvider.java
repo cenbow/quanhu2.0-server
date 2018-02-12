@@ -291,6 +291,7 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
             resourceTotal.setContent(releaseInfo.getContent());
             if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
                 resourceTotal.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
+                resourceTotal.setPrice(releaseInfo.getContentPrice());
             }
 
             resourceTotal.setCreateDate(DateUtils.getString(Calendar.getInstance().getTime()));
