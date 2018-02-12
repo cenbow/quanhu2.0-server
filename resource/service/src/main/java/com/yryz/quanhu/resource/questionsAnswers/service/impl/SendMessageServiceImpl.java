@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
 import java.util.UUID;
@@ -45,10 +47,11 @@ public class SendMessageServiceImpl implements SendMessageService {
      * @return
      */
     @Override
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
     public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant, Boolean persistent) {
         Long kid = messageBusinessVo.getKid();
         Long tosendUserId = messageBusinessVo.getTosendUserId();
-        long fromUserId = messageBusinessVo.getFromUserId();
+        Long fromUserId = messageBusinessVo.getFromUserId();
         String title = messageBusinessVo.getTitle();
         title = StringUtils.length(title) > 20 ? title.substring(0, 19) : title;
         Byte isAnonymity = messageBusinessVo.getIsAnonymity();
