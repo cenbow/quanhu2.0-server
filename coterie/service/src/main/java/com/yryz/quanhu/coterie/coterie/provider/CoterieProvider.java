@@ -261,7 +261,7 @@ public class CoterieProvider implements CoterieApi {
 			//手动分页
 			List<CoterieInfo> resultList=Lists.newArrayList();
 			int start=(pageNum-1)*pageSize;
-			for (int i = start; i < pageSize; i++) {
+			for (int i = start; i < start+pageSize; i++) {
 				if(i<sortList.size()){
 					resultList.add(sortList.get(i));
 				}
@@ -319,7 +319,7 @@ public class CoterieProvider implements CoterieApi {
 			//手动分页
 			int start=(pageNum-1)*pageSize;
 			List<CoterieInfo> result=Lists.newArrayList();
-			for (int i = start; i < pageSize; i++) {
+			for (int i = start; i < start+pageSize; i++) {
 				if(i<list.size()){
 					result.add(list.get(i));
 				}
