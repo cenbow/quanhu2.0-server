@@ -20,8 +20,10 @@ public class UserRelationDto extends UserRelationEntity{
     private Integer currentPage = 1;
     /**每页大小*/
     private Integer pageSize = 10;
-
-
+    /**
+     * 原关系状态
+     */
+    private int orgRelationStatus;
     /**
      * 用户ID
      */
@@ -46,6 +48,14 @@ public class UserRelationDto extends UserRelationEntity{
      * 用户简介
      */
     private String userSummary;
+
+    public int getOrgRelationStatus() {
+        return orgRelationStatus;
+    }
+
+    public void setOrgRelationStatus(int orgRelationStatus) {
+        this.orgRelationStatus = orgRelationStatus;
+    }
 
     public String getUserRemarkName() {
         return userRemarkName;

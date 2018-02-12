@@ -11,7 +11,6 @@ import java.io.Serializable;
  */
 public class UserRelationCountDto implements Serializable{
 
-    private boolean isNewRecord;
 
     private String targetUserId;
     /**
@@ -46,14 +45,6 @@ public class UserRelationCountDto implements Serializable{
 
     public void setBothBlackCount(long bothBlackCount) {
         this.bothBlackCount = bothBlackCount;
-    }
-
-    public boolean isNewRecord() {
-        return isNewRecord;
-    }
-
-    public void setNewRecord(boolean newRecord) {
-        isNewRecord = newRecord;
     }
 
     public String getTargetUserId() {
