@@ -177,6 +177,7 @@ public class AnswerServiceImpl implements AnswerService {
               }
             }
         }
+
         /**
          * 向圈粉发送已回答消息
          */
@@ -211,6 +212,7 @@ public class AnswerServiceImpl implements AnswerService {
         }
         resourceTotal.setContent(answerVo1.getContent());
         resourceTotal.setTitle(answerVo1.getContent());
+        resourceTotal.setPrice(questionVo.getChargeAmount());
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceTotal.setResourceId(answerVo1.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.ANSWER));
