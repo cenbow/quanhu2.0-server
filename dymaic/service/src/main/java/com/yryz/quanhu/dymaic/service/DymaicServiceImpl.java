@@ -488,7 +488,7 @@ public class DymaicServiceImpl {
         //3 查询统计数据
         Map<Long, Map<String, Long>> statics = null;
         if (kidList != null && !kidList.isEmpty()) {
-            statics = invokeStatics(kidList);
+            statics = invokeStatics(userId, kidList);
         }
         final Long staticsEnd = System.currentTimeMillis();
 
@@ -579,11 +579,12 @@ public class DymaicServiceImpl {
      * @param kids
      * @return
      */
-    private Map<Long, Map<String, Long>> invokeStatics(List<Long> kids) {
+    private Map<Long, Map<String, Long>> invokeStatics(Long userId, List<Long> kids) {
         Map<Long, Map<String, Long>> statics = null;
         try {
             String countType = BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Transmit.getCode();
-            Response<Map<Long,Map<String, Long>>> response = countApi.getCount(countType, kids, null);
+            Response<Map<Long,Map<String, Long>>> response = countApi.getCountFlag(countType, kids, null, userId
+            );
             statics = response.getData();
         } catch (Exception e) {
             logger.warn("cannot get statics cause: " + e.getMessage());
