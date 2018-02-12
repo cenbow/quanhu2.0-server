@@ -21,6 +21,7 @@ import com.yryz.quanhu.order.score.rule.service.impl.BaseRuleScoreServiceImpl;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.score.vo.EventAcount;
 
+import net.sf.json.JSONObject;
 import redis.clients.jedis.ShardedJedis;
 
 /**
@@ -97,19 +98,19 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			ea.setGrowLevel(level.getLevel());
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
+			logger.info("-------处理成长值运算事件if(EventAcount) == null，每次触发传入数据：={}",JSONObject.fromObject(ea));
 			eventAcountService.save(ea);
 		} else {
 			// 同积分总账更新方式，更新成长值时，可能会覆盖积分值
-			logger.info("-------处理成长值运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
-			logger.info("-------处理成长值运算事件，每次触发传入数据：newGrow" + newGrow);
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
 			allGrow = ea.getGrow() + newGrow;
-			logger.info("-------处理成长值运算事件，每次触发传入数据：allGrow" + allGrow);
+			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：ea.getGrow(): " + ea.getGrow()+" newGrow: "+newGrow+" allGrow: "+allGrow);
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			ea.setGrow(Math.abs(allGrow + 0L));
 			ea.setGrowLevel(level.getLevel());
 			ea.setUpdateTime(now);
 			ea.setScore(null);
+			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：={}",JSONObject.fromObject(ea));
 			eventAcountService.update(ea);
 		}
 		// 无论总值表有无数据，流水是要记的
