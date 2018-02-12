@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.yryz.quanhu.user.contants.UserRelationConstant.NO;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.*;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.YES;
 
 /**
@@ -79,9 +80,6 @@ public class UserRelationCacheDao {
 
     @Value("${user.relation.mq.direct.exchange}")
     private String mqDirectExchange;
-
-
-
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -286,8 +284,16 @@ public class UserRelationCacheDao {
         //删除动态
         this.syncDynamicTimeLine(relationDto);
 
-        //统计数据
-        UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
+        /**
+         * 统计数据
+         * 1，数据库实时groupby统计（不建议采用）
+         * 2，缓存内存计算统计
+         */
+
+        //UserRelationCountDto dto = this.selectTotalCount(relationDto.getSourceUserId());
+
+        UserRelationCountDto dto = this.rebuildCacheTotalCount(relationDto);
+
 
         //添加积分成长值
         this.syncScoreEvent(relationDto,dto);
@@ -296,6 +302,8 @@ public class UserRelationCacheDao {
         this.refreshCacheCount(relationDto.getSourceUserId(),dto);
 
     }
+
+
     /**
      * 异步MQ处理
      * @param data
@@ -396,6 +404,44 @@ public class UserRelationCacheDao {
 
     }
 
+    /**
+     * 由于数据每次实时groupby比较耗性能，采用redis实时更新
+     * @param targetUserId
+     * @return
+     */
+    public UserRelationCountDto rebuildCacheTotalCount(UserRelationDto relationDto){
+        /**
+         * 查询redis统计
+         */
+        UserRelationCountDto countDto = this.getCacheTotalCount(relationDto.getSourceUserId());
+        if(countDto==null){
+            countDto = new UserRelationCountDto();
+            countDto.setTargetUserId(relationDto.getSourceUserId());
+        }
+        //原状态
+        int org = relationDto.getOrgRelationStatus();
+        //新状态
+        int now = relationDto.getRelationStatus();
+
+        logger.info("DynamicCount.doCount:{}={}>{}",countDto.getTargetUserId(),org,now);
+
+        //状态没变，直接返回
+        if(org==now){
+            return countDto;
+        }
+
+        logger.info("DynamicCount.before:{}",JSON.toJSON(countDto));
+        //动态计数
+        DynamicCount dynamicCount = new DynamicCount(countDto);
+
+        countDto = dynamicCount.doCount(org,now);
+
+        logger.info("DynamicCount.after:{}",JSON.toJSON(countDto));
+
+        return countDto;
+    }
+
+
     public UserRelationCountDto selectTotalCount(String targetUserId){
 
         List<Map<String,Object>> listMaps = userRelationDao.selectTotalCount(targetUserId);
@@ -408,22 +454,22 @@ public class UserRelationCacheDao {
             Map<String,Object> map = listMaps.get(i);
             int status = (int) map.get("relationStatus");
             long count = (long) map.get("totalCount");
-            if(status==UserRelationConstant.STATUS.FANS.getCode()){         //粉丝
+            if(status== FANS.getCode()){         //粉丝
                 dto.setFansCount(count);
             }
-            if(status==UserRelationConstant.STATUS.FOLLOW.getCode()){       //关注
+            if(status==FOLLOW.getCode()){       //关注
                 dto.setFollowCount(count);
             }
-            if(status==UserRelationConstant.STATUS.TO_BLACK.getCode()){     //拉黑
+            if(status==TO_BLACK.getCode()){     //拉黑
                 dto.setToBlackCount(count);
             }
-            if(status==UserRelationConstant.STATUS.FROM_BLACK.getCode()){   //被拉黑
+            if(status==FROM_BLACK.getCode()){   //被拉黑
                 dto.setFromBlackCount(count);
             }
-            if(status==UserRelationConstant.STATUS.BOTH_BLACK.getCode()){    //互相拉黑
+            if(status==BOTH_BLACK.getCode()){    //互相拉黑
                 dto.setBothBlackCount(count);
             }
-            if(status==UserRelationConstant.STATUS.FRIEND.getCode()){        //好友
+            if(status==FRIEND.getCode()){        //好友
                 dto.setFriendCount(count);
             }
         }
@@ -500,6 +546,121 @@ public class UserRelationCacheDao {
             }finally {
                 logger.info("syncImRelation.deleteFriend ={} finish",JSON.toJSON(im));
             }
+        }
+    }
+
+
+    /**
+     * 正整数计数
+     * 当前计数大于0才参与递减，防止出现负数则直接返回0
+     * @param count
+     * @param val
+     * @return
+     */
+    private static long positiveCount(long count,int val){
+        if(count>0){
+            return count+val;
+        }else if(count==0){
+            if(val<0){
+                return count;
+            }else{
+                return count+val;
+            }
+        }else{
+            return 0;
+        }
+    }
+
+
+    /**
+     * 动态计数实现
+     */
+    private class DynamicCount{
+
+        private long fans;
+        private long follow;
+        private long friend;
+        private long toBlack;
+        private long fromBlack;
+        private long bothBlack;
+
+        private UserRelationCountDto dto;
+
+        private DynamicCount(UserRelationCountDto dto){
+
+            /**
+             * 由于统计到redis的数据，互相关系，已经合并到单向关系统计中，
+             * 在计数时，需剔除进行重新计算
+             */
+
+            //当前计数
+            this.fans = dto.getFansCount()-dto.getFriendCount();
+            this.follow = dto.getFollowCount()-dto.getFriendCount();
+            this.friend = dto.getFriendCount();
+            this.toBlack = dto.getToBlackCount()-dto.getBothBlackCount();
+            this.fromBlack = dto.getFromBlackCount()-dto.getBothBlackCount();
+            this.bothBlack = dto.getBothBlackCount();
+
+            this.dto = dto;
+        }
+
+
+        private UserRelationCountDto doCount(int org ,int now){
+
+            logger.info("DynamicCount.[{}].start:fans={},follow={},friend={},toBlack={},fromBlack={},bothBlack={}"
+                    ,dto.getTargetUserId(),fans,follow,friend,toBlack,fromBlack,bothBlack);
+
+            //对原状态数量依次-1
+            switch (org){
+                case 0:                 //无状态
+                    break;
+                case 1:                 //粉丝
+                    this.fans = positiveCount(fans,-1);break;
+                case 2:                 //关注
+                    this.follow = positiveCount(follow,-1);break;
+                case 3:                 //拉黑
+                    this.toBlack = positiveCount(toBlack,-1);break;
+                case 4:                 //被拉黑
+                    this.fromBlack = positiveCount(fromBlack,-1);break;
+                case 5:                 //好友
+                    this.friend = positiveCount(friend,-1);break;
+                case 6:                 //互相拉黑
+                    this.bothBlack = positiveCount(bothBlack,-1);break;
+            }
+
+            //对新状态数量依次+1
+            switch (now){
+                case 0:                 //无状态
+                    break;
+                case 1:                 //粉丝
+                    fans++;break;
+                case 2:                 //关注
+                    follow++;break;
+                case 3:                 //拉黑
+                    toBlack++;break;
+                case 4:                 //被拉黑
+                    fromBlack++;break;
+                case 5:                 //好友
+                    friend++;break;
+                case 6:                 //互相拉黑
+                    bothBlack++;break;
+            }
+
+            logger.info("DynamicCount.[{}].finish:fans={},follow={},friend={},toBlack={},fromBlack={},bothBlack={}"
+                    ,dto.getTargetUserId(),fans,follow,friend,toBlack,fromBlack,bothBlack);
+
+            //将双向关系，计算到单向关系中
+
+            dto.setFansCount(fans+friend);
+            dto.setFollowCount(follow+friend);
+
+            dto.setToBlackCount(toBlack+bothBlack);
+            dto.setFromBlackCount(fromBlack+bothBlack);
+
+            dto.setFriendCount(friend);
+            dto.setBothBlackCount(bothBlack);
+
+            return dto;
         }
     }
 }

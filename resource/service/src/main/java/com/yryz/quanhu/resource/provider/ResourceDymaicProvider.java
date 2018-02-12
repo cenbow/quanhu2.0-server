@@ -31,8 +31,11 @@ public class ResourceDymaicProvider implements ResourceDymaicApi {
 
     @Override
     public Response<Object> commitResourceDymaic(ResourceTotal resourceTotal) {
-        if(StringUtils.isEmpty(resourceTotal.getIntimate())){
+        if (StringUtils.isEmpty(resourceTotal.getIntimate())) {
             resourceTotal.setIntimate(ResourceEnum.INTIMATE_FALSE);
+        }
+        if (resourceTotal.getPrice() == null || resourceTotal.getPrice() < 0) {
+            resourceTotal.setPrice(0L);
         }
         String msg = GsonUtils.parseJson(resourceTotal);
         logger.debug("commitResourceDymaic msg :" + msg);

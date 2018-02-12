@@ -2,31 +2,20 @@ package com.yryz.quanhu.coterie.member.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
-import com.yryz.common.response.ResponseUtils;
-import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
-import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
-import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieMemberInfo;
-import com.yryz.quanhu.coterie.coterie.vo.MemberSearch;
-import com.yryz.quanhu.coterie.coterie.vo.MemberSearchParam;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dao.CoterieApplyDao;
 import com.yryz.quanhu.coterie.member.dao.CoterieMemberDao;
 import com.yryz.quanhu.coterie.member.dao.CoterieMemberRedis;
-import com.yryz.quanhu.coterie.member.dto.CoterieMemberSearchDto;
 import com.yryz.quanhu.coterie.member.entity.CoterieMember;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberApply;
 import com.yryz.quanhu.coterie.member.entity.CoterieMemberNotify;
@@ -36,28 +25,21 @@ import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberApplyVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
-import com.yryz.quanhu.order.api.OrderApi;
-import com.yryz.quanhu.order.enums.OrderConstant;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
-import com.yryz.quanhu.order.sdk.entity.Order;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
 import com.yryz.quanhu.user.dto.UserRelationDto;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
-
-import static java.lang.Long.getLong;
 
 /**
  * 私圈成员服务实现
@@ -379,6 +361,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 saveOrUpdateApply(userId, coterieId, "", memberStatus);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new QuanhuException(ExceptionEnum.SysException);
         }
     }
@@ -556,7 +539,11 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 coterieMember.setKid(idApi.getSnowflakeId().getData());
                 coterieMember.setUserId(userId);
                 coterieMember.setCoterieId(coterieId);
-                coterieMember.setReason(reason);
+                if (StringUtils.isBlank(reason)) {
+                    coterieMember.setReason("");
+                } else {
+                    coterieMember.setReason(reason);
+                }
                 coterieMember.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
                 coterieMember.setCreateDate(new Date());
                 coterieMember.setLastUpdateDate(new Date());
@@ -589,6 +576,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 throw QuanhuException.busiError("更新成员人数失败");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw QuanhuException.busiError("保存或更新私圈成员异常");
         }
         return true;

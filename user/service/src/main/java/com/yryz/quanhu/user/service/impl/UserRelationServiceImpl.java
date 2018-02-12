@@ -103,14 +103,20 @@ public class UserRelationServiceImpl implements UserRelationService{
             if(sourceDto == null){
                 sourceDto = new UserRelationDto();
                 sourceDto.setRelationStatus(NONE.getCode());
+                sourceDto.setOrgRelationStatus(NONE.getCode());
                 sourceDto.setSourceUserId(sourceUserId);
                 sourceDto.setTargetUserId(targetUserId);
+            }else{
+                sourceDto.setOrgRelationStatus(sourceDto.getRelationStatus());
             }
             if(targetDto == null){
                 targetDto = new UserRelationDto();
                 targetDto.setRelationStatus(NONE.getCode());
+                targetDto.setOrgRelationStatus(NONE.getCode());
                 targetDto.setSourceUserId(targetUserId);
                 targetDto.setTargetUserId(sourceUserId);
+            }else{
+                targetDto.setOrgRelationStatus(targetDto.getRelationStatus());
             }
             /**
              * 判断关系

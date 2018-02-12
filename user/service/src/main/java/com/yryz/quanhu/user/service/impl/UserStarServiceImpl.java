@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.BeanUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -325,7 +326,14 @@ public class UserStarServiceImpl implements UserStarService {
 	 * @param authModel
 	 */
 	private void saveStarAuthLog(UserStarAuth authModel) {
-		UserStarAuthLog logModel = GsonUtils.parseObj(authModel, UserStarAuthLog.class);
+		UserStarAuthLog logModel = new UserStarAuthLog();
+		UserStarAuth auth = persistenceDao.get(authModel.getUserId().toString(), null, null);
+		if(auth != null){
+			BeanUtils.copyProperties(auth, authModel, BeanUtils.getNullPropertyNames(authModel));
+			BeanUtils.copyProperties(logModel, authModel);
+		}else{
+			logModel = GsonUtils.parseObj(authModel, UserStarAuthLog.class);
+		}
 		try {
 			logModel.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_USER_STAR_AUTH_LOG)));
 			logModel.setCreateDate(new Date());

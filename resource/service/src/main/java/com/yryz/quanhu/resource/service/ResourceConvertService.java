@@ -49,10 +49,31 @@ public interface ResourceConvertService {
 	public List<ResourceVo> addBatch(List<ResourceVo> list);
 	
 	/**
-	 * 添加统计数
+	 * 添加统计数（批量）
 	 * @param list
 	 * @return
 	 */
 	public List<ResourceVo> addCount(List<ResourceVo> list);
+	
+	/**
+	 * 添加统计数
+	 * @param resourceVo
+	 * @return
+	 */
+	public ResourceVo addCount(ResourceVo resourceVo);
+	
+	/**
+	 * 添加私圈(批量)
+	 * @param list
+	 * @return
+	 */
+	public List<ResourceVo> addCoterie(List<ResourceVo> list);
+	
+	/**
+	 * 添加私圈
+	 * @param resourceVo
+	 * @return
+	 */
+	public ResourceVo addCoterie(ResourceVo resourceVo);
 
 }
