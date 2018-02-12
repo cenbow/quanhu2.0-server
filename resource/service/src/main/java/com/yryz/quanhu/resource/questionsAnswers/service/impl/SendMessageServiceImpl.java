@@ -47,7 +47,7 @@ public class SendMessageServiceImpl implements SendMessageService {
      * @return
      */
     @Override
-    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    @Transactional
     public Boolean sendNotify4Question(MessageBusinessVo messageBusinessVo, MessageConstant messageConstant, Boolean persistent) {
         Long kid = messageBusinessVo.getKid();
         Long tosendUserId = messageBusinessVo.getTosendUserId();

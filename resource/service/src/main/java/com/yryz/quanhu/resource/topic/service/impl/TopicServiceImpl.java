@@ -25,6 +25,7 @@ import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +60,7 @@ public class TopicServiceImpl implements TopicService {
      * @return
      */
     @Override
+    @Transactional
     public TopicVo saveTopic(TopicDto topicDto) {
         /**
          * 校验参数
@@ -184,6 +186,7 @@ public class TopicServiceImpl implements TopicService {
      * @return
      */
     @Override
+    @Transactional
     public Integer deleteTopic(Long kid, Long userId) {
         /**
          * 校验参数

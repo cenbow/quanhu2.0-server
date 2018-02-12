@@ -108,6 +108,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
+    @Transactional
     public Question saveQuestion(Question question) {
         /**
          * 检验传递的参数是否缺失
@@ -255,6 +256,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
+    @Transactional
     public int deleteQuestion(Long kid, Long userId) {
         /**
          * 检查参数是否缺失
@@ -584,6 +586,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public Integer updateByPrimaryKeySelective(Question question) {
         return this.questionDao.updateByPrimaryKeySelective(question);
     }
@@ -609,6 +612,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @param
      */
     @Override
+    @Transactional
     public void updateInValidQuestionRefund() {
         /**
          * 查询失效的问题

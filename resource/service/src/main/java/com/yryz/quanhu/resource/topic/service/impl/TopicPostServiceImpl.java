@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,6 +75,7 @@ public class TopicPostServiceImpl implements TopicPostService {
      * @return
      */
     @Override
+    @Transactional
     public Integer saveTopicPost(TopicPostDto topicPostDto) {
         /**
          * 校验参数
@@ -271,6 +273,7 @@ public class TopicPostServiceImpl implements TopicPostService {
      * @return
      */
     @Override
+    @Transactional
     public Integer deleteTopicPost(Long kid, Long userId) {
         /**
          * 传入参数校验
