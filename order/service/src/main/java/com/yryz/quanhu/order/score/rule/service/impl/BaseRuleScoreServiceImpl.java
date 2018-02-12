@@ -106,16 +106,16 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		if (ea == null || ea.getId() == null) {
 			allScore = 0L + newScore;
 			ea = new EventAcount(userId);
-			ea.setScore(allScore);
+			ea.setScore(Math.abs(allScore));
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
 			eventAcountService.save(ea);
 		} else {
 			logger.info("-------处理积分运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
 			logger.info("-------处理积分运算事件，每次触发传入数据：newScore" + newScore);
-			logger.info("-------处理积分运算事件，每次触发传入数据：allScore" + allScore);
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
 			allScore = ea.getScore() + newScore;
+			logger.info("-------处理积分运算事件，每次触发传入数据：allScore" + allScore);
 			ea.setScore(Math.abs(allScore + 0L));
 			ea.setUpdateTime(now);
 			ea.setGrow(null);
@@ -124,7 +124,7 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		}
 		// 无论总值表有无数据，流水是要记的
 		ScoreFlow sf = new ScoreFlow(userId, eventCode, newScore);
-		sf.setAllScore(allScore);
+		sf.setAllScore(Math.abs(allScore + 0L));
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);
 		scoreFlowService.save(sf);

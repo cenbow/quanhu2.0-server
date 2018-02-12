@@ -93,7 +93,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			allGrow = 0L + newGrow;
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			ea = new EventAcount(userId);
-			ea.setGrow(allGrow);
+			ea.setGrow(Math.abs(allGrow));
 			ea.setGrowLevel(level.getLevel());
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
@@ -102,9 +102,9 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			// 同积分总账更新方式，更新成长值时，可能会覆盖积分值
 			logger.info("-------处理成长值运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
 			logger.info("-------处理成长值运算事件，每次触发传入数据：newGrow" + newGrow);
-			logger.info("-------处理成长值运算事件，每次触发传入数据：allGrow" + allGrow);
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
 			allGrow = ea.getGrow() + newGrow;
+			logger.info("-------处理成长值运算事件，每次触发传入数据：allGrow" + allGrow);
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			ea.setGrow(Math.abs(allGrow + 0L));
 			ea.setGrowLevel(level.getLevel());
@@ -114,7 +114,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		}
 		// 无论总值表有无数据，流水是要记的
 		GrowFlow sf = new GrowFlow(userId, eventCode, newGrow);
-		sf.setAllGrow(allGrow);
+		sf.setAllGrow(Math.abs(allGrow + 0L));
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);
 		growFlowService.save(sf);
