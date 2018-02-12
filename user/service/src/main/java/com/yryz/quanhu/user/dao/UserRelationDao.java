@@ -27,5 +27,6 @@ public interface UserRelationDao extends BaseDao{
     List<Map<String,Object>> selectTotalCount(@Param("userId")String userId);
 
     long selectCount(@Param("userId")String userId,@Param("relationStatus")int relationStatus);
-
+    
+    <T> List<T> selectAllFriend(@Param("status")Integer status);
 }
