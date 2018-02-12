@@ -2,20 +2,10 @@ package com.yryz.quanhu.openapi.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.collect.Sets;
-import com.yryz.common.utils.BeanUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.quanhu.dymaic.service.DymaicService;
-import com.yryz.quanhu.dymaic.service.ElasticsearchService;
-import com.yryz.quanhu.dymaic.vo.Dymaic;
-import com.yryz.quanhu.user.dto.StarInfoDTO;
-import com.yryz.quanhu.user.vo.UserDynamicVO;
-import io.swagger.annotations.ApiImplicitParams;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,20 +21,20 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.common.utils.WebUtil;
+import com.yryz.quanhu.dymaic.service.ElasticsearchService;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.service.AuthService;
 import com.yryz.quanhu.openapi.utils.CommonUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.vo.StarInfoVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Api(description = "用户达人接口")
 @RestController
@@ -54,7 +44,8 @@ public class UserStarController {
 
     @Reference(check = false)
     private UserStarApi starApi;
-
+    @Autowired
+    private AuthService authService;
 //    @Reference
 //    private DymaicService dymaicService;
 
@@ -117,7 +108,7 @@ public class UserStarController {
     public Response<StarAuthInfo> get(String userId, HttpServletRequest request) {
         RequestHeader header = WebUtil.getHeader(request);
         StarAuthInfo authInfo = null;
-        if (StringUtils.isNotBlank(userId)) {
+        if (StringUtils.isNotBlank(userId) && !StringUtils.equals(userId, header.getUserId())) {
             authInfo = ResponseUtils.getResponseData(starApi.get(userId));
             if (authInfo != null) {
                 authInfo.setContactCall(CommonUtils.getPhone(authInfo.getContactCall()));
@@ -125,6 +116,7 @@ public class UserStarController {
                 authInfo.setRealName(CommonUtils.getRealName(authInfo.getRealName()));
             }
         } else {
+        	authService.checkToken(request);
             authInfo = ResponseUtils.getResponseData(starApi.get(header.getUserId()));
         }
         return ResponseUtils.returnApiObjectSuccess(authInfo);

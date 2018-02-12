@@ -67,6 +67,9 @@ public class DymaicServiceImpl {
     @Autowired
     private SortIdHelper sortIdHelper;
 
+    @Autowired
+    private DymaicTopServiceImpl dymaicTopService;
+
     /**
      * 发布动态
      *
@@ -116,6 +119,9 @@ public class DymaicServiceImpl {
         //write db
         dymaic.setDelFlag(STATUS_OFF);
         dymaicDao.update(dymaic);
+
+        //删除置顶
+        dymaicTopService.delIfExist(userId, kid);
 
         //update cache
         dymaicCache.addDynamic(dymaic);

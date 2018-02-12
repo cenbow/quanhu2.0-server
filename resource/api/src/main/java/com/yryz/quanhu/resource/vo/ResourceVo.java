@@ -80,6 +80,11 @@ public class ResourceVo implements Serializable {
     private String content;
     
     /**
+     * 价格
+     */
+    private Long price;
+    
+    /**
      * 删除标记
      * 10正常，11已删除
      */
@@ -275,6 +280,20 @@ public class ResourceVo implements Serializable {
 	 */
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	/**
+	 * @return the price
+	 */
+	public Long getPrice() {
+		return price;
+	}
+
+	/**
+	 * @param price the price to set
+	 */
+	public void setPrice(Long price) {
+		this.price = price;
 	}
 
 	/**

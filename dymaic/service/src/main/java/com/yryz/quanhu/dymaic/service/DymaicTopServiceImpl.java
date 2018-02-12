@@ -45,6 +45,25 @@ public class DymaicTopServiceImpl {
     }
 
     /**
+     * 当动态为置顶时，执行删除
+     * @param userId
+     * @param kid
+     * @return
+     */
+    public void delIfExist(Long userId, Long kid) {
+
+        if (kid == null || kid < 1) {
+            return;
+        }
+
+        Long dymaicId = getTopDymaicKid(userId);
+
+        if (kid.equals(dymaicId)) {
+            delete(userId, kid);
+        }
+    }
+
+    /**
      * 添加置顶动态
      * @param userId
      * @param dymaicId
@@ -70,6 +89,22 @@ public class DymaicTopServiceImpl {
      */
     public DymaicVo get(Long userId) {
         DymaicVo vo = null;
+
+        Long dymaicId = getTopDymaicKid(userId);
+
+        if (dymaicId != null && dymaicId > 0) {
+            vo = dymaicServiceImpl.mergeDymaicVo(userId, dymaicId);
+        }
+
+        return (vo == null) ? new DymaicVo() : vo;
+    }
+
+    /**
+     * 查询置顶动态ID
+     * @param userId
+     * @return
+     */
+    private Long getTopDymaicKid(Long userId) {
         String cacheKey = getCacheKey(userId);
 
         Long dymaicId = getRedisTemplate().opsForValue().get(cacheKey);
@@ -81,11 +116,7 @@ public class DymaicTopServiceImpl {
             getRedisTemplate().opsForValue().set(cacheKey, dymaicId, EXPIRE_DAY, TimeUnit.DAYS);
         }
 
-        if (dymaicId != null && dymaicId > 0) {
-            vo = dymaicServiceImpl.mergeDymaicVo(userId, dymaicId);
-        }
-
-        return (vo == null) ? new DymaicVo() : vo;
+        return dymaicId;
     }
 
     /**

@@ -30,6 +30,10 @@ public class VerifyCodeDTO implements Serializable {
 	 */
 	private String verifyKey;
 	/**
+	 * ip地址
+	 */
+	private String ip;
+	/**
 	 * 接入方系统分配的id
 	 */
 	private String appId;
@@ -79,6 +83,12 @@ public class VerifyCodeDTO implements Serializable {
 	}
 	public void setNeedDelete(boolean needDelete) {
 		this.needDelete = needDelete;
+	}
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 	public VerifyCodeDTO() {
 		super();

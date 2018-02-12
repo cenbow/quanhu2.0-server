@@ -54,6 +54,11 @@ public class Constants {
 	 */
 	public static final String AUTH_CONFIG_NAME = "userAuthConfig";
 	
+	/**
+	 * 邀请注册配置
+	 */
+	public static final String INVITER_CONFIG_NAME = "inviterConfig";
+	
     /**
 	 * 头像审核状态
 	 *

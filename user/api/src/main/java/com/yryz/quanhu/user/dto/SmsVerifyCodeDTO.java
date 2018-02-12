@@ -24,6 +24,10 @@ public class SmsVerifyCodeDTO implements Serializable{
 	 * 用户id
 	 */
 	private Long userId;
+	/**
+	 * ip地址
+	 */
+	private String ip;
 
 	/**
 	 * 阿里验证码请求参数
@@ -94,5 +98,13 @@ public class SmsVerifyCodeDTO implements Serializable{
 	}
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 }

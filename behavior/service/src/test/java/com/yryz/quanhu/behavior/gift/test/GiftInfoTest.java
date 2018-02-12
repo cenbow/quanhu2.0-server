@@ -69,4 +69,16 @@ public class GiftInfoTest {
         record.setGiftName("豪车");
         System.out.println(new ObjectMapper().writeValueAsString(giftInfoService.updateByKid(record)));
     }
+    
+    /**  
+    * @Description: 禮物詳情
+    * @author wangheng
+    * @param @throws JsonProcessingException
+    * @return void
+    * @throws  
+    */
+    @Test
+    public void test004() throws JsonProcessingException {
+        System.out.println(new ObjectMapper().writeValueAsString(giftInfoService.selectByKid(1L)));
+    }
 }

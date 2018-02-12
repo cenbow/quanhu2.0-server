@@ -47,7 +47,10 @@ public class SmsLog extends GenericEntity{
      * 短信模板编码
      */
     private String smsTemplateCode;
-
+    /**
+     * ip地址
+     */
+    private String ip;
     public String getPhone() {
         return phone;
     }
@@ -95,6 +98,14 @@ public class SmsLog extends GenericEntity{
     public void setSmsTemplateCode(String smsTemplateCode) {
         this.smsTemplateCode = smsTemplateCode == null ? null : smsTemplateCode.trim();
     }
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
 
 	public SmsLog() {
 		super();
