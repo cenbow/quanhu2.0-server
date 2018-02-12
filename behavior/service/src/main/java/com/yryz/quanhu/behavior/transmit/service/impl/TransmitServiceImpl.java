@@ -274,18 +274,16 @@ public class TransmitServiceImpl implements TransmitService {
             boolean isPush = true;
             String moduleEnum = resourceVo.getModuleEnum();
             String resourceId = resourceVo.getResourceId();
-            if(ModuleContants.RELEASE.equals(transmitInfo.getModuleEnum()) ) {
+            //如果parentId与resourceId不相等，属于动态
+            if(!transmitInfo.getParentId().equals(transmitInfo.getResourceId()) ) {
+                content = user.getUserNickName()+"转发了您的动态。";
+                isPush = false;
+                moduleEnum = ModuleContants.DYNAMIC;
+                resourceId = transmitInfo.getParentId().toString();
+            } else if(ModuleContants.RELEASE.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的内容。";
             } else if(ModuleContants.TOPIC_POST.equals(transmitInfo.getModuleEnum()) ) {
                 content = user.getUserNickName()+"转发了您发布的帖子。";
-            } else {
-                //如果parentId与resourceId不相等，属于动态
-                if(!transmitInfo.getParentId().equals(transmitInfo.getResourceId()) ) {
-                    content = user.getUserNickName()+"转发了您的动态。";
-                    isPush = false;
-                    moduleEnum = ModuleContants.DYNAMIC;
-                    resourceId = transmitInfo.getParentId().toString();
-                }
             }
             messageVo.setContent(content);
             messageVo.setCreateTime(DateUtils.getDateTime());

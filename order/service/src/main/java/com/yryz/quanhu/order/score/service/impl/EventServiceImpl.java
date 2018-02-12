@@ -82,25 +82,29 @@ public class EventServiceImpl implements EventService {
 		EventAcount eventAcount = eventAcountService.getLastAcount(log.getUserId());
 		EventReportVo eventReportVo = new EventReportVo();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-		if (StringUtils.isNotBlank("" + eventAcount.getScore())) {
-			eventReportVo.setAllScore(eventAcount.getScore());
-		}
-		if (StringUtils.isNotBlank("" + eventAcount.getGrow())) {
-			eventReportVo.setGrow(eventAcount.getGrow());
-		}
-		if (StringUtils.isNotBlank(eventAcount.getGrowLevel())) {
-			eventReportVo.setGrowLevel(eventAcount.getGrowLevel());
-		}
-		if (StringUtils.isNotBlank(eventAcount.getUserId())) {
-			eventReportVo.setUserId(Long.valueOf(eventAcount.getUserId()));
-		}
 		
-		if (StringUtils.isNotBlank(""+eventAcount.getCreateTime())) {
-			eventReportVo.setCreateTime(sdf.format(eventAcount.getCreateTime()));
-		}
-		if (StringUtils.isNotBlank(""+eventAcount.getUpdateTime())) {
-			eventReportVo.setUpdateTime(sdf.format(eventAcount.getUpdateTime()));
+		if (eventAcount!=null){
+			
+			if ( eventAcount.getScore()!=null && !"".equals(eventAcount.getScore()) ) {
+				eventReportVo.setAllScore(eventAcount.getScore());
+			}
+			if ( eventAcount.getGrow()!=null && !"".equals(eventAcount.getGrow())  ) {
+				eventReportVo.setGrow(eventAcount.getGrow());
+			}
+			if (  eventAcount.getGrowLevel()!=null && !"".equals(eventAcount.getGrowLevel()) ) {
+				eventReportVo.setGrowLevel(eventAcount.getGrowLevel());
+			}
+			if ( eventAcount.getUserId()!=null && !"".equals(eventAcount.getUserId())  ) {
+				eventReportVo.setUserId(Long.valueOf(eventAcount.getUserId()));
+			}
+			
+			if (  eventAcount.getCreateTime()!=null && !"".equals(eventAcount.getCreateTime()) ) {
+				eventReportVo.setCreateTime(sdf.format(eventAcount.getCreateTime()));
+			}
+			if (  eventAcount.getUpdateTime()!=null && !"".equals(eventAcount.getUpdateTime())  ) {
+				eventReportVo.setUpdateTime(sdf.format(eventAcount.getUpdateTime()));
+			}
+		
 		}
 		
 		return eventReportVo;

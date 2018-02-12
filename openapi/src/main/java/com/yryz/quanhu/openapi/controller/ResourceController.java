@@ -7,8 +7,14 @@
  */
 package com.yryz.quanhu.openapi.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +55,9 @@ public class ResourceController {
 
     @Reference
     private ResourceApi resourceApi;
+
+    @Reference
+    private CountApi countApi;
 
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
@@ -92,16 +101,21 @@ public class ResourceController {
         ResourceVo resourceVo = new ResourceVo();
         if (permiss == null || MemberConstant.Permission.STRANGER_NON_CHECK.getStatus() == permiss || MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + ",");
+            resourceVo.setPrice(0L);
             pageSize = 3;
         } else if (MemberConstant.Permission.OWNER.getStatus() == permiss || MemberConstant.Permission.MEMBER.getStatus() == permiss) {
             resourceVo.setModuleEnum(ModuleContants.RELEASE + "," + ModuleContants.TOPIC + "," + ModuleContants.ANSWER + "," + ModuleContants.ACTIVITY_COTERIE);
         }
-      //  resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE);
+        //  resourceVo.setPublicState(ResourceEnum.PUBLIC_STATE);
         resourceVo.setIntimate(ResourceEnum.INTIMATE_FALSE);
         resourceVo.setCoterieId(coterieId);
         PageList<ResourceVo> pageList = new PageList<>();
         pageList.setCurrentPage(currentPage);
-        pageList.setEntities(ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "sort,createTime", start, pageSize, null, null)));
+        List<ResourceVo> list = ResponseUtils.getResponseData(resourceApi.getResources(resourceVo, "sort,createTime", start, pageSize, null, null));
+        if (list != null && list.size() > 0 && userId != null) {
+            addCount(list, userId);
+        }
+        pageList.setEntities(list);
         pageList.setPageSize(pageSize);
         return ResponseUtils.returnObjectSuccess(pageList);
     }
@@ -172,5 +186,33 @@ public class ResourceController {
         resource.setSort(0L);
         resourceApi.updateResource(Lists.newArrayList(resource));
         return ResponseUtils.returnSuccess();
+    }
+
+    /**
+     * 添加统计数(批量)
+     *
+     * @param list
+     * @return
+     */
+    private List<ResourceVo> addCount(List<ResourceVo> list, Long userId) {
+        if (CollectionUtils.isNotEmpty(list)) {
+            List<Long> resourceIds = new ArrayList<>();
+            for (ResourceVo resourceVo : list) {
+                resourceIds.add(Long.parseLong(resourceVo.getResourceId()));
+            }
+            Response<Map<Long, Map<String, Long>>> response = countApi.getCountFlag(BehaviorEnum.Like.getCode() + "," + BehaviorEnum.Comment.getCode(), resourceIds, null, userId);
+            if (response.success()) {
+                Map<Long, Map<String, Long>> map = response.getData();
+                for (ResourceVo resourceVo : list) {
+                    Map<String, Long> statistics = map.get(Long.parseLong(resourceVo.getResourceId()));
+                    if (statistics != null) {
+                        resourceVo.setStatistics(statistics);
+                    } else {
+                        resourceVo.setStatistics(new HashMap<>());
+                    }
+                }
+            }
+        }
+        return list;
     }
 }

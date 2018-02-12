@@ -102,6 +102,10 @@ public class DateUtils  extends org.apache.commons.lang.time.DateUtils {
     	long nowTime = System.currentTimeMillis();
     	Calendar cal = Calendar.getInstance();
     	cal.add(Calendar.DAY_OF_MONTH, 1);
+    	cal.set(Calendar.HOUR, 0);
+    	cal.set(Calendar.MINUTE, 0);
+    	cal.set(Calendar.SECOND, 0);
+    	cal.set(Calendar.MILLISECOND, 0);
     	return (cal.getTimeInMillis() - nowTime)/1000;
     }
     /**
