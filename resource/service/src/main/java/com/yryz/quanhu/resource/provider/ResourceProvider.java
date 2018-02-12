@@ -96,7 +96,8 @@ public class ResourceProvider implements ResourceApi {
 		}
 		List<ResourceModel> list = resourceService.getResources(GsonUtils.parseObj(resource, ResourceModel.class), orderColumn, start, limit, startTime, endTime);
 		List<ResourceVo> listVo = GsonUtils.parseList(list, ResourceVo.class);
-		listVo = resourceConvertService.addBatch(listVo);
+		listVo = resourceConvertService.addUser(listVo);
+		listVo = resourceConvertService.addCoterie(listVo);
 		return ResponseUtils.returnListSuccess(listVo);
 	}
 
