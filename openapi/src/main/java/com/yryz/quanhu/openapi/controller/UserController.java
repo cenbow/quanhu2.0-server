@@ -58,6 +58,7 @@ import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.service.UserOperateApi;
+import com.yryz.quanhu.user.service.UserSyncApi;
 import com.yryz.quanhu.user.service.UserTagApi;
 import com.yryz.quanhu.user.vo.AuthTokenVO;
 import com.yryz.quanhu.user.vo.LoginMethodVO;
@@ -655,7 +656,22 @@ public class UserController {
 				.getResponseData(operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId));
 		return ResponseUtils.returnApiObjectSuccess(inviterVO);
 	}
-
+	
+	@Reference(check=false,cluster="failfast")
+	UserSyncApi syncApi;
+	
+	/**
+	 * 用户同步im接口
+	 * @param actionType
+	 * @return
+	 */
+	@GetMapping(value = "/{version}/user/syncIm")
+	public Response<Boolean> getInviterUser(Integer actionType) {
+		boolean result = ResponseUtils
+				.getResponseData(syncApi.syncUser(actionType));
+		return ResponseUtils.returnApiObjectSuccess(result);
+	}
+	
 	/**
 	 * 得到初始化后的注册日志
 	 * 

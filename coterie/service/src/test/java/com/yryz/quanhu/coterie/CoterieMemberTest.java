@@ -30,16 +30,16 @@ public class CoterieMemberTest {
     CoterieMemberOrderNotifyServiceImpl service;
 
     private static Long userId = 368619989000192L;
-    private static Long coterieId = 368706374885376L;
-    private static Long memberId = 360812433489920L;
+    private static Long coterieId = 367787629371392L;
+
+    private static Long memberId = 365780477952000L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
-
 
     @Test
     public void test010_Join() {
 //        Response response = coterieMemberAPI.join(730941139577331712L,5536534415L,"我要加入,不审核的");
-        Response response = coterieMemberAPI.join(memberId, coterieId, "我要加入,要审核的");
+        Response response = coterieMemberAPI.join(memberId, coterieId, null);
         System.out.println(JsonUtils.toFastJson(response));
     }
 

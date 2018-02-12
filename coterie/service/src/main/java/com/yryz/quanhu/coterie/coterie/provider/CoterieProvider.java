@@ -206,7 +206,7 @@ public class CoterieProvider implements CoterieApi {
 			throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "未知错误","积分统计查询失败");
 		}
 		int level=1;
-		if(vo==null){
+		if(vo==null || vo.getGrowLevel()==null){
 			level=1;
 		}else{
 			level=Integer.valueOf(vo.getGrowLevel());
