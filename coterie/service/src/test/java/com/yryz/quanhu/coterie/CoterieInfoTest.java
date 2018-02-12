@@ -76,7 +76,7 @@ public class CoterieInfoTest {
     
     @Test
     public void queryHotCoterieList() {
-    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.queryHotCoterieList(1,10));
+    	List<CoterieInfo> list=ResponseUtils.getResponseData(coterieApi.queryHotCoterieList(2,10));
     	System.out.println(list);
     }
     
