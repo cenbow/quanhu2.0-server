@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -389,6 +390,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @return
      */
     @Override
+    @Transactional
     public Integer rejectAnswer(Long kid, Long userId) {
         /**
          * 参数校验
@@ -420,8 +422,20 @@ public class QuestionServiceImpl implements QuestionService {
         int result = this.questionDao.updateByPrimaryKeySelective(question);
 
 
+
+        /**
+         * 发送消息（拒绝消息和退款消息）
+         */
+        MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+        messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
+        messageBusinessVo.setIsAnonymity(null);
+        messageBusinessVo.setKid(question.getKid());
+        messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
+        messageBusinessVo.setFromUserId(question.getCreateUserId());
+        messageBusinessVo.setTitle(question.getContent());
+        messageBusinessVo.setTosendUserId(question.getCreateUserId());
+        messageBusinessVo.setAmount(question.getChargeAmount());
         if (result > 0) {
-            MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
             /**
              * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
              */
@@ -431,17 +445,6 @@ public class QuestionServiceImpl implements QuestionService {
                     question.setRefundOrderId(String.valueOf(orderId));
                     question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
 
-                    /**
-                     * 退款消息
-                     */
-                    messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
-                    messageBusinessVo.setIsAnonymity(null);
-                    messageBusinessVo.setKid(question.getKid());
-                    messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-                    messageBusinessVo.setFromUserId(question.getCreateUserId());
-                    messageBusinessVo.setTitle(question.getContent());
-                    messageBusinessVo.setTosendUserId(question.getCreateUserId());
-                    messageBusinessVo.setAmount(question.getChargeAmount());
                     questionMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.QUESTION_REJECT_REFUND, true);
                 } else {
                     question.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
