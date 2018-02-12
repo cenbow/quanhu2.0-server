@@ -235,6 +235,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
         resourceTotal.setTitle(questionQuery.getContent());
         resourceTotal.setContent(questionQuery.getContent());
+        resourceTotal.setPrice(questionQuery.getChargeAmount());
         resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_FALSE);
         resourceTotal.setResourceId(question.getKid());
         resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.QUESTION));

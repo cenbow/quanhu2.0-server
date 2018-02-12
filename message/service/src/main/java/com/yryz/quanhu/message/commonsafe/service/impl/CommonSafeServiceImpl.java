@@ -111,7 +111,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			params.put("verifyCode", code);
 			params.put("expire", rangeConfigVo.getNormalCodeExpireTime() / 60);
 			try {
-				smsService.sendSms(new SmsDTO(codeDTO.getVerifyKey(), codeDTO.getAppId(), SmsType.VERIFY_CODE, params));
+				smsService.sendSms(new SmsDTO(codeDTO.getVerifyKey(), codeDTO.getAppId(), SmsType.VERIFY_CODE, params,codeDTO.getIp()));
 			} catch (Exception e) {
 				Logger.error("短信发送失败", e);
 			}
