@@ -22,6 +22,11 @@ public class EventAcountServiceImpl implements EventAcountService {
 	
 	@Autowired
 	EventAcountDao eventAcountDao;
+	
+	@Override
+	public int saveOrUpdate(EventAcount ea) {
+		return eventAcountDao.saveOrUpdate(ea);
+	}
 
 	@Override
 	public Long save(EventAcount ea) {

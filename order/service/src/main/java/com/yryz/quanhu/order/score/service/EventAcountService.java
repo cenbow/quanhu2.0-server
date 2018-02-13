@@ -12,6 +12,8 @@ public interface EventAcountService {
 	
 	int update(EventAcount ea);
 	
+	int saveOrUpdate(EventAcount ea);
+	
 	EventAcount getLastAcount(String userId);
 	
 	Long initAcount(String userId);

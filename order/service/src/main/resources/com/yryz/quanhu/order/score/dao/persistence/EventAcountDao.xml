@@ -12,6 +12,58 @@
 		 update_time as  updateTime 
 
 	</sql>
+	
+	<!-- 更新或者插入saveOrUpdate -->
+	<insert id="saveOrUpdate" >
+	  <selectKey keyProperty="id" resultType="com.yryz.quanhu.score.vo.EventAcount" order="BEFORE">
+	    select count(id) as id from event_acount where user_id = #{userId}
+	  </selectKey>
+	  <if test="id == 1">
+	  UPDATE event_acount 
+		<trim prefix="set" prefixOverrides=",">
+			<if test="score != null">
+				score = score + #{score},
+			</if>
+			<if test="grow != null">
+				grow = grow + #{grow},
+			</if>
+			<if test="growLevel != null">
+				grow_level = #{growLevel},
+			</if>
+			update_time = #{updateTime}
+		</trim>
+		where user_id = #{userId}
+	  </if>
+	  <if test="id == 0">
+		  INSERT INTO event_acount(
+			user_id,
+			<if test="score != null">
+			score,
+			</if>
+			<if test="grow != null">
+			grow,
+			</if>
+			<if test="growLevel != null">
+			grow_level,
+			</if>
+			create_time,
+			update_time
+			) VALUES (
+			#{userId},
+			<if test="score != null">
+			#{score},
+			</if>
+			<if test="grow != null">
+			#{grow},
+			</if>
+			<if test="growLevel != null">
+			#{growLevel},
+			</if>
+			#{createTime},
+			#{updateTime}
+			)
+	  </if>
+	</insert>
 
 	<!-- 新增用户事件账户记录 -->
 	<insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.yryz.quanhu.score.vo.EventAcount">
@@ -31,10 +83,12 @@
 		) VALUES (
 		#{userId},
 		<if test="score != null">
-		#{score},
+		<!-- #{score}, -->
+		score = #{score},
 		</if>
 		<if test="grow != null">
-		#{grow},
+		<!-- #{grow}, -->
+		grow =  #{grow},
 		</if>
 		<if test="growLevel != null">
 		#{growLevel},
@@ -54,10 +108,10 @@
 		UPDATE event_acount 
 		<trim prefix="set" prefixOverrides=",">
 			<if test="score != null">
-				score =  #{score},
+			    score = score + #{score},
 			</if>
 			<if test="grow != null">
-				grow =  #{grow},
+				grow = grow + #{grow},
 			</if>
 			<if test="growLevel != null">
 				grow_level = #{growLevel},
