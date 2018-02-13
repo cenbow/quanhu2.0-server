@@ -74,7 +74,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		// 计算新增积分数
 		Date now = new Date();
 		// 数据库记录的积分类型与编码中的枚举映射 关系 0：一次性触发 Once 1：每次触发 Pertime 2：条件日期循环触发 Loop
-		int newGrow = sei.getEventGrow();
+		Integer newGrow = sei.getEventGrow();
 
 		if (amount > 0) {
 			//统一转换金额单位为：元
@@ -88,13 +88,15 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		// newGrow = sei.getEventGrow();
 		// }
 		long allGrow = 0;
+		logger.info("-------处理成长值运算事件传入userId ，每次触发传入数据：userId = "+userId);
 		EventAcount ea = eventAcountService.getLastAcount(userId);
+		logger.info("-------处理成长值运算事件ea，每次触发传入数据：={}",JSONObject.fromObject(ea));
 		// 总值表无数据 ，则初始化该表
-		if (ea == null || ea.getId() == null) {
+		if (ea == null || ea.getId() == null  || ea.getGrow() == null) {
 			allGrow = 0L + newGrow;
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			ea = new EventAcount(userId);
-			ea.setGrow(Math.abs(allGrow));
+			ea.setGrow(Long.valueOf(Math.abs(newGrow)));
 			ea.setGrowLevel(level.getLevel());
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
@@ -106,7 +108,8 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			allGrow = ea.getGrow() + newGrow;
 			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：ea.getGrow(): " + ea.getGrow()+" newGrow: "+newGrow+" allGrow: "+allGrow);
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
-			ea.setGrow(Math.abs(allGrow + 0L));
+			//数据库运算
+			ea.setGrow(Long.valueOf(Math.abs(newGrow)));
 			ea.setGrowLevel(level.getLevel());
 			ea.setUpdateTime(now);
 			ea.setScore(null);
@@ -115,9 +118,10 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		}
 		// 无论总值表有无数据，流水是要记的
 		GrowFlow sf = new GrowFlow(userId, eventCode, newGrow);
-		sf.setAllGrow(Math.abs(allGrow + 0L));
+		sf.setAllGrow(Long.valueOf(Math.abs(allGrow)));
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);
+		logger.info("-------处理成长值(流水表GrowFlow)运算事件，每次触发传入数据：={}",JSONObject.fromObject(sf));
 		growFlowService.save(sf);
 
 		return 0L;
