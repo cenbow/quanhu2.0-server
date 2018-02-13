@@ -93,8 +93,8 @@ public interface UserStarAuthDao extends BaseDao{
 
     /**
      * 后台推荐更新达人记录
-     * @param starAuths
+     * @param starAuth
      * @return
      */
-    int updateRecommendsort(List<UserStarAuth> starAuths);
+    int updateRecommendDesc(UserStarAuth starAuth);
 }

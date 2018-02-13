@@ -33,6 +33,14 @@ public interface UserStarForAdminService {
     public Boolean updateRecmd(UserStarAuthDto dto,boolean isTop);
 
     /**
+     * 达人推荐语更新
+     * @param dto
+     * @return
+     */
+    public Boolean updateRecmdDesc(UserStarAuthDto dto);
+
+
+    /**
      * 批量更新排序
      * @param dtos
      * @return

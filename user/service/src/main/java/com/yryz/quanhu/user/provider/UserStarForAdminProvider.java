@@ -71,6 +71,20 @@ public class UserStarForAdminProvider implements UserStarForAdminApi{
     }
 
     @Override
+    public Response<Boolean> updateRecmdDesc(UserStarAuthDto dto) {
+        try {
+            logger.info("updateRecmdDesc={} start", JSON.toJSON(dto));
+            return ResponseUtils.returnObjectSuccess(userStarForAdminService.updateRecmdDesc(dto));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("updateRecmdDesc={} finish",JSON.toJSON(dto));
+        }
+    }
+
+
+    @Override
     public Response<Boolean> updateRecmdTop(UserStarAuthDto dto) {
         try {
             logger.info("updateRecmdTop={} start", JSON.toJSON(dto));

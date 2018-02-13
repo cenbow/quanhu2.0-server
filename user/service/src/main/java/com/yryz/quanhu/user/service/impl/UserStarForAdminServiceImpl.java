@@ -115,6 +115,28 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         return updateCount==1?true:false;
     }
 
+    public Boolean updateRecmdDesc(UserStarAuthDto dto) {
+
+        UserStarAuth starAuth = new UserStarAuth();
+        starAuth.setKid(dto.getKid());
+        starAuth.setRecommendDesc(dto.getRecommendDesc());              //推荐语
+        starAuth.setLastUpdateUserId(dto.getLastUpdateUserId());        //操作人
+
+        //更新达人数据库
+        int updateCount = userStarAuthDao.updateRecommendDesc(starAuth);
+        /**
+         * 反查询达人用户信息，进行联动
+         */
+        UserStarAuth orgAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+        /**
+         *1,同步删除达人缓存
+         */
+        this.syncDeleteRedis(orgAuth);
+
+        return updateCount==1?true:false;
+    }
+
+
     @Override
     public Boolean updateRecmd(UserStarAuthDto dto,boolean isTop) {
 
