@@ -1,5 +1,7 @@
 package com.yryz.quanhu.order.grow.rule.service.impl;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -17,12 +19,10 @@ import com.yryz.quanhu.order.grow.entity.GrowLevel;
 import com.yryz.quanhu.order.grow.manage.service.GrowLevelManageService;
 import com.yryz.quanhu.order.grow.rule.service.RuleGrowService;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
-import com.yryz.quanhu.order.score.rule.service.impl.BaseRuleScoreServiceImpl;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.score.vo.EventAcount;
 
 import net.sf.json.JSONObject;
-import redis.clients.jedis.ShardedJedis;
 
 /**
  * 循环规则积分事件服务基类
@@ -114,6 +114,9 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			ea.setUpdateTime(now);
 			ea.setScore(null);
 			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：={}",JSONObject.fromObject(ea));
+			if(ea.getGrow()<1){
+				throw new RuntimeException("-------处理成长事件，结果：直接捕获视为异常消息，原因：ea.getGrow()查询成长总值为空,传入数据：" + ea.getGrow()); 
+			}
 			eventAcountService.update(ea);
 		}
 		// 无论总值表有无数据，流水是要记的
