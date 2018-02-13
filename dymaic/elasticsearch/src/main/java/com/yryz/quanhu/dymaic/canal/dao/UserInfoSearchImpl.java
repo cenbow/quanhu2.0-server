@@ -58,7 +58,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         // WildcardQueryBuilder
         // query1=QueryBuilders.wildcardQuery("userNickName", "*"+keyWord+"*");
         QueryBuilder query1 = QueryBuilders.matchQuery("userBaseInfo.userDesc", keyWord);
-        QueryBuilder query2 = QueryBuilders.matchQuery("userBaseInfo.userNickName", keyWord);
+        QueryBuilder query2 = QueryBuilders.wildcardQuery("userBaseInfo.userNickName.keyword", "*" + keyWord + "*");
         QueryBuilder query3 = QueryBuilders.termQuery("userBaseInfo.delFlag", 10);
         QueryBuilder query4 = QueryBuilders.termQuery("userBaseInfo.appId", quanhu_app_id);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "userBaseInfo.lastHeat"));
