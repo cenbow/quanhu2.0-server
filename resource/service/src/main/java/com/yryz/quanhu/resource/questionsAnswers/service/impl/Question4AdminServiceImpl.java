@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -225,6 +226,7 @@ public class Question4AdminServiceImpl implements Question4AdminService {
      * @return
      */
     @Override
+    @Transactional
     public Integer shalveDown(Long kid) {
         Question question = new Question();
         question.setKid(kid);

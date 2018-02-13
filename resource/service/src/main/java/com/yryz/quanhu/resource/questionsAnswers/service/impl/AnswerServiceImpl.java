@@ -34,6 +34,7 @@ import com.yryz.quanhu.resource.vo.ResourceTotal;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -72,6 +73,7 @@ public class AnswerServiceImpl implements AnswerService {
     private SendMessageService questionMessageService;
 
     @Override
+    @Transactional
     public AnswerVo saveAnswer(AnswerDto answerdto) {
         /**
          * 校验参数
@@ -241,6 +243,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
+    @Transactional
     public Integer deleteAnswer(AnswerDto answerdto) {
         /**
          * 校验参数

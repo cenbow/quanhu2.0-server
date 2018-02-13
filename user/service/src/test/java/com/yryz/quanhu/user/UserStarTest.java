@@ -30,7 +30,7 @@ public class UserStarTest {
 	UserOperateApi operateApi;
 	@Test
 	public void save(){
-		String userId = "729671306726400002";
+		String userId = "357091546488832";
 		List<String> splitToList = SplitterUtils.ID_SPLITTER.splitToList(userId);
 		for (String id : splitToList) {
 			StarAuthInfo info = new StarAuthInfo();
@@ -39,7 +39,7 @@ public class UserStarTest {
 			info.setAppId("vebff12m1762");
 			info.setUserId(id);
 			info.setRealName("呵呵");
-			info.setIdCard("421281198902045136");
+			info.setIdCard("421281198902045156");
 			info.setLocation("位置");
 			info.setTradeField("haha");
 			info.setResourceDesc("哒呵呵哒呵呵哒呵呵哒");
@@ -47,7 +47,6 @@ public class UserStarTest {
 			Response<Boolean> response = starApi.save(info);
 			System.out.println(JsonUtils.toFastJson(response));
 		}
-
 	}
 	
 	//@Test
@@ -71,7 +70,7 @@ public class UserStarTest {
 		System.out.println("labelStarListTest: " + JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void getInviter(){
 		Response<MyInviterVO> response = operateApi.getMyInviter(738943677265461248L, 10, null);
 		System.out.println(JsonUtils.toFastJson(response));
