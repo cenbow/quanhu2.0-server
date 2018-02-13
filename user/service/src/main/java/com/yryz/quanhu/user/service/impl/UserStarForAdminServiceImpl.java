@@ -126,28 +126,26 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         starAuth.setRecommendDesc(dto.getRecommendDesc());              //推荐语
         starAuth.setLastUpdateUserId(dto.getLastUpdateUserId());        //操作人
         starAuth.setOperational(dto.getOperational());                  //推荐人名称
+
+
         /**
-         * 反查询达人用户信息，进行联动
+         * 所有推荐权重值，由发号器生成，
+         * 保证所有被推荐的达人，权重值不一样，后续根据交换权重值达到上下移效果
+         * 注意：每次推荐都会有置顶效果（待产品确认）
          */
-        UserStarAuth orgAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
 
-
-        //置顶  计算推荐权重最大值
-        if(isTop){
-            int maxRecmdNum = userStarAuthDao.getMaxHeight();
-            maxRecmdNum++;
-            starAuth.setRecommendHeight(maxRecmdNum);
-        }else{
-
-            if(11 == dto.getRecommendStatus().intValue()){      //推荐，在当前推荐值上加1
-                starAuth.setRecommendHeight(orgAuth.getRecommendHeight()+1);
-            }
+        if(11 == dto.getRecommendStatus().intValue()){      //推荐，在当前推荐值上加
+            Long sort = idApi.getKid("qh_user_star_auth").getData();
+            starAuth.setRecommendHeight(sort.intValue());
         }
 
         //更新达人数据库
         int updateCount = userStarAuthDao.updateRecommendStatus(starAuth);
 
-
+        /**
+         * 反查询达人用户信息，进行联动
+         */
+        UserStarAuth orgAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
         /**
          *1,同步删除达人缓存
          */
