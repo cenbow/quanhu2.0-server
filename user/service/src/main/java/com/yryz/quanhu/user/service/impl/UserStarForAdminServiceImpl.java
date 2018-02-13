@@ -134,8 +134,8 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
          * 注意：每次推荐都会有置顶效果（待产品确认）
          */
 
-        if(11 == dto.getRecommendStatus().intValue()){      //推荐，在当前推荐值上加
-            Long sort = idApi.getKid("qh_user_star_auth").getData();
+        if(11 == dto.getRecommendStatus().intValue()){      //推荐
+            Long sort = idApi.getKid("qh_user_star_recmd_sort").getData();
             starAuth.setRecommendHeight(sort.intValue());
         }
 
