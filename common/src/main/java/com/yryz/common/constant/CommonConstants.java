@@ -88,6 +88,16 @@ public class CommonConstants {
 	 */
 	public static final Byte recommend_NO = 10;
 
+	/**
+	 * 置顶
+	 */
+	public static final Byte TOP_YES = 11;
+
+	/**
+	 * 非置顶
+	 */
+	public static final Byte TOP_NO = 10;
+
 
 	/**  
 	* @Fields : 服務名

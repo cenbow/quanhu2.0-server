@@ -1,5 +1,6 @@
 package com.yryz.quanhu.dymaic.vo;
 
+import com.yryz.common.constant.CommonConstants;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
@@ -11,6 +12,11 @@ import java.util.Map;
  * @data 2018/1/19 0019 29
  */
 public class DymaicVo extends Dymaic implements Serializable {
+
+    /**
+     * 置顶状态,10未置顶，11置顶(默认不置顶)
+     */
+    private Byte topFlag = CommonConstants.TOP_NO;
 
     /**
      * 用户信息
@@ -36,5 +42,13 @@ public class DymaicVo extends Dymaic implements Serializable {
 
     public void setStatistics(Map<String, Long> statistics) {
         this.statistics = statistics;
+    }
+
+    public Byte getTopFlag() {
+        return topFlag;
+    }
+
+    public void setTopFlag(Byte topFlag) {
+        this.topFlag = topFlag;
     }
 }
