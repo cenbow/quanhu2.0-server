@@ -3,6 +3,7 @@ package com.yryz.quanhu.coterie.coterie.vo;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.yryz.common.constant.ModuleContants;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -101,6 +102,11 @@ public class CoterieInfo implements Serializable{
 
 	@ApiModelProperty("圈主信息")
     private  User  user;
+
+	/**
+	 * 私圈的功能枚举
+	 */
+	private String moduleEnum = ModuleContants.COTERIE;
 	
 	public User getUser() {
 		return user;
@@ -341,6 +347,14 @@ public class CoterieInfo implements Serializable{
 
 	public void setAuditCreator(String auditCreator) {
 		this.auditCreator = auditCreator;
+	}
+
+	public String getModuleEnum() {
+		return moduleEnum;
+	}
+
+	public void setModuleEnum(String moduleEnum) {
+		this.moduleEnum = moduleEnum;
 	}
 }
 
