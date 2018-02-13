@@ -32,6 +32,12 @@ public interface UserStarForAdminService {
      */
     public Boolean updateRecmd(UserStarAuthDto dto,boolean isTop);
 
+    /**
+     * 批量更新排序
+     * @param dtos
+     * @return
+     */
+    public Boolean updateRecmdsort(List<UserStarAuthDto> dtos);
 
     /**
      * 查询达人标签详情

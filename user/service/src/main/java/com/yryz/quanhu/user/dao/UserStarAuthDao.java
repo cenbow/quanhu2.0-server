@@ -91,4 +91,10 @@ public interface UserStarAuthDao extends BaseDao{
      */
     int updateRecommendStatus(UserStarAuth starAuth);
 
+    /**
+     * 后台推荐更新达人记录
+     * @param starAuths
+     * @return
+     */
+    int updateRecommendsort(List<UserStarAuth> starAuths);
 }

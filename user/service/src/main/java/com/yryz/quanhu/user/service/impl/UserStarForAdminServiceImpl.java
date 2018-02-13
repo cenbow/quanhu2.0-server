@@ -126,32 +126,57 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         starAuth.setRecommendDesc(dto.getRecommendDesc());              //推荐语
         starAuth.setLastUpdateUserId(dto.getLastUpdateUserId());        //操作人
         starAuth.setOperational(dto.getOperational());                  //推荐人名称
+        /**
+         * 反查询达人用户信息，进行联动
+         */
+        UserStarAuth orgAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
 
-
-        if(starAuth.getRecommendHeight()==null){
-            starAuth.setRecommendHeight(0);
-        }
 
         //置顶  计算推荐权重最大值
         if(isTop){
             int maxRecmdNum = userStarAuthDao.getMaxHeight();
             maxRecmdNum++;
             starAuth.setRecommendHeight(maxRecmdNum);
+        }else{
+
+            if(11 == dto.getRecommendStatus().intValue()){      //推荐，在当前推荐值上加1
+                starAuth.setRecommendHeight(orgAuth.getRecommendHeight()+1);
+            }
         }
 
         //更新达人数据库
         int updateCount = userStarAuthDao.updateRecommendStatus(starAuth);
 
-        /**
-         * 反查询达人用户信息，进行联动
-         */
-        starAuth = userStarAuthDao.selectByKid(UserStarAuth.class,dto.getKid());
+
         /**
          *1,同步删除达人缓存
          */
-        this.syncDeleteRedis(starAuth);
+        this.syncDeleteRedis(orgAuth);
 
         return updateCount==1?true:false;
+    }
+
+    @Override
+    public Boolean updateRecmdsort(List<UserStarAuthDto> dtos) {
+
+        List<UserStarAuth> list = new ArrayList<>();
+        int updateCount = 0;
+        for(int i = 0 ; i < dtos.size() ; i++){
+            UserStarAuthDto dto = dtos.get(i);
+
+            UserStarAuth starAuth = new UserStarAuth();
+            starAuth.setKid(dto.getKid());
+            starAuth.setRecommendStatus((byte) 11);                         //推荐状态
+            starAuth.setRecommendHeight(dto.getRecommendHeight());          //权重值
+            starAuth.setRecommendOperate(dto.getRecommendOperate());        //推荐人
+            starAuth.setRecommendDesc(null);                                //推荐语(不修改)
+            starAuth.setLastUpdateUserId(dto.getLastUpdateUserId());        //操作人
+            starAuth.setOperational(dto.getOperational());                  //推荐人名称
+
+            updateCount += userStarAuthDao.updateRecommendStatus(starAuth);
+        }
+
+        return updateCount == dtos.size()?true:false;
     }
 
 

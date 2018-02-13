@@ -84,6 +84,19 @@ public class UserStarForAdminProvider implements UserStarForAdminApi{
     }
 
     @Override
+    public Response<Boolean> updateRecmdsort(List<UserStarAuthDto> dtos) {
+        try {
+            logger.info("updateRecmdsort={} start", JSON.toJSON(dtos));
+            return ResponseUtils.returnObjectSuccess(userStarForAdminService.updateRecmdsort(dtos));
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            return ResponseUtils.returnException(e);
+        }finally {
+            logger.info("updateRecmdsort={} finish",JSON.toJSON(dtos));
+        }
+    }
+
+    @Override
     public Response<List<UserTagDTO>> getTags(UserStarAuthDto dto) {
         try {
             logger.info("updateRecmdTop={} start", JSON.toJSON(dto));

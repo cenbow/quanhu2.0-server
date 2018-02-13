@@ -47,6 +47,14 @@ public interface UserStarForAdminApi {
     public Response<Boolean> updateRecmdTop(UserStarAuthDto dto);
 
     /**
+     * 批量更新排序
+     * @param kids
+     * @param sorts
+     * @return
+     */
+    public Response<Boolean> updateRecmdsort(List<UserStarAuthDto> dtos);
+
+    /**
      * 查询达人标签
      * @param dto
      * @return

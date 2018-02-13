@@ -263,7 +263,15 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         queryBuilder.withFilter(boolQueryBuilder).withPageable(pageable);
 
         //排序
-        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_APPLYTIME).order(SortOrder.DESC));
+        if(11 == recommendStatus.intValue()){
+            //推荐列表，根据推荐值排序
+            queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_RECOMMEND_HEIGHT).order(SortOrder.DESC));
+            queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_RECOMMEND_TIME).order(SortOrder.DESC));
+
+        }else{
+            //其他，根据达人申请日期排序
+            queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_APPLYTIME).order(SortOrder.DESC));
+        }
 
         //执行查询
         SearchQuery query = queryBuilder.build();
