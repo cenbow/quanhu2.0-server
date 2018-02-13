@@ -10,6 +10,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.dymaic.service.ElasticsearchService;
+import com.yryz.quanhu.dymaic.vo.UserSimpleVo;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.vo.StarInfoVO;
@@ -36,7 +37,7 @@ public class EsTest {
 
     @Test
     public void buildTest() {
-        elasticsearchService.rebuildUserInfo();
+//        elasticsearchService.rebuildUserInfo();
     }
 
     @Test
@@ -55,6 +56,11 @@ public class EsTest {
         Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
         System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }
-
-
+    
+    @Test
+    public void searchUser() {
+    	Response<PageList<UserSimpleVo>>  list=elasticsearchService.searchUser("qh", 1, 10);
+    	System.out.println(list);
+    }
+    
 }
