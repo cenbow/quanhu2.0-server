@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.yryz.common.constant.CommonConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,6 +73,7 @@ public class DymaicController {
         }
         if (kid == null || kid == 0L) {
             DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
+            topDymaic.setTopFlag(CommonConstants.TOP_YES);
             list.add(0, topDymaic);
         }
         return ResponseUtils.returnObjectSuccess(list);
