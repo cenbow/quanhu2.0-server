@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
@@ -28,56 +29,79 @@ public class UserRelationRemarkProvider implements UserRelationRemarkApi{
     @Autowired
     private UserRelationRemarkService userRelationRemarkService;
 
+
+    private static Object logWithOutNull(Response<?> out){
+        try{
+            if(out!=null){
+                Object data = out.getData();
+                if(data != null){
+                    return JSON.toJSONString(data);
+                }
+            }
+        }catch (Exception e){
+            logger.error("logWithOutNull",e);
+        }
+        return "";
+    }
+
     @Override
     public Response<Boolean> setRemarkName(UserRelationRemarkDto dto) {
+        Response<Boolean> out = null;
         try {
-            logger.info("setRemarkName={}/{} > {}/{} start",dto.getSourceUserId(),dto.getTargetUserId(),dto.getRemarkType(),dto.getRemarkValue());
-            return ResponseUtils.returnObjectSuccess(userRelationRemarkService.setRemarkName(dto));
+            logger.info("setRemarkName.start={}",JSON.toJSON(dto));
+            out = ResponseUtils.returnObjectSuccess(userRelationRemarkService.setRemarkName(dto));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("setRemarkName={}/{} > {}/{} finish",dto.getSourceUserId(),dto.getTargetUserId(),dto.getRemarkType(),dto.getRemarkValue());
+            logger.info("setRemarkName.finish={},out={}",JSON.toJSON(dto),logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<Boolean> resetRemarkName(UserRelationRemarkDto dto) {
+        Response<Boolean> out = null;
         try {
-            logger.info("resetRemarkName={}/{} > {} start",dto.getSourceUserId(),dto.getTargetUserId(),dto.getRemarkType());
-            return ResponseUtils.returnObjectSuccess(userRelationRemarkService.resetRemarkName(dto));
+            logger.info("resetRemarkName.start={}",JSON.toJSON(dto));
+            out = ResponseUtils.returnObjectSuccess(userRelationRemarkService.resetRemarkName(dto));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("resetRemarkName={}/{} > {} finish",dto.getSourceUserId(),dto.getTargetUserId(),dto.getRemarkType());
+            logger.info("resetRemarkName.finish={},out={}",JSON.toJSON(dto),logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<UserRelationRemarkDto> getRemarkDto(String sourceUserId, String targetUserId, UserRelationConstant.TYPE type) {
+        Response<UserRelationRemarkDto> out = null;
         try {
-            logger.info("getRemarkDto={}/{} > {} start",sourceUserId,targetUserId,type);
-            return ResponseUtils.returnObjectSuccess(userRelationRemarkService.getRemarkDto(sourceUserId,targetUserId,type));
+            logger.info("getRemarkDto.start={}/{}/{}",sourceUserId,targetUserId,type);
+            out = ResponseUtils.returnObjectSuccess(userRelationRemarkService.getRemarkDto(sourceUserId,targetUserId,type));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("getRemarkDto={}/{} > {} finish",sourceUserId,targetUserId,type);
+            logger.info("getRemarkDto.finish={}/{}/{},out={}",sourceUserId,targetUserId,type,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<List<UserRelationRemarkDto>> selectBy(String sourceUserId, UserRelationConstant.TYPE type) {
+        Response<List<UserRelationRemarkDto>> out = null;
         try {
-            logger.info("getRemarkDto={} > {} start",sourceUserId,type);
-            return ResponseUtils.returnObjectSuccess(userRelationRemarkService.selectBy(sourceUserId,type));
+            logger.info("selectBy.start={}/{} ",sourceUserId,type);
+            out = ResponseUtils.returnObjectSuccess(userRelationRemarkService.selectBy(sourceUserId,type));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("getRemarkDto={} > {} finish",sourceUserId,type);
+            logger.info("selectBy.finish={}/{},out={}",sourceUserId,type,logWithOutNull(out));
         }
+        return out;
     }
 
 

@@ -1,6 +1,7 @@
 package com.yryz.quanhu.user.provider;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -31,108 +32,138 @@ public class UserRelationProvider implements UserRelationApi{
     @Autowired
     private UserRelationService userRelationService;
 
+
+    private static Object logWithOutNull(Response<?> out){
+        try{
+            if(out!=null){
+                Object data = out.getData();
+                if(data != null){
+                    return JSON.toJSONString(data);
+                }
+            }
+        }catch (Exception e){
+            logger.error("logWithOutNull",e);
+        }
+        return "";
+    }
+
     @Override
     public Response<UserRelationDto> setRelation(String sourceUserId,String targetUserId, UserRelationConstant.EVENT event){
+        Response<UserRelationDto> out = null;
         try {
-            logger.info("setRelation={}/{},eventType={} start",sourceUserId,targetUserId,event);
-            return ResponseUtils.returnObjectSuccess(userRelationService.setRelation(sourceUserId,targetUserId,event));
+            logger.info("setRelation.start={}/{},eventType={}",sourceUserId,targetUserId,event);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.setRelation(sourceUserId,targetUserId,event));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("setRelation={}/{},eventType={} finish",sourceUserId,targetUserId,event);
+            logger.info("setRelation.finish={}/{},eventType={},out={}",sourceUserId,targetUserId,event,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<UserRelationDto> getRelation(String sourceUserId, String targetUserId) {
+        Response<UserRelationDto> out = null;
         try {
-            logger.info("getRelation={}/{} start",sourceUserId,targetUserId);
-            return ResponseUtils.returnObjectSuccess(userRelationService.getRelation(sourceUserId,targetUserId));
+            logger.info("getRelation.start={}/{}",sourceUserId,targetUserId);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.getRelation(sourceUserId,targetUserId));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
-            return ResponseUtils.returnException(e);
+            out = ResponseUtils.returnException(e);
         }finally {
-            logger.info("getRelation={}/{} finish",sourceUserId,targetUserId);
+            logger.info("getRelation.finish={}/{},out={}",sourceUserId,targetUserId,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<UserRelationDto> getRelationByTargetPhone(String sourceUserId, String targetPhoneNo) {
+        Response<UserRelationDto> out = null;
         try {
-            logger.info("getRelationByTargetPhone={}/{} start",sourceUserId,targetPhoneNo);
-            return ResponseUtils.returnObjectSuccess(userRelationService.getRelationByTargetPhone(sourceUserId,targetPhoneNo));
+            logger.info("getRelationByTargetPhone.start={}/{}",sourceUserId,targetPhoneNo);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.getRelationByTargetPhone(sourceUserId,targetPhoneNo));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("getRelationByTargetPhone={}/{} finish",sourceUserId,targetPhoneNo);
+            logger.info("getRelationByTargetPhone.finish={}/{},out={}",sourceUserId,targetPhoneNo,logWithOutNull(out));
         }
-
+        return out;
     }
 
     @Override
     public Response<PageList<UserRelationDto>> selectByPage(UserRelationDto dto,UserRelationConstant.STATUS status) {
+        Response<PageList<UserRelationDto>> out = null;
         try {
-            logger.info("selectByPage={}/{},status={} start",dto.getSourceUserId(),dto.getTargetUserId(),status);
-            return ResponseUtils.returnObjectSuccess(userRelationService.selectByPage(dto,status));
+            logger.info("selectByPage.start={}/{},page={}/{},status={}",dto.getSourceUserId(),dto.getTargetUserId(),dto.getCurrentPage(),dto.getPageSize(),status);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.selectByPage(dto,status));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("selectByPage={}/{},status={} finish",dto.getSourceUserId(),dto.getTargetUserId(),status);
+            logger.info("selectByPage.finish={}/{},page={}/{},status={},out={}",dto.getSourceUserId(),dto.getTargetUserId(),dto.getCurrentPage(),dto.getPageSize(),status,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<List<UserRelationDto>> selectByAll(UserRelationDto dto, UserRelationConstant.STATUS status) {
+        Response<List<UserRelationDto>> out = null;
         try {
-            logger.info("selectByAll={}/{},status={} start",dto.getSourceUserId(),dto.getTargetUserId(),status);
-            return ResponseUtils.returnObjectSuccess(userRelationService.selectByAll(dto,status));
+            logger.info("selectByAll.start={}/{},status={}",dto.getSourceUserId(),dto.getTargetUserId(),status);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.selectByAll(dto,status));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("selectByAll={}/{},status={} finish",dto.getSourceUserId(),dto.getTargetUserId(),status);
+            logger.info("selectByAll.finish={}/{},status={},out={}",dto.getSourceUserId(),dto.getTargetUserId(),status,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<Set<String>> selectBy(String sourceUserId, UserRelationConstant.STATUS status) {
+        Response<Set<String>> out = null;
         try {
-            logger.info("selectBy={},status={} start",sourceUserId,status);
-            return ResponseUtils.returnObjectSuccess(userRelationService.selectBy(sourceUserId,status));
+            logger.info("selectBy.start={},status={}",sourceUserId,status);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.selectBy(sourceUserId,status));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("selectBy={},status={} finish",sourceUserId,status);
+            logger.info("selectBy.finish={},status={},out={}",sourceUserId,status,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<List<UserRelationDto>> selectBy(String userSourceKid, Set<String> userTargetKids) {
+        Response<List<UserRelationDto>> out = null;
         try {
-            logger.info("selectBy={}/{} start",userSourceKid,userTargetKids);
-            return ResponseUtils.returnObjectSuccess(userRelationService.selectBy(userSourceKid,userTargetKids));
+            logger.info("selectBy.start={}/{}",userSourceKid,userTargetKids);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.selectBy(userSourceKid,userTargetKids));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("selectBy={}/{} finish",userSourceKid,userTargetKids);
+            logger.info("selectBy.finish={}/{},out={}",userSourceKid,userTargetKids,logWithOutNull(out));
         }
+        return out;
     }
 
     @Override
     public Response<UserRelationCountDto> totalBy(String sourceUserId,String targetUserId){
+        Response<UserRelationCountDto> out = null;
         try {
-            logger.info("totalBy={}/{} start",sourceUserId,targetUserId);
-            return ResponseUtils.returnObjectSuccess(userRelationService.totalBy(sourceUserId,targetUserId));
+            logger.info("totalBy.start={}/{}",sourceUserId,targetUserId);
+            out = ResponseUtils.returnObjectSuccess(userRelationService.totalBy(sourceUserId,targetUserId));
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }finally {
-            logger.info("totalBy={}/{} finish",sourceUserId,targetUserId);
+            logger.info("totalBy.finish={}/{},out={}",sourceUserId,targetUserId,logWithOutNull(out));
         }
+        return out;
     }
 }
