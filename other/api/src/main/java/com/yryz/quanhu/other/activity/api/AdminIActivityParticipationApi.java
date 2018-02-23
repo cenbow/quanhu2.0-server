@@ -7,6 +7,8 @@ import com.yryz.common.response.Response;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto;
 import com.yryz.quanhu.other.activity.dto.AdminConfigObjectDto;
+import com.yryz.quanhu.other.activity.entity.ActivityVoteDetail;
+import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
@@ -44,4 +46,6 @@ public interface AdminIActivityParticipationApi {
 	Response<PageList> adminlist(AdminActivityVoteRecordDto adminActivityVoteRecordDto);
 
     Response<PageList<UserBaseInfoVO>> selectUser(AdminUserInfoDTO custInfoDTO, Integer pageNo, Integer pageSize);
+
+	Response<ActivityVoteDetailVo> candDetail(Long kid);
 }

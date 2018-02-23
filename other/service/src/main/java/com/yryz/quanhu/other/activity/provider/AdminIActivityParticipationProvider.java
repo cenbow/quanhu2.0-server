@@ -10,7 +10,9 @@ import com.yryz.quanhu.other.activity.api.AdminIActivityParticipationApi;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto;
 import com.yryz.quanhu.other.activity.dto.AdminActivityVoteRecordDto;
 import com.yryz.quanhu.other.activity.dto.AdminConfigObjectDto;
+import com.yryz.quanhu.other.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.other.activity.service.AdminIActivityParticipationService;
+import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteRecordVo;
@@ -137,5 +139,17 @@ public class AdminIActivityParticipationProvider implements AdminIActivityPartic
 			return ResponseUtils.returnException(e);
 		}
 		return ResponseUtils.returnObjectSuccess(list);
+	}
+
+	@Override
+	public Response<ActivityVoteDetailVo> candDetail(Long kid) {
+		ActivityVoteDetailVo activityVoteDetail = null;
+		try {
+			activityVoteDetail = adminIActivityParticipationService.candDetail(kid);
+		} catch (Exception e) {
+			logger.error("后台作品失败:",e);
+			return ResponseUtils.returnException(e);
+		}
+		return ResponseUtils.returnObjectSuccess(activityVoteDetail);
 	}
 }
