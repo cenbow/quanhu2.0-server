@@ -415,9 +415,13 @@ public class UserRelationCacheDao {
          */
         UserRelationCountDto countDto = this.getCacheTotalCount(relationDto.getSourceUserId());
         if(countDto==null){
-            countDto = new UserRelationCountDto();
-            countDto.setTargetUserId(relationDto.getSourceUserId());
+            /**
+             * redis中统计过期，
+             * 则从数据库重新查询，因为数据库实时更新，相关数据已经变更，则不在参与内存动态计算统计，直接返回
+             */
+            return this.selectTotalCount(relationDto.getSourceUserId());
         }
+
         //原状态
         int org = relationDto.getOrgRelationStatus();
         //新状态

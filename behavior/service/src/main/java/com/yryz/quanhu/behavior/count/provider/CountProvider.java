@@ -112,7 +112,7 @@ public class CountProvider implements CountApi {
         if (MapUtils.isEmpty(map) || userId == null) {
             return ResponseUtils.returnObjectSuccess(map);
         }
-        
+
         try {
             // 如果查点赞数或者收藏数，自动拼装点赞状态和收藏状态
             for (String code : countType.split(",")) {
@@ -236,16 +236,17 @@ public class CountProvider implements CountApi {
     public Response<Map<Long, Map<String, Long>>> getCountFlag(String countType, List<Long> kids, String page, Long userId) {
         Map<Long, Map<String, Long>> map = ResponseUtils.getResponseData(getCount(countType, kids, page));
         try {
-            // 如果查点赞数或者收藏数，自动拼装点赞状态和收藏状态
-            for (String code : countType.split(",")) {
-                switch (code) {
-                    case "11":
-                        //点赞状态
-                        Map<String, Integer> likeMap = ResponseUtils.getResponseData(likeApi.getLikeFlagBatch(kids, userId));
-                        for (Long kid : map.keySet()) {
-                            map.get(kid).put("likeFlag", likeMap.get(kid.toString()).longValue());
-                        }
-                        break;
+            if (userId != null) {
+                // 如果查点赞数或者收藏数，自动拼装点赞状态和收藏状态
+                for (String code : countType.split(",")) {
+                    switch (code) {
+                        case "11":
+                            //点赞状态
+                            Map<String, Integer> likeMap = ResponseUtils.getResponseData(likeApi.getLikeFlagBatch(kids, userId));
+                            for (Long kid : map.keySet()) {
+                                map.get(kid).put("likeFlag", likeMap.get(kid.toString()).longValue());
+                            }
+                            break;
 //                    case "15":
 //                        //收藏状态
 //                        CollectionInfoDto collectionInfoDto = new CollectionInfoDto();
@@ -256,6 +257,7 @@ public class CountProvider implements CountApi {
 //                            map.put("collectionFlag", collectionFlag.longValue());
 //                        }
 //                        break;
+                    }
                 }
             }
         } catch (Exception e) {
