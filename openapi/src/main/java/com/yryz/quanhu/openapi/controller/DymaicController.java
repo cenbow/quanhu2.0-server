@@ -59,14 +59,17 @@ public class DymaicController {
     @ApiOperation("动态tab的所关注的全部动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/gettimeline")
-    public Response<List<DymaicVo>> getTimeLine(@RequestHeader Long userId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
+    public Response<List<DymaicVo>> getTimeLine(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
+        }
         return dymaicService.getTimeLine(userId, kid, limit);
     }
 
     @ApiOperation("用户个人主页")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/homepage")
-    public Response<List<DymaicVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam Long targetUserId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
+    public Response<List<DymaicVo>> coterieRecommend(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam Long targetUserId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
         List<DymaicVo> list = ResponseUtils.getResponseData(dymaicService.getSendList(userId, targetUserId, kid, limit));
         if (list == null || list.size() == 0) {
             return ResponseUtils.returnSuccess();
@@ -104,9 +107,12 @@ public class DymaicController {
     @ApiOperation("删除动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/delete")
-    public Response<Boolean> delete(@RequestHeader Long userId, @RequestBody Dymaic dymaic) {
+    public Response<Boolean> delete(@RequestHeader(value = "userId", required = false) Long userId, @RequestBody Dymaic dymaic) {
         if (dymaic == null || dymaic.getKid() == null) {
             return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
+        }
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
         }
         return dymaicService.delete(userId, dymaic.getKid());
     }
@@ -114,9 +120,12 @@ public class DymaicController {
     @ApiOperation("动态置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/addTopDymaic")
-    public Response<Boolean> addTopDymaic(@RequestHeader Long userId, @RequestBody Dymaic dymaic) {
+    public Response<Boolean> addTopDymaic(@RequestHeader(value = "userId", required = false) Long userId, @RequestBody Dymaic dymaic) {
         if (dymaic == null || dymaic.getKid() == null) {
             return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
+        }
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
         }
         return dymaicService.addTopDymaic(userId, dymaic.getKid());
     }
@@ -125,9 +134,12 @@ public class DymaicController {
     @ApiOperation("动态取消置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/deleteTopDymaic")
-    public Response<Boolean> deleteTopDymaic(@RequestHeader Long userId, @RequestBody Dymaic dymaic) {
+    public Response<Boolean> deleteTopDymaic(@RequestHeader(value = "userId", required = false) Long userId, @RequestBody Dymaic dymaic) {
         if (dymaic == null || dymaic.getKid() == null) {
             return ResponseUtils.returnException(QuanhuException.busiError("kid参数为空"));
+        }
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
         }
         return dymaicService.deleteTopDymaic(userId, dymaic.getKid());
     }
@@ -135,7 +147,10 @@ public class DymaicController {
     @ApiOperation("动态置顶状态查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/getTopDymaic")
-    public Response<DymaicVo> getTopDymaic(@RequestHeader Long userId) {
+    public Response<DymaicVo> getTopDymaic(@RequestHeader(value = "userId", required = false) Long userId) {
+        if (userId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
+        }
         return dymaicService.getTopDymaic(userId);
     }
 }
