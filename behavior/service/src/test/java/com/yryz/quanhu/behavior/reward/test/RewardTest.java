@@ -137,13 +137,14 @@ public class RewardTest {
       @Test
     public void test005() throws JsonProcessingException {
         RewardInfo upInfo = new RewardInfo();
-        upInfo.setKid(368003988348928L);
+        upInfo.setKid(378033735573504L);
         //upInfo.setRewardPrice(rewardedPrice);
         upInfo.setRewardStatus(RewardConstants.reward_status_pay_success);
         // 为用户打赏/收益明细 缓存预留用户参数，DB实际不更新
-        upInfo.setCreateUserId(360712374173696L);
-        upInfo.setToUserId(356903405871104L);
-
+        upInfo.setCreateUserId(360812374769664L);
+        upInfo.setToUserId(368619989000192L);
+        upInfo.setResourceId(377959471226880L);
+        
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoService.updateByKid(upInfo)));
     }
 }

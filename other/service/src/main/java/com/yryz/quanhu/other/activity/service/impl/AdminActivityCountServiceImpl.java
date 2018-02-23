@@ -43,8 +43,8 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
      * @return
      * */
     public PageList<AdminActivityCountVo> activityCount(AdminActivityCountDto adminActivityCountDto) {
+        AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
         if(adminActivityCountDto.getStartDate() == null) {
-            AdminActivityInfoVo1 activityDetail = adminActivityVoteService.getActivityDetail(adminActivityCountDto.getActivityInfoId());
             if(activityDetail == null) {
                 adminActivityCountDto.setStartDate(new Date());
             } else {
@@ -123,6 +123,14 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
             }
         }
 
+        if(activityDetail.getActivityType()==11){
+            Collections.sort(list, new Comparator<AdminActivityCountVo>() {
+                @Override
+                public int compare(AdminActivityCountVo o1, AdminActivityCountVo o2) {
+                    return (o1.getDetailCount()==o2.getDetailCount())?0:(o2.getDetailCount()-o1.getDetailCount());
+                }
+            });
+        }
         PageList<AdminActivityCountVo> pageList = new PageList<>();
         pageList.setCurrentPage(adminActivityCountDto.getCurrentPage());
         pageList.setPageSize(adminActivityCountDto.getPageSize());

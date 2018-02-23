@@ -302,6 +302,11 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
 		return new PageList(pageNo, pageSize, list, page.getTotal());
     }
 
+    @Override
+    public ActivityVoteDetailVo candDetail(Long kid) {
+        return activityParticipationDao.selectByKid(kid);
+    }
+
     public AdminActivityInfoVo1 detail(Long infoId) {
         if (null != infoId) {
             return activityVoteService.getActivityDetail(infoId);

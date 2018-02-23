@@ -211,7 +211,7 @@
 			<if test="rewardStatus != null">
 				reward_status = #{rewardStatus,jdbcType=TINYINT},
 			</if>
-			<if test="orderId != null">
+			<!-- <if test="orderId != null">
 				order_id = #{orderId,jdbcType=BIGINT},
 			</if>
 			<if test="moduleEnum != null">
@@ -222,7 +222,7 @@
 			</if>
 			<if test="coterieId != null">
 				coterie_id = #{coterieId,jdbcType=BIGINT},
-			</if>
+			</if> -->
 			<if test="lastUpdateUserId != null">
 				last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},
 			</if>

@@ -69,7 +69,7 @@ public class AdminActivityVoteServiceImpl implements AdminActivityVoteService {
 	 * 活动列表
 	 */
 	@Override
-	public PageList adminlist(AdminActivityInfoVoteDto param) {
+	public PageList<AdminActivityVoteVo> adminlist(AdminActivityInfoVoteDto param) {
 		Page page = PageHelper.startPage(param.getPageNo(), param.getPageSize());
 		List<AdminActivityVoteVo> list = activityVoteDao.adminlist(param);
 		if (CollectionUtils.isEmpty(list)) {
