@@ -257,11 +257,11 @@ public class AnswerServiceImpl implements AnswerService {
         if (null == kid || null == delFlag) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        Answer answer = new Answer();
+        AnswerWithBLOBs answer = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answer);
         //删除聚合的资源
         resourceApi.deleteResourceById(String.valueOf(kid));
-        return this.answerDao.updateByPrimaryKey(answer);
+        return this.answerDao.updateByPrimaryKeySelective(answer);
     }
 
 

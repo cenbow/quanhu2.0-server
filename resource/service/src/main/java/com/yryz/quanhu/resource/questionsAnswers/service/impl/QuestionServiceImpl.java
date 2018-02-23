@@ -316,22 +316,21 @@ public class QuestionServiceImpl implements QuestionService {
                     questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
                 }
 
-               result= this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+                result = this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+            }
 
-                if(result>0) {
-                    //删除提问的资源
-                    resourceApi.deleteResourceById(String.valueOf(kid));
-                }
-                /**
-                 * 级联删除提问的回答
-                 */
-                AnswerVo answerVo=answerService.queryAnswerVoByquestionId(kid);
-                if(answerVo!=null){
-                    AnswerDto answerDto=new AnswerDto();
-                    BeanUtils.copyProperties(answerVo,answerDto);
-                    answerDto.setDelFlag(CommonConstants.DELETE_YES);
-                    answerService.deleteAnswer(answerDto);
-                }
+            //删除提问的资源
+            resourceApi.deleteResourceById(String.valueOf(kid));
+
+            /**
+             * 级联删除提问的回答
+             */
+            AnswerVo answerVo = answerService.queryAnswerVoByquestionId(kid);
+            if (answerVo != null) {
+                AnswerDto answerDto = new AnswerDto();
+                answerDto.setKid(answerVo.getKid());
+                answerDto.setDelFlag(CommonConstants.DELETE_YES);
+                answerService.deleteAnswer(answerDto);
             }
         }
         return result;
@@ -443,7 +442,6 @@ public class QuestionServiceImpl implements QuestionService {
 
 
         int result = this.questionDao.updateByPrimaryKeySelective(question);
-
 
 
         /**
