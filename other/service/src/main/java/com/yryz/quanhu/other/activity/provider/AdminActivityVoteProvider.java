@@ -15,6 +15,7 @@ import com.yryz.quanhu.other.activity.service.AdminActivityVoteService;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoSignUpVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
+import com.yryz.quanhu.other.activity.vo.AdminActivityVoteVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,8 @@ public class AdminActivityVoteProvider implements AdminActivityVoteApi {
 	 * 活动列表
 	 */
 	@Override
-	public Response<PageList<AdminActivityInfoSignUpVo>> adminlist(AdminActivityInfoVoteDto param){
-		PageList<AdminActivityInfoSignUpVo> pageList = null;
+	public Response<PageList<AdminActivityVoteVo>> adminlist(AdminActivityInfoVoteDto param){
+		PageList<AdminActivityVoteVo> pageList = null;
 		try {
 			pageList = adminActivityVoteService.adminlist(param);
 		} catch (Exception e) {

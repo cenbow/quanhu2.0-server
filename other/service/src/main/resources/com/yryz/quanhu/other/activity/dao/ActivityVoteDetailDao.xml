@@ -312,7 +312,7 @@
 				]]>
 			</if>
 		</where>
-		ORDER BY vote_count
+		ORDER BY (vote_count + add_vote) DESC
 	</select>
 
 	<!-- 查询全部分页列表 -->
@@ -339,7 +339,7 @@
 				and add_vote between #{record.startVote} and #{record.endVote}
 			</if>
 		</where>
-		ORDER BY vote_count
+		ORDER BY (vote_count + add_vote) DESC
 	</select>
 
 	<select id="selectByParam" parameterType="com.yryz.quanhu.other.activity.dto.AdminActivityVoteDetailDto"
