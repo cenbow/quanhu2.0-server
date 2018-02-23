@@ -1,15 +1,26 @@
 package com.yryz.quanhu.openapi.controller;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.UserBehaviorValidation;
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
-import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
@@ -19,18 +30,11 @@ import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.user.service.AccountApi;
 import com.yryz.quanhu.user.service.AuthApi;
 import com.yryz.quanhu.user.service.UserApi;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author wangtao
@@ -114,10 +118,10 @@ public class CoterieController {
     @ApiOperation("获取私圈详情")
     @ApiImplicitParams({
 		    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-		    @ApiImplicitParam(name = "userId", paramType = "header", required = true),
+		    @ApiImplicitParam(name = "userId", paramType = "header", required = false),
 		    @ApiImplicitParam(name = "coterieId", paramType = "query", required = true) })
     @GetMapping(value = "/{version}/coterieInfo/single")
-    public Response<CoterieInfo> details(@RequestHeader Long userId,Long coterieId, HttpServletRequest request) {
+    public Response<CoterieInfo> details(@RequestHeader(required = false) Long userId,Long coterieId, HttpServletRequest request) {
         if(coterieId==null){
         	return ResponseUtils.returnCommonException("参数不能为空");
         }
@@ -126,7 +130,7 @@ public class CoterieController {
         if(coterieInfo.success() && userId!=null){
         	//如果是圈主第一次访问则记录时间
         	CoterieInfo info = coterieInfo.getData();
-            if (info!=null && userId.toString().equals(info.getOwnerId())) {
+            if (info!=null && String.valueOf(userId).equals(info.getOwnerId())) {
             	CoterieInfo param=new CoterieInfo();
             	param.setMasterLastViewTime(new Date());
             	param.setCoterieId(coterieId);
