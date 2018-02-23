@@ -249,27 +249,31 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 	}
 
 	@Override
-	public Response<PageList<ResourceInfoVo>> searchTopicInfo(String keyWord, Integer page, Integer size) {
-		try {
-			List<ResourceInfo> list = resourceInfoRepository.searchTopicInfo(keyWord, page, size);
-			List<ResourceInfoVo> rstList = new ArrayList<>();
-			List<Long> topicPostKids = new ArrayList<>();
-			for (int i = 0; i < list.size(); i++) {
-				ResourceInfo info = list.get(i);
-				ResourceInfoVo vo = GsonUtils.parseObj(info, ResourceInfoVo.class);
-				rstList.add(vo);
+    public Response<PageList<ResourceInfoVo>> searchTopicInfo(String keyWord, Integer page, Integer size) {
+        try {
+            List<ResourceInfo> list = resourceInfoRepository.searchTopicInfo(keyWord, page, size);
+            List<ResourceInfoVo> rstList = new ArrayList<>();
+            List<Long> topicKids = new ArrayList<>();
+            List<Long> topicPostKids = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                ResourceInfo info = list.get(i);
+                ResourceInfoVo vo = GsonUtils.parseObj(info, ResourceInfoVo.class);
+                rstList.add(vo);
 
-				if (info.getResourceType() == 1 && info.getTopicInfo() != null
-						&& info.getTopicInfo().getCreateUserId() != null) {
-					Optional<UserInfo> user = userRepository.findById(info.getTopicInfo().getCreateUserId());
-					if (user.isPresent()) {
-						UserSimpleVo userVo = new UserSimpleVo();
-						BeanUtils.copyProperties(user.get(), userVo);
-						vo.setCreateUserInfo(userVo);
-					}
-				}
+                // 1 话题
+                if (info.getResourceType() == 1) {
+                    if (info.getTopicInfo() != null && info.getTopicInfo().getCreateUserId() != null) {
+                        Optional<UserInfo> user = userRepository.findById(info.getTopicInfo().getCreateUserId());
+                        if (user.isPresent()) {
+                            UserSimpleVo userVo = new UserSimpleVo();
+                            BeanUtils.copyProperties(user.get(), userVo);
+                            vo.setCreateUserInfo(userVo);
+                        }
+                    }
+                    topicKids.add(info.getKid());
+                }
 
-				// 2帖子
+                // 2帖子
                 if (info.getResourceType() == 2) {
                     if (info.getTopicPostInfo() != null && info.getTopicPostInfo().getCreateUserId() != null) {
                         Optional<UserInfo> user = userRepository.findById(info.getTopicPostInfo().getCreateUserId());
@@ -281,34 +285,40 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
                     }
                     topicPostKids.add(info.getKid());
                 }
-			}
-			
-			// 批量设置 帖子浏览数
+            }
+
+            // 批量设置 帖子浏览数
             if (CollectionUtils.isNotEmpty(rstList) && CollectionUtils.isNotEmpty(topicPostKids)) {
-                Map<Long, Map<String, Long>> countMap = ResponseUtils
+                // 帖子阅读数
+                Map<Long, Map<String, Long>> topicPostCountMap = ResponseUtils
                         .getResponseData(countApi.getCount(BehaviorEnum.Read.getCode(), topicPostKids, null));
-                if (MapUtils.isNotEmpty(countMap)) {
+                // 话题帖子数
+                Map<Long, Map<String, Long>> topicCountMap = ResponseUtils
+                        .getResponseData(countApi.getCount(BehaviorEnum.TALK.getCode(), topicKids, null));
+                if (MapUtils.isNotEmpty(topicPostCountMap)) {
                     for (ResourceInfoVo vo : rstList) {
                         if (vo.getResourceType() == 2 && vo.getTopicPostInfo() != null) {
                             // 帖子浏览数
-                            vo.setStatistics(countMap.get(vo.getTopicPostInfo().getKid()));
+                            vo.setStatistics(topicPostCountMap.get(vo.getTopicPostInfo().getKid()));
+                        } else if (vo.getResourceType() == 1 && vo.getTopicInfo() != null) {
+                            // 话题帖子数
+                            vo.setStatistics(topicCountMap.get(vo.getTopicInfo().getKid()));
                         }
                     }
                 }
             }
-			
 
-			PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
-			pageList.setEntities(rstList);
-			pageList.setCount(null);
-			pageList.setCurrentPage(page);
-			pageList.setPageSize(size);
-			return ResponseUtils.returnObjectSuccess(pageList);
-		} catch (Exception e) {
-			logger.error("searchUser", e);
-			return ResponseUtils.returnException(e);
-		}
-	}
+            PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
+            pageList.setEntities(rstList);
+            pageList.setCount(null);
+            pageList.setCurrentPage(page);
+            pageList.setPageSize(size);
+            return ResponseUtils.returnObjectSuccess(pageList);
+        } catch (Exception e) {
+            logger.error("searchTopicInfo", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
 
 	@Override
     public Response<PageList<ResourceInfoVo>> searchReleaseInfo(String keyWord, Integer page, Integer size) {
