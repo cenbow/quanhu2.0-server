@@ -63,7 +63,6 @@ public class ActivitySignUpController {
         Response<ActivityRecord> activityRecordResponse = activitySignUpApi.activitySignUpSubmit(activityRecord, userId);
         return activityRecordResponse;
     }
-    @UserBehaviorValidation(login = true)
     @ApiOperation("参与报名-获取活动配置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpFrom")
