@@ -25,6 +25,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -271,6 +272,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
                         }
                     }
                     topicKids.add(info.getKid());
+                    vo.setModuleEnum(ModuleContants.TOPIC);
                 }
 
                 // 2帖子
@@ -284,6 +286,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
                         }
                     }
                     topicPostKids.add(info.getKid());
+                    vo.setModuleEnum(ModuleContants.TOPIC_POST);
                 }
             }
 
@@ -329,6 +332,7 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
             for (int i = 0; i < list.size(); i++) {
                 ResourceInfo info = list.get(i);
                 ResourceInfoVo vo = GsonUtils.parseObj(info, ResourceInfoVo.class);
+                vo.setModuleEnum(ModuleContants.RELEASE);
                 rstList.add(vo);
 
                 if (info.getReleaseInfo() != null && info.getReleaseInfo().getCreateUserId() != null) {
