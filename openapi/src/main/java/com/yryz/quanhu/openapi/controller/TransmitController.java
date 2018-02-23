@@ -13,6 +13,7 @@ import com.yryz.quanhu.behavior.transmit.entity.TransmitInfo;
 import com.yryz.quanhu.behavior.transmit.vo.TransmitInfoVo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.user.service.AccountApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
 @RestController
 public class TransmitController {
 
-    private Logger logger = LoggerFactory.getLogger(ShareController.class);
+    private Logger logger = LoggerFactory.getLogger(TransmitController.class);
 
     @Reference(check = false, timeout = 30000)
     TransmitApi transmitApi;
@@ -41,12 +42,15 @@ public class TransmitController {
     @Reference(check = false, timeout = 30000)
     EventAPI eventAPI;
 
+    @Reference(check = false, timeout = 30000)
+    AccountApi accountApi;
+
     /**
      * 转发
      * @param   transmitInfo
      * */
     @UserBehaviorArgs(contexts = {"object.TransmitInfo.content"}, sourceUserId="object.TransmitInfo.targetUserId")
-    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
+    @UserBehaviorValidation(login = true, blacklist = true, illegalWords = true)
     @ApiOperation("转发")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/transmit/single")
@@ -55,9 +59,25 @@ public class TransmitController {
         Assert.hasText(userId, "userId不能为空");
         transmitInfo.setCreateUserId(Long.valueOf(userId));
         Assert.isTrue(this.matcher(transmitInfo.getModuleEnum(), "1003|1004|1005|1000"), "moduleEnum格式有误");
-        if(!StringUtils.isEmpty(transmitInfo.getContent()) && transmitInfo.getContent().length() > 140) {
-            throw new QuanhuException(ExceptionEnum.TRANSMIT_CONTENT_ERROR);
+        if(!StringUtils.isEmpty(transmitInfo.getContent()) ) {
+            if(transmitInfo.getContent().length() > 140) {
+                throw new QuanhuException(ExceptionEnum.TRANSMIT_CONTENT_ERROR);
+            }
+            boolean flag = false;
+            try {
+                //判断当前用户是否被平台禁言
+                Response<Boolean> rpc = accountApi.checkUserDisTalk(transmitInfo.getCreateUserId());
+                if(rpc.success()){
+                    flag = rpc.getData();
+                }
+            } catch (Exception e) {
+                logger.error("调用禁言接口失败：", e);
+            }
+            if(flag) {
+                throw new QuanhuException(ExceptionEnum.USER_NO_TALK);
+            }
         }
+
         return transmitApi.single(transmitInfo);
     }
 
