@@ -35,7 +35,7 @@ public class LikeController {
     
     @ApiOperation("用户点赞/取消点赞")
     @UserBehaviorArgs(sourceUserId="object.Like.resourceId")
-    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = false)
+    @UserBehaviorValidation(login = true, mute = false, blacklist = false, illegalWords = false)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/like/dian")
     public Response<Map<String, Object>> accretion(@RequestBody Like like, @RequestHeader Long userId) {

@@ -4,24 +4,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yryz.quanhu.order.grow.entity.GrowLevel;
-import com.yryz.quanhu.order.score.consumer.ScoreEventConsumer;
 import com.yryz.quanhu.order.score.rule.service.RuleScoreService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
 import com.yryz.quanhu.score.entity.ScoreEventInfo;
 import com.yryz.quanhu.score.entity.ScoreFlow;
 import com.yryz.quanhu.score.vo.EventAcount;
+
+import net.sf.json.JSONObject;
 
 /**
  * 循环规则积分事件服务基类
@@ -98,35 +95,49 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 			break;
 		}
 
-		long allScore = 0;
 
+		
+//		long allScore = 0;
 		// 会导致重复写入问题，初始化放到注册时统一初始化
-		EventAcount ea = eventAcountService.getLastAcount(userId);
+		//EventAcount ea = eventAcountService.getLastAcount(userId);
 		// 总值表无数据 ，则初始化该表
-		if (ea == null || ea.getId() == null) {
-			allScore = 0L + newScore;
-			ea = new EventAcount(userId);
-			ea.setScore(Math.abs(allScore));
-			ea.setCreateTime(now);
-			ea.setUpdateTime(now);
-			eventAcountService.save(ea);
-		} else {
-			logger.info("-------处理积分运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
-			logger.info("-------处理积分运算事件，每次触发传入数据：newScore" + newScore);
-			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
-			allScore = ea.getScore() + newScore;
-			logger.info("-------处理积分运算事件，每次触发传入数据：allScore" + allScore);
-			ea.setScore(Math.abs(allScore + 0L));
-			ea.setUpdateTime(now);
-			ea.setGrow(null);
-			ea.setGrowLevel(null);
-			eventAcountService.update(ea);
-		}
-		// 无论总值表有无数据，流水是要记的
+//		if (ea == null || ea.getId() == null) {
+//			allScore = 0L + newScore;
+//			ea = new EventAcount(userId);
+//			ea.setScore(Math.abs(allScore));
+//			ea.setCreateTime(now);
+//			ea.setUpdateTime(now);
+//			logger.info("-------处理积分运算事件if(EventAcount) == null，每次触发传入数据：={}",JSONObject.fromObject(ea));
+//			eventAcountService.save(ea);
+//		} else {
+//
+//			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
+//			allScore = ea.getScore() + newScore;
+//			logger.info("-------处理积分运算事件else(EventAcount)，每次触发传入数据：ea.getScore(): " + ea.getScore()+" newScore: "+newScore+" allScore: "+allScore);
+//			ea.setScore(Math.abs(allScore + 0L));
+//			ea.setUpdateTime(now);
+//			ea.setGrow(null);
+//			ea.setGrowLevel(null);
+//			logger.info("-------处理积分运算事件else(EventAcount)，每次触发传入数据：={}",JSONObject.fromObject(ea));
+//			eventAcountService.update(ea);
+//		}
+		
+		//记录用户事件账户表,数据库判断是否新增还是更新
+		EventAcount ea = new EventAcount();
+		ea.setScore(Long.valueOf(Math.abs(newScore)));
+		ea.setCreateTime(now);
+		ea.setUpdateTime(now);
+		ea.setUserId(userId);
+		logger.info("-------处理积分运算事件(EventAcount总表)，每次触发传入数据：={}",JSONObject.fromObject(ea));
+		eventAcountService.saveOrUpdate(ea);
+		
+		// 无论总值表有无数据，sf是要记的
 		ScoreFlow sf = new ScoreFlow(userId, eventCode, newScore);
-		sf.setAllScore(Math.abs(allScore + 0L));
+		//数据库计算
+		sf.setAllScore(Long.valueOf(newScore));
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);
+		logger.info("-------处理积分运算事件(ScoreFlow流水表)，每次触发传入数据：={}",JSONObject.fromObject(sf));
 		scoreFlowService.save(sf);
 
 		return 0L;

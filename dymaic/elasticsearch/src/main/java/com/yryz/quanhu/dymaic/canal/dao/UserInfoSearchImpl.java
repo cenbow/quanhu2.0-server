@@ -58,7 +58,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         // WildcardQueryBuilder
         // query1=QueryBuilders.wildcardQuery("userNickName", "*"+keyWord+"*");
         QueryBuilder query1 = QueryBuilders.matchQuery("userBaseInfo.userDesc", keyWord);
-        QueryBuilder query2 = QueryBuilders.matchQuery("userBaseInfo.userNickName", keyWord);
+        QueryBuilder query2 = QueryBuilders.wildcardQuery("userBaseInfo.userNickName.keyword", "*" + keyWord + "*");
         QueryBuilder query3 = QueryBuilders.termQuery("userBaseInfo.delFlag", 10);
         QueryBuilder query4 = QueryBuilders.termQuery("userBaseInfo.appId", quanhu_app_id);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "userBaseInfo.lastHeat"));
@@ -262,8 +262,19 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         queryBuilder.withFilter(boolQueryBuilder).withPageable(pageable);
 
+
         //排序
-        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_APPLYTIME).order(SortOrder.DESC));
+        if(null != recommendStatus && 11 == recommendStatus.intValue()){
+
+            //推荐列表，根据推荐值排序
+            queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_RECOMMEND_HEIGHT).order(SortOrder.DESC));
+            queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_RECOMMEND_TIME).order(SortOrder.DESC));
+
+        }else{
+
+            //其他，根据达人申请日期排序
+            queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.STAR_APPLYTIME).order(SortOrder.DESC));
+        }
 
         //执行查询
         SearchQuery query = queryBuilder.build();

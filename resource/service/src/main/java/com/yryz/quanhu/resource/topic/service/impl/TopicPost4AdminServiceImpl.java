@@ -31,6 +31,7 @@ import com.yryz.quanhu.resource.topic.entity.TopicPostExample;
 import com.yryz.quanhu.resource.topic.entity.TopicPostWithBLOBs;
 import com.yryz.quanhu.resource.topic.service.TopicPost4AdminService;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
@@ -154,6 +155,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
     }
 
     @Override
+    @Transactional
     public Integer shelve(Long kid, Byte shelveFlag) {
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         topicPost.setKid(kid);

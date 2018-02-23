@@ -495,4 +495,13 @@
 		WHERE kid = #{kid,jdbcType=BIGINT}
 	</update>
 
+	<!--更新推荐语状态-->
+	<update id="updateRecommendDesc" parameterType="com.yryz.quanhu.user.entity.UserStarAuth">
+		UPDATE qh_user_star_auth SET
+		last_update_date = NOW()
+		,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+		,recommend_desc = #{recommendDesc,jdbcType=VARCHAR}
+		WHERE kid = #{kid,jdbcType=BIGINT}
+	</update>
+
 </mapper>

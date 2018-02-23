@@ -69,9 +69,9 @@ public class LikeServiceImpl implements LikeService {
                 like.setUserId(userId);
                 int count = likeDao.isLike(like);
                 if(count>0){
-                    maps.put(String.valueOf(resourceId),10);
-                }else{
                     maps.put(String.valueOf(resourceId),11);
+                }else{
+                    maps.put(String.valueOf(resourceId),10);
                 }
             }
         }

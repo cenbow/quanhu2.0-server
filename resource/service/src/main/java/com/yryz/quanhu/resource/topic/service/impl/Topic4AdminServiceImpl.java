@@ -26,6 +26,7 @@ import org.assertj.core.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,6 +64,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
      * @return
      */
     @Override
+    @Transactional
     public TopicVo saveTopic(TopicDto topicDto) {
         /**
          * 校验参数
@@ -223,6 +225,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
      * @return
      */
     @Override
+    @Transactional
     public Integer deleteTopic(Long kid, Long userId) {
         /**
          * 校验参数
@@ -281,6 +284,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
     }
 
     @Override
+    @Transactional
     public Integer recommond(Long kid, Byte recommondFlag) {
         Topic topic = new Topic();
         topic.setKid(kid);

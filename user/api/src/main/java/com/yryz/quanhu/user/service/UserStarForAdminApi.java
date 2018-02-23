@@ -40,11 +40,26 @@ public interface UserStarForAdminApi {
     public Response<Boolean> updateRecmd(UserStarAuthDto dto);
 
     /**
+     * 达人推荐语更新
+     * @param dto
+     * @return
+     */
+    public Response<Boolean> updateRecmdDesc(UserStarAuthDto dto);
+
+    /**
      * 设置/取消置顶
      * @param dto
      * @return
      */
     public Response<Boolean> updateRecmdTop(UserStarAuthDto dto);
+
+    /**
+     * 批量更新排序
+     * @param kids
+     * @param sorts
+     * @return
+     */
+    public Response<Boolean> updateRecmdsort(List<UserStarAuthDto> dtos);
 
     /**
      * 查询达人标签

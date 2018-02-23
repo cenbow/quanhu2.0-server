@@ -1,5 +1,7 @@
 package com.yryz.quanhu.order.grow.rule.service.impl;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -17,11 +19,10 @@ import com.yryz.quanhu.order.grow.entity.GrowLevel;
 import com.yryz.quanhu.order.grow.manage.service.GrowLevelManageService;
 import com.yryz.quanhu.order.grow.rule.service.RuleGrowService;
 import com.yryz.quanhu.order.grow.service.GrowFlowService;
-import com.yryz.quanhu.order.score.rule.service.impl.BaseRuleScoreServiceImpl;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.score.vo.EventAcount;
 
-import redis.clients.jedis.ShardedJedis;
+import net.sf.json.JSONObject;
 
 /**
  * 循环规则积分事件服务基类
@@ -73,7 +74,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		// 计算新增积分数
 		Date now = new Date();
 		// 数据库记录的积分类型与编码中的枚举映射 关系 0：一次性触发 Once 1：每次触发 Pertime 2：条件日期循环触发 Loop
-		int newGrow = sei.getEventGrow();
+		Integer newGrow = sei.getEventGrow();
 
 		if (amount > 0) {
 			//统一转换金额单位为：元
@@ -87,36 +88,43 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		// newGrow = sei.getEventGrow();
 		// }
 		long allGrow = 0;
+		logger.info("-------处理成长值运算事件传入userId ，每次触发传入数据：userId = "+userId);
 		EventAcount ea = eventAcountService.getLastAcount(userId);
+		logger.info("-------处理成长值运算事件ea，每次触发传入数据：={}",JSONObject.fromObject(ea));
 		// 总值表无数据 ，则初始化该表
-		if (ea == null || ea.getId() == null) {
+		if (ea == null || ea.getId() == null  || ea.getGrow() == null) {
 			allGrow = 0L + newGrow;
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			ea = new EventAcount(userId);
-			ea.setGrow(Math.abs(allGrow));
+			ea.setGrow(Long.valueOf(Math.abs(newGrow)));
 			ea.setGrowLevel(level.getLevel());
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
+			logger.info("-------处理成长值运算事件if(EventAcount) == null，每次触发传入数据：={}",JSONObject.fromObject(ea));
 			eventAcountService.save(ea);
 		} else {
 			// 同积分总账更新方式，更新成长值时，可能会覆盖积分值
-			logger.info("-------处理成长值运算事件，每次触发传入数据：ea.getScore()" + ea.getScore());
-			logger.info("-------处理成长值运算事件，每次触发传入数据：newGrow" + newGrow);
 			// 更新时，由于积分和成长都在更新，可能取出来的跟积分无关的数据在更新积分时被回写到数据库
 			allGrow = ea.getGrow() + newGrow;
-			logger.info("-------处理成长值运算事件，每次触发传入数据：allGrow" + allGrow);
+			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：ea.getGrow(): " + ea.getGrow()+" newGrow: "+newGrow+" allGrow: "+allGrow);
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
-			ea.setGrow(Math.abs(allGrow + 0L));
+			//数据库运算
+			ea.setGrow(Long.valueOf(Math.abs(newGrow)));
 			ea.setGrowLevel(level.getLevel());
 			ea.setUpdateTime(now);
 			ea.setScore(null);
+			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：={}",JSONObject.fromObject(ea));
+			if(ea.getGrow()<1){
+				throw new RuntimeException("-------处理成长事件，结果：直接捕获视为异常消息，原因：ea.getGrow()查询成长总值为空,传入数据：" + ea.getGrow()); 
+			}
 			eventAcountService.update(ea);
 		}
 		// 无论总值表有无数据，流水是要记的
 		GrowFlow sf = new GrowFlow(userId, eventCode, newGrow);
-		sf.setAllGrow(Math.abs(allGrow + 0L));
+		sf.setAllGrow(Long.valueOf(Math.abs(allGrow)));
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);
+		logger.info("-------处理成长值(流水表GrowFlow)运算事件，每次触发传入数据：={}",JSONObject.fromObject(sf));
 		growFlowService.save(sf);
 
 		return 0L;
