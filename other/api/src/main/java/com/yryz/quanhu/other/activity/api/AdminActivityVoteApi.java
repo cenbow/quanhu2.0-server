@@ -10,6 +10,7 @@ import com.yryz.quanhu.other.activity.entity.ActivityVoteConfig;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoSignUpVo;
 import com.yryz.quanhu.other.activity.vo.AdminActivityInfoVo1;
 import com.yryz.quanhu.other.activity.vo.AdminActivityVoteDetailVo;
+import com.yryz.quanhu.other.activity.vo.AdminActivityVoteVo;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface AdminActivityVoteApi {
 	/**
 	 * 活动列表
 	 */
-	Response<PageList<AdminActivityInfoSignUpVo>> adminlist(AdminActivityInfoVoteDto param);
+	Response<PageList<AdminActivityVoteVo>> adminlist(AdminActivityInfoVoteDto param);
 
 	Response<Integer> activityRelease(ActivityInfo activity, ActivityVoteConfig config, List<ActivityPrizes> prizes);
 

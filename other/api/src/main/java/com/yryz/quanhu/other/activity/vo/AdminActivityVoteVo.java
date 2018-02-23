@@ -29,6 +29,11 @@ public class AdminActivityVoteVo extends ActivityInfo {
 
 	private Integer userFlag;
 
+	/**
+	 *是否可编辑 1可编辑
+	 */
+	private Integer isEdit;
+
 	public Integer getUserFlag() {
 		return userFlag;
 	}
@@ -92,5 +97,12 @@ public class AdminActivityVoteVo extends ActivityInfo {
 	public void setVoteTotalCount(Integer voteTotalCount) {
 		this.voteTotalCount = voteTotalCount;
 	}
-	
+
+	public Integer getIsEdit() {
+		return isEdit;
+	}
+
+	public void setIsEdit(Integer isEdit) {
+		this.isEdit = isEdit;
+	}
 }
