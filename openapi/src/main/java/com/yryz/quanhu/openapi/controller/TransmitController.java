@@ -63,14 +63,18 @@ public class TransmitController {
             if(transmitInfo.getContent().length() > 140) {
                 throw new QuanhuException(ExceptionEnum.TRANSMIT_CONTENT_ERROR);
             }
+            boolean flag = false;
             try {
                 //判断当前用户是否被平台禁言
                 Response<Boolean> rpc = accountApi.checkUserDisTalk(transmitInfo.getCreateUserId());
-                if(rpc.success() && rpc.getData() ) {
-                    throw new QuanhuException(ExceptionEnum.USER_NO_TALK);
+                if(rpc.success()){
+                    flag = rpc.getData();
                 }
             } catch (Exception e) {
                 logger.error("调用禁言接口失败：", e);
+            }
+            if(flag) {
+                throw new QuanhuException(ExceptionEnum.USER_NO_TALK);
             }
         }
 
