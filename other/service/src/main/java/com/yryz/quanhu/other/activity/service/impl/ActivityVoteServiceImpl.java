@@ -359,7 +359,18 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         PageList<ActivityUserPrizes> pageList = new PageList<>();
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
-        pageList.setEntities(activityUserPrizesDao.selectUserPrizesList(activityVoteDto));
+        List<ActivityUserPrizes> list = activityUserPrizesDao.selectUserPrizesList(activityVoteDto);
+        if(!CollectionUtils.isEmpty(list)) {
+            Date now = new Date();
+            list.stream().forEach(userPrizes -> {
+                if(userPrizes.getEndTime() != null) {
+                    if(now.after(userPrizes.getEndTime())) {
+                        userPrizes.setState(3);//已过期
+                    }
+                }
+            });
+        }
+        pageList.setEntities(list);
         pageList.setCount(page.getTotal());
         return pageList;
     }
