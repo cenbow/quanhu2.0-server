@@ -25,6 +25,7 @@ import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.user.contants.RegType;
 import com.yryz.quanhu.user.contants.SmsContants;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.AgentRegisterDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.ForgotPasswordDTO;
 import com.yryz.quanhu.user.dto.LoginDTO;
@@ -110,7 +111,30 @@ public class UserTest {
 
 		System.out.println(JsonUtils.toFastJson(loginVO));
 	}
-
+	
+	/**
+	 * 代理注册
+	 */
+	//@Test
+	public void agentRegister(){
+		AgentRegisterDTO registerDTO = new AgentRegisterDTO();
+		registerDTO.setAppId("vebff12m1762");
+		registerDTO.setIsVest(1);
+		registerDTO.setUserDesc("ssss");
+		registerDTO.setUserGenders(1);
+		registerDTO.setUserImg("https://cdn.yryz.com/pic/opus/5B121DCF-0685-4B91-81DA-CCA680C45BE3_iOS.jpg");
+		registerDTO.setUserSignature("ssss");
+		registerDTO.setUserPwd("dc483e80a7a0bd9ef71d8cf973673924");
+		long phone = 14000141841l;
+		Response<Boolean> response = null;
+		for(int i = 0 ; i < 1999; i++){
+			registerDTO.setUserPhone(String.valueOf(phone+i));
+			registerDTO.setUserNickName(String.valueOf(phone+i).substring(2));
+			response = accountApi.agentResiter(registerDTO);
+			System.out.println(JsonUtils.toFastJson(response));
+		}
+	}
+	
 	//@Test
 	public void getLoginMethod() {
 		Response<List<LoginMethodVO>> response = accountApi.getLoginMethod(724007310011252736L);
@@ -136,6 +160,30 @@ public class UserTest {
 				"127.0.0.1", "", "", null);
 		loginDTO.setRegLogDTO(logDTO);
 		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
+		System.out.println(JsonUtils.toFastJson(response));
+	}
+	
+	@Test
+	public void thirdBindPhone(){
+		RequestHeader header = new RequestHeader();
+		header.setAppId("vebff12m1762");
+		header.setAppVersion("2.0");
+		header.setDevId("24456241457878");
+		header.setDevName("HUAWEI");
+		header.setDevType("11");
+		header.setDitchCode("APP");
+		ThirdLoginDTO loginDTO = new ThirdLoginDTO();
+		loginDTO.setAccessToken("113667D3A8F66055C2D688CB59DA6D2E");
+		loginDTO.setOpenId("002F037E1B23D59E0E5FD4A87B2F3283");
+		loginDTO.setUserRegInviterCode("48565247");
+		loginDTO.setType(12);
+		loginDTO.setVerifyCode("1245");
+		loginDTO.setPhone("18970000009");
+		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(),
+				RegType.QQ.getText(), DevType.ANDROID.getLabel(), header.getDevName(), header.getAppId(),
+				"127.0.0.1", "", "", null);
+		loginDTO.setRegLogDTO(logDTO);
+		Response<RegisterLoginVO> response = accountApi.loginThirdBindPhone(loginDTO, header);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
@@ -256,7 +304,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void getUserSimple(){
 		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560L);
 		//UserSimpleVO simpleVO = response.getData();

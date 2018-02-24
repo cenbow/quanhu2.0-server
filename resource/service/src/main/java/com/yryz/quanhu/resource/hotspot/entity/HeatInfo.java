@@ -202,10 +202,16 @@ public class HeatInfo {
 	 * @return
 	 */
 	public Long countHeat(){
-		if(check()){
-			return countExponentHeat();
-		} else {
+		//用户只走通用类型
+		if(HeatInfoEnum.HEAT_TYPE_USER.equals(this.type)){
 			return countCommonHeat();
+		//资源走两种规则，按天数来
+		} else {
+			if(check()){
+				return countExponentHeat();
+			} else {
+				return countCommonHeat();
+			}
 		}
 	}
 	
