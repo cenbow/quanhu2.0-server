@@ -10,9 +10,20 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 
 public interface CoterieAdminService {
 
-    //分页查询
+    /**
+     * 分页查询
+     */
     PageList<CoterieInfo> queryCoterieByCoterieSearch(CoterieSearchParam param);
 
-    //审核私圈
+    /**
+     * 审核私圈
+     */
     Response<String> audit(CoterieUpdateAdmin info);
+
+    /**
+     * 私圈详情
+     * @param coterieId
+     * @return
+     */
+    public CoterieInfo getCoterieInfo(Long coterieId);
 }

@@ -117,7 +117,7 @@ public class CoterieMemberMessageManager {
             message.setLabel(MessageLabel.INTERACTIVE_COTERIE);
             message.setToCust(userId.toString());
             message.setViewCode(MessageViewCode.INTERACTIVE_MESSAGE);
-            message.setActionCode(MessageActionCode.NONE);//无跳转
+            message.setActionCode(MessageActionCode.COTERIE_HOME);//跳转到私圈首页
             message.setTitle("踢出私圈通知");
             message.setContent(user.getUserNickName() + "将你踢出了私圈" + (StringUtils.isEmpty(reason) ? "" : "，踢出理由：" + reason));
             message.setImg(coterie.getIcon());
