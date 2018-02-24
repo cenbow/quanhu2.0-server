@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.Lists;
 import com.yryz.common.constant.CommonConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +60,16 @@ public class DymaicController {
     @ApiOperation("动态tab的所关注的全部动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/gettimeline")
-    public Response<List<DymaicVo>> getTimeLine(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
+    public Response<List<DymaicVo>> getTimeLine(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam Long kid,
+                                                @RequestParam(value = "currentPage", required = false) Long currentPage, @RequestParam Long limit, HttpServletRequest request) {
         if (userId == null) {
             return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
+        }
+        //传了currentPage则控制显示1000条
+        if (currentPage != null && currentPage >= 0) {
+            if (currentPage * limit >= 1000) {//超过1000条，则返回空集合
+                return ResponseUtils.returnListSuccess(null);
+            }
         }
         return dymaicService.getTimeLine(userId, kid, limit);
     }
@@ -75,9 +83,11 @@ public class DymaicController {
             return ResponseUtils.returnSuccess();
         }
         if (kid == null || kid == 0L) {
-            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
-            topDymaic.setTopFlag(CommonConstants.TOP_YES);
-            list.add(0, topDymaic);
+            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(targetUserId));
+            if (topDymaic != null && topDymaic.getKid() != null) {
+                topDymaic.setTopFlag(CommonConstants.TOP_YES);
+                list.add(0, topDymaic);
+            }
         }
         return ResponseUtils.returnObjectSuccess(list);
     }

@@ -73,7 +73,7 @@ public class CoterieMemberMessageManager {
             message.setViewCode(MessageViewCode.INTERACTIVE_MESSAGE);
             message.setActionCode(MessageActionCode.APPLY_LIST);
             message.setTitle("新成员审核");
-            message.setContent(user.getUserNickName() + "申请加入私圈" + (StringUtils.isEmpty(reason) ? "" : "，加入理由：" + reason));
+            message.setContent(user.getUserNickName() + "申请加入你的私圈,快去审核一下吧");
             message.setImg(coterie.getIcon());
             message.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             message.setCoterieId(coterieId.toString());
@@ -112,6 +112,15 @@ public class CoterieMemberMessageManager {
                 }
             }
 
+            UserSimpleVO owner = null;
+            Response<UserSimpleVO> responseOwner = userApi.getUserSimple(Long.parseLong(coterie.getOwnerId()));
+            if (responseOwner.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
+                owner = response.getData();
+                if (owner == null) {
+                    throw new QuanhuException(ExceptionEnum.SysException);
+                }
+            }
+
             MessageVo message = new MessageVo();
             message.setType(MessageType.INTERACTIVE_TYPE);
             message.setLabel(MessageLabel.INTERACTIVE_COTERIE);
@@ -119,7 +128,7 @@ public class CoterieMemberMessageManager {
             message.setViewCode(MessageViewCode.INTERACTIVE_MESSAGE);
             message.setActionCode(MessageActionCode.COTERIE_HOME);//跳转到私圈首页
             message.setTitle("踢出私圈通知");
-            message.setContent(user.getUserNickName() + "将你踢出了私圈" + (StringUtils.isEmpty(reason) ? "" : "，踢出理由：" + reason));
+            message.setContent(owner.getUserNickName() + "将你踢出了私圈" + (StringUtils.isEmpty(reason) ? "" : "，踢出理由：" + reason));
             message.setImg(coterie.getIcon());
             message.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
@@ -140,7 +149,7 @@ public class CoterieMemberMessageManager {
     }
 
     /**
-     * 被禁言	 消息
+     * 禁言/取消禁言	 消息
      */
     public void banSpeakMessage(Long userId, Long coterieId) {
         try {
@@ -158,6 +167,15 @@ public class CoterieMemberMessageManager {
                 }
             }
 
+            UserSimpleVO owner = null;
+            Response<UserSimpleVO> responseOwner = userApi.getUserSimple(Long.parseLong(coterie.getOwnerId()));
+            if (responseOwner.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
+                owner = response.getData();
+                if (owner == null) {
+                    throw new QuanhuException(ExceptionEnum.SysException);
+                }
+            }
+
             MessageVo message = new MessageVo();
             message.setType(MessageType.INTERACTIVE_TYPE);
             message.setLabel(MessageLabel.INTERACTIVE_COTERIE);
@@ -165,7 +183,7 @@ public class CoterieMemberMessageManager {
             message.setViewCode(MessageViewCode.INTERACTIVE_MESSAGE);
             message.setActionCode(MessageActionCode.COTERIE_HOME);
             message.setTitle("禁言通知");
-            message.setContent(user.getUserNickName() + "将你设为了禁言。");
+            message.setContent(owner.getUserNickName() + "将你设为了禁言。");
             message.setImg(coterie.getIcon());
             message.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             message.setCoterieId(coterieId.toString());

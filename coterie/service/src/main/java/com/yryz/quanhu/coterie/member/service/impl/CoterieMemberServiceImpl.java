@@ -149,7 +149,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             }
 
             //permission cache
-            coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.MEMBER.getStatus());
+            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
 
             result.setStatus((byte) 20);
             return result;
@@ -178,7 +178,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             }
 
             //permission cache
-            coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus());
+            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus());
 
             result.setStatus((byte) 30);
             return result;
@@ -218,7 +218,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             coterieMemberMessageManager.kickMessage(userId, coterieId, reason);
 
             //permission cache
-            coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
+            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -249,7 +249,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 }
 
                 //permission cache
-                coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
+                coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
             }
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
@@ -258,20 +258,22 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     public void banSpeak(Long userId, Long coterieId, Integer type) {
-        CoterieMember record = new CoterieMember();
-        record.setUserId(userId);
-        record.setCoterieId(coterieId);
-        record.setLastUpdateDate(new Date());
-        if (type == 10) {
-            record.setBanSpeak(MemberConstant.BanSpeak.BANSPEAK.getStatus());
-        } else {
-            record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
-        }
-
         try {
+            CoterieMember record = new CoterieMember();
+            record.setUserId(userId);
+            record.setCoterieId(coterieId);
+            record.setLastUpdateDate(new Date());
+            if (type == 10) {
+                record.setBanSpeak(MemberConstant.BanSpeak.BANSPEAK.getStatus());
+            } else {
+                record.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
+            }
+
             coterieMemberDao.updateByCoterieMember(record);
             //todo msg
-            coterieMemberMessageManager.banSpeakMessage(userId, coterieId);
+            if (type == 10) {
+                coterieMemberMessageManager.banSpeakMessage(userId, coterieId);
+            }
         } catch (Exception e) {
             throw new QuanhuException(ExceptionEnum.SysException);
         }
@@ -282,14 +284,14 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         try {
 
-            if (userId == null ) {
+            if (userId == null) {
                 return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
             }
 
             Integer permission = coterieMemberRedis.getPermission(coterieId, userId);
             if (null == permission) {
-               permission = getPermissionByDb(coterieId, userId);
-               coterieMemberRedis.savePermission(coterieId, userId, permission);
+                permission = getPermissionByDb(coterieId, userId);
+                coterieMemberRedis.savePermission(coterieId, userId, permission);
             }
             return permission;
 
@@ -302,7 +304,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     public Boolean isBanSpeak(Long userId, Long coterieId) {
 
         if (permission(userId, coterieId) == MemberConstant.Permission.OWNER.getStatus()) {
-           return false;
+            return false;
         }
 
         CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
@@ -344,7 +346,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             String reason = "";
 
             if (null != memberApply) {
-               reason = memberApply.getReason();
+                reason = memberApply.getReason();
             }
 
             if (memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
@@ -361,7 +363,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 coterieEventManager.joinCoterieEvent(coterieId);
 
                 //permission cache
-                coterieMemberRedis.savePermission(coterieId,userId,MemberConstant.Permission.MEMBER.getStatus());
+                coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
             } else {
                 saveOrUpdateApply(userId, coterieId, "", memberStatus);
             }
@@ -616,9 +618,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     /**
      * 更新redis缓存
      */
-    private void updateMemberModelCache(Long coterieId, Long userId){
+    private void updateMemberModelCache(Long coterieId, Long userId) {
         CoterieMember model = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
-        if(model != null){
+        if (model != null) {
             coterieMemberRedis.saveCoterieMember(model);
         }
     }

@@ -165,8 +165,7 @@ public class AccountServiceImpl implements AccountService {
 		}
 		if (StringUtils.isNotBlank(loginDTO.getRegistrationId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getRegistrationId(), null));
-			;
+			userService.updateUserAttachInfo(new UserBaseInfo(account.getKid(), null, loginDTO.getRegistrationId(), null));
 		}
 
 		return account.getKid();
@@ -193,7 +192,7 @@ public class AccountServiceImpl implements AccountService {
 		// 更新设备号
 		if (StringUtils.isNotBlank(registerDTO.getRegistrationId())) {
 			// 更新设备号
-			userService.updateUserInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getRegistrationId(), null));
+			userService.updateUserAttachInfo(new UserBaseInfo(account.getKid(), null, registerDTO.getRegistrationId(), null));
 		}
 		return account.getKid();
 	}
@@ -213,7 +212,7 @@ public class AccountServiceImpl implements AccountService {
 		}
 		// 更新设备号
 		if (StringUtils.isNotBlank(loginDTO.getRegistrationId())) {
-			userService.updateUserInfo(new UserBaseInfo(userId, null, loginDTO.getRegistrationId(), null));
+			userService.updateUserAttachInfo(new UserBaseInfo(userId, null, loginDTO.getRegistrationId(), null));
 		}
 		return userId;
 	}

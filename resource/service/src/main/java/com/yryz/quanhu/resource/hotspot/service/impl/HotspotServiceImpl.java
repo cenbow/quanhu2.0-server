@@ -139,10 +139,14 @@ public class HotspotServiceImpl implements HotspotService {
 		HeatInfo heatInfo = new HeatInfo();
 		heatInfo.setObjectId(objectId);
 		heatInfo.setType(type);
-		if(StringUtils.isNotEmpty(talentType) && ResourceEnum.TALENT_TYPE_TRUE.equals(talentType)){
-			heatInfo.setInitHeat(HeatInfoEnum.INIT_TALENT_HOT);
+		if(HeatInfoEnum.HEAT_TYPE_USER.equals(type)){
+			heatInfo.setInitHeat(0L);
 		} else {
-			heatInfo.setInitHeat(HeatInfoEnum.INIT_USER_HOT);
+			if(StringUtils.isNotEmpty(talentType) && ResourceEnum.TALENT_TYPE_TRUE.equals(talentType)){
+				heatInfo.setInitHeat(HeatInfoEnum.INIT_TALENT_HOT);
+			} else {
+				heatInfo.setInitHeat(HeatInfoEnum.INIT_USER_HOT);
+			}
 		}
 		heatInfo.setAttenuation(0L);
 		heatInfo.setBehaviorHeat(0L);

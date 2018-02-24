@@ -153,7 +153,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
     @Override
     public ActivityEnrolConfig getActivitySignUpFrom(Long activityInfoId, String custId) {
         Assert.notNull(activityInfoId, "活动id不能为空");
-        Assert.notNull(custId, "用户id不能为空");
+        //Assert.notNull(custId, "用户id不能为空");
         ActivityInfo activityInfo = activityInfoService.getActivityInfoVo(activityInfoId, null);
         Assert.notNull(activityInfo, "获取活动id:" + activityInfoId + "信息为空");
         ActivityEnrolConfig activityEnrolConfig = new ActivityEnrolConfig();
@@ -161,15 +161,15 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
             activityEnrolConfig.setShelveFlag(11);
             return activityEnrolConfig;
         }
-        Date date = new Date();
+        /*Date date = new Date();
         if (DateUtils.getDistanceOfTwoDate(date, activityInfo.getBeginTime()) > 0) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "活动未开始", "活动未开始");
         } else if (DateUtils.getDistanceOfTwoDate(date, activityInfo.getEndTime()) < 0) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "活动已结束", "活动已结束");
-        }
+        }*/
         activityEnrolConfig = activityEnrolConfigDao.selectByActivityId(activityInfoId);
         Assert.notNull(activityEnrolConfig, "获取活动id:" + activityInfoId + "配置信息为空");
-        Integer EnrolStatus = this.getEnrolStatusByCustId(custId, activityInfoId, activityEnrolConfig.getSignUpType());
+        /*Integer EnrolStatus = this.getEnrolStatusByCustId(custId, activityInfoId, activityEnrolConfig.getSignUpType());
         if (EnrolStatus == ActivityConstant.ACTIVITY_ENROL_STATUS_ALREADY_JOIN) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "您已经参加过该活动，不能再次参加！", "您已经参加过该活动，不能再次参加！");
         }
@@ -179,7 +179,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
 
         if (activityInfo.getJoinCount() >= activityEnrolConfig.getEnrolUpper()) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "该活动报名人数已满，不能参加！", "该活动报名人数已满，不能参加！");
-        }
+        }*/
         return activityEnrolConfig;
     }
 

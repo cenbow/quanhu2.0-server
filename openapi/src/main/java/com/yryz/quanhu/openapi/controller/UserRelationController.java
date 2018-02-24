@@ -17,6 +17,7 @@ import com.yryz.quanhu.user.vo.UserRelationQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -271,8 +272,11 @@ public class UserRelationController {
         String userId       = request.getHeader("userId");
         String targetUserId = request.getParameter("targetUserId");
 
+        //用户关系查询，用户未登录则可以查询其他人的关系数量
+        if(StringUtils.isBlank(userId)){
+            userId="";
+        }
         //check
-        Assert.notNull(userId,"userId不能为空");
         Assert.notNull(targetUserId,"targetUserId不能为空");
 
         Response<UserRelationCountDto> rpc = userRelationApi.totalBy(userId,targetUserId);
