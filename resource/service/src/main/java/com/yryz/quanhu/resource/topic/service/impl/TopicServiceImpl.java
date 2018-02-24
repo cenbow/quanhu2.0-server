@@ -110,7 +110,7 @@ public class TopicServiceImpl implements TopicService {
         criteria.andKidEqualTo(kid);
         List<Topic> topics = this.topicDao.selectByExample(example);
         if (null == topics || topics.isEmpty()) {
-            return null;
+            throw  QuanhuException.busiError("查询的话题不存在");
         }
         Topic topic=topics.get(0);
         TopicVo topicVo = new TopicVo();
