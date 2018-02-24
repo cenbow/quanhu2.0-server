@@ -73,6 +73,7 @@ public class HeatInfoMongo extends AbsBaseMongoDAO<HeatInfo>{
 			heatInfo.setBehaviorHeat(behaviorHeat);
 			Long heat = heatInfo.countHeat();
 			heatInfo.setHeat(heat);
+			heatInfo.setUpdateTime(System.currentTimeMillis());
 			return update(heatInfo);
 		}
 		return null;

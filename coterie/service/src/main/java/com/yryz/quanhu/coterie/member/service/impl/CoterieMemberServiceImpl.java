@@ -332,6 +332,13 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         try {
 
+            CoterieInfo coterie = coterieService.find(coterieId);
+
+            //私圈人数已满
+            if (coterie.getMemberNum().intValue() >= 2000) {
+                throw QuanhuException.busiError("私圈人数已达到上限");
+            }
+
             CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
 
             String reason = "";
@@ -342,8 +349,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             if (memberStatus == MemberConstant.MemberStatus.PASS.getStatus()) {
                 saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
-
-                CoterieInfo coterie = coterieService.find(coterieId);
 
                 //如果没有拉黑则自动关注圈主
                 //todo

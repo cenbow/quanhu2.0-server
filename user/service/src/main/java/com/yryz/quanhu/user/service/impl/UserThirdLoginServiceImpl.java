@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.IdConstants;
@@ -44,18 +45,20 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 	private UserAccountRedisDao accountRedisDao;
 	
 	@Override
+	@Transactional
 	public int delete(Long userId,String thirdId) {
 		try {
 			int result = mysqlDao.delete(userId,thirdId,null);
 			accountRedisDao.deleteLoginMethod(userId);
 			return result;
 		} catch (Exception e) {
-			logger.error("[CustThirdLoginDao.delete]",e);
+			logger.error("[UserThirdLoginDao.delete]",e);
 			throw new MysqlOptException(e);
 		}
 	}
 	
 	@Override
+	@Transactional
 	public int insert(UserThirdLogin record) {
 		record.setCreateDate(new Date());
 		record.setKid(ResponseUtils.getResponseData(idApi.getKid(IdConstants.QUANHU_THIRD_LOGIN)));
@@ -65,7 +68,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 			accountRedisDao.deleteLoginMethod(record.getUserId());
 			return result;
 		} catch (Exception e) {
-			logger.error("[CustThirdLoginDao.insert]",e);
+			logger.error("[UserThirdLoginDao.insert]",e);
 			throw new MysqlOptException(e);
 		}
 	}
@@ -79,7 +82,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 		try {
 			logins = mysqlDao.selectByUserId(userId);
 		} catch (Exception e) {
-			logger.error("[CustThirdLoginDao.selectByUserId]",e);
+			logger.error("[UserThirdLoginDao.selectByUserId]",e);
 			throw new MysqlOptException(e);
 		}
 		if(CollectionUtils.isNotEmpty(logins)){
@@ -97,7 +100,7 @@ public class UserThirdLoginServiceImpl implements UserThirdLoginService {
 		try {
 			login = mysqlDao.selectByThirdId(thirdId,appId);
 		} catch (Exception e) {
-			logger.error("[CustThirdLoginDao.selectByThirdId]",e);
+			logger.error("[UserThirdLoginDao.selectByThirdId]",e);
 			throw new MysqlOptException(e);
 		}
 		if(login != null){

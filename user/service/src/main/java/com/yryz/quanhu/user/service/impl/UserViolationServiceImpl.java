@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,7 @@ import com.yryz.common.constant.IdConstants;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.RedisOptException;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -112,14 +112,14 @@ public class UserViolationServiceImpl implements UserViolationService {
 		// 解除禁言
 		if (violation.getViolationType().intValue() == ViolatType.ALLTAIK.getType()) {
 			// 同步用户状态
-			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
+			userService.updateUserAttachInfo(new UserBaseInfo(violation.getUserId(),
 					null, null, null, null, null, new Date()));
 			violation.setPushMessage("解除禁言");
 			violation.setReason("解除禁言");
 		} // 解冻
 		else if(violation.getViolationType().intValue() == ViolatType.NOFREEZE.getType()){
 			// 同步用户状态
-			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
+			userService.updateUserAttachInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.NORMAL.getStatus(), null, null, null, null, new Date()));
 			violation.setPushMessage("解冻");
 			violation.setReason("解冻");
@@ -230,14 +230,14 @@ public class UserViolationServiceImpl implements UserViolationService {
 		else if (violation.getViolationType().intValue() == ViolatType.NOTALK.getType()) {
 			// 同步用户状态
 			userService
-					.updateUserInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(),
+					.updateUserAttachInfo(new UserBaseInfo(violation.getUserId(), (byte) UserAccountStatus.NORMAL.getStatus(),
 							null, null, null, null, DateUtils.addHours(new Date(), Constants.NO_TALK_HOUR)));
 			// 消息
 			messageManager.disTalk(violation.getUserId().toString());
 		} // 冻结
 		else if (violation.getViolationType().intValue() == ViolatType.FREEZE.getType()) {
 			// 同步用户状态
-			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
+			userService.updateUserAttachInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.FREEZE.getStatus(), null, null, null, null, new Date()));
 			// 请求im发送下线消息
 			imManager.block(violation.getUserId(), appId);
@@ -245,7 +245,7 @@ public class UserViolationServiceImpl implements UserViolationService {
 		} // 注销
 		else {
 			// 同步用户状态
-			userService.updateUserInfo(new UserBaseInfo(violation.getUserId(),
+			userService.updateUserAttachInfo(new UserBaseInfo(violation.getUserId(),
 					(byte) UserAccountStatus.DISTORY.getStatus(), null, null, null, null, new Date()));
 			// 请求im发送下线消息
 			imManager.block(violation.getUserId(), appId);

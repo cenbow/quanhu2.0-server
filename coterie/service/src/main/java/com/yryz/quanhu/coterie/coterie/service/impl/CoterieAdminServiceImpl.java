@@ -84,11 +84,11 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
                 ids.add(coterie.getOwnerId());
             }
 
-            Response<Map<String,UserBaseInfoVO>> response  = userApi.getUser(ids);
+            Response<Map<String, UserBaseInfoVO>> response = userApi.getUser(ids);
             Map<String, UserBaseInfoVO> userMap = ResponseUtils.getResponseNotNull(response);
 
 
-            List<CoterieInfo> infos = list.stream().map(coterie-> {
+            List<CoterieInfo> infos = list.stream().map(coterie -> {
 
                 CoterieInfo info = new CoterieInfo();
                 BeanUtils.copyProperties(coterie, info);
@@ -154,5 +154,18 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
         } catch (Exception e) {
             throw QuanhuException.busiError("审核私圈发生异常");
         }
+    }
+
+    @Override
+    public CoterieInfo getCoterieInfo(Long coterieId) {
+        Coterie info = coterieRedis.get(coterieId);
+        if (info == null) {
+            info = coterieMapper.selectByCoterieId(coterieId);
+        }
+
+        CoterieInfo coterieInfo = new CoterieInfo();
+        BeanUtils.copyProperties(info, coterieInfo);
+
+        return coterieInfo;
     }
 }

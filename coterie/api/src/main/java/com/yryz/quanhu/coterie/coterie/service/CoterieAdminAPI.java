@@ -18,4 +18,6 @@ public interface CoterieAdminAPI {
 
     public Response<String> audit(CoterieUpdateAdmin info);
 
+    public Response<CoterieInfo> queryCoterieInfo(Long coterieId);
+
 }

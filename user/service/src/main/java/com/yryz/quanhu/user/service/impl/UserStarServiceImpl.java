@@ -313,8 +313,9 @@ public class UserStarServiceImpl implements UserStarService {
 	 * 
 	 * @param record
 	 */
+	@Transactional
 	private void updateUserStar(Long userId, UserRole role, UserAuthStatus authStatus) {
-		userService.updateUserInfo(
+		userService.updateUserAttachInfo(
 				new UserBaseInfo(userId, null, role.getRole(), null, authStatus.getStatus(), null, null));
 		// 设置达人等级
 		eventService.starAuth(userId.toString());
