@@ -310,7 +310,7 @@ public class AccountProvider implements AccountApi {
 				}
 			}
 			// 老用户不存在需要继续走第三方绑定手机号流程
-			if (userId != null && userId != 0l) {
+			if (userId == null || userId == 0l) {
 				userId = accountService.loginThirdBindPhone(loginDTO, thirdUser);
 			}
 
