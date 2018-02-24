@@ -83,7 +83,7 @@ public class DymaicController {
             return ResponseUtils.returnSuccess();
         }
         if (kid == null || kid == 0L) {
-            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
+            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(targetUserId));
             if (topDymaic != null && topDymaic.getKid() != null) {
                 topDymaic.setTopFlag(CommonConstants.TOP_YES);
                 list.add(0, topDymaic);
