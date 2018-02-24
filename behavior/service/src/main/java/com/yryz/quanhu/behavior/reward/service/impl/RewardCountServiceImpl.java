@@ -47,16 +47,17 @@ public class RewardCountServiceImpl implements RewardCountService {
     @Override
     public int addCountByTargetId(RewardCount record) {
         Assert.notNull(record.getTargetId(), "record.getTargetId() is null !");
+        int result = 0;
         if (null == this.selectByTargetId(record.getTargetId())) {
-            return this.getDao().insertSelective(record);
+            result = this.getDao().insertSelective(record);
+        }else{
+            result = this.getDao().addCountByTargetId(record);
         }
-
-        int upRow = this.getDao().addCountByTargetId(record);
-        if (upRow > 0) {
+        if (result > 0) {
             redisTemplate.delete(this.getCacheKey("targetId:" + record.getTargetId()));
         }
 
-        return upRow;
+        return result;
     }
 
     @Override

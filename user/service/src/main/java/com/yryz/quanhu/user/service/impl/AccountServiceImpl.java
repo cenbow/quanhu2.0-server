@@ -343,6 +343,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
+	@Transactional
 	public void bindThird(Long userId, ThirdUser thirdUser, Integer type, String appId) {
 		UserThirdLogin thirdLogin = new UserThirdLogin();
 		thirdLogin.setUserId(userId);
@@ -354,6 +355,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
+	@Transactional
 	public void unbindThird(Long userId, String thirdId, Integer type, String appId) {
 		UserThirdLogin thirdLogin = thirdLoginService.selectByThirdId(thirdId, appId, type);
 		if (thirdLogin == null) {
@@ -367,10 +369,14 @@ public class AccountServiceImpl implements AccountService {
 		if (StringUtils.isBlank(account.getUserPhone())) {
 			throw QuanhuException.busiShowError("主账号没有其他登录方式，不能解绑第三方","主账号没有其他登录方式，不能解绑第三方");
 		}
+		//删除登录方式以及账号
 		thirdLoginService.delete(userId, thirdId);
+		//删除第三方登录账号缓存
+		accountRedisDao.deleteUserThird(thirdId, thirdLogin.getAppId(), type);
 	}
 
 	@Override
+	@Transactional
 	public void editPassword(Long userId, String newPassword, String oldPassword) {
 		UserAccount account = selectOne(userId, null, null);
 		if (account == null) {
@@ -491,6 +497,7 @@ public class AccountServiceImpl implements AccountService {
 	 * @param record
 	 * @return
 	 */
+	@Transactional
 	private int update(UserAccount record) {
 		try {
 			UserAccount account = mysqlDao.selectOne(record.getKid(), null, null);

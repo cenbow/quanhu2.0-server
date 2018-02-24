@@ -167,7 +167,7 @@ public enum MessageConstant {
     /**
      * 内容下架
      */
-    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE);
+    RELEASE_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的'{count}'因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE);
 
     private Integer type;
 

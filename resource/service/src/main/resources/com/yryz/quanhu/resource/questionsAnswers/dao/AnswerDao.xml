@@ -276,9 +276,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
     update qh_answer
     <set>
-      <if test="kid != null">
-        kid = #{kid,jdbcType=BIGINT},
-      </if>
       <if test="questionId != null">
         question_id = #{questionId,jdbcType=BIGINT},
       </if>
@@ -340,7 +337,7 @@
         content_source = #{contentSource,jdbcType=LONGVARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
+    where kid = #{kid,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs">
     update qh_answer

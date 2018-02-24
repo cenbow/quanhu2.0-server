@@ -13,6 +13,7 @@ import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
@@ -68,6 +69,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Reference
     private ReadApi readApi;
+
+    @Reference
+    private ResourceApi resourceApi;
 
     @Autowired
     private SendMessageService questionMessageService;
@@ -249,13 +253,15 @@ public class AnswerServiceImpl implements AnswerService {
          * 校验参数
          */
         Long kid = answerdto.getKid();
-        Byte shelveFlag = answerdto.getShelveFlag();
-        if (null == kid || null == shelveFlag) {
+        Byte delFlag = answerdto.getDelFlag();
+        if (null == kid || null == delFlag) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        Answer answer = new Answer();
+        AnswerWithBLOBs answer = new AnswerWithBLOBs();
         BeanUtils.copyProperties(answerdto, answer);
-        return this.answerDao.updateByPrimaryKey(answer);
+        //删除聚合的资源
+        resourceApi.deleteResourceById(String.valueOf(kid));
+        return this.answerDao.updateByPrimaryKeySelective(answer);
     }
 
 

@@ -57,6 +57,11 @@ public class SendMessageServiceImpl implements SendMessageService {
         Byte isAnonymity = messageBusinessVo.getIsAnonymity();
         String coterieId = messageBusinessVo.getCoterieId();
         Long amount = messageBusinessVo.getAmount();
+        if(amount==null){
+            amount=0L;
+        }else{
+            amount=amount/100;
+        }
         String imgUrl = messageBusinessVo.getImgUrl();
         String moduleEnum = messageBusinessVo.getModuleEnum();
 

@@ -284,7 +284,7 @@ public class UserStarForAdminServiceImpl implements UserStarForAdminService{
         /**
          * 更新达人状态位
          */
-        userService.updateUserInfo(info);
+        userService.updateUserAttachInfo(info);
 
         logger.info("syncUserRole:{} finish",JSON.toJSON(info));
     }

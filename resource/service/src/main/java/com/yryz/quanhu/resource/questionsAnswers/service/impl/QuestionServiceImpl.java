@@ -24,10 +24,12 @@ import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.vo.UserAccount;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstants;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
+import com.yryz.quanhu.resource.questionsAnswers.dto.AnswerDto;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
@@ -96,6 +98,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Reference
     private ResourceDymaicApi resourceDymaicApi;
+
+
+    @Reference
+    private ResourceApi resourceApi;
 
 
     @Autowired
@@ -310,7 +316,21 @@ public class QuestionServiceImpl implements QuestionService {
                     questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.For_refund);
                 }
 
-               result= this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+                result = this.questionDao.updateByPrimaryKeySelective(questionBySearch);
+            }
+
+            //删除提问的资源
+            resourceApi.deleteResourceById(String.valueOf(kid));
+
+            /**
+             * 级联删除提问的回答
+             */
+            AnswerVo answerVo = answerService.queryAnswerVoByquestionId(kid);
+            if (answerVo != null) {
+                AnswerDto answerDto = new AnswerDto();
+                answerDto.setKid(answerVo.getKid());
+                answerDto.setDelFlag(CommonConstants.DELETE_YES);
+                answerService.deleteAnswer(answerDto);
             }
         }
         return result;
@@ -422,7 +442,6 @@ public class QuestionServiceImpl implements QuestionService {
 
 
         int result = this.questionDao.updateByPrimaryKeySelective(question);
-
 
 
         /**

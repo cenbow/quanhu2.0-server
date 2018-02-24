@@ -14,7 +14,7 @@ public class ResourceInfoVo implements Serializable {
 	private Date createDate;
 	private Long lastHeat;
 	private UserSimpleVo createUserInfo;
-
+	private String moduleEnum;
 	/**
      * 计数、状态
      */
@@ -82,6 +82,14 @@ public class ResourceInfoVo implements Serializable {
 
     public void setStatistics(Map<String, Long> statistics) {
         this.statistics = statistics;
+    }
+    
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
     }
 
     @Override

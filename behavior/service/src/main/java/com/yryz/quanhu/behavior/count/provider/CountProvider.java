@@ -71,6 +71,7 @@ public class CountProvider implements CountApi {
 
     @Override
     public Response<Map<String, Long>> getCount(String countType, Long kid, String page) {
+        Map<String, Long> map = Maps.newConcurrentMap();
         try {
             if (StringUtils.isEmpty(page)) {
                 page = "-1";
@@ -79,7 +80,6 @@ public class CountProvider implements CountApi {
                 throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
             }
             List<BehaviorEnum> list = getBehaviorEnumList(countType);
-            Map<String, Long> map = Maps.newConcurrentMap();
             for (BehaviorEnum behaviorEnum : list) {
                 Long count = 0L;
                 if (BehaviorEnum.Coterie.getCode().equals(behaviorEnum.getCode())) {
@@ -99,21 +99,20 @@ public class CountProvider implements CountApi {
                 }
                 map.put(behaviorEnum.getKey(), count);
             }
-            return ResponseUtils.returnObjectSuccess(map);
         } catch (Exception e) {
             logger.error("getCount falid! ", e);
-            return ResponseUtils.returnException(e);
         }
+        return ResponseUtils.returnObjectSuccess(map);
     }
 
     @Override
     public Response<Map<String, Long>> getCountFlag(String countType, Long kid, String page, Long userId) {
         Map<String, Long> map = ResponseUtils.getResponseData(getCount(countType, kid, page));
-        if (MapUtils.isEmpty(map) || userId == null) {
-            return ResponseUtils.returnObjectSuccess(map);
-        }
 
         try {
+            if (MapUtils.isEmpty(map) || userId == null) {
+                return ResponseUtils.returnObjectSuccess(map);
+            }
             // 如果查点赞数或者收藏数，自动拼装点赞状态和收藏状态
             for (String code : countType.split(",")) {
                 switch (code) {
@@ -198,6 +197,7 @@ public class CountProvider implements CountApi {
 
     @Override
     public Response<Map<Long, Map<String, Long>>> getCount(String countType, List<Long> kids, String page) {
+        Map<Long, Map<String, Long>> map = Maps.newConcurrentMap();
         try {
             if (StringUtils.isEmpty(page)) {
                 page = "-1";
@@ -206,7 +206,6 @@ public class CountProvider implements CountApi {
                 throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
             }
             List<BehaviorEnum> list = getBehaviorEnumList(countType);
-            Map<Long, Map<String, Long>> map = Maps.newConcurrentMap();
             //根据kids初始化返回map集合
             for (Long kid : kids) {
                 if (kid == null) {
@@ -225,11 +224,10 @@ public class CountProvider implements CountApi {
                     map.get(kid).put(behaviorEnum.getKey(), count);
                 }
             }
-            return ResponseUtils.returnObjectSuccess(map);
         } catch (Exception e) {
             logger.error("getCount falid! ", e);
-            return ResponseUtils.returnException(e);
         }
+        return ResponseUtils.returnObjectSuccess(map);
     }
 
     @Override
