@@ -116,19 +116,23 @@ public class UserController {
 	public Response<UserLoginSimpleVO> findUser(Long userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		UserLoginSimpleVO simpleVO = null;
+		//用户登录的情况下
 		if (userId == null) {
 			authService.checkToken(request);
 			simpleVO = ResponseUtils
 					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
-		} else if(userId != null && !StringUtils.equals(header.getUserId(),userId.toString())){
-			simpleVO = ResponseUtils
-					.getResponseData(userApi.getUserLoginSimpleVO(userId));
-			simpleVO.setUserPhone(CommonUtils.getPhone(simpleVO.getUserPhone()));
-		}//用户登录的情况下
-		else {
-			authService.checkToken(request);
-			simpleVO = ResponseUtils
-					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
+		} else if(userId != null ){
+			if(StringUtils.isNotBlank(header.getUserId())){
+				authService.checkToken(request);
+			}
+			if(StringUtils.isNotBlank(header.getUserId()) && !StringUtils.equals(userId.toString(), header.getUserId())){
+				simpleVO = ResponseUtils
+						.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
+				simpleVO.setUserPhone(CommonUtils.getPhone(simpleVO.getUserPhone()));
+			}else{
+				simpleVO = ResponseUtils
+						.getResponseData(userApi.getUserLoginSimpleVO(userId));
+			}
 		}
 		return ResponseUtils.returnApiObjectSuccess(simpleVO);
 	}
