@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.UUID;
 
@@ -125,10 +126,10 @@ public class SendMessageServiceImpl implements SendMessageService {
             DecimalFormat df = new DecimalFormat("#0.00");
             if (messageConstant == MessageConstant.ANSWER_PAYED) {
                 logger.info("处理推送消息里的抽成后的金额开始");
-                //FeeDetail feeDetail = BranchFeesConstant.ANSWER.getFee().get(0);
                 FeeDetail feeDetail = new FeeDetail("", 90L, 1, "");
                 logger.info("原始金额是 : " + amount + ", 抽成规则是 : " + feeDetail.getFee());
-                long cost = amount * (feeDetail.getFee() / 100L);
+                BigDecimal cost = BigDecimal.valueOf(amount).multiply(BigDecimal.valueOf(feeDetail.getFee()))
+                        .divide(BigDecimal.valueOf(100L));
                 logger.info("抽成后金额是 : " + String.valueOf(cost));
                 String money = df.format(cost);
                 content = content.replaceAll("\\{money\\}", money);
