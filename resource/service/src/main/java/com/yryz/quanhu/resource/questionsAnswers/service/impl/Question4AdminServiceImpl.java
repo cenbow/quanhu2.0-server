@@ -304,4 +304,10 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         return 0;
     }
 
+
+    @Override
+    public AnswerWithBLOBs queryAnswerDetail(Long kid){
+        AnswerWithBLOBs answerVo=this.answerService.queryAnswerBykid(kid);
+        return answerVo;
+    }
 }
