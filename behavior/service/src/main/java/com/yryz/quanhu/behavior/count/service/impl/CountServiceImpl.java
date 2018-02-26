@@ -169,8 +169,8 @@ public class CountServiceImpl implements CountService {
                 String[] arr = str.split(":");
                 String type, kid, page;
                 kid = arr[0];
-                type = arr[0].split("_")[0];
-                page = arr[0].split("_")[1];
+                type = arr[1].split("_")[0];
+                page = arr[1].split("_")[1];
                 CountModel countModel = new CountModel(type, kid, page, redisTemplate.opsForValue().get(key), date, dateTime.getHour(), new Date().getTime());
                 list.add(countModel);
             }
