@@ -64,20 +64,11 @@ public class FreeMarkers {
         Template template = null;
         try {
             template = cfg.getTemplate(fileName + ".ftl", "utf-8");
-            //throw new IOException();
         } catch (IOException e) {
             Configuration conf = new Configuration();
             conf.setDefaultEncoding("UTF-8");
             conf.setClassForTemplateLoading(TemplateFactory.class, "/templates");
             template = conf.getTemplate(fileName + ".ftl");
-            /*AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Configuration.class);
-            Configuration configuration = (Configuration) context.getBean("configuration");
-            template = configuration.getTemplate(fileName + ".ftl", "UTF-8");*/
-            /*Resource resource = new ClassPathResource(fileName + ".ftl");
-            File file = resource.getFile();
-            Configuration cfg1 = new Configuration();
-            cfg1.setDirectoryForTemplateLoading(file);
-            template = cfg1.getTemplate(fileName + ".ftl", "utf-8");*/
         }
         SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMddHHmmss");
         String date = myFmt.format(new Date());

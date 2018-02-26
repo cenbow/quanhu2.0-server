@@ -11,6 +11,7 @@ import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.dto.UpdateBaseInfoDTO;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserRegInfoVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 /**
  * 用户基础信息服务
@@ -163,4 +164,14 @@ public interface UserApi {
 	 * @return
 	 */
 	Response<List<UserBaseInfoVO>> getAllByUserIds(List<Long> userIds);
+
+	/**
+	 * 管理后台message模块查询用户列表
+	 * @param pageNo
+	 * @param pageSize
+	 * @param custInfoDTO
+	 * @return
+	 * @Description 昵称需要加特殊字符转义
+	 */
+	Response<PageList<UserRegInfoVO>> listMsgUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO);
 }

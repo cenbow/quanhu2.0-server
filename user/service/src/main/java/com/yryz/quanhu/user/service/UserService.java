@@ -14,6 +14,7 @@ import java.util.Set;
 import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
+import com.yryz.quanhu.user.entity.UserRegInfo;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -190,4 +191,13 @@ public interface UserService {
      * @return
      */
     public  UserBaseInfo getUserByNickName(String appId, String nickName);
+
+	/**
+	 * 管理后台message模块查询用户列表
+	 * @param pageNo
+	 * @param pageSize
+	 * @param custInfoDTO
+	 * @return
+	 */
+    Page<UserRegInfo> listMsgUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO);
 }
