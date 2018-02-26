@@ -295,7 +295,7 @@ public class UserStarProvider implements UserStarApi {
 		}
 	}
 
-	@Override
+	@Deprecated
 	public Response<PageList<StarAuthInfo>> listByAuth(Integer pageNo, Integer pageSize, StarAuthQueryDTO paramDTO) {
 
 		try {
@@ -324,7 +324,7 @@ public class UserStarProvider implements UserStarApi {
 		}
 	}
 
-	@Override
+	@Deprecated
 	public Response<PageList<StarAuthInfo>> listByRecommend(Integer pageNo, Integer pageSize,
 			StarRecommendQueryDTO paramDTO) {
 
