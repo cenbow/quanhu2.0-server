@@ -475,9 +475,10 @@
     FROM `qh_coterie` s
     WHERE 1=1
     <if test="status !=null"> AND s.state=#{status}</if>
+    <if test="shelveFlag !=null"> AND s.shelve_flag=#{shelveFlag}</if>
     <if test="name !=null"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
     <if test="ownerId !=null and ownerId != ''"> AND s.owner_id=#{ownerId}</if>
-    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
+    <if test="startTime !=null and endTime !=null"> AND ${sortValue} BETWEEN #{startTime} AND #{endTime}</if>
     <if test="recommend !=null"> AND s.recommend = #{recommend}</if>
   </select>
 
@@ -506,6 +507,7 @@
     FROM `qh_coterie`
     WHERE 1=1
     <if test="status !=null"> AND state=#{status}</if>
+    <if test="shelveFlag !=null"> AND shelve_flag=#{shelveFlag}</if>
     <if test="name !=null and name != ''"> AND coterie_name LIKE CONCAT('%',#{name},'%')</if>
     <if test="ownerId !=null and ownerId != ''"> AND owner_id=#{ownerId}</if>
     <if test="startTime !=null and endTime !=null"> AND ${sortValue} BETWEEN #{startTime} AND #{endTime}</if>

@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user.service.impl;
 
+import static com.yryz.quanhu.user.contants.UserRelationConstant.EVENT.CANCEL_BLACK;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.EVENT.SET_BLACK;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.BOTH_BLACK;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FANS;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FOLLOW;
@@ -223,15 +225,18 @@ public class UserRelationServiceImpl implements UserRelationService{
          * 1，判断自己是否在对方黑名单中，如果在，不允许做任何操作
          * 2，判断对方是否在自己黑名单中，如果在，除取消拉黑，不允许做任何操作
          */
-        if(TO_BLACK.getCode() == sourceDto.getRelationStatus()){
-            if(UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单","你已将该用户加入黑名单");
-            }
+        int status = sourceDto.getRelationStatus();
+        if(TO_BLACK.getCode() == status && CANCEL_BLACK != event){
+            //已拉黑，非取消拉黑，抛异常
+            throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单，无法操作","你已将该用户加入黑名单");
 
-        }else if(FROM_BLACK.getCode() == sourceDto.getRelationStatus()){
-            if(UserRelationConstant.EVENT.SET_BLACK != event&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException(ExceptionEnum.TARGETUSER_BLACK_USER_ERROR.getCode(),"对方已将你加入黑名单","对方已将你加入黑名单");
-            }
+        }else if(FROM_BLACK.getCode() == status && SET_BLACK != event){
+            //被拉黑，非拉黑，抛异常
+            throw new QuanhuException(ExceptionEnum.TARGETUSER_BLACK_USER_ERROR.getCode(),"对方已将你加入黑名单，无法操作","对方已将你加入黑名单");
+
+        }else if(BOTH_BLACK.getCode() == status && CANCEL_BLACK != event){
+            //互相拉黑，非取消拉黑，抛异常
+            throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单，无法操作","你已将该用户加入黑名单");
         }
         return true;
     }
@@ -270,7 +275,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             }else if(ss == FOLLOW && ts == FANS){
                 ts = NONE;ss = NONE;
             }
-        }else if(UserRelationConstant.EVENT.SET_BLACK == event){       //拉黑
+        }else if(SET_BLACK == event){       //拉黑
             /**
              * 如果target拉黑我，则设置双向拉黑关系
              * 否则，设置我拉黑别人，别人被拉黑
@@ -280,7 +285,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             }else{
                 ss = TO_BLACK;ts = FROM_BLACK;
             }
-        }else if(UserRelationConstant.EVENT.CANCEL_BLACK == event){    //取消拉黑
+        }else if(CANCEL_BLACK == event){    //取消拉黑
             /**
              * 如果target是双向拉黑，则设置我被别人拉黑，别人拉黑我
              * 否则 取消双向所有关系
