@@ -189,8 +189,9 @@ public class UserRelationServiceImpl implements UserRelationService{
         }
         /**
          * 判断关注人数是否已达到上线
+         * 查询缓存>查询数据库
          */
-        UserRelationCountDto countDto = userRelationCacheDao.selectTotalCount(sourceUserId);
+        UserRelationCountDto countDto = this.totalBy(sourceUserId,sourceUserId);
         if(countDto.getFollowCount()>=maxFollowCount){
             throw new QuanhuException(ExceptionEnum.USER_FOLLOW_MAX_COUNT_ERROR);
         }
