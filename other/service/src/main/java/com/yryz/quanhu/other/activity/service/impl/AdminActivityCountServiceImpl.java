@@ -120,11 +120,11 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
                         adminActivityCountVo.setCandidateDetailCount(count);
                     }
                 }
-                StringBuffer sb = new StringBuffer();
+              /*  StringBuffer sb = new StringBuffer();
                 String s = sb.append(adminActivityCountVo.getDate()).insert(4,"-").toString();
                 sb = new StringBuffer();
                 s = sb.append(s).insert(7,"-").toString();
-                adminActivityCountVo.setDate(s);
+                adminActivityCountVo.setDate(s);*/
             }
         }
 

@@ -157,10 +157,10 @@ public class DymaicController {
     @ApiOperation("动态置顶状态查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/getTopDymaic")
-    public Response<DymaicVo> getTopDymaic(@RequestHeader(value = "userId", required = false) Long userId) {
-        if (userId == null) {
-            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
+    public Response<DymaicVo> getTopDymaic(@RequestParam(value = "targetUserId", required = false) Long targetUserId) {
+        if (targetUserId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING));
         }
-        return dymaicService.getTopDymaic(userId);
+        return dymaicService.getTopDymaic(targetUserId);
     }
 }
