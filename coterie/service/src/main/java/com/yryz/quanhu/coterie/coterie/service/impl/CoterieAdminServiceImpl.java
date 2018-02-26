@@ -33,10 +33,7 @@ import org.springframework.scheduling.concurrent.ScheduledExecutorTask;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +73,12 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
             int start = (param.getPageNum() - 1) * param.getPageSize();
             param.setPageNum(start);
             Integer count = coterieMapper.selectCountBySearchParam(param);
+
+            if (count == 0) {
+                PageList<CoterieInfo> pageList = new PageList<>(currentPage, param.getPageSize(), new ArrayList(), 0L);
+                return pageList;
+            }
+
             list = coterieMapper.selectBySearchParam(param);
 
             Set<String> ids = new HashSet<>();

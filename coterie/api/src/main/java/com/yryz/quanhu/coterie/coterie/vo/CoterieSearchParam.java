@@ -71,9 +71,9 @@ public class CoterieSearchParam implements Serializable{
 	private Integer pageSize;
 	
 	/**
-	 * 值：asc,desc  默认desc
+	 * 值：字段  默认 create_date
 	 */
-	private String sortValue;
+	private String sortValue = "create_date";
 
 	public Byte getStatus() {
 		return status;

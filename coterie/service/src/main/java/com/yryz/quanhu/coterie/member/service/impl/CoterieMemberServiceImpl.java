@@ -270,7 +270,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             }
 
             coterieMemberDao.updateByCoterieMember(record);
-            //todo msg
+
             if (type == 10) {
                 coterieMemberMessageManager.banSpeakMessage(userId, coterieId);
             }
@@ -336,8 +336,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             CoterieInfo coterie = coterieService.find(coterieId);
 
+//            coterieService
+
             //私圈人数已满
-            if (coterie.getMemberNum().intValue() >= 2000) {
+            if (coterie.getMemberNum().intValue() + 1 >= 2000) {
                 throw QuanhuException.busiError("私圈人数已达到上限");
             }
 
