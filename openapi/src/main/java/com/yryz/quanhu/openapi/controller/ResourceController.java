@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
@@ -68,7 +69,6 @@ public class ResourceController {
     @Reference
     private ReleaseInfoApi releaseInfoApi;
 
-
     @ApiOperation("首页资源推荐")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/appRecommend")
@@ -88,11 +88,10 @@ public class ResourceController {
 
     }
 
-    //    @UserBehaviorValidation(login = true)
     @ApiOperation("私圈首页动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/resource/coterieRecommend")
-    public Response<PageList<ResourceVo>> coterieRecommend(@RequestHeader Long userId, @RequestParam String coterieId, @RequestParam Integer currentPage, @RequestParam Integer pageSize) {
+    public Response<PageList<ResourceVo>> coterieRecommend(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam String coterieId, @RequestParam Integer currentPage, @RequestParam Integer pageSize) {
         int start = 0;
         if (pageSize == null) {
             pageSize = 10;
@@ -152,6 +151,7 @@ public class ResourceController {
         return ResponseUtils.returnObjectSuccess(pageList);
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/resource/top")
@@ -178,6 +178,7 @@ public class ResourceController {
         return ResponseUtils.returnSuccess();
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("取消置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/resource/canceltop")
@@ -222,6 +223,7 @@ public class ResourceController {
         return list;
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("资源删除")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/resource/delete")
