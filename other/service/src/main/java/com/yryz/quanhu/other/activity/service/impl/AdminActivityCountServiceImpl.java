@@ -120,6 +120,11 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
                         adminActivityCountVo.setCandidateDetailCount(count);
                     }
                 }
+              /*  StringBuffer sb = new StringBuffer();
+                String s = sb.append(adminActivityCountVo.getDate()).insert(4,"-").toString();
+                sb = new StringBuffer();
+                s = sb.append(s).insert(7,"-").toString();
+                adminActivityCountVo.setDate(s);*/
             }
         }
 
@@ -241,5 +246,15 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         Integer size = ((currentPage -1) * pageSize) + pageSize;
         return size > total ? total : size;
     }
+
+    public static void main(String[] args) {
+        String a = "20180701";
+        StringBuffer sb = new StringBuffer();
+        a = sb.append(a).insert(4,"-").toString();
+        sb = new StringBuffer();
+        sb.append(a).insert(7,"-");
+        System.out.println(sb.toString());
+    }
+
 
 }

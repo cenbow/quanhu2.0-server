@@ -149,7 +149,8 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
                 if(collectionInfoVo.getResourceId() != null) {
                     resourceSet.add(collectionInfoVo.getResourceId().toString());
                 }
-                if(collectionInfoVo.getCoterieId() != null) {
+                if(collectionInfoVo.getCoterieId() != null
+                        && !Long.valueOf(0).equals(collectionInfoVo.getCoterieId()) ) {
                     coterieIdList.add(collectionInfoVo.getCoterieId());
                 }
                 collectionInfoVo.setDelFlag(ResourceEnum.DEL_FLAG_TRUE);

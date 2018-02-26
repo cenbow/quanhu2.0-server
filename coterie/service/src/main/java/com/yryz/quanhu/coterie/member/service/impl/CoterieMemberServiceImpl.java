@@ -332,17 +332,15 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void audit(Long userId, Long coterieId, Byte memberStatus, Byte joinType) {
 
+
+        CoterieInfo coterie = coterieService.find(coterieId);
+
+        //私圈人数已满
+        if (coterie.getMemberNum().intValue() + 1 >= 2000) {
+            throw QuanhuException.busiError("私圈人数已达到上限");
+        }
+
         try {
-
-            CoterieInfo coterie = coterieService.find(coterieId);
-
-//            coterieService
-
-            //私圈人数已满
-            if (coterie.getMemberNum().intValue() + 1 >= 2000) {
-                throw QuanhuException.busiError("私圈人数已达到上限");
-            }
-
             CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
 
             String reason = "";
@@ -355,13 +353,11 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
 
                 //如果没有拉黑则自动关注圈主
-                //todo
                 Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
                 if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
                     saveOrUpdateMember(userId, coterieId, reason, joinType);
                 }
 
-                //todo event
                 coterieEventManager.joinCoterieEvent(coterieId);
 
                 //permission cache
