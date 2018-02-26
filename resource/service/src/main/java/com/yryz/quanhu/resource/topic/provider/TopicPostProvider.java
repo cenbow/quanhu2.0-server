@@ -43,6 +43,9 @@ public class TopicPostProvider implements TopicPostApi {
     public Response<TopicPostVo> quetyDetail(Long kid, Long userId) {
         try {
             TopicPostVo vo = this.topicPostService.getDetail(kid, userId);
+            if(vo==null){
+                throw   QuanhuException.busiError("查询的帖子不存在");
+            }
             return ResponseUtils.returnObjectSuccess(vo);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

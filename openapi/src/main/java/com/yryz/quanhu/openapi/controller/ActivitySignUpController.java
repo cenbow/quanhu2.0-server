@@ -66,10 +66,10 @@ public class ActivitySignUpController {
     @ApiOperation("参与报名-获取活动配置")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/activity/signUp/activitySignUpFrom")
-    public Response<ActivityEnrolConfig> getActivitySignUpFrom(Long activityInfoId, @RequestHeader("userId") String userId, HttpServletRequest request) {
+    public Response<ActivityEnrolConfig> getActivitySignUpFrom(Long activityInfoId, HttpServletRequest request) {
         Assert.notNull(activityInfoId, "activityInfoId is null");
-        Assert.notNull(userId, "userId is null");
-        return activitySignUpApi.getActivitySignUpFrom(activityInfoId, userId);
+       // Assert.notNull(userId, "userId is null");
+        return activitySignUpApi.getActivitySignUpFrom(activityInfoId, null);
     }
     @UserBehaviorValidation(login = true)
     @ApiOperation("查询报名状态(token)")

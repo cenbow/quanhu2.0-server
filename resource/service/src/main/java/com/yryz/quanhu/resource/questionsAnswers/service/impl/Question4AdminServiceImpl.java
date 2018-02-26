@@ -21,10 +21,7 @@ import com.yryz.quanhu.resource.questionsAnswers.constants.QuestionAnswerConstan
 import com.yryz.quanhu.resource.questionsAnswers.dao.AnswerDao;
 import com.yryz.quanhu.resource.questionsAnswers.dao.QuestionDao;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
-import com.yryz.quanhu.resource.questionsAnswers.entity.Answer;
-import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerExample;
-import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
-import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
+import com.yryz.quanhu.resource.questionsAnswers.entity.*;
 import com.yryz.quanhu.resource.questionsAnswers.service.*;
 import com.yryz.quanhu.resource.questionsAnswers.vo.*;
 import com.yryz.quanhu.score.service.EventAPI;
@@ -281,11 +278,11 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         criteria.andQuestionIdEqualTo(question.getKid());
         List<Answer> answers = this.answerDao.selectByExample(example);
         if (answers != null && !answers.isEmpty()) {
-            Answer answer = new Answer();
+            AnswerWithBLOBs answer = new AnswerWithBLOBs();
             Long answerKid=answers.get(0).getKid();
             answer.setKid(answerKid);
             answer.setShelveFlag(CommonConstants.SHELVE_NO);
-            int result = this.answerDao.updateByPrimaryKey(answer);
+            int result = this.answerDao.updateByPrimaryKeySelective(answer);
             if (result > 0) {
                 MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
                 messageBusinessVo.setCoterieId(String.valueOf(question.getCoterieId()));
@@ -307,4 +304,10 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         return 0;
     }
 
+
+    @Override
+    public AnswerWithBLOBs queryAnswerDetail(Long kid){
+        AnswerWithBLOBs answerVo=this.answerService.queryAnswerBykid(kid);
+        return answerVo;
+    }
 }

@@ -2,6 +2,9 @@ package com.yryz.quanhu.behavior.reward.test;
 
 import java.util.Date;
 
+import com.yryz.quanhu.behavior.reward.entity.RewardCount;
+import com.yryz.quanhu.behavior.reward.service.RewardCountService;
+import com.yryz.quanhu.order.sdk.constant.BranchFeesEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +39,10 @@ public class RewardTest {
     
     @Autowired
     private RewardInfoService rewardInfoService;
-    
+
+    @Autowired
+    private RewardCountService rewardCountService;
+
     /**  
     * @Description: 打赏发起
     * @author wangheng
@@ -127,14 +133,14 @@ public class RewardTest {
          System.out.println(new ObjectMapper().writeValueAsString(rewardInfoService.selectRewardFlow(356393596608512L, 1, 30)));
      }
      
-     /**  
-      * @Description: 打赏成功 更新狀態
-      * @author wangheng
-      * @param @throws JsonProcessingException
-      * @return void
-      * @throws  
-      */
-      @Test
+    /**
+    * @Description: 打赏成功 更新狀態
+    * @author wangheng
+    * @param @throws JsonProcessingException
+    * @return void
+    * @throws
+    */
+    @Test
     public void test005() throws JsonProcessingException {
         RewardInfo upInfo = new RewardInfo();
         upInfo.setKid(378033735573504L);
@@ -146,5 +152,37 @@ public class RewardTest {
         upInfo.setResourceId(377959471226880L);
         
         System.out.println(new ObjectMapper().writeValueAsString(rewardInfoService.updateByKid(upInfo)));
+    }
+
+    @Test
+    public void test006() throws JsonProcessingException{
+        RewardInfo info = this.rewardInfoService.selectByKid(378232084209664L);
+        Long rewardedPrice = info.getGiftNum() * info.getGiftPrice() * BranchFeesEnum.REWARD.getFee().get(1).getFee() / 100L;
+        // 更新打赏者 统计
+        RewardCount uCount = new RewardCount();
+        uCount.setTargetId(info.getCreateUserId());
+        uCount.setTargetType(RewardConstants.target_type_user);
+        uCount.setTotalRewardAmount(info.getGiftNum() * info.getGiftPrice());
+        uCount.setTotalRewardCount(1);
+        rewardCountService.addCountByTargetId(uCount);
+        System.out.println("资源打赏 订单回调，更新打赏者 统计,TargetId==>>" + info.getCreateUserId());
+
+        // 更新被打赏者 统计
+        RewardCount uBeCount = new RewardCount();
+        uBeCount.setTargetId(info.getToUserId());
+        uBeCount.setTargetType(RewardConstants.target_type_user);
+        uBeCount.setTotalRewardedAmount(rewardedPrice);
+        uBeCount.setTotalRewardedCount(1);
+        rewardCountService.addCountByTargetId(uBeCount);
+        System.out.println("资源打赏 订单回调，更新被打赏者 统计,TargetId==>>" + info.getToUserId());
+
+        // 更新资源被打赏 统计
+        RewardCount rCount = new RewardCount();
+        rCount.setTargetId(info.getResourceId());
+        rCount.setTargetType(RewardConstants.target_type_resource);
+        rCount.setTotalRewardedAmount(info.getGiftNum() * info.getGiftPrice());
+        rCount.setTotalRewardedCount(1);
+        rewardCountService.addCountByTargetId(rCount);
+        System.out.println("资源打赏 订单回调，更新资源被打赏 统计,TargetId==>>" + info.getResourceId());
     }
 }

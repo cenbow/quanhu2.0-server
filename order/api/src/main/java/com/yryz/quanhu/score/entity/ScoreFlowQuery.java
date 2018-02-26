@@ -55,7 +55,7 @@ public class ScoreFlowQuery implements Serializable{
 	
  
     /** 积分增减标志（0-增加，1-减少）*/
-	private Integer consumeFlag = 0;
+	private Integer consumeFlag;
 
 
 	public Integer getConsumeFlag() {

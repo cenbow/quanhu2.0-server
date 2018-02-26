@@ -379,7 +379,7 @@ public class UserController {
 	@ApiOperation("微信授权登录返回授权地址")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@RequestMapping(value = "/{version}/user/wxOauthLogin")
+	@GetMapping(value = "/{version}/user/wxOauthLogin")
 	public void wxOauthLogin(String returnUrl,String activityChannelCode,HttpServletResponse response,HttpServletRequest request) throws IOException{
 		response.setContentType("text/html;charset=UTF-8");
 		response.setCharacterEncoding("utf-8");
@@ -412,7 +412,7 @@ public class UserController {
 	@ApiOperation("微信授权登录返回授权地址")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-	@RequestMapping(value = "/{version}/user/wxOauthLoginNotify")
+	@GetMapping(value = "/{version}/user/wxOauthLoginNotify")
 	public void wxOauthLoginNotify(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		String code = request.getParameter("code");
 		String state = request.getParameter("state");
@@ -688,9 +688,9 @@ public class UserController {
 	private static UserRegLogDTO getUserRegLog(RequestHeader header, RegType regType, String location,
 			String activityChannelCode, DevType type, String ip) {
 		UserRegLogDTO logDTO = new UserRegLogDTO(null, header.getDitchCode(), header.getAppVersion(), regType.getText(),
-				type.getLabel(), header.getDevName(), header.getAppId(), ip, location, activityChannelCode, null);
+				type.name(), header.getDevName(), header.getAppId(), ip, location, activityChannelCode, null);
 		// 拼接组合的圈乎渠道码
-		String channelCode = StringUtils.join(new String[] { logDTO.getAppChannel(), logDTO.getDevType(),
+		String channelCode = StringUtils.join(new String[] { logDTO.getAppChannel(), type.getLabel(),
 				logDTO.getRegType(), logDTO.getActivityChannelCode() }, " ");
 		logDTO.setChannelCode(channelCode);
 		return logDTO;

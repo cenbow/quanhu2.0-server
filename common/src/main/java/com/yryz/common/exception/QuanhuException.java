@@ -12,6 +12,7 @@ public class QuanhuException extends IllegalArgumentException {
     private String errorMsg;
 
     public QuanhuException(ExceptionEnum exceptionEnum) {
+        super(exceptionEnum.getErrorMsg());
         if (exceptionEnum != null) {
             this.code = exceptionEnum.getCode();
             this.msg = exceptionEnum.getShowMsg();
@@ -20,6 +21,7 @@ public class QuanhuException extends IllegalArgumentException {
     }
     
     public QuanhuException(ExceptionEnum exceptionEnum, String errorMsg) {
+        super(errorMsg);
         if (exceptionEnum != null) {
             this.code = exceptionEnum.getCode();
             this.msg = exceptionEnum.getShowMsg();

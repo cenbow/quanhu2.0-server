@@ -16,6 +16,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.user.dto.StarAuthInfo;
 import com.yryz.quanhu.user.dto.StarAuthParamDTO;
+import com.yryz.quanhu.user.dto.StarRecommendQueryDTO;
 import com.yryz.quanhu.user.service.UserOperateApi;
 import com.yryz.quanhu.user.service.UserStarApi;
 import com.yryz.quanhu.user.vo.MyInviterVO;
@@ -68,6 +69,11 @@ public class UserStarTest {
 		paramDTO.setUserId(727061873573347328L);
 		Response<PageList<StarInfoVO>> response = starApi.labelStarList(paramDTO);
 		System.out.println("labelStarListTest: " + JsonUtils.toFastJson(response));
+	}
+	
+	public void listByParams(){
+		
+		//starApi.listByRecommend(1, 10, new StarRecommendQueryDTO());
 	}
 	
 	//@Test

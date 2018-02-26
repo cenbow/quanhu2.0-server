@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.yryz.quanhu.resource.api.ResourceApi;
+import org.apache.commons.lang.StringUtils;
 import org.assertj.core.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
         example.setPageSize(pageSize);
         example.setOrderByClause("create_date desc");
 
-        if (com.yryz.common.utils.StringUtils.isNotBlank(dto.getStartTime()) && com.yryz.common.utils.StringUtils.isNotBlank(dto.getEndTime())) {
+        if (StringUtils.isNotBlank(dto.getStartTime()) && StringUtils.isNotBlank(dto.getEndTime())) {
             criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
         }
         if (dto.getKid() != null) {
@@ -125,8 +126,12 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
         if (dto.getShelveFlag() != null) {
             criteria.andShelveFlagEqualTo(dto.getShelveFlag());
         }
-        if (com.yryz.common.utils.StringUtils.isNotBlank(dto.getContent())) {
+        if (StringUtils.isNotBlank(dto.getContent())) {
             criteria.andContentLike("%" + dto.getContent() + "%");
+        }
+
+        if(dto.getCreateUserId()!=null){
+            criteria.andCreateUserIdEqualTo(dto.getCreateUserId());
         }
 
         List<TopicPostWithBLOBs> topicPosts = this.topicPostDao.selectByExampleWithBLOBs(example);

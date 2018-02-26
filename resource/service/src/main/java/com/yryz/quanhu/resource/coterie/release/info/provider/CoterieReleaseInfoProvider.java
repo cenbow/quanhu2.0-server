@@ -133,12 +133,6 @@ public class CoterieReleaseInfoProvider implements CoterieReleaseInfoApi {
 
             // 资源进聚合
             this.commitResourceAndDynamic(record, createUser);
-            try {
-                // 资源计数接入
-                countApi.commitCount(BehaviorEnum.Release, record.getCreateUserId(), null, 1L);
-            } catch (Exception e) {
-                logger.error("统计计数 接入异常！", e);
-            }
 
             // 对接积分事件
             releaseInfoService.commitEvent(eventAPI, record);

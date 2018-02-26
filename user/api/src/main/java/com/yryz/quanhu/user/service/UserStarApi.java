@@ -71,27 +71,6 @@ public interface UserStarApi {
      */
     public Response<Boolean> updateStarWeight(Long userId,Integer weight);
     /**
-     * 后台达人认证信息列表
-     * @param pageNo
-     * @param pageSize
-     * @param paramDTO
-     * @return
-     * @throws ServiceException
-     */
-    @Deprecated
-    public Response<PageList<StarAuthInfo>> listByAuth(Integer pageNo,Integer pageSize,StarAuthQueryDTO paramDTO);
-    /**
-     * 后台达人推荐信息列表
-     * @param pageNo
-     * @param pageSize
-     * @param paramDTO
-     * @return
-     * @throws ServiceException
-     */
-    @Deprecated
-    public Response<PageList<StarAuthInfo>> listByRecommend(Integer pageNo,Integer pageSize,StarRecommendQueryDTO paramDTO);
-     
-    /**
      * 查询达人申请以及审核日志(达人审核详情)
      * @param userId
      * @return
