@@ -45,6 +45,8 @@ public class Question4AdminServiceImpl implements Question4AdminService {
 
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
+    private static final String REFUND_FLAG="2";
+
     @Autowired
     private QuestionDao questionDao;
 
@@ -92,6 +94,7 @@ public class Question4AdminServiceImpl implements Question4AdminService {
      */
     @Override
     public PageList<QuestionAdminVo> queryQuestionAnswerList(QuestionDto dto) {
+
         PageList<QuestionAdminVo> questionAdminVoList = new PageList<>();
         Integer pageNum = dto.getCurrentPage() == null ? 1 : dto.getCurrentPage();
         Integer pageSize = dto.getPageSize() == null ? 10 : dto.getPageSize();
@@ -102,8 +105,13 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         example.setOrderByClause("create_date desc");
 
         QuestionExample.Criteria criteria = example.createCriteria();
+        String refundFlag= dto.getRefundFlag();
+        if(!REFUND_FLAG.equals(refundFlag)){
         criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
+        }
+        if(!REFUND_FLAG.equals(refundFlag)) {
+            criteria.andOrderFlagEqualTo(QuestionAnswerConstants.OrderType.paid);
+        }
         if (StringUtils.isNotBlank(dto.getLastAnswerDateBegin()) && StringUtils.isNotBlank(dto.getLastAnswerDateEnd())) {
             AnswerExample answerExample = new AnswerExample();
             AnswerExample.Criteria answerCriteria = answerExample.createCriteria();
@@ -145,7 +153,15 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         if (StringUtils.isNotBlank(dto.getBeginDate()) && StringUtils.isNotBlank(dto.getEndDate())) {
             criteria.andCreateDateBetween(DateUtils.parseDate(dto.getBeginDate()), DateUtils.parseDate(dto.getEndDate()));
         }
-        example.setOrderByClause("create_date desc");
+
+
+        if(REFUND_FLAG.equals(refundFlag)){
+            List<Byte> orderFlags=new ArrayList<>();
+            orderFlags.add(QuestionAnswerConstants.OrderType.For_refund);
+            orderFlags.add(QuestionAnswerConstants.OrderType.Have_refund);
+            criteria.andOrderFlagIn(orderFlags);
+        }
+
         Long count = this.questionDao.countByExample(example);
         List<Question> list = this.questionDao.selectByExampleWithBLOBs(example);
         List<QuestionAdminVo> questionAdminVos = new ArrayList<>();
