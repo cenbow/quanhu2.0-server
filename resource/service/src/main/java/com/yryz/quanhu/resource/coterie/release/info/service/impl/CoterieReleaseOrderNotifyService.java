@@ -126,7 +126,7 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
             // 付费阅读成功 给阅读者发送扣费消息
             MessageVo messageVo = MessageUtils.buildMessage(MessageConstant.CONTENT_BUY_REMINDERS,
                     String.valueOf(sponsorUser.getUserId()), coterieInfo.getName(), systemBody);
-            messageVo.setContent(messageVo.getContent().replaceAll("\\{money\\}",
+            messageVo.setContent(messageVo.getContent().replace("{money}",
                     String.valueOf(releaseInfo.getContentPrice() / 100)));
             messageAPI.sendMessage(messageVo, true);
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
             money = df.format(new BigDecimal(info.getContentPrice()).divide(new BigDecimal(100))
                     .multiply(new BigDecimal(fee.getFee()).divide(new BigDecimal(100))));
         }
-        messageVo.setContent(messageVo.getContent().replaceAll("\\{money\\}", money));
+        messageVo.setContent(messageVo.getContent().replace("{money}", money));
         messageAPI.sendMessage(messageVo, true);
     }
 }

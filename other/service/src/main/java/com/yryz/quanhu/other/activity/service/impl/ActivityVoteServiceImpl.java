@@ -386,9 +386,9 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 			content = constant.getContent().replaceAll("\\{count\\}", activityInfoVo.getTitle());
 		}*/
             if (StringUtils.isNotEmpty(activity.getPrizesName())) {
-                content = constant.getContent().replaceAll("\\{count1\\}", activity.getPrizesName());
+                content = constant.getContent().replace("{count1}", activity.getPrizesName());
             }
-            content = content.replaceAll("\\{count2\\}", "1");
+            content = content.replace("{count2}", "1");
             messageVo.setContent(content);
             messageVo.setCreateTime(DateUtils.getDateTime());
             messageVo.setLabel(constant.getLabel());

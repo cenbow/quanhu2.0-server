@@ -215,10 +215,10 @@ public class CoterieMemberMessageManager {
 
         String content = constant.getContent();
         if (StringUtils.isNotEmpty(coterieMemberNotify.getCoterieName())) {
-            content = content.replaceAll("\\{name\\}", coterieMemberNotify.getCoterieName());
+            content = content.replace("{name}", coterieMemberNotify.getCoterieName());
         }
         if (null != coterieMemberNotify.getAmount()) {
-            content = content.replaceAll("\\{money\\}", new DecimalFormat("#0.00").format(coterieMemberNotify.getAmount() / 100.00));
+            content = content.replace("{money}", new DecimalFormat("#0.00").format(coterieMemberNotify.getAmount() / 100.00));
         }
         messageVo.setContent(content);
         messageVo.setCreateTime(DateUtils.getDateTime());
@@ -264,7 +264,7 @@ public class CoterieMemberMessageManager {
 
         if (null != user) {
             if (StringUtils.isNotEmpty(user.getUserNickName())) {
-                content = content.replaceAll("\\{name\\}", user.getUserNickName());
+                content = content.replace("{name}", user.getUserNickName());
             }
         }
 
@@ -290,7 +290,7 @@ public class CoterieMemberMessageManager {
         logger.info("处理推送消息里的抽成后的金额完成 money : " + money);
 
         if (null != coterieMemberNotify.getAmount()) {
-            content = content.replaceAll("\\{money\\}", money);
+            content = content.replace("{money}", money);
         }
         messageVo.setContent(content);
         messageVo.setCreateTime(DateUtils.getDateTime());
