@@ -231,6 +231,41 @@ public class Question4AdminServiceImpl implements Question4AdminService {
         return questionAnswerVo;
     }
 
+    /**
+     * 查询问答详情
+     *
+     * @param kid
+     * @return
+     */
+    @Override
+    public QuestionAnswerVo queryQuestionByKid(Long kid) {
+        QuestionAnswerVo questionAnswerVo = new QuestionAnswerVo();
+        QuestionExample example = new QuestionExample();
+        QuestionExample.Criteria criteria = example.createCriteria();
+        criteria.andKidEqualTo(kid);
+        List<Question> questions = this.questionDao.selectByExample(example);
+        if (null != questions && !questions.isEmpty()) {
+            Question question = questions.get(0);
+            QuestionVo questionVo = new QuestionVo();
+            BeanUtils.copyProperties(question, questionVo);
+            if (question.getCreateUserId() != null) {
+                UserSimpleVO userSimpleVO = apIservice.getUser(question.getCreateUserId());
+                questionVo.setUser(userSimpleVO);
+            }
+            if (question.getTargetId() != null) {
+                UserSimpleVO userSimpleVO = apIservice.getUser(Long.valueOf(question.getTargetId()));
+                questionVo.setTargetUser(userSimpleVO);
+            }
+            questionAnswerVo.setQuestion(questionVo);
+
+            if (QuestionAnswerConstants.AnswerdFlag.ANSWERED.compareTo(question.getAnswerdFlag()) == 0) {
+                AnswerVo answerVo = this.answerService.getDetail(question.getKid());
+                questionAnswerVo.setAnswer(answerVo);
+            }
+        }
+        return questionAnswerVo;
+    }
+
 
     /**
      * 问题下架
