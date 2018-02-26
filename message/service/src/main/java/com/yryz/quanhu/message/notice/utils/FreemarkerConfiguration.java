@@ -21,7 +21,7 @@ public class FreemarkerConfiguration {
     @Bean
     public freemarker.template.Configuration freemarkerConfig() throws IOException {
         freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_27);
-        cfg.setTemplateLoader(new ClassTemplateLoader(getClass().getClassLoader(), "templates"));
+        cfg.setTemplateLoader(new ClassTemplateLoader(getClass().getClassLoader(), "/templates"));
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         cfg.setLogTemplateExceptions(false);
