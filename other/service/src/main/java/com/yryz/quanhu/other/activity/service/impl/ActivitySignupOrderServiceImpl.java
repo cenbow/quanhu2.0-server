@@ -78,13 +78,13 @@ public class ActivitySignupOrderServiceImpl implements IOrderNotifyService {
         messageVo.setActionCode(constant.getMessageActionCode());
         String content =null;
         if (StringUtils.isNotEmpty(activityInfo.getTitle())) {
-            content = constant.getContent().replaceAll("\\{count\\}", activityInfo.getTitle());
+            content = constant.getContent().replace("{count}", activityInfo.getTitle());
         }
         if (record.getAmount()==null) {
         	record.setAmount(0);
         }
         DecimalFormat df = new DecimalFormat("#0.00");
-        content = content.replaceAll("\\{count1\\}", df.format(record.getAmount()/100.00));
+        content = content.replace("{count1}", df.format(record.getAmount()/100.00));
         messageVo.setContent(content);
         messageVo.setCreateTime(DateUtils.getDateTime());
         messageVo.setLabel(constant.getLabel());

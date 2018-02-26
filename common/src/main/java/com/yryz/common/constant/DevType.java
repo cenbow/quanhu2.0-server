@@ -96,4 +96,8 @@ public enum DevType {
 		}
 		return devType;
 	}
+	
+	public static void main(String[] args){
+		System.out.println(DevType.ANDROID.name());
+	}
 }

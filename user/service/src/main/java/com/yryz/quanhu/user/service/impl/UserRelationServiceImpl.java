@@ -140,14 +140,14 @@ public class UserRelationServiceImpl implements UserRelationService{
     }
     /**
      *
-     * 查询数据库
+     * 查询缓存>数据库
      * @param userSourceKid
      * @param userTargetKid
      * @return
      */
     @Override
     public UserRelationDto getRelation(String sourceUserId, String targetUserId) {
-        UserRelationDto dto = userRelationDao.selectUser(UserRelationDto.class,sourceUserId,targetUserId);
+        UserRelationDto dto = userRelationCacheDao.getCacheRelation(sourceUserId,targetUserId);
         if(dto == null){
             dto = new UserRelationDto();
             dto.setRelationStatus(NONE.getCode());
@@ -189,11 +189,10 @@ public class UserRelationServiceImpl implements UserRelationService{
         }
         /**
          * 判断关注人数是否已达到上线
+         * 查询缓存>查询数据库
          */
-        Long followCount = userRelationDao.selectCount(sourceUserId,FOLLOW.getCode());
-        Long friendCount = userRelationDao.selectCount(sourceUserId,FRIEND.getCode());
-
-        if((followCount+friendCount)>=maxFollowCount){
+        UserRelationCountDto countDto = this.totalBy(sourceUserId,sourceUserId);
+        if(countDto.getFollowCount()>=maxFollowCount){
             throw new QuanhuException(ExceptionEnum.USER_FOLLOW_MAX_COUNT_ERROR);
         }
         /**

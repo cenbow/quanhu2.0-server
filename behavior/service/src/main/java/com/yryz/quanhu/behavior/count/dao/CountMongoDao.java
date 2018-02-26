@@ -84,7 +84,9 @@ public class CountMongoDao extends AbsBaseMongoDAO<CountModel> {
         Sort sort = new Sort(order);
         query.with(sort);
         query.limit(1);
-        logger.info("getLastData query :" + query.getQueryObject().toString() + ".sort:" + query.getSortObject().toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("getLastData query :" + query.getQueryObject().toString() + ".sort:" + query.getSortObject().toString());
+        }
         return findOne(query);
     }
 }
