@@ -20,4 +20,11 @@ public interface CoterieAdminAPI {
 
     public Response<CoterieInfo> queryCoterieInfo(Long coterieId);
 
+    /**
+     * 设置私圈信息
+     * @param info  coterieId必填
+     * @throws ServiceException
+     */
+    public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info);
+
 }

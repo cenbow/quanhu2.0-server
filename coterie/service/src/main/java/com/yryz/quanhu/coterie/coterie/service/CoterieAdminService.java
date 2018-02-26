@@ -8,6 +8,8 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 
+import java.util.List;
+
 public interface CoterieAdminService {
 
     /**
@@ -26,4 +28,22 @@ public interface CoterieAdminService {
      * @return
      */
     public CoterieInfo getCoterieInfo(Long coterieId);
+
+    /**
+     * 根据名称查私圈
+     * @param name
+     * @return
+     */
+    List<CoterieInfo> findByName(String name);
+
+    /**
+     * 编辑私圈
+     */
+    void modify(CoterieInfo info);
+
+
+    /**
+     * 查询私圈
+     */
+    CoterieInfo find(Long coterieId);
 }

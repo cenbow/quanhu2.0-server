@@ -337,7 +337,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         //私圈人数已满
         if (coterie.getMemberNum().intValue() + 1 >= 2000) {
-            throw QuanhuException.busiError("私圈人数已达到上限");
+
+            String msg = "私圈人数已达到上限";
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,msg);
         }
 
         try {

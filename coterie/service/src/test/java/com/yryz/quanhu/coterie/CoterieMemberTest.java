@@ -29,10 +29,10 @@ public class CoterieMemberTest {
     @Autowired
     CoterieMemberOrderNotifyServiceImpl service;
 
-    private static Long userId = 368619989000192L;
-    private static Long coterieId = 367787629371392L;
+    private static Long userId = 377914625728512L;
+    private static Long coterieId = 378686755151872L;
 
-    private static Long memberId = 365780477952000L;
+    private static Long memberId = 356895487025152L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
 
