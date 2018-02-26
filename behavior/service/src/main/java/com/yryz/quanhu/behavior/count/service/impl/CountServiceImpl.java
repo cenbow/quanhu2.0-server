@@ -166,8 +166,12 @@ public class CountServiceImpl implements CountService {
             RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
             for (String key : redisTemplate.keys(RedisContants.WRITE_COUNT_KEY + "*")) {
                 String str = key.replace(RedisContants.WRITE_COUNT_KEY, "");
-                String[] arr = str.split("_");
-                CountModel countModel = new CountModel(arr[1], arr[0], arr[2], redisTemplate.opsForValue().get(key), date, dateTime.getHour(), new Date().getTime());
+                String[] arr = str.split(":");
+                String type, kid, page;
+                kid = arr[0];
+                type = arr[0].split("_")[0];
+                page = arr[0].split("_")[1];
+                CountModel countModel = new CountModel(type, kid, page, redisTemplate.opsForValue().get(key), date, dateTime.getHour(), new Date().getTime());
                 list.add(countModel);
             }
         } catch (Exception e) {

@@ -97,7 +97,9 @@ public class ReadServiceImpl implements ReadService {
                 e.printStackTrace();
                 logger.error("resourceId:" + res.getKid() + " 的文章增加阅读数失败!" + e.getMessage(), e.getCause());
             }
-            logger.info("excuteViewCountJob realease kid :" + res.getKid()+".count:"+readCount);
+            if(logger.isDebugEnabled()){
+                logger.debug("excuteViewCountJob realease kid :" + res.getKid()+".count:"+readCount);
+            }
         }
     }
 
