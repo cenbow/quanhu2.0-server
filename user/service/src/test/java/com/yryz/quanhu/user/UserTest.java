@@ -304,9 +304,9 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void getUserSimple(){
-		Response<UserSimpleVO> response = userApi.getUserSimple(726907134491074560L);
+		Response<UserSimpleVO> response = userApi.getUserSimple(380065213161472L);
 		//UserSimpleVO simpleVO = response.getData();
 		//Response<Map<String,UserSimpleVO>> response = userApi.getUserSimple(Sets.newHashSet("724011759597371392"));
 		System.out.println(JsonUtils.toFastJson(response));
