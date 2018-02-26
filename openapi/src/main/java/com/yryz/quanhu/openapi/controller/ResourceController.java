@@ -12,8 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
+import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
+import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,6 +64,9 @@ public class ResourceController {
 
     @Reference
     private CoterieMemberAPI coterieMemberAPI;
+
+    @Reference
+    private ReleaseInfoApi releaseInfoApi;
 
 
     @ApiOperation("首页资源推荐")
@@ -214,5 +220,27 @@ public class ResourceController {
             }
         }
         return list;
+    }
+
+    @ApiOperation("资源删除")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @PostMapping(value = "/{version}/resource/delete")
+    public Response<Object> delete(@RequestHeader Long userId, @RequestBody ResourceVo resourceVo) {
+        if (StringUtils.isEmpty(resourceVo.getResourceId())) {
+            return ResponseUtils.returnException(new QuanhuException(ExceptionEnum.PARAM_MISSING));
+        }
+        Long kid = new Long(resourceVo.getResourceId());
+        switch (resourceVo.getModuleEnum()) {
+            case ModuleContants.RELEASE://文章
+                ReleaseInfo upInfo = new ReleaseInfo();
+                upInfo.setKid(kid);
+                upInfo.setLastUpdateUserId(userId);
+                releaseInfoApi.deleteBykid(upInfo);
+                break;
+            case ModuleContants.TOPIC://话题
+                // TODO
+                break;
+        }
+        return ResponseUtils.returnSuccess();
     }
 }

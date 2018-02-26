@@ -324,4 +324,10 @@ public class AnswerServiceImpl implements AnswerService {
         }
         return null;
     }
+
+    @Override
+    public AnswerWithBLOBs queryAnswerBykid(Long kid){
+        AnswerWithBLOBs answerWithBLOBs=this.answerDao.selectByPrimaryKey(kid);
+        return answerWithBLOBs;
+    }
 }

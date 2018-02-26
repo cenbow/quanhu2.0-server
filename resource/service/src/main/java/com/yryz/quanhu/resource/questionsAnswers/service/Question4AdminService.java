@@ -2,7 +2,9 @@ package com.yryz.quanhu.resource.questionsAnswers.service;
 
 import com.yryz.common.response.PageList;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
+import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
+import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAdminVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 
@@ -26,4 +28,7 @@ public interface Question4AdminService {
 
 
     public Integer shalveDown(Long kid);
+
+
+    AnswerWithBLOBs queryAnswerDetail(Long kid);
 }
