@@ -388,7 +388,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             _dto.setUserId(_dto.getTargetUserId());
             _dto.setUserName(info.getUserNickName());
             _dto.setUserHeadImg(info.getUserImg());
-            _dto.setUserSummary(info.getUserSignature());
+            _dto.setUserSummary(info.getUserDesc());
             _dto.setUserStarFlag(info.getUserRole());
             return true;
         }else{
