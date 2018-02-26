@@ -81,7 +81,8 @@ public class AdvertUtil {
 		model.put("createTime", DateUtils.formatDate(new Date(), "yyyy-MM-dd"));
 		File file = null;
 		try {
-			String fileName = FreeMarkers.createFile(NoticeConstants.NOTICETHTML, model);
+			FreeMarkers freeMarkers = new FreeMarkers();
+			String fileName = freeMarkers.createFile(NoticeConstants.NOTICETHTML, model);
 
 			String filePath = new StringBuffer().append(AdvertUtil.getRealPath())
 					.append(Context.getProperty("web.newPageUrl")).append(fileName).toString();

@@ -110,16 +110,16 @@ public class SendMessageServiceImpl implements SendMessageService {
          */
         String content = messageConstant.getContent();
         if (StringUtils.isNotEmpty(fromUser.getUserNickName())) {
-            content = content.replaceAll("\\{someone\\}", fromUser.getUserNickName());
+            content = content.replace("{someone}", fromUser.getUserNickName());
         }
 
 
         if (StringUtils.isNotBlank(title)) {
-            content = content.replaceAll("\\{title\\}", title);
+            content = content.replace("{title}", title);
         }
 
         if (coterieInfo != null) {
-            content = content.replaceAll("\\{coterieName\\}", coterieInfo.getName());
+            content = content.replace("{coterieName}", coterieInfo.getName());
         }
 
         if (amount != null) {
@@ -132,9 +132,9 @@ public class SendMessageServiceImpl implements SendMessageService {
                         .divide(BigDecimal.valueOf(100L));
                 logger.info("抽成后金额是 : " + String.valueOf(cost));
                 String money = df.format(cost);
-                content = content.replaceAll("\\{money\\}", money);
+                content = content.replace("{money}", money);
             } else {
-                content = content.replaceAll("\\{money\\}", df.format(amount));
+                content = content.replace("{money}", df.format(amount));
             }
         }
         messageVo.setContent(content);

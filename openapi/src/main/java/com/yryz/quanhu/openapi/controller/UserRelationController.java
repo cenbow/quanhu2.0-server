@@ -177,9 +177,11 @@ public class UserRelationController {
         String targetUserId = request.getParameter("targetUserId");
         String relationType = request.getParameter("relationType");
 
-
+        //用户关系查询，用户未登录则可以查询其他人的关系
+        if(StringUtils.isBlank(userId)){
+            userId="";
+        }
         //check
-        Assert.notNull(userId,"userId不能为空");
         Assert.notNull(targetUserId,"targetUserId不能为空");
         Assert.notNull(relationType,"relationType不能为空");
 
@@ -221,9 +223,11 @@ public class UserRelationController {
         String currentPage  = request.getParameter("currentPage");
         String pageSize     = request.getParameter("pageSize");
 
-
+        //用户关系查询，用户未登录则可以查询其他人的关系
+        if(StringUtils.isBlank(userId)){
+            userId="";
+        }
         //check
-        Assert.notNull(userId,"userId不能为空");
         Assert.notNull(targetUserId,"targetUserId不能为空");
         Assert.notNull(relationType,"relationType不能为空");
         Assert.notNull(currentPage,"currentPage不能为空");
