@@ -5,17 +5,20 @@ import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberDto;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.coterie.member.vo.*;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.utils.CommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -77,10 +80,16 @@ public class CoterieMemberController {
     @ApiOperation("获取用户与私圈的权限关系")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/permission")
-    public Response permission(@RequestHeader("userId") Long userId, Long coterieId) {
+    public Response permission(Long coterieId, HttpServletRequest request) {
 
         CoterieMemberVoForPermission permissionResult = new CoterieMemberVoForPermission();
-        permissionResult.setPermission(ResponseUtils.getResponseData(coterieMemberAPI.permission(userId, coterieId)));
+
+        String userId = CommonUtils.getHeaderValue(request, "userId");
+        if (StringUtils.isNotBlank(userId)) {
+            permissionResult.setPermission(ResponseUtils.getResponseData(coterieMemberAPI.permission(Long.parseLong(userId), coterieId)));
+        } else {
+            permissionResult.setPermission(MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
+        }
 
         return new Response<>(permissionResult);
 
