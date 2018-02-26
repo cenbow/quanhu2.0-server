@@ -308,7 +308,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 	private boolean checkNeedSlipCode(VerifyCodeConfigVO configVO, VerifyCodeDTO codeDTO) {
 		int num = redisDao.getImgCodeCount(codeDTO.getVerifyKey(), codeDTO.getAppId());
 		redisDao.saveImgCodeCount(codeDTO.getVerifyKey(), codeDTO.getAppId(), configVO);
-		return configVO.getImgCodeNumLimit() < num;
+		return configVO.getImgCodeNumLimit() <= num;
 	}
 
 	@Override
