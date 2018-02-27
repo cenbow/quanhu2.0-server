@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.quanhu.user.entity.UserRegInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -650,6 +651,9 @@ public class UserServiceImpl implements UserService {
 				for (int i = 0; i < dtos.size(); i++) {
 					dto = dtos.get(i);
 					if (StringUtils.equals(dto.getUserId(), friendId)) {
+						if(StringUtils.equals(friendId, userId.toString())){
+							dto.setRelationStatus(STATUS.OWNER.getCode());
+						}
 						map.put(friendId, dto);
 						noRelation = false;
 					}
@@ -687,5 +691,11 @@ public class UserServiceImpl implements UserService {
 		return starUserIds;
 	}
 
-
+	@Override
+	public Page<UserRegInfo> listMsgUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
+		custInfoDTO.setNickName(replayStr(custInfoDTO.getNickName()));
+		Page<UserRegInfo> page = PageHelper.startPage(pageNo, pageSize);
+		custbaseinfoDao.listMsgUserInfo(custInfoDTO);
+		return page;
+	}
 }

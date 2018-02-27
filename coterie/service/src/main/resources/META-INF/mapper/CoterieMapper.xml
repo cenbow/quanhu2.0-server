@@ -245,7 +245,7 @@
         shelve_flag = #{shelveFlag},
       </if>
       <if test="auditUserId != null" >
-        audit_userId = #{auditUserId},
+        audit_user_id = #{auditUserId},
       </if>
       <if test="auditRemark != null" >
         audit_remark = #{auditRemark},

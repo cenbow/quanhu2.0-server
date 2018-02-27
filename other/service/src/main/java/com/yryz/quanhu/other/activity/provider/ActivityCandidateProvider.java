@@ -78,7 +78,7 @@ public class ActivityCandidateProvider implements ActivityCandidateApi {
      * */
     public Response<ActivityVoteDetailVo> detail(ActivityVoteDto activityVoteDto) {
         try {
-            Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
+            //Assert.notNull(activityVoteDto.getActivityInfoId(), "activityInfoId不能为空");
             Assert.notNull(activityVoteDto.getCandidateId(), "candidateId不能为空");
             Assert.notNull(activityVoteDto.getOtherFlag(), "otherFlag不能为空");
             return ResponseUtils.returnObjectSuccess(activityCandidateService.detail(activityVoteDto));

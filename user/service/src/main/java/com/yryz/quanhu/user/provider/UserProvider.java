@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.quanhu.user.entity.UserRegInfo;
+import com.yryz.quanhu.user.vo.UserRegInfoVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +35,10 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 @Service(interfaceClass=UserApi.class)
 public class UserProvider implements UserApi{
 	private static final Logger logger = LoggerFactory.getLogger(UserProvider.class);
-	
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Override
 	public Response<UserSimpleVO> getUserSimple(Long userId) {
 		try {
@@ -59,7 +61,7 @@ public class UserProvider implements UserApi{
 				throw QuanhuException.busiError("friendId不能为空");
 			}
 			UserSimpleVO simpleVO = userService.getUserSimple(userId,friendId);
-			
+
 			return ResponseUtils.returnObjectSuccess(simpleVO);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -76,7 +78,7 @@ public class UserProvider implements UserApi{
 				throw QuanhuException.busiError("userIds不能为空");
 			}
 			Map<String, UserSimpleVO> map = userService.getUserSimple(userIds);
-			
+
 			return ResponseUtils.returnObjectSuccess(map);
 		} catch (QuanhuException e) {
 			return ResponseUtils.returnException(e);
@@ -316,5 +318,20 @@ public class UserProvider implements UserApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
-	
+
+	@Override
+	public Response<PageList<UserRegInfoVO>> listMsgUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
+		try {
+			if(custInfoDTO == null || StringUtils.isBlank(custInfoDTO.getAppId())){
+				throw QuanhuException.busiError("appId不能为空");
+			}
+			Page<UserRegInfo> list = userService.listMsgUserInfo(pageNo, pageSize, custInfoDTO);
+			List<UserRegInfoVO> baseInfos = GsonUtils.parseList(list, UserRegInfoVO.class);
+			PageList<UserRegInfoVO> pageList = new PageList<>(pageNo, pageSize, baseInfos, list.getTotal());
+			return ResponseUtils.returnObjectSuccess(pageList);
+		} catch (Exception e) {
+			logger.error("listUserInfo error", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
 }

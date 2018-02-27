@@ -62,7 +62,7 @@ public class Question4AdminProvider implements Question4AdminApi {
     @Override
     public Response<QuestionAnswerVo> queryDetail(Long kid) {
         try {
-            QuestionAnswerVo result= this.questionService.queryAvailableQuestionByKid(kid);
+            QuestionAnswerVo result= this.questionService.queryQuestionByKid(kid);
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

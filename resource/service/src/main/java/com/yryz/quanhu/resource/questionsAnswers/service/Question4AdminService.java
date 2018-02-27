@@ -27,6 +27,8 @@ public interface Question4AdminService {
     public QuestionAnswerVo queryAvailableQuestionByKid(Long kid);
 
 
+    QuestionAnswerVo queryQuestionByKid(Long kid);
+
     public Integer shalveDown(Long kid);
 
 

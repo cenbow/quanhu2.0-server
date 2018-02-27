@@ -62,5 +62,18 @@ public class EsTest {
     	Response<PageList<UserSimpleVo>>  list=elasticsearchService.searchUser("qh", 1, 10);
     	System.out.println(list);
     }
+
+    @Test
+    public void searchMsgUserAdmin() {
+        AdminUserInfoDTO dto = new AdminUserInfoDTO();
+        dto.setPageSize(20);
+        dto.setPageNo(1);
+        dto.setRegType("Phone");
+        dto.setAppId("vebff12m1762");
+        dto.setDevType("IOS");
+        dto.setAppVersion("2.0.0");
+        Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.searchMsgUserAdmin(dto);
+        System.out.println(pageListResponse);
+    }
     
 }

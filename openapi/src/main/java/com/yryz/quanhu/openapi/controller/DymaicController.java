@@ -12,6 +12,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.Lists;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.CommonConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +57,7 @@ public class DymaicController {
     private UserApi userApi;
 
 
-    //    @UserBehaviorValidation(login = true)
+    @UserBehaviorValidation(login = true)
     @ApiOperation("动态tab的所关注的全部动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/gettimeline")
@@ -114,6 +115,7 @@ public class DymaicController {
         }
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("删除动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/delete")
@@ -127,6 +129,7 @@ public class DymaicController {
         return dymaicService.delete(userId, dymaic.getKid());
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("动态置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/addTopDymaic")
@@ -140,7 +143,7 @@ public class DymaicController {
         return dymaicService.addTopDymaic(userId, dymaic.getKid());
     }
 
-
+    @UserBehaviorValidation(login = true)
     @ApiOperation("动态取消置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/deleteTopDymaic")
