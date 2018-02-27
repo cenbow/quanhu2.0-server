@@ -110,7 +110,7 @@ public class PushMsgConsumer {
 			if (messageVo != null && StringUtils.isNotBlank(messageVo.getMessageId())) {
 				logger.info("start update push message status");
 				MessageVo vo = messageMongo.get(messageVo.getMessageId());
-				if (vo != null && StringUtils.isNotBlank(vo.getJpId())) {
+				if (vo != null && StringUtils.isBlank(vo.getJpId())) {
 					MessageVo toUpdate = new MessageVo(messageVo.getMessageId());
 					toUpdate.setJpId(msg_id);
 					messageMongo.update(toUpdate);

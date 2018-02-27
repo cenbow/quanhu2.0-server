@@ -188,7 +188,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
             if (advertisementAdminDto.getAdvStatus() != null && advertisementAdminDto.getAdvType() != null && advertisementAdminDto.getAdvType().equals(AdvertisementConstants.TYPE_GUIDE)) {
                 if (advertisementAdminDto.getAdvStatus().equals(AdvertisementConstants.STATUS_ING) || advertisementAdminDto.getAdvStatus().equals(AdvertisementConstants.STATUS_FUTURE_START)) {
-                    if (!checkConflict(advertisementAdminDto)) {
+                    if (!checkShelveFlagConflict(advertisementAdminDto)) {
                         return 3;
                     }
                 }
@@ -217,6 +217,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         } catch (Exception e) {
             LOGGER.error("更新失败！", e);
             throw QuanhuException.busiError("更新失败！");
+        }
+    }
+
+    private boolean checkShelveFlagConflict(AdvertisementAdminDto advertisementAdminDto) {
+        if (advertisementAdminDto.getAdvStatus() != null && advertisementAdminDto.getAdvStatus() != 30) {
+            List<AdvertisementAdminVo> list = advertisementDao.checkShelveFlagConflict(advertisementAdminDto);
+            return CollectionUtils.isEmpty(list);
+        } else {
+            return true;
         }
     }
 
