@@ -1,18 +1,36 @@
 package com.yryz.quanhu.behavior.like.provider;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.alibaba.fastjson.JSONObject;
 import com.yryz.common.constant.ModuleContants;
-import com.yryz.common.message.*;
+import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.InteractiveBody;
+import com.yryz.common.message.MessageActionCode;
+import com.yryz.common.message.MessageLabel;
+import com.yryz.common.message.MessageType;
+import com.yryz.common.message.MessageViewCode;
+import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.IdGen;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
-import com.yryz.quanhu.behavior.comment.dto.CommentAssemble;
-import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
@@ -21,11 +39,8 @@ import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeService;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
-import com.yryz.quanhu.dymaic.service.DymaicService;
-import com.yryz.quanhu.dymaic.vo.Dymaic;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.message.message.api.MessageAPI;
-import com.yryz.quanhu.resource.hotspot.api.HotSpotApi;
 import com.yryz.quanhu.resource.questionsAnswers.api.AnswerApi;
 import com.yryz.quanhu.resource.questionsAnswers.api.QuestionApi;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
@@ -41,15 +56,6 @@ import com.yryz.quanhu.score.vo.GrowFlowReportVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Author:sun
@@ -117,7 +123,7 @@ public class LikeProvider implements LikeApi {
                     LikeVO likeVO = likeService.querySingleLiker(like);
                     if (null != likeVO) {
                         try {
-                            UserSimpleVO userSimpleVO = userApi.getUserSimple(likeVO.getUserId()).getData();
+                            UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(userApi.getUserSimple(likeVO.getUserId()));
                             if (null != userSimpleVO) {
                                 map.put("userNickName", userSimpleVO.getUserNickName());
                                 map.put("userImg", userSimpleVO.getUserImg());
@@ -259,8 +265,8 @@ public class LikeProvider implements LikeApi {
     @Override
     public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO) {
         try {
-            Response<Map<String, Long>> mapResponse = countApi.getCount("11", likeFrontDTO.getResourceId(), "");
-            Long count = mapResponse.getData().get("likeCount");
+            Map<String, Long> map = ResponseUtils.getResponseData(countApi.getCount("11", likeFrontDTO.getResourceId(), ""));
+            Long count = map.get("likeCount");
             PageList<LikeVO> likeVOS = likeService.queryLikers(likeFrontDTO);
             for (LikeVO likeVO : likeVOS.getEntities()) {
                 UserSimpleVO userSimpleVO = userApi.getUserSimple(likeVO.getUserId()).getData();
@@ -328,7 +334,7 @@ public class LikeProvider implements LikeApi {
     }
 
     public void switchSend(Like like) {
-        UserSimpleVO userSimpleVO = userApi.getUserSimple(like.getUserId()).getData();
+        UserSimpleVO userSimpleVO = ResponseUtils.getResponseData(userApi.getUserSimple(like.getUserId()));
         String nickName = "";
         if (null != userSimpleVO) {
             nickName = userSimpleVO.getUserNickName();
@@ -348,7 +354,10 @@ public class LikeProvider implements LikeApi {
             this.topicPostPush(likeAssemble);
         }
         if (like.getModuleEnum().equals(ModuleContants.ANSWER)) {
-            AnswerVo answerVo = answerApi.getDetail(like.getResourceId()).getData();
+            AnswerVo answerVo = ResponseUtils.getResponseData(answerApi.getDetail(like.getResourceId()));
+            if(answerVo == null){
+            	throw QuanhuException.busiShowError("答案不存在", "答案不存在"); 
+            }
             LikeAssemble likeAssembleAnswer = new LikeAssemble();
             if (null != likeAssembleAnswer.getContent() && likeAssembleAnswer.getContent().length() > 20) {
                 likeAssembleAnswer.setTitle(answerVo.getContent().substring(0, 20));
@@ -380,7 +389,10 @@ public class LikeProvider implements LikeApi {
                 }
             }
             this.sendMessage(likeAssembleAnswer);
-            Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
+            Question question = ResponseUtils.getResponseData(questionApi.queryDetail(answerVo.getQuestionId()));
+            if(question == null){
+            	throw QuanhuException.busiShowError("问题不存在", "问题不存在"); 
+            }
             LikeAssemble likeAssembleQuestion = new LikeAssemble();
             likeAssembleQuestion.setTargetUserId(question.getCreateUserId());
             likeAssembleQuestion.setContent(nickName + "点赞了您的问答");
@@ -442,7 +454,7 @@ public class LikeProvider implements LikeApi {
 
     public void releasePush(LikeAssemble likeAssemble) {
         try {
-            ReleaseInfoVo releaseInfoVo = releaseInfoApi.infoByKid(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()).getData();
+            ReleaseInfoVo releaseInfoVo = ResponseUtils.getResponseData(releaseInfoApi.infoByKid(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()));
             likeAssemble.setTitle(releaseInfoVo.getTitle());
             likeAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
             if (!releaseInfoVo.getImgUrl().equals("")) {
@@ -474,7 +486,7 @@ public class LikeProvider implements LikeApi {
 
     public void topicPostPush(LikeAssemble likeAssemble) {
         try {
-            TopicPostVo topicPostVo = topicPostApi.quetyDetail(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()).getData();
+            TopicPostVo topicPostVo = ResponseUtils.getResponseData(topicPostApi.quetyDetail(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()));
             likeAssemble.setTargetUserId(topicPostVo.getUser().getUserId());
             if (null != topicPostVo.getContent() && topicPostVo.getContent().length() > 20) {
                 likeAssemble.setTitle(topicPostVo.getContent().substring(0, 20));
