@@ -117,9 +117,9 @@ public class UserController {
 	public Response<UserLoginSimpleVO> findUser(Long userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		UserLoginSimpleVO simpleVO = null;
-		/*if (StringUtils.isNotBlank(header.getUserId())) {
+		if (StringUtils.isNotBlank(header.getUserId())) {
 			authService.checkToken(request);
-		}*/
+		}
 		if (userId != null && userId != 0l) {
 			if (StringUtils.isNotBlank(header.getUserId())) {
 				simpleVO = ResponseUtils.getResponseData(
