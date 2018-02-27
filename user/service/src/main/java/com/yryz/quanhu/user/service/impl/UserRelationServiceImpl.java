@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.pagehelper.Page;
 import com.yryz.common.constant.ExceptionEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -348,11 +349,13 @@ public class UserRelationServiceImpl implements UserRelationService{
         /**
          * 先查询sourceUserId的相关关系
          */
-        PageHelper.startPage(dto.getCurrentPage(),dto.getPageSize());
+        Page<UserRelationDto> page = PageHelper.startPage(dto.getCurrentPage(),dto.getPageSize());
 
         List<UserRelationDto> targetList =
                 userRelationDao.selectStatus(UserRelationDto.class,targetUserId,status.getCode());
 
+        //先获取总数量，再清楚page对象
+        long total = page.getTotal();
         PageHelper.clearPage();
 
         /**
@@ -373,7 +376,12 @@ public class UserRelationServiceImpl implements UserRelationService{
             targetUserIds.add(targetList.get(i).getTargetUserId());
         }
         List<UserRelationDto> outArray = this.selectBy(sourceUserId,targetUserIds);
-        return new PageModel<UserRelationDto>().getPageList(outArray);
+
+        //重新设置page数量
+        PageList<UserRelationDto> pageList = new PageModel<UserRelationDto>().getPageList(outArray);
+        pageList.setCount(total);
+
+        return pageList;
     }
 
     private void mergeRelation(List<UserRelationDto> list,UserRelationDto _dto){
