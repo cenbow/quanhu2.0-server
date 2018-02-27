@@ -55,5 +55,8 @@ public class OrderConstant {
 	public static final String PAY_WAY_LLPAY_FAST_CREDIT = "11";
 	/**支付方式:银联支付**/
 	public static final String PAY_WAY_UNIONPAY = "12";
+	/**支付方式:微信提现到银行卡**/
+	public static final String PAY_WAY_WX_CASH_CARD = "13";
+
 	
 }

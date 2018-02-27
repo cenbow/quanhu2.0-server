@@ -21,6 +21,7 @@ import javax.print.attribute.standard.RequestingUserName;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.quanhu.openapi.order.utils.BankUtil;
 import com.yryz.quanhu.order.enums.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -432,6 +433,14 @@ public class PayService {
 		if (custBank == null) {
 			return ResponseUtils.returnCommonException("银行卡信息不存在");
 		}
+		String bankCardNo = custBank.getBankCardNo();
+		if(StringUtils.isBlank(bankCardNo)){
+			return ResponseUtils.returnCommonException("银行卡号信息不存在");
+		}
+		String wxBankId= BankUtil.getWxBankId(bankCardNo.replace(" ", ""));
+		if(StringUtils.isBlank(wxBankId)){
+			return ResponseUtils.returnCommonException("暂不支持提现到该银行卡，请选择已支持的银行");
+		}
 		//验证密码
 		Response<?> checkResponse = checkPassword(custId, password);
 		if (!checkResponse.success()) {
@@ -447,7 +456,7 @@ public class PayService {
 		payInfo.setCreateTime(new Date());
 		payInfo.setCurrency("156");
 		payInfo.setCustId(custId);
-		payInfo.setOrderChannel(OrderConstant.PAY_WAY_UNIONPAY);
+		payInfo.setOrderChannel(OrderConstant.PAY_WAY_WX_CASH_CARD);
 		payInfo.setOrderDesc(OrderDescEnum.INTEGRAL_CASH);
 		payInfo.setOrderId(orderId);
 		payInfo.setOrderState(OrderPayConstants.OrderState.CREATE);
@@ -460,6 +469,7 @@ public class PayService {
 		startDescMap.put("userName",custBank.getName());
 		startDescMap.put("bankCardNo",custBank.getBankCardNo().replace(" ", ""));
 		startDescMap.put("bankName",custBank.getBankCode());
+		startDescMap.put("wxBankId",wxBankId);
 		payInfo.setStartDesc(JSON.toJSONString(startDescMap));
 
 		Response<PayInfo> response = orderAPI.executePay(payInfo, custId, null, null);
