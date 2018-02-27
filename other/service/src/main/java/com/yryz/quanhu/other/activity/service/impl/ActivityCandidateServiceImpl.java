@@ -153,6 +153,8 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
      * @return
      * */
     public ActivityVoteDetailVo detail(ActivityVoteDto activityVoteDto) {
+        ActivityVoteDetailVo activityVoteDetailVo = activityVoteDetailDao.selectByKid(activityVoteDto.getCandidateId());
+        activityVoteDto.setActivityInfoId(activityVoteDetailVo.getActivityInfoId());
         Set<ZSetOperations.TypedTuple<Long>> set = new HashSet<>();
         set.add(new DefaultTypedTuple<>(activityVoteDto.getCandidateId(), 0d));
         List<ActivityVoteDetailVo> list = this.getDetail(activityVoteDto.getActivityInfoId(), set);

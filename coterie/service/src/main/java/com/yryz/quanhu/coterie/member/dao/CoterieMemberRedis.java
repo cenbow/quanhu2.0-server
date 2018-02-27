@@ -56,6 +56,14 @@ public class CoterieMemberRedis {
 		return null;
 	}
 
+	/**
+	 * 删除缓存
+	 */
+	public void deletePermission(Long coterieId, Long userId){
+		String key=getCoterieMemberPermissionKey(coterieId, userId);
+		redisTemplate.delete(key);
+	}
+
 	/********* apply ******************************************************/
 
 	/**

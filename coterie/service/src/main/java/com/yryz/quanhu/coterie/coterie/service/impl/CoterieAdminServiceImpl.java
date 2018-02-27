@@ -171,4 +171,43 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
 
         return coterieInfo;
     }
+
+
+    @Override
+    public List<CoterieInfo> findByName(String name) {
+        List<Coterie> list = Lists.newArrayList();
+        list = coterieMapper.selectByName(name);
+        return (List<CoterieInfo>) GsonUtils.parseList(list, CoterieInfo.class);
+    }
+
+    @Override
+    public void modify(CoterieInfo info) {
+        Coterie coterie = (Coterie) GsonUtils.parseObj(info, Coterie.class);
+        coterieMapper.updateByCoterieIdSelective(coterie);
+        updateCache(coterie.getCoterieId());
+
+        if (coterie.getShelveFlag() == 11) {
+            coterieMessageManager.offlineMessage(coterie.getCoterieId(), coterie.getAuditRemark());
+        }
+    }
+
+    @Override
+    public CoterieInfo find(Long coterieId) {
+        Coterie info = coterieRedis.get(coterieId);
+        if(info==null){
+            info = coterieMapper.selectByCoterieId(coterieId);
+        }
+        return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
+    }
+
+
+    /**
+     * 更新redis缓存
+     */
+    private void updateCache(Long coterieId){
+        Coterie model = coterieMapper.selectByCoterieId(coterieId);
+        if(model != null){
+            coterieRedis.save(model);
+        }
+    }
 }

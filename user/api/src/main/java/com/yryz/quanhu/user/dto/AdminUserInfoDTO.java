@@ -125,6 +125,84 @@ public class AdminUserInfoDTO implements Serializable{
 	 */
 	private Boolean needIntegral = false;
 
+	/**
+	 * 用户性别 10-女 11-男
+	 */
+	private Byte userGenders;
+
+	/**
+	 * 注册方式 PHONE、WEIXIN、SINA
+	 */
+	private String regType;
+
+	/**
+	 * ANDROID、IOS、WEB、WAP
+	 */
+	private String devType;
+
+	/**
+	 * 应用版本号
+	 */
+	private String appVersion;
+
+    /**
+     * 认证状态 10-未认证 11-已认证
+     */
+    private Byte authStatus;
+
+	/**
+	 * 1. 包含以下
+	 */
+	private Integer versionInclude;
+
+	public Integer getVersionInclude() {
+		return versionInclude;
+	}
+
+	public void setVersionInclude(Integer versionInclude) {
+		this.versionInclude = versionInclude;
+	}
+
+	public Byte getAuthStatus() {
+        return authStatus;
+    }
+
+    public void setAuthStatus(Byte authStatus) {
+        this.authStatus = authStatus;
+    }
+
+    public Byte getUserGenders() {
+		return userGenders;
+	}
+
+	public void setUserGenders(Byte userGenders) {
+		this.userGenders = userGenders;
+	}
+
+	public String getRegType() {
+		return regType;
+	}
+
+	public void setRegType(String regType) {
+		this.regType = regType;
+	}
+
+	public String getDevType() {
+		return devType;
+	}
+
+	public void setDevType(String devType) {
+		this.devType = devType;
+	}
+
+	public String getAppVersion() {
+		return appVersion;
+	}
+
+	public void setAppVersion(String appVersion) {
+		this.appVersion = appVersion;
+	}
+
 	public String getRealName() {
 		return realName;
 	}

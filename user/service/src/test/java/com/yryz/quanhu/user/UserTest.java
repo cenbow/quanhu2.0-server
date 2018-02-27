@@ -304,7 +304,7 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	@Test
+	//@Test
 	public void getUserSimple(){
 		Response<UserSimpleVO> response = userApi.getUserSimple(380065213161472L);
 		//UserSimpleVO simpleVO = response.getData();
@@ -312,9 +312,9 @@ public class UserTest {
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	
-	//@Test
+	@Test
 	public void getUserLoginSimpleVO(){
-		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(724007310011252736L);
+		Response<UserLoginSimpleVO> response = userApi.getUserLoginSimpleVO(380065213161472L);
 		System.out.println(JsonUtils.toFastJson(response));
 	}
 	

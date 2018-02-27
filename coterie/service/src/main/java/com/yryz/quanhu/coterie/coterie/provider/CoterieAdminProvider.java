@@ -13,8 +13,10 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service(interfaceClass=CoterieAdminAPI.class)
 public class CoterieAdminProvider implements CoterieAdminAPI {
@@ -68,6 +70,38 @@ public class CoterieAdminProvider implements CoterieAdminAPI {
                 }
             }
             return ResponseUtils.returnObjectSuccess(info);
+        } catch (Exception e) {
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+
+    /**
+     * 设置私圈信息
+     * @param info  coterieId必填
+     */
+    @Override
+    public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info) {
+
+        try {
+            if (info == null ||  info.getCoterieId()==null) {
+                return ResponseUtils.returnCommonException("私圈ID不存在");
+            }
+            String name = StringUtils.trim(info.getName());
+            if (StringUtils.isNotEmpty(name)) {
+                List<CoterieInfo> clist = coterieAdminService.findByName(name);
+                if (!clist.isEmpty()&&!clist.get(0).getCoterieId().equals(info.getCoterieId())) {
+                    return ResponseUtils.returnCommonException("私圈名称已存在");
+                }
+            }
+            if (info.getJoinFee() != null && (info.getJoinFee() > 50000 || info.getJoinFee() < 0)) {
+                return ResponseUtils.returnCommonException("加入私圈金额设置不正确。");
+            }
+            if (info.getConsultingFee()!=null && (info.getConsultingFee() > 10000 || info.getConsultingFee() < 0)) {
+                return ResponseUtils.returnCommonException("私圈咨询费金额设置不正确。");
+            }
+            coterieAdminService.modify(info);
+            return ResponseUtils.returnObjectSuccess(coterieAdminService.find(info.getCoterieId()));
         } catch (Exception e) {
             return ResponseUtils.returnException(e);
         }

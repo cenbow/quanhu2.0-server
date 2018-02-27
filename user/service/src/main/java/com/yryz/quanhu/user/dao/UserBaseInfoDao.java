@@ -10,6 +10,7 @@ package com.yryz.quanhu.user.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.yryz.quanhu.user.entity.UserRegInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -45,4 +46,7 @@ public interface UserBaseInfoDao {
     List<UserBaseInfo> getUserListByCreateDate(@Param("startDate")String startDate,@Param("endDate")String endDate);
 
     List<UserBaseInfo> getAllByUserIds(@Param("userIds")List<Long> userIds);
+
+    List<UserRegInfo> listMsgUserInfo(AdminUserInfoDTO custInfoDTO);
+
 }
