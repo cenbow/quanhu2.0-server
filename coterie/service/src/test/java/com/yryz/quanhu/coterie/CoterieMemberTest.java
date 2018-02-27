@@ -66,7 +66,7 @@ public class CoterieMemberTest {
         OutputOrder outputOrder = new OutputOrder();
 
 //        {"userId":737251236811898880,"coterieId":233665981858,"reason":"我要加入,要审核的","coterieName":"think","icon":"icon","owner":"727909974996672512","amount":10000}
-        outputOrder.setBizContent("{\"userId\":738941340803252224,\"coterieId\":233665981858,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
+        outputOrder.setBizContent("{\"userId\":365780477952000,\"coterieId\":369229933076480,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
 
         outputOrder.setOrderId(20180207164695L);
         outputOrder.setPayType(10);
@@ -74,8 +74,8 @@ public class CoterieMemberTest {
         outputOrder.setCost(1000L);
         outputOrder.setModuleEnum(ModuleContants.COTERIE);
         outputOrder.setCreateDate(new Date());
-        outputOrder.setCoterieId(233665981858L);
-        outputOrder.setCreateUserId(738941340803252224L);
+        outputOrder.setCoterieId(369229933076480L);
+        outputOrder.setCreateUserId(365780477952000L);
         service.notify(outputOrder);
     }
 
