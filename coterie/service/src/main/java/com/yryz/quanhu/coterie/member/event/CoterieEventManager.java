@@ -1,6 +1,7 @@
 package com.yryz.quanhu.coterie.member.event;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberService;
@@ -48,6 +49,7 @@ public class CoterieEventManager {
             event.setUserId(coterie.getOwnerId());
             event.setEventNum(1);
             event.setEventCode(EventEnum.CREATE_COTERIE.getCode());
+            logger.info(GsonUtils.parseJson(event));
             eventAPI.commit(event);
         } catch (Exception e) {
             logger.error("event Exception", e);
