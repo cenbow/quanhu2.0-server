@@ -8,6 +8,7 @@ import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
+import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
@@ -122,6 +123,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             inputOrder.setResourceId(coterieId);
             inputOrder.setBizContent(extJson);
 
+            logger.info(GsonUtils.parseJson(inputOrder));
             Long orderId = orderSDK.createOrder(inputOrder);
 
             result.setStatus((byte) 10);
@@ -137,6 +139,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
             if (null == memberApply) {
                 //insert member apply
+                logger.info("save or update apply");
                 saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.PASS.getStatus());
             } else {
                 throw QuanhuException.busiError("用户已申请加入私圈!");
@@ -146,6 +149,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
             if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
                 //再入成员表
+                logger.info("save or update member");
                 saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
             } else {
 
@@ -153,8 +157,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             }
 
             //permission cache
+            logger.info("update redis");
 //            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
             coterieMemberRedis.deletePermission(coterieId, userId);
+            logger.info("update redis end ");
 
             result.setStatus((byte) 20);
             return result;
@@ -169,6 +175,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 saveOrUpdateApply(userId, coterieId, reason, MemberConstant.MemberStatus.WAIT.getStatus());
 
                 //msg
+                logger.info("join message ");
                 coterieMemberMessageManager.joinMessage(userId, coterieId, reason);
 
                 //设置红点
@@ -176,6 +183,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 coterieInfo.setCoterieId(coterieId);
                 coterieInfo.setRedDot(11);
                 coterieService.modify(coterieInfo);
+                logger.info("set red dot ");
 
             } else {
 
@@ -183,8 +191,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             }
 
             //permission cache
+            logger.info("update redis");
 //            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus());
             coterieMemberRedis.deletePermission(coterieId, userId);
+            logger.info("update redis end");
 
             result.setStatus((byte) 30);
             return result;
@@ -217,10 +227,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
                 if (resultMember > 0 && resultApply > 0) {
                     //更新私圈成员数
+                    logger.info("update member num");
                     coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
                 }
             }
-            //todo msg
+
+            logger.info("kick message ");
             coterieMemberMessageManager.kickMessage(userId, coterieId, reason);
 
             //permission cache
@@ -299,13 +311,17 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         try {
 
             if (userId == null) {
+                logger.info("user is null permission 30");
                 return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
             }
 
             Integer permission = coterieMemberRedis.getPermission(coterieId, userId);
             if (null == permission) {
+                logger.info("permission redis is null");
                 permission = getPermissionByDb(coterieId, userId);
+                logger.info("permission db is : " + permission);
                 coterieMemberRedis.savePermission(coterieId, userId, permission);
+                logger.info("permission db is : " + permission);
             }
             return permission;
 
@@ -624,12 +640,14 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         //是否为圈主
         if (userId.longValue() == ownerId.longValue()) {
+            logger.info("圈主");
             return MemberConstant.Permission.OWNER.getStatus();
         }
 
         //是否为成员
         CoterieMember member = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
         if (null != member && member.getDelFlag().equals(MemberConstant.DelFlag.NORMAL.getStatus())) {
+            logger.info("成员");
             return MemberConstant.Permission.MEMBER.getStatus();
         }
 
@@ -637,8 +655,10 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
         CoterieMemberApply apply = coterieApplyDao.selectWaitingByCoterieIdAndUserId(coterieId, userId);
 
         if (null != apply) {
+            logger.info("路人已申请");
             return MemberConstant.Permission.STRANGER_WAITING_CHECK.getStatus();
         } else {
+            logger.info("路人未申请");
             return MemberConstant.Permission.STRANGER_NON_CHECK.getStatus();
         }
     }
