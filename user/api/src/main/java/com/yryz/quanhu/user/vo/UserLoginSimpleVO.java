@@ -103,7 +103,7 @@ public class UserLoginSimpleVO implements Serializable {
     /**
      * 关系状态 {@link #UserRelationConstant.STATUS}
      */
-    private Integer relationStatus = STATUS.NONE.getCode();
+    private Integer relationStatus = STATUS.OWNER.getCode();
     /**
      * 好友备注名
      */
