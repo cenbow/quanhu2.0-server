@@ -41,6 +41,7 @@ import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.support.illegalWord.api.IllegalWordsApi;
 import com.yryz.quanhu.user.contants.RegType;
+import com.yryz.quanhu.user.contants.UserRelationConstant.STATUS;
 import com.yryz.quanhu.user.dto.AuthRefreshDTO;
 import com.yryz.quanhu.user.dto.BindPhoneDTO;
 import com.yryz.quanhu.user.dto.BindThirdDTO;
@@ -93,12 +94,12 @@ public class UserController {
 	private IllegalWordsApi wordApi;
 	@Autowired
 	private AuthService authService;
-	
+
 	@ApiOperation("用户token刷新")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/refreshToken")
-	public Response<AuthTokenVO> refreshToken(@RequestBody Map<String,String> params, HttpServletRequest request) {
+	public Response<AuthTokenVO> refreshToken(@RequestBody Map<String, String> params, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		AuthRefreshDTO refreshDTO = new AuthRefreshDTO(params.get("refreshToken"), true);
 		refreshDTO.setAppId(header.getAppId());
@@ -116,23 +117,23 @@ public class UserController {
 	public Response<UserLoginSimpleVO> findUser(Long userId, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		UserLoginSimpleVO simpleVO = null;
-		//用户登录的情况下
-		if (userId == null) {
+		/*if (StringUtils.isNotBlank(header.getUserId())) {
 			authService.checkToken(request);
-			simpleVO = ResponseUtils
-					.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId())));
-		} else if(userId != null ){
-			if(StringUtils.isNotBlank(header.getUserId())){
-				authService.checkToken(request);
+		}*/
+		if (userId != null && userId != 0l) {
+			if (StringUtils.isNotBlank(header.getUserId())) {
+				simpleVO = ResponseUtils.getResponseData(
+						userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()),userId));
+			} else {
+				simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(userId));
 			}
-			if(StringUtils.isNotBlank(header.getUserId()) && !StringUtils.equals(userId.toString(), header.getUserId())){
-				simpleVO = ResponseUtils
-						.getResponseData(userApi.getUserLoginSimpleVO(NumberUtils.createLong(header.getUserId()), userId));
-				simpleVO.setUserPhone(CommonUtils.getPhone(simpleVO.getUserPhone()));
-			}else{
-				simpleVO = ResponseUtils
-						.getResponseData(userApi.getUserLoginSimpleVO(userId));
-			}
+		} else {
+			simpleVO = ResponseUtils.getResponseData(userApi.getUserLoginSimpleVO(
+					NumberUtils.createLong(header.getUserId())));
+		}
+		// 非本人
+		if (simpleVO.getRelationStatus() != STATUS.OWNER.getCode()) {
+			simpleVO.setUserPhone(CommonUtils.getPhone(simpleVO.getUserPhone()));
 		}
 		return ResponseUtils.returnApiObjectSuccess(simpleVO);
 	}
@@ -144,38 +145,40 @@ public class UserController {
 	public Response<Boolean> userUpdate(@RequestBody UpdateBaseInfoDTO infoDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		infoDTO.setUserId(NumberUtils.createLong(header.getUserId()));
-		if(StringUtils.isNotBlank(infoDTO.getUserNickName())){
+		if (StringUtils.isNotBlank(infoDTO.getUserNickName())) {
 			Set<String> set = ResponseUtils.getResponseData(wordApi.matchIllegalWords(infoDTO.getUserNickName()));
-			if(CollectionUtils.isNotEmpty(set)){
-				return ResponseUtils.returnCommonException("昵称存在敏感词:"+getStringBySet(set));
+			if (CollectionUtils.isNotEmpty(set)) {
+				return ResponseUtils.returnCommonException("昵称存在敏感词:" + getStringBySet(set));
 			}
 		}
-		if(StringUtils.isNotBlank(infoDTO.getUserDesc())){
+		if (StringUtils.isNotBlank(infoDTO.getUserDesc())) {
 			Set<String> set = ResponseUtils.getResponseData(wordApi.matchIllegalWords(infoDTO.getUserDesc()));
-			if(CollectionUtils.isNotEmpty(set)){
-				return ResponseUtils.returnCommonException("昵称存在敏感词:"+getStringBySet(set));
+			if (CollectionUtils.isNotEmpty(set)) {
+				return ResponseUtils.returnCommonException("昵称存在敏感词:" + getStringBySet(set));
 			}
 		}
 		Boolean result = ResponseUtils.getResponseData(userApi.updateUserInfo(infoDTO));
 		return ResponseUtils.returnApiObjectSuccess(result);
 	}
-	
+
 	@ApiOperation("根据手机号查询用户账号(没有注册的userId为空)")
 	@UserBehaviorValidation(login = true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/findPhones")
-	public Response<List<Map<String,String>>> findPhones(String phones, HttpServletRequest request) {
+	public Response<List<Map<String, String>>> findPhones(String phones, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		String[] phoneArray = StringUtils.split(phones, ",");
-		if(ArrayUtils.isEmpty(phoneArray)){
+		if (ArrayUtils.isEmpty(phoneArray)) {
 			return ResponseUtils.returnCommonException("手机号为空");
 		}
-		List<Map<String,String>> maps = ResponseUtils.getResponseData(accountApi.getUserAccountByPhone(Sets.newHashSet(phoneArray), header.getAppId()));
+		List<Map<String, String>> maps = ResponseUtils
+				.getResponseData(accountApi.getUserAccountByPhone(Sets.newHashSet(phoneArray), header.getAppId()));
 		return ResponseUtils.returnApiObjectSuccess(maps);
 	}
-	
+
 	/**
 	 * 查询用户权限
+	 * 
 	 * @param request
 	 * @return
 	 */
@@ -294,7 +297,8 @@ public class UserController {
 		UserRegLogDTO logDTO = getUserRegLog(header, RegType.PHONE, loginDTO.getLocation(), null, devType, ip);
 		loginDTO.setRegLogDTO(logDTO);
 		Response<RegisterLoginVO> response = accountApi.loginThird(loginDTO, header);
-		if (!StringUtils.equals(response.getCode(), ResponseConstant.SUCCESS.getCode()) && !StringUtils.equals(response.getCode(), ExceptionEnum.NEED_PHONE.getCode())) {
+		if (!StringUtils.equals(response.getCode(), ResponseConstant.SUCCESS.getCode())
+				&& !StringUtils.equals(response.getCode(), ExceptionEnum.NEED_PHONE.getCode())) {
 			throw QuanhuException.busiError("第三方登录失败");
 		}
 		Map<String, Object> map = new HashMap<>();
@@ -350,9 +354,9 @@ public class UserController {
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/webLoginThird")
-	public Response<String> webLoginThird(String loginType, String returnUrl,HttpServletRequest request) {
+	public Response<String> webLoginThird(String loginType, String returnUrl, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
-		return accountApi.webLoginThird(loginType, returnUrl,header.getAppId());
+		return accountApi.webLoginThird(loginType, returnUrl, header.getAppId());
 	}
 
 	/**
@@ -369,18 +373,20 @@ public class UserController {
 	public void webThirdLoginNotify(HttpServletRequest request, HttpServletResponse response) {
 
 	}
-	
+
 	/**
 	 * 微信授权登录返回授权地址
+	 * 
 	 * @param loginDTO
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@ApiOperation("微信授权登录返回授权地址")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/wxOauthLogin")
-	public void wxOauthLogin(String returnUrl,String activityChannelCode,HttpServletResponse response,HttpServletRequest request) throws IOException{
+	public void wxOauthLogin(String returnUrl, String activityChannelCode, HttpServletResponse response,
+			HttpServletRequest request) throws IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		response.setCharacterEncoding("utf-8");
 		try {
@@ -403,22 +409,24 @@ public class UserController {
 			return;
 		}
 	}
+
 	/**
 	 * 微信授权登录回调返回成功的地址
+	 * 
 	 * @param loginDTO
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@ApiOperation("微信授权登录返回授权地址")
 	@UserBehaviorValidation(login = false)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@GetMapping(value = "/{version}/user/wxOauthLoginNotify")
-	public void wxOauthLoginNotify(HttpServletRequest request, HttpServletResponse response) throws IOException{
+	public void wxOauthLoginNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String code = request.getParameter("code");
 		String state = request.getParameter("state");
 		response.setContentType("text/html;charset=UTF-8");
 		response.setCharacterEncoding("utf-8");
-		logger.info("[wxOauthLoginNotify]:code:{},state:{}",code,state);
+		logger.info("[wxOauthLoginNotify]:code:{},state:{}", code, state);
 		if (StringUtils.isEmpty(code) || StringUtils.isEmpty(state)) {
 			response.getWriter().write("授权失败,code or state 为空！");
 			response.getWriter().flush();
@@ -428,7 +436,7 @@ public class UserController {
 			RequestHeader header = WebUtil.getHeader(request);
 			WebThirdLoginDTO loginDTO = new WebThirdLoginDTO(header.getAppId(), code, state);
 			String returnUrl = ResponseUtils.getResponseData(accountApi.wxOauthLoginNotify(loginDTO));
-			logger.info("[wxOauthLoginNotify]:code:{},state:{},returnUrl:{}",code,state,returnUrl);
+			logger.info("[wxOauthLoginNotify]:code:{},state:{},returnUrl:{}", code, state, returnUrl);
 			response.sendRedirect(returnUrl);
 			response.getWriter().flush();
 			return;
@@ -442,7 +450,7 @@ public class UserController {
 			return;
 		}
 	}
-	
+
 	/**
 	 * 获取登录方式
 	 * 
@@ -501,7 +509,7 @@ public class UserController {
 	@UserBehaviorValidation(login = true)
 	@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
 	@PostMapping(value = "/{version}/user/activityCheckPhone")
-	public Response<Boolean> activityCheckPhone(@RequestBody BindPhoneDTO phoneDTO,HttpServletRequest request) {
+	public Response<Boolean> activityCheckPhone(@RequestBody BindPhoneDTO phoneDTO, HttpServletRequest request) {
 		RequestHeader header = WebUtil.getHeader(request);
 		phoneDTO.setUserId(NumberUtils.createLong(header.getUserId()));
 		phoneDTO.setAppId(header.getAppId());
@@ -509,7 +517,6 @@ public class UserController {
 		return ResponseUtils.returnApiObjectSuccess(result);
 	}
 
-	
 	/**
 	 * 绑定 第三方账户
 	 * 
@@ -660,22 +667,22 @@ public class UserController {
 				.getResponseData(operateApi.getMyInviter(NumberUtils.createLong(header.getUserId()), limit, inviterId));
 		return ResponseUtils.returnApiObjectSuccess(inviterVO);
 	}
-	
-	@Reference(check=false,cluster="failfast")
+
+	@Reference(check = false, cluster = "failfast")
 	UserSyncApi syncApi;
-	
+
 	/**
 	 * 用户同步im接口
+	 * 
 	 * @param actionType
 	 * @return
 	 */
 	@GetMapping(value = "/{version}/user/syncIm")
 	public Response<Boolean> getInviterUser(Integer actionType) {
-		boolean result = ResponseUtils
-				.getResponseData(syncApi.syncUser(actionType));
+		boolean result = ResponseUtils.getResponseData(syncApi.syncUser(actionType));
 		return ResponseUtils.returnApiObjectSuccess(result);
 	}
-	
+
 	/**
 	 * 得到初始化后的注册日志
 	 * 
@@ -695,15 +702,15 @@ public class UserController {
 		logDTO.setChannelCode(channelCode);
 		return logDTO;
 	}
-	
-	private static String getStringBySet(Set<String> set){
-		if(CollectionUtils.isNotEmpty(set)){
-			return set.toString().substring(1,set.toString().length()-1);
+
+	private static String getStringBySet(Set<String> set) {
+		if (CollectionUtils.isNotEmpty(set)) {
+			return set.toString().substring(1, set.toString().length() - 1);
 		}
 		return "";
 	}
-	
-	public static void main(String[] args){
+
+	public static void main(String[] args) {
 		System.out.println(UserController.getStringBySet(Sets.newHashSet("dsdsd")));
 	}
 }

@@ -651,6 +651,9 @@ public class UserServiceImpl implements UserService {
 				for (int i = 0; i < dtos.size(); i++) {
 					dto = dtos.get(i);
 					if (StringUtils.equals(dto.getUserId(), friendId)) {
+						if(StringUtils.equals(friendId, userId.toString())){
+							dto.setRelationStatus(STATUS.OWNER.getCode());
+						}
 						map.put(friendId, dto);
 						noRelation = false;
 					}
