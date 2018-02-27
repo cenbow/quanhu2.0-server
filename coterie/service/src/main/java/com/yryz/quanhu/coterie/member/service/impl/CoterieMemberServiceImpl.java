@@ -248,6 +248,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Override
     @Transactional
     public void quit(Long userId, Long coterieId) {
+
+        logger.info("quit userId : " + userId + ", coterieId : " + coterieId);
+
         try {
             CoterieInfo coterie = coterieService.find(coterieId);
             if (coterie != null) {
@@ -307,6 +310,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     public Integer permission(Long userId, Long coterieId) {
+
+        logger.info("permission userId : " + userId + ", coterieId : " + coterieId);
 
         try {
 
@@ -398,7 +403,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 }
 
                 logger.info("审核通过时, 发送加入私圈事件ing");
-                coterieEventManager.joinCoterieEvent(coterieId);
+                coterieEventManager.joinCoterieEvent(userId,coterieId);
                 logger.info("审核通过时, 发送加入私圈事件end");
 
                 //permission cache
