@@ -380,7 +380,7 @@ public class UserRelationServiceImpl implements UserRelationService{
         //重新设置page数量
         PageList<UserRelationDto> pageList = new PageModel<UserRelationDto>().getPageList(outArray);
         pageList.setCount(total);
-
+        pageList.setCurrentPage(dto.getCurrentPage());
         return pageList;
     }
 
