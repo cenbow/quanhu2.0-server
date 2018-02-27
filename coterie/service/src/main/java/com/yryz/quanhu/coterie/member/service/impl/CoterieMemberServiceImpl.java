@@ -398,7 +398,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 }
 
                 logger.info("审核通过时, 发送加入私圈事件ing");
-                coterieEventManager.joinCoterieEvent(coterieId);
+                coterieEventManager.joinCoterieEvent(userId,coterieId);
                 logger.info("审核通过时, 发送加入私圈事件end");
 
                 //permission cache
