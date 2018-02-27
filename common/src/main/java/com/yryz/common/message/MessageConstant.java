@@ -76,6 +76,8 @@ public enum MessageConstant {
 
     POST_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的帖子因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
+    DYMAIC_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的动态因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
+
     QUESTIONANSWER_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "问答{title}的相关内容因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
     /**
