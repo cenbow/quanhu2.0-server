@@ -407,6 +407,26 @@
         </where>
     </select>
 
+    <select id="checkShelveFlagConflict" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        <where>
+            <![CDATA[   start_date <= #{checkStartDate} ]]>
+            <![CDATA[  AND end_date > #{checkStartDate} ]]>
+            <![CDATA[  AND start_time <= #{checkStartTime} ]]>
+            <![CDATA[  AND end_time > #{checkStartTime} ]]>
+            AND adv_status != 30
+            OR
+            <![CDATA[   start_date <= #{checkStartDate} ]]>
+            <![CDATA[  AND end_date > #{checkStartDate} ]]>
+            <![CDATA[  AND start_time >= #{checkStartTime} ]]>
+            <![CDATA[  AND start_time < #{checkEndTime} ]]>
+            AND adv_status != 30
+        </where>
+    </select>
+
     <update id="cancelDefAd">
         update qh_adv
         SET adv_def = 20, adv_status = 30, end_date_time = now()
