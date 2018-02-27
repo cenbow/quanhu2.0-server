@@ -315,7 +315,7 @@
         <![CDATA[ AND start_date_time <= #{nowDateTime} ]]>
         <![CDATA[ AND end_date_time >= #{nowDateTime} ]]>
         order by adv_sort desc, create_date desc
-        limit 0, 100
+        limit 0, 5
     </select>
 
     <select id="selectListAdmin" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
