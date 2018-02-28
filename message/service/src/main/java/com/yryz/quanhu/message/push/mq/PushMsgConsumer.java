@@ -12,7 +12,9 @@ import com.google.common.collect.Lists;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.message.message.mongo.MessageAdminMongo;
 import com.yryz.quanhu.message.message.mongo.MessageMongo;
+import com.yryz.quanhu.message.message.vo.MessageAdminVo;
 import com.yryz.quanhu.message.push.entity.PushReqVo.CommonPushType;
 import com.yryz.quanhu.message.push.constants.AmqpConstants;
 import com.yryz.quanhu.message.push.entity.PushParamsDTO;
@@ -44,6 +46,8 @@ public class PushMsgConsumer {
 
 	@Autowired
 	private MessageMongo messageMongo;
+	@Autowired
+	private MessageAdminMongo messageAdminMongo;
 
 	/**
 	 * QueueBinding: exchange和queue的绑定
@@ -111,9 +115,16 @@ public class PushMsgConsumer {
 				logger.info("start update push message status");
 				MessageVo vo = messageMongo.get(messageVo.getMessageId());
 				if (vo != null && StringUtils.isBlank(vo.getJpId())) {
+					//更新每个用户信息
 					MessageVo toUpdate = new MessageVo(messageVo.getMessageId());
 					toUpdate.setJpId(msg_id);
 					messageMongo.update(toUpdate);
+
+					//管理后台
+					MessageAdminVo adminUpdate = new MessageAdminVo();
+					adminUpdate.setMessageId(messageVo.getMessageId());
+					adminUpdate.setJpId(msg_id);
+					messageAdminMongo.update(adminUpdate);
 					logger.info("finish update push message status");
 				}
 			}

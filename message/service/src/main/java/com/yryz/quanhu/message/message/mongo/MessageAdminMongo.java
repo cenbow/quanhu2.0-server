@@ -86,6 +86,9 @@ public class MessageAdminMongo extends AbsBaseMongoDAO<MessageAdminVo> {
         if (messageAdminVo.getPushDate() != null) {
             update.set("pushDate", messageAdminVo.getPushDate());
         }
+        if (org.apache.commons.lang.StringUtils.isNotBlank(messageAdminVo.getJpId())) {
+            update.set("jpId", messageAdminVo.getJpId());
+        }
 
         return this.update(query, update);
     }
