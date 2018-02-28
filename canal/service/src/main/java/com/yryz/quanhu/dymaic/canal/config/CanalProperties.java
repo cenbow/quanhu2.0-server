@@ -6,8 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CanalProperties {
 	private String host;
 	private Integer port;
-	private String zookeeperHost;
-	private Integer zookeeperPort;
+	private String zkServers;
 	private String instance;
 
 	public String getHost() {
@@ -34,20 +33,11 @@ public class CanalProperties {
 		this.instance = instance;
 	}
 
-	public String getZookeeperHost() {
-		return zookeeperHost;
+	public String getZkServers() {
+		return zkServers;
 	}
 
-	public void setZookeeperHost(String zookeeperHost) {
-		this.zookeeperHost = zookeeperHost;
+	public void setZkServers(String zkServers) {
+		this.zkServers = zkServers;
 	}
-
-	public Integer getZookeeperPort() {
-		return zookeeperPort;
-	}
-
-	public void setZookeeperPort(Integer zookeeperPort) {
-		this.zookeeperPort = zookeeperPort;
-	}
-
 }
