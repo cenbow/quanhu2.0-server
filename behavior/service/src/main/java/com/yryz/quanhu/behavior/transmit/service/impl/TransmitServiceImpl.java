@@ -179,7 +179,7 @@ public class TransmitServiceImpl implements TransmitService {
         List<TransmitInfoVo> resultList = new ArrayList<>();
         Query query = new Query();
         query.addCriteria(Criteria.where("parentId").is(transmitInfoDto.getParentId()));
-        query.addCriteria(Criteria.where("moduleEnum").is(transmitInfoDto.getModuleEnum()));
+//        query.addCriteria(Criteria.where("moduleEnum").is(transmitInfoDto.getModuleEnum()));
         query.addCriteria(Criteria.where("shelveFlag").is(Integer.valueOf(CommonConstants.SHELVE_YES)));
         long count = transmitMongoDao.count(query);
         if(count > 0) {
