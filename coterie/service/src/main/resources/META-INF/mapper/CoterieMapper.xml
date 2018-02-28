@@ -516,6 +516,18 @@
     limit #{pageNum},#{pageSize}
   </select>
 
+  <select id="queryAbleCreteCoterieUserIds" resultType="java.lang.Long" >
+    select B.userId from
+    (select count(a.relation_status) as followCount,a.source_user_id as userId from qh_user_relation  as  a where a.relation_status=2  GROUP BY source_user_id) as B
+    where B.followCount &gt;= 20
+    and userId in
+    (select C.userId from (select
+    owner_id as userId,count(*) as coterieCount
+    from qh_coterie as coterie
+    WHERE
+    (coterie.state =10 or coterie.shelve_flag=10) GROUP BY coterie.owner_id) as C where c.coterieCount &lt;= 10)
+  </select>
+
 
 
 
@@ -547,5 +559,8 @@
     </set>
     where kid = #{coterieId,jdbcType=CHAR}
   </update>
+
+
+
 
 </mapper>

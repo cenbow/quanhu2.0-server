@@ -1,35 +1,36 @@
 package com.yryz.quanhu.coterie.coterie.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminService;
-import com.yryz.quanhu.coterie.coterie.vo.*;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 import com.yryz.quanhu.coterie.member.event.CoterieEventManager;
 import com.yryz.quanhu.coterie.member.event.CoterieMessageManager;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ScheduledExecutorTask;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -63,6 +64,9 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
 
     @Autowired
     private CoterieRedis coterieRedis;
+
+    @Reference
+    private EventAcountApiService eventAcountApiService;
 
 
     @Override
@@ -133,7 +137,7 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
                     //dynamic
                     ResourceTotal resourceTotal = new ResourceTotal();
                     resourceTotal.setCreateDate(DateUtils.getDate());
-                    resourceTotal.setExtJson(JSON.toJSONString(coterieDb));
+                    resourceTotal.setExtJson(JsonUtils.toFastJson(coterieDb));
                     resourceTotal.setResourceId(coterie.getCoterieId());
                     resourceTotal.setModuleEnum(Integer.valueOf(ModuleContants.COTERIE));
                     resourceTotal.setUserId(NumberUtils.toLong(coterieDb.getOwnerId()));
@@ -210,4 +214,30 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
             coterieRedis.save(model);
         }
     }
+
+
+    /**
+     * 查询有权限创建私圈的用户
+     * @return
+     */
+    @Override
+    public Set<Long> queryAbleCreteCoterieUserIds() {
+        Set<Long> userIdsSet=new HashSet<>();
+        Set<Long> userIds= coterieMapper.queryAbleCreteCoterieUserIds();
+        ScoreFlowQuery sfq = new  ScoreFlowQuery();
+        sfq.setGrowLevel("4");
+        Response<PageList<ScoreFlowReportVo>> scoreFlowReportVos = eventAcountApiService.getEventAcount(sfq);
+        PageList<ScoreFlowReportVo> pageListData=ResponseUtils.getResponseData(scoreFlowReportVos);
+        if(pageListData!=null){
+          List<ScoreFlowReportVo> scoreFlowReportVoList= pageListData.getEntities();
+          for(ScoreFlowReportVo vo :scoreFlowReportVoList){
+              if(userIds.contains(Long.valueOf(vo.getUserId()))){
+                  userIdsSet.add(Long.valueOf(vo.getUserId()));
+              }
+          }
+        }
+        return userIdsSet;
+    }
+
+
 }

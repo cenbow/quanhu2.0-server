@@ -31,9 +31,9 @@ public class CanalConnectorConfig {
 	}
 	
 	@Bean
-	@ConditionalOnProperty(prefix = "canal", name = {"zookeeperHost","zookeeperPort","instance"}, matchIfMissing = false)
+	@ConditionalOnProperty(prefix = "canal", name = {"zkServers","instance"}, matchIfMissing = false)
 	public CanalConnector clusterConnector(){
-		CanalConnector connector = CanalConnectors.newClusterConnector(properties.getZookeeperHost()+":"+properties.getZookeeperPort(), properties.getInstance(), "", "");
+		CanalConnector connector = CanalConnectors.newClusterConnector(properties.getZkServers(), properties.getInstance(), "", "");
 		return connector;
 	}
 	

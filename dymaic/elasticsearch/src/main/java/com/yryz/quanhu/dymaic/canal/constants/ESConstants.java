@@ -22,6 +22,8 @@ public class ESConstants {
     public static final String BAN_POST_TIME = "userBaseInfo.banPostTime";
     public static final String USER_ROLE = "userBaseInfo.userRole";
     public static final String USER_LASTHEAT = "userBaseInfo.lastHeat";
+    public static final String USER_GENDERS = "userBaseInfo.userGenders";
+
 
     //达人认证信息
     public static final String STAR_AUDITSTATUS = "userStarInfo.auditStatus";
@@ -47,6 +49,10 @@ public class ESConstants {
 
     //reg log
     public static final String USER_ACTIVITYCHANNELCODE = "userRegLog.activityChannelCode";
+    public static final String USER_REG_TYPE = "userRegLog.regType.keyword";
+    public static final String USER_DEV_TYPE = "userRegLog.devType.keyword";
+    public static final String USER_APP_VERSION = "userRegLog.appVersion.keyword";
+
 
 }
 

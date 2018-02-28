@@ -123,6 +123,13 @@ public interface EventAcountApiService {
 	 * @return
 	 */
 	Response<String> updateEventScoreOne(ScoreEventInfo scoreEventInfo);
+	
+	
+	/**
+	 * 根据各种条件分页查询用户事件账户表信息
+	 * @return PageList<ScoreFlowReportVo>
+	 */
+	Response<PageList<ScoreFlowReportVo>> getEventAcount(ScoreFlowQuery sfq);
 
 
 }

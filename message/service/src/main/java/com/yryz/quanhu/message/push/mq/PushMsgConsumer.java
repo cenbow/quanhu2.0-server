@@ -12,7 +12,10 @@ import com.google.common.collect.Lists;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.quanhu.message.message.dto.MessageAdminDto;
+import com.yryz.quanhu.message.message.mongo.MessageAdminMongo;
 import com.yryz.quanhu.message.message.mongo.MessageMongo;
+import com.yryz.quanhu.message.message.vo.MessageAdminVo;
 import com.yryz.quanhu.message.push.entity.PushReqVo.CommonPushType;
 import com.yryz.quanhu.message.push.constants.AmqpConstants;
 import com.yryz.quanhu.message.push.entity.PushParamsDTO;
@@ -44,6 +47,8 @@ public class PushMsgConsumer {
 
 	@Autowired
 	private MessageMongo messageMongo;
+	@Autowired
+	private MessageAdminMongo messageAdminMongo;
 
 	/**
 	 * QueueBinding: exchange和queue的绑定
@@ -109,13 +114,28 @@ public class PushMsgConsumer {
 			MessageVo messageVo = JsonUtils.fromJson(paramsDTO.getMsg(), new TypeReference<MessageVo>() {});
 			if (messageVo != null && StringUtils.isNotBlank(messageVo.getMessageId())) {
 				logger.info("start update push message status");
+
+				//更新每个用户mongo数据
 				MessageVo vo = messageMongo.get(messageVo.getMessageId());
-				if (vo != null && StringUtils.isNotBlank(vo.getJpId())) {
+				if (vo != null && StringUtils.isBlank(vo.getJpId())) {
 					MessageVo toUpdate = new MessageVo(messageVo.getMessageId());
 					toUpdate.setJpId(msg_id);
 					messageMongo.update(toUpdate);
-					logger.info("finish update push message status");
+					logger.info("finish update api messageMongo status");
 				}
+
+				//更新adminMongo数据
+				MessageAdminDto dto = new MessageAdminDto();
+				dto.setMessageId(messageVo.getMessageId());
+				MessageAdminVo adminVo = messageAdminMongo.findOne(dto);
+				if (adminVo != null && StringUtils.isBlank(adminVo.getJpId())) {
+					MessageAdminVo adminUpdate = new MessageAdminVo();
+					adminUpdate.setMessageId(messageVo.getMessageId());
+					adminUpdate.setJpId(msg_id);
+					messageAdminMongo.update(adminUpdate);
+					logger.info("finish update api messageAdminMongo status");
+				}
+
 			}
 		} catch (Throwable e) {
 			logger.error("update message status error", e);

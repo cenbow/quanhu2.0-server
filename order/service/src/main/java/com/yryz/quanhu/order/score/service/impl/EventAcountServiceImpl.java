@@ -1,6 +1,7 @@
 package com.yryz.quanhu.order.score.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yryz.quanhu.order.score.dao.persistence.EventAcountDao;
 import com.yryz.quanhu.order.score.service.EventAcountService;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.EventAcount;
 
 import redis.clients.jedis.JedisCommands;
@@ -70,6 +72,13 @@ public class EventAcountServiceImpl implements EventAcountService {
 			}
 		});
 		return result;
+	}
+
+
+	@Override
+	public List<EventAcount> getPage(ScoreFlowQuery sfq) {
+		
+		return eventAcountDao.getAll(sfq);
 	}
 
 	

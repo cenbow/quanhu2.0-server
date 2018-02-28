@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 @Service(interfaceClass=CoterieAdminAPI.class)
 public class CoterieAdminProvider implements CoterieAdminAPI {
@@ -105,5 +106,19 @@ public class CoterieAdminProvider implements CoterieAdminAPI {
         } catch (Exception e) {
             return ResponseUtils.returnException(e);
         }
+    }
+
+
+    /**
+     * 查询有权限创建私圈的用户
+     * @return
+     */
+    @Override
+    public Response<Set<Long>> queryAbleCreteCoterieUserIds() {
+        try {
+        return ResponseUtils.returnObjectSuccess(coterieAdminService.queryAbleCreteCoterieUserIds());
+    } catch (Exception e) {
+        return ResponseUtils.returnException(e);
+    }
     }
 }

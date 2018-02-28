@@ -120,5 +120,32 @@
 		</trim>
 		where user_id = #{userId}
 	</update>
+	
+	
+	
+	<!-- 获取用户账户列表ALL -->
+	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventAcount">
+		select <include refid="columns" /> from event_acount where 
+		1=1 
+
+		<if test="grow != null and grow !=''">
+			and grow = #{grow}
+		</if>
+		<if test="score != null and score !=''">
+			and score = #{score}
+		</if>
+		<if test="growLevel != null and growLevel !=''">
+			and grow_level > #{growLevel}
+		</if>
+		<if test="startTime != null and startTime !=''">
+			and create_time &gt;= #{startTime}
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and create_time &lt;= #{endTime}
+		</if>
+		order by update_Time desc
+	</select>
+	
+	
 
 </mapper>

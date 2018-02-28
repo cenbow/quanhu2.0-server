@@ -420,7 +420,7 @@ public class JsonUtils {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
-			if(StringUtils.isNotEmpty(pattern)) {
+			if(StringUtils.isEmpty(pattern)) {
                 pattern = "yyyy-MM-dd HH:mm:ss";
             }
 			SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);

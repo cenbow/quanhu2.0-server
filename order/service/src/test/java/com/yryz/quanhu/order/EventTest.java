@@ -13,8 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 /**
  * @author yehao
@@ -29,6 +35,11 @@ public class EventTest {
 	@Reference
 	private EventAPI eventAPI;
 	
+	
+	@Reference
+	private  EventAcountApiService  eventAcountApiService;
+	
+	
 	@Test
 	public void eventCommit(){
 		EventInfo event = new EventInfo();
@@ -37,5 +48,14 @@ public class EventTest {
 		event.setOwnerId("737469249351843840");
 		eventAPI.commit(event);
 	}
+	
+	@Test
+	public void getEventAcount(){
+		ScoreFlowQuery sfq = new  ScoreFlowQuery();
+		sfq.setGrowLevel("4");
+		Response<PageList<ScoreFlowReportVo>> VO = eventAcountApiService.getEventAcount(sfq);
+	System.out.println(" VO.getData().getCount(): "+VO.getData().getCount());
+	}
+
 
 }

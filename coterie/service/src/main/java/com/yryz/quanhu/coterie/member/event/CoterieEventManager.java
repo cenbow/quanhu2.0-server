@@ -61,14 +61,16 @@ public class CoterieEventManager {
      *
      * @param coterieId
      */
-    public void joinCoterieEvent(Long coterieId) {
+    public void joinCoterieEvent(Long userId,Long coterieId) {
         try {
             CoterieInfo coterie = coterieService.find(coterieId);
             EventInfo event = new EventInfo();
             event.setCoterieId(coterie.getCoterieId().toString());
             event.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            event.setUserId(coterie.getOwnerId());
+            event.setUserId(String.valueOf(userId));
             event.setEventNum(1);
+            event.setAmount(Double.valueOf(coterie.getJoinFee()));
+            event.setOwnerId(coterie.getOwnerId());
             event.setEventCode(EventEnum.JOIN_COTERIE.getCode());
             eventAPI.commit(event);
         } catch (Exception e) {

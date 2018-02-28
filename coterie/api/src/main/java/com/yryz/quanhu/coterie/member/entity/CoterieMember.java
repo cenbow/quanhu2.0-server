@@ -10,10 +10,10 @@ import java.util.Date;
  */
 public class CoterieMember extends GenericEntity implements Serializable {
 	private static final long serialVersionUID = -312906342632969011L;
-	/**
-	 * KID
-	 */
-	private Long kid;
+//	/**
+//	 * KID
+//	 */
+//	private Long kid;
 
 	/**
 	 * 私圈ID
@@ -65,15 +65,15 @@ public class CoterieMember extends GenericEntity implements Serializable {
 	 */
 	private Byte delFlag;
 
-	@Override
-	public Long getKid() {
-		return kid;
-	}
-
-	@Override
-	public void setKid(Long kid) {
-		this.kid = kid;
-	}
+//	@Override
+//	public Long getKid() {
+//		return kid;
+//	}
+//
+//	@Override
+//	public void setKid(Long kid) {
+//		this.kid = kid;
+//	}
 
 	public Long getCoterieId() {
 		return coterieId;

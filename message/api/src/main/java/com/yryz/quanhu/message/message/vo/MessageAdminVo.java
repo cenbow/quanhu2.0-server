@@ -169,9 +169,36 @@ public class MessageAdminVo implements Serializable{
     private Long pushNumber;
 
     /**
+     * 已推送的人数
+     */
+    private Long receivedNumber;
+
+    /**
+     * 到达率
+     */
+    private String receivedRate = "";
+
+
+    /**
      * 最后更新人名字
      */
     private String lastUpdateUserName;
+
+    public String getReceivedRate() {
+        return receivedRate;
+    }
+
+    public void setReceivedRate(String receivedRate) {
+        this.receivedRate = receivedRate;
+    }
+
+    public Long getReceivedNumber() {
+        return receivedNumber;
+    }
+
+    public void setReceivedNumber(Long receivedNumber) {
+        this.receivedNumber = receivedNumber;
+    }
 
     public String getLastUpdateUserName() {
         return lastUpdateUserName;

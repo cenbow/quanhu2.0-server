@@ -38,4 +38,7 @@ public interface AdvertisementDao extends BaseDao {
     List<AdvertisementVo> selectListBanner(AdvertisementDto advertisementDto);
 
     Integer cancelDefAd();
+
+    List<AdvertisementAdminVo> checkShelveFlagConflict(AdvertisementAdminDto advertisementAdminDto);
+
 }

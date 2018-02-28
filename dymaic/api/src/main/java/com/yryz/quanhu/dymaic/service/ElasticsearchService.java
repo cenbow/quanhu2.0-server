@@ -88,4 +88,10 @@ public interface ElasticsearchService {
 	 */
 	Response<PageList<UserInfoVO>> searchStarUserForAdmin(AdminUserInfoDTO userInfoDTO);
 
+	/**
+	 * 管理后台消息搜索用户
+	 * @param userInfoDTO
+	 * @return
+	 */
+	Response<PageList<UserInfoVO>> searchMsgUserAdmin(AdminUserInfoDTO userInfoDTO);
 }
