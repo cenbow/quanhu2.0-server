@@ -88,6 +88,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         if (result > 0) {
             TopicVo vo = new TopicVo();
             BeanUtils.copyProperties(topic, vo);
+            vo.setModuleEnum(ModuleContants.TOPIC);
             /**
              * 资源聚合
              */

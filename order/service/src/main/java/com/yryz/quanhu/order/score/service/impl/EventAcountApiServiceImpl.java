@@ -236,9 +236,9 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	}
 
 	@Override
-	public Response<PageList<ScoreFlowReportVo>> getEventAcount(ScoreFlowQuery sfq){
+	public Response<List<ScoreFlowReportVo>> getEventAcountAll(ScoreFlowQuery sfq){
 		 try {
-			 PageList<ScoreFlowReportVo> list =  eventAcountAPI.getEventAcount(sfq);
+			 List<ScoreFlowReportVo> list =  eventAcountAPI.getEventAcountAll(sfq);
 		      return ResponseUtils.returnObjectSuccess(list);
 	        } catch (QuanhuException e) {
 	            return ResponseUtils.returnException(e);

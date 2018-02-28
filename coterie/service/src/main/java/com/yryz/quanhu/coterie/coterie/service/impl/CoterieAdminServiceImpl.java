@@ -226,11 +226,10 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
         Set<Long> userIds= coterieMapper.queryAbleCreteCoterieUserIds();
         ScoreFlowQuery sfq = new  ScoreFlowQuery();
         sfq.setGrowLevel("4");
-        Response<PageList<ScoreFlowReportVo>> scoreFlowReportVos = eventAcountApiService.getEventAcount(sfq);
-        PageList<ScoreFlowReportVo> pageListData=ResponseUtils.getResponseData(scoreFlowReportVos);
+        Response<List<ScoreFlowReportVo>> scoreFlowReportVos = eventAcountApiService.getEventAcountAll(sfq);
+        List<ScoreFlowReportVo> pageListData=ResponseUtils.getResponseData(scoreFlowReportVos);
         if(pageListData!=null){
-          List<ScoreFlowReportVo> scoreFlowReportVoList= pageListData.getEntities();
-          for(ScoreFlowReportVo vo :scoreFlowReportVoList){
+          for(ScoreFlowReportVo vo :pageListData){
               if(userIds.contains(Long.valueOf(vo.getUserId()))){
                   userIdsSet.add(Long.valueOf(vo.getUserId()));
               }

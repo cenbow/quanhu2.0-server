@@ -92,8 +92,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         CoterieInfo coterie = coterieService.find(coterieId);
 
+        logger.info("join coterie : " + JsonUtils.toFastJson(coterie));
         //私圈人数已满
-        if (coterie.getMemberNum().intValue() >= 2000) {
+        if (coterie.getMemberNum().intValue() + 1 >= 2000) {
             result.setStatus((byte) 40);
             return result;
         }
@@ -206,39 +207,41 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Override
     @Transactional
     public void kick(Long userId, Long coterieId, String reason) {
-        CoterieInfo coterie = coterieService.find(coterieId);
-        if (coterie != null) {
-            //update member kickStatus
-            CoterieMember coterieMember = new CoterieMember();
-            coterieMember.setUserId(userId);
-            coterieMember.setCoterieId(coterieId);
-            coterieMember.setReason(reason);
-            coterieMember.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
-            coterieMember.setKickStatus(MemberConstant.KickStatus.KICKED.getStatus());
-            int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
+        //update member kickStatus
+        CoterieMember coterieMember = new CoterieMember();
+        coterieMember.setUserId(userId);
+        coterieMember.setCoterieId(coterieId);
+        coterieMember.setReason(reason);
+        coterieMember.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+        coterieMember.setKickStatus(MemberConstant.KickStatus.KICKED.getStatus());
+        int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
 
-            //update apply delFlag
-            CoterieMemberApply apply = new CoterieMemberApply();
-            apply.setUserId(userId);
-            apply.setCoterieId(coterieId);
-            apply.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
-            int resultApply = coterieApplyDao.updateByCoterieApply(apply);
+        //update apply delFlag
+        CoterieMemberApply apply = new CoterieMemberApply();
+        apply.setUserId(userId);
+        apply.setCoterieId(coterieId);
+        apply.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+        int resultApply = coterieApplyDao.updateByCoterieApply(apply);
 
-            if (resultMember > 0 && resultApply > 0) {
-                //更新私圈成员数
-                logger.info("update member num");
-                coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
+        if (resultMember > 0 && resultApply > 0) {
+
+            //permission cache
+            logger.info("kick更新权限缓存ing");
+//            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
+            coterieMemberRedis.deletePermission(coterieId, userId);
+            logger.info("kick更新权限缓存end");
+
+            //更新私圈成员数
+            logger.info("update member num");
+            CoterieInfo coterie = coterieService.find(coterieId);
+            if (coterie != null) {
+                coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() - 1), coterie.getMemberNum());
             }
+
+            logger.info("kick message ");
+            coterieMemberMessageManager.kickMessage(userId, coterieId, reason);
         }
 
-        logger.info("kick message ");
-        coterieMemberMessageManager.kickMessage(userId, coterieId, reason);
-
-        //permission cache
-        logger.info("kick更新权限缓存ing");
-//            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
-        coterieMemberRedis.deletePermission(coterieId, userId);
-        logger.info("kick更新权限缓存end");
     }
 
     @Override
@@ -247,33 +250,36 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         logger.info("quit userId : " + userId + ", coterieId : " + coterieId);
 
-        CoterieInfo coterie = coterieService.find(coterieId);
-        if (coterie != null) {
-            //update delFlag
-            CoterieMember coterieMember = new CoterieMember();
-            coterieMember.setUserId(userId);
-            coterieMember.setCoterieId(coterieId);
-            coterieMember.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
-            int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
+        //update delFlag
+        CoterieMember coterieMember = new CoterieMember();
+        coterieMember.setUserId(userId);
+        coterieMember.setCoterieId(coterieId);
+        coterieMember.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+        int resultMember = coterieMemberDao.updateByCoterieMember(coterieMember);
 
-            //update delFlag
-            CoterieMemberApply apply = new CoterieMemberApply();
-            apply.setUserId(userId);
-            apply.setCoterieId(coterieId);
-            apply.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
-            int resultApply = coterieApplyDao.updateByCoterieApply(apply);
-            if (resultMember > 0 && resultApply > 0) {
-                //更新私圈成员数
-                logger.info("quit更新私圈成员数ing");
-                coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
-                logger.info("quit更新私圈成员数end");
-            }
-
+        //update delFlag
+        CoterieMemberApply apply = new CoterieMemberApply();
+        apply.setUserId(userId);
+        apply.setCoterieId(coterieId);
+        apply.setDelFlag(MemberConstant.DelFlag.DELETED.getStatus());
+        int resultApply = coterieApplyDao.updateByCoterieApply(apply);
+        if (resultMember > 0 && resultApply > 0) {
             //permission cache
             logger.info("更新权限缓存ing");
-//                coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
-            coterieMemberRedis.deletePermission(coterieId, userId);
+            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
+//            coterieMemberRedis.deletePermission(coterieId, userId);
             logger.info("更新权限缓存end");
+            //更新私圈成员数
+
+            CoterieInfo coterie = coterieService.find(coterieId);
+            if (coterie != null) {
+                logger.info("quit更新私圈成员数ing coterie info : " + JsonUtils.toFastJson(coterie));
+                coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() - 1, coterie.getMemberNum());
+                logger.info("quit更新私圈成员数end");
+            } else {
+                logger.info("quit更新私圈成员数 coterie info is null");
+            }
+
         }
     }
 
@@ -312,8 +318,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             permission = getPermissionByDb(coterieId, userId);
             logger.info("permission db is : " + permission);
             coterieMemberRedis.savePermission(coterieId, userId, permission);
-            logger.info("permission db is : " + permission);
         }
+        logger.info("permission is : " + permission);
         return permission;
     }
 
@@ -377,17 +383,17 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 logger.info("审核通过时, 自动关注圈主完成后再更新或插入成员数据");
                 saveOrUpdateMember(userId, coterieId, reason, joinType);
                 logger.info("审核通过时, 更新或插入成员数据完成");
+
+                //permission cache
+                logger.info("审核通过时, 更新成员权限缓存ing");
+                coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
+//            coterieMemberRedis.deletePermission(coterieId, userId);
+                logger.info("审核通过时, 更新成员权限缓存end");
+
+                logger.info("审核通过时, 发送加入私圈事件ing");
+                coterieEventManager.joinCoterieEvent(userId, coterieId);
+                logger.info("审核通过时, 发送加入私圈事件end");
             }
-
-            logger.info("审核通过时, 发送加入私圈事件ing");
-            coterieEventManager.joinCoterieEvent(userId, coterieId);
-            logger.info("审核通过时, 发送加入私圈事件end");
-
-            //permission cache
-            logger.info("审核通过时, 更新成员权限缓存ing");
-//                coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
-            coterieMemberRedis.deletePermission(coterieId, userId);
-            logger.info("审核通过时, 更新成员权限缓存end");
         } else {
             logger.info("审核不通过时, 更新申请加入数据(预留)ing");
             saveOrUpdateApply(userId, coterieId, "", memberStatus);
