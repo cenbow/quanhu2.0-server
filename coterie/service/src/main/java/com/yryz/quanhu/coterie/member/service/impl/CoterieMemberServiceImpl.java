@@ -629,7 +629,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 coterieMember.setAmount(Long.valueOf(amount));
                 coterieMember.setCreateUserId(userId);
 
-                logger.info("coterie member update : " + GsonUtils.parseJson(coterieMember));
+//                logger.info("coterie member update : " + GsonUtils.parseJson(coterieMember));
                 result = coterieMemberDao.updateByCoterieMember(coterieMember);
                 logger.info("result : " + result);
             }
