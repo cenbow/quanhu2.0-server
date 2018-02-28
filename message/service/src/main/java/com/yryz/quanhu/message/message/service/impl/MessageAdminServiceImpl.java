@@ -95,16 +95,20 @@ public class MessageAdminServiceImpl implements MessageAdminService {
                                 receivedCount += pushReceived.getAndroid_received();
                                 receivedCount += pushReceived.getIos_msg_received();
                                 messageAdminVo.setReceivedNumber(Long.valueOf(receivedCount));
-                                if (receivedCount <= messageAdminVo.getPushNumber()) {
-                                    NumberFormat numberFormat = NumberFormat.getInstance();
-                                    // 设置精确到小数点后2位
-                                    numberFormat.setMaximumFractionDigits(2);
-                                    String result = numberFormat.format((float) receivedCount / (float) messageAdminVo.getPushNumber() * 100);
-                                    messageAdminVo.setReceivedRate(result + "%");
-                                } else {
-                                    LOGGER.warn("receivedRate_fix");
-                                    messageAdminVo.setReceivedRate("100%");
+                                int pushUserSize = CollectionUtils.isNotEmpty(messageAdminVo.getPushUserIds()) ? messageAdminVo.getPushUserIds().size() : 0;
+                                if (pushUserSize > 0) {
+                                    if (receivedCount <= pushUserSize) {
+                                        NumberFormat numberFormat = NumberFormat.getInstance();
+                                        // 设置精确到小数点后2位
+                                        numberFormat.setMaximumFractionDigits(2);
+                                        String result = numberFormat.format((float) receivedCount / (float) pushUserSize * 100);
+                                        messageAdminVo.setReceivedRate(result + "%");
+                                    } else {
+                                        LOGGER.warn("receivedRate_fix");
+                                        messageAdminVo.setReceivedRate("100%");
+                                    }
                                 }
+
                             }
                         }
 

@@ -63,7 +63,7 @@ public class MessageAdminTest {
     @Test
     public void adminTest() {
         MessageAdminDto dto = new MessageAdminDto();
-        dto.setTitle("test test");
+        dto.setTitle("hhhhh");
         Response<PageList<MessageAdminVo>> pageListResponse = messageAdminAPI.listAdmin(dto);
         System.out.println(ResponseUtils.getResponseNotNull(pageListResponse));
     }
