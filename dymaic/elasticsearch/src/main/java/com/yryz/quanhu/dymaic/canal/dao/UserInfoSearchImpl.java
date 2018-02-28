@@ -187,6 +187,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         String devType = adminUserDTO.getDevType();
         String appVersion = adminUserDTO.getAppVersion();
         Integer versionInclude = adminUserDTO.getVersionInclude();
+        Set<Long> tagIds = adminUserDTO.getTagIds();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (StringUtils.isNotBlank(appId)) {
@@ -210,7 +211,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         }
 
         if (StringUtils.isNotBlank(regType)) {
-            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_REG_TYPE, regType));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_REG_TYPE, "*" + regType + "*"));
         }
 
         if (StringUtils.isNotBlank(devType)) {
@@ -219,6 +220,14 @@ public class UserInfoSearchImpl implements UserInfoSearch {
 
         if (StringUtils.isNotBlank(appVersion)) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APP_VERSION, appVersion));
+        }
+
+        if (CollectionUtils.isNotEmpty(tagIds)) {
+            BoolQueryBuilder boolQueryBuilder1 = QueryBuilders.boolQuery();
+            tagIds.stream().filter(tagId -> tagId != null).forEach(tagId -> {
+                boolQueryBuilder1.should(QueryBuilders.matchQuery(ESConstants.USER_ID_KEY, tagId));
+            });
+            boolQueryBuilder.must(boolQueryBuilder1);
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
