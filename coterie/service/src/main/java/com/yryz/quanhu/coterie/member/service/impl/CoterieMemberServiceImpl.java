@@ -92,8 +92,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
         CoterieInfo coterie = coterieService.find(coterieId);
 
+        logger.info("join coterie : " + JsonUtils.toFastJson(coterie));
         //私圈人数已满
-        if (coterie.getMemberNum().intValue() >= 2000) {
+        if (coterie.getMemberNum().intValue() + 1 >= 2000) {
             result.setStatus((byte) 40);
             return result;
         }
@@ -312,8 +313,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             permission = getPermissionByDb(coterieId, userId);
             logger.info("permission db is : " + permission);
             coterieMemberRedis.savePermission(coterieId, userId, permission);
-            logger.info("permission db is : " + permission);
         }
+        logger.info("permission is : " + permission);
         return permission;
     }
 
