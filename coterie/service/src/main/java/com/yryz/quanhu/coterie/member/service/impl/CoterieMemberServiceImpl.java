@@ -590,7 +590,6 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             logger.info("get member : coterieId : " + coterieId + ", userId : "+userId);
             CoterieMember coterieMember = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
-            logger.info("coterie member : " + GsonUtils.parseJson(coterieMember));
 
             if (coterieMember == null) {
 
