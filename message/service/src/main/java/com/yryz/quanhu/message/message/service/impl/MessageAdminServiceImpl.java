@@ -2,11 +2,14 @@ package com.yryz.quanhu.message.message.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageVo;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.*;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.message.message.constants.MessageContants;
 import com.yryz.quanhu.message.message.constants.MessageMap;
@@ -17,13 +20,17 @@ import com.yryz.quanhu.message.message.service.MessageAdminService;
 import com.yryz.quanhu.message.message.service.MessageService;
 import com.yryz.quanhu.message.message.vo.MessageAdminVo;
 import com.yryz.quanhu.message.push.api.PushAPI;
+import com.yryz.quanhu.message.push.entity.PushReceived;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.*;
+import org.apache.commons.lang3.math.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -68,7 +75,58 @@ public class MessageAdminServiceImpl implements MessageAdminService {
 
     @Override
     public PageList<MessageAdminVo> listAdmin(MessageAdminDto messageAdminDto) {
-        return messageAdminMongo.listAdmin(messageAdminDto);
+        PageList<MessageAdminVo> pageList = messageAdminMongo.listAdmin(messageAdminDto);
+        List<MessageAdminVo> entities = pageList.getEntities();
+        if (CollectionUtils.isNotEmpty(entities)) {
+            List<String> msgIds = Lists.newArrayList();
+            entities.forEach(messageAdminVo -> {
+                if (org.apache.commons.lang.StringUtils.isNotBlank(messageAdminVo.getJpId())) {
+                    msgIds.add(messageAdminVo.getJpId());
+                }
+            });
+            if (CollectionUtils.isNotEmpty(msgIds)) {
+                List<PushReceived> pushReceivedList = ResponseUtils.getResponseData(pushAPI.getReceived(msgIds));
+                if (CollectionUtils.isNotEmpty(pushReceivedList)) {
+                    entities.forEach(messageAdminVo -> {
+                        if (org.apache.commons.lang.StringUtils.isNotBlank(messageAdminVo.getJpId())) {
+                            PushReceived pushReceived = getPushReceived(pushReceivedList, messageAdminVo.getJpId());
+                            if (pushReceived != null) {
+                                int receivedCount = 0;
+                                receivedCount += pushReceived.getAndroid_received();
+                                receivedCount += pushReceived.getIos_msg_received();
+                                messageAdminVo.setReceivedNumber(Long.valueOf(receivedCount));
+                                if (receivedCount <= messageAdminVo.getPushNumber()) {
+                                    NumberFormat numberFormat = NumberFormat.getInstance();
+                                    // 设置精确到小数点后2位
+                                    numberFormat.setMaximumFractionDigits(2);
+                                    String result = numberFormat.format((float) receivedCount / (float) messageAdminVo.getPushNumber() * 100);
+                                    messageAdminVo.setReceivedRate(result + "%");
+                                } else {
+                                    LOGGER.warn("receivedRate_fix");
+                                    messageAdminVo.setReceivedRate("100%");
+                                }
+                            }
+                        }
+
+                    });
+                }
+
+            }
+
+        }
+
+        return pageList;
+    }
+
+    private PushReceived getPushReceived(List<PushReceived> pushReceivedList, String messageId) {
+        if (CollectionUtils.isNotEmpty(pushReceivedList)) {
+            for (PushReceived pushReceived : pushReceivedList) {
+                if (pushReceived != null && org.apache.commons.lang.StringUtils.equals(pushReceived.getMsg_id(), messageId)) {
+                    return pushReceived;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
