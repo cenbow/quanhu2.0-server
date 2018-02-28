@@ -1,11 +1,11 @@
 package com.yryz.quanhu.score.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.aliyun.oss.ServiceException;
 import com.yryz.common.response.PageList;
-import com.yryz.common.response.Response;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.CircleStatsVo;
 import com.yryz.quanhu.score.vo.CoterieStatsVo;
@@ -85,5 +85,5 @@ public interface EventAcountAPI {
 	 * @param ScoreFlowQuery sfq
 	 * @return PageList<ScoreFlowReportVo>
 	 */
-	PageList<ScoreFlowReportVo> getEventAcount(ScoreFlowQuery sfq);
+	List<ScoreFlowReportVo> getEventAcountAll(ScoreFlowQuery sfq);
 }

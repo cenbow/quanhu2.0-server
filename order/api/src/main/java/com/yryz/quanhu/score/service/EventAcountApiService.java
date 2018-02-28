@@ -126,10 +126,10 @@ public interface EventAcountApiService {
 	
 	
 	/**
-	 * 根据各种条件分页查询用户事件账户表信息
-	 * @return PageList<ScoreFlowReportVo>
+	 * 根据各种条件查询用户事件账户表信息
+	 * @return List<ScoreFlowReportVo>
 	 */
-	Response<PageList<ScoreFlowReportVo>> getEventAcount(ScoreFlowQuery sfq);
+	Response<List<ScoreFlowReportVo>> getEventAcountAll(ScoreFlowQuery sfq);
 
 
 }

@@ -124,24 +124,23 @@
 	
 	
 	<!-- 获取用户账户列表ALL -->
-	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventAcount">
+	<select id="getAll" resultType="com.yryz.quanhu.score.vo.EventAcount" >
 		select <include refid="columns" /> from event_acount where 
 		1=1 
-
-		<if test="grow != null and grow !=''">
-			and grow = #{grow}
+		<if test="sfq.grow != null and sfq.grow !=''">
+			and grow = #{sfq.grow}
 		</if>
-		<if test="score != null and score !=''">
-			and score = #{score}
+		<if test="sfq.score != null and sfq.score !=''">
+			and score = #{sfq.score}
 		</if>
-		<if test="growLevel != null and growLevel !=''">
-			and grow_level > #{growLevel}
+		<if test="sfq.growLevel != null and sfq.growLevel !=''">
+			and grow_level > #{sfq.growLevel}
 		</if>
-		<if test="startTime != null and startTime !=''">
-			and create_time &gt;= #{startTime}
+		<if test="sfq.startTime != null and sfq.startTime !=''">
+			and create_time &gt;= #{sfq.startTime}
 		</if>
-		<if test="endTime != null and endTime !=''">
-			and create_time &lt;= #{endTime}
+		<if test="sfq.endTime != null and sfq.endTime !=''">
+			and create_time &lt;= #{sfq.endTime}
 		</if>
 		order by update_Time desc
 	</select>
