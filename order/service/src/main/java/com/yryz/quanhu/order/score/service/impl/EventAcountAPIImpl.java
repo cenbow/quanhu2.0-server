@@ -1,5 +1,8 @@
 package com.yryz.quanhu.order.score.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,13 +12,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.PageUtils;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.ScoreStatusSignService;
+import com.yryz.quanhu.order.utils.Page;
+import com.yryz.quanhu.score.entity.ScoreEventInfo;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAcountAPI;
 import com.yryz.quanhu.score.vo.CircleStatsVo;
 import com.yryz.quanhu.score.vo.CoterieStatsVo;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventSign;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 import com.yryz.quanhu.score.vo.UserStatsVo;
 
 
@@ -180,6 +188,53 @@ public class EventAcountAPIImpl implements EventAcountAPI {
 	@Override
 	public Long initAcount(String custId) {
 		return eventAcountService.initAcount(custId);
+	}
+
+	
+
+	@Override
+	public PageList<ScoreFlowReportVo> getEventAcount(ScoreFlowQuery sfq) {
+		
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		   PageList<ScoreFlowReportVo> pageList = new PageList<>();
+	        pageList.setCurrentPage(sfq.getCurrentPage());
+	        pageList.setPageSize(sfq.getPageSize());
+
+			Page<EventAcount> page = new Page<EventAcount>();
+			page.setPageNo(sfq.getCurrentPage());
+			page.setPageSize(sfq.getPageSize());
+			//PageHelper.startPage(sfq.getCurrentPage(), sfq.getPageSize());
+	        @SuppressWarnings("unchecked")
+			com.github.pagehelper.Page<EventAcount> pageHelp = PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
+			//com.github.pagehelper.Page<ScoreFlow> pageHelp =   PageUtils.startPage(sfq.getCurrentPage(), sfq.getPageSize(), true);
+//	        EventAcount sfvo  = new EventAcount();  
+//	        sfvo.setGrowLevel(sfq.getGrowLevel());
+//	        sfvo.setGrow(sfq.getGrow());
+	        pageHelp = (com.github.pagehelper.Page<EventAcount>) eventAcountService.getPage(sfq);
+			List<EventAcount> list =  new ArrayList<EventAcount>(pageHelp.getResult());
+ 
+			List<ScoreFlowReportVo> listVO =  new ArrayList<ScoreFlowReportVo>();
+			for (EventAcount s :list){
+				ScoreFlowReportVo vo = new ScoreFlowReportVo();
+				vo.setId(s.getId());
+				vo.setUserId(s.getUserId());
+				vo.setScore(s.getScore());
+				vo.setGrow(s.getGrow());
+				vo.setGrowLevel(s.getGrowLevel());
+				vo.setUpdateTime(sdf.format(s.getUpdateTime()));
+				vo.setCreateTime(sdf.format(s.getCreateTime()));
+				listVO.add(vo);
+				
+			}
+
+			pageList.setEntities(listVO);
+			pageList.setCount(pageHelp.getTotal());
+		
+	        return pageList;
+//		
+//		PageList<ScoreFlowReportVo> list =  eventAcountAPI.getEventAcount(sfq);
+//		return null;
 	}
 
 }
