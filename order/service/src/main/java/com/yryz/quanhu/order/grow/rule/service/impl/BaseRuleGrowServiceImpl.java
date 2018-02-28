@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.grow.entity.GrowEventInfo;
 import com.yryz.quanhu.grow.entity.GrowFlow;
 import com.yryz.quanhu.order.grow.entity.GrowLevel;
@@ -90,7 +91,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 		long allGrow = 0;
 		logger.info("-------处理成长值运算事件传入userId ，每次触发传入数据：userId = "+userId);
 		EventAcount ea = eventAcountService.getLastAcount(userId);
-		logger.info("-------处理成长值运算事件ea，每次触发传入数据：={}",JSONObject.fromObject(ea));
+		logger.info("-------处理成长值运算事件ea，每次触发传入数据：={}",JsonUtils.toFastJson(ea,null));
 		// 总值表无数据 ，则初始化该表
 		if (ea == null || ea.getId() == null  || ea.getGrow() == null) {
 			allGrow = 0L + newGrow;
@@ -100,7 +101,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			ea.setGrowLevel(level.getLevel());
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
-			logger.info("-------处理成长值运算事件if(EventAcount) == null，每次触发传入数据：={}",JSONObject.fromObject(ea));
+			logger.info("-------处理成长值运算事件if(EventAcount) == null，每次触发传入数据：={}",JsonUtils.toFastJson(ea,null));
 			eventAcountService.save(ea);
 		} else {
 			// 同积分总账更新方式，更新成长值时，可能会覆盖积分值
@@ -113,7 +114,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			ea.setGrowLevel(level.getLevel());
 			ea.setUpdateTime(now);
 			ea.setScore(null);
-			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：={}",JSONObject.fromObject(ea));
+			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：={}",JsonUtils.toFastJson(ea,null));
 			if(ea.getGrow()<1){
 				throw new RuntimeException("-------处理成长事件，结果：直接捕获视为异常消息，原因：ea.getGrow()查询成长总值为空,传入数据：" + ea.getGrow()); 
 			}

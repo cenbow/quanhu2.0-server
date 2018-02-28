@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.order.score.rule.service.RuleScoreService;
 import com.yryz.quanhu.order.score.service.EventAcountService;
 import com.yryz.quanhu.order.score.service.ScoreFlowService;
@@ -128,7 +129,7 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		ea.setCreateTime(now);
 		ea.setUpdateTime(now);
 		ea.setUserId(userId);
-		logger.info("-------处理积分运算事件(EventAcount总表)，每次触发传入数据：={}",JSONObject.fromObject(ea));
+		logger.info("-------处理积分运算事件(EventAcount总表)，每次触发传入数据：={}", JsonUtils.toFastJson(ea,null));
 		eventAcountService.saveOrUpdate(ea);
 		
 		// 无论总值表有无数据，sf是要记的
@@ -137,7 +138,7 @@ public abstract class BaseRuleScoreServiceImpl implements RuleScoreService {
 		sf.setAllScore(Long.valueOf(newScore));
 		sf.setCreateTime(now);
 		sf.setUpdateTime(now);
-		logger.info("-------处理积分运算事件(ScoreFlow流水表)，每次触发传入数据：={}",JSONObject.fromObject(sf));
+		logger.info("-------处理积分运算事件(ScoreFlow流水表)，每次触发传入数据：={}",JsonUtils.toFastJson(ea,null));
 		scoreFlowService.save(sf);
 
 		return 0L;
