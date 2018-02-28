@@ -235,6 +235,17 @@ public class EventAcountApiServiceImpl implements EventAcountApiService {
 	        }
 	}
 
-		 
+	@Override
+	public Response<PageList<ScoreFlowReportVo>> getEventAcount(ScoreFlowQuery sfq){
+		 try {
+			 PageList<ScoreFlowReportVo> list =  eventAcountAPI.getEventAcount(sfq);
+		      return ResponseUtils.returnObjectSuccess(list);
+	        } catch (QuanhuException e) {
+	            return ResponseUtils.returnException(e);
+	        } catch (Exception e) {
+	            logger.error("获取用户事件账户表！", e);
+	            return ResponseUtils.returnException(e);
+	        }
+	}
 	    
 }

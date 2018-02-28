@@ -7,6 +7,9 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 
+import java.util.Set;
+
+
 /**
  * 私圈管理后台 接口
  * @author wt
@@ -26,5 +29,11 @@ public interface CoterieAdminAPI {
      * @throws ServiceException
      */
     public Response<CoterieInfo> modifyCoterieInfo(CoterieInfo info);
+
+    /**
+     * 查询有权限创建私圈的用户
+     * @return
+     */
+    public Response<Set<Long>> queryAbleCreteCoterieUserIds();
 
 }

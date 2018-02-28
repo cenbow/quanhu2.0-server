@@ -9,6 +9,7 @@ import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CoterieAdminService {
 
@@ -46,4 +47,10 @@ public interface CoterieAdminService {
      * 查询私圈
      */
     CoterieInfo find(Long coterieId);
+
+    /**
+     * 查询有权限创建私圈的用户
+     * @return
+     */
+    public Set<Long> queryAbleCreteCoterieUserIds();
 }

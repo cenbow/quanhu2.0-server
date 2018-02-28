@@ -5,10 +5,13 @@ import java.util.Set;
 
 import com.aliyun.oss.ServiceException;
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.CircleStatsVo;
 import com.yryz.quanhu.score.vo.CoterieStatsVo;
 import com.yryz.quanhu.score.vo.EventAcount;
 import com.yryz.quanhu.score.vo.EventSign;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 import com.yryz.quanhu.score.vo.UserStatsVo;
 
 /**
@@ -76,4 +79,11 @@ public interface EventAcountAPI {
 	 * @return
 	 */
 	Long initAcount(String userId);
+	
+	/**
+	 * 查询EventAcount信息
+	 * @param ScoreFlowQuery sfq
+	 * @return PageList<ScoreFlowReportVo>
+	 */
+	PageList<ScoreFlowReportVo> getEventAcount(ScoreFlowQuery sfq);
 }
