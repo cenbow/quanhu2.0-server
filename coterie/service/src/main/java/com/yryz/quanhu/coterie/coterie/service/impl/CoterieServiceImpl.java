@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
@@ -18,6 +19,8 @@ import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,9 @@ import java.util.Map;
  */
 @Service
 public class CoterieServiceImpl implements CoterieService {
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
 	@Resource
 	private CoterieMapper coterieMapper;
 	@Reference(check = false)
@@ -91,10 +97,17 @@ public class CoterieServiceImpl implements CoterieService {
 
 	@Override
 	public CoterieInfo find(Long coterieId) {
+
+		logger.info("coterieId : " + coterieId);
+
 		Coterie info = coterieRedis.get(coterieId);
+
 		if(info==null){
 			info = coterieMapper.selectByCoterieId(coterieId);
 		}
+
+		logger.info("coterie : " + JsonUtils.toFastJson(info));
+
 		return (CoterieInfo) GsonUtils.parseObj(info, CoterieInfo.class);
 	}
 
