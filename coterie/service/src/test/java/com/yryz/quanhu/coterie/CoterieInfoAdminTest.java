@@ -41,6 +41,7 @@ public class CoterieInfoAdminTest {
     @Test
     public void queryAbleCreteCoterieUserIds(){
         Response<Set<Long>> result=coterieAdminAPI.queryAbleCreteCoterieUserIds();
-        System.out.println("用户数："+ResponseUtils.getResponseData(result).size());
+        String strData=ResponseUtils.getResponseData(result).toString();
+        System.out.println("用户："+strData);
     }
 }

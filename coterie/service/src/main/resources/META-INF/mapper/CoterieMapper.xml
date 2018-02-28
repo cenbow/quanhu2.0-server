@@ -525,7 +525,7 @@
     owner_id as userId,count(*) as coterieCount
     from qh_coterie as coterie
     WHERE
-    (coterie.state =10 or coterie.shelve_flag=10) GROUP BY coterie.owner_id) as C where c.coterieCount &lt;= 10)
+    (coterie.state =10 or coterie.shelve_flag=10) GROUP BY coterie.owner_id) as C where c.coterieCount &lt; 10)
   </select>
 
 
