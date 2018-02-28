@@ -114,23 +114,24 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
                 }
                 List<AdminActivityVoteDetailVo> activityVoteDetailList =activityParticipationDao.select(adminActivityVoteDetailDto);
                 Integer candidateCount = 0;
-                for (AdminActivityVoteDetailVo adminActivityVoteDetailVo :activityVoteDetailList){
-                    if(!StringUtils.isEmpty(adminActivityCountDto.getPageCandidate())) {
-                        countStatisticsDto.setKid(adminActivityVoteDetailVo.getKid());
-                        countStatisticsDto.setPage(adminActivityCountDto.getPageCandidate());
-                        Response<Map<String, Long>> mapResponse = countStatisticsApi.countModelMap(countStatisticsDto);
-                        if(mapResponse.success()) {
-                            mapPageCandidate = mapResponse.getData();
+                if (!CollectionUtils.isEmpty(activityVoteDetailList)){
+                    for (AdminActivityVoteDetailVo adminActivityVoteDetailVo :activityVoteDetailList){
+                        if(!StringUtils.isEmpty(adminActivityCountDto.getPageCandidate())) {
+                            countStatisticsDto.setKid(adminActivityVoteDetailVo.getKid());
+                            countStatisticsDto.setPage(adminActivityCountDto.getPageCandidate());
+                            Response<Map<String, Long>> mapResponse = countStatisticsApi.countModelMap(countStatisticsDto);
+                            if(mapResponse.success()) {
+                                mapPageCandidate = mapResponse.getData();
+                            }
+                            if(mapPageCandidate != null) {
+                                Integer count = mapPageCandidate.get(adminActivityCountVo.getDate()) == null
+                                        ? 0 : mapPageCandidate.get(adminActivityCountVo.getDate()).intValue();
+                                candidateCount += count;
+                            }
                         }
-                        if(mapPageCandidate != null) {
-                            Integer count = mapPageCandidate.get(adminActivityCountVo.getDate()) == null
-                                    ? 0 : mapPageCandidate.get(adminActivityCountVo.getDate()).intValue();
-                            candidateCount += count;
-                        }
+                        countStatisticsDto.setKid(adminActivityVoteDetailVo.getActivityInfoId());
                     }
-                    countStatisticsDto.setKid(adminActivityVoteDetailVo.getActivityInfoId());
                 }
-
                 if(candidateCount != 0) {
                     adminActivityCountVo.setCandidateDetailCount(candidateCount - preCandidateCount > 0 ? candidateCount - preCandidateCount : 0);
                     preCandidateCount = candidateCount;
@@ -217,21 +218,23 @@ public class AdminActivityCountServiceImpl implements AdminActivityCountService 
         adminActivityVoteDetailDto.setActivityInfoId(countStatisticsDto.getKid());
         List<AdminActivityVoteDetailVo> activityVoteDetailList =activityParticipationDao.select(adminActivityVoteDetailDto);
         Integer candidateCount = 0;
-        for (AdminActivityVoteDetailVo adminActivityVoteDetailVo :activityVoteDetailList){
-            if(!StringUtils.isEmpty(adminActivityCountDto.getPageCandidate())) {
-                countStatisticsDto.setKid(adminActivityVoteDetailVo.getKid());
-                countStatisticsDto.setPage(adminActivityCountDto.getPageCandidate());
-                Response<Map<String, Long>> mapResponse = countStatisticsApi.countModelMap(countStatisticsDto);
-                if(mapResponse.success()) {
-                    mapPageCandidate = mapResponse.getData();
+        if (!CollectionUtils.isEmpty(activityVoteDetailList)){
+            for (AdminActivityVoteDetailVo adminActivityVoteDetailVo :activityVoteDetailList){
+                if(!StringUtils.isEmpty(adminActivityCountDto.getPageCandidate())) {
+                    countStatisticsDto.setKid(adminActivityVoteDetailVo.getKid());
+                    countStatisticsDto.setPage(adminActivityCountDto.getPageCandidate());
+                    Response<Map<String, Long>> mapResponse = countStatisticsApi.countModelMap(countStatisticsDto);
+                    if(mapResponse.success()) {
+                        mapPageCandidate = mapResponse.getData();
+                    }
+                    if(mapPageCandidate != null) {
+                        Integer c = mapPageCandidate.get("count") == null
+                                ? 0 : mapPageCandidate.get("count").intValue();
+                        candidateCount += c;
+                    }
                 }
-                if(mapPageCandidate != null) {
-                    Integer c = mapPageCandidate.get("count") == null
-                            ? 0 : mapPageCandidate.get("count").intValue();
-                    candidateCount += c;
-                }
+                countStatisticsDto.setKid(adminActivityVoteDetailVo.getActivityInfoId());
             }
-            countStatisticsDto.setKid(adminActivityVoteDetailVo.getActivityInfoId());
         }
         adminActivityCountVo.setCandidateDetailCount(candidateCount);
 
