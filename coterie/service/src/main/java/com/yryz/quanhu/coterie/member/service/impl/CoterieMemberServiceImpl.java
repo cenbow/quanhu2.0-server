@@ -248,6 +248,9 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     @Override
     @Transactional
     public void quit(Long userId, Long coterieId) {
+
+        logger.info("quit userId : " + userId + ", coterieId : " + coterieId);
+
         try {
             CoterieInfo coterie = coterieService.find(coterieId);
             if (coterie != null) {
@@ -307,6 +310,8 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
     @Override
     public Integer permission(Long userId, Long coterieId) {
+
+        logger.info("permission userId : " + userId + ", coterieId : " + coterieId);
 
         try {
 
@@ -398,7 +403,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 }
 
                 logger.info("审核通过时, 发送加入私圈事件ing");
-                coterieEventManager.joinCoterieEvent(coterieId);
+                coterieEventManager.joinCoterieEvent(userId,coterieId);
                 logger.info("审核通过时, 发送加入私圈事件end");
 
                 //permission cache
@@ -573,6 +578,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
     private Boolean saveOrUpdateMember(Long userId, Long coterieId, String reason, Byte joinType) {
         try {
 
+            logger.info("save or update member");
             Integer result = null;
 
             CoterieInfo coterie = coterieService.find(coterieId);
@@ -582,9 +588,12 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 amount = coterie.getJoinFee().longValue();
             }
 
+            logger.info("get member : coterieId : " + coterieId + ", userId : "+userId);
             CoterieMember coterieMember = coterieMemberDao.selectByCoterieIdAndUserId(coterieId, userId);
+
             if (coterieMember == null) {
 
+                logger.info("coterie member is null ");
                 coterieMember = new CoterieMember();
 
                 coterieMember.setKid(idApi.getSnowflakeId().getData());
@@ -606,6 +615,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 coterieMember.setAmount(Long.valueOf(amount));
                 coterieMember.setCreateUserId(userId);
 
+                logger.info("coterie member insert : " + GsonUtils.parseJson(coterieMember));
                 result = coterieMemberDao.insert(coterieMember);
             } else {
                 coterieMember.setReason(reason);
@@ -619,17 +629,22 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 coterieMember.setAmount(Long.valueOf(amount));
                 coterieMember.setCreateUserId(userId);
 
+//                logger.info("coterie member update : " + GsonUtils.parseJson(coterieMember));
                 result = coterieMemberDao.updateByCoterieMember(coterieMember);
+                logger.info("result : " + result);
             }
 
             Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
+            logger.info("update member number result : " + updateNumberResult);
             if (result == 0 || updateNumberResult == 0) {
+                logger.info("update member number result exception");
                 throw QuanhuException.busiError("更新成员人数失败");
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw QuanhuException.busiError("保存或更新私圈成员异常");
         }
+        logger.info("save or update member end ");
         return true;
     }
 

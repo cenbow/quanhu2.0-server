@@ -149,7 +149,7 @@ public class CoterieMemberMessageManager {
     }
 
     /**
-     * 禁言/取消禁言	 消息
+     * 禁言	 消息
      */
     public void banSpeakMessage(Long userId, Long coterieId) {
         try {
@@ -170,7 +170,7 @@ public class CoterieMemberMessageManager {
             UserSimpleVO owner = null;
             Response<UserSimpleVO> responseOwner = userApi.getUserSimple(Long.parseLong(coterie.getOwnerId()));
             if (responseOwner.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
-                owner = response.getData();
+                owner = responseOwner.getData();
                 if (owner == null) {
                     throw new QuanhuException(ExceptionEnum.SysException);
                 }
