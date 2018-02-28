@@ -417,13 +417,13 @@
             <![CDATA[  AND end_date > #{checkStartDate} ]]>
             <![CDATA[  AND start_time <= #{checkStartTime} ]]>
             <![CDATA[  AND end_time > #{checkStartTime} ]]>
-            AND adv_status != 30 AND adv_type = #{advType}
+            AND adv_status != 30 AND adv_type = #{advType} AND kid != #{kid}
             OR
             <![CDATA[   start_date <= #{checkStartDate} ]]>
             <![CDATA[  AND end_date > #{checkStartDate} ]]>
             <![CDATA[  AND start_time >= #{checkStartTime} ]]>
             <![CDATA[  AND start_time < #{checkEndTime} ]]>
-            AND adv_status != 30 AND adv_type = #{advType}
+            AND adv_status != 30 AND adv_type = #{advType} AND kid != #{kid}
         </where>
     </select>
 
