@@ -8,6 +8,7 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
@@ -399,6 +400,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
      */
     private Boolean isExistCoterie(Long coterieId) {
         CoterieInfo coterie = coterieService.find(coterieId);
+        logger.info(JsonUtils.toFastJson(coterie));
         if (coterie != null) {
             if (coterie.getStatus() == 10) {
                 throw QuanhuException.busiError("私圈审批中...");
