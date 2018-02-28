@@ -16,6 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 私圈信息
@@ -88,4 +89,6 @@ public interface CoterieMapper {
     List<Coterie> selectBySearchParam(CoterieSearchParam param);
 
     Integer selectCountBySearchParam(CoterieSearchParam param);
+
+    Set<Long> queryAbleCreteCoterieUserIds();
 }

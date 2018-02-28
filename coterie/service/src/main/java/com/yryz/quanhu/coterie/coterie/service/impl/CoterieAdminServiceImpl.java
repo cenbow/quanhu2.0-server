@@ -21,7 +21,10 @@ import com.yryz.quanhu.coterie.member.event.CoterieEventManager;
 import com.yryz.quanhu.coterie.member.event.CoterieMessageManager;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.vo.ResourceTotal;
+import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.service.EventAcountApiService;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
@@ -61,6 +64,9 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
 
     @Autowired
     private CoterieRedis coterieRedis;
+
+    @Reference
+    private EventAcountApiService eventAcountApiService;
 
 
     @Override
@@ -208,4 +214,30 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
             coterieRedis.save(model);
         }
     }
+
+
+    /**
+     * 查询有权限创建私圈的用户
+     * @return
+     */
+    @Override
+    public Set<Long> queryAbleCreteCoterieUserIds() {
+        Set<Long> userIdsSet=new HashSet<>();
+        Set<Long> userIds= coterieMapper.queryAbleCreteCoterieUserIds();
+        ScoreFlowQuery sfq = new  ScoreFlowQuery();
+        sfq.setGrowLevel("4");
+        Response<PageList<ScoreFlowReportVo>> scoreFlowReportVos = eventAcountApiService.getEventAcount(sfq);
+        PageList<ScoreFlowReportVo> pageListData=ResponseUtils.getResponseData(scoreFlowReportVos);
+        if(pageListData!=null){
+          List<ScoreFlowReportVo> scoreFlowReportVoList= pageListData.getEntities();
+          for(ScoreFlowReportVo vo :scoreFlowReportVoList){
+              if(userIds.contains(Long.valueOf(vo.getUserId()))){
+                  userIdsSet.add(Long.valueOf(vo.getUserId()));
+              }
+          }
+        }
+        return userIdsSet;
+    }
+
+
 }
