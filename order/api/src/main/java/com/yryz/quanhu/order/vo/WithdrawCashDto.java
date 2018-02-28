@@ -26,6 +26,11 @@ public class WithdrawCashDto implements Serializable {
      */
     private Integer orderState;
 
+    /**
+     * 提现渠道 12中国银联提现 13微信提现到银行卡
+     */
+    private String orderChannel;
+
     public Integer getCurrentPage() {
         return currentPage;
     }
@@ -48,5 +53,13 @@ public class WithdrawCashDto implements Serializable {
 
     public void setOrderState(Integer orderState) {
         this.orderState = orderState;
+    }
+
+    public String getOrderChannel() {
+        return orderChannel;
+    }
+
+    public void setOrderChannel(String orderChannel) {
+        this.orderChannel = orderChannel;
     }
 }

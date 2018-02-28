@@ -134,6 +134,9 @@
 			<if test="orderState != null ">
 				AND a.order_state = #{orderState}
 			</if>
+			<if test="orderChannel != null and orderChannel != ''">
+				AND a.order_channel = #{orderChannel}
+			</if>
 		ORDER BY a.create_time DESC, auto_id DESC
 	</select>
 </mapper>
