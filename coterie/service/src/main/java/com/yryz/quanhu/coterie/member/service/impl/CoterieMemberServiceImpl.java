@@ -591,16 +591,18 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             coterieMember.setProcessTime(new Date());
             coterieMember.setJoinType(joinType);
             coterieMember.setKickStatus(MemberConstant.KickStatus.NORMAL.getStatus());
+            coterieMember.setBanSpeak(MemberConstant.BanSpeak.NORMAL.getStatus());
             coterieMember.setDelFlag(MemberConstant.DelFlag.NORMAL.getStatus());
             coterieMember.setAmount(Long.valueOf(amount));
             coterieMember.setCreateUserId(userId);
 
+            logger.info("coterie member insert : " + GsonUtils.parseJson(coterieMember));
             result = coterieMemberDao.updateByCoterieMember(coterieMember);
             logger.info("result : " + result);
         }
 
-        logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + coterie.getMemberNum() + 1 + ", old memberNum : " + coterie.getMemberNum());
-        Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), coterie.getMemberNum() + 1, coterie.getMemberNum());
+        logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + (coterie.getMemberNum() + 1) + ", old memberNum : " + coterie.getMemberNum());
+        Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() + 1), coterie.getMemberNum());
         logger.info("update member number result : " + updateNumberResult);
         if (result == 0 || updateNumberResult == 0) {
             logger.info("update member number result exception");
