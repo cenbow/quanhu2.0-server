@@ -7,6 +7,8 @@
  */
 package com.yryz.quanhu.coterie.coterie.entity;
 
+import com.yryz.common.constant.ModuleContants;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -135,6 +137,11 @@ public class Coterie implements Serializable {
 	 * 10:显示，11:不显示
 	 */
 	private Integer redDot;
+
+	/**
+	 * 私圈的功能枚举
+	 */
+	private String moduleEnum = ModuleContants.COTERIE;
 
 	public Long getId() {
 		return id;
@@ -342,5 +349,13 @@ public class Coterie implements Serializable {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getModuleEnum() {
+		return moduleEnum;
+	}
+
+	public void setModuleEnum(String moduleEnum) {
+		this.moduleEnum = moduleEnum;
 	}
 }
