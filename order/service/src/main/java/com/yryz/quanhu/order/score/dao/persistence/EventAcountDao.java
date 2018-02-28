@@ -3,6 +3,7 @@ package com.yryz.quanhu.order.score.dao.persistence;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.vo.EventAcount;
@@ -17,5 +18,5 @@ public interface EventAcountDao {
 
 	EventAcount getLastAcount(String userId);
 
-	List<EventAcount> getAll(ScoreFlowQuery sfq);
+	List<EventAcount> getAll(@Param("sfq") ScoreFlowQuery sfq);
 }

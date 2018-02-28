@@ -7,19 +7,19 @@
  */
 package com.yryz.quanhu.order;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.quanhu.score.entity.ScoreFlowQuery;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.service.EventAcountApiService;
 import com.yryz.quanhu.score.vo.EventInfo;
-import com.yryz.quanhu.score.vo.EventReportVo;
 import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 /**
@@ -50,11 +50,13 @@ public class EventTest {
 	}
 	
 	@Test
-	public void getEventAcount(){
+	public void getEventAcountAll(){
 		ScoreFlowQuery sfq = new  ScoreFlowQuery();
 		sfq.setGrowLevel("4");
-		Response<PageList<ScoreFlowReportVo>> VO = eventAcountApiService.getEventAcount(sfq);
-	System.out.println(" VO.getData().getCount(): "+VO.getData().getCount());
+//		String userId = "123456789";
+//		sfq.setUserId(userId);
+		Response<List<ScoreFlowReportVo>> VO = eventAcountApiService.getEventAcountAll(sfq);
+		System.out.println(" VO.getData().size(): "+VO.getData().size());
 	}
 
 

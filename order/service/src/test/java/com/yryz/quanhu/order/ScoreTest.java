@@ -10,6 +10,7 @@ package com.yryz.quanhu.order;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -29,6 +30,7 @@ import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
 import com.yryz.quanhu.score.vo.EventReportVo;
 import com.yryz.quanhu.score.vo.EventSign;
+import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 
 /**
  * @author syc
@@ -109,6 +111,16 @@ public class ScoreTest {
 //		System.out.println("sfslist size(): "+sfslist.getCount());
 
      // System.out.println("ScoreFlow list: "+list.size());
+    }
+	
+	
+	@Test
+    public  void getScoreFlowAll()  {
+		String userId = "123456789";
+		ScoreFlowQuery sfq =new ScoreFlowQuery();
+		sfq.setUserId(userId);
+		List<ScoreFlowReportVo> list  = scoreAPI.getScoreFlowAll(sfq);
+		System.out.println("list.size()"+list.size());
     }
 	
 	

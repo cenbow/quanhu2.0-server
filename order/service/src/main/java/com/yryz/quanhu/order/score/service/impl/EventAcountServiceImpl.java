@@ -76,7 +76,7 @@ public class EventAcountServiceImpl implements EventAcountService {
 
 
 	@Override
-	public List<EventAcount> getPage(ScoreFlowQuery sfq) {
+	public List<EventAcount> getAll(ScoreFlowQuery sfq) {
 		
 		return eventAcountDao.getAll(sfq);
 	}
