@@ -32,6 +32,7 @@ public enum ExceptionEnum {
     COTERIE_NOT_HAVE_COTERIE("1026", "您不是圈主,禁止操作！", "您不是私圈圈主！"),
     COTERIE_NOT_MEMBER("1027", "您不是私圈成员，禁止访问！", "您不是私圈成员！"),
     COTERIE_NON_EXISTENT("1028", "未找到该私圈,访问出错", "私圈不存在！"),
+    COTERIE_SHELVED("1029", "私圈已下架", "私圈已下架！"),
     RESOURCE_NO_EXIST("1030", "资源不存在", "资源不存在。"),
     NOT_TO_PLAY_REWARD("1031", "打赏人不允许 打赏自己的资源！", "不能对自己打赏哦~"),
     
