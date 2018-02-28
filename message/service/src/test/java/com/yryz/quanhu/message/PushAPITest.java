@@ -8,6 +8,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.quanhu.message.push.api.PushAPI;
 import com.yryz.quanhu.message.push.entity.PushConfigDTO;
+import com.yryz.quanhu.message.push.entity.PushReceived;
 import com.yryz.quanhu.message.push.entity.PushReqVo;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
@@ -51,5 +52,14 @@ public class PushAPITest {
 //        dto.setPushEvn(false);
 //        dto.setPushDesc("测试环境推送配置");
 //        System.out.println("wfefe"+GsonUtils.parseJson(dto));
+    }
+
+    @Test
+    public void getReceivedTest() {
+
+        RpcContext.getContext().setAttachment(AppConstants.APP_ID, "vebff12m1762");
+        Response<List<PushReceived>> getReceived = pushAPI.getReceived(Lists.newArrayList("20266201255698740"));
+
+        System.out.println(GsonUtils.parseJson(getReceived));
     }
 }

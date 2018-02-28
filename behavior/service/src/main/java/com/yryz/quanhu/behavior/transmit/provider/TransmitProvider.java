@@ -47,7 +47,7 @@ public class TransmitProvider implements TransmitApi {
      * */
     public Response<PageList<TransmitInfoVo>> list(TransmitInfoDto transmitInfoDto) {
         try {
-            Assert.hasText(transmitInfoDto.getModuleEnum(), "moduleEnum不能为空");
+//            Assert.hasText(transmitInfoDto.getModuleEnum(), "moduleEnum不能为空");
             Assert.notNull(transmitInfoDto.getParentId(), "parentId不能为空");
             return ResponseUtils.returnObjectSuccess(transmitService.list(transmitInfoDto));
         } catch (Exception e) {

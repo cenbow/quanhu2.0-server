@@ -8,8 +8,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -58,7 +57,7 @@ public class FreeMarkers {
         return cfg;
     }
 
-    public static String createFile(String fileName, Map<String, String> model) throws IOException {
+    public String createFile(String fileName, Map<String, String> model) throws IOException {
         String path = AdvertUtil.getRealPath();
         logger.info("ftl模板文件路径" + path);
         Configuration cfg = FreeMarkers.buildConfiguration(path);
@@ -66,19 +65,10 @@ public class FreeMarkers {
         try {
             template = cfg.getTemplate(fileName + ".ftl", "utf-8");
         } catch (IOException e) {
-			/*logger.error("未找到模板", e);
-			InputStream inputStream = FreeMarkers.class.getClassLoader().getResourceAsStream("/config/notice.ftl");
-			File file = new File(path);
-			inputstreamtofile(inputStream, file);
-			logger.info("%%%%%%%%%%%%%%%%%%" + file.getAbsolutePath() + "%%%%%%%%%%%%%%%%%%");
-			Configuration cfg1 = new Configuration();
-			cfg1.setDirectoryForTemplateLoading(file);
-            template = cfg1.getTemplate(fileName + ".ftl", "utf-8");*/
-            Resource resource = new ClassPathResource(fileName + ".ftl");
-            File file = resource.getFile();
-            Configuration cfg1 = new Configuration();
-            cfg1.setDirectoryForTemplateLoading(file);
-            template = cfg1.getTemplate(fileName + ".ftl", "utf-8");
+            Configuration conf = new Configuration();
+            conf.setDefaultEncoding("UTF-8");
+            conf.setClassForTemplateLoading(TemplateFactory.class, "/templates");
+            template = conf.getTemplate(fileName + ".ftl");
         }
         SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMddHHmmss");
         String date = myFmt.format(new Date());

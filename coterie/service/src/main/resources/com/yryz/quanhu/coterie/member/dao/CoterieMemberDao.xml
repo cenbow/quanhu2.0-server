@@ -59,6 +59,9 @@
         <if test="delFlag!= null">
             ,del_flag= #{delFlag}
         </if>
+        <if test="joinType!= null">
+            ,join_type= #{joinType}
+        </if>
         <if test="reason!= null">
             ,reason= #{reason}
         </if>

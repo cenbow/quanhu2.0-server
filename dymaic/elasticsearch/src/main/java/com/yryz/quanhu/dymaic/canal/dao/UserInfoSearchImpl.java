@@ -1,25 +1,22 @@
 package com.yryz.quanhu.dymaic.canal.dao;
 
-import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
 import com.google.common.collect.Lists;
 import com.yryz.common.response.PageList;
+import com.yryz.common.utils.DateUtils;
+import com.yryz.common.utils.GsonUtils;
+import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
+import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
+import com.yryz.quanhu.user.contants.AdminQueryUserStatus;
+import com.yryz.quanhu.user.contants.UserAccountStatus;
+import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
+import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.vo.UserInfoVO;
-import org.apache.commons.collections.CollectionUtils;
-import com.yryz.common.response.PageList;
-import com.yryz.quanhu.user.vo.UserInfoVO;
+import com.yryz.quanhu.user.vo.UserRegLogVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
@@ -30,20 +27,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
-import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Repository;
 
-import com.yryz.common.utils.DateUtils;
-import com.yryz.common.utils.GsonUtils;
-import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.dymaic.canal.constants.ESConstants;
-import com.yryz.quanhu.dymaic.canal.entity.UserInfo;
-import com.yryz.quanhu.user.contants.AdminQueryUserStatus;
-import com.yryz.quanhu.user.contants.UserAccountStatus;
-import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
-import com.yryz.quanhu.user.dto.StarInfoDTO;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static com.yryz.quanhu.dymaic.canal.constants.ESConstants.USER_CREATEDATE;
 
 @Repository
 public class UserInfoSearchImpl implements UserInfoSearch {
@@ -178,6 +172,102 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         return pageList;
     }
 
+    @Override
+    public PageList<UserInfoVO> searchMsgUserAdmin(AdminUserInfoDTO adminUserDTO) {
+        Integer pageNo = adminUserDTO.getPageNo();
+        Integer pageSize = adminUserDTO.getPageSize();
+
+        String appId = adminUserDTO.getAppId();
+
+        String nickName = adminUserDTO.getNickName();
+        String phone = adminUserDTO.getPhone();
+        Integer userRole = adminUserDTO.getUserRole();
+        Byte userGenders = adminUserDTO.getUserGenders();
+        String regType = adminUserDTO.getRegType();
+        String devType = adminUserDTO.getDevType();
+        String appVersion = adminUserDTO.getAppVersion();
+        Integer versionInclude = adminUserDTO.getVersionInclude();
+        Set<Long> tagIds = adminUserDTO.getTagIds();
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if (StringUtils.isNotBlank(appId)) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
+        }
+
+        if (StringUtils.isNotBlank(nickName)) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_NICKNAME, "*" + nickName + "*"));
+        }
+
+        if (StringUtils.isNotBlank(phone)) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_PHONE, "*" + phone + "*"));
+        }
+
+        if (userRole != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole));
+        }
+
+        if (userGenders != null) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_GENDERS, userGenders));
+        }
+
+        if (StringUtils.isNotBlank(regType)) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ESConstants.USER_REG_TYPE, "*" + regType + "*"));
+        }
+
+        if (StringUtils.isNotBlank(devType)) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_DEV_TYPE, devType));
+        }
+
+        if (StringUtils.isNotBlank(appVersion)) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APP_VERSION, appVersion));
+        }
+
+        if (CollectionUtils.isNotEmpty(tagIds)) {
+            BoolQueryBuilder boolQueryBuilder1 = QueryBuilders.boolQuery();
+            tagIds.stream().filter(tagId -> tagId != null).forEach(tagId -> {
+                boolQueryBuilder1.should(QueryBuilders.matchQuery(ESConstants.USER_ID_KEY, tagId));
+            });
+            boolQueryBuilder.must(boolQueryBuilder1);
+        }
+
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        queryBuilder.withFilter(boolQueryBuilder).withPageable(pageable);
+        queryBuilder.withSort(SortBuilders.fieldSort(ESConstants.USER_CREATEDATE).order(SortOrder.DESC));
+        NativeSearchQuery query = queryBuilder.build();
+        AggregatedPage<UserInfo> userInfos = elasticsearchTemplate.queryForPage(query, UserInfo.class);
+        List<UserInfo> userInfoList = userInfos.getContent();
+        List<UserInfoVO> userInfoVOS = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(userInfoList)) {
+            userInfoVOS = GsonUtils.parseList(userInfoList, UserInfoVO.class);
+            if (versionInclude != null && versionInclude == 1 && StringUtils.isNotBlank(appVersion)) {
+                List<UserInfoVO> newUserInfoVOS = new ArrayList<>();
+
+                userInfoVOS.stream().filter(userInfoVO -> userInfoVO != null).forEach(userInfoVO -> {
+                    if (userInfoVO.getUserRegLog() != null) {
+                        UserRegLogVO userRegLog = userInfoVO.getUserRegLog();
+                        String version = userRegLog.getAppVersion();
+                        if (StringUtils.isNotBlank(version)) {
+                            String replaceVersion = version.replace(".", "");
+                            Long appVersionNum = Long.valueOf(appVersion.replace(".", ""));
+                            Long replaceVersionNum = Long.valueOf(replaceVersion);
+                            if (appVersionNum >= replaceVersionNum) {
+                                newUserInfoVOS.add(userInfoVO);
+                            }
+                        }
+                    }
+                });
+                userInfoVOS.clear();
+                userInfoVOS.addAll(newUserInfoVOS);
+            }
+        }
+        PageList<UserInfoVO> pageList = new PageList<>();
+        pageList.setCurrentPage(pageNo);
+        pageList.setPageSize(pageSize);
+        pageList.setEntities(userInfoVOS);
+        pageList.setCount(userInfos.getTotalElements());
+        return pageList;
+    }
 
     /**
      * 基本条件搜索：用户名称，联系电话，申请认证时间，审核状态，认证类型，认证方式，用户等级，用户标签

@@ -140,7 +140,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         uBeCount.setTargetType(RewardConstants.target_type_user);
         uBeCount.setTotalRewardedAmount(rewardedPrice);
         uBeCount.setTotalRewardedCount(1);
-        rewardCountService.addCountByTargetId(uCount);
+        rewardCountService.addCountByTargetId(uBeCount);
         logger.info("资源打赏 订单回调，更新被打赏者 统计,TargetId==>>" + info.getToUserId());
 
         // 更新资源被打赏 统计
@@ -149,7 +149,7 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
         rCount.setTargetType(RewardConstants.target_type_resource);
         rCount.setTotalRewardedAmount(info.getGiftNum() * info.getGiftPrice());
         rCount.setTotalRewardedCount(1);
-        rewardCountService.addCountByTargetId(uCount);
+        rewardCountService.addCountByTargetId(rCount);
         logger.info("资源打赏 订单回调，更新资源被打赏 统计,TargetId==>>" + info.getResourceId());
 
         // 给打赏者、被打赏者 发送消息

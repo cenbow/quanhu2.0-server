@@ -9,9 +9,11 @@ import com.yryz.common.utils.BeanUtils;
 import com.yryz.quanhu.resource.questionsAnswers.api.Question4AdminApi;
 import com.yryz.quanhu.resource.questionsAnswers.api.QuestionApi;
 import com.yryz.quanhu.resource.questionsAnswers.dto.QuestionDto;
+import com.yryz.quanhu.resource.questionsAnswers.entity.AnswerWithBLOBs;
 import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.service.Question4AdminService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
+import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAdminVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
@@ -60,7 +62,21 @@ public class Question4AdminProvider implements Question4AdminApi {
     @Override
     public Response<QuestionAnswerVo> queryDetail(Long kid) {
         try {
-            QuestionAnswerVo result= this.questionService.queryAvailableQuestionByKid(kid);
+            QuestionAnswerVo result= this.questionService.queryQuestionByKid(kid);
+            return ResponseUtils.returnObjectSuccess(result);
+        } catch (QuanhuException e) {
+            return ResponseUtils.returnException(e);
+        } catch (Exception e) {
+            logger.error("注册未知异常", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+
+    @Override
+    public Response<AnswerWithBLOBs> queryAnswerDetail(Long kid){
+        try {
+            AnswerWithBLOBs result= this.questionService.queryAnswerDetail(kid);
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

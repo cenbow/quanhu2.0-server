@@ -179,7 +179,7 @@ public class PushServiceImpl implements PushService {
 
 	@Override
 	public List<PushReceived> getPushReceived(List<String> msgIds) {
-		String appId = null;//RpcUtils.getAppId();
+		String appId = RpcContext.getContext().getAttachment(Constants.APP_ID);
 		// 获取推送配置
 		PushConfigDTO configDTO = getPushConfig(appId);
 

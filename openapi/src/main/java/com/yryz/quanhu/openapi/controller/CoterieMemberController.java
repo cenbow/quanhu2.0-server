@@ -5,17 +5,20 @@ import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
 import com.yryz.quanhu.coterie.member.dto.CoterieMemberDto;
 import com.yryz.quanhu.coterie.member.service.CoterieMemberAPI;
 import com.yryz.quanhu.coterie.member.vo.*;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+import com.yryz.quanhu.openapi.utils.CommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -33,7 +36,7 @@ public class CoterieMemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @PostMapping(value = "/services/app/{version}/coterie/member/join")
     public Response<CoterieMemberVoForJoin> join(@RequestHeader("userId") Long userId, @RequestBody CoterieMemberDto memberDto) {
         return coterieMemberAPI.join(userId, memberDto.getCoterieId(), memberDto.getReason());
@@ -44,9 +47,9 @@ public class CoterieMemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @PostMapping(value = "/services/app/{version}/coterie/member/kick")
-    public Response<String> kick(@RequestHeader("userId") Long userId,@RequestBody CoterieMemberDto memberDto) {
+    public Response<String> kick(@RequestHeader("userId") Long userId, @RequestBody CoterieMemberDto memberDto) {
 
         return coterieMemberAPI.kick(userId, memberDto.getMemberId(), memberDto.getCoterieId(), memberDto.getReason());
     }
@@ -56,9 +59,9 @@ public class CoterieMemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @PostMapping(value = "/services/app/{version}/coterie/member/quit")
-    public Response<String> quit(@RequestHeader("userId") Long userId,@RequestBody CoterieMemberDto memberDto) {
+    public Response<String> quit(@RequestHeader("userId") Long userId, @RequestBody CoterieMemberDto memberDto) {
         return coterieMemberAPI.quit(userId, memberDto.getCoterieId());
     }
 
@@ -67,9 +70,9 @@ public class CoterieMemberController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
             @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
-            @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @PostMapping(value = "/services/app/{version}/coterie/member/banSpeak")
-    public Response banSpeak(@RequestHeader("userId") Long userId,@RequestBody CoterieMemberDto memberDto) {
+    public Response banSpeak(@RequestHeader("userId") Long userId, @RequestBody CoterieMemberDto memberDto) {
 
         return coterieMemberAPI.banSpeak(userId, memberDto.getMemberId(), memberDto.getCoterieId(), memberDto.getType());
     }
@@ -77,10 +80,16 @@ public class CoterieMemberController {
     @ApiOperation("获取用户与私圈的权限关系")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/coterie/member/permission")
-    public Response permission(@RequestHeader("userId") Long userId, Long coterieId) {
+    public Response permission(Long coterieId, HttpServletRequest request) {
 
         CoterieMemberVoForPermission permissionResult = new CoterieMemberVoForPermission();
-        permissionResult.setPermission(ResponseUtils.getResponseData(coterieMemberAPI.permission(userId, coterieId)));
+
+        String userId = CommonUtils.getHeaderValue(request, "userId");
+        if (StringUtils.isNotBlank(userId)) {
+            permissionResult.setPermission(ResponseUtils.getResponseData(coterieMemberAPI.permission(Long.parseLong(userId), coterieId)));
+        } else {
+            permissionResult.setPermission(MemberConstant.Permission.STRANGER_NON_CHECK.getStatus());
+        }
 
         return new Response<>(permissionResult);
 
@@ -101,15 +110,12 @@ public class CoterieMemberController {
     @ApiOperation("成员申请加入私圈的审批")
     @UserBehaviorValidation(login = true)
     @ApiImplicitParams({
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
-    @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
-    @ApiImplicitParam(name = "userId", paramType = "header", required = true) })
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
+            @ApiImplicitParam(name = "memberDto", paramType = "body", required = true),
+            @ApiImplicitParam(name = "userId", paramType = "header", required = true)})
     @PostMapping(value = "/services/app/{version}/coterie/member/audit")
     public Response audit(@RequestHeader("userId") Long userId, @RequestBody CoterieMemberDto memberDto) {
-
-        coterieMemberAPI.audit(userId, memberDto.getMemberId(), memberDto.getCoterieId(), MemberConstant.MemberStatus.PASS.getStatus());
-
-        return new Response();
+        return coterieMemberAPI.audit(userId, memberDto.getMemberId(), memberDto.getCoterieId(), MemberConstant.MemberStatus.PASS.getStatus());
     }
 
     @ApiOperation("私圈新审请的成员数量")

@@ -55,15 +55,14 @@ public class MessageUtils {
         messageVo.setActionCode(mc.getMessageActionCode());
         String content = mc.getContent();
         if (StringUtils.isNotEmpty(msg)) {
-            String regex = "\\{count\\}";
+            String target = "{count}";
             try {
-                content = content.replaceAll(regex, msg);
+                content = content.replace(target, msg);
             } catch (Exception e) {
-                logger.error(content + " replaceAll Exception", e);
-                regex = "{count}";
-                if (content.indexOf(regex) > -1) {
-                    content = StringUtils.substringBefore(content, regex) + msg
-                            + StringUtils.substringAfter(content, regex);
+                logger.error(content + " replace Exception", e);
+                if (content.indexOf(target) > -1) {
+                    content = StringUtils.substringBefore(content, target) + msg
+                            + StringUtils.substringAfter(content, target);
                 }
             }
         }
@@ -75,60 +74,6 @@ public class MessageUtils {
         messageVo.setToCust(userId);
         messageVo.setViewCode(mc.getMessageViewCode());
         messageVo.setBody(body);
-        return messageVo;
-    }
-
-    public void buildMessageByJump(MessageConstant constant, String userId, String msg, Object body,
-                                  JumpDetails jumpDetails, boolean flag) {
-        MessageVo messageVo = new MessageVo();
-        messageVo.setMessageId(UUID.randomUUID().toString());
-        messageVo.setActionCode(constant.getMessageActionCode());
-        String content = constant.getContent();
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(msg)) {
-            content = content.replaceAll("\\{count\\}", msg);
-        }
-        messageVo.setContent(content);
-        messageVo.setCreateTime(DateUtils.getDateTime());
-        messageVo.setLabel(constant.getLabel());
-        messageVo.setType(constant.getType());
-        messageVo.setTitle(constant.getTitle());
-        messageVo.setToCust(userId);
-        messageVo.setViewCode(constant.getMessageViewCode());
-        messageVo.setCircleRoute(jumpDetails.getCircleRoute());// 圈子名称,【私圈文章,话题,帖子,问题,活动必填】
-        messageVo.setResourceId(jumpDetails.getResourceId());// 资源id,【私圈文章,话题,帖子,问题,活动必填】
-        messageVo.setModuleEnum(jumpDetails.getModuleEnum());// 功能id,【私圈文章,话题,帖子,问题,活动必填】
-        messageVo.setCoterieId(jumpDetails.getCoterieId());// 私圈id,【私圈文章,话题,帖子,问题,活动必填】
-
-        messageVo.setCircleId(org.apache.commons.lang3.StringUtils.defaultString(String.valueOf(ReflectionUtils.invokeGetterMethod(body, "circleId"))));
-        messageVo.setImg(org.apache.commons.lang3.StringUtils.defaultString(String.valueOf(ReflectionUtils.invokeGetterMethod(body, "bodyImg"))));
-        messageVo.setBody(body);
-        logger.info("send message :" + JSONObject.toJSONString(messageVo));
-        //sendMessage(messageVo, flag);
-    }
-
-    public static MessageVo buildMessageForComment(MessageConstant constant, String userId, String msg, Object body,
-                                      String resourceId, String moduleEnum, String circleId, String circleRoute, String coterieId, boolean flag) {
-        MessageVo messageVo = new MessageVo();
-        messageVo.setMessageId(UUID.randomUUID().toString());
-        messageVo.setActionCode(constant.getMessageActionCode());
-        String content = constant.getContent();
-        if (StringUtils.isNotEmpty(msg)) {
-            content = content.replaceAll("\\{count\\}", msg);
-        }
-        messageVo.setContent(content);
-        messageVo.setCreateTime(DateUtils.getDateTime());
-        messageVo.setLabel(constant.getLabel());
-        messageVo.setType(constant.getType());
-        messageVo.setTitle(constant.getTitle());
-        messageVo.setToCust(userId);
-        messageVo.setViewCode(constant.getMessageViewCode());
-        messageVo.setBody(body);
-        messageVo.setResourceId(resourceId);
-        messageVo.setModuleEnum(moduleEnum);
-        messageVo.setCircleId(circleId);
-        messageVo.setCircleRoute(circleRoute);
-        messageVo.setCoterieId(coterieId);
-        logger.info("send message :" + JSONObject.toJSONString(messageVo));
         return messageVo;
     }
 

@@ -245,7 +245,7 @@
         shelve_flag = #{shelveFlag},
       </if>
       <if test="auditUserId != null" >
-        audit_userId = #{auditUserId},
+        audit_user_id = #{auditUserId},
       </if>
       <if test="auditRemark != null" >
         audit_remark = #{auditRemark},
@@ -475,43 +475,57 @@
     FROM `qh_coterie` s
     WHERE 1=1
     <if test="status !=null"> AND s.state=#{status}</if>
+    <if test="shelveFlag !=null"> AND s.shelve_flag=#{shelveFlag}</if>
     <if test="name !=null"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
-    <if test="ownerId !=null"> AND s.owner_id=#{ownerId}</if>
-    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
+    <if test="ownerId !=null and ownerId != ''"> AND s.owner_id=#{ownerId}</if>
+    <if test="startTime !=null and endTime !=null"> AND ${sortValue} BETWEEN #{startTime} AND #{endTime}</if>
     <if test="recommend !=null"> AND s.recommend = #{recommend}</if>
   </select>
 
 
   <select id="selectBySearchParam" resultType="com.yryz.quanhu.coterie.coterie.entity.Coterie" parameterType="com.yryz.quanhu.coterie.coterie.entity.CoterieSearch">
     SELECT
-    s.coterie_name name,
-    s.create_date createDate,
-    s.join_fee joinFee,
-    s.consulting_fee consultingFee,
-    s.owner_id ownerId,
-    s.intro,
-    s.kid coterieId,
-    s.join_check joinCheck,
-    s.state,
-    s.recommend,
-    s.is_expert isExpert,
-    s.icon,
-    s.state status,
-    s.shelve_flag,
-    s.member_num memberNum,
-    s.process_time,
-    s.audit_user_id,
-    s.audit_remark,
-    s.heat
-    FROM `qh_coterie` s
+    coterie_name name,
+    create_date createDate,
+    join_fee joinFee,
+    consulting_fee consultingFee,
+    owner_id ownerId,
+    intro,
+    kid coterieId,
+    join_check joinCheck,
+    state,
+    recommend,
+    is_expert isExpert,
+    icon,
+    state status,
+    shelve_flag,
+    member_num memberNum,
+    process_time,
+    audit_user_id,
+    audit_remark,
+    heat
+    FROM `qh_coterie`
     WHERE 1=1
-    <if test="status !=null"> AND s.state=#{status}</if>
-    <if test="name !=null and name != ''"> AND s.coterie_name LIKE CONCAT('%',#{name},'%')</if>
-    <if test="ownerId !=null and name != ''"> AND s.owner_id=#{ownerId}</if>
-    <if test="startTime !=null"> AND s.create_date BETWEEN #{startTime} AND #{endTime}</if>
-    <if test="recommend !=null"> AND s.recommend = #{recommend}</if>
-    order by s.create_date ${sortValue}
+    <if test="status !=null"> AND state=#{status}</if>
+    <if test="shelveFlag !=null"> AND shelve_flag=#{shelveFlag}</if>
+    <if test="name !=null and name != ''"> AND coterie_name LIKE CONCAT('%',#{name},'%')</if>
+    <if test="ownerId !=null and ownerId != ''"> AND owner_id=#{ownerId}</if>
+    <if test="startTime !=null and endTime !=null"> AND ${sortValue} BETWEEN #{startTime} AND #{endTime}</if>
+    <if test="recommend !=null"> AND recommend = #{recommend}</if>
+    order by ${sortValue} DESC
     limit #{pageNum},#{pageSize}
+  </select>
+
+  <select id="queryAbleCreteCoterieUserIds" resultType="java.lang.Long" >
+    select B.userId from
+    (select count(a.relation_status) as followCount,a.source_user_id as userId from qh_user_relation  as  a where a.relation_status=2  GROUP BY source_user_id) as B
+    where B.followCount &gt;= 20
+    and userId in
+    (select C.userId from (select
+    owner_id as userId,count(*) as coterieCount
+    from qh_coterie as coterie
+    WHERE
+    (coterie.state =10 or coterie.shelve_flag=10) GROUP BY coterie.owner_id) as C where c.coterieCount &lt;= 10)
   </select>
 
 
@@ -545,5 +559,8 @@
     </set>
     where kid = #{coterieId,jdbcType=CHAR}
   </update>
+
+
+
 
 </mapper>

@@ -33,6 +33,9 @@ public class CoterieInfo implements Serializable{
 	@ApiModelProperty("个人简介")
     private String ownerIntro;
 
+	@ApiModelProperty("达人行业")
+	private String starTradeField;
+
 	@ApiModelProperty("私圈名称")
 	private String name;
 	
@@ -355,6 +358,14 @@ public class CoterieInfo implements Serializable{
 
 	public void setModuleEnum(String moduleEnum) {
 		this.moduleEnum = moduleEnum;
+	}
+
+	public String getStarTradeField() {
+		return starTradeField;
+	}
+
+	public void setStarTradeField(String starTradeField) {
+		this.starTradeField = starTradeField;
 	}
 }
 

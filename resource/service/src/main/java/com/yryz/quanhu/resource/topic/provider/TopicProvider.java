@@ -52,6 +52,9 @@ public class TopicProvider implements TopicApi {
     public Response<TopicVo> queryDetail(Long kid, Long userId) {
         try {
             TopicVo  result=this.topicService.queryDetail(kid,userId);
+            if(result==null){
+                throw   QuanhuException.busiError("查询的话题不存在");
+            }
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);

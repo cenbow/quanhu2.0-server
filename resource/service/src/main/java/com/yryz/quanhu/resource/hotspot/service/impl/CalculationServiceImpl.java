@@ -82,6 +82,7 @@ public class CalculationServiceImpl implements CalculationService {
 		for (HeatInfo heatInfo : infos) {
 			long heat = heatInfo.countHeat();
 			heatInfo.setHeat(heat);
+			heatInfo.setUpdateTime(System.currentTimeMillis());
 			heatInfoMongo.update(heatInfo);
 			updateResourceHeat(heatInfo.getObjectId(), heatInfo);
 		}

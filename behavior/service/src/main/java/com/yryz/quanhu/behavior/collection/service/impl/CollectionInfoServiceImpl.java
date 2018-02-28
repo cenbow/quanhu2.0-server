@@ -71,11 +71,11 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
             //获取资源实体
             result = resourceApi.getResourcesById(collectionInfoDto.getResourceId().toString());
             if(!result.success()) {
-                throw new QuanhuException(ExceptionEnum.SysException);
+            	throw QuanhuException.busiError(ExceptionEnum.SysException);
             }
         } catch (Exception e) {
             logger.error("获取资源失败", e);
-            throw new QuanhuException(ExceptionEnum.COLLECTION_EXIST_ERROR);
+            throw QuanhuException.busiError(ExceptionEnum.COLLECTION_EXIST_ERROR);
         }
         ResourceVo resourceVo = result.getData();
         if(resourceVo == null || ResourceEnum.DEL_FLAG_TRUE.equals(resourceVo.getDelFlag())) {
@@ -83,7 +83,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         }
         Response<Long> idResult = idAPI.getSnowflakeId();
         if(!idResult.success()) {
-            throw new QuanhuException(ExceptionEnum.SysException);
+        	throw QuanhuException.busiError(ExceptionEnum.SysException);
         }
         CollectionInfo collectionInfo = new CollectionInfo();
         collectionInfo.setKid(idResult.getData());
@@ -94,7 +94,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
         collectionInfo.setCreateUserId(collectionInfoDto.getCreateUserId());
         collectionInfo.setDelFlag(ResourceEnum.DEL_FLAG_FALSE);
         if(collectionInfoDao.insertByPrimaryKeySelective(collectionInfo) == 0) {
-            throw new QuanhuException(ExceptionEnum.COLLECTION_ALREADY_ERROR);
+        	throw QuanhuException.busiError(ExceptionEnum.COLLECTION_ALREADY_ERROR);
         }
         //提交事件
         this.sendEvent(collectionInfo, resourceVo);
@@ -126,7 +126,7 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
                 logger.error("递减收藏数 失败", e);
             }
         } else {
-            throw new QuanhuException(ExceptionEnum.COLLECTION_NOT_ERROR);
+            throw QuanhuException.busiError(ExceptionEnum.COLLECTION_NOT_ERROR);
         }
     }
 
@@ -149,7 +149,8 @@ public class CollectionInfoServiceImpl implements CollectionInfoService {
                 if(collectionInfoVo.getResourceId() != null) {
                     resourceSet.add(collectionInfoVo.getResourceId().toString());
                 }
-                if(collectionInfoVo.getCoterieId() != null) {
+                if(collectionInfoVo.getCoterieId() != null
+                        && !Long.valueOf(0).equals(collectionInfoVo.getCoterieId()) ) {
                     coterieIdList.add(collectionInfoVo.getCoterieId());
                 }
                 collectionInfoVo.setDelFlag(ResourceEnum.DEL_FLAG_TRUE);

@@ -359,7 +359,18 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
         PageList<ActivityUserPrizes> pageList = new PageList<>();
         pageList.setCurrentPage(activityVoteDto.getCurrentPage());
         pageList.setPageSize(activityVoteDto.getPageSize());
-        pageList.setEntities(activityUserPrizesDao.selectUserPrizesList(activityVoteDto));
+        List<ActivityUserPrizes> list = activityUserPrizesDao.selectUserPrizesList(activityVoteDto);
+        if(!CollectionUtils.isEmpty(list)) {
+            Date now = new Date();
+            list.stream().forEach(userPrizes -> {
+                if(userPrizes.getEndTime() != null) {
+                    if(now.after(userPrizes.getEndTime())) {
+                        userPrizes.setState(3);//已过期
+                    }
+                }
+            });
+        }
+        pageList.setEntities(list);
         pageList.setCount(page.getTotal());
         return pageList;
     }
@@ -375,9 +386,9 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
 			content = constant.getContent().replaceAll("\\{count\\}", activityInfoVo.getTitle());
 		}*/
             if (StringUtils.isNotEmpty(activity.getPrizesName())) {
-                content = constant.getContent().replaceAll("\\{count1\\}", activity.getPrizesName());
+                content = constant.getContent().replace("{count1}", activity.getPrizesName());
             }
-            content = content.replaceAll("\\{count2\\}", "1");
+            content = content.replace("{count2}", "1");
             messageVo.setContent(content);
             messageVo.setCreateTime(DateUtils.getDateTime());
             messageVo.setLabel(constant.getLabel());

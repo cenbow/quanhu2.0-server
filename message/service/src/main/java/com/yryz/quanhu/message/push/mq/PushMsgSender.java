@@ -46,7 +46,7 @@ public class PushMsgSender {
 		rabbitTemplate.setExchange(AmqpConstants.JPUSH_QUANHU_DIRECT_EXCHANGE);
 		rabbitTemplate.setRoutingKey(AmqpConstants.JPUSH_QUANHU_DIRECT_QUEUE);
 		rabbitTemplate.convertAndSend(msg);
-		logger.info("directSend info: {}", msg);
+//		logger.info("directSend info: {}", msg);
 	}
 
 	/**

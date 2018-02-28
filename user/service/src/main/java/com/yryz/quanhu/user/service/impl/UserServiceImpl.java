@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.yryz.quanhu.user.entity.UserRegInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -33,6 +34,7 @@ import com.google.common.collect.Sets;
 import com.yryz.common.constant.AppConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.IdConstants;
+import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
@@ -132,11 +134,8 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		int result = custbaseinfoDao.update(baseInfo);
-
-		// 删除缓存用户信息
-		baseInfoRedisDao.deleteUserInfo(baseInfo.getUserId());
-
+		int result = updateUser(baseInfo);
+				
 		// 删除旧的用户手机号信息
 		if (StringUtils.isNotBlank(baseInfo.getUserPhone())) {
 			baseInfoRedisDao.deleteUserPhoneInfo(user.getUserPhone(), user.getAppId());
@@ -154,7 +153,13 @@ public class UserServiceImpl implements UserService {
 
 		return result;
 	}
-
+	
+	@Override
+	@Transactional
+	public int updateUserAttachInfo(UserBaseInfo userBaseInfo) {
+		return updateUser(userBaseInfo);
+	}
+	
 	@Override
 	public UserLoginSimpleVO getUserLoginSimpleVO(Long userId) {
 		return getUserLoginSimpleVO(null, userId);
@@ -181,7 +186,6 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		simpleVO.setStarTradeField(starTradeField);
-		simpleVO.setRelationStatus(STATUS.OWNER.getCode());
 		// 聚合关系数据
 		if (userId != null && userId != 0L) {
 			Map<String, UserRelationDto> map = getRelation(userId, Sets.newHashSet(friendId.toString()));
@@ -404,7 +408,26 @@ public class UserServiceImpl implements UserService {
 	public UserBaseInfo getUserByNickName(String appId, String nickName) {
 		return custbaseinfoDao.checkUserByNname(appId, nickName);
 	}
-
+	
+	/**
+	 * 更新用户信息
+	 * @param info
+	 * @return
+	 */
+	@Transactional
+	private int updateUser(UserBaseInfo info){
+		int result = 0;
+		try {
+			result = custbaseinfoDao.update(info);
+		} catch (Exception e) {
+			logger.error("[UserBaseInfo.update]",e);
+			throw new MysqlOptException(e);
+		}
+		// 删除缓存用户信息
+		baseInfoRedisDao.deleteUserInfo(info.getUserId());
+		return result;
+	}
+	
 	/**
 	 * 获取用户基本信息
 	 * 
@@ -628,6 +651,9 @@ public class UserServiceImpl implements UserService {
 				for (int i = 0; i < dtos.size(); i++) {
 					dto = dtos.get(i);
 					if (StringUtils.equals(dto.getUserId(), friendId)) {
+						if(StringUtils.equals(friendId, userId.toString())){
+							dto.setRelationStatus(STATUS.OWNER.getCode());
+						}
 						map.put(friendId, dto);
 						noRelation = false;
 					}
@@ -663,5 +689,13 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		return starUserIds;
+	}
+
+	@Override
+	public Page<UserRegInfo> listMsgUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO) {
+		custInfoDTO.setNickName(replayStr(custInfoDTO.getNickName()));
+		Page<UserRegInfo> page = PageHelper.startPage(pageNo, pageSize);
+		custbaseinfoDao.listMsgUserInfo(custInfoDTO);
+		return page;
 	}
 }

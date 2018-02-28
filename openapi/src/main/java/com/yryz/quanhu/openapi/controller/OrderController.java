@@ -298,7 +298,7 @@ public class OrderController {
 		}catch (Exception e){
 			logger.error("获取资金-提现配置失败", e);
 		}
-		return withdrawCashConfig;
+		return withdrawCashConfig == null ? new WithdrawCashConfig():withdrawCashConfig;
 	}
 
     /**
@@ -322,10 +322,11 @@ public class OrderController {
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
 		}
+		long lcost = 0;
 		if (StringUtils.isEmpty(cost)) {
 			return ResponseUtils.returnCommonException("提现金额cost必填");
 		} else {
-			long lcost = Long.parseLong(cost);
+			lcost = Long.parseLong(cost);
 			if (lcost < 100) {
 				return ResponseUtils.returnCommonException("请输入正常的提现金额");
 			}
@@ -336,14 +337,19 @@ public class OrderController {
 		if (StringUtils.isEmpty(payPassword)) {
 			return ResponseUtils.returnCommonException("payPassword必填");
 		}
-
-		if (DateUtils.checkBetween(new Date(), "23:00", "9:00")) {
-			return ResponseUtils.returnCommonException("提现系统维护中，23:00-9:00 是系统维护时间");
-		}
-		//添加提现控制开关
+		//获取提现配置
 		WithdrawCashConfig withdrawCashConfig = getWithdrawCashConfig();
-		if(null != withdrawCashConfig && WithdrawCashConfig.NOT_ALLOWED == withdrawCashConfig.getAllowFlag()){
+		//判断提现控制开关
+		if(WithdrawCashConfig.NOT_ALLOWED == withdrawCashConfig.getAllowFlag()){
 			return ResponseUtils.returnCommonException(withdrawCashConfig.getMsg());
+		}
+		//判断提现时段
+		if (DateUtils.checkBetween(new Date(), withdrawCashConfig.getStartTime(), withdrawCashConfig.getEndTime())) {
+			return ResponseUtils.returnCommonException(withdrawCashConfig.getTimeLimitMsg());
+		}
+		//判断额度合理
+		if(lcost > withdrawCashConfig.getOnceMaxAmount()){
+			return ResponseUtils.returnCommonException(withdrawCashConfig.getAmountLimitMsg());
 		}
 		return payService.getCash(appId , userId, cost, cust2BankId, payPassword);
 	}
@@ -380,7 +386,6 @@ public class OrderController {
 	public Response<UserBankDTO> bindBankCard(@RequestHeader String userId, @RequestBody BindBankCardDTO bindBankCardDTO) {
     	String bankCardNo = bindBankCardDTO.getBankCardNo();
     	String name = bindBankCardDTO.getName();
-    	String bankCode = bindBankCardDTO.getBankCode();
 
 		if (StringUtils.isEmpty(userId)) {
 			return ResponseUtils.returnCommonException("用户ID为必填");
@@ -392,10 +397,11 @@ public class OrderController {
 			return ResponseUtils.returnCommonException("用户真实姓名name必填");
 		}
 
-		bankCode = BankUtil.getSimpleNameOfBank(bankCardNo.replace(" ", ""));
+		//查询标准银行简称
+		String bankCode = BankUtil.getSimpleNameOfBank(bankCardNo.replace(" ", ""));
 
 		UserBankDTO userBankDTO = new UserBankDTO();
-		userBankDTO.setBankCardNo(bankCardNo.trim());
+		userBankDTO.setBankCardNo(bankCardNo.replace(" ", "").trim());
 		userBankDTO.setBankCode(bankCode.trim());
 		userBankDTO.setCreateBy(userId);
 		userBankDTO.setCustId(userId);

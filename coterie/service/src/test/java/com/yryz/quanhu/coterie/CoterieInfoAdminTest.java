@@ -1,6 +1,7 @@
 package com.yryz.quanhu.coterie;
 
 import com.yryz.common.response.PageList;
+import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminAPI;
 import com.yryz.quanhu.coterie.coterie.service.CoterieApi;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Set;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -33,5 +35,12 @@ public class CoterieInfoAdminTest {
 //        param.setName("安慕希");
     	PageList<CoterieInfo> list=ResponseUtils.getResponseData(coterieAdminAPI.getCoterieByPage(param));
     	System.out.println(list);
+    }
+
+
+    @Test
+    public void queryAbleCreteCoterieUserIds(){
+        Response<Set<Long>> result=coterieAdminAPI.queryAbleCreteCoterieUserIds();
+        System.out.println("用户数："+ResponseUtils.getResponseData(result).size());
     }
 }

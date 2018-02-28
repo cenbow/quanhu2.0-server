@@ -93,6 +93,7 @@ public class AnswerServiceImpl implements AnswerService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
+
         if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(content) && StringUtils.isBlank(answerAudio)){
             throw  QuanhuException.busiError("","音频回答和图文回答不能都为空","音频回答和图文回答不能都为空");
         }
@@ -122,6 +123,11 @@ public class AnswerServiceImpl implements AnswerService {
         Question questionCheck=this.questionService.queryAvailableQuestionByKid(questionId);
         if(null==questionCheck){
             throw  QuanhuException.busiError("","提问不存在","提问不存在");
+        }
+
+        String targetId=questionCheck.getTargetId()==null?"0":questionCheck.getTargetId();
+        if(answerdto.getCreateUserId().compareTo(Long.valueOf(targetId))!=0){
+            throw QuanhuException.busiShowError("非圈主不能回答该提问","非圈主不能回答该提问");
         }
 
         if(null !=questionCheck.getAnswerdFlag() && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionCheck.getAnswerdFlag())==-1){
@@ -323,5 +329,11 @@ public class AnswerServiceImpl implements AnswerService {
             return answerVo;
         }
         return null;
+    }
+
+    @Override
+    public AnswerWithBLOBs queryAnswerBykid(Long kid){
+        AnswerWithBLOBs answerWithBLOBs=this.answerDao.selectByPrimaryKey(kid);
+        return answerWithBLOBs;
     }
 }

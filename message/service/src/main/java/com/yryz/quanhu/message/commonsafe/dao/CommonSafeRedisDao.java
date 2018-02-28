@@ -140,7 +140,7 @@ public class CommonSafeRedisDao {
 			RedisTemplate<String, Integer> template = templateBuilder.buildRedisTemplate(Integer.class);
 			template.opsForValue().increment(rediskey, 1);
 			if(template.getExpire(key) < 0){
-				template.expire(rediskey, configVO.getImgCodeNumLimit()*configVO.getImgCodeExpireTime(),TimeUnit.SECONDS);
+				template.expire(rediskey, configVO.getImgCodeExpireTime(), TimeUnit.SECONDS);
 			}
 		} catch (Exception e) {
 			logger.error("[saveImgCodeCount]", e);

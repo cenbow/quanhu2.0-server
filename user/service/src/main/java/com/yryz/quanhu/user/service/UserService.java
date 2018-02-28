@@ -14,6 +14,7 @@ import java.util.Set;
 import com.github.pagehelper.Page;
 import com.yryz.quanhu.user.dto.AdminUserInfoDTO;
 import com.yryz.quanhu.user.entity.UserBaseInfo;
+import com.yryz.quanhu.user.entity.UserRegInfo;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
@@ -146,13 +147,20 @@ public interface UserService {
 	void createUser(UserBaseInfo baseInfo);
 	
 	/**
-	 * 更新用户信息
+	 * 更新用户基础信息
 	 * @param custBaseInfo
 	 * @return void
 	 * @Description 更新头像需要更新头像审核信息
 	 */
 	int updateUserInfo(UserBaseInfo custBaseInfo ) ;
-
+	
+	/**
+	 * 更新用户附属信息，例如：达人、状态等
+	 * @param userBaseInfo
+	 * @return
+	 */
+	int updateUserAttachInfo(UserBaseInfo userBaseInfo);
+	
 	/**
 	 * 查询一段时间的全部用户ID，不分状态
 	 * @param startDate
@@ -183,4 +191,13 @@ public interface UserService {
      * @return
      */
     public  UserBaseInfo getUserByNickName(String appId, String nickName);
+
+	/**
+	 * 管理后台message模块查询用户列表
+	 * @param pageNo
+	 * @param pageSize
+	 * @param custInfoDTO
+	 * @return
+	 */
+    Page<UserRegInfo> listMsgUserInfo(int pageNo, int pageSize, AdminUserInfoDTO custInfoDTO);
 }

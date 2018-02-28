@@ -60,7 +60,7 @@ public class QuanhuMessage {
 				msg = (icount / 100) +"";
 			} catch (Exception e) {
 			}
-			content = content.replaceAll("\\{count\\}", msg);
+			content = content.replace("{count}", msg);
 		}
 		messageVo.setContent(content);
 		messageVo.setCreateTime(DateUtils.getDateTime());
@@ -126,7 +126,7 @@ public class QuanhuMessage {
 		String msg = "3.698";
 		String content = MessageConstant.CASH.getContent();
 		if(StringUtils.isNotEmpty(msg)){
-			content = content.replaceAll("\\{count\\}", msg);
+			content = content.replace("{count}", msg);
 		}
 		System.out.println(content);
 	}

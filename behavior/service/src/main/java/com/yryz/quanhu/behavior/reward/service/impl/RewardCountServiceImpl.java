@@ -40,7 +40,7 @@ public class RewardCountServiceImpl implements RewardCountService {
         return Context.getProperty(CommonConstants.SPRING_APPLICATION_NAME) + ":RewardCount:Key_" + key;
     }
 
-    public RewardCountDao getDao() {
+    private RewardCountDao getDao() {
         return this.rewardCountDao;
     }
 
@@ -48,7 +48,7 @@ public class RewardCountServiceImpl implements RewardCountService {
     public int addCountByTargetId(RewardCount record) {
         Assert.notNull(record.getTargetId(), "record.getTargetId() is null !");
         int result = 0;
-        if (null == this.selectByTargetId(record.getTargetId())) {
+        if (null == this.getDao().selectByTargetId(record.getTargetId())) {
             result = this.getDao().insertSelective(record);
         }else{
             result = this.getDao().addCountByTargetId(record);

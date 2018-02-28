@@ -315,7 +315,7 @@
         <![CDATA[ AND start_date_time <= #{nowDateTime} ]]>
         <![CDATA[ AND end_date_time >= #{nowDateTime} ]]>
         order by adv_sort desc, create_date desc
-        limit 0, 100
+        limit 0, 5
     </select>
 
     <select id="selectListAdmin" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
@@ -404,6 +404,26 @@
             <![CDATA[  AND start_time <= #{checkStartTime} ]]>
             <![CDATA[  AND end_time > #{checkStartTime} ]]>
             AND adv_status != 30
+        </where>
+    </select>
+
+    <select id="checkShelveFlagConflict" parameterType="com.yryz.quanhu.resource.advertisement.dto.AdvertisementAdminDto"
+            resultType="com.yryz.quanhu.resource.advertisement.vo.AdvertisementAdminVo">
+        select
+        <include refid="Base_Column_List"/>
+        from qh_adv
+        <where>
+            <![CDATA[   start_date <= #{checkStartDate} ]]>
+            <![CDATA[  AND end_date > #{checkStartDate} ]]>
+            <![CDATA[  AND start_time <= #{checkStartTime} ]]>
+            <![CDATA[  AND end_time > #{checkStartTime} ]]>
+            AND adv_status != 30 AND adv_type = #{advType}
+            OR
+            <![CDATA[   start_date <= #{checkStartDate} ]]>
+            <![CDATA[  AND end_date > #{checkStartDate} ]]>
+            <![CDATA[  AND start_time >= #{checkStartTime} ]]>
+            <![CDATA[  AND start_time < #{checkEndTime} ]]>
+            AND adv_status != 30 AND adv_type = #{advType}
         </where>
     </select>
 

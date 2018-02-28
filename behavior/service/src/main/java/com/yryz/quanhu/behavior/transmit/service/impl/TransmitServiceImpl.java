@@ -179,7 +179,7 @@ public class TransmitServiceImpl implements TransmitService {
         List<TransmitInfoVo> resultList = new ArrayList<>();
         Query query = new Query();
         query.addCriteria(Criteria.where("parentId").is(transmitInfoDto.getParentId()));
-        query.addCriteria(Criteria.where("moduleEnum").is(transmitInfoDto.getModuleEnum()));
+//        query.addCriteria(Criteria.where("moduleEnum").is(transmitInfoDto.getModuleEnum()));
         query.addCriteria(Criteria.where("shelveFlag").is(Integer.valueOf(CommonConstants.SHELVE_YES)));
         long count = transmitMongoDao.count(query);
         if(count > 0) {
@@ -306,7 +306,11 @@ public class TransmitServiceImpl implements TransmitService {
             body.setUserNickName(user.getUserNickName());
             body.setBodyTitle(title);
             RemoteResource convert = RemoteResourceUtils.convert(resourceVo);
-            body.setBodyImg(convert != null ? convert.getImgUrl() : null);
+            if(convert != null) {
+                String imgUrl = convert.getFirstImgUrl() == null
+                        ? convert.getVideoThumbnailUrl() : convert.getFirstImgUrl();
+                body.setBodyImg(imgUrl);
+            }
             messageVo.setBody(body);
             messageAPI.sendMessage(messageVo, isPush);
         } catch (Exception e) {

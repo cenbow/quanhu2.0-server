@@ -2,11 +2,13 @@ package com.yryz.quanhu.message;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.message.*;
+import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.message.message.api.MessageAdminAPI;
 import com.yryz.quanhu.message.message.constants.MessageContants;
+import com.yryz.quanhu.message.message.dto.MessageAdminDto;
 import com.yryz.quanhu.message.message.vo.MessageAdminVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +58,14 @@ public class MessageAdminTest {
         messageAdminVo.setPushUserIds(list);
         Response<MessageAdminVo> booleanResponse = messageAdminAPI.push(messageAdminVo);
         System.out.println(ResponseUtils.getResponseNotNull(booleanResponse));
+    }
+
+    @Test
+    public void adminTest() {
+        MessageAdminDto dto = new MessageAdminDto();
+        dto.setTitle("hhhhh");
+        Response<PageList<MessageAdminVo>> pageListResponse = messageAdminAPI.listAdmin(dto);
+        System.out.println(ResponseUtils.getResponseNotNull(pageListResponse));
     }
 
 }

@@ -11,6 +11,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.Lists;
+import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.CommonConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,13 +57,20 @@ public class DymaicController {
     private UserApi userApi;
 
 
-    //    @UserBehaviorValidation(login = true)
+    @UserBehaviorValidation(login = true)
     @ApiOperation("动态tab的所关注的全部动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/gettimeline")
-    public Response<List<DymaicVo>> getTimeLine(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam Long kid, @RequestParam Long limit, HttpServletRequest request) {
+    public Response<List<DymaicVo>> getTimeLine(@RequestHeader(value = "userId", required = false) Long userId, @RequestParam Long kid,
+                                                @RequestParam(value = "currentPage", required = false) Long currentPage, @RequestParam Long limit, HttpServletRequest request) {
         if (userId == null) {
             return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
+        }
+        //传了currentPage则控制显示1000条
+        if (currentPage != null && currentPage >= 0) {
+            if (currentPage * limit >= 1000) {//超过1000条，则返回空集合
+                return ResponseUtils.returnListSuccess(null);
+            }
         }
         return dymaicService.getTimeLine(userId, kid, limit);
     }
@@ -75,9 +84,11 @@ public class DymaicController {
             return ResponseUtils.returnSuccess();
         }
         if (kid == null || kid == 0L) {
-            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(userId));
-            topDymaic.setTopFlag(CommonConstants.TOP_YES);
-            list.add(0, topDymaic);
+            DymaicVo topDymaic = ResponseUtils.getResponseData(dymaicService.getTopDymaic(targetUserId));
+            if (topDymaic != null && topDymaic.getKid() != null) {
+                topDymaic.setTopFlag(CommonConstants.TOP_YES);
+                list.add(0, topDymaic);
+            }
         }
         return ResponseUtils.returnObjectSuccess(list);
     }
@@ -104,6 +115,7 @@ public class DymaicController {
         }
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("删除动态")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/delete")
@@ -117,6 +129,7 @@ public class DymaicController {
         return dymaicService.delete(userId, dymaic.getKid());
     }
 
+    @UserBehaviorValidation(login = true)
     @ApiOperation("动态置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/addTopDymaic")
@@ -130,7 +143,7 @@ public class DymaicController {
         return dymaicService.addTopDymaic(userId, dymaic.getKid());
     }
 
-
+    @UserBehaviorValidation(login = true)
     @ApiOperation("动态取消置顶")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @PostMapping(value = "/{version}/dymaic/deleteTopDymaic")
@@ -147,10 +160,10 @@ public class DymaicController {
     @ApiOperation("动态置顶状态查询")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
     @GetMapping(value = "/{version}/dymaic/getTopDymaic")
-    public Response<DymaicVo> getTopDymaic(@RequestHeader(value = "userId", required = false) Long userId) {
-        if (userId == null) {
-            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.NEEDTOKEN));
+    public Response<DymaicVo> getTopDymaic(@RequestParam(value = "targetUserId", required = false) Long targetUserId) {
+        if (targetUserId == null) {
+            return ResponseUtils.returnException(QuanhuException.busiError(ExceptionEnum.PARAM_MISSING));
         }
-        return dymaicService.getTopDymaic(userId);
+        return dymaicService.getTopDymaic(targetUserId);
     }
 }

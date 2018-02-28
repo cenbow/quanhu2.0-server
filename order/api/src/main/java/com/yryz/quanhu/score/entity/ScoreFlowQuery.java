@@ -1,6 +1,8 @@
 package com.yryz.quanhu.score.entity;
 
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 /**
  * 
  * @author syc  
@@ -14,11 +16,19 @@ public class ScoreFlowQuery implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 3438993563315960305L;
-	
+
     /** id */
 	private String id;
 	
+	
+    /** 积分 */
+	private String score;
 
+	/** 成长值 */
+	private Long grow = 0L;
+	
+	/** 成长级别 */
+	private String growLevel;
 
 	/** 用户id */
 	private String userId;
@@ -55,8 +65,33 @@ public class ScoreFlowQuery implements Serializable{
 	
  
     /** 积分增减标志（0-增加，1-减少）*/
-	private Integer consumeFlag = 0;
+	private Integer consumeFlag;
+	
 
+	
+    public String getScore() {
+		return score;
+	}
+
+	public void setScore(String score) {
+		this.score = score;
+	}	
+	
+   public Long getGrow() {
+		return grow;
+	}
+
+	public void setGrow(Long grow) {
+		this.grow = grow;
+	}
+
+	public String getGrowLevel() {
+		return growLevel;
+	}
+
+	public void setGrowLevel(String growLevel) {
+		this.growLevel = growLevel;
+	}
 
 	public Integer getConsumeFlag() {
 		return consumeFlag;
@@ -82,8 +117,6 @@ public class ScoreFlowQuery implements Serializable{
 		this.userPhone = userPhone;
 	}
 
-    
-    
     public Integer getCurrentPage() {
 		return currentPage;
 	}

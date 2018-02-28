@@ -39,11 +39,14 @@ public class CoterieMemberOrderNotifyServiceImpl implements IOrderNotifyService 
     @Override
     public void notify(OutputOrder outputOrder) {
 
+        logger.info("付费加入私圈ing");
         CoterieMemberNotify coterieMemberNotify = JSONObject.parseObject(outputOrder.getBizContent(), CoterieMemberNotify.class);
 
+        logger.info("付费加入私圈自动审核ing");
         coterieMemberService.audit(coterieMemberNotify.getUserId(), coterieMemberNotify.getCoterieId(),
                 MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
 
+        logger.info("付费加入私圈自动审核end");
         // 消息推送
 
         /**

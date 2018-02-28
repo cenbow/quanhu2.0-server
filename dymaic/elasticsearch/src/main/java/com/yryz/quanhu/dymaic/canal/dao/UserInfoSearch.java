@@ -36,4 +36,11 @@ public interface UserInfoSearch {
 	 * @return
 	 */
 	PageList<UserInfoVO> searchStarUserForAdmin(AdminUserInfoDTO adminUserDTO);
+
+	/**
+	 * 管理后台消息用户搜索
+	 * @param adminUserDTO
+	 * @return
+	 */
+	PageList<UserInfoVO> searchMsgUserAdmin(AdminUserInfoDTO adminUserDTO);
 }

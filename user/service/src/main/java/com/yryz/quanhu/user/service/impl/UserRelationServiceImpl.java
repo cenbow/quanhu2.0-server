@@ -1,5 +1,7 @@
 package com.yryz.quanhu.user.service.impl;
 
+import static com.yryz.quanhu.user.contants.UserRelationConstant.EVENT.CANCEL_BLACK;
+import static com.yryz.quanhu.user.contants.UserRelationConstant.EVENT.SET_BLACK;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.BOTH_BLACK;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FANS;
 import static com.yryz.quanhu.user.contants.UserRelationConstant.STATUS.FOLLOW;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.pagehelper.Page;
 import com.yryz.common.constant.ExceptionEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -140,14 +143,14 @@ public class UserRelationServiceImpl implements UserRelationService{
     }
     /**
      *
-     * 查询数据库
+     * 查询缓存>数据库
      * @param userSourceKid
      * @param userTargetKid
      * @return
      */
     @Override
     public UserRelationDto getRelation(String sourceUserId, String targetUserId) {
-        UserRelationDto dto = userRelationDao.selectUser(UserRelationDto.class,sourceUserId,targetUserId);
+        UserRelationDto dto = userRelationCacheDao.getCacheRelation(sourceUserId,targetUserId);
         if(dto == null){
             dto = new UserRelationDto();
             dto.setRelationStatus(NONE.getCode());
@@ -189,11 +192,10 @@ public class UserRelationServiceImpl implements UserRelationService{
         }
         /**
          * 判断关注人数是否已达到上线
+         * 查询缓存>查询数据库
          */
-        Long followCount = userRelationDao.selectCount(sourceUserId,FOLLOW.getCode());
-        Long friendCount = userRelationDao.selectCount(sourceUserId,FRIEND.getCode());
-
-        if((followCount+friendCount)>=maxFollowCount){
+        UserRelationCountDto countDto = this.totalBy(sourceUserId,sourceUserId);
+        if(countDto.getFollowCount()>=maxFollowCount){
             throw new QuanhuException(ExceptionEnum.USER_FOLLOW_MAX_COUNT_ERROR);
         }
         /**
@@ -224,15 +226,18 @@ public class UserRelationServiceImpl implements UserRelationService{
          * 1，判断自己是否在对方黑名单中，如果在，不允许做任何操作
          * 2，判断对方是否在自己黑名单中，如果在，除取消拉黑，不允许做任何操作
          */
-        if(TO_BLACK.getCode() == sourceDto.getRelationStatus()){
-            if(UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单","你已将该用户加入黑名单");
-            }
+        int status = sourceDto.getRelationStatus();
+        if(TO_BLACK.getCode() == status && CANCEL_BLACK != event){
+            //已拉黑，非取消拉黑，抛异常
+            throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单，无法操作","你已将该用户加入黑名单");
 
-        }else if(FROM_BLACK.getCode() == sourceDto.getRelationStatus()){
-            if(UserRelationConstant.EVENT.SET_BLACK != event&&UserRelationConstant.EVENT.CANCEL_BLACK != event){
-                throw new QuanhuException(ExceptionEnum.TARGETUSER_BLACK_USER_ERROR.getCode(),"对方已将你加入黑名单","对方已将你加入黑名单");
-            }
+        }else if(FROM_BLACK.getCode() == status && SET_BLACK != event){
+            //被拉黑，非拉黑，抛异常
+            throw new QuanhuException(ExceptionEnum.TARGETUSER_BLACK_USER_ERROR.getCode(),"对方已将你加入黑名单，无法操作","对方已将你加入黑名单");
+
+        }else if(BOTH_BLACK.getCode() == status && CANCEL_BLACK != event){
+            //互相拉黑，非取消拉黑，抛异常
+            throw new QuanhuException(ExceptionEnum.USER_BLACK_TARGETUSER_ERROR.getCode(),"你已将该用户加入黑名单，无法操作","你已将该用户加入黑名单");
         }
         return true;
     }
@@ -271,7 +276,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             }else if(ss == FOLLOW && ts == FANS){
                 ts = NONE;ss = NONE;
             }
-        }else if(UserRelationConstant.EVENT.SET_BLACK == event){       //拉黑
+        }else if(SET_BLACK == event){       //拉黑
             /**
              * 如果target拉黑我，则设置双向拉黑关系
              * 否则，设置我拉黑别人，别人被拉黑
@@ -281,7 +286,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             }else{
                 ss = TO_BLACK;ts = FROM_BLACK;
             }
-        }else if(UserRelationConstant.EVENT.CANCEL_BLACK == event){    //取消拉黑
+        }else if(CANCEL_BLACK == event){    //取消拉黑
             /**
              * 如果target是双向拉黑，则设置我被别人拉黑，别人拉黑我
              * 否则 取消双向所有关系
@@ -344,11 +349,13 @@ public class UserRelationServiceImpl implements UserRelationService{
         /**
          * 先查询sourceUserId的相关关系
          */
-        PageHelper.startPage(dto.getCurrentPage(),dto.getPageSize());
+        Page<UserRelationDto> page = PageHelper.startPage(dto.getCurrentPage(),dto.getPageSize());
 
         List<UserRelationDto> targetList =
                 userRelationDao.selectStatus(UserRelationDto.class,targetUserId,status.getCode());
 
+        //先获取总数量，再清楚page对象
+        long total = page.getTotal();
         PageHelper.clearPage();
 
         /**
@@ -369,7 +376,12 @@ public class UserRelationServiceImpl implements UserRelationService{
             targetUserIds.add(targetList.get(i).getTargetUserId());
         }
         List<UserRelationDto> outArray = this.selectBy(sourceUserId,targetUserIds);
-        return new PageModel<UserRelationDto>().getPageList(outArray);
+
+        //重新设置page数量
+        PageList<UserRelationDto> pageList = new PageModel<UserRelationDto>().getPageList(outArray);
+        pageList.setCount(total);
+        pageList.setCurrentPage(dto.getCurrentPage());
+        return pageList;
     }
 
     private void mergeRelation(List<UserRelationDto> list,UserRelationDto _dto){
@@ -388,7 +400,7 @@ public class UserRelationServiceImpl implements UserRelationService{
             _dto.setUserId(_dto.getTargetUserId());
             _dto.setUserName(info.getUserNickName());
             _dto.setUserHeadImg(info.getUserImg());
-            _dto.setUserSummary(info.getUserSignature());
+            _dto.setUserSummary(info.getUserDesc());
             _dto.setUserStarFlag(info.getUserRole());
             return true;
         }else{
