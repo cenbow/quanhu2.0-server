@@ -9,6 +9,10 @@
     ;
   </select>
 
+  <select id="selectByPidAdmin"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
+    select * from qh_category where parent_kid= #{pid};
+  </select>
+
   <select id="selectByKid"  resultType="com.yryz.quanhu.other.category.entity.Category" parameterType="java.lang.Long">
     select * from qh_category where kid= #{kid};
   </select>
@@ -48,7 +52,7 @@
       AND category_type =  #{categoryType}
     </if>
     <if test="sortField != null ">
-      ORDER BY #{sortField} DESC
+      ORDER BY category_sort ASC , create_date DESC
     </if>
     <if test="start != null and limit != null ">
       limit #{start}, #{limit}
