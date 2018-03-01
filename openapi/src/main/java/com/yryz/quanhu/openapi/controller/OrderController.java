@@ -27,7 +27,6 @@ import com.yryz.quanhu.order.enums.OrderDescEnum;
 import com.yryz.quanhu.order.enums.ProductEnum;
 import com.yryz.quanhu.order.util.BankUtil;
 import com.yryz.quanhu.order.vo.*;
-import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import com.yryz.quanhu.user.contants.SmsType;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
@@ -73,9 +72,6 @@ public class OrderController {
 
     @Autowired
     private PayService payService;
-
-    @Reference
-    private BasicConfigApi basicConfigApi;
 
     /**
      * 设置支付密码
