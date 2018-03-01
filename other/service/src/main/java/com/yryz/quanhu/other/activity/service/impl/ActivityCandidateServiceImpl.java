@@ -23,6 +23,7 @@ import com.yryz.quanhu.other.activity.entity.ActivityVoteDetail;
 import com.yryz.quanhu.other.activity.service.ActivityCandidateService;
 import com.yryz.quanhu.other.activity.service.ActivityVoteRedisService;
 import com.yryz.quanhu.other.activity.service.ActivityVoteService;
+import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailResourceVo;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteDetailVo;
 import com.yryz.quanhu.other.activity.vo.ActivityVoteInfoVo;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
@@ -32,6 +33,7 @@ import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -527,15 +529,17 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
 
     private void setResource(ActivityVoteDetail voteDetail, ActivityVoteInfoVo activityVoteInfoVo) {
         try {
+            ActivityVoteDetailResourceVo activityVoteDetailResourceVo = new ActivityVoteDetailResourceVo();
+            BeanUtils.copyProperties(activityVoteDetailResourceVo, voteDetail);
             ResourceTotal resourceTotal = new ResourceTotal();
-            resourceTotal.setContent(voteDetail.getContent());
+            resourceTotal.setContent(activityVoteDetailResourceVo.getContent());
             resourceTotal.setCreateDate(DateUtils.getString(new Date()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(voteDetail));
-            resourceTotal.setModuleEnum(new Integer(voteDetail.getModuleEnum()));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(activityVoteDetailResourceVo));
+            resourceTotal.setModuleEnum(new Integer(activityVoteDetailResourceVo.getModuleEnum()));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-            resourceTotal.setResourceId(voteDetail.getKid());
+            resourceTotal.setResourceId(activityVoteDetailResourceVo.getKid());
 
-            Response<UserSimpleVO> userSimple = userApi.getUserSimple(voteDetail.getCreateUserId());
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(activityVoteDetailResourceVo.getCreateUserId());
             if(userSimple.success()
                     && userSimple.getData() != null
                     && userSimple.getData().getUserRole() != null) {
@@ -543,7 +547,7 @@ public class ActivityCandidateServiceImpl implements ActivityCandidateService {
             }
 
             resourceTotal.setTitle(activityVoteInfoVo.getTitle());
-            resourceTotal.setUserId(voteDetail.getCreateUserId());
+            resourceTotal.setUserId(activityVoteDetailResourceVo.getCreateUserId());
             resourceDymaicApi.commitResourceDymaic(resourceTotal);
         } catch (Exception e) {
             logger.error("资源聚合 接入异常！", e);

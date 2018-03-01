@@ -53,6 +53,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static java.awt.SystemColor.info;
 import static org.springframework.util.Assert.isNull;
 @Service
 public class AdminIActivityParticipationServiceImpl implements AdminIActivityParticipationService {
@@ -426,14 +427,17 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
     }
     private void commitResource(ActivityVoteDetail activityVoteDetail,AdminActivityInfoVo1 activityInfo) {
         try {
+            ActivityVoteDetailResourceVo activityVoteDetailResourceVo = new ActivityVoteDetailResourceVo();
+            BeanUtils.copyProperties(activityVoteDetailResourceVo, activityVoteDetail);
+            activityVoteDetailResourceVo.setTitle(activityInfo.getTitle());
             ResourceTotal resourceTotal = new ResourceTotal();
-            resourceTotal.setContent(activityVoteDetail.getContent());
+            resourceTotal.setContent(activityVoteDetailResourceVo.getContent());
             resourceTotal.setCreateDate(DateUtils.getString(new Date()));
-            resourceTotal.setExtJson(JsonUtils.toFastJson(activityVoteDetail));
-            resourceTotal.setModuleEnum(new Integer(activityVoteDetail.getModuleEnum()));
+            resourceTotal.setExtJson(JsonUtils.toFastJson(activityVoteDetailResourceVo));
+            resourceTotal.setModuleEnum(new Integer(activityVoteDetailResourceVo.getModuleEnum()));
             resourceTotal.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);
-            resourceTotal.setResourceId(activityVoteDetail.getKid());
-            Response<UserSimpleVO> userSimple = userApi.getUserSimple(activityVoteDetail.getCreateUserId());
+            resourceTotal.setResourceId(activityVoteDetailResourceVo.getKid());
+            Response<UserSimpleVO> userSimple = userApi.getUserSimple(activityVoteDetailResourceVo.getCreateUserId());
             if(userSimple.success()
                     && userSimple.getData() != null
                     && userSimple.getData().getUserRole() != null) {
@@ -441,7 +445,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
             }
 
             resourceTotal.setTitle(activityInfo.getTitle());
-            resourceTotal.setUserId(activityVoteDetail.getCreateUserId());
+            resourceTotal.setUserId(activityVoteDetailResourceVo.getCreateUserId());
             resourceDymaicApi.commitResourceDymaic(resourceTotal);
         } catch (Exception e) {
             logger.error("资源聚合 接入异常！", e);
