@@ -6,6 +6,8 @@ import java.util.Set;
 
 import com.yryz.quanhu.user.entity.UserRegInfo;
 import com.yryz.quanhu.user.vo.UserRegInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleNoneOtherVO;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +40,24 @@ public class UserProvider implements UserApi{
 
 	@Autowired
 	private UserService userService;
+	
+	@Override
+	public Response<Map<String, UserSimpleNoneOtherVO>> getUserSimpleNoneOtherInfo(Set<String> userIds) {
+		try {
+			if(CollectionUtils.isEmpty(userIds)){
+				throw QuanhuException.busiError("userIds不能为空");
+			}
+			Map<String, UserSimpleNoneOtherVO> map = userService.getUserSimpleNoneOtherInfo(userIds);
 
+			return ResponseUtils.returnObjectSuccess(map);
+		} catch (QuanhuException e) {
+			return ResponseUtils.returnException(e);
+		} catch (Exception e) {
+			logger.error("用户信息查询异常", e);
+			return ResponseUtils.returnException(e);
+		}
+	}
+	
 	@Override
 	public Response<UserSimpleVO> getUserSimple(Long userId) {
 		try {
@@ -334,4 +353,6 @@ public class UserProvider implements UserApi{
 			return ResponseUtils.returnException(e);
 		}
 	}
+
+
 }

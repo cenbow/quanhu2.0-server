@@ -62,6 +62,7 @@ import com.yryz.quanhu.user.utils.PhoneUtils;
 import com.yryz.quanhu.user.utils.UserUtils;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserSimpleNoneOtherVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import com.yryz.quanhu.user.vo.UserStarSimpleVo;
 
@@ -225,6 +226,22 @@ public class UserServiceImpl implements UserService {
 		return map.get(friendId.toString());
 	}
 
+	@Override
+	public Map<String, UserSimpleNoneOtherVO> getUserSimpleNoneOtherInfo(Set<String> userIds) {
+		if(CollectionUtils.isEmpty(userIds)){
+			return null;
+		}
+		List<UserBaseInfo> list = getUserInfo(userIds);
+		int lenght = list == null ? 0 : list.size();
+		Map<String, UserSimpleNoneOtherVO> map = new HashMap<String, UserSimpleNoneOtherVO>(lenght);
+		for(int i = 0 ; i < lenght; i++){
+			UserBaseInfo baseInfo = list.get(i);
+			UserSimpleNoneOtherVO noneOtherVO = UserBaseInfo.getUserSimpleNoneOtherVo(baseInfo);
+			map.put(baseInfo.getUserId().toString(), noneOtherVO);
+		}
+		return map;
+	}
+	
 	@Override
 	public Map<String, UserSimpleVO> getUserSimple(Long userId, Set<String> friendIds) {
 		if (CollectionUtils.isEmpty(friendIds)) {
@@ -698,4 +715,6 @@ public class UserServiceImpl implements UserService {
 		custbaseinfoDao.listMsgUserInfo(custInfoDTO);
 		return page;
 	}
+
+	
 }

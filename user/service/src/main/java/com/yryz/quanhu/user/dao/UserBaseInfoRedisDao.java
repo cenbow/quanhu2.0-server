@@ -29,7 +29,7 @@ public class UserBaseInfoRedisDao {
 	/**
 	 * 用户信息缓存过期时间/天
 	 */
-	private static final int USER_INFO_EXPIRE = 30;
+	private static final int USER_INFO_EXPIRE = 180;
 	
 	@Autowired
 	private RedisTemplateBuilder templateBuilder;

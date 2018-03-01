@@ -35,8 +35,8 @@ public class CommentController {
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
-    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId")
-    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
+    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
+    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/accretion")
     public Response<Comment> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
