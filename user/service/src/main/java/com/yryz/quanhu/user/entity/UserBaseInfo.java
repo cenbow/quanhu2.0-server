@@ -14,6 +14,7 @@ import java.util.Date;
 import com.yryz.common.entity.GenericEntity;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserSimpleNoneOtherVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
@@ -585,7 +586,21 @@ public class UserBaseInfo extends GenericEntity {
 				baseInfo.getUserImg(), baseInfo.getUserDesc(), baseInfo.getUserRole());
 		return simpleVO;
 	}
-
+	
+	/**
+	 * 
+	 * @param baseInfo
+	 * @return
+	 */
+	public static UserSimpleNoneOtherVO getUserSimpleNoneOtherVo(UserBaseInfo baseInfo) {
+		if(baseInfo == null){
+			return new UserSimpleNoneOtherVO();
+		}
+		UserSimpleNoneOtherVO simpleVO = new UserSimpleNoneOtherVO(baseInfo.getUserId(), baseInfo.getUserNickName(),
+				baseInfo.getUserImg(), baseInfo.getUserDesc(), baseInfo.getUserRole());
+		return simpleVO;
+	}
+	
 	public static UserLoginSimpleVO getUserLoginSimpleVO(UserBaseInfo baseInfo) {
 		if(baseInfo == null){
 			return new UserLoginSimpleVO();
