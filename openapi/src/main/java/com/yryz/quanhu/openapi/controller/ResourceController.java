@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.quanhu.behavior.count.api.CountApi;
@@ -244,5 +245,20 @@ public class ResourceController {
                 break;
         }
         return ResponseUtils.returnSuccess();
+    }
+
+    @ApiOperation("资源状态")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @GetMapping(value = "/{version}/resource/state")
+    public Response<Map<String, Object>> state(@RequestParam Long resourceId, @RequestParam(required = false) Long moduleEnum) {
+        Map<String, Object> result = Maps.newHashMap();
+        Integer resourceState = ResourceEnum.DEL_FLAG_TRUE;
+        ResourceVo resourceVo = ResponseUtils.getResponseData(this.resourceApi.getResourcesById(String.valueOf(resourceId)));
+        if (null != resourceVo) {
+            resourceState = resourceVo.getDelFlag();
+        }
+        result.put("resourceState", resourceState);
+
+        return ResponseUtils.returnObjectSuccess(result);
     }
 }

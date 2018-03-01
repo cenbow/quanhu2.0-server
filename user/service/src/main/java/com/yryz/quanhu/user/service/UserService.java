@@ -17,6 +17,7 @@ import com.yryz.quanhu.user.entity.UserBaseInfo;
 import com.yryz.quanhu.user.entity.UserRegInfo;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserSimpleNoneOtherVO;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 /**
@@ -39,6 +40,14 @@ public interface UserService {
 	 * @return
 	 */
 	UserSimpleVO getUserSimple(Long userId,Long friendId);
+	
+	/**
+	 * 查询用户简要信息（没有聚合其他数据）
+	 * @param userIds
+	 * @return
+	 */
+	Map<String,UserSimpleNoneOtherVO> getUserSimpleNoneOtherInfo(Set<String> userIds);
+	
 	/**
 	 * 查询用户简要信息
 	 * @param userIds

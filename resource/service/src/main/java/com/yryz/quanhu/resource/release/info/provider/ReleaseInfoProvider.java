@@ -234,20 +234,20 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
             int result = releaseInfoService.updateByUkSelective(upInfo);
             Assert.isTrue(result > 0, "作者删除文章失败！");
 
+            // 聚合资源下线
             try {
-                // 聚合资源下线
                 resourceApi.deleteResourceById(String.valueOf(upInfo.getKid()));
             } catch (Exception e) {
-                logger.error("资源聚合、统计计数 接入异常！", e);
+                logger.error("统计计数 接入异常！", e);
             }
 
-            try {
-                // 接入统计计数
-                if (info.getCoterieId() != null && info.getCoterieId() != 0L) {
-                    countApi.commitCount(BehaviorEnum.Release, upInfo.getCreateUserId(), null, -1L);
+            // 接入统计计数[我的发布，只包含非私圈]
+            if (info.getCoterieId() == null || info.getCoterieId() == 0L) {
+                try {
+                    countApi.commitCount(BehaviorEnum.Release, info.getCreateUserId(), null, -1L);
+                } catch (Exception e) {
+                    logger.error("统计计数 接入异常！", e);
                 }
-            } catch (Exception e) {
-                logger.error("资源聚合、统计计数 接入异常！", e);
             }
 
             return ResponseUtils.returnObjectSuccess(result);
