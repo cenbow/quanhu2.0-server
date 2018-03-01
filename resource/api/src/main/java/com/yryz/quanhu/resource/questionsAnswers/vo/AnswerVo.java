@@ -6,6 +6,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class AnswerVo  implements Serializable {
 
@@ -47,6 +48,8 @@ public class AnswerVo  implements Serializable {
 
     private String moduleEnum;
 
+
+    private Map<String, Long> statistics;
 
     public Long getKid() {
         return kid;
@@ -184,5 +187,13 @@ public class AnswerVo  implements Serializable {
 
     public void setModuleEnum(String moduleEnum) {
         this.moduleEnum = moduleEnum;
+    }
+
+    public Map<String, Long> getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(Map<String, Long> statistics) {
+        this.statistics = statistics;
     }
 }
