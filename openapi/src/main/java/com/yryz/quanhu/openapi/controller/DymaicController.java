@@ -68,7 +68,7 @@ public class DymaicController {
         }
         //传了currentPage则控制显示1000条
         if (currentPage != null && currentPage >= 0) {
-            if (currentPage * limit >= 1000) {//超过1000条，则返回空集合
+            if (currentPage * limit > 1000) {//超过1000条，则返回空集合
                 return ResponseUtils.returnListSuccess(null);
             }
         }
