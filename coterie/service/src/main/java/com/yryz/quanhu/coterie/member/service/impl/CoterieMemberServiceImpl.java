@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
@@ -111,24 +112,46 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             coterieMemberNotify.setAmount(coterie.getJoinFee().longValue());
             coterieMemberNotify.setIcon(coterie.getIcon());
 
-            String extJson = JsonUtils.toFastJson(coterieMemberNotify);
+//            String extJson = JsonUtils.toFastJson(coterieMemberNotify);
+//
+//            InputOrder inputOrder = new InputOrder();
+//            inputOrder.setCreateUserId(userId);
+//            inputOrder.setCost(coterie.getJoinFee().longValue());
+//            inputOrder.setCoterieId(coterieId);
+//            inputOrder.setFromId(userId);
+//            inputOrder.setModuleEnum(ModuleContants.COTERIE);
+//            inputOrder.setOrderEnum(OrderEnum.JOIN_COTERIE_ORDER);
+//            inputOrder.setToId(Long.parseLong(coterie.getOwnerId()));
+//            inputOrder.setResourceId(coterieId);
+//            inputOrder.setBizContent(extJson);
+//
+//            logger.info(GsonUtils.parseJson(inputOrder));
+//            Long orderId = orderSDK.createOrder(inputOrder);
+            Long orderId = orderSDK.executeOrder(OrderEnum.JOIN_COTERIE_ORDER, userId, Long.parseLong(coterie.getOwnerId()), coterie.getJoinFee().longValue());
 
-            InputOrder inputOrder = new InputOrder();
-            inputOrder.setCreateUserId(userId);
-            inputOrder.setCost(coterie.getJoinFee().longValue());
-            inputOrder.setCoterieId(coterieId);
-            inputOrder.setFromId(userId);
-            inputOrder.setModuleEnum(ModuleContants.COTERIE);
-            inputOrder.setOrderEnum(OrderEnum.JOIN_COTERIE_ORDER);
-            inputOrder.setToId(Long.parseLong(coterie.getOwnerId()));
-            inputOrder.setResourceId(coterieId);
-            inputOrder.setBizContent(extJson);
+            if (null != orderId) {
 
-            logger.info(GsonUtils.parseJson(inputOrder));
-            Long orderId = orderSDK.createOrder(inputOrder);
+                logger.info("付费加入私圈自动审核ing");
+                this.audit(userId, coterieId, MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
+                logger.info("付费加入私圈自动审核end");
+
+                /**
+                 * 付费加入私圈发送消息
+                 */
+                logger.info("付费加入私圈的推送信息开始");
+                coterieMemberMessageManager.sendMessageToJoinCoteriePayed(coterieMemberNotify, MessageConstant.JOIN_COTERIE_PAYED);
+                logger.info("付费加入私圈的推送信息完成");
+
+                /**
+                 * 私圈奖励
+                 */
+                logger.info("私圈圈主奖励的推送信息开始");
+                coterieMemberMessageManager.sendMessageToJoinCoterieReward(coterieMemberNotify, MessageConstant.JOIN_COTERIE_REWARD);
+                logger.info("私圈圈主奖励的推送信息完成");
+            }
 
             result.setStatus((byte) 10);
-            result.setOrderId(orderId);
+//            result.setOrderId(orderId);
             return result;
         }
 
