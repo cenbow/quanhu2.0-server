@@ -2,10 +2,7 @@ package com.yryz.quanhu.coterie.coterie.service;
 
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieAdmin;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
-import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
+import com.yryz.quanhu.coterie.coterie.vo.*;
 
 import java.util.Set;
 
@@ -36,4 +33,5 @@ public interface CoterieAdminAPI {
      */
     public Response<Set<Long>> queryAbleCreteCoterieUserIds();
 
+    Response<CoterieInfo> applyCreate(CoterieBasicInfo info);
 }
