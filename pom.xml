@@ -32,12 +32,79 @@
     <!--请遵循奥卡姆剃刀原则 如无充分理由禁止随意引入依赖 工具类优先使用spring自带-->
     <dependencyManagement>
         <dependencies>
+	       <!-- 圈乎业务jar begin -->
 			<dependency>
 				<groupId>com.yryz.quanhu</groupId>
 				<artifactId>quanhu-common</artifactId>
 				<version>${quanhu.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>behavior-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>coterie-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+                <groupId>com.yryz.quanhu</groupId>
+                <artifactId>demo-api</artifactId>
+                <version>${quanhu.version}</version>
+            </dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>dymaic-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>dymaic-elasticsearch</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>message-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>order-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>order-pay-sdk</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>order-sdk</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>other-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>resource-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>support-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.yryz.quanhu</groupId>
+				<artifactId>user-api</artifactId>
+				<version>${quanhu.version}</version>
+			</dependency>
+            <!-- 圈乎业务jar end -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>dubbo</artifactId>

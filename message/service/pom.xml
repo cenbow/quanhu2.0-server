@@ -11,7 +11,6 @@
 
     <artifactId>message-service</artifactId>
 	<properties>
-		<common.version>2.0-SNAPSHOT</common.version>
 		<taobao.version>1.0</taobao.version>
 	</properties>
 
@@ -21,12 +20,10 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>message-api</artifactId>
-            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>support-api</artifactId>
-            <version>${parent.version}</version>
         </dependency>
        <dependency>
             <groupId>com.yryz.quanhu</groupId>
