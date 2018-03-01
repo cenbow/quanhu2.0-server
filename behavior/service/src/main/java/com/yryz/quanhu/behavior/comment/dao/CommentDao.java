@@ -26,11 +26,32 @@ public interface CommentDao {
     Comment querySingleComment(Comment comment);
 
     int delComment(Comment comment);
-
+    
+    /**
+     * 根据topId删除评论
+     * @param comment
+     * @return
+     */
+    int delCommentByTopId(Comment comment);
+    
     List<CommentVO> queryComments(CommentFrontDTO commentFrontDTO);
-
+    
+    /**
+     * 
+     * @param commentFrontDTO
+     * @return
+     */
+    List<Comment> listCommentByParams(CommentFrontDTO commentFrontDTO);
+    
     int updownBatch(List<Comment> comments);
-
+    
+    /**
+     * 根据topId下架评论
+     * @param comment
+     * @return
+     */
+    int updownByTopId(Comment comment);
+    
     List<CommentVOForAdmin> queryCommentForAdmin(CommentDTO commentDTO);
 
     CommentInfoVO querySingleCommentInfo(CommentSubDTO commentSubDTO);

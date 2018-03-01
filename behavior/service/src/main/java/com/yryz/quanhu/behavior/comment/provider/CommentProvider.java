@@ -18,7 +18,9 @@ import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentApi;
 import com.yryz.quanhu.behavior.comment.service.CommentService;
+import com.yryz.quanhu.behavior.comment.vo.CommentDetailVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentListInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 import com.yryz.quanhu.behavior.count.api.CountApi;
@@ -51,7 +53,7 @@ import java.util.*;
  * @Description:评论
  * @Date:Created in 19:13 2018/1/23
  */
-@Service(interfaceClass = CommentApi.class)
+//@Service(interfaceClass = CommentApi.class)
 public class CommentProvider implements CommentApi {
 
     private static final Logger logger = LoggerFactory.getLogger(CommentProvider.class);
@@ -629,5 +631,17 @@ public class CommentProvider implements CommentApi {
         String[] arries = imgs.split(",");
         return arries[0];
     }
+
+	@Override
+	public Response<PageList<CommentListInfoVO>> listComments(CommentFrontDTO commentFrontDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response<CommentDetailVO> queryCommentDetail(CommentSubDTO commentSubDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
