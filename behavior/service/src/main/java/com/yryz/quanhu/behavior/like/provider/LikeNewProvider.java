@@ -20,7 +20,7 @@ import com.yryz.quanhu.behavior.like.service.LikeNewService;
 import com.yryz.quanhu.behavior.like.vo.LikeInfoVO;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 
-@Service(interfaceClass = LikeApi.class)
+//@Service(interfaceClass = LikeApi.class)
 public class LikeNewProvider implements LikeApi{
 	private static final Logger logger = LoggerFactory.getLogger(LikeNewProvider.class);
 	

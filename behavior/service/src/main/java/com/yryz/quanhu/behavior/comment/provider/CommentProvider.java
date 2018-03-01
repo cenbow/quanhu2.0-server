@@ -53,7 +53,7 @@ import java.util.*;
  * @Description:评论
  * @Date:Created in 19:13 2018/1/23
  */
-//@Service(interfaceClass = CommentApi.class)
+@Service(interfaceClass = CommentApi.class)
 public class CommentProvider implements CommentApi {
 
     private static final Logger logger = LoggerFactory.getLogger(CommentProvider.class);

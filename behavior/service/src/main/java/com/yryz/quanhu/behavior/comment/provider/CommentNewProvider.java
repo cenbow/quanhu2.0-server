@@ -24,7 +24,7 @@ import com.yryz.quanhu.behavior.comment.vo.CommentListInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 
-@Service(interfaceClass = CommentApi.class)
+//@Service(interfaceClass = CommentApi.class)
 public class CommentNewProvider implements CommentApi {
 	private static final Logger logger = LoggerFactory.getLogger(CommentNewProvider.class);
 	
