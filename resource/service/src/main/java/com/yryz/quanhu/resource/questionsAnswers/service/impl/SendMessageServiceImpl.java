@@ -54,7 +54,7 @@ public class SendMessageServiceImpl implements SendMessageService {
         Long tosendUserId = messageBusinessVo.getTosendUserId();
         Long fromUserId = messageBusinessVo.getFromUserId();
         String title = messageBusinessVo.getTitle();
-        title = StringUtils.length(title) > 20 ? title.substring(0, 19) : title;
+        title = StringUtils.length(title) > 20 ? title.substring(0, 20) : title;
         Byte isAnonymity = messageBusinessVo.getIsAnonymity();
         String coterieId = messageBusinessVo.getCoterieId();
         Long amount = messageBusinessVo.getAmount();
