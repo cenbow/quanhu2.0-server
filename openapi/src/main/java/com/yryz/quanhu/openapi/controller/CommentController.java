@@ -35,12 +35,44 @@ public class CommentController {
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
-    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
-    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
+
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/accretion")
     public Response<Comment> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
         comment.setCreateUserId(userId);
+
+        /**
+         * 根据参数判断评论类型，私圈/平台
+         */
+        if(comment.getCoterieId()!=0){
+            return coterieAccretion(comment,userId,request);
+        }else{
+            return platformAccretion(comment,userId,request);
+        }
+    }
+    /**
+     * 私圈评论
+     * @param comment
+     * @param userId
+     * @param request
+     * @return
+     */
+    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
+    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
+    private Response<Comment> coterieAccretion(Comment comment, Long userId, HttpServletRequest request) {
+        return commentApi.accretion(comment);
+    }
+
+    /**
+     * 平台评论
+     * @param comment
+     * @param userId
+     * @param request
+     * @return
+     */
+    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
+    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
+    private Response<Comment> platformAccretion(Comment comment, Long userId, HttpServletRequest request) {
         return commentApi.accretion(comment);
     }
 
