@@ -16,4 +16,11 @@ public interface CountStatisticsApi {
      * */
     Response<Map<String, Long>> countModelMap(CountStatisticsDto countStatisticsDto);
 
+    /**
+     * 统计参与者在活动中的浏览总数
+     * @param   countStatisticsDto
+     * @return
+     * */
+    Response<Map<String, Long>> countDetailModelMap(CountStatisticsDto countStatisticsDto);
+
 }
