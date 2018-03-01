@@ -184,6 +184,10 @@ public class HeatInfo {
 		return initHeat + behaviorHeat - attenuation;
 	}
 	
+	public Long countUserHeat(){
+		return initHeat + behaviorHeat;
+	}
+	
 	/**
 	 * 检查是否使用通用热度
 	 * @return
@@ -204,7 +208,7 @@ public class HeatInfo {
 	public Long countHeat(){
 		//用户只走通用类型
 		if(HeatInfoEnum.HEAT_TYPE_USER.equals(this.type)){
-			return countCommonHeat();
+			return countUserHeat();
 		//资源走两种规则，按天数来
 		} else {
 			if(check()){
