@@ -140,7 +140,13 @@ public class QuestionServiceImpl implements QuestionService {
         if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || COTERIE_STATUS_UP.compareTo(coterieInfo.getStatus()) != 0) {
             throw QuanhuException.busiError("", "提问的私圈不存在。", "提问的私圈不存在。");
         }
+        /**
+         * 校验提问金额是否合法
+         */
         Integer consultingFee = coterieInfo.getConsultingFee() == null ? 0 : coterieInfo.getConsultingFee();
+        if (question.getChargeAmount() == null || question.getChargeAmount() != Long.valueOf(consultingFee)) {
+            throw new QuanhuException(ExceptionEnum.AMOUNT_PARAM_ERROR);
+        }
         //保存提问费用
         question.setChargeAmount(Long.valueOf(consultingFee));
 
