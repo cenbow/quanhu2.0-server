@@ -182,7 +182,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
                 messageBusinessVo.setFromUserId(topicPostWithBLOBs.getCreateUserId());
                 messageBusinessVo.setIsAnonymity(null);
                 messageBusinessVo.setCoterieId(null);
-                sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, true);
+                sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, false);
 
                 //提交讨论数
                 countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
