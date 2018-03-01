@@ -14,6 +14,7 @@ import com.yryz.quanhu.user.dto.StarInfoDTO;
 import com.yryz.quanhu.user.vo.UserInfoVO;
 import com.yryz.quanhu.user.vo.UserRegLogVO;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -120,7 +121,6 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         String appId = adminUserDTO.getAppId();
         Integer userRole = adminUserDTO.getUserRole();
 
-
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if(userRole!=null){
             boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_ROLE, userRole.intValue()));
@@ -137,6 +137,10 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         if(StringUtils.isNotBlank(appId)){
         	boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
         }
+        if (BooleanUtils.isTrue(adminUserDTO.getCoterieLevel())) {
+            boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.EVENT_GROWLEVEL).gte("5"));
+        }
+
         if(userStatus != null){
         	if(userStatus == AdminQueryUserStatus.NORMAL.getStatus()){
         		boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_STATUS, UserAccountStatus.NORMAL.getStatus()));
