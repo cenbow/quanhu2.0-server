@@ -7,6 +7,8 @@ package com.yryz.quanhu.dymaic.canal.constants;
  * @description
  */
 public class ESConstants {
+    public static final int CAN_CREATE_COTERIE_LEVEL_VALUE = 5;
+
     //用户ID KEY
     public static final String USER_ID_KEY = "userId";
 
