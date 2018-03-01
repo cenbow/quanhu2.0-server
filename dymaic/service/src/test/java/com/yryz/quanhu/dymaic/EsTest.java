@@ -37,7 +37,7 @@ public class EsTest {
 
     @Test
     public void buildTest() {
-//        elasticsearchService.rebuildUserInfo();
+        elasticsearchService.rebuildUserInfo();
     }
 
     @Test
@@ -52,7 +52,8 @@ public class EsTest {
 //        dto.setNickName("q");
 //        dto.setAuditStatus((byte) 11);
 //        dto.setGrowLevel("5");
-        dto.setNickName("呵");
+        dto.setNickName("000143677");
+        dto.setCoterieLevel(true);
         Response<PageList<UserInfoVO>> pageListResponse = elasticsearchService.adminSearchUser(dto);
         System.out.println("pageListResponse " + GsonUtils.parseJson(pageListResponse));
     }

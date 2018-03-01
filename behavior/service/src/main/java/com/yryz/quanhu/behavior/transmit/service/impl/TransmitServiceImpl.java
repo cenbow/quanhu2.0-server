@@ -213,8 +213,24 @@ public class TransmitServiceImpl implements TransmitService {
         query.addCriteria(Criteria.where("kid").is(transmitId));
         Update update = new Update();
         update.set("shelveFlag", shelvesFlag == null ? CommonConstants.SHELVE_NO : shelvesFlag);
+        int i = transmitMongoDao.update(query, update) == null ? 0 : 1;
+        if(i > 0) {
+            try {
+                Query query1 = new Query();
+                query1.addCriteria(Criteria.where("kid").is(transmitId));
+                TransmitInfo transmitInfo = transmitMongoDao.findOne(query1);
+                Long count = -1L;
+                if(CommonConstants.SHELVE_YES.intValue() == shelvesFlag.intValue()) {
+                    count = 1L;
+                }
+                //递减转发数
+                countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, count);
+            } catch (Exception e) {
+                logger.error("递减转发数 失败", e);
+            }
+        }
 
-        return transmitMongoDao.update(query, update) == null ? 0 : 1;
+        return i;
     }
 
     /**
@@ -224,8 +240,20 @@ public class TransmitServiceImpl implements TransmitService {
     public Integer removeTransmit(Long transmitId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("kid").is(transmitId));
+        Integer i = transmitMongoDao.remove(query);
+        if(i > 0) {
+            try {
+                Query query1 = new Query();
+                query1.addCriteria(Criteria.where("kid").is(transmitId));
+                TransmitInfo transmitInfo = transmitMongoDao.findOne(query1);
+                //递减转发数
+                countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, -1L);
+            } catch (Exception e) {
+                logger.error("递减转发数 失败", e);
+            }
+        }
 
-        return transmitMongoDao.remove(query);
+        return i;
     }
 
     private void sendDymaic(TransmitInfo transmitInfo, String extJson) {

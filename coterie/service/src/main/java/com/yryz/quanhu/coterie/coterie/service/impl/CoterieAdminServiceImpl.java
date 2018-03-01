@@ -10,10 +10,12 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminService;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
@@ -28,6 +30,7 @@ import com.yryz.quanhu.score.vo.ScoreFlowReportVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserBaseInfoVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,17 +81,19 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
             param.setPageNum(start);
             Integer count = coterieMapper.selectCountBySearchParam(param);
 
-            if (count == 0) {
+            list = coterieMapper.selectBySearchParam(param);
+
+            if (count == 0 || list.size() == 0 ) {
                 PageList<CoterieInfo> pageList = new PageList<>(currentPage, param.getPageSize(), new ArrayList(), 0L);
                 return pageList;
             }
 
-            list = coterieMapper.selectBySearchParam(param);
-
             Set<String> ids = new HashSet<>();
 
             for (Coterie coterie : list) {
-                ids.add(coterie.getOwnerId());
+                if (StringUtils.isNotBlank(coterie.getOwnerId())) {
+                    ids.add(coterie.getOwnerId());
+                }
             }
 
             Response<Map<String, UserBaseInfoVO>> response = userApi.getUser(ids);
@@ -100,8 +105,10 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
                 CoterieInfo info = new CoterieInfo();
                 BeanUtils.copyProperties(coterie, info);
 
-                info.setOwnerName(userMap.get(coterie.getOwnerId()).getUserNickName());
-                info.setPhone(userMap.get(coterie.getOwnerId()).getUserPhone());
+                if (null != userMap.get(coterie.getOwnerId())) {
+                    info.setOwnerName(userMap.get(coterie.getOwnerId()).getUserNickName());
+                    info.setPhone(userMap.get(coterie.getOwnerId()).getUserPhone());
+                }
 
                 return info;
 
@@ -236,6 +243,31 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
           }
         }
         return userIdsSet;
+    }
+
+
+    @Override
+    public CoterieInfo save(CoterieBasicInfo info) {
+        Coterie coterie = (Coterie) GsonUtils.parseObj(info, Coterie.class);
+        coterie.setCoterieId(idapi.getSnowflakeId().getData());
+        coterie.setConsultingFee(0);
+        coterie.setCreateDate(new Date());
+        coterie.setDeleted((byte) 10);
+        coterie.setHeat(0L);
+        coterie.setJoinCheck(info.getJoinCheck() == null ? 11 : info.getJoinCheck());
+        coterie.setJoinFee(info.getJoinFee() == null ? 0 : info.getJoinFee());
+        coterie.setLastUpdateDate(new Date());
+        coterie.setMemberNum(0);
+        coterie.setShelveFlag(10);
+        coterie.setRevision(1);
+        coterie.setStatus((byte)11);
+        coterie.setRecommend((byte) 10);
+        UserSimpleVO user = ResponseUtils.getResponseData(userApi.getUserSimple(Long.parseLong(info.getOwnerId())));
+        coterie.setIsExpert(user.getUserRole());
+        coterie.setRedDot(10);
+        coterieMapper.insertSelective(coterie);
+        updateCache(coterie.getCoterieId());
+        return (CoterieInfo) GsonUtils.parseObj(coterie, CoterieInfo.class);
     }
 
 

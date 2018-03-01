@@ -453,7 +453,7 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setKid(question.getKid());
         messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-        messageBusinessVo.setFromUserId(question.getCreateUserId());
+        messageBusinessVo.setFromUserId(Long.valueOf(question.getTargetId()));
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setTosendUserId(question.getCreateUserId());
         messageBusinessVo.setAmount(question.getChargeAmount());
