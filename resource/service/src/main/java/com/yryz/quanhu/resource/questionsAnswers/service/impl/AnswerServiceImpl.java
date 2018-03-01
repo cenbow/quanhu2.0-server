@@ -11,6 +11,7 @@ import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
+import com.yryz.quanhu.order.enums.AccountEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.resource.api.ResourceApi;
@@ -168,7 +169,8 @@ public class AnswerServiceImpl implements AnswerService {
         //向圈主支付回答的费用
         if(null!=questionCheck.getChargeAmount()){
             if(questionCheck.getChargeAmount().longValue()>0){
-              Long orderId=  orderSDK.executeOrder(OrderEnum.ANSWER_ORDER,answerdto.getCreateUserId(),questionCheck.getChargeAmount());
+              Long orderId=  orderSDK.executeOrder(OrderEnum.ANSWER_ORDER, Long.valueOf(AccountEnum.SYSID),
+                      answerdto.getCreateUserId(), questionCheck.getChargeAmount());
               if(null!=orderId){
                   answerWithBLOBs.setOrderFlag(QuestionAnswerConstants.OrderType.paid);
                   answerWithBLOBs.setOrderId(String.valueOf(orderId));

@@ -136,15 +136,19 @@ public class OrderService implements OrderSDK {
      * 系统触发执行订单接口(用于业务端调用，如圈主回答问题后需要将钱支付给圈主，到期未回答退款给用户)
      *
      * @param orderEnum 订单枚举
+     * @param fromId    借款人ID
      * @param toId      收款人ID
      * @param cost      金额
      * @return 成功返回订单ID，否则抛出QuanhuException
      */
     @Override
-    public Long executeOrder(OrderEnum orderEnum, Long toId, Long cost) {
+    public Long executeOrder(OrderEnum orderEnum, Long fromId, Long toId, Long cost) {
         if (null == orderEnum)
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "orderEnum is null");
+        if (null == fromId)
+            throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
+                    ExceptionEnum.ValidateException.getShowMsg(), "fromId is null");
         if (null == toId)
             throw new QuanhuException(ExceptionEnum.ValidateException.getCode(),
                     ExceptionEnum.ValidateException.getShowMsg(), "toId is null");
@@ -159,7 +163,7 @@ public class OrderService implements OrderSDK {
                     orderIdResponse == null ? "获取订单ID失败" : orderIdResponse.getErrorMsg());
         }
         Long orderId = Long.valueOf(orderIdResponse.getData());
-        PreOrderVo orderVo = orderEnum.getOrder(orderId, Long.valueOf(AccountEnum.SYSID), toId, cost);
+        PreOrderVo orderVo = orderEnum.getOrder(orderId, fromId, toId, cost);
         Response<?> response = orderApi.executeOrder(orderVo.getOrderInfo(), orderVo.getAccounts(), orderVo.getIntegrals(), null, null, null);
         if (response.success()) {
             return orderId;

@@ -292,7 +292,8 @@ public class QuestionServiceImpl implements QuestionService {
         if (result > 0) {
             if (questionBySearch.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(questionBySearch.getOrderFlag()) == 0
                     && QuestionAnswerConstants.AnswerdFlag.NOt_ANSWERED.compareTo(questionBySearch.getAnswerdFlag()) == 0) {
-                Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
+                Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, Long.valueOf(AccountEnum.SYSID),
+                        questionBySearch.getCreateUserId(), questionBySearch.getChargeAmount());
                 if (null != orderId) {
                     questionBySearch.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
                     questionBySearch.setRefundOrderId(String.valueOf(orderId));
@@ -461,7 +462,8 @@ public class QuestionServiceImpl implements QuestionService {
              * 圈粉删除问题，如果是付费问题，则进行退款，并通知圈粉
              */
             if (question.getChargeAmount() > 0 && QuestionAnswerConstants.OrderType.paid.compareTo(question.getOrderFlag()) == 0) {
-                Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
+                Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, Long.valueOf(AccountEnum.SYSID),
+                        question.getCreateUserId(), question.getChargeAmount());
                 if (null != orderId) {
                     question.setRefundOrderId(String.valueOf(orderId));
                     question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
@@ -654,7 +656,8 @@ public class QuestionServiceImpl implements QuestionService {
             /**
              * 失效进行全额退款
              */
-            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, question.getCreateUserId(), question.getChargeAmount());
+            Long orderId = orderSDK.executeOrder(OrderEnum.NO_ANSWER_ORDER, Long.valueOf(AccountEnum.SYSID),
+                    question.getCreateUserId(), question.getChargeAmount());
             if (null != orderId) {
                 question.setOrderFlag(QuestionAnswerConstants.OrderType.Have_refund);
                 question.setRefundOrderId(String.valueOf(orderId));

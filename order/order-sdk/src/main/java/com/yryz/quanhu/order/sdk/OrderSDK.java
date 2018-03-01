@@ -31,11 +31,12 @@ public interface OrderSDK {
      * 系统触发执行订单接口(用于业务端调用，如圈主回答问题后需要将钱支付给圈主，到期未回答退款给用户)
      *
      * @param orderEnum 订单枚举
+     * @param fromId    借款人ID
      * @param toId      收款人ID
      * @param cost      金额
      * @return 成功返回订单ID，否则抛出QuanhuException
      */
-    Long executeOrder(OrderEnum orderEnum, Long toId, Long cost);
+    Long executeOrder(OrderEnum orderEnum, Long fromId, Long toId, Long cost);
 
     /**
      * 查询用户是否已经购买成功
