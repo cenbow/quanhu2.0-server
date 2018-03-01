@@ -39,29 +39,31 @@ public class CoterieMemberOrderNotifyServiceImpl implements IOrderNotifyService 
     @Override
     public void notify(OutputOrder outputOrder) {
 
-        logger.info("付费加入私圈ing");
-        CoterieMemberNotify coterieMemberNotify = JSONObject.parseObject(outputOrder.getBizContent(), CoterieMemberNotify.class);
+        logger.info("没有回调了");
 
-        logger.info("付费加入私圈自动审核ing");
-        coterieMemberService.audit(coterieMemberNotify.getUserId(), coterieMemberNotify.getCoterieId(),
-                MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
-
-        logger.info("付费加入私圈自动审核end");
-        // 消息推送
-
-        /**
-         * 付费加入私圈
-         */
-        logger.info("付费加入私圈的推送信息开始");
-        coterieMemberMessageManager.sendMessageToJoinCoteriePayed(coterieMemberNotify, MessageConstant.JOIN_COTERIE_PAYED);
-        logger.info("付费加入私圈的推送信息完成");
-
-        /**
-         * 私圈奖励
-         */
-        logger.info("私圈圈主奖励的推送信息开始");
-        coterieMemberMessageManager.sendMessageToJoinCoterieReward(coterieMemberNotify, MessageConstant.JOIN_COTERIE_REWARD);
-        logger.info("私圈圈主奖励的推送信息完成");
+//        logger.info("付费加入私圈ing");
+//        CoterieMemberNotify coterieMemberNotify = JSONObject.parseObject(outputOrder.getBizContent(), CoterieMemberNotify.class);
+//
+//        logger.info("付费加入私圈自动审核ing");
+//        coterieMemberService.audit(coterieMemberNotify.getUserId(), coterieMemberNotify.getCoterieId(),
+//                MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
+//
+//        logger.info("付费加入私圈自动审核end");
+//        // 消息推送
+//
+//        /**
+//         * 付费加入私圈
+//         */
+//        logger.info("付费加入私圈的推送信息开始");
+//        coterieMemberMessageManager.sendMessageToJoinCoteriePayed(coterieMemberNotify, MessageConstant.JOIN_COTERIE_PAYED);
+//        logger.info("付费加入私圈的推送信息完成");
+//
+//        /**
+//         * 私圈奖励
+//         */
+//        logger.info("私圈圈主奖励的推送信息开始");
+//        coterieMemberMessageManager.sendMessageToJoinCoterieReward(coterieMemberNotify, MessageConstant.JOIN_COTERIE_REWARD);
+//        logger.info("私圈圈主奖励的推送信息完成");
 
     }
 }

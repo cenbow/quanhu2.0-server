@@ -10,6 +10,7 @@ import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionVo;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
 import com.yryz.quanhu.resource.topic.vo.TopicPostVo;
+import com.yryz.quanhu.resource.topic.vo.TopicVo;
 import com.yryz.quanhu.resource.vo.ResourceVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -49,6 +50,18 @@ public class RemoteResourceUtils {
                     remoteResource.setVideoThumbnailUrl(releaseInfo.getVideoThumbnailUrl());
                     remoteResource.setCreateUserId(releaseInfo.getCreateUserId());
                     remoteResource.setCreateDate(releaseInfo.getCreateDate());
+                }
+            } else if (ModuleContants.TOPIC.equals(resourceVo.getModuleEnum())) {
+                TopicVo topicVo = JSON.parseObject(resourceVo.getExtJson(), TopicVo.class);
+                if(null != topicVo) {
+                    remoteResource.setContent(topicVo.getContent());
+                    remoteResource.setImgUrl(topicVo.getImgUrl());
+                    if(StringUtils.isNotBlank(topicVo.getImgUrl())) {
+                        remoteResource.setFirstImgUrl(Splitter.on(",")
+                                .omitEmptyStrings().limit(1).splitToList(topicVo.getImgUrl()).get(0));
+                    }
+                    remoteResource.setCreateUserId(topicVo.getUser() == null ? null : topicVo.getUser().getUserId());
+                    remoteResource.setCreateDate(topicVo.getCreateDate());
                 }
             } else if (ModuleContants.TOPIC_POST.equals(resourceVo.getModuleEnum())) {
                 TopicPostVo topicPostVo = JSON.parseObject(resourceVo.getExtJson(), TopicPostVo.class);
