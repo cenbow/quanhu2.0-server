@@ -10,23 +10,17 @@
 	</parent>
 
 	<artifactId>behavior-service</artifactId>
-	<properties>
-		<order.sdk.version>2.0-SNAPSHOT</order.sdk.version>
-        <resource.api.version>2.0-SNAPSHOT</resource.api.version>
-	</properties>
 
 	<dependencies>
 		<!--项目内部依赖 -->
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>behavior-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>support-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 
 		<dependency>
@@ -37,43 +31,36 @@
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>user-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>message-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>order-sdk</artifactId>
-			<version>${order.sdk.version}</version>
 		</dependency>
 		
 		<dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>resource-api</artifactId>
-            <version>${resource.api.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>dymaic-api</artifactId>
-            <version>${quanhu.version}</version>
         </dependency>
 
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>coterie-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>other-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 
 		<!--公司内部库 -->
