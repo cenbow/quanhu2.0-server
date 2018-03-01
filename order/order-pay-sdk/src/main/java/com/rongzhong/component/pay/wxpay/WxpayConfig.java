@@ -20,6 +20,13 @@ public class WxpayConfig {
 	
 	/** 微信手机支付MD5秘钥 **/
 	public static final String MD5_KEY = Context.getProperty("wxpay_md5_key");
+
+	//微信支付商务证书
+	public static final String MERCHANT_KEY_PATH = Context.getProperty("wxpay_merchant_key_path");
+
+	//微信提现加密公钥证书（PKCS#8）
+	public static final String PUBLIC_KEY_PATH = Context.getProperty("wxpay_public_key_path");
+
 	
 	/** 微信公众号APP ID **/
 	public static final String GZH_APP_ID = Context.getProperty("wxpay_gzh_app_id");

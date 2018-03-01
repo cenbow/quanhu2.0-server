@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.other.category.dao.CategoryDao;
 import com.yryz.quanhu.other.category.entity.Category;
 import com.yryz.quanhu.other.category.service.ICategoryAdminService;
@@ -13,6 +14,8 @@ import com.yryz.quanhu.other.category.vo.CategoryTreeAdminVo;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.service.UserTagApi;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
  */
 @Service("categoryAdminService")
 public class CategoryAdminServiceImpl implements ICategoryAdminService {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Resource
     private CategoryDao categoryDao;
@@ -109,20 +114,45 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
 
         Integer count = categoryDao.selectCountBySearch(search);
 
-        List<Category> categories = categoryDao.selectBySearch(search);
+        LinkedList<Category> categories = categoryDao.selectBySearch(search);
+
+        logger.info(JsonUtils.toFastJson(categories));
+
+
+        CategorySearchAdminVo vo = new CategorySearchAdminVo();
 
         List<CategoryAdminVo> categoryList = categories.stream().map(category -> {
 
             CategoryAdminVo categoryAdminVo = new CategoryAdminVo();
             BeanUtils.copyProperties(category, categoryAdminVo);
 
-
-            CategorySearchAdminVo vo = new CategorySearchAdminVo();
             if (search.getParentKid() == 0L) {
                 //下属分类数
                 vo.setParentKid(category.getKid());
-                Integer num = categoryDao.selectCountBySearch(search);
+                Integer num = categoryDao.selectCountBySearch(vo);
                 categoryAdminVo.setSubordinateNum(num);
+
+                //下属达人数
+                Set<String> tagIds = new HashSet<>();
+                tagIds.add(category.getKid().toString());
+
+               List<Category> suborinateList = categoryDao.selectByPidAdmin(category.getKid());
+
+                for (Category c : suborinateList ) {
+                    tagIds.add(c.getKid().toString());
+                }
+
+                Response<Map<String, Long>> rpc = userTagApi.getTagCountByUser(tagIds);
+                Map<String, Long> countMap = rpc.getData();
+
+                Long starNum = 0L;
+
+                for (Long size : countMap.values() ) {
+
+                    starNum += size;
+                }
+                categoryAdminVo.setStarNum(starNum);
+            } else {
 
                 //下属达人数
                 Set<String> tagIds = new HashSet<>();
@@ -149,7 +179,7 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
 
         if (category.getCategoryStatus() != null) {
 
-            List<Category> categories = categoryDao.selectByPid(category.getKid(), null);
+            List<Category> categories = categoryDao.selectByPidAdmin(category.getKid());
             if (CollectionUtils.isNotEmpty(categories)) {
                 for (Category categoryDb : categories) {
                     category.setKid(categoryDb.getKid());
@@ -165,7 +195,7 @@ public class CategoryAdminServiceImpl implements ICategoryAdminService {
         Response<Long> response = idAPI.getSnowflakeId();
         Long kid = ResponseUtils.getResponseNotNull(response);
         category.setKid(kid);
-        category.setCategorySort(0);
+        category.setCategorySort(9999999);
         category.setCategoryStatus(10);
         category.setRecommend(20);
         category.setCreateDate(new Date());

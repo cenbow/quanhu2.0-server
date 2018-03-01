@@ -140,7 +140,13 @@ public class QuestionServiceImpl implements QuestionService {
         if (null == coterieInfo || Integer.valueOf(CommonConstants.SHELVE_YES).compareTo(coterieInfo.getShelveFlag()) != 0 || COTERIE_STATUS_UP.compareTo(coterieInfo.getStatus()) != 0) {
             throw QuanhuException.busiError("", "提问的私圈不存在。", "提问的私圈不存在。");
         }
+        /**
+         * 校验提问金额是否合法
+         */
         Integer consultingFee = coterieInfo.getConsultingFee() == null ? 0 : coterieInfo.getConsultingFee();
+        if (question.getChargeAmount() == null || question.getChargeAmount() != Long.valueOf(consultingFee)) {
+            throw new QuanhuException(ExceptionEnum.AMOUNT_PARAM_ERROR);
+        }
         //保存提问费用
         question.setChargeAmount(Long.valueOf(consultingFee));
 
@@ -453,7 +459,7 @@ public class QuestionServiceImpl implements QuestionService {
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setKid(question.getKid());
         messageBusinessVo.setModuleEnum(ModuleContants.QUESTION);
-        messageBusinessVo.setFromUserId(question.getCreateUserId());
+        messageBusinessVo.setFromUserId(Long.valueOf(question.getTargetId()));
         messageBusinessVo.setTitle(question.getContent());
         messageBusinessVo.setTosendUserId(question.getCreateUserId());
         messageBusinessVo.setAmount(question.getChargeAmount());

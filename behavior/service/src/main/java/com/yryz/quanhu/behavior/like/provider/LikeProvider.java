@@ -38,6 +38,7 @@ import com.yryz.quanhu.behavior.like.dto.LikeAssemble;
 import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeService;
+import com.yryz.quanhu.behavior.like.vo.LikeInfoVO;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 import com.yryz.quanhu.grow.entity.GrowFlowQuery;
 import com.yryz.quanhu.message.message.api.MessageAPI;
@@ -63,8 +64,8 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
  * @Description:点赞
  * @Date:Created in 15:03 2018/1/24
  */
-@Service(interfaceClass = LikeApi.class)
-public class LikeProvider implements LikeApi {
+//@Service(interfaceClass = LikeApi.class)
+public class LikeProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LikeProvider.class);
 
@@ -107,7 +108,6 @@ public class LikeProvider implements LikeApi {
     @Reference(check = false)
     private EventAcountApiService eventAcountApiService;
 
-    @Override
     @Transactional
     public Response<Map<String, Object>> dian(Like like) {
         RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
@@ -262,7 +262,7 @@ public class LikeProvider implements LikeApi {
         return date.getTime();
     }
 
-    @Override
+
     public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO) {
         try {
             Map<String, Long> map = ResponseUtils.getResponseData(countApi.getCount("11", likeFrontDTO.getResourceId(), ""));
@@ -285,7 +285,7 @@ public class LikeProvider implements LikeApi {
         }
     }
 
-    @Override
+
     public Response<Integer> isLike(Like like) {
         try {
             return ResponseUtils.returnObjectSuccess(likeService.isLike(like));
@@ -296,7 +296,7 @@ public class LikeProvider implements LikeApi {
 
     }
 
-    @Override
+
     public Response<Long> getLikeFlag(Map<String, Object> map) {
         try {
             RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
@@ -322,7 +322,7 @@ public class LikeProvider implements LikeApi {
 
     }
 
-    @Override
+
     public Response<Map<String,Integer>> getLikeFlagBatch(List<Long> resourceIds, long userId) {
         try{
             return ResponseUtils.returnObjectSuccess(likeService.getLikeFlagBatch(resourceIds,userId));
@@ -607,5 +607,10 @@ public class LikeProvider implements LikeApi {
         String[] arries = imgs.split(",");
         return arries[0];
     }
+
+	public Response<PageList<LikeInfoVO>> listLike(LikeFrontDTO likeFrontDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

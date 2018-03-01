@@ -26,7 +26,10 @@ public class CommentFrontDTO extends PageList implements Serializable {
     
     private long createUserId;
     private long checkType;
-
+    /**
+     * 当前用户id
+     */
+    private String userId;
     public long getCheckType() {
         return checkType;
     }
@@ -82,5 +85,13 @@ public class CommentFrontDTO extends PageList implements Serializable {
     public void setCreateUserId(long createUserId) {
         this.createUserId = createUserId;
     }
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 }
 

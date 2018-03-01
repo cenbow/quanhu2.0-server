@@ -111,6 +111,11 @@ public class AdminUserInfoDTO implements Serializable{
 	private String growLevel;
 
 	/**
+	 * 用户等级是否可以创建
+	 */
+	private Boolean coterieLevel = false;
+
+	/**
 	 * 申请认证开始时间
 	 */
 	private String applyAuthBeginDate;
@@ -154,6 +159,14 @@ public class AdminUserInfoDTO implements Serializable{
 	 * 1. 包含以下
 	 */
 	private Integer versionInclude;
+
+	public Boolean getCoterieLevel() {
+		return coterieLevel;
+	}
+
+	public void setCoterieLevel(Boolean coterieLevel) {
+		this.coterieLevel = coterieLevel;
+	}
 
 	public Integer getVersionInclude() {
 		return versionInclude;

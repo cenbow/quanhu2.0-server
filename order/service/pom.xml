@@ -20,6 +20,11 @@
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
+            <artifactId>order-pay-sdk</artifactId>
+            <version>${quanhu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yryz.quanhu</groupId>
             <artifactId>message-api</artifactId>
             
         </dependency>

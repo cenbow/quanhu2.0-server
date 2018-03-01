@@ -30,7 +30,7 @@ public class CoterieMemberTest {
     CoterieMemberOrderNotifyServiceImpl service;
 
     private static Long userId = 377914625728512L;
-    private static Long coterieId = 378686755151872L;
+    private static Long coterieId = 381091760791552L;
 
     private static Long memberId = 356895487025152L;
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
@@ -66,16 +66,16 @@ public class CoterieMemberTest {
         OutputOrder outputOrder = new OutputOrder();
 
 //        {"userId":737251236811898880,"coterieId":233665981858,"reason":"我要加入,要审核的","coterieName":"think","icon":"icon","owner":"727909974996672512","amount":10000}
-        outputOrder.setBizContent("{\"userId\":365780477952000,\"coterieId\":369229933076480,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
+        outputOrder.setBizContent("{\"userId\":381098110967808,\"coterieId\":367803483840512,\"reason\":\"我要加入,要审核的\",\"coterieName\":\"think\",\"icon\":\"icon\",\"owner\":\"727909974996672512\",\"amount\":10000}");
 
         outputOrder.setOrderId(20180207164695L);
         outputOrder.setPayType(10);
-        outputOrder.setResourceId(233665981858L);
-        outputOrder.setCost(1000L);
+        outputOrder.setResourceId(367803483840512L);
+        outputOrder.setCost(100L);
         outputOrder.setModuleEnum(ModuleContants.COTERIE);
         outputOrder.setCreateDate(new Date());
-        outputOrder.setCoterieId(369229933076480L);
-        outputOrder.setCreateUserId(365780477952000L);
+        outputOrder.setCoterieId(367803483840512L);
+        outputOrder.setCreateUserId(381098110967808L);
         service.notify(outputOrder);
     }
 

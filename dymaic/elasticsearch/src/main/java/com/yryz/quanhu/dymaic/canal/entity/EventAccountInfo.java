@@ -36,8 +36,8 @@ public class EventAccountInfo {
     /**
      * 成长级别
      */
-    @Field(type = FieldType.text)
-    private String growLevel;
+    @Field(type = FieldType.Integer)
+    private Integer growLevel;
 
     /**
      * 创建时间
@@ -76,11 +76,11 @@ public class EventAccountInfo {
         this.grow = grow;
     }
 
-    public String getGrowLevel() {
+    public Integer getGrowLevel() {
         return growLevel;
     }
 
-    public void setGrowLevel(String growLevel) {
+    public void setGrowLevel(Integer growLevel) {
         this.growLevel = growLevel;
     }
 

@@ -678,10 +678,10 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
 		Response<Map<Long, EventAcount>> eventAcountResponse = acountApiService
 				.getEventAcountBatch(Sets.newHashSet(ulist));
 		Response<Map<Long, UserRegLogVO>> regLogResponse = userOperateApi.listByUserId(ulist);
-		logger.info(
+		/*logger.info(
 				"saveAllUsers starResponse: {}, userTagInfoResponse: {}, eventAcountResponse: {}, regLogResponse: {}",
 				GsonUtils.parseJson(starResponse), GsonUtils.parseJson(userTagInfoResponse),
-				GsonUtils.parseJson(eventAcountResponse), GsonUtils.parseJson(regLogResponse));
+				GsonUtils.parseJson(eventAcountResponse), GsonUtils.parseJson(regLogResponse));*/
 
 		List<UserInfo> userlist = new ArrayList<>();
 		for (int j = 0; j < volist.size(); j++) {
