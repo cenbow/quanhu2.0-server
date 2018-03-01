@@ -5,8 +5,10 @@ import com.rongzhong.component.pay.util.MD5Util;
 import com.rongzhong.component.pay.wxpay.WxpayConfig;
 import com.rongzhong.component.pay.wxpay.util.CodeGenerator;
 import com.rongzhong.component.pay.wxpay.util.XMLUtil;
+import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
+import com.yryz.quanhu.order.enums.OrderPayConstants;
+import com.yryz.quanhu.order.service.OrderService;
 import com.yryz.quanhu.order.service.WxpayCashService;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,13 +21,16 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import javax.net.ssl.SSLContext;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PublicKey;
@@ -52,6 +57,9 @@ public class WxpayCashServiceImpl implements WxpayCashService {
     private Cipher cipher;
     //SSL连接工厂
     private SSLConnectionSocketFactory sslConnectionSocketFactory;
+
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 获取微信提现加密RSA公钥
@@ -89,6 +97,11 @@ public class WxpayCashServiceImpl implements WxpayCashService {
      */
     public boolean wxpayCash(String orderId, String userName, String bankCardNo, String bankId, String amount) {
         try {
+            RrzOrderPayInfo rrzOrderPayInfo = orderService.getPayInfo(orderId);
+            if (null == rrzOrderPayInfo || !OrderPayConstants.OrderState.CREATE.equals(rrzOrderPayInfo.getOrderState())) {
+                logger.error("不合法的提现请求，已拒绝。orderId:{}", orderId);
+                return false;
+            }
             SortedMap<String, String> parameters = new TreeMap<String, String>();
             parameters.put("mch_id", WxpayConfig.MCH_ID);
             parameters.put("partner_trade_no", orderId);
