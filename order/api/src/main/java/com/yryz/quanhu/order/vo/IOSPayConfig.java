@@ -1,4 +1,4 @@
-package com.yryz.quanhu.openapi.order.dto;
+package com.yryz.quanhu.order.vo;
 
 import java.io.Serializable;
 

@@ -193,4 +193,58 @@ public class Alipay {
 
 		return response;
 	}
+
+	public static PayResponse parsePayResult(Map<String, String> params) throws IOException {
+
+		// 商户订单号
+		String out_trade_no = params.get("out_trade_no");
+
+		// 支付宝交易号
+		String trade_no = params.get("trade_no");
+
+		// 交易状态
+		String trade_status = params.get("trade_status");
+
+		// 交易付款时间
+		String paymentTime = params.get("gmt_payment");
+
+		// 商户号
+		String sellerId = params.get("seller_id");
+
+		// 交易金额(单位：元)
+		String totalFee = params.get("total_amount");
+
+		//APPId
+		String appId = params.get("auth_app_id");
+
+		PayResponse response = new PayResponse();
+		response.setSn(out_trade_no);
+		response.setBankSn(trade_no);
+		response.setPayDatetime(paymentTime);
+		response.setMchId(sellerId);
+		response.setEndDesc(params.toString());
+		Double payAmount = Double.parseDouble(totalFee) * 100;// 转换为分
+		response.setPayAmount(String.valueOf(payAmount.intValue())); // 去掉小数点
+
+		if(!StringUtils.equals(appId, AlipayConfig.app_id) || !StringUtils.equals(sellerId, AlipayConfig.partner)){
+			response.setResult(Response.VERIFY_FAILURE);
+			response.setMessage("验证 APPID|PARTNER 失败");
+			logger.error("支付宝支付，sn: " + out_trade_no + "验证 APPID|PARTNER 失败");
+		} else
+		if (AlipayNotify.verify(params, AlipayConfig.sign_type)) {// 验证成功
+			if (trade_status.equals("TRADE_FINISHED")) {
+				response.setResult(Response.SUCCESS);
+				response.setMessage("success");
+			} else if (trade_status.equals("TRADE_SUCCESS")) {
+				response.setResult(Response.SUCCESS);
+				response.setMessage("success");
+			}
+		} else {// 验证失败
+			response.setResult(Response.VERIFY_FAILURE);
+			response.setMessage("验证签名失败");
+			logger.error("支付宝支付，sn: " + out_trade_no + "验证签名失败");
+		}
+
+		return response;
+	}
 }
