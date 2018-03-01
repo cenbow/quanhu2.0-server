@@ -61,4 +61,54 @@ public class CountStatisticsServiceImpl implements CountStatisticsService {
         return resultMap;
     }
 
+    /**
+     * 统计参与者在活动中的浏览总数
+     * @param   countStatisticsDto
+     * @return
+     * */
+    public Map<String, Long> countDetailModelMap(CountStatisticsDto countStatisticsDto) {
+        Map<String, Long> resultMap = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String startDate = sdf.format(countStatisticsDto.getStartDate());
+        String endDate = sdf.format(countStatisticsDto.getEndDate());
+        Query query = new Query();
+        query.addCriteria(Criteria.where("page").is(countStatisticsDto.getPage()));
+        if(!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate) ) {
+            query.addCriteria(new Criteria().andOperator(Criteria.where("date").gte(Integer.valueOf(startDate)),
+                    Criteria.where("date").lte(Integer.valueOf(endDate))));
+        }
+        long count = countMongoDao.count(query);
+        if(count > 0) {
+            query.with(new Sort(Sort.Direction.DESC, "date"));
+            query.with(new Sort(Sort.Direction.DESC, "time"));
+            List<CountModel> list = countMongoDao.find(query);
+            if(!CollectionUtils.isEmpty(list)) {
+                Map<String, Long> countModelMap = new HashMap<>();
+                for(int i=0; i<list.size(); i++) {
+                    CountModel countModel = list.get(i);
+                    String d = countModel.getDate() + "_" + countModel.getKid();
+                    Long c = countModel.getCount();
+                    if(!countModelMap.containsKey(d)) {
+                        countModelMap.put(d, c);
+                    }
+                }
+                Long totalCount = 0L;
+                for(Map.Entry<String, Long> entry : countModelMap.entrySet()) {
+                    String key = entry.getKey();
+                    if(key.lastIndexOf("_") != -1) {
+                        String d = key.substring(key.lastIndexOf("_") + 1);
+                        if(!resultMap.containsKey(d)) {
+                            resultMap.put(d, entry.getValue());
+                            totalCount = totalCount + entry.getValue();
+                        } else {
+                            resultMap.put(d, resultMap.get(d) + entry.getValue());
+                        }
+                    }
+                }
+            }
+        }
+
+        return resultMap;
+    }
+
 }

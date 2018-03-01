@@ -36,4 +36,18 @@ public class CountStatisticsProvider implements CountStatisticsApi {
         }
     }
 
+    /**
+     * 统计参与者在活动中的浏览总数
+     * @param   countStatisticsDto
+     * @return
+     * */
+    public Response<Map<String, Long>> countDetailModelMap(CountStatisticsDto countStatisticsDto) {
+        try {
+            return ResponseUtils.returnObjectSuccess(countStatisticsService.countDetailModelMap(countStatisticsDto));
+        } catch (Exception e) {
+            logger.error("统计参与者在活动中的浏览总数 失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
 }
