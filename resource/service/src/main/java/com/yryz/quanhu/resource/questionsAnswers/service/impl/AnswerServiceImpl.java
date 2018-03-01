@@ -6,9 +6,13 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.message.MessageConstant;
+import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.count.api.CountApi;
+import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.order.enums.AccountEnum;
@@ -40,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -73,6 +78,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Reference
     private ResourceApi resourceApi;
+
+    @Reference
+    private CountApi countApi;
 
     @Autowired
     private SendMessageService questionMessageService;
@@ -328,6 +336,12 @@ public class AnswerServiceImpl implements AnswerService {
                 answerVo.setUser(apIservice.getUser(createUserId));
             }
             answerVo.setModuleEnum(ModuleContants.ANSWER);
+            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode(),
+                    answerVo.getKid(), null);
+            if (ResponseConstant.SUCCESS.getCode().equals(countData.getCode())) {
+                Map<String, Long> count = countData.getData();
+                answerVo.setStatistics(count);
+            }
             return answerVo;
         }
         return null;

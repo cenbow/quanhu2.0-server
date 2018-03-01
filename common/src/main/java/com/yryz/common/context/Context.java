@@ -91,10 +91,11 @@ public class Context implements EnvironmentAware {
     }
 
     public static String getWebRootRealPath() {
-        if (Context.webRootRealPath == null) {
-            Context.webRootRealPath = getWebRealPath();
-        }
-        return webRootRealPath;
+//        if (Context.webRootRealPath == null) {
+//            Context.webRootRealPath = getWebRealPath();
+//        }
+//        return webRootRealPath;
+        return "";
     }
 
     public static void setWebRootRealPath(String webRootRealPath) {
@@ -115,7 +116,7 @@ public class Context implements EnvironmentAware {
         System.out.println("---------------------------------------------------");
         System.out.println("---------------------------------------------------");
         if (folderPath.indexOf("WEB-INF/lib") > 0) {
-            path = folderPath.substring(0, folderPath.indexOf("/lib")) + "/classes";
+            path = folderPath.substring(0, folderPath.indexOf("/lib")) + "/classes/";
         }
         return path;
     }

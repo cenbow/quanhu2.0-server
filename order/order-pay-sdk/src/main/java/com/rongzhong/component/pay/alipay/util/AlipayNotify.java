@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import com.rongzhong.component.pay.alipay.AlipayConfig;
 import com.rongzhong.component.pay.alipay.sign.MD5;
 import com.rongzhong.component.pay.alipay.sign.RSA;
+import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
 
 
 /* *
@@ -83,8 +85,10 @@ public class AlipayNotify {
 	 * @throws IOException
 	 */
 	private static String getAliPublicKey() throws IOException {
-		File file = new File(AlipayConfig.ali_public_key_path);
-		return FileUtils.readFileToString(file, "UTF-8");
+		ClassPathResource classPathResource = new ClassPathResource(AlipayConfig.ali_public_key_path);
+		String result = IOUtils.toString(classPathResource.getInputStream(),"UTF-8");
+//        System.out.println("======private key=============" + result + "==================");
+		return result;
 	}
 
 	/**

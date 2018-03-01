@@ -136,12 +136,15 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 * @return
 	 */
 	public ResourceVo addCount(ResourceVo resourceVo){
-		Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
-		if(map != null){
-			resourceVo.setStatistics(map);
-		} else {
-			resourceVo.setStatistics(new HashMap<>());
+		if(null != resourceVo){
+			Map<String, Long> map = countApi.getCount(BehaviorEnum.Read.getCode(), Long.parseLong(resourceVo.getResourceId()), null).getData();
+			if(map != null){
+				resourceVo.setStatistics(map);
+			} else {
+				resourceVo.setStatistics(new HashMap<>());
+			}
 		}
+
 		return resourceVo;
 	}
 	
@@ -177,7 +180,7 @@ public class ResourceConvertServiceImpl implements ResourceConvertService {
 	 * @return
 	 */
 	public ResourceVo addCoterie(ResourceVo resourceVo){
-		if(StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
+		if(null != resourceVo && StringUtils.isNotEmpty(resourceVo.getCoterieId()) && !"0".equals(resourceVo.getCoterieId())){
 			List<ResourceVo> list = new ArrayList<>();
 			list.add(resourceVo);
 			list = addCoterie(list);

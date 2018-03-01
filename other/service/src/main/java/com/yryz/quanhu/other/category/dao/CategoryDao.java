@@ -13,6 +13,7 @@ import com.yryz.quanhu.other.category.vo.CategorySearchAdminVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Mapper
@@ -26,11 +27,12 @@ public interface CategoryDao {
 
     List<Category> findAll();
 
-    List<Category> selectBySearch(CategorySearchAdminVo search);
+    LinkedList<Category> selectBySearch(CategorySearchAdminVo search);
     Integer selectCountBySearch(CategorySearchAdminVo search);
 
     Integer insert(CategoryAdminVo category);
 
     Integer update(CategoryAdminVo category);
 
+    List<Category> selectByPidAdmin(@Param("pid") Long parentKid);
 }

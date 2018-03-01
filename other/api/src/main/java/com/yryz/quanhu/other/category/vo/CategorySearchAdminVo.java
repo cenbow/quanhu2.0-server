@@ -14,7 +14,7 @@ public class CategorySearchAdminVo implements Serializable {
     private Integer pageSize;
 
 
-    private String sortField = "create_date";
+    private String sortField = "category_sort";
     private Integer start;
     private Integer limit;
 

@@ -37,7 +37,7 @@ import com.rongzhong.component.pay.wxpay.util.XMLUtil;
 
 public class Wxpay {
 	protected static Logger logger = LoggerFactory.getLogger(Wxpay.class);
-	
+
 	/**
 	 * 创建签名
 	 * @param characterEncoding
@@ -53,9 +53,9 @@ public class Wxpay {
 			Map.Entry<String, String> entry = it.next();
 			String k = entry.getKey();
 			String v = entry.getValue();
-			if (null != v 
-					&& !"".equals(v) 
-					&& !"sign".equals(k) 
+			if (null != v
+					&& !"".equals(v)
+					&& !"sign".equals(k)
 					&& !"key".equals(k)) {
 				sb.append(k + "=" + v + "&");
 			}
@@ -65,7 +65,7 @@ public class Wxpay {
 		logger.info("微信支付创建签名结束：" + System.currentTimeMillis());
 		return sign;
 	}
-	
+
 	/**
 	 * 将请求参数转换为xml格式的string
 	 * @param parameters
@@ -89,7 +89,7 @@ public class Wxpay {
 		sb.append("</xml>");
 		return sb.toString();
 	}
-	
+
 	/**
 	 * 发送https请求
 	 * @param requestUrl
@@ -97,8 +97,8 @@ public class Wxpay {
 	 * @param outputStr
 	 * @return
 	 */
-	private static String httpsRequest(String requestUrl, 
-									String requestMethod, 
+	private static String httpsRequest(String requestUrl,
+									String requestMethod,
 									String outputStr) throws ConnectException, Exception {
 		HttpsURLConnection conn = null;
 		String result = "";
@@ -129,7 +129,7 @@ public class Wxpay {
 					}
 				}
 			}
-			
+
 			InputStream inputStream = null;
 			InputStreamReader inputStreamReader = null;
 			BufferedReader bufferedReader = null;
@@ -161,10 +161,10 @@ public class Wxpay {
 			if (conn != null)
 				conn.disconnect();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * 获取微信手机支付请求参数列表
 	 * @param orderInfo
@@ -201,7 +201,7 @@ public class Wxpay {
 				logger.error("调用微信手机支付统一下单接口，验证签名失败！sn: " + map.get("out_trade_no") + ", prepay_id: " + map.get("prepay_id"));
 				throw new PayException("100038");
 			}
-			
+
 			// 创建微信app支付请求参数Map
 			String prepayId = map.get("prepay_id");
 			resultMap.put("appid", WxpayConfig.APP_ID);
@@ -214,10 +214,10 @@ public class Wxpay {
 			sign = createSign("UTF-8", resultMap, WxpayConfig.MD5_KEY);
 			resultMap.put("sign", sign);
 		}
-		
+
 		return resultMap;
 	}
-	
+
 	/**
 	 * 获取wap微信手机支付请求参数列表
 	 * @param orderInfo
@@ -256,7 +256,7 @@ public class Wxpay {
 				logger.error("调用微信手机支付统一下单接口，验证签名失败！sn: " + map.get("out_trade_no") + ", prepay_id: " + map.get("prepay_id"));
 				throw new PayException("100038");
 			}
-			
+
 			// 创建微信app支付请求参数Map
 			String prepayId = map.get("prepay_id");
 			resultMap.put("appid", WxpayConfig.APP_ID);
@@ -269,10 +269,10 @@ public class Wxpay {
 			sign = createSign("UTF-8", resultMap, WxpayConfig.MD5_KEY);
 			resultMap.put("sign", sign);
 		}
-		
+
 		return resultMap;
 	}
-	
+
 	/**
 	 * 获取微信h5支付请求参数列表
 	 * @param orderInfo
@@ -309,7 +309,7 @@ public class Wxpay {
 				logger.error("调用微信手机支付统一下单接口，验证签名失败！sn: " + map.get("out_trade_no") + ", prepay_id: " + map.get("prepay_id"));
 				throw new PayException("100038");
 			}
-			
+
 			// 创建微信app支付请求参数Map
 			String prepayId = map.get("prepay_id");
 			resultMap.put("appid", WxpayConfig.APP_ID);
@@ -323,10 +323,10 @@ public class Wxpay {
 			sign = createSign("UTF-8", resultMap, WxpayConfig.MD5_KEY);
 			resultMap.put("sign", sign);
 		}
-		
+
 		return resultMap;
 	}
-	
+
 	/**
 	 * 获取微信扫码支付相关信息
 	 * @param orderInfo
@@ -347,11 +347,11 @@ public class Wxpay {
 		parameters.put("product_id", orderInfo.getSn());
 		parameters.put("sign", createSign("UTF-8", parameters, WxpayConfig.MD5_KEY));
 		String requestXML = getRequestXml(parameters);
-		
+
 		logger.info("请求微信统一下单接口开始：" + System.currentTimeMillis());
 		String result = httpsRequest(WxpayConfig.UNIFIED_ORDER_URL, "POST", requestXML);
 		logger.info("请求微信统一下单接口结束：" + System.currentTimeMillis());
-		
+
 		Map<String, String> map = XMLUtil.doXMLParse(result);
 		WxQRpay qrpay = new WxQRpay();
 		if (map.get("return_code") != null &&
@@ -365,17 +365,17 @@ public class Wxpay {
 				logger.error("调用微信扫码支付统一下单接口，验证签名失败！sn: " + map.get("out_trade_no") + ", prepay_id: " + map.get("prepay_id"));
 				throw new PayException("100038");
 			}
-			
+
 			qrpay.setTradeType(map.get("trade_type"));
 			qrpay.setPrepayId(map.get("prepay_id"));
 			qrpay.setCodeUrl(map.get("code_url"));
 		}
-		else 
+		else
 			return null;
-		
+
 		return qrpay;
 	}
-	
+
 	/**
 	 * 获取微信扫码支付相关信息
 	 * @param orderInfo
@@ -396,11 +396,11 @@ public class Wxpay {
 		parameters.put("product_id", orderInfo.getSn());
 		parameters.put("sign", createSign("UTF-8", parameters, WxpayConfig.MD5_KEY));
 		String requestXML = getRequestXml(parameters);
-		
+
 		logger.info("请求微信统一下单接口开始：" + System.currentTimeMillis());
 		String result = httpsRequest(WxpayConfig.UNIFIED_ORDER_URL, "POST", requestXML);
 		logger.info("请求微信统一下单接口结束：" + System.currentTimeMillis());
-		
+
 		Map<String, String> map = XMLUtil.doXMLParse(result);
 		WxWapPay wxWapPay = new WxWapPay();
 		if (map.get("return_code") != null &&
@@ -414,18 +414,18 @@ public class Wxpay {
 				logger.error("调用微信扫码支付统一下单接口，验证签名失败！sn: " + map.get("out_trade_no") + ", prepay_id: " + map.get("prepay_id"));
 				throw new PayException("100038");
 			}
-			
+
 			wxWapPay.setTradeType(map.get("trade_type"));
 			wxWapPay.setPrepayId(map.get("prepay_id"));
 			wxWapPay.setMwebUrl(map.get("mweb_url"));
 			wxWapPay.setPackageId(map.get("package"));
 		}
-		else 
+		else
 			return null;
-		
+
 		return wxWapPay;
 	}
-	
+
 	/**
 	 * 构建返回给微信结果的xml
 	 * @param return_code
@@ -433,8 +433,8 @@ public class Wxpay {
 	 * @return
 	 */
 	public static String buildReturnXML(String return_code, String return_msg) {
-		return "<xml><return_code><![CDATA[" + return_code + 
-				"]]></return_code><return_msg><![CDATA[" + return_msg + 
+		return "<xml><return_code><![CDATA[" + return_code +
+				"]]></return_code><return_msg><![CDATA[" + return_msg +
 				"]]></return_msg></xml>";
 	}
 
@@ -447,7 +447,7 @@ public class Wxpay {
 	public static PayResponse parsePayResult(HttpServletRequest request) throws Exception {
 		InputStream inStream = null;
 		ByteArrayOutputStream outStream = null;
-		
+
 		try {
 			inStream = request.getInputStream();
 			outStream = new ByteArrayOutputStream();
@@ -468,7 +468,7 @@ public class Wxpay {
 		for (Object keyValue : map.keySet()) {
 			System.out.println(keyValue + "=" + map.get(keyValue));
 		}
-		
+
 		PayResponse response = new PayResponse();
 		response.setSn(map.get("out_trade_no"));
 		response.setBankSn(map.get("transaction_id"));
@@ -476,13 +476,13 @@ public class Wxpay {
 		response.setMchId(map.get("mch_id"));
 		response.setPayAmount(map.get("total_fee"));
 		response.setEndDesc(map.toString());
-		
+
 		SortedMap<String, String> sortedMap = new TreeMap<String, String>(map);
 		String md5Key = WxpayConfig.MD5_KEY;
 		if (map.get("mch_id").equals(WxpayConfig.GZH_MCH_ID)) {
 			md5Key = WxpayConfig.GZH_MD5_KEY;
 		}
-		
+
 		String sign = createSign("UTF-8", sortedMap, md5Key); // 验证签名
 		if (!sign.equals(map.get("sign"))) {
 			response.setResult(Response.VERIFY_FAILURE);
@@ -500,14 +500,57 @@ public class Wxpay {
 
 		return response;
 	}
-	
+
+	/**
+	 * 解析微信支付结果
+	 * @param paramStr
+	 * @return
+	 * @throws Exception
+	 */
+	public static PayResponse parsePayResult(String paramStr) throws Exception {
+		Map<String,String> params = XMLUtil.doXMLParse(paramStr);
+		for (Object keyValue : params.keySet()) {
+			System.out.println(keyValue + "=" + params.get(keyValue));
+		}
+
+		PayResponse response = new PayResponse();
+		response.setSn(params.get("out_trade_no"));
+		response.setBankSn(params.get("transaction_id"));
+		response.setPayDatetime(params.get("time_end"));
+		response.setMchId(params.get("mch_id"));
+		response.setPayAmount(params.get("total_fee"));
+		response.setEndDesc(params.toString());
+
+		SortedMap<String, String> sortedMap = new TreeMap<String, String>(params);
+		String md5Key = WxpayConfig.MD5_KEY;
+		if (params.get("mch_id").equals(WxpayConfig.GZH_MCH_ID)) {
+			md5Key = WxpayConfig.GZH_MD5_KEY;
+		}
+
+		String sign = createSign("UTF-8", sortedMap, md5Key); // 验证签名
+		if (!sign.equals(params.get("sign"))) {
+			response.setResult(Response.VERIFY_FAILURE);
+			response.setMessage("验证签名失败");
+			logger.error("微信支付，sn: " + params.get("out_trade_no") + "验证签名失败");
+		}
+		else if (params.get("result_code").equalsIgnoreCase("SUCCESS")) {
+			response.setResult(Response.SUCCESS);
+			response.setMessage("success");
+		}
+		else {
+			response.setResult(Response.FAILURE);
+			response.setMessage(params.get("err_code"));
+		}
+		return response;
+	}
+
 	public static void main(String[] args) throws ConnectException, Exception {
 		OrderInfo orderInfo = new OrderInfo();
 		orderInfo.setSn("201604151541002x");
 		orderInfo.setOrderAmount(100L);
 		orderInfo.setProductName("test");
 		orderInfo.setProductId("1256894365862062");
-		
+
 		WxQRpay qrPay = getWxQRpay(orderInfo, "127.0.0.1");
 	}
 }
