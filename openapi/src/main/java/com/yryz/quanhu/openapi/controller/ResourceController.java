@@ -19,6 +19,7 @@ import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.resource.release.info.api.ReleaseInfoApi;
 import com.yryz.quanhu.resource.release.info.entity.ReleaseInfo;
+import io.swagger.annotations.ApiImplicitParams;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -248,7 +249,9 @@ public class ResourceController {
     }
 
     @ApiOperation("资源状态")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true)
+    @ApiImplicitParams({@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.COMPATIBLE_VERSION, required = true),
+            @ApiImplicitParam(name = "resourceId", paramType = "query", required = true),
+            @ApiImplicitParam(name = "moduleEnum", paramType = "query", required = false)})
     @GetMapping(value = "/{version}/resource/state")
     public Response<Map<String, Object>> state(@RequestParam Long resourceId, @RequestParam(required = false) Long moduleEnum) {
         Map<String, Object> result = Maps.newHashMap();
