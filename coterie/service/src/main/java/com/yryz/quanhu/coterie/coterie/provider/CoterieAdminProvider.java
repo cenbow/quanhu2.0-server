@@ -2,18 +2,28 @@ package com.yryz.quanhu.coterie.coterie.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminAPI;
 import com.yryz.quanhu.coterie.coterie.service.CoterieAdminService;
+import com.yryz.quanhu.coterie.coterie.service.CoterieService;
+import com.yryz.quanhu.coterie.coterie.vo.CoterieBasicInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieSearchParam;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieUpdateAdmin;
+import com.yryz.quanhu.score.service.EventAPI;
+import com.yryz.quanhu.score.vo.EventInfo;
+import com.yryz.quanhu.score.vo.EventReportVo;
+import com.yryz.quanhu.user.dto.UserRelationCountDto;
 import com.yryz.quanhu.user.service.UserApi;
+import com.yryz.quanhu.user.service.UserRelationApi;
 import com.yryz.quanhu.user.vo.UserLoginSimpleVO;
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -28,6 +38,16 @@ public class CoterieAdminProvider implements CoterieAdminAPI {
 
     @Reference
     private UserApi userApi;
+
+    @Autowired
+    private CoterieService coterieService;
+
+
+    @Reference
+    private EventAPI eventAPI;
+
+    @Reference
+    private UserRelationApi userRelationApi;
 
 
     @Override
@@ -120,5 +140,82 @@ public class CoterieAdminProvider implements CoterieAdminAPI {
     } catch (Exception e) {
         return ResponseUtils.returnException(e);
     }
+    }
+
+
+    /**
+     * 创建私圈
+     * @param info
+     * @return
+     */
+    @Override
+    public Response<CoterieInfo> applyCreate(CoterieBasicInfo info) {
+        try {
+            checkApplyCreateParam(info);
+            return ResponseUtils.returnObjectSuccess(coterieAdminService.save(info));
+        }catch (Exception e) {
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+
+    public void checkApplyCreateParam(CoterieBasicInfo info) {
+        if (info == null) {
+            throw new QuanhuException( "2007","对象为空","对象为空",null);
+        }
+        if (StringUtils.isEmpty(info.getIcon())) {
+            throw new QuanhuException( "2007","参数错误","icon不能为空",null);
+        }
+        if (StringUtils.isEmpty(info.getIntro())) {
+            throw new QuanhuException( "2007","参数错误","intro不能为空",null);
+        }
+        if (StringUtils.isEmpty(info.getName())) {
+            throw new QuanhuException( "2007","参数错误","name不能为空",null);
+        }
+        if (StringUtils.isEmpty(info.getOwnerId())) {
+            throw new QuanhuException( "2007","参数错误","ownerId不能为空",null);
+        }
+        if (info.getJoinFee()!=null && (info.getJoinFee()>50000 || info.getJoinFee()<0)) {//私圈单位为分，0表示免费，小于100的  单位必定错误
+            throw new QuanhuException( "2007","参数错误","加入私圈金额设置不正确。",null);
+        }
+        List<CoterieInfo> coterieList = coterieService.findByName(StringUtils.trim(info.getName()));
+        if (!coterieList.isEmpty()) {
+            throw new QuanhuException( "2007","私圈名称已存在","私圈名称已存在");
+        }
+        Integer count=coterieService.findMyCreateCoterieCount(info.getOwnerId());
+        if(count>=10)
+        {
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"最多只能申请10个私圈","最多只能申请10个私圈");
+        }
+        UserSimpleVO cust=ResponseUtils.getResponseData(userApi.getUserSimple(Long.valueOf(info.getOwnerId())));
+        if(cust==null){
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "用户不存在","用户("+info.getOwnerId()+")不存在");
+        }
+        EventInfo param=new EventInfo();
+        param.setUserId(info.getOwnerId());
+        EventReportVo vo= null;
+        try {
+            vo = ResponseUtils.getResponseData(eventAPI.getScoreFlowList(param));
+        } catch (Exception e) {
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "未知错误","积分统计查询失败");
+        }
+        int level=1;
+        if(vo==null || vo.getGrowLevel()==null){
+            level=1;
+        }else{
+            level=Integer.valueOf(vo.getGrowLevel());
+        }
+        if(level<5){
+            String msg="等级达到LV5才能创建私圈";
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,msg);
+        }
+
+        UserRelationCountDto countDto=ResponseUtils.getResponseData(userRelationApi.totalBy(info.getOwnerId(), info.getOwnerId()));
+        if(countDto!=null){
+            if(countDto.getFollowCount()<20){
+                String msg="关注人数需达到20人才能创建私圈";
+                throw new QuanhuException(ExceptionEnum.BusiException.getCode(),msg,msg);
+            }
+        }
     }
 }
