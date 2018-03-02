@@ -88,7 +88,7 @@ public class CoterieMemberMessageManager {
             body.setUserImg(user.getUserImg());
             body.setUserNickName(user.getUserNickName());
             message.setBody(body);
-            messageAPI.sendMessage(message, true);
+            messageAPI.sendMessage(message, false);
         } catch (Exception e) {
             logger.error("notice Exception", e);
         }
@@ -142,7 +142,7 @@ public class CoterieMemberMessageManager {
             body.setUserImg(user.getUserImg());
             body.setUserNickName(user.getUserNickName());
             message.setBody(body);
-            messageAPI.sendMessage(message, true);
+            messageAPI.sendMessage(message, false);
         } catch (Exception e) {
             logger.error("notice Exception", e);
         }
@@ -198,7 +198,7 @@ public class CoterieMemberMessageManager {
             body.setUserImg(user.getUserImg());
             body.setUserNickName(user.getUserNickName());
             message.setBody(body);
-            messageAPI.sendMessage(message, true);
+            messageAPI.sendMessage(message, false);
         } catch (Exception e) {
             logger.error("notice Exception", e);
         }
