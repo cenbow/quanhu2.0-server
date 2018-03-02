@@ -29,43 +29,21 @@ public class CoterieMemberTest {
     @Autowired
     CoterieMemberOrderNotifyServiceImpl service;
 
+    //用户
     private static Long userId = 377914625728512L;
-    private static Long coterieId = 367337454723072L;
 
-    private static Long memberId = 356895487025152L;
+    //私圈
+    private static Long coterieId = 381091760791552L;
+//    private static Long coterieId = ;
+
+
+    //成员
+//    private static Long memberId = 752036215052845056L;  //没有钱的
+    private static Long memberId = 381098110967808L; // 有钱的
+
+
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
     private static String reason_join = "【测试】【不审】 " + System.currentTimeMillis();
-
-//
-//
-//
-//    367303078723584
-//
-//
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305670803456=2, 367305981181952=0, 367306710990848=0, 367305872130048=0, 367306299949056=0,
-//            367305167486976=3, 367305586917376=1, 367306182508544=1, 367305477865472=2, 367306375446528=0, 367303078723584=0, 367305368813568=12, 367306643881984=0, 367306568384512=0, 367305771466752=1}]
-//
-//
-//
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305167486976=3}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305368813568=12}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305477865472=2}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305586917376=1}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305670803456=2}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305771466752=1}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305872130048=0}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367305981181952=0}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306073456640=1}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306182508544=1}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306299949056=0}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306375446528=0}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306568384512=0}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306643881984=0}]
-//    Response [status=true, code=200, msg=success, errorMsg=, data={367306710990848=0}]
-//
-//
-
-
 
     @Test
     public void test010_Join() {

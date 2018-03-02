@@ -176,9 +176,13 @@
 
     <update id="delComment" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
         UPDATE qh_comment_info SET del_flag=11
-        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT} AND create_user_id=#{createUserId,jdbcType=BIGINT}
+        WHERE 1=1 AND kid=#{kid,jdbcType=BIGINT} AND resource_id=#{resourceId,jdbcType=BIGINT}
     </update>
 
+	<update id="delCommentByTopId" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
+        UPDATE qh_comment_info SET del_flag=11
+        WHERE 1=1 AND top_id=#{kid}
+    </update>
 
     <select id="queryCommentForAdmin" parameterType="com.yryz.quanhu.behavior.comment.dto.CommentDTO"
             resultType="com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin">
@@ -242,13 +246,41 @@
             create_date DESC
         </where>
     </select>
-
+	
+	<!-- 评论查询 -->
+	<select id="listCommentByParams" 
+            resultType="com.yryz.quanhu.behavior.comment.entity.Comment">
+        SELECT
+        <include refid="Base_Comment_Column_List_trans"/>
+        FROM qh_comment_info
+        <where>
+            del_flag=10 AND shelve_flag=10
+            <if test="resourceId!=null and resourceId != 0">
+                AND resource_id=#{resourceId,jdbcType=BIGINT}
+            </if>
+            <if test="moduleEnum != null">
+            	AND modeule_enum = #{moduleEnum}
+            </if>
+            <if test="topId!=null">
+                AND top_id=#{topId,jdbcType=BIGINT}
+            </if>
+            ORDER BY
+            create_date DESC
+        </where>
+    </select>
+	
     <update id="updownBatch" parameterType="java.util.List">
         <foreach close="" collection="list" index="index" item="item" open="" separator=";">
             UPDATE qh_comment_info SET
             shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now(),del_flag=11
             where kid=#{item.kid,jdbcType=BIGINT}
         </foreach>
+    </update>
+
+	<update id="updownByTopId" >       
+            UPDATE qh_comment_info SET
+            shelve_flag=#{shelveFlag},last_update_user_id=#{lastUpdateUserId},last_update_date=now(),del_flag=11
+            where top_id = #{topId}
     </update>
 
     <update id="updownSingle" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">

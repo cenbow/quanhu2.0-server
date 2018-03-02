@@ -98,7 +98,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			ea = new EventAcount(userId);
 			ea.setGrow(Long.valueOf(Math.abs(newGrow)));
-			ea.setGrowLevel(level.getLevel());
+			ea.setGrowLevel(Integer.valueOf(level.getLevel()));
 			ea.setCreateTime(now);
 			ea.setUpdateTime(now);
 			logger.info("-------处理成长值运算事件if(EventAcount) == null，每次触发传入数据：={}",JsonUtils.toFastJson(ea,null));
@@ -111,7 +111,7 @@ public abstract class BaseRuleGrowServiceImpl implements RuleGrowService {
 			GrowLevel level = growLevelManageService.getByLevelValue((int) allGrow);
 			//数据库运算
 			ea.setGrow(Long.valueOf(Math.abs(newGrow)));
-			ea.setGrowLevel(level.getLevel());
+			ea.setGrowLevel(Integer.valueOf(level.getLevel()));
 			ea.setUpdateTime(now);
 			ea.setScore(null);
 			logger.info("-------处理成长值运算事件else(EventAcount)，每次触发传入数据：={}",JsonUtils.toFastJson(ea,null));

@@ -1,193 +1,197 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.yryz.quanhu</groupId>
-        <artifactId>parent</artifactId>
-        <version>2.0-SNAPSHOT</version>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.yryz.quanhu</groupId>
+		<artifactId>parent</artifactId>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>openapi</artifactId>
+	<artifactId>openapi</artifactId>
 
-    <!-- 运维要求打war包 mvn clean package -P war -U -->
-    <packaging>war</packaging>
-    <profiles>
-        <profile>
-            <id>war</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+	<!-- 运维要求打war包 mvn clean package -P war -U -->
+	<packaging>war</packaging>
+	<profiles>
+		<profile>
+			<id>war</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>quanhu-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>demo-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>user-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>coterie-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>resource-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>support-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>message-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>order-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>behavior-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>dymaic-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.quanhu</groupId>
-            <artifactId>other-api</artifactId>
-            <version>${quanhu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yryz.framework</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>quanhu-common</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>demo-api</artifactId>
 
-        <!-- common-lang3 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>
-        <!-- json -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <!-- JSON setting -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>order-pay-sdk</artifactId>
 
-        <!-- framework -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>user-api</artifactId>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>coterie-api</artifactId>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>resource-api</artifactId>
 
-        <dependency>
-            <groupId>io.dubbo.springboot</groupId>
-            <artifactId>spring-boot-starter-dubbo</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>support-api</artifactId>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>message-api</artifactId>
 
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>order-api</artifactId>
 
-    </dependencies>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>behavior-api</artifactId>
 
-    <build>
-        <finalName>openapi</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>dymaic-api</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.quanhu</groupId>
+			<artifactId>other-api</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>com.yryz.framework</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+
+		<!-- common-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+		<!-- json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<!-- JSON setting -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+
+		<!-- framework -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.dubbo.springboot</groupId>
+			<artifactId>spring-boot-starter-dubbo</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<finalName>openapi</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -400,7 +400,7 @@ public class ActivityVoteServiceImpl implements ActivityVoteService {
             body.setBodyTitle(voteInfo.getTitle());
             body.setBodyImg(voteInfo.getCoverPlan());
             messageVo.setBody(body);
-            messageAPI.sendMessage(messageVo, true);
+            messageAPI.sendMessage(messageVo, false);
         } catch (Exception e) {
             logger.error("领取奖品 失败", e);
         }

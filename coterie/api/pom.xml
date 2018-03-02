@@ -35,7 +35,6 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>user-api</artifactId>
-            <version>${quanhu.version}</version>
         </dependency>
     </dependencies>
 

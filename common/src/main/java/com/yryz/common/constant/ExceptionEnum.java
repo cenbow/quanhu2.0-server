@@ -35,6 +35,7 @@ public enum ExceptionEnum {
     COTERIE_SHELVED("1029", "私圈已下架", "私圈已下架！"),
     RESOURCE_NO_EXIST("1030", "资源不存在", "资源不存在。"),
     NOT_TO_PLAY_REWARD("1031", "打赏人不允许 打赏自己的资源！", "不能对自己打赏哦~"),
+    AMOUNT_PARAM_ERROR("1040", "付费金额与设定金额不一致", "付费金额与设定金额不一致"),
     
     ValidateException("2000", "数据验证失败！", "网络开小差了，请稍候再试！"),
     PARAM_MISSING("2001", "参数缺失", "网络开小差了，请稍候再试！"),

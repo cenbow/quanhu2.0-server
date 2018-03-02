@@ -11,13 +11,15 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseConstant;
 import com.yryz.quanhu.order.api.OrderApi;
 import com.yryz.quanhu.order.api.OrderAsynApi;
-import com.yryz.quanhu.order.enums.AccountEnum;
+import com.yryz.quanhu.order.enums.OrderMsgEnum;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderConstants;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
 import com.yryz.quanhu.order.sdk.dao.OrderDao;
+import com.yryz.quanhu.order.sdk.dto.ExecuteOrderResult;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.sdk.entity.Order;
 import com.yryz.quanhu.order.vo.OrderInfo;
@@ -130,6 +132,25 @@ public class OrderService implements OrderSDK {
                     ExceptionEnum.BusiException.getShowMsg(), "save order to db error!", e);
         }
         return orderId;
+    }
+
+    @Override
+    public ExecuteOrderResult executeOrderWithResult(OrderEnum orderEnum, Long fromId, Long toId, Long cost) {
+        ExecuteOrderResult executeOrderResult = new ExecuteOrderResult();
+        try {
+            Long orderId = executeOrder(orderEnum, fromId, toId, cost);
+            executeOrderResult.setCode(ResponseConstant.SUCCESS.getCode());
+            executeOrderResult.setOrderId(orderId);
+        } catch (QuanhuException e) {
+            if (OrderMsgEnum.NOT_ENOUGH.getMsg().equals(e.getMsg())) {
+                executeOrderResult.setCode(String.valueOf(OrderMsgEnum.NOT_ENOUGH.getCode()));
+            } else {
+                executeOrderResult.setCode(ExceptionEnum.SysException.getCode());
+            }
+        } catch (Exception e) {
+            executeOrderResult.setCode(ExceptionEnum.SysException.getCode());
+        }
+        return executeOrderResult;
     }
 
     /**

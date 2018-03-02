@@ -92,7 +92,7 @@ public class EventServiceImpl implements EventService {
 				eventReportVo.setGrow(eventAcount.getGrow());
 			}
 			if (  eventAcount.getGrowLevel()!=null && !"".equals(eventAcount.getGrowLevel()) ) {
-				eventReportVo.setGrowLevel(eventAcount.getGrowLevel());
+				eventReportVo.setGrowLevel(eventAcount.getGrowLevel().toString());
 			}
 			if ( eventAcount.getUserId()!=null && !"".equals(eventAcount.getUserId())  ) {
 				eventReportVo.setUserId(Long.valueOf(eventAcount.getUserId()));

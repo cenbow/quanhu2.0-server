@@ -19,7 +19,11 @@ public class CommentSubDTO extends PageList implements Serializable {
     private Long kid;
     
     private Long resourceId;
-
+    
+    /**
+     * 当前用户id
+     */
+    private String userId;
     public Long getResourceId() {
         return resourceId;
     }
@@ -35,4 +39,12 @@ public class CommentSubDTO extends PageList implements Serializable {
     public void setKid(Long kid) {
         this.kid = kid;
     }
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 }

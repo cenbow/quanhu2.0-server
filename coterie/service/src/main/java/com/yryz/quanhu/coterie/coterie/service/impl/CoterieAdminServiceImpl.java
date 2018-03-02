@@ -10,7 +10,7 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.JsonUtils;
-import com.yryz.quanhu.coterie.coterie.common.CoterieConstant;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieMapper;
 import com.yryz.quanhu.coterie.coterie.dao.CoterieRedis;
 import com.yryz.quanhu.coterie.coterie.entity.Coterie;
@@ -81,17 +81,19 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
             param.setPageNum(start);
             Integer count = coterieMapper.selectCountBySearchParam(param);
 
-            if (count == 0) {
+            list = coterieMapper.selectBySearchParam(param);
+
+            if (count == 0 || list.size() == 0 ) {
                 PageList<CoterieInfo> pageList = new PageList<>(currentPage, param.getPageSize(), new ArrayList(), 0L);
                 return pageList;
             }
 
-            list = coterieMapper.selectBySearchParam(param);
-
             Set<String> ids = new HashSet<>();
 
             for (Coterie coterie : list) {
-                ids.add(coterie.getOwnerId());
+                if (StringUtils.isNotBlank(coterie.getOwnerId())) {
+                    ids.add(coterie.getOwnerId());
+                }
             }
 
             Response<Map<String, UserBaseInfoVO>> response = userApi.getUser(ids);
@@ -103,8 +105,10 @@ public class CoterieAdminServiceImpl implements CoterieAdminService {
                 CoterieInfo info = new CoterieInfo();
                 BeanUtils.copyProperties(coterie, info);
 
-                info.setOwnerName(userMap.get(coterie.getOwnerId()).getUserNickName());
-                info.setPhone(userMap.get(coterie.getOwnerId()).getUserPhone());
+                if (null != userMap.get(coterie.getOwnerId())) {
+                    info.setOwnerName(userMap.get(coterie.getOwnerId()).getUserNickName());
+                    info.setPhone(userMap.get(coterie.getOwnerId()).getUserPhone());
+                }
 
                 return info;
 

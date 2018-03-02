@@ -138,7 +138,7 @@ public class UserInfoSearchImpl implements UserInfoSearch {
         	boolQueryBuilder.must(QueryBuilders.termQuery(ESConstants.USER_APPID, appId));
         }
         if (BooleanUtils.isTrue(adminUserDTO.getCoterieLevel())) {
-            boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.EVENT_GROWLEVEL).gte("5"));
+            boolQueryBuilder.must(QueryBuilders.rangeQuery(ESConstants.EVENT_GROWLEVEL).gte(ESConstants.CAN_CREATE_COTERIE_LEVEL_VALUE));
         }
 
         if(userStatus != null){

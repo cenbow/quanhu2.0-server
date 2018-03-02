@@ -39,9 +39,9 @@ public class EventAcount implements Serializable{
 	
     /** 成长级别 */
     @ApiModelProperty(value = "成长级别")
-	private String growLevel;
-	
-    /** 创建时间 */
+	private Integer growLevel;
+
+	/** 创建时间 */
     @ApiModelProperty(value = "创建时间")
 	private Date createTime;
 	
@@ -51,6 +51,15 @@ public class EventAcount implements Serializable{
 
 	public EventAcount(){}
 	
+	
+    public Integer getGrowLevel() {
+		return growLevel;
+	}
+
+	public void setGrowLevel(Integer growLevel) {
+		this.growLevel = growLevel;
+	}
+
 	public EventAcount(String userId){
 		this.userId = userId;
 	}
@@ -87,13 +96,7 @@ public class EventAcount implements Serializable{
 		this.grow = grow;
 	}
 	
-	public String getGrowLevel() {
-		return growLevel;
-	}
 
-	public void setGrowLevel(String growLevel) {
-		this.growLevel = growLevel;
-	}
 
 	public Date getCreateTime() {
 		return createTime;

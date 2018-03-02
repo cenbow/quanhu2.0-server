@@ -144,6 +144,7 @@ public class UserStarServiceImpl implements UserStarService {
 		record.setAuditStatus(StarAuditStatus.WAIT_AUDIT.getStatus());
 		record.setRecommendStatus(StarRecommendStatus.FALSE.getStatus());
 		record.setAuditFailReason("");
+		record.setCreateDate(new Date());
 		try {
 			// 平台设置直接通过
 			if (record.getAuthWay().intValue() == StarAuthWay.ADMIN_SET.getWay()) {
