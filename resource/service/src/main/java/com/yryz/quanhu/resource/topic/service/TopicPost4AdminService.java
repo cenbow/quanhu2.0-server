@@ -13,6 +13,6 @@ public interface TopicPost4AdminService {
 
     public PageList<TopicPostVo> queryList(TopicPostDto dto);
 
-    public Integer shelve(Long kid,Byte shelveFlag);
+    public Integer shelve(Long kid,Byte shelveFlag,Boolean isCascade);
 
 }

@@ -5,6 +5,7 @@ import com.yryz.common.constant.CommonConstants;
 import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.exception.QuanhuException;
+import com.yryz.common.message.MessageConstant;
 import com.yryz.common.response.PageList;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.JsonUtils;
@@ -14,6 +15,8 @@ import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
+import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
+import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.topic.dao.TopicDao;
 import com.yryz.quanhu.resource.topic.dao.TopicPostDao;
 import com.yryz.quanhu.resource.topic.dto.TopicDto;
@@ -56,6 +59,9 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
 
     @Reference
     private ResourceDymaicApi resourceDymaicApi;
+
+    @Autowired
+    private SendMessageService sendMessageService;
 
     /**
      * 发布话题
@@ -264,17 +270,33 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         topic.setShelveFlag(shalveFlag);
         int result = this.topicDao.updateByPrimaryKeySelective(topic);
 
-        /**
-         * 话题下架的同时话题对应的帖子也下架
-         */
         if(result>0) {
+            /**
+             * 发送话题的下架通知
+             */
+            Topic topicQery=this.topicDao.selectByPrimaryKey(kid);
+            if(topicQery!=null) {
+                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+                messageBusinessVo.setImgUrl(topicQery.getImgUrl());
+                messageBusinessVo.setTitle(topicQery.getTitle());
+                messageBusinessVo.setTosendUserId(topicQery.getCreateUserId());
+                messageBusinessVo.setModuleEnum(ModuleContants.TOPIC);
+                messageBusinessVo.setKid(topicQery.getKid());
+                messageBusinessVo.setFromUserId(topicQery.getCreateUserId());
+                messageBusinessVo.setIsAnonymity(null);
+                messageBusinessVo.setCoterieId(null);
+                sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_SHALVEDWON_PUBLISH, false);
+            }
+            /**
+             * 话题下架的同时话题对应的帖子也下架
+             */
             TopicPostExample example = new TopicPostExample();
             TopicPostExample.Criteria criteria = example.createCriteria();
             criteria.andTopicIdEqualTo(kid);
             List<TopicPost> topicPosts = this.topicPostDao.selectByExample(example);
             if (topicPosts != null) {
                 for (TopicPost topicPost : topicPosts) {
-                    this.topicPost4AdminService.shelve(topicPost.getKid(), CommonConstants.SHELVE_NO);
+                    this.topicPost4AdminService.shelve(topicPost.getKid(), CommonConstants.SHELVE_NO,true );
                 }
             }
 

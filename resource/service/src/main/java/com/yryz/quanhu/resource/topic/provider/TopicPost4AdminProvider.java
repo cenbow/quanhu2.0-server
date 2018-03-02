@@ -50,7 +50,7 @@ public class TopicPost4AdminProvider implements TopicPost4AdminApi {
     @Override
     public Response<Integer> shelve(Long kid, Byte shelveFlag) {
         try {
-            Integer data = this.topicPostService.shelve(kid,shelveFlag);
+            Integer data = this.topicPostService.shelve(kid,shelveFlag,false);
             return ResponseUtils.returnObjectSuccess(data);
         } catch (QuanhuException e) {
             return ResponseUtils.returnException(e);
