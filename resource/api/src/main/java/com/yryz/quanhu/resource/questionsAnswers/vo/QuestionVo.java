@@ -2,12 +2,11 @@ package com.yryz.quanhu.resource.questionsAnswers.vo;
 
 
 
-import com.yryz.quanhu.resource.topic.vo.BehaviorVo;
-import com.yryz.quanhu.user.vo.UserSimpleVO;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+
+import com.yryz.quanhu.user.vo.UserSimpleVO;
 
 public class QuestionVo  implements Serializable {
 
@@ -49,8 +48,15 @@ public class QuestionVo  implements Serializable {
     private String orderId;
 
 
+    /**  
+    * @Fields : 服务器时间
+    */
     private Date serviceCurrentDate;
 
+    /**  
+    * @Fields : 失效时间
+    */
+    private Date failureDate;
     /**
      * 阅读数状态
      */
@@ -224,5 +230,13 @@ public class QuestionVo  implements Serializable {
 
     public void setServiceCurrentDate(Date serviceCurrentDate) {
         this.serviceCurrentDate = serviceCurrentDate;
+    }
+
+    public Date getFailureDate() {
+        return failureDate;
+    }
+
+    public void setFailureDate(Date failureDate) {
+        this.failureDate = failureDate;
     }
 }

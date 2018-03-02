@@ -1,5 +1,19 @@
 package com.yryz.quanhu.resource.questionsAnswers.service.impl;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.CommonConstants;
@@ -35,8 +49,8 @@ import com.yryz.quanhu.resource.questionsAnswers.entity.Question;
 import com.yryz.quanhu.resource.questionsAnswers.entity.QuestionExample;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
 import com.yryz.quanhu.resource.questionsAnswers.service.AnswerService;
-import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.service.QuestionService;
+import com.yryz.quanhu.resource.questionsAnswers.service.SendMessageService;
 import com.yryz.quanhu.resource.questionsAnswers.vo.AnswerVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.MessageBusinessVo;
 import com.yryz.quanhu.resource.questionsAnswers.vo.QuestionAnswerVo;
@@ -45,15 +59,6 @@ import com.yryz.quanhu.resource.vo.ResourceTotal;
 import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.EventAPI;
 import com.yryz.quanhu.score.vo.EventInfo;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 /**
  * @author wanght
@@ -391,7 +396,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
         questionVo.setModuleEnum(ModuleContants.QUESTION);
         questionVo.setServiceCurrentDate(Calendar.getInstance().getTime());
-
+        questionVo.setFailureDate(DateUtils.addDateMinut(questionVo.getCreateDate(), QuestionAnswerConstants.VALID_HOUR));
         //虚拟阅读数
         readApi.read(kid, questionBysearch.getCreateUserId());
         /**
