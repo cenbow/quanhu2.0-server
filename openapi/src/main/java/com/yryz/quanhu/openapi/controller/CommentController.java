@@ -20,7 +20,9 @@ import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentApi;
+import com.yryz.quanhu.behavior.comment.vo.CommentDetailVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentListInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 
@@ -86,13 +88,22 @@ public class CommentController {
     
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/comment/list")
+    //@GetMapping(value = "/services/app/{version}/comment/list")
     public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
         com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
         commentFrontDTO.setUserId(header.getUserId());
         return commentApi.queryComments(commentFrontDTO);
     }
 
+    @ApiOperation("用户评论列表")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/services/app/{version}/comment/list")
+    public Response<PageList<CommentListInfoVO>> listComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
+        com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
+        commentFrontDTO.setUserId(header.getUserId());
+        return commentApi.listComments(commentFrontDTO);
+    }
+    
     
     @ApiOperation("用户删除评论")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -105,11 +116,19 @@ public class CommentController {
     
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    //@GetMapping(value = "/services/app/{version}/comment/singleInfo")
     public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO,HttpServletRequest request){
     	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
     	commentSubDTO.setUserId(header.getUserId());
         return commentApi.querySingleCommentInfo(commentSubDTO);
     }
 
+    @ApiOperation("用户评论详情")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    public Response<CommentDetailVO> getCommentDetail(CommentSubDTO commentSubDTO,HttpServletRequest request){
+    	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
+    	commentSubDTO.setUserId(header.getUserId());
+        return commentApi.queryCommentDetail(commentSubDTO);
+    }
 }

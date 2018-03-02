@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,27 +236,12 @@ public class CommentNewServiceImpl implements CommentNewService {
 	}
 
 	@Override
+	@Transactional
 	public int updownBatch(List<Comment> comments) {
-		int result = commentDao.updownBatch(comments);
 		for (Comment comment : comments) {
-			// 删除回复
-			if (comment.getTopId() == 0l) {
-				commentDao.delCommentByTopId(comment);
-				delReplyComment(comment);
-			}
-			// 删除缓存评论
-			commentCache.deleteComment(comment.getKid());
-			// 评论总数-1
-			countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "", -1l);
+			updownSingle(comment);
 		}
-		// 删除缓存列表
-		commentCache.delCommentList(comments);
-
-		// 发消息
-		if (result > 0) {
-			messageService.commentUpdownSendMsg(comments);
-		}
-		return result;
+		return comments.size();
 	}
 
 	@Override
@@ -325,7 +312,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 				replyVOs.add(replyVo);
 			}
 			PageList<CommentSimpleVO> pageList = new PageList<>(commentSubDTO.getCurrentPage(),
-					commentSubDTO.getPageSize(), replyVOs);
+					commentSubDTO.getPageSize(), replyVOs,totalReply);
 			detailVO.setReplys(pageList);
 		}
 
@@ -333,6 +320,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 	}
 
 	@Override
+	@Transactional
 	public int updownSingle(Comment comment) {
 		Comment localComment = getComment(comment.getKid());
 		int result = commentDao.updownSingle(comment);
@@ -341,16 +329,16 @@ public class CommentNewServiceImpl implements CommentNewService {
 		commentCache.delCommentList(comment);
 		// 删除缓存评论
 		commentCache.deleteComment(comment.getKid());
-		if (result > 0) {
-			messageService.commentUpdownSendMsg(Lists.newArrayList(comment));
-		}
 
 		// 评论总数-1
 		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "", -1l);
 
-		// 删除回复
 		if (localComment.getTopId() != 0l) {
-			delReplyComment(comment);
+			// 删除回复
+			delReplyComment(localComment);
+		}else{
+			//发消息
+			messageService.commentUpdownSendMsg(Lists.newArrayList(localComment));
 		}
 		return result;
 	}
@@ -367,11 +355,12 @@ public class CommentNewServiceImpl implements CommentNewService {
 			return comment;
 		}
 		comment = commentDao.querySingleCommentById(commentId);
-		/*if (comment != null) {
-			if(comment.getDelFlag() != 10 || comment.getShelveFlag() != 10){
+		if (comment != null) {
+			if(comment.getDelFlag() != 10 && comment.getShelveFlag() != 10){
 				commentCache.saveComment(comment);
+				commentCache.addCommentList(comment);
 			}
-		}*/
+		}
 		return comment;
 	}
 
@@ -414,11 +403,21 @@ public class CommentNewServiceImpl implements CommentNewService {
 		if (CollectionUtils.isNotEmpty(comments)) {
 			return comments;
 		}
-		PageHelper.startPage(commentFrontDTO.getCurrentPage(), commentFrontDTO.getPageSize());
+		//查询回复直接查询全部回复写入缓存，查询评论按需查询
+		if(commentFrontDTO.getTopId() == 0l){
+			PageHelper.startPage(commentFrontDTO.getCurrentPage(), commentFrontDTO.getPageSize(),false);
+		}
+		
 		comments = commentDao.listCommentByParams(commentFrontDTO);
 		if (CollectionUtils.isNotEmpty(comments)) {
 			commentCache.saveComment(comments);
 			commentCache.addCommentList(comments);
+		}
+		
+		//返回回复数据
+		if(commentFrontDTO.getTopId() != 0l && CollectionUtils.isNotEmpty(comments)){
+			int length = comments.size();
+			return length > 3 ? comments.subList(0, 2) : comments.subList(0, length);
 		}
 		return comments;
 	}

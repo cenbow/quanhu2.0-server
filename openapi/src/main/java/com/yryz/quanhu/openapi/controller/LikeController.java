@@ -6,9 +6,11 @@ import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
 import com.yryz.quanhu.behavior.like.entity.Like;
+import com.yryz.quanhu.behavior.like.vo.LikeInfoVO;
 import com.yryz.quanhu.behavior.like.vo.LikeVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import io.swagger.annotations.Api;
@@ -46,9 +48,16 @@ public class LikeController {
     
     @ApiOperation("点赞列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/like/frontlist")
+    //@GetMapping(value = "/services/app/{version}/like/frontlist")
     public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO){
         return likeApi.queryLikers(likeFrontDTO);
     }
 
+    
+    @ApiOperation("点赞列表")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/services/app/{version}/like/frontlist")
+    public Response<PageList<LikeInfoVO>> listLiker(LikeFrontDTO likeFrontDTO){
+        return likeApi.listLike(likeFrontDTO);
+    }
 }

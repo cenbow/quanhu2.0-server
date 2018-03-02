@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.common.manager.EventManager;
 import com.yryz.quanhu.behavior.common.manager.MessageManager;
 import com.yryz.quanhu.behavior.common.manager.UserRemote;
+import com.yryz.quanhu.behavior.common.util.ThreadPoolUtil;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.count.service.CountService;
 import com.yryz.quanhu.behavior.like.dao.LikeCache;
@@ -82,7 +84,12 @@ public class LikeServiceNewImpl implements LikeNewService {
 
 	@Override
 	public int isLike(Like like) {
-		return likeCache.checkLikeFlag(like.getResourceId(), like.getUserId()) ? 1 : 0;
+		int flag = likeCache.checkLikeFlag(like.getResourceId(), like.getUserId()) ? 1 : 0;
+		if(flag == 0){
+			//异步同步点赞状态
+			syncLikeCache(Lists.newArrayList(like.getResourceId()), like.getUserId());
+		}
+		return flag; 
 	}
 
 	@Override
@@ -171,4 +178,33 @@ public class LikeServiceNewImpl implements LikeNewService {
 	}
 	
 	
+	
+	/**
+	 * 异步同步点赞状态无的点赞数据
+	 * @param resourceIds
+	 * @param userId
+	 */
+	public void syncLikeCache(List<Long> resourceIds, long userId){
+		ThreadPoolUtil.execue(new Runnable() {
+			
+			@Override
+			public void run() {
+				Map<String, Integer> flagMap = getLikeFlagBatch(resourceIds, userId);
+				for(Long resourceId : resourceIds){
+					int result = flagMap.get(resourceId.toString());
+					if(result == 0){
+						Like like = new Like();
+						like.setResourceId(resourceId);
+						like.setUserId(userId);
+						LikeVO likeVO = querySingleLiker(like);
+						if(likeVO != null){
+							like.setCreateDate(DateUtils.parseDate(likeVO.getCreateDate()));
+							likeCache.saveLike(like);
+						}
+					}
+				}
+			}
+		});
+		
+	}
 }
