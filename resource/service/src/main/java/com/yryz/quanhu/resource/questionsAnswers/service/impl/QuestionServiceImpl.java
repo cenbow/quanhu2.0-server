@@ -144,7 +144,7 @@ public class QuestionServiceImpl implements QuestionService {
          * 校验提问金额是否合法
          */
         Integer consultingFee = coterieInfo.getConsultingFee() == null ? 0 : coterieInfo.getConsultingFee();
-        if (question.getChargeAmount() == null || question.getChargeAmount() != Long.valueOf(consultingFee)) {
+        if (question.getChargeAmount() == null || question.getChargeAmount().longValue() != Long.valueOf(consultingFee).longValue()) {
             throw new QuanhuException(ExceptionEnum.AMOUNT_PARAM_ERROR);
         }
         //保存提问费用
