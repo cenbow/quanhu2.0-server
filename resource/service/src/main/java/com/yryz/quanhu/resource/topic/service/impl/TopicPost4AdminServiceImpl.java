@@ -175,7 +175,6 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
              */
             TopicPostWithBLOBs topicPostWithBLOBs = this.topicPostDao.selectByPrimaryKey(kid);
             if (null != topicPostWithBLOBs) {
-                if (!isCascade) {
                     MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
                     messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
                     messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
@@ -186,21 +185,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
                     messageBusinessVo.setIsAnonymity(null);
                     messageBusinessVo.setCoterieId(null);
                     sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, false);
-                } else {
-                    Topic topicQery = this.topicDao.selectByPrimaryKey(kid);
-                    if (topicQery != null) {
-                        MessageBusinessVo messageBusinessVoTopic = new MessageBusinessVo();
-                        messageBusinessVoTopic.setImgUrl(topicQery.getImgUrl());
-                        messageBusinessVoTopic.setTitle(topicQery.getTitle());
-                        messageBusinessVoTopic.setTosendUserId(topicQery.getCreateUserId());
-                        messageBusinessVoTopic.setModuleEnum(ModuleContants.TOPIC);
-                        messageBusinessVoTopic.setKid(topicQery.getKid());
-                        messageBusinessVoTopic.setFromUserId(topicPostWithBLOBs.getCreateUserId());
-                        messageBusinessVoTopic.setIsAnonymity(null);
-                        messageBusinessVoTopic.setCoterieId(null);
-                        sendMessageService.sendNotify4Question(messageBusinessVoTopic, MessageConstant.TOPIC_HAVE_SHALVEDWON_PARTICIPANT, false);
-                    }
-                }
+
                 //提交讨论数
                 countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
                 //提交发布数

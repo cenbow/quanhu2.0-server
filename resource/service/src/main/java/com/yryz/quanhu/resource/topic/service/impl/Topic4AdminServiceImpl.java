@@ -273,7 +273,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
         if(result>0) {
             /**
              * 发送话题的下架通知
-             */
+
             Topic topicQery=this.topicDao.selectByPrimaryKey(kid);
             if(topicQery!=null) {
                 MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
@@ -287,6 +287,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
                 messageBusinessVo.setCoterieId(null);
                 sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_SHALVEDWON_PUBLISH, false);
             }
+             */
             /**
              * 话题下架的同时话题对应的帖子也下架
              */
