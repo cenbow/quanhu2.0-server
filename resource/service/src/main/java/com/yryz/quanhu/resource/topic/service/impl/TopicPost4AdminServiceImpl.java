@@ -61,6 +61,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     /**
      * 查询帖子详情
+     *
      * @param kid
      * @param userId
      * @return
@@ -98,6 +99,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     /**
      * 帖子列表查询
+     *
      * @param dto
      * @return
      */
@@ -130,7 +132,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
             criteria.andContentLike("%" + dto.getContent() + "%");
         }
 
-        if(dto.getCreateUserId()!=null){
+        if (dto.getCreateUserId() != null) {
             criteria.andCreateUserIdEqualTo(dto.getCreateUserId());
         }
 
@@ -161,7 +163,7 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
 
     @Override
     @Transactional
-    public Integer shelve(Long kid, Byte shelveFlag) {
+    public Integer shelve(Long kid, Byte shelveFlag, Boolean isCascade) {
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
         topicPost.setKid(kid);
         topicPost.setShelveFlag(shelveFlag);
@@ -172,17 +174,17 @@ public class TopicPost4AdminServiceImpl implements TopicPost4AdminService {
              * 帖子下线通知
              */
             TopicPostWithBLOBs topicPostWithBLOBs = this.topicPostDao.selectByPrimaryKey(kid);
-            if(null!=topicPostWithBLOBs) {
-                MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
-                messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
-                messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
-                messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
-                messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
-                messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
-                messageBusinessVo.setFromUserId(topicPostWithBLOBs.getCreateUserId());
-                messageBusinessVo.setIsAnonymity(null);
-                messageBusinessVo.setCoterieId(null);
-                sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, false);
+            if (null != topicPostWithBLOBs) {
+                    MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
+                    messageBusinessVo.setImgUrl(topicPostWithBLOBs.getImgUrl());
+                    messageBusinessVo.setTitle(topicPostWithBLOBs.getContent());
+                    messageBusinessVo.setTosendUserId(topicPostWithBLOBs.getCreateUserId());
+                    messageBusinessVo.setModuleEnum(ModuleContants.TOPIC_POST);
+                    messageBusinessVo.setKid(topicPostWithBLOBs.getKid());
+                    messageBusinessVo.setFromUserId(topicPostWithBLOBs.getCreateUserId());
+                    messageBusinessVo.setIsAnonymity(null);
+                    messageBusinessVo.setCoterieId(null);
+                    sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.POST_HAVE_SHALVEDWON, false);
 
                 //提交讨论数
                 countApi.commitCount(BehaviorEnum.TALK, topicPostWithBLOBs.getTopicId(), null, -1L);
