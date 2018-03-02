@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.rongzhong.component.pay.alipay.Alipay;
 import com.rongzhong.component.pay.alipay.AlipayConfig;
 import com.rongzhong.component.pay.api.YryzPaySDK;
+import com.rongzhong.component.pay.chinapay.ChinapayCash;
 import com.rongzhong.component.pay.entity.OrderInfo;
 import com.rongzhong.component.pay.entity.PayResponse;
 import com.rongzhong.component.pay.iospay.IosVerify;
@@ -17,9 +18,13 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.DateUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
-import com.yryz.quanhu.order.api.OrderApi;
+import com.yryz.quanhu.order.entity.RrzOrderCust2bank;
+import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
 import com.yryz.quanhu.order.enums.*;
+import com.yryz.quanhu.order.service.OrderService;
 import com.yryz.quanhu.order.service.PayService;
+import com.yryz.quanhu.order.service.UserPhyService;
+import com.yryz.quanhu.order.service.WxpayCashService;
 import com.yryz.quanhu.order.util.BankUtil;
 import com.yryz.quanhu.order.vo.*;
 import com.yryz.quanhu.support.config.api.BasicConfigApi;
@@ -27,6 +32,7 @@ import com.yryz.quanhu.support.id.api.IdAPI;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,10 +59,29 @@ public class PayServiceImpl implements PayService {
     private IdAPI idAPI;
 
     @Reference
-    private OrderApi orderApi;
-
-    @Reference
     private BasicConfigApi basicConfigApi;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private UserPhyService userPhyService;
+
+    @Autowired
+    private WxpayCashService wxpayCashService;
+
+    private void executePay(PayInfo payInfo, String custId, String payPassword, String remark) {
+        logger.info("executePay...payInfo:" + GsonUtils.parseJson(payInfo) + "...custId:" + custId
+                + "...payPassword:" + payPassword + "...remark:" + remark);
+        try {
+            RrzOrderPayInfo orderPayInfo = GsonUtils.parseObj(payInfo, RrzOrderPayInfo.class);
+            orderService.executePayInfo(orderPayInfo, custId, payPassword, remark);
+        } catch (Exception e) {
+            // 出现任何异常，将重新刷新缓存缓存数据，以防出现数据不一致的问题
+            orderService.refreshPay(payInfo);
+            throw e;
+        }
+    }
 
     @Override
     public PayVO createPay(Long userId, String payWay, String orderSrc, Long orderAmount, String currency, String ipAddress) {
@@ -141,12 +166,8 @@ public class PayServiceImpl implements PayService {
                 e.printStackTrace();
             }
         }
-        Response<PayInfo> response = orderApi.executePay(payInfo, String.valueOf(userId), null, null);
-        if (response.success()) {
-            return payVO;
-        } else {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getErrorMsg());
-        }
+        executePay(payInfo, String.valueOf(userId), null, null);
+        return payVO;
     }
 
     private OrderInfo buildOrderInfo(PayVO payVO) {
@@ -305,10 +326,7 @@ public class PayServiceImpl implements PayService {
             payInfo.setCost(Long.parseLong(payResp.getPayAmount()));
         }
         payInfo.setOrderState(orderState);
-        Response<PayInfo> response = orderApi.executePay(payInfo, null, null, null);
-        if (!response.success()) {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getErrorMsg());
-        }
+        executePay(payInfo, null, null, null);
     }
 
     private WithdrawCashConfig getWithdrawCashConfig() {
@@ -355,7 +373,7 @@ public class PayServiceImpl implements PayService {
         //判断提现时段
         if (DateUtils.checkBetween(new Date(), withdrawCashConfig.getStartTime(), withdrawCashConfig.getEndTime())) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(),
-                    withdrawCashConfig.getTimeLimitMsg(),withdrawCashConfig.getTimeLimitMsg());
+                    withdrawCashConfig.getTimeLimitMsg(), withdrawCashConfig.getTimeLimitMsg());
         }
         //判断额度合理
         if (lcost > withdrawCashConfig.getOnceMaxAmount()) {
@@ -364,7 +382,7 @@ public class PayServiceImpl implements PayService {
         }
 
         //验证银行卡
-        CustBank custBank = orderApi.getCustBankById(cust2BankId).getData();
+        RrzOrderCust2bank custBank = orderService.getCustBank(cust2BankId);
         if (custBank == null) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(), "银行卡信息不存在", "银行卡信息不存在");
         }
@@ -378,7 +396,7 @@ public class PayServiceImpl implements PayService {
                     "暂不支持提现到该银行卡，请选择已支持的银行", "暂不支持提现到该银行卡，请选择已支持的银行");
         }
         //验证密码
-        Response<?> checkResponse = orderApi.checkUserPayPassword(String.valueOf(userId), password);
+        Response<?> checkResponse = userPhyService.checkPayPassword(String.valueOf(userId), password);
         if (!checkResponse.success()) {
             throw new QuanhuException(ExceptionEnum.BusiException.getCode(), checkResponse.getMsg(), checkResponse.getErrorMsg());
         }
@@ -407,11 +425,63 @@ public class PayServiceImpl implements PayService {
         startDescMap.put("bankName", custBank.getBankCode());
         startDescMap.put("wxBankId", wxBankId);
         payInfo.setStartDesc(JSON.toJSONString(startDescMap));
+        executePay(payInfo, String.valueOf(userId), null, null);
+    }
 
-        Response<PayInfo> response = orderApi.executePay(payInfo, String.valueOf(userId), null, null);
-        if (!response.success()) {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), checkResponse.getMsg(), checkResponse.getErrorMsg());
+    @Override
+    public void refuseCash(String orderId, String endDesc) {
+        PayInfo payInfo = GsonUtils.parseObj(orderService.getPayInfo(orderId), PayInfo.class);
+        if (null == payInfo || !OrderPayConstants.OrderState.CREATE.equals(payInfo.getOrderState())) {
+            logger.error("不合法请求，已拒绝。orderId:{}", orderId);
+            return;
         }
+        payInfo.setOrderState(OrderPayConstants.OrderState.FAILURE);
+        payInfo.setEndDesc(endDesc);
+        payInfo.setCompleteTime(new Date());
+        executePay(payInfo, null, null, null);
+    }
+
+    @Override
+    public boolean wxpayCash(String orderId, String userName, String bankCardNo, String wxBankId, String amount, String endDesc) {
+        PayInfo payInfo = GsonUtils.parseObj(orderService.getPayInfo(orderId), PayInfo.class);
+        if (null == payInfo || !OrderPayConstants.OrderState.CREATE.equals(payInfo.getOrderState())
+                || !OrderConstant.PAY_WAY_WX_CASH_CARD.equals(payInfo.getOrderChannel())) {
+            logger.error("不合法的微信提现请求，已拒绝。orderId:{}", orderId);
+            return false;
+        }
+        payInfo.setOrderState(OrderPayConstants.OrderState.SUCCESS);
+        payInfo.setEndDesc(endDesc);
+        payInfo.setCompleteTime(new Date());
+        executePay(payInfo, null, null, null);
+        boolean result = wxpayCashService.wxpayCash(orderId, userName, bankCardNo, wxBankId, amount);
+        if (!result) {
+            throw new QuanhuException(ExceptionEnum.BusiException, "调用微信提现接口失败");
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, String> wxpayCashQuery(String orderId) {
+        return wxpayCashService.wxpayCashQuery(orderId);
+    }
+
+    @Override
+    public boolean chinapayCash(String orderId, String userName, String bankCardNo, String bankName, String amount, String endDesc) {
+        PayInfo payInfo = GsonUtils.parseObj(orderService.getPayInfo(orderId), PayInfo.class);
+        if (null == payInfo || !OrderPayConstants.OrderState.CREATE.equals(payInfo.getOrderState())
+                || !OrderConstant.PAY_WAY_UNIONPAY.equals(payInfo.getOrderChannel())) {
+            logger.error("不合法的银联提现请求，已拒绝。orderId:{}", orderId);
+            return false;
+        }
+        payInfo.setOrderState(OrderPayConstants.OrderState.SUCCESS);
+        payInfo.setEndDesc(endDesc);
+        payInfo.setCompleteTime(new Date());
+        executePay(payInfo, null, null, null);
+        boolean result = ChinapayCash.payCash(amount, orderId, userName, bankCardNo, bankName);
+        if (!result) {
+            throw new QuanhuException(ExceptionEnum.BusiException, "调用银联提现接口失败");
+        }
+        return result;
     }
 
 }

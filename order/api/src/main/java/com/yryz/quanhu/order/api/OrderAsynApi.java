@@ -21,7 +21,7 @@ public interface OrderAsynApi {
 	
 	/**
 	 * 创建预处理订单
-	 * @param orderVO
+	 * @param preOrderVo
 	 * @return
 	 */
 	public Response<PreOrderVo> createOrder(PreOrderVo preOrderVo);

@@ -36,17 +36,6 @@ public interface OrderApi {
     Response<?> executeOrder(OrderInfo orderInfo, List<AccountOrder> accounts, List<IntegralOrder> integrals, String custId, String payPassword, String remark);
 
     /**
-     * 执行充值、提现、手续费订单。涉及资金的业务(现金订单)
-     *
-     * @param payInfo     执行详情
-     * @param custId      用户ID(需验证密码的客户ID)
-     * @param payPassword 支付密码
-     * @param remark      备注信息
-     * @return
-     */
-    Response<PayInfo> executePay(PayInfo payInfo, String custId, String payPassword, String remark);
-
-    /**
      * 订单流水查询
      *
      * @param custId
