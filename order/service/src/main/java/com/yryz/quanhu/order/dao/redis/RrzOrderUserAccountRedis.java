@@ -82,6 +82,14 @@ public class RrzOrderUserAccountRedis{
 //		}
 	}
 
+	/**
+	 * 删除用户账户缓存
+	 * @param custId
+	 */
+	public void delete(String custId) {
+		redisTemplate.delete(RedisKeyEnum.getRrzOrderUserAccount(custId));
+	}
+
 	public RrzOrderUserAccount optAccountSource(String custId , long amount, int type) {
 		RrzOrderUserAccount rrzOrderUserAccount = getUserAccount(custId);
 		if(rrzOrderUserAccount == null){

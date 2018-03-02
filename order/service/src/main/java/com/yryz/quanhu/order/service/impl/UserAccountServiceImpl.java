@@ -139,7 +139,12 @@ public class UserAccountServiceImpl implements UserAccountService {
 	@Override
 	public void updateUserAccountCache(String custId){
 		RrzOrderUserAccount redisAccount = rrzOrderUserAccountDao.get(custId);
-		rrzOrderUserAccountRedis.update(redisAccount);
+		if(null != redisAccount){
+			rrzOrderUserAccountRedis.update(redisAccount);
+		}else{
+			//不存在的时候清理掉redis缓存，保持数据一致性
+			rrzOrderUserAccountRedis.delete(custId);
+		}
 	}
 	
 	/**
