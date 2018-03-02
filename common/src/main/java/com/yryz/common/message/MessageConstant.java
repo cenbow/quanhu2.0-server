@@ -74,7 +74,7 @@ public enum MessageConstant {
     COMMENT_SHELVE(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "审核通知", "您在{count}下发布的评论因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
 
-    POST_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的帖子因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE),
+    POST_HAVE_SHALVEDWON(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的帖子因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_2, MessageActionCode.NONE),
 
     TOPIC_HAVE_SHALVEDWON_PUBLISH(MessageType.SYSTEM_TYPE, MessageLabel.SYSTEM_REVIEW, "下线通知", "您发布的话题{title}因违反平台相关规定已被管理员下线。", MessageViewCode.SYSTEM_MESSAGE_1, MessageActionCode.NONE),
 
