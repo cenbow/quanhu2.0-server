@@ -26,6 +26,7 @@ public class QuestionVo  implements Serializable {
 
     private Date createDate;
 
+    private Integer validTime;
     
     private Long coterieId;
 
@@ -111,6 +112,14 @@ public class QuestionVo  implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Integer getValidTime() {
+        return validTime;
+    }
+
+    public void setValidTime(Integer validTime) {
+        this.validTime = validTime;
     }
 
     public Long getCoterieId() {
