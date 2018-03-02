@@ -68,21 +68,45 @@ public interface PayApi {
     Response<?> getCash(String appId, Long userId, String cost, String cust2BankId, String password);
 
     /**
+     * 提现审核拒绝
+     *
+     * @param orderId
+     * @param endDesc
+     * @return
+     */
+    Response<?> refuseCash(String orderId, String endDesc);
+
+    /**
      * 微信提现到银行卡
      *
      * @param orderId
      * @param userName
      * @param bankCardNo
-     * @param bankId
+     * @param wxBankId
      * @param amount
+     * @param endDesc
      * @return
      */
-    Response<?> wxpayCash(String orderId, String userName, String bankCardNo, String bankId, String amount);
+    Response<?> wxpayCash(String orderId, String userName, String bankCardNo, String wxBankId, String amount, String endDesc);
 
     /**
      * 查询微信提现到银行卡的结果
+     *
      * @param orderId
      * @return
      */
     Response<Map<String, String>> wxpayCashQuery(String orderId);
+
+    /**
+     * 银联提现到银行卡
+     *
+     * @param orderId
+     * @param userName
+     * @param bankCardNo
+     * @param bankName
+     * @param amount
+     * @param endDesc
+     * @return
+     */
+    Response<?> chinapayCash(String orderId, String userName, String bankCardNo, String bankName, String amount, String endDesc);
 }

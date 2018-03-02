@@ -63,4 +63,45 @@ public interface PayService {
      */
     void getCash(String appId, Long userId, String cost, String cust2BankId, String password);
 
+    /**
+     * 提现审核拒绝
+     *
+     * @param orderId
+     * @param endDesc
+     */
+    void refuseCash(String orderId, String endDesc);
+
+    /**
+     * 微信提现到银行卡
+     *
+     * @param orderId
+     * @param userName
+     * @param bankCardNo
+     * @param wxBankId
+     * @param amount
+     * @param endDesc
+     * @return
+     */
+    boolean wxpayCash(String orderId, String userName, String bankCardNo, String wxBankId, String amount, String endDesc);
+
+    /**
+     * 查询微信提现到银行卡的结果
+     *
+     * @param orderId
+     * @return
+     */
+    Map<String, String> wxpayCashQuery(String orderId);
+
+    /**
+     * 银联提现到银行卡
+     *
+     * @param orderId
+     * @param userName
+     * @param bankCardNo
+     * @param bankName
+     * @param amount
+     * @param endDesc
+     * @return
+     */
+    boolean chinapayCash(String orderId, String userName, String bankCardNo, String bankName, String amount, String endDesc);
 }
