@@ -220,7 +220,7 @@ public class TransmitServiceImpl implements TransmitService {
                 query1.addCriteria(Criteria.where("kid").is(transmitId));
                 TransmitInfo transmitInfo = transmitMongoDao.findOne(query1);
                 Long count = -1L;
-                if(CommonConstants.SHELVE_YES.intValue() == shelvesFlag.intValue()) {
+                if(shelvesFlag != null && CommonConstants.SHELVE_YES.intValue() == shelvesFlag.intValue()) {
                     count = 1L;
                 }
                 //递减转发数
@@ -240,12 +240,13 @@ public class TransmitServiceImpl implements TransmitService {
     public Integer removeTransmit(Long transmitId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("kid").is(transmitId));
+        TransmitInfo transmitInfo = transmitMongoDao.findOne(query);
+        if(transmitInfo == null) {
+            return 0;
+        }
         Integer i = transmitMongoDao.remove(query);
         if(i > 0) {
             try {
-                Query query1 = new Query();
-                query1.addCriteria(Criteria.where("kid").is(transmitId));
-                TransmitInfo transmitInfo = transmitMongoDao.findOne(query1);
                 //递减转发数
                 countApi.commitCount(BehaviorEnum.Transmit, transmitInfo.getParentId(), null, -1L);
             } catch (Exception e) {
