@@ -88,7 +88,7 @@ public class CommentController {
     
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    //@GetMapping(value = "/services/app/{version}/comment/list")
+    @GetMapping(value = "/services/app/{version}/comment/list")
     public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
         com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
         commentFrontDTO.setUserId(header.getUserId());
@@ -97,7 +97,7 @@ public class CommentController {
 
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/comment/list")
+    //@GetMapping(value = "/services/app/{version}/comment/list")
     public Response<PageList<CommentListInfoVO>> listComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
         com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
         commentFrontDTO.setUserId(header.getUserId());
@@ -116,7 +116,7 @@ public class CommentController {
     
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    //@GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
     public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO,HttpServletRequest request){
     	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
     	commentSubDTO.setUserId(header.getUserId());
@@ -125,7 +125,7 @@ public class CommentController {
 
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    //@GetMapping(value = "/services/app/{version}/comment/singleInfo")
     public Response<CommentDetailVO> getCommentDetail(CommentSubDTO commentSubDTO,HttpServletRequest request){
     	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
     	commentSubDTO.setUserId(header.getUserId());

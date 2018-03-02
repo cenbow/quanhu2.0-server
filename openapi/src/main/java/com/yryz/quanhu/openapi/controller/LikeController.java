@@ -48,7 +48,7 @@ public class LikeController {
     
     @ApiOperation("点赞列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    //@GetMapping(value = "/services/app/{version}/like/frontlist")
+    @GetMapping(value = "/services/app/{version}/like/frontlist")
     public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO){
         return likeApi.queryLikers(likeFrontDTO);
     }
@@ -56,7 +56,7 @@ public class LikeController {
     
     @ApiOperation("点赞列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/like/frontlist")
+    //@GetMapping(value = "/services/app/{version}/like/frontlist")
     public Response<PageList<LikeInfoVO>> listLiker(LikeFrontDTO likeFrontDTO){
         return likeApi.listLike(likeFrontDTO);
     }
