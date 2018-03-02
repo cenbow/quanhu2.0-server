@@ -5,7 +5,6 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.quanhu.order.api.PayApi;
 import com.yryz.quanhu.order.service.PayService;
-import com.yryz.quanhu.order.service.WxpayCashService;
 import com.yryz.quanhu.order.vo.PayVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +26,6 @@ public class PayProvider implements PayApi {
 
     @Autowired
     private PayService payService;
-
-    @Autowired
-    private WxpayCashService wxpayCashService;
 
     @Override
     public Response<PayVO> createPay(Long userId, String payWay, String orderSrc, Long orderAmount, String currency, String ipAddress) {
@@ -84,9 +80,20 @@ public class PayProvider implements PayApi {
     }
 
     @Override
-    public Response<?> wxpayCash(String orderId, String userName, String bankCardNo, String bankId, String amount) {
+    public Response<?> refuseCash(String orderId, String endDesc) {
         try {
-            wxpayCashService.wxpayCash(orderId, userName, bankCardNo, bankId, amount);
+            payService.refuseCash(orderId, endDesc);
+            return ResponseUtils.returnSuccess();
+        } catch (Exception e) {
+            logger.error("提现审核拒绝失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<?> wxpayCash(String orderId, String userName, String bankCardNo, String wxBankId, String amount, String endDesc) {
+        try {
+            payService.wxpayCash(orderId, userName, bankCardNo, wxBankId, amount, endDesc);
             return ResponseUtils.returnSuccess();
         } catch (Exception e) {
             logger.error("执行微信提现到银行卡失败", e);
@@ -97,9 +104,20 @@ public class PayProvider implements PayApi {
     @Override
     public Response<Map<String, String>> wxpayCashQuery(String orderId) {
         try {
-            return ResponseUtils.returnObjectSuccess(wxpayCashService.wxpayCashQuery(orderId));
+            return ResponseUtils.returnObjectSuccess(payService.wxpayCashQuery(orderId));
         } catch (Exception e) {
             logger.error("查询微信提现到银行卡结果失败", e);
+            return ResponseUtils.returnException(e);
+        }
+    }
+
+    @Override
+    public Response<?> chinapayCash(String orderId, String userName, String bankCardNo, String bankName, String amount, String endDesc) {
+        try {
+            payService.chinapayCash(orderId, userName, bankCardNo, bankName, amount, endDesc);
+            return ResponseUtils.returnSuccess();
+        } catch (Exception e) {
+            logger.error("执行银联提现到银行卡失败", e);
             return ResponseUtils.returnException(e);
         }
     }

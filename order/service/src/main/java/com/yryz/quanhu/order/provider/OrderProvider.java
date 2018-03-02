@@ -7,17 +7,6 @@
  */
 package com.yryz.quanhu.order.provider;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.yryz.common.constant.ExceptionEnum;
-import com.yryz.common.exception.QuanhuException;
-import com.yryz.quanhu.order.vo.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yryz.common.exception.MysqlOptException;
 import com.yryz.common.response.PageList;
@@ -26,21 +15,18 @@ import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.GsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.order.api.OrderApi;
-import com.yryz.quanhu.order.entity.RrzOrderAccountHistory;
-import com.yryz.quanhu.order.entity.RrzOrderCust2bank;
-import com.yryz.quanhu.order.entity.RrzOrderInfo;
-import com.yryz.quanhu.order.entity.RrzOrderIntegralHistory;
-import com.yryz.quanhu.order.entity.RrzOrderPayInfo;
-import com.yryz.quanhu.order.entity.RrzOrderUserAccount;
-import com.yryz.quanhu.order.entity.RrzOrderUserPhy;
+import com.yryz.quanhu.order.entity.*;
 import com.yryz.quanhu.order.exception.CommonException;
-import com.yryz.quanhu.order.exception.SourceNotEnoughException;
-import com.yryz.quanhu.order.service.OrderAccountHistoryService;
-import com.yryz.quanhu.order.service.OrderIntegralHistoryService;
-import com.yryz.quanhu.order.service.OrderService;
-import com.yryz.quanhu.order.service.UserAccountService;
-import com.yryz.quanhu.order.service.UserPhyService;
+import com.yryz.quanhu.order.service.*;
 import com.yryz.quanhu.order.utils.Page;
+import com.yryz.quanhu.order.vo.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author yehao
@@ -99,38 +85,6 @@ public class OrderProvider implements OrderApi {
 			// 出现任何异常，将重新刷新缓存，以防出现数据不一致的问题
 			orderService.refreshOrder(rrzOrderInfo, rrzOrderAccountHistories, rrzOrderIntegralHistories);
 			logger.error("executeOrder error", e);
-			return ResponseUtils.returnException(e);
-		}
-	}
-
-	/**
-	 * 执行资金订单
-	 * @param payInfo
-	 * @param custId
-	 * @param payPassword
-	 * @param remark
-	 * @return
-	 */
-	@Override
-	public Response<PayInfo> executePay(PayInfo payInfo, String custId, String payPassword, String remark) {
-		logger.info("executePay...payInfo:" + GsonUtils.parseJson(payInfo) + "...custId:" + custId + "...payPassword:"
-				+ payPassword + "...remark:" + remark);
-		try {
-			RrzOrderPayInfo orderPayInfo = GsonUtils.parseObj(payInfo, RrzOrderPayInfo.class);
-			orderPayInfo = orderService.executePayInfo(orderPayInfo, custId, payPassword, remark);
-//			// 生效的充值订单推送消息
-//			if (orderPayInfo != null && orderPayInfo.getProductType() != null
-//					&& orderPayInfo.getProductType().intValue() == ProductTypeEnum.RECHARGE_TYPE
-//					&& StringUtils.isNotEmpty(orderPayInfo.getCustId()) && orderPayInfo.getOrderState().intValue() == 1){
-//				pushService.charge(orderPayInfo.getCustId(), orderPayInfo.getCost());
-//			}
-			return ResponseUtils.returnObjectSuccess(GsonUtils.parseObj(orderPayInfo, PayInfo.class));
-		} catch (Exception e) {
-			// 出现任何异常，将重新刷新缓存缓存数据，以防出现数据不一致的问题
-			orderService.refreshPay(payInfo);
-			logger.error("executePay error", e);
-			logger.error("executePay error...payInfo:" + GsonUtils.parseJson(payInfo) + "...custId:" + custId
-					+ "...payPassword:" + payPassword + "...remark:" + remark);
 			return ResponseUtils.returnException(e);
 		}
 	}

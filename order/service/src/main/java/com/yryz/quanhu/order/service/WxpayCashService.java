@@ -24,11 +24,11 @@ public interface WxpayCashService {
      * @param orderId
      * @param userName
      * @param bankCardNo
-     * @param bankId
+     * @param wxBankId
      * @param amount
      * @return
      */
-    boolean wxpayCash(String orderId, String userName, String bankCardNo, String bankId, String amount);
+    boolean wxpayCash(String orderId, String userName, String bankCardNo, String wxBankId, String amount);
 
     /**
      * 查询微信提现到银行卡的结果
@@ -37,6 +37,5 @@ public interface WxpayCashService {
      * @return
      */
     Map<String, String> wxpayCashQuery(String orderId);
-
 
 }
