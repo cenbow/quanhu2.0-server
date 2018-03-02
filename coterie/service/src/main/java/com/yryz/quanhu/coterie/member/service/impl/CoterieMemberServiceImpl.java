@@ -117,8 +117,15 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             logger.info("付费加入私圈自动审核ing");
 
             //重新组装流程， 不能直接调用audit,有事务问题， 成员与申请， 私圈成员数， 缓存可能都要回滚
-            logger.info("审核通过时, 更新或插入申请信息");
-            saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
+
+            CoterieMemberApply memberApply = coterieApplyDao.selectByCoterieIdAndUserId(coterieId, userId);
+            if (null == memberApply) {
+                //insert member apply
+                logger.info("save or update apply");
+                saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
+            } else {
+                throw QuanhuException.busiError("用户已申请加入私圈!");
+            }
 
             logger.info("审核通过时, 自动关注圈主完成后再更新或插入成员数据");
             saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.NOTFREE.getStatus());
@@ -127,6 +134,7 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 //            this.audit(userId, coterieId, MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
             logger.info("付费加入私圈自动审核end");
 
+            logger.info("创建订单参数： " + coterie.getOwnerId() + ", join fee : " + coterie.getJoinFee().longValue());
             ExecuteOrderResult orderResult = orderSDK.executeOrderWithResult(OrderEnum.JOIN_COTERIE_ORDER, userId, Long.parseLong(coterie.getOwnerId()), coterie.getJoinFee().longValue());
 
             if ("200".equals(orderResult.getCode())) {

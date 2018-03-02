@@ -33,13 +33,14 @@ public class CoterieMemberTest {
     private static Long userId = 377914625728512L;
 
     //私圈
-    private static Long coterieId = 381091760791552L;
-//    private static Long coterieId = ;
+//    private static Long coterieId = 381091760791552L;
+    private static Long coterieId = 377931302281216L;
 
 
     //成员
 //    private static Long memberId = 752036215052845056L;  //没有钱的
     private static Long memberId = 381098110967808L; // 有钱的
+//    private static Long memberId = 367896194736128L; // 没有钱的
 
 
     private static String reason_waitting = "【测试】【待审】 " + System.currentTimeMillis();
@@ -49,6 +50,7 @@ public class CoterieMemberTest {
     public void test010_Join() {
 //        Response response = coterieMemberAPI.join(730941139577331712L,5536534415L,"我要加入,不审核的");
         Response response = coterieMemberAPI.join(memberId, coterieId, null);
+        Response response1 = coterieMemberAPI.join(memberId, coterieId, null);
         System.out.println(JsonUtils.toFastJson(response));
     }
 

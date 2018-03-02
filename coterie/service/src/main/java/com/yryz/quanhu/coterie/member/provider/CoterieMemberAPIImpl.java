@@ -9,6 +9,7 @@ import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseConstant;
 import com.yryz.common.response.ResponseUtils;
 import com.yryz.common.utils.JsonUtils;
+import com.yryz.framework.core.lock.DistributedLockManager;
 import com.yryz.quanhu.coterie.coterie.service.CoterieService;
 import com.yryz.quanhu.coterie.coterie.vo.CoterieInfo;
 import com.yryz.quanhu.coterie.member.constants.MemberConstant;
@@ -22,6 +23,7 @@ import com.yryz.quanhu.user.service.UserApi;
 import com.yryz.quanhu.user.vo.UserSimpleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
@@ -43,9 +45,14 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
     @Reference
     private AccountApi accountApi;
 
+    @Autowired
+    DistributedLockManager manager;
+
     @Override
     public Response<CoterieMemberVoForJoin> join(Long userId, Long coterieId, String reason) {
         logger.debug("join params: userId(" + userId + "),coterieId(" + coterieId + ")reason(" + reason + ")");
+
+        String lockKey = null;
         try {
 
             Assert.notNull(userId, "userId is null !");
@@ -56,6 +63,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
                 throw new QuanhuException(ExceptionEnum.COTERIE_NON_EXISTENT);
             }
 
+            lockKey = manager.lock("qh-coterie-member", coterieId + "_" + userId);
             CoterieMemberVoForJoin result = coterieMemberService.join(userId, coterieId, reason);
             return ResponseUtils.returnObjectSuccess(result);
         } catch (QuanhuException e) {
@@ -63,6 +71,11 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
         } catch (Exception e) {
             logger.error("加入私圈时发生异常！", e);
             return ResponseUtils.returnException(e);
+        } finally {
+
+            if (lockKey != null) {
+                manager.unlock("qh-coterie-member", lockKey);
+            }
         }
 
     }
@@ -404,7 +417,7 @@ public class CoterieMemberAPIImpl implements CoterieMemberAPI {
         if (coterie != null) {
             if (coterie.getStatus() == 10) {
                 throw QuanhuException.busiError("私圈审批中...");
-            } else if (coterie.getStatus() == 12){
+            } else if (coterie.getStatus() == 12) {
                 throw QuanhuException.busiError("私圈审批不通过");
             } else if (coterie.getShelveFlag() == 11) {
                 throw new QuanhuException(ExceptionEnum.COTERIE_SHELVED);
