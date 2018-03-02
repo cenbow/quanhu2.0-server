@@ -122,7 +122,7 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 			eventCode = "-1";
 		}
 		if (ea != null && ea.getId() != null) {
-			String existsLevel = ea.getGrowLevel();
+			String existsLevel = ea.getGrowLevel().toString();
 			if (existsLevel.compareTo(growLevel) >= 0) {
 				return 0;
 			}
@@ -150,7 +150,7 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 				growFlowService.save(gf);
 	
 				ea.setGrow(growLevelStart  + 0L);
-				ea.setGrowLevel(growLevel);
+				ea.setGrowLevel(Integer.valueOf(growLevel));
 				ea.setUpdateTime(now);
 				ea.setScore(null);
 				eventAcountService.update(ea);
@@ -164,7 +164,7 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 		growFlowService.save(gf);
 		ea = new EventAcount(userId);
 		ea.setGrow(gl.getLevelStart() + 0L);
-		ea.setGrowLevel(growLevel);
+		ea.setGrowLevel(Integer.valueOf(growLevel));
 		ea.setCreateTime(now);
 		ea.setUpdateTime(now);
 		eventAcountService.save(ea);
@@ -214,7 +214,7 @@ pageHelpGrow = (com.github.pagehelper.Page<GrowFlow>) growFlowService.getPage(gf
 			VO.setCreateTime(growLevel.getCreateTime());
 			VO.setGrade(growLevel.getGrade());
 			VO.setId(growLevel.getId());
-			VO.setLevel(growLevel.getLevel());
+			VO.setLevel(growLevel.getLevel().toString());
 			VO.setLevelEnd(growLevel.getLevelEnd());
 			VO.setLevelStart(growLevel.getLevelStart());
 			VO.setUpdateTime(growLevel.getUpdateTime());

@@ -192,7 +192,7 @@ public class UserController {
 				.getResponseData(accountApi.checkUserDisTalk(NumberUtils.createLong(header.getUserId())));
 		EventAcount acount = eventApi.getEventAcount(header.getUserId());
 		Integer level = acount == null || acount.getGrowLevel() == null ? 1
-				: NumberUtils.toInt(acount.getGrowLevel(), 1);
+				: acount.getGrowLevel();
 		Map<String, Object> map = new HashMap<>();
 		map.put("createCoterie", level >= 5);
 		map.put("disTalk", disTalk);
