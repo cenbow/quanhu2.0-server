@@ -52,7 +52,7 @@ public class EventAcountServiceImpl implements EventAcountService {
 		EventAcount ea = new EventAcount(userId);
 		ea.setCreateTime(now);
 		ea.setUpdateTime(now);
-		ea.setGrowLevel("1");
+		ea.setGrowLevel(1);
 		eventAcountDao.save(ea);
 		return ea.getId();
 	}

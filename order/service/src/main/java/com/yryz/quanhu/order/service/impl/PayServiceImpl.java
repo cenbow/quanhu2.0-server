@@ -145,7 +145,7 @@ public class PayServiceImpl implements PayService {
         if (response.success()) {
             return payVO;
         } else {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getMsg());
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getErrorMsg());
         }
     }
 
@@ -307,7 +307,7 @@ public class PayServiceImpl implements PayService {
         payInfo.setOrderState(orderState);
         Response<PayInfo> response = orderApi.executePay(payInfo, null, null, null);
         if (!response.success()) {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getMsg());
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(), response.getMsg(), response.getErrorMsg());
         }
     }
 

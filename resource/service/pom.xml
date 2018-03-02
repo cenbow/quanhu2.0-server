@@ -11,14 +11,13 @@
 
     <artifactId>resource-service</artifactId>
 	<properties>
-		<common.version>2.0-SNAPSHOT</common.version>
+		<common.version></common.version>
 	</properties>
     <dependencies>
         <!--项目内部依赖-->
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>resource-api</artifactId>
-            <version>${parent.version}</version>
         </dependency>
 
        <dependency>
@@ -29,27 +28,22 @@
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>order-sdk</artifactId>
-			<version>${common.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yryz.quanhu</groupId>
 			<artifactId>message-api</artifactId>
-			<version>${quanhu.version}</version>
 		</dependency>
 		<dependency>
         	<groupId>com.yryz.quanhu</groupId>
         	<artifactId>support-api</artifactId>
-        	<version>${quanhu.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>behavior-api</artifactId>
-            <version>${quanhu.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>coterie-api</artifactId>
-            <version>${quanhu.version}</version>
         </dependency>
 
         <!--公司内部库-->

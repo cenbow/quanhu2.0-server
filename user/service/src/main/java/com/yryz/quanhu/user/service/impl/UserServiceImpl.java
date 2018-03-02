@@ -197,10 +197,10 @@ public class UserServiceImpl implements UserService {
 		}
 		// 依赖积分系统，获取用户等级
 		EventAcount acount = eventManager.getGrow(friendId.toString());
-		if (acount == null || NumberUtils.toLong(acount.getGrowLevel()) < 1) {
+		if (acount == null ||  acount.getGrowLevel() < 1) {
 			simpleVO.setUserLevel("1");
 		} else {
-			simpleVO.setUserLevel(acount.getGrowLevel());
+			simpleVO.setUserLevel(acount.getGrowLevel().toString());
 		}
 		return simpleVO;
 	}

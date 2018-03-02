@@ -1,25 +1,34 @@
 package com.yryz.quanhu.openapi.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentApi;
+import com.yryz.quanhu.behavior.comment.vo.CommentDetailVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentListInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @Author:sun
@@ -81,15 +90,20 @@ public class CommentController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/comment/list")
     public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
-        String userIdHead=request.getHeader("userId");
-        Long userId=0L;
-        if(null!=userIdHead&&!userIdHead.equals("")){
-            userId=Long.valueOf(userIdHead);
-        }
-        commentFrontDTO.setCreateUserId(userId);
+        com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
+        commentFrontDTO.setUserId(header.getUserId());
         return commentApi.queryComments(commentFrontDTO);
     }
 
+    @ApiOperation("用户评论列表")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    //@GetMapping(value = "/services/app/{version}/comment/list")
+    public Response<PageList<CommentListInfoVO>> listComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
+        com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
+        commentFrontDTO.setUserId(header.getUserId());
+        return commentApi.listComments(commentFrontDTO);
+    }
+    
     
     @ApiOperation("用户删除评论")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -103,8 +117,18 @@ public class CommentController {
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/comment/singleInfo")
-    public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO){
+    public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO,HttpServletRequest request){
+    	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
+    	commentSubDTO.setUserId(header.getUserId());
         return commentApi.querySingleCommentInfo(commentSubDTO);
     }
 
+    @ApiOperation("用户评论详情")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    //@GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    public Response<CommentDetailVO> getCommentDetail(CommentSubDTO commentSubDTO,HttpServletRequest request){
+    	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
+    	commentSubDTO.setUserId(header.getUserId());
+        return commentApi.queryCommentDetail(commentSubDTO);
+    }
 }

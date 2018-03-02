@@ -10,11 +10,6 @@
     </parent>
 
     <artifactId>resource-api</artifactId>
-    
-    <properties>
-		<common.version>2.0-SNAPSHOT</common.version>
-		<user.api.version>2.0-SNAPSHOT</user.api.version>
-	</properties>
 
     <!--api里面不写死依赖 全部设置为provided 以便部分使用api内容 例如仅仅使用vo的情况-->
     <dependencies>
@@ -39,12 +34,10 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>user-api</artifactId>
-            <version>${user.api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>coterie-api</artifactId>
-            <version>${user.api.version}</version>
         </dependency>
     </dependencies>
 </project>

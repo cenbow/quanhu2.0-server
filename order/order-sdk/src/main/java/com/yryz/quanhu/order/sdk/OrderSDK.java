@@ -8,6 +8,7 @@
 package com.yryz.quanhu.order.sdk;
 
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.order.sdk.dto.ExecuteOrderResult;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.order.vo.UserAccount;
 
@@ -26,6 +27,17 @@ public interface OrderSDK {
      * @return
      */
     Long createOrder(InputOrder inputOrder);
+
+    /**
+     * 系统触发执行订单接口(用于业务端调用，如圈主回答问题后需要将钱支付给圈主，到期未回答退款给用户)
+     *
+     * @param orderEnum 订单枚举
+     * @param fromId    借款人ID
+     * @param toId      收款人ID
+     * @param cost      金额
+     * @return 返回订单ID和状态码Code
+     */
+    ExecuteOrderResult executeOrderWithResult(OrderEnum orderEnum, Long fromId, Long toId, Long cost);
 
     /**
      * 系统触发执行订单接口(用于业务端调用，如圈主回答问题后需要将钱支付给圈主，到期未回答退款给用户)

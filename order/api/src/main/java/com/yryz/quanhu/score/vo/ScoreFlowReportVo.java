@@ -67,8 +67,16 @@ public class ScoreFlowReportVo implements Serializable{
 	private Long grow = 0L;
 	
     /** 成长级别 */
-	private String growLevel;
+	private Integer growLevel;
 	
+
+	public Integer getGrowLevel() {
+		return growLevel;
+	}
+
+	public void setGrowLevel(Integer growLevel) {
+		this.growLevel = growLevel;
+	}
 
 	public Long getScore() {
 			return score;
@@ -85,15 +93,6 @@ public class ScoreFlowReportVo implements Serializable{
 	public void setGrow(Long grow) {
 		this.grow = grow;
 	}
-
-	public String getGrowLevel() {
-		return growLevel;
-	}
-
-	public void setGrowLevel(String growLevel) {
-		this.growLevel = growLevel;
-	}
-
 
     public int getAmountPower() {
 		return amountPower;

@@ -29,6 +29,7 @@ import com.yryz.quanhu.coterie.member.vo.CoterieMemberVo;
 import com.yryz.quanhu.coterie.member.vo.CoterieMemberVoForJoin;
 import com.yryz.quanhu.order.sdk.OrderSDK;
 import com.yryz.quanhu.order.sdk.constant.OrderEnum;
+import com.yryz.quanhu.order.sdk.dto.ExecuteOrderResult;
 import com.yryz.quanhu.order.sdk.dto.InputOrder;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.user.contants.UserRelationConstant;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -112,28 +114,48 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             coterieMemberNotify.setAmount(coterie.getJoinFee().longValue());
             coterieMemberNotify.setIcon(coterie.getIcon());
 
-//            String extJson = JsonUtils.toFastJson(coterieMemberNotify);
-//
-//            InputOrder inputOrder = new InputOrder();
-//            inputOrder.setCreateUserId(userId);
-//            inputOrder.setCost(coterie.getJoinFee().longValue());
-//            inputOrder.setCoterieId(coterieId);
-//            inputOrder.setFromId(userId);
-//            inputOrder.setModuleEnum(ModuleContants.COTERIE);
-//            inputOrder.setOrderEnum(OrderEnum.JOIN_COTERIE_ORDER);
-//            inputOrder.setToId(Long.parseLong(coterie.getOwnerId()));
-//            inputOrder.setResourceId(coterieId);
-//            inputOrder.setBizContent(extJson);
-//
-//            logger.info(GsonUtils.parseJson(inputOrder));
-//            Long orderId = orderSDK.createOrder(inputOrder);
-            Long orderId = orderSDK.executeOrder(OrderEnum.JOIN_COTERIE_ORDER, userId, Long.parseLong(coterie.getOwnerId()), coterie.getJoinFee().longValue());
+            logger.info("付费加入私圈自动审核ing");
 
-            if (null != orderId) {
+            //重新组装流程， 不能直接调用audit,有事务问题， 成员与申请， 私圈成员数， 缓存可能都要回滚
+            logger.info("审核通过时, 更新或插入申请信息");
+            saveOrUpdateApply(userId, coterieId, "", MemberConstant.MemberStatus.PASS.getStatus());
 
-                logger.info("付费加入私圈自动审核ing");
-                this.audit(userId, coterieId, MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
-                logger.info("付费加入私圈自动审核end");
+            logger.info("审核通过时, 自动关注圈主完成后再更新或插入成员数据");
+            saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.NOTFREE.getStatus());
+            logger.info("审核通过时, 更新或插入成员数据完成");
+
+//            this.audit(userId, coterieId, MemberConstant.MemberStatus.PASS.getStatus(), MemberConstant.JoinType.NOTFREE.getStatus());
+            logger.info("付费加入私圈自动审核end");
+
+            ExecuteOrderResult orderResult = orderSDK.executeOrderWithResult(OrderEnum.JOIN_COTERIE_ORDER, userId, Long.parseLong(coterie.getOwnerId()), coterie.getJoinFee().longValue());
+
+            if ("200".equals(orderResult.getCode())) {
+                logger.info("付费加入成功; userId : " + userId + ", coterieId : " + coterieId);
+
+                logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + (coterie.getMemberNum() + 1) + ", old memberNum : " + coterie.getMemberNum());
+                Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() + 1), coterie.getMemberNum());
+                logger.info("update member number result : " + updateNumberResult);
+                if (updateNumberResult == 0) {
+                    logger.info("update member number result exception");
+                }
+
+                //permission cache
+                logger.info("审核通过时, 更新成员权限缓存ing");
+//            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
+                coterieMemberRedis.deletePermission(coterieId, userId);
+                logger.info("审核通过时, 更新成员权限缓存end");
+
+                logger.info("审核通过时, 发送加入私圈事件ing");
+                coterieEventManager.joinCoterieEvent(userId, coterieId);
+                logger.info("审核通过时, 发送加入私圈事件end");
+
+                //如果没有拉黑则自动关注圈主
+                logger.info("审核通过时, 自动关注圈主");
+                Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
+
+                if (response.getCode() != ResponseConstant.SUCCESS.getCode()) {
+                    logger.info(response.getErrorMsg());
+                }
 
                 /**
                  * 付费加入私圈发送消息
@@ -148,10 +170,19 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 logger.info("私圈圈主奖励的推送信息开始");
                 coterieMemberMessageManager.sendMessageToJoinCoterieReward(coterieMemberNotify, MessageConstant.JOIN_COTERIE_REWARD);
                 logger.info("私圈圈主奖励的推送信息完成");
+
+            } else if ("1000".equals(orderResult.getCode())) {
+                logger.info("您的余额不足; userId : " + userId + ", coterieId : " + coterieId);
+//                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw QuanhuException.busiError(ExceptionEnum.USER_NOT_SUFFICIENT_FUNDS);
+
+            } else if ("100".equals(orderResult.getCode())) {
+                logger.info("支付失败,请重试; userId : " + userId + ", coterieId : " + coterieId);
+//                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw QuanhuException.busiError("支付失败,请重试");
             }
 
             result.setStatus((byte) 10);
-//            result.setOrderId(orderId);
             return result;
         }
 
@@ -169,15 +200,22 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
                 throw QuanhuException.busiError("用户已申请加入私圈!");
             }
 
+            //再入成员表
+            logger.info("save or update member");
+            saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
+
             //如果没有拉黑则自动关注圈主
             Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
-            if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
-                //再入成员表
-                logger.info("save or update member");
-                saveOrUpdateMember(userId, coterieId, reason, MemberConstant.JoinType.FREE.getStatus());
-            } else {
 
-                throw QuanhuException.busiError("添加关注关系异常");
+            if (response.getCode() != ResponseConstant.SUCCESS.getCode()) {
+                logger.info(response.getErrorMsg());
+            }
+
+            logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + (coterie.getMemberNum() + 1) + ", old memberNum : " + coterie.getMemberNum());
+            Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() + 1), coterie.getMemberNum());
+            logger.info("update member number result : " + updateNumberResult);
+            if (updateNumberResult == 0) {
+                logger.info("update member number result exception");
             }
 
             //permission cache
@@ -401,22 +439,28 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
 
             //如果没有拉黑则自动关注圈主
             logger.info("审核通过时, 自动关注圈主");
-            Response<UserRelationDto> response = userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
-            if (response.getCode().equals(ResponseConstant.SUCCESS.getCode())) {
-                logger.info("审核通过时, 自动关注圈主完成后再更新或插入成员数据");
-                saveOrUpdateMember(userId, coterieId, reason, joinType);
-                logger.info("审核通过时, 更新或插入成员数据完成");
+            userRelationApi.setRelation(userId.toString(), coterie.getOwnerId(), UserRelationConstant.EVENT.SET_FOLLOW);
 
-                //permission cache
-                logger.info("审核通过时, 更新成员权限缓存ing");
-                coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
-//            coterieMemberRedis.deletePermission(coterieId, userId);
-                logger.info("审核通过时, 更新成员权限缓存end");
+            logger.info("审核通过时, 自动关注圈主完成后再更新或插入成员数据");
+            saveOrUpdateMember(userId, coterieId, reason, joinType);
+            logger.info("审核通过时, 更新或插入成员数据完成");
 
-                logger.info("审核通过时, 发送加入私圈事件ing");
-                coterieEventManager.joinCoterieEvent(userId, coterieId);
-                logger.info("审核通过时, 发送加入私圈事件end");
+            logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + (coterie.getMemberNum() + 1) + ", old memberNum : " + coterie.getMemberNum());
+            Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() + 1), coterie.getMemberNum());
+            logger.info("update member number result : " + updateNumberResult);
+            if (updateNumberResult == 0) {
+                logger.info("update member number result exception");
             }
+
+            //permission cache
+            logger.info("审核通过时, 更新成员权限缓存ing");
+//            coterieMemberRedis.savePermission(coterieId, userId, MemberConstant.Permission.MEMBER.getStatus());
+            coterieMemberRedis.deletePermission(coterieId, userId);
+            logger.info("审核通过时, 更新成员权限缓存end");
+
+            logger.info("审核通过时, 发送加入私圈事件ing");
+            coterieEventManager.joinCoterieEvent(userId, coterieId);
+            logger.info("审核通过时, 发送加入私圈事件end");
         } else {
             logger.info("审核不通过时, 更新申请加入数据(预留)ing");
             saveOrUpdateApply(userId, coterieId, "", memberStatus);
@@ -625,17 +669,17 @@ public class CoterieMemberServiceImpl implements CoterieMemberService {
             coterieMember.setAmount(Long.valueOf(amount));
             coterieMember.setCreateUserId(userId);
 
-            logger.info("coterie member insert : " + GsonUtils.parseJson(coterieMember));
+            logger.info("coterie member update : " + GsonUtils.parseJson(coterieMember));
             result = coterieMemberDao.updateByCoterieMember(coterieMember);
             logger.info("result : " + result);
         }
 
-        logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + (coterie.getMemberNum() + 1) + ", old memberNum : " + coterie.getMemberNum());
-        Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() + 1), coterie.getMemberNum());
-        logger.info("update member number result : " + updateNumberResult);
-        if (result == 0 || updateNumberResult == 0) {
-            logger.info("update member number result exception");
-        }
+//        logger.info("update member number : coterieId" + coterie.getCoterieId() + ", new memberNum : " + (coterie.getMemberNum() + 1) + ", old memberNum : " + coterie.getMemberNum());
+//        Integer updateNumberResult = coterieService.updateMemberNum(coterie.getCoterieId(), (coterie.getMemberNum() + 1), coterie.getMemberNum());
+//        logger.info("update member number result : " + updateNumberResult);
+//        if (result == 0 || updateNumberResult == 0) {
+//            logger.info("update member number result exception");
+//        }
         logger.info("save or update member end ");
         return true;
     }

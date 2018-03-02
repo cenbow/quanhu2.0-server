@@ -23,7 +23,6 @@
         <dependency>
             <groupId>com.yryz.quanhu</groupId>
             <artifactId>user-api</artifactId>
-            <version>${parent.version}</version>
         </dependency>
 
         <!-- 公司内部库 -->
