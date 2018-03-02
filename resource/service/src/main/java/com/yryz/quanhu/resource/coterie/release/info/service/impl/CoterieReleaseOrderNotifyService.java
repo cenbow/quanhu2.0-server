@@ -104,7 +104,9 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
         // 构建消息体
         SystemBody systemBody = new SystemBody();
         try {
-            if (StringUtils.isNotBlank(releaseInfo.getImgUrl())) {
+            if (StringUtils.isNotBlank(releaseInfo.getVideoThumbnailUrl())) {
+                systemBody.setBodyImg(releaseInfo.getVideoThumbnailUrl());
+            } else if (StringUtils.isNotBlank(releaseInfo.getImgUrl())) {
                 systemBody.setBodyImg(StringUtils.split(releaseInfo.getImgUrl(), ",")[0]);
             }
             systemBody.setBodyTitle(releaseInfo.getTitle());

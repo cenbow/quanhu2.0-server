@@ -41,7 +41,9 @@ public class RemoteResourceUtils {
                     remoteResource.setTitle(releaseInfo.getTitle());
                     remoteResource.setContent(releaseInfo.getContent());
                     remoteResource.setImgUrl(releaseInfo.getImgUrl());
-                    if (StringUtils.isNotBlank(releaseInfo.getImgUrl())) {
+                    if (StringUtils.isNotBlank(releaseInfo.getVideoThumbnailUrl())) {
+                        remoteResource.setFirstImgUrl(releaseInfo.getVideoThumbnailUrl());
+                    } else if (StringUtils.isNotBlank(releaseInfo.getImgUrl())) {
                         remoteResource.setFirstImgUrl(Splitter.on(",")
                                 .omitEmptyStrings().limit(1).splitToList(releaseInfo.getImgUrl()).get(0));
                     }
