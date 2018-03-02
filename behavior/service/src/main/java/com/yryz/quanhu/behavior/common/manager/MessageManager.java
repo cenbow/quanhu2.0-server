@@ -787,6 +787,7 @@ public class MessageManager {
 		body.setCoterieName(commentAssemble.getCoterieName());
 		body.setBodyImg(commentAssemble.getBodyImg());
 		body.setBodyTitle(commentAssemble.getBodyTitle());
+		messageVo.setBody(body);
 		try {
 			messageAPI.sendMessage(messageVo, false);
 			logger.info("[message_send]:messageVo:{}", JsonUtils.toFastJson(messageVo));
@@ -823,6 +824,7 @@ public class MessageManager {
 		body.setCoterieName(likeAssemble.getCoterieName());
 		body.setBodyImg(likeAssemble.getBodyImg());
 		body.setBodyTitle(likeAssemble.getBodyTitle());
+		messageVo.setBody(body);
 		try {
 			messageAPI.sendMessage(messageVo, false);
 		} catch (Exception e) {
