@@ -390,7 +390,7 @@ public class QuestionServiceImpl implements QuestionService {
             questionVo.setTargetUser(apIservice.getUser(targetId));
         }
         questionVo.setModuleEnum(ModuleContants.QUESTION);
-
+        questionVo.setServiceCurrentDate(Calendar.getInstance().getTime());
 
         //虚拟阅读数
         readApi.read(kid, questionBysearch.getCreateUserId());

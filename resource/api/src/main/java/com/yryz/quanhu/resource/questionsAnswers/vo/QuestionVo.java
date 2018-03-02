@@ -47,6 +47,9 @@ public class QuestionVo  implements Serializable {
 
     private String orderId;
 
+
+    private Date serviceCurrentDate;
+
     /**
      * 阅读数状态
      */
@@ -204,5 +207,13 @@ public class QuestionVo  implements Serializable {
 
     public void setTargetUser(UserSimpleVO targetUser) {
         this.targetUser = targetUser;
+    }
+
+    public Date getServiceCurrentDate() {
+        return serviceCurrentDate;
+    }
+
+    public void setServiceCurrentDate(Date serviceCurrentDate) {
+        this.serviceCurrentDate = serviceCurrentDate;
     }
 }
