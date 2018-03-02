@@ -213,15 +213,18 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             }
             commitMessage(messageVo, false);
             logger.info("给打赏者send reward message, data:{}", JsonUtils.toFastJson(messageVo));
+
             //给打赏者推送极光消息
             PushReqVo reqVo = new PushReqVo();
-            reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getCreateUserId())));
-            reqVo.setMsg(JsonUtils.toFastJson(messageVo));
-            reqVo.setNotification(MessageConstant.REWARD_ACCOUNT.getTitle());
-            reqVo.setNofiticationBody(String.format("打赏成功，支付%s悠然币。",
-                    formatMoney(info.getGiftNum() * info.getGiftPrice())));
-            reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
-            pushAPI.commonSendAlias(reqVo);
+            if (null != remoteResource && ModuleContants.RELEASE.equals(remoteResource.getModuleEnum())) {
+                reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getCreateUserId())));
+                reqVo.setMsg(JsonUtils.toFastJson(messageVo));
+                reqVo.setNotification(MessageConstant.REWARD_ACCOUNT.getTitle());
+                reqVo.setNofiticationBody(String.format("打赏成功，支付%s悠然币。",
+                        formatMoney(info.getGiftNum() * info.getGiftPrice())));
+                reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
+                pushAPI.commonSendAlias(reqVo);
+            }
 
             //给被打赏者发持久化消息
             messageVo = MessageUtils.buildMessage(MessageConstant.REWARD_INTEGRAL,
@@ -234,16 +237,19 @@ public class RewardOrderNotifyService implements IOrderNotifyService {
             }
             commitMessage(messageVo, false);
             logger.info("给被打赏者send rewarded message, data:{}", JsonUtils.toFastJson(messageVo));
+
             //给被打赏者推送极光消息
-            reqVo = new PushReqVo();
-            reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getToUserId())));
-            reqVo.setMsg(JsonUtils.toFastJson(messageVo));
-            reqVo.setNotification(MessageConstant.REWARD_INTEGRAL.getTitle());
-            reqVo.setNofiticationBody(String.format("%s打赏了一个%s，您获得%s奖励。",
-                    userSimpleVO.getUserNickName(), giftInfo.getGiftName(), formatMoney(rewardedPrice)));
-            reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
-            pushAPI.commonSendAlias(reqVo);
-            logger.info("给被打赏者推送极光消息, data:{}", JsonUtils.toFastJson(messageVo));
+            if (null != remoteResource && ModuleContants.RELEASE.equals(remoteResource.getModuleEnum())) {
+                reqVo = new PushReqVo();
+                reqVo.setCustIds(Lists.newArrayList(String.valueOf(info.getToUserId())));
+                reqVo.setMsg(JsonUtils.toFastJson(messageVo));
+                reqVo.setNotification(MessageConstant.REWARD_INTEGRAL.getTitle());
+                reqVo.setNofiticationBody(String.format("%s打赏了一个%s，您获得%s奖励。",
+                        userSimpleVO.getUserNickName(), giftInfo.getGiftName(), formatMoney(rewardedPrice)));
+                reqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
+                pushAPI.commonSendAlias(reqVo);
+                logger.info("给被打赏者推送极光消息, data:{}", JsonUtils.toFastJson(messageVo));
+            }
         } catch (Exception e) {
             logger.error("打赏发送消息失败", e);
         }
