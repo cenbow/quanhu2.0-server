@@ -21,7 +21,9 @@ public interface LikeDao {
     int isLike(Like like);
 
     int cleanLike(Like like);
-
+    
+    int update(Like like);
+    
     List<LikeVO> queryLikers(LikeFrontDTO likeFrontDTO);
 
     LikeVO querySingleLiker(Like like);

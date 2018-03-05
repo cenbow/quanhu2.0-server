@@ -373,7 +373,7 @@ public class ResourceServiceImpl implements ResourceService {
 	 */
 	public List<ResourceModel> getNoneRecommendResource(int start , int limit){
 		ResourceModel resourceModel = new ResourceModel();
-		resourceModel.setModuleEnum(ResourceModuleEnum.RELEASE);
+		resourceModel.setModuleEnum(ResourceModuleEnum.RELEASE.getCode());
 		resourceModel.setRecommend(ResourceEnum.RECOMMEND_TYPE_FALSE);
 		resourceModel.setTalentType(ResourceEnum.TALENT_TYPE_TRUE);
 		resourceModel.setPublicState(ResourceEnum.PUBLIC_STATE_TRUE);

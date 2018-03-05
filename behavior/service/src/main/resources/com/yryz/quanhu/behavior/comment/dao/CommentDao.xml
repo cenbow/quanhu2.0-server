@@ -272,19 +272,19 @@
     <update id="updownBatch" parameterType="java.util.List">
         <foreach close="" collection="list" index="index" item="item" open="" separator=";">
             UPDATE qh_comment_info SET
-            shelve_flag=#{item.shelveFlag,jdbcType=TINYINT},last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now(),del_flag=11
+            shelve_flag= 11,last_update_user_id=#{item.lastUpdateUserId,jdbcType=BIGINT},last_update_date=now(),del_flag=11
             where kid=#{item.kid,jdbcType=BIGINT}
         </foreach>
     </update>
 
 	<update id="updownByTopId" >       
             UPDATE qh_comment_info SET
-            shelve_flag=#{shelveFlag},last_update_user_id=#{lastUpdateUserId},last_update_date=now(),del_flag=11
+            shelve_flag= 11,last_update_user_id=#{lastUpdateUserId},last_update_date=now(),del_flag=11
             where top_id = #{topId}
     </update>
 
     <update id="updownSingle" parameterType="com.yryz.quanhu.behavior.comment.entity.Comment">
-         UPDATE qh_comment_info SET shelve_flag = #{shelveFlag,jdbcType=TINYINT},last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
+         UPDATE qh_comment_info SET shelve_flag = 11,del_flag = 11,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT},last_update_date=now()
          where kid=#{kid,jdbcType=BIGINT}
     </update>
 

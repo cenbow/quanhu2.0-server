@@ -1,6 +1,7 @@
 package com.yryz.quanhu.behavior.report.dto;
 
 import com.yryz.common.response.PageList;
+import com.yryz.quanhu.behavior.report.entity.Report;
 
 import java.io.Serializable;
 
@@ -10,61 +11,45 @@ import java.io.Serializable;
  * @Description:举报
  * @Date:Created in 16:13 2018/1/20
  */
-public class ReportDTO extends PageList implements Serializable {
-    private static final long serialVersionUID = 6823220474426141657L;
-    private String moduleEnum;
-    private String informTypeName;
-    private byte informStatus;
-    private String startTime;
-    private String endTime;
-    private String informDesc;
+public class ReportDTO extends Report{
 
-    public String getInformDesc() {
-        return informDesc;
+    /**页码*/
+    private Integer currentPage = 1;
+    /**每页大小*/
+    private Integer pageSize = 20;
+
+    private String startDate;
+    private String endDate;
+
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setInformDesc(String informDesc) {
-        this.informDesc = informDesc;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
-    public String getInformTypeName() {
-        return informTypeName;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setInformTypeName(String informTypeName) {
-        this.informTypeName = informTypeName;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
-    public String getModuleEnum() {
-        return moduleEnum;
+    public Integer getCurrentPage() {
+        return currentPage;
     }
 
-    public void setModuleEnum(String moduleEnum) {
-        this.moduleEnum = moduleEnum;
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
     }
 
-
-    public byte getInformStatus() {
-        return informStatus;
+    public Integer getPageSize() {
+        return pageSize;
     }
 
-    public void setInformStatus(byte informStatus) {
-        this.informStatus = informStatus;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }

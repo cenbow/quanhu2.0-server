@@ -2,6 +2,8 @@ package com.yryz.quanhu.behavior.report.provider;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.yryz.common.constant.ModuleContants;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
@@ -16,6 +18,7 @@ import com.yryz.quanhu.behavior.report.vo.ReportVo;
 import com.yryz.quanhu.behavior.report.vo.ReportVoForAdmin;
 import com.yryz.quanhu.support.config.api.BasicConfigApi;
 import com.yryz.quanhu.support.id.api.IdAPI;
+import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,82 +40,38 @@ public class ReportProvider implements ReportApi {
     @Autowired
     private ReportService reportService;
 
-    @Reference(check = false)
-    private IdAPI idAPI;
-
-    @Reference(check = false)
-    private BasicConfigApi basicConfigApi;
-
-    @Reference(check = false)
-    private CountApi countApi;
 
     @Override
-    public Response<Map<String, Integer>> accretion(Report report) {
-        try {
-            report.setKid(idAPI.getSnowflakeId().getData());
-            Map<String,Integer> map=new HashMap<String,Integer>();
-            report.setInformStatus((byte) 10);
-            if(report.getResourceId()==0){
-                report.setModuleEnum(ModuleContants.USER);
-            }
-            int count = reportService.accretion(report);
-            if(count>0){
-                map.put("result",1);
-                try{
-                    countApi.commitCount(BehaviorEnum.Report,report.getResourceId(),"",1L);
-                }catch (Exception e){
-                    logger.info("进入统计系统失败:"+e);
-                }
-            }else{
-                map.put("result",0);
-            }
-            return ResponseUtils.returnObjectSuccess(map);
-        } catch (Exception e) {
-            logger.error("", e);
-            return ResponseUtils.returnException(e);
-        }
-
-    }
-
-    @Override
-    public Response<PageList<ReportVoForAdmin>> queryReportForAdmin(ReportDTO reportDTO) {
+    public Response<Map<String, Integer>> submit(ReportDTO dto) {
         try{
-            return ResponseUtils.returnObjectSuccess(reportService.queryReportForAdmin(reportDTO));
+            logger.info("submit.start={}", JSON.toJSON(dto));
+
+            int out = reportService.submit(dto);
+            Map<String,Integer> outMap = Maps.newHashMap();
+            outMap.put("result",out);
+
+            logger.info("submit.finish={},out={}", JSON.toJSON(dto),JSON.toJSON(outMap));
+
+            return ResponseUtils.returnObjectSuccess(outMap);
         }catch (Exception e){
-            logger.error("", e);
+            logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }
 
     }
 
     @Override
-    public Response<Report> querySingleReport(Report report) {
+    public Response<List<ReportVo>> getReportType(ReportDTO dto) {
         try{
-            return ResponseUtils.returnObjectSuccess(reportService.querySingleReport(report));
-        }catch (Exception e){
-            logger.error("", e);
-            return ResponseUtils.returnException(e);
-        }
 
-    }
+            logger.info("getReportType.start={}", JSON.toJSON(dto));
+            List<ReportVo> out = reportService.getReportType(dto);
+            logger.info("getReportType.finish={},out={}", JSON.toJSON(dto),JSON.toJSON(out));
 
-    @Override
-    public Response<List<ReportVo>> queryInformDesc() {
-        Response<String> informDescResponse=null;
-        try{
-            informDescResponse = basicConfigApi.getValue("reportDesc");
-            String[] array= informDescResponse.getData().split(",");
-            List<ReportVo> reportVos=new ArrayList<ReportVo>();
-            for(int i=0;i<array.length;i++){
-                ReportVo reportVo=new ReportVo();
-                reportVo.setInformDesc(array[i]);
-                reportVos.add(reportVo);
-            }
-            return ResponseUtils.returnObjectSuccess(reportVos);
+            return ResponseUtils.returnObjectSuccess(out);
         }catch (Exception e){
-            logger.error("", e);
+            logger.error(e.getMessage(),e);
             return ResponseUtils.returnException(e);
         }
     }
-
 }

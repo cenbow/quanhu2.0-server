@@ -42,22 +42,22 @@ public class LikeController {
     @PostMapping(value = "/services/app/{version}/like/dian")
     public Response<Map<String, Object>> accretion(@RequestBody Like like, @RequestHeader Long userId) {
         like.setUserId(userId);
-        return likeApi.dian(like);
-    }
-
-    
-    @ApiOperation("点赞列表")
-    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/like/frontlist")
-    public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO){
-        return likeApi.queryLikers(likeFrontDTO);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(likeApi.dian(like)));
     }
 
     
     @ApiOperation("点赞列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     //@GetMapping(value = "/services/app/{version}/like/frontlist")
+    public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO){
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(likeApi.queryLikers(likeFrontDTO)));
+    }
+
+    
+    @ApiOperation("点赞列表")
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @GetMapping(value = "/services/app/{version}/like/frontlist")
     public Response<PageList<LikeInfoVO>> listLiker(LikeFrontDTO likeFrontDTO){
-        return likeApi.listLike(likeFrontDTO);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(likeApi.listLike(likeFrontDTO)));
     }
 }

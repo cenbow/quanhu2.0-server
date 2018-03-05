@@ -231,7 +231,7 @@ public class MessageManager {
 				} else {
 					commentAssembleAnswer.setCoterieName(answerVo.getContent());
 				}
-				if (!answerVo.getImgUrl().equals("")) {
+				if (StringUtils.isNotBlank(answerVo.getImgUrl())) {
 					String img = getImgFirstUrl(answerVo.getImgUrl());
 					commentAssembleAnswer.setBodyImg(img);
 				}
@@ -323,7 +323,7 @@ public class MessageManager {
 				} else {
 					likeAssembleAnswer.setCoterieName(answerVo.getContent());
 				}
-				if (!answerVo.getImgUrl().equals("")) {
+				if (StringUtils.isNotBlank(answerVo.getImgUrl())) {
 					String img = getImgFirstUrl(answerVo.getImgUrl());
 					likeAssembleAnswer.setBodyImg(img);
 				}
@@ -437,7 +437,7 @@ public class MessageManager {
 			TopicPostVo topicPostVo = topicPostApi
 					.quetyDetail(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()).getData();
 			if (contentType == 0) {
-				if (!topicPostVo.getImgUrl().equals("")) {
+				if (StringUtils.isNotBlank(topicPostVo.getImgUrl())) {
 					String img = getImgFirstUrl(topicPostVo.getImgUrl());
 					commentAssemble.setImg(img);
 				}
@@ -458,7 +458,7 @@ public class MessageManager {
 				} else {
 					commentAssemble.setCoterieName(topicPostVo.getContent());
 				}
-				if (!topicPostVo.getImgUrl().equals("")) {
+				if (StringUtils.isNotBlank(topicPostVo.getImgUrl())) {
 					String img = getImgFirstUrl(topicPostVo.getImgUrl());
 					commentAssemble.setBodyImg(img);
 				}
@@ -466,7 +466,7 @@ public class MessageManager {
 			}
 			this.sendMessage(commentAssemble);
 		} catch (Exception e) {
-			logger.error("调用文章出现异常", e);
+			logger.error("[comment_message_get_topic_error]", e);
 		}
 	}
 	
@@ -487,7 +487,7 @@ public class MessageManager {
 			} else {
 				likeAssemble.setTitle(topicPostVo.getContent());
 			}
-			if (!topicPostVo.getImgUrl().equals("")) {
+			if (StringUtils.isNotBlank(topicPostVo.getImgUrl())) {
 				String img = getImgFirstUrl(topicPostVo.getImgUrl());
 				likeAssemble.setImg(img);
 			}
@@ -497,7 +497,7 @@ public class MessageManager {
 				} else {
 					likeAssemble.setCoterieName(topicPostVo.getContent());
 				}
-				if (!topicPostVo.getImgUrl().equals("")) {
+				if (StringUtils.isNotBlank(topicPostVo.getImgUrl())) {
 					String img = getImgFirstUrl(topicPostVo.getImgUrl());
 					likeAssemble.setBodyImg(img);
 				}
@@ -506,7 +506,7 @@ public class MessageManager {
 			}
 			this.sendMessage(likeAssemble);
 		} catch (Exception e) {
-			logger.info("调用帖子出现异常" + e);
+			logger.error("[like_message_get_topic_error]", e);
 		}
 	}
 	
@@ -522,25 +522,25 @@ public class MessageManager {
 			if(dymaic == null){
 				return;
 			}
-			if (!dymaic.getExtJson().equals("")) {
-				Map<String, String> maps = JsonUtils.fromJson(dymaic.getExtJson(),
-						new TypeReference<Map<String, String>>() {
+			if (StringUtils.isNotBlank(dymaic.getExtJson())) {
+				Map<String, Object> maps = JsonUtils.fromJson(dymaic.getExtJson(),
+						new TypeReference<Map<String, Object>>() {
 						});
-				String title = maps.get("title");
-				String image = maps.get("imgUrl");
+				String title = StringUtils.toString(maps.get("title"),"");
+				String image = StringUtils.toString(maps.get("imgUrl"),"");
 				String content = "";
 				if (contentType == 0) {
 					String imgUrl = "";
-					if (!image.equals("")) {
+					if (StringUtils.isNotBlank(image)) {
 						imgUrl = getImgFirstUrl(image);
 						commentAssemble.setImg(imgUrl);
 					}
-					if (!title.equals("")) {
+					if (StringUtils.isNotBlank(title)) {
 						commentAssemble.setTitle(title);
 					}
-					content = maps.get("content").toString();
-					if (title.equals("") && !content.equals("")) {
-						commentAssemble.setTitle(content.substring(0, 20));
+					content = StringUtils.toString(maps.get("content"),"");
+					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
+						commentAssemble.setTitle(StringUtils.substring(content,0, 20));
 					}
 					commentAssemble.setViewCode((byte) 2);
 				}
@@ -550,29 +550,38 @@ public class MessageManager {
 					commentAssemble.setTitle(bePingContent);
 				}
 				if (commentAssemble.getCoterieId() != 0) {
-					if (!title.equals("") && title.length() > 7) {
+					/*if (!title.equals("") && title.length() > 7) {
 						commentAssemble.setCoterieName(title.substring(0, 7));
 					} else {
 						commentAssemble.setCoterieName(title);
-					}
-					if (!title.equals("") && title.length() > 20) {
+					}*/
+					commentAssemble.setCoterieName(StringUtils.substring(title,0, 7));
+					
+					/*if (!title.equals("") && title.length() > 20) {
 						commentAssemble.setBodyTitle(content.substring(0, 20));
 					} else {
 						commentAssemble.setBodyTitle(title);
-					}
-					if (title.equals("") && !content.equals("")) {
-						if (content.length() > 7) {
+					}*/
+					commentAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
+					
+					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
+						/*if (content.length() > 7) {
 							commentAssemble.setCoterieName(content.substring(0, 7));
 						} else {
 							commentAssemble.setCoterieName(content);
-						}
-						if (content.length() > 20) {
+						}*/
+						
+						commentAssemble.setCoterieName(StringUtils.substring(content,0, 7));
+						
+						/*if (content.length() > 20) {
 							commentAssemble.setBodyTitle(content.substring(0, 20));
 						} else {
 							commentAssemble.setBodyTitle(content);
-						}
+						}*/
+						
+						commentAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
 					}
-					if (!image.equals("")) {
+					if (StringUtils.isNotBlank(image)) {
 						String imgUrl = getImgFirstUrl(image);
 						commentAssemble.setBodyImg(imgUrl);
 					}
@@ -580,7 +589,7 @@ public class MessageManager {
 				this.sendMessage(commentAssemble);
 			}
 		} catch (Exception e) {
-			logger.info("调用动态出现异常" + e);
+			logger.error("[comment_message_get_dymaic_error]", e);
 		}
 	}
 
@@ -594,49 +603,56 @@ public class MessageManager {
 			if(dymaic == null ){
 				return;
 			}
-			if (!dymaic.getExtJson().equals("")) {
-				Map<String, String> maps = JsonUtils.fromJson(dymaic.getExtJson(),
-						new TypeReference<Map<String, String>>() {
+			if (StringUtils.isNotBlank(dymaic.getExtJson())) {
+				Map<String, Object> maps = JsonUtils.fromJson(dymaic.getExtJson(),
+						new TypeReference<Map<String, Object>>() {
 						});
-				String title = maps.get("title");
-				String image = maps.get("imgUrl");
-				String coterieId = maps.get("coterieId");
+				String title = StringUtils.toString(maps.get("title"),"");
+				String image = StringUtils.toString(maps.get("imgUrl"),"");
+				String coterieId = StringUtils.toString(maps.get("coterieId"),"0");
 				String imgUrl = "";
-				if (!image.equals("")) {
+				if (StringUtils.isNoneBlank(image)) {
 					imgUrl = getImgFirstUrl(image);
 					likeAssemble.setImg(imgUrl);
 				}
-				if (!title.equals("")) {
+				if (StringUtils.isNoneBlank(title)) {
 					likeAssemble.setTitle(title);
 				}
-				String content = maps.get("content");
-				if (title.equals("") && !content.equals("")) {
-					likeAssemble.setTitle(content.substring(0, 20));
+				String content = StringUtils.toString(maps.get("content"),"");
+				if (StringUtils.isBlank(title) && StringUtils.isNoneBlank(content)) {
+					likeAssemble.setTitle(StringUtils.substring(content, 0, 20));
 				}
-				if (!coterieId.equals("0")) {
-					if (!title.equals("") && title.length() > 7) {
-						likeAssemble.setCoterieName(title.substring(0, 7));
+				if (StringUtils.equals(coterieId,"0")) {
+					/*if (StringUtils.isNotBlank(title) && title.length() > 7) {
+						likeAssemble.setCoterieName(StringUtils.substring(title,0, 7));
 					} else {
 						likeAssemble.setCoterieName(title);
-					}
-					if (!title.equals("") && title.length() > 20) {
-						likeAssemble.setBodyTitle(content.substring(0, 20));
+					}*/
+					likeAssemble.setCoterieName(StringUtils.substring(title,0, 7));
+					
+					/*if (!title.equals("") && title.length() > 20) {
+					likeAssemble.setBodyTitle(content.substring(0, 20));
 					} else {
 						likeAssemble.setBodyTitle(title);
-					}
-					if (title.equals("") && !content.equals("")) {
-						if (content.length() > 7) {
+					}*/
+					likeAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
+					
+					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
+						/*if (content.length() > 7) {
 							likeAssemble.setCoterieName(content.substring(0, 7));
 						} else {
 							likeAssemble.setCoterieName(content);
-						}
-						if (content.length() > 20) {
+						}*/
+						likeAssemble.setCoterieName(StringUtils.substring(content,0, 7));
+						
+						/*if (content.length() > 20) {
 							likeAssemble.setBodyTitle(content.substring(0, 20));
 						} else {
 							likeAssemble.setBodyTitle(content);
-						}
+						}*/
+						likeAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
 					}
-					if (!image.equals("")) {
+					if (StringUtils.isNotBlank(image)) {
 						String imgUrls = getImgFirstUrl(image);
 						likeAssemble.setBodyImg(imgUrls);
 					}
@@ -645,7 +661,7 @@ public class MessageManager {
 				this.sendMessage(likeAssemble);
 			}
 		} catch (Exception e) {
-			logger.info("调用动态出现异常" + e);
+			logger.error("[like_message_get_dymaic_error]", e);
 		}
 	}
 	
@@ -665,7 +681,7 @@ public class MessageManager {
 			commentAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
 			String img = "";
 			if (contentType == 0) {
-				if (!releaseInfoVo.getImgUrl().equals("")) {
+				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
 					img = getImgFirstUrl(releaseInfoVo.getImgUrl());
 					commentAssemble.setImg(img);
 				}
@@ -678,24 +694,28 @@ public class MessageManager {
 				commentAssemble.setTitle(bePingContent);
 			}
 			if (commentAssemble.getCoterieId() != 0 && null != releaseInfoVo.getTitle()) {
-				if (releaseInfoVo.getTitle().length() > 7) {
+				/*if (releaseInfoVo.getTitle().length() > 7) {
 					commentAssemble.setCoterieName(releaseInfoVo.getTitle().substring(0, 7));
 				} else {
 					commentAssemble.setCoterieName(releaseInfoVo.getTitle());
 				}
-				if (!releaseInfoVo.getImgUrl().equals("")) {
+				*/
+				commentAssemble.setCoterieName(StringUtils.substring(releaseInfoVo.getTitle(),0, 7));
+				
+				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
 					img = getImgFirstUrl(releaseInfoVo.getImgUrl());
 					commentAssemble.setBodyImg(img);
 				}
-				if (releaseInfoVo.getTitle().length() > 20) {
+				/*if (releaseInfoVo.getTitle().length() > 20) {
 					commentAssemble.setBodyTitle(releaseInfoVo.getTitle().substring(0, 20));
 				} else {
 					commentAssemble.setBodyTitle(releaseInfoVo.getTitle());
-				}
+				}*/
+				commentAssemble.setBodyTitle(StringUtils.substring(releaseInfoVo.getTitle(),0, 20));
 			}
 			this.sendMessage(commentAssemble);
 		} catch (Exception e) {
-			logger.error("调用文章出现异常", e);
+			logger.error("[comment_message_get_release_error]", e);
 		}
 	}
 	
@@ -712,7 +732,7 @@ public class MessageManager {
 			}
 			likeAssemble.setTitle(releaseInfoVo.getTitle());
 			likeAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
-			if (!releaseInfoVo.getImgUrl().equals("")) {
+			if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
 				String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
 				likeAssemble.setImg(img);
 			}
@@ -722,7 +742,8 @@ public class MessageManager {
 				} else {
 					likeAssemble.setCoterieName(releaseInfoVo.getTitle());
 				}
-				if (!releaseInfoVo.getImgUrl().equals("")) {
+				
+				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
 					String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
 					likeAssemble.setBodyImg(img);
 				}
@@ -735,7 +756,7 @@ public class MessageManager {
 			}
 			this.sendMessage(likeAssemble);
 		} catch (Exception e) {
-			logger.info("调用文章出现异常" + e);
+			logger.error("[like_message_get_release_error]", e);
 		}
 	}
 
@@ -787,7 +808,6 @@ public class MessageManager {
 		body.setCoterieName(commentAssemble.getCoterieName());
 		body.setBodyImg(commentAssemble.getBodyImg());
 		body.setBodyTitle(commentAssemble.getBodyTitle());
-		messageVo.setBody(body);
 		try {
 			messageAPI.sendMessage(messageVo, false);
 			logger.info("[message_send]:messageVo:{}", JsonUtils.toFastJson(messageVo));
@@ -824,11 +844,10 @@ public class MessageManager {
 		body.setCoterieName(likeAssemble.getCoterieName());
 		body.setBodyImg(likeAssemble.getBodyImg());
 		body.setBodyTitle(likeAssemble.getBodyTitle());
-		messageVo.setBody(body);
 		try {
 			messageAPI.sendMessage(messageVo, false);
 		} catch (Exception e) {
-			logger.info("持久化消息失败:" + e);
+			logger.error("持久化消息失败:" , e);
 		}
 	}
 
