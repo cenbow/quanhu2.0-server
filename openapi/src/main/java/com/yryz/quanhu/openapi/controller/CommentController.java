@@ -47,10 +47,9 @@ public class CommentController {
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
-
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "/services/app/{version}/comment/accretion")
-    public Response<Comment> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
+    public Response<CommentSimpleVO> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
         comment.setCreateUserId(userId);
 
         /**
@@ -71,8 +70,8 @@ public class CommentController {
      */
     @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
     @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
-    private Response<Comment> coterieAccretion(Comment comment, Long userId, HttpServletRequest request) {
-        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.accretion(comment)));
+    private Response<CommentSimpleVO> coterieAccretion(Comment comment, Long userId, HttpServletRequest request) {
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.saveComment(comment)));
     }
 
     /**
@@ -84,12 +83,12 @@ public class CommentController {
      */
     @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
     @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
-    private Response<Comment> platformAccretion(Comment comment, Long userId, HttpServletRequest request) {
-        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.accretion(comment)));
+    private Response<CommentSimpleVO> platformAccretion(Comment comment, Long userId, HttpServletRequest request) {
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.saveComment(comment)));
     }
 
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/comment/accretion")
+    //@PostMapping(value = "/services/app/{version}/comment/accretion")
     public Response<CommentSimpleVO> addComment(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
         comment.setCreateUserId(userId);
         CommentSimpleVO simpleVO = ResponseUtils.getResponseData(commentApi.saveComment(comment));
