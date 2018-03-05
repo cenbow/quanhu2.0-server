@@ -55,7 +55,7 @@ import java.util.*;
  * @Date:Created in 19:13 2018/1/23
  */
 //@Service(interfaceClass = CommentApi.class)
-public class CommentProvider implements CommentApi {
+public class CommentProvider{
 
     private static final Logger logger = LoggerFactory.getLogger(CommentProvider.class);
 
@@ -92,7 +92,6 @@ public class CommentProvider implements CommentApi {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @Override
     public Response<Comment> accretion(Comment comment) {
         try {
             comment.setKid(idAPI.getSnowflakeId().getData());
@@ -127,7 +126,6 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    @Override
     public Response<Map<String, Integer>> delComment(Comment comment) {
         try {
             Map<String, Integer> map = new HashMap<String, Integer>();
@@ -164,7 +162,6 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    @Override
     public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO) {
         try {
             return ResponseUtils.returnObjectSuccess(commentService.queryComments(commentFrontDTO));
@@ -174,7 +171,6 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    @Override
     public Response<Integer> updownBatch(List<Comment> comments) {
         try {
             int count = commentService.updownBatch(comments);
@@ -198,7 +194,6 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    @Override
     public Response<PageList<CommentVOForAdmin>> queryCommentForAdmin(CommentDTO commentDTO) {
         try {
             return ResponseUtils.returnObjectSuccess(commentService.queryCommentForAdmin(commentDTO));
@@ -208,7 +203,6 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    @Override
     public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO) {
         try {
             CommentInfoVO commentInfoVO = commentService.querySingleCommentInfo(commentSubDTO);
@@ -223,7 +217,6 @@ public class CommentProvider implements CommentApi {
         }
     }
 
-    @Override
     public Response<Integer> updownSingle(Comment comment) {
         try {
 
@@ -633,19 +626,16 @@ public class CommentProvider implements CommentApi {
         return arries[0];
     }
 
-	@Override
 	public Response<PageList<CommentListInfoVO>> listComments(CommentFrontDTO commentFrontDTO) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Response<CommentDetailVO> queryCommentDetail(CommentSubDTO commentSubDTO) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Response<CommentSimpleVO> saveComment(Comment comment) {
 		// TODO Auto-generated method stub
 		return null;
