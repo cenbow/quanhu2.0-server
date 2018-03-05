@@ -184,13 +184,16 @@ public class CommentNewServiceImpl implements CommentNewService {
 		Map<String, UserSimpleNoneOtherVO> userMap = new HashMap<>(commentLength);
 		Map<Long, List<Comment>> replyMap = new HashMap<>(commentLength);
 		Map<String, Integer> likeFlagMap = new HashMap<>(commentLength);
-
+		Map<Long,Long> likeCountMap = new HashMap<>(commentLength);
+		
 		for (int i = 0; i < commentLength; i++) {
 			Comment comment = comments.get(i);
 			userIds.add(comment.getCreateUserId().toString());
 			topCommentIds.add(comment.getKid());
 		}
 		replyMap = getReply(topCommentIds);
+		likeCountMap = getLikeCount(topCommentIds);
+		
 		if (StringUtils.isNoneBlank(commentFrontDTO.getUserId())) {
 			likeFlagMap = likeService.getLikeFlagBatch(Lists.newArrayList(topCommentIds),
 					NumberUtils.createLong(commentFrontDTO.getUserId()));
@@ -199,6 +202,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		if (MapUtils.isNotEmpty(replyMap)) {
 			userIds.addAll(getUserIdByReplyMap(replyMap));
 		}
+		
 		userMap = userService.getUserInfo(userIds);
 		List<CommentListInfoVO> commentVOs = new ArrayList<>();
 
@@ -217,8 +221,11 @@ public class CommentNewServiceImpl implements CommentNewService {
 			// 获取回复总数
 			Long replycount = commentCache.getCommentReplyCount(comment.getKid());
 			replycount = replycount == null ? 0l : replycount;
+			
+			//设置点赞、评论总数
 			listInfoVO.setCommentCount(replycount.intValue());
-
+			listInfoVO.setLikeCount(likeCountMap.get(likeCountMap));
+			
 			List<Comment> replys = replyMap.get(comment.getKid());
 			// 聚合评论回复
 			if (CollectionUtils.isNotEmpty(replys)) {
@@ -482,5 +489,23 @@ public class CommentNewServiceImpl implements CommentNewService {
 			simpleVO.setParentUser(otherVO);
 		}
 		return simpleVO;
+	}
+	
+	/**
+	 * 获取点赞数量
+	 * @param topCommentIds
+	 * @return
+	 */
+	private Map<Long,Long> getLikeCount(Set<Long> topCommentIds){
+		if(CollectionUtils.isEmpty(topCommentIds)){
+			return new HashMap<>();
+		}
+		Map<Long,Long> countMap = new HashMap<>(topCommentIds.size());
+		for(Iterator<Long> iterator = topCommentIds.iterator();iterator.hasNext();){
+			Long commentId = iterator.next();
+			Long count = countService.getCount(commentId.toString(),  BehaviorEnum.Like.getCode(), "-1");
+			countMap.put(commentId, count == null ? 0: count);
+		}
+		return countMap;
 	}
 }
