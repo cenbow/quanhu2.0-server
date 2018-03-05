@@ -1,6 +1,7 @@
 package com.yryz.quanhu.behavior.comment;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Lists;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.GsonUtils;
@@ -57,7 +58,7 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    //@Test
+    @Test
     public void like(){
     	Like like = new Like();
     	like.setUserId(378867848421376l);
@@ -67,6 +68,13 @@ public class CommentTest {
     	like.setResourceUserId(377199907938304l);
     	Response<Map<String,Object>> response = likeApi.dian(like);
     	System.out.println(JsonUtils.toFastJson(response));
+    }
+    
+    public void updownComment(){
+    	Comment comment = new Comment();
+    	comment.setKid(367981230055424l);
+    	
+    	commentApi.updownSingle(comment);
     }
     
     //@Test
@@ -100,14 +108,25 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    @Test
+    //@Test
     public void listComment(){
     	CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
     	commentFrontDTO.setCurrentPage(1);
     	commentFrontDTO.setPageSize(10);
     	commentFrontDTO.setUserId("377199907938304");
-    	commentFrontDTO.setResourceId(380803544997888l);
+    	commentFrontDTO.setResourceId(100218l);
     	Response<PageList<CommentListInfoVO>> response = commentApi.listComments(commentFrontDTO);
+    	System.out.println(JsonUtils.toFastJson(response));
+    }
+    
+    //@Test
+    public void getLikeFlag(){
+    	CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
+    	commentFrontDTO.setCurrentPage(1);
+    	commentFrontDTO.setPageSize(10);
+    	commentFrontDTO.setUserId("377199907938304");
+    	commentFrontDTO.setResourceId(100218l);
+    	Response<Map<String,Integer>> response = likeApi.getLikeFlagBatch(Lists.newArrayList(100218l), 359979376959488l);
     	System.out.println(JsonUtils.toFastJson(response));
     }
     

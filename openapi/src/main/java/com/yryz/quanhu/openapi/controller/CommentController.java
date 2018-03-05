@@ -43,7 +43,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 public class CommentController {
 
-    @Reference(cluster="failfast")
+    @Reference(cluster="failfast",url="dubbo://127.0.0.1:20882")
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
