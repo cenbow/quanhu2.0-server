@@ -89,7 +89,7 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    @Test
+    //@Test
     public void commentDetail(){
     	CommentSubDTO commentSubDTO = new CommentSubDTO();
     	commentSubDTO.setCurrentPage(1);
@@ -100,7 +100,7 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    //@Test
+    @Test
     public void listComment(){
     	CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
     	commentFrontDTO.setCurrentPage(1);

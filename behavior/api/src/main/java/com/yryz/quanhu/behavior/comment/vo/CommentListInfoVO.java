@@ -1,5 +1,6 @@
 package com.yryz.quanhu.behavior.comment.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public class CommentListInfoVO extends CommentSimpleVO {
 	/**
 	 * 回复列表
 	 */
-	private List<CommentSimpleVO> replyVos;
+	private List<CommentSimpleVO> replyVos = new ArrayList<>();
 	/**
 	 * 点赞状态
 	 */
@@ -21,6 +22,8 @@ public class CommentListInfoVO extends CommentSimpleVO {
 	 * 点赞总数
 	 */
 	private long likeCount = 0l;
+	
+
 	public List<CommentSimpleVO> getReplyVos() {
 		return replyVos;
 	}

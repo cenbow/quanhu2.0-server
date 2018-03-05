@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.yryz.common.context.Context;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
+import com.yryz.quanhu.behavior.like.contants.LikeContants.LikeFlag;
 import com.yryz.quanhu.behavior.like.entity.Like;
 
 @Component
@@ -28,18 +29,31 @@ public class LikeCache {
 	public void saveLike(Like like){
 		String key = LikeApi.getLikeListKey(like.getResourceId());
 		RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
-		redisTemplate.opsForZSet().add(key, String.valueOf(like.getUserId()), like.getCreateDate().getTime());
+		redisTemplate.opsForZSet().add(key,String.valueOf(like.getUserId()), like.getCreateDate().getTime());
 		redisTemplate.expire(key, getExpireDay(), TimeUnit.DAYS);
+	}
+	
+	/**
+	 * 点赞状态保存
+	 * @param like
+	 */
+	public void saveLikeFlag(Like like){
+		String flagKey = LikeApi.getLikeFlagKey(like.getResourceId());
+		RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
+		redisTemplate.opsForZSet().add(flagKey,String.valueOf(like.getUserId()),like.getLikeFlag());
+		redisTemplate.expire(flagKey, getExpireDay(), TimeUnit.DAYS);
 	}
 	
 	/**
 	 * 取消点赞
 	 * @param like
 	 */
-	public void delLike(Long resourceId,Long userId){
+	public void cancelLike(Long resourceId,Long userId){
 		String key = LikeApi.getLikeListKey(resourceId);
+		String flagKey = LikeApi.getLikeFlagKey(resourceId);
 		RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
 		redisTemplate.opsForZSet().remove(key, userId.toString());
+		redisTemplate.opsForZSet().add(flagKey, userId.toString(),(double)LikeFlag.FALSE.getFlag());
 	}
 	
 	/**
@@ -49,11 +63,11 @@ public class LikeCache {
 	 * @param userId
 	 * @return
 	 */
-	public boolean checkLikeFlag(Long resourceId,Long userId){
-		String key = LikeApi.getLikeListKey(resourceId);
+	public Double checkLikeFlag(Long resourceId,Long userId){
+		String key = LikeApi.getLikeFlagKey(resourceId);
 		RedisTemplate<String, String> redisTemplate = redisTemplateBuilder.buildRedisTemplate(String.class);
-		Long index = redisTemplate.opsForZSet().rank(key, userId.toString());
-		return index == null || index < 0 ? false : true;  
+		Double score = redisTemplate.opsForZSet().score(key, userId.toString());
+		return score;  
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.yryz.common.context.Context;
+import com.yryz.common.utils.StringUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentApi;
@@ -184,6 +185,10 @@ public class CommentCache {
 		//查询回复列表
 		if (topCommentId != null && topCommentId != 0l) {
 			key = CommentApi.getCommentReplyListKey(topCommentId);
+		}
+		
+		if(StringUtils.isEmpty(key)){
+			return null;
 		}
 		RedisTemplate<String, Long> redisTemplate = redisTemplateBuilder.buildRedisTemplate(Long.class);
 
