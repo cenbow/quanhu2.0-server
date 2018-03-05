@@ -15,6 +15,8 @@ import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
+import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.WebUtil;
 import com.yryz.quanhu.behavior.comment.dto.CommentFrontDTO;
 import com.yryz.quanhu.behavior.comment.dto.CommentSubDTO;
@@ -23,6 +25,7 @@ import com.yryz.quanhu.behavior.comment.service.CommentApi;
 import com.yryz.quanhu.behavior.comment.vo.CommentDetailVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentListInfoVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentSimpleVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 
@@ -40,13 +43,13 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 public class CommentController {
 
-    @Reference
+    @Reference(url="dubbo://127.0.0.1:20882",cluster="failfast")
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
 
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @PostMapping(value = "/services/app/{version}/comment/accretion")
+    //@PostMapping(value = "/services/app/{version}/comment/accretion")
     public Response<Comment> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
         comment.setCreateUserId(userId);
 
@@ -85,10 +88,18 @@ public class CommentController {
         return commentApi.accretion(comment);
     }
 
+    @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+    @PostMapping(value = "/services/app/{version}/comment/accretion")
+    public Response<CommentSimpleVO> addComment(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
+        comment.setCreateUserId(userId);
+        CommentSimpleVO simpleVO = ResponseUtils.getResponseData(commentApi.saveComment(comment));
+        return ResponseUtils.returnApiObjectSuccess(simpleVO);
+    }
+    
     
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/comment/list")
+    //@GetMapping(value = "/services/app/{version}/comment/list")
     public Response<PageList<CommentVO>> queryComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
         com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
         commentFrontDTO.setUserId(header.getUserId());
@@ -97,11 +108,18 @@ public class CommentController {
 
     @ApiOperation("用户评论列表")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    //@GetMapping(value = "/services/app/{version}/comment/list")
+    @GetMapping(value = "/services/app/{version}/comment/list")
     public Response<PageList<CommentListInfoVO>> listComments(CommentFrontDTO commentFrontDTO,HttpServletRequest request){
         com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
         commentFrontDTO.setUserId(header.getUserId());
-        return commentApi.listComments(commentFrontDTO);
+       /* try {
+        	Response<PageList<CommentListInfoVO>> response = commentApi.listComments(commentFrontDTO);
+        	JsonUtils.toFastJson(response);
+        } catch (Exception e) {
+			e.printStackTrace();
+		}*/
+        PageList<CommentListInfoVO> pageList = ResponseUtils.getResponseData(commentApi.listComments(commentFrontDTO));
+        return ResponseUtils.returnApiObjectSuccess(pageList);
     }
     
     
@@ -116,7 +134,7 @@ public class CommentController {
     
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    //@GetMapping(value = "/services/app/{version}/comment/singleInfo")
     public Response<CommentInfoVO> querySingleCommentInfo(CommentSubDTO commentSubDTO,HttpServletRequest request){
     	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
     	commentSubDTO.setUserId(header.getUserId());
@@ -125,10 +143,11 @@ public class CommentController {
 
     @ApiOperation("用户评论详情")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    //@GetMapping(value = "/services/app/{version}/comment/singleInfo")
+    @GetMapping(value = "/services/app/{version}/comment/singleInfo")
     public Response<CommentDetailVO> getCommentDetail(CommentSubDTO commentSubDTO,HttpServletRequest request){
     	com.yryz.common.entity.RequestHeader header = WebUtil.getHeader(request);
     	commentSubDTO.setUserId(header.getUserId());
-        return commentApi.queryCommentDetail(commentSubDTO);
+    	CommentDetailVO detailVO = ResponseUtils.getResponseData(commentApi.queryCommentDetail(commentSubDTO));
+    	return ResponseUtils.returnApiObjectSuccess(detailVO);
     }
 }

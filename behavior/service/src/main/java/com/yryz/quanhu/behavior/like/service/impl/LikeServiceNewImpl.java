@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +24,9 @@ import com.yryz.common.utils.DateUtils;
 import com.yryz.quanhu.behavior.common.manager.EventManager;
 import com.yryz.quanhu.behavior.common.manager.MessageManager;
 import com.yryz.quanhu.behavior.common.manager.UserRemote;
-import com.yryz.quanhu.behavior.common.util.ThreadPoolUtil;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.count.service.CountService;
+import com.yryz.quanhu.behavior.like.contants.LikeContants.LikeFlag;
 import com.yryz.quanhu.behavior.like.dao.LikeCache;
 import com.yryz.quanhu.behavior.like.dao.LikeDao;
 import com.yryz.quanhu.behavior.like.dto.LikeFrontDTO;
@@ -61,17 +60,16 @@ public class LikeServiceNewImpl implements LikeNewService {
 	@Transactional
 	public int accretion(Like like) {
 		//取消点赞
-		if(isLike(like) == 1){
+		if(isLike(like) == LikeFlag.TRUE.getFlag()){
 			return cleanLike(like);
 		}
-		like.setCreateDate(new Date());
-		like.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));		
-		int result = likeDao.accretion(like);
+		like.setLikeFlag(LikeFlag.TRUE.getFlag());
+		int result = saveLike(like);
 		if(result > 0){
 			likeCache.saveLike(like);
-			
+			likeCache.saveLikeFlag(like);
 			//点赞数+1
-			countService.commitCount(BehaviorEnum.Like,String.valueOf(like.getResourceId()) ,"", 1l);
+			countService.commitCount(BehaviorEnum.Like,String.valueOf(like.getResourceId()) ,"-1", 1l);
 			//发消息
 			messageService.likeSendMsg(like);
 			//对本人的点赞不计成长
@@ -84,25 +82,58 @@ public class LikeServiceNewImpl implements LikeNewService {
 
 	@Override
 	public int isLike(Like like) {
-		int flag = likeCache.checkLikeFlag(like.getResourceId(), like.getUserId()) ? 1 : 0;
-		if(flag == 0){
-			//异步同步点赞状态
-			syncLikeCache(Lists.newArrayList(like.getResourceId()), like.getUserId());
+		Double flag = likeCache.checkLikeFlag(like.getResourceId(), like.getUserId());
+		
+		if(flag == null){
+			LikeVO likeVO = querySingleLiker(like);
+			//同步点赞状态
+			if(likeVO != null){
+				like.setCreateDate(DateUtils.parseDate(likeVO.getCreateDate()));
+				likeCache.saveLike(like);
+				likeCache.saveLikeFlag(like);
+				return likeVO.getLikeFlag();
+			}else{
+				like.setLikeFlag(LikeFlag.FALSE.getFlag());
+				likeCache.saveLikeFlag(like);
+				return LikeFlag.FALSE.getFlag();
+			}
+		}else{
+			return flag.intValue();
 		}
-		return flag; 
 	}
 
 	@Override
 	@Transactional
 	public int cleanLike(Like like) {
-		int result = likeDao.cleanLike(like);
-		//清理缓存
-		likeCache.delLike(like.getResourceId(), like.getUserId());
+		int result = 0;
+		like.setLikeFlag(LikeFlag.FALSE.getFlag());
+		result = saveLike(like);
+		//取消点赞更新缓存
+		likeCache.cancelLike(like.getResourceId(), like.getUserId());
 		//总数-1
-		countService.commitCount(BehaviorEnum.Like, String.valueOf(like.getResourceId()), "", -1l);
+		countService.commitCount(BehaviorEnum.Like, String.valueOf(like.getResourceId()), "-1", -1l);
 		return result;
 	}
-
+	
+	/**
+	 * 持久化点赞状态
+	 * @param like
+	 * @return
+	 */
+	private int saveLike(Like like){
+		int result = 0;
+		LikeVO likeVO = querySingleLiker(like);
+		//未点赞信息作为状态持久化保存
+		if(likeVO == null){
+			like.setCreateDate(new Date());
+			like.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));		
+			result = likeDao.accretion(like);
+		}else{
+			result = likeDao.update(like);
+		}
+		return result;
+	}
+	
 	@Override
 	public PageList<LikeInfoVO> listLike(LikeFrontDTO likeFrontDTO){
 		PageList<LikeInfoVO> pageList = new PageList<>(likeFrontDTO.getCurrentPage(), likeFrontDTO.getPageSize(), null);
@@ -113,7 +144,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 		//查询点赞时间
 		Map<String,Long> likeTimeMap = likeCache.getLikeTime(likeFrontDTO.getResourceId(), userIds);
 		
-		Long count = countService.getCount(String.valueOf(likeFrontDTO.getResourceId()), BehaviorEnum.Like.getCode(), "");
+		Long count = countService.getCount(String.valueOf(likeFrontDTO.getResourceId()), BehaviorEnum.Like.getCode(), "-1");
 		
 		pageList.setCount(count);
 		Map<String,UserSimpleNoneOtherVO> userMap = userService.getUserInfo(userIds);
@@ -177,34 +208,4 @@ public class LikeServiceNewImpl implements LikeNewService {
 		return flagMap;
 	}
 	
-	
-	
-	/**
-	 * 异步同步点赞状态无的点赞数据
-	 * @param resourceIds
-	 * @param userId
-	 */
-	public void syncLikeCache(List<Long> resourceIds, long userId){
-		ThreadPoolUtil.execue(new Runnable() {
-			
-			@Override
-			public void run() {
-				Map<String, Integer> flagMap = getLikeFlagBatch(resourceIds, userId);
-				for(Long resourceId : resourceIds){
-					int result = flagMap.get(resourceId.toString());
-					if(result == 0){
-						Like like = new Like();
-						like.setResourceId(resourceId);
-						like.setUserId(userId);
-						LikeVO likeVO = querySingleLiker(like);
-						if(likeVO != null){
-							like.setCreateDate(DateUtils.parseDate(likeVO.getCreateDate()));
-							likeCache.saveLike(like);
-						}
-					}
-				}
-			}
-		});
-		
-	}
 }

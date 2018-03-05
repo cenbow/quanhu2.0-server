@@ -10,9 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +96,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 			commentCache.saveComment(comment);
 			commentCache.addCommentList(comment);
 			// 增加统计数
-			countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "", 1L);
+			countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", 1L);
 
 			// 发消息
 			messageService.commentSendMsg(comment);
@@ -128,7 +126,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		int result = commentDao.delComment(comment);
 		commentCache.delCommentList(comment);
 		commentCache.deleteComment(comment.getKid());
-		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "", -1L);
+		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", -1L);
 		if (comment.getTopId() == 0l) {
 			delReplyComment(comment);
 		}
@@ -162,7 +160,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		// 删除缓存回复评论列表
 		commentCache.delCommentReplyList(comment.getKid());
 		// 减少评论数
-		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "", -(long) length);
+		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", -(long) length);
 	}
 
 	@Override
@@ -177,7 +175,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 
 		// 获取评论总数
 		Long pageTotals = countService.getCount(String.valueOf(commentFrontDTO.getResourceId()),
-				BehaviorEnum.Comment.getCode(), "");
+				BehaviorEnum.Comment.getCode(), "-1");
 		pageList.setCount(pageTotals);
 
 		int commentLength = comments.size();
@@ -206,6 +204,9 @@ public class CommentNewServiceImpl implements CommentNewService {
 
 		for (int i = 0; i < commentLength; i++) {
 			Comment comment = comments.get(i);
+			if(comment == null){
+				continue;
+			}
 			CommentListInfoVO listInfoVO = CommentListInfoVO
 					.parseByCommentSimple(parseCommentToCommentVO(comment, userMap));
 			// 点赞状态
@@ -301,7 +302,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		}
 
 		// 设置点赞总数
-		Long likeCount = countService.getCount(comment.getKid().toString(), BehaviorEnum.Like.getCode(), "");
+		Long likeCount = countService.getCount(comment.getKid().toString(), BehaviorEnum.Like.getCode(), "-1");
 		detailVO.setLikeCount(likeCount == null ? 0 : likeCount);
 
 		if (CollectionUtils.isNotEmpty(replys)) {
@@ -331,7 +332,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		commentCache.deleteComment(comment.getKid());
 
 		// 评论总数-1
-		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "", -1l);
+		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", -1l);
 
 		if (localComment.getTopId() != 0l) {
 			// 删除回复
@@ -417,7 +418,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		//返回回复数据
 		if(commentFrontDTO.getTopId() != 0l && CollectionUtils.isNotEmpty(comments)){
 			int length = comments.size();
-			return length > 3 ? comments.subList(0, 2) : comments.subList(0, length);
+			return length > commentFrontDTO.getPageSize() ? comments.subList(0, commentFrontDTO.getPageSize()) : comments.subList(0, length);
 		}
 		return comments;
 	}
@@ -438,9 +439,11 @@ public class CommentNewServiceImpl implements CommentNewService {
 			if (CollectionUtils.isNotEmpty(comments)) {
 				for (int i = 0; i < comments.size(); i++) {
 					Comment comment = comments.get(i);
-					userIds.add(comment.getCreateUserId().toString());
-					if (comment.getParentUserId() != 0) {
-						userIds.add(String.valueOf(comment.getParentUserId()));
+					if(comment != null){
+						userIds.add(comment.getCreateUserId().toString());
+						if (comment.getParentUserId() != 0) {
+							userIds.add(String.valueOf(comment.getParentUserId()));
+						}
 					}
 				}
 			}
@@ -455,7 +458,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 	 * @param userMap
 	 * @return
 	 */
-	private CommentSimpleVO parseCommentToCommentVO(Comment comment, Map<String, UserSimpleNoneOtherVO> userMap) {
+	public static CommentSimpleVO parseCommentToCommentVO(Comment comment, Map<String, UserSimpleNoneOtherVO> userMap) {
 		CommentSimpleVO simpleVO = new CommentSimpleVO();
 		simpleVO.setKid(comment.getKid());
 		simpleVO.setTopId(comment.getTopId());

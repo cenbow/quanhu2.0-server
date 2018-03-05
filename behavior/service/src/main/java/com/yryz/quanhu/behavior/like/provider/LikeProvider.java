@@ -64,7 +64,7 @@ import com.yryz.quanhu.user.vo.UserSimpleVO;
  * @Description:点赞
  * @Date:Created in 15:03 2018/1/24
  */
-@Service(interfaceClass = LikeApi.class)
+//@Service(interfaceClass = LikeApi.class)
 public class LikeProvider implements LikeApi{
 
     private static final Logger logger = LoggerFactory.getLogger(LikeProvider.class);

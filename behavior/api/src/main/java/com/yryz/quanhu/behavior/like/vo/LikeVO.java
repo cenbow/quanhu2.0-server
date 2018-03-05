@@ -46,7 +46,10 @@ public class LikeVO implements Serializable{
      * 用户头像
      */
     private String userImg;
-
+    /**
+     * 点赞状态 10-未点赞 11-已点赞
+     */
+    private Integer likeFlag;
     public long getKid() {
         return kid;
     }
@@ -94,4 +97,12 @@ public class LikeVO implements Serializable{
     public void setUserImg(String userImg) {
         this.userImg = userImg;
     }
+
+	public Integer getLikeFlag() {
+		return likeFlag;
+	}
+
+	public void setLikeFlag(Integer likeFlag) {
+		this.likeFlag = likeFlag;
+	}
 }
