@@ -40,7 +40,10 @@ public class Like extends GenericEntity {
      */
     
     private long coterieId;
-
+    /**
+     * 点赞状态10-未点赞 11-已点赞
+     */
+    private Integer likeFlag;
     public long getCoterieId() {
         return coterieId;
     }
@@ -80,4 +83,12 @@ public class Like extends GenericEntity {
     public void setUserId(long userId) {
         this.userId = userId;
     }
+
+	public Integer getLikeFlag() {
+		return likeFlag;
+	}
+
+	public void setLikeFlag(Integer likeFlag) {
+		this.likeFlag = likeFlag;
+	}
 }

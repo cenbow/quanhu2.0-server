@@ -13,13 +13,22 @@ public class ReportVo implements Serializable{
 
     private static final long serialVersionUID = 1611039581135205855L;
 
-    private String informDesc;
+    private String type;
+    private String desc;
 
-    public String getInformDesc() {
-        return informDesc;
+    public String getType() {
+        return type;
     }
 
-    public void setInformDesc(String informDesc) {
-        this.informDesc = informDesc;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

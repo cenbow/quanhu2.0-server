@@ -9,4 +9,24 @@ package com.yryz.quanhu.behavior.like.contants;
 public class LikeContants {
 
     public static final String QH_LIKE="qh_like";
+    
+    /**
+     * 点赞状态
+     * @author Administrator
+     *
+     */
+    public enum LikeFlag{
+    	/** 未点赞*/
+    	FALSE(10),
+    	/** 已点赞 */
+    	TRUE(11);
+    	private int flag;
+    	
+    	LikeFlag(int flag) {
+			this.flag = flag;
+		}
+    	public int getFlag(){
+    		return this.flag;
+    	}
+    }
 }

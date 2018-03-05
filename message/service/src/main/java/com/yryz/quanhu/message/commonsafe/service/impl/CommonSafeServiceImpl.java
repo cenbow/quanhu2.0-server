@@ -293,7 +293,7 @@ public class CommonSafeServiceImpl implements CommonSafeService {
 			}
 			if (lastTime != null && System.currentTimeMillis() - lastTime < configVO.getNormalCodeDelayTime()) {
 				throw QuanhuException.busiShowError(VerifyStatus.MORETHAN_LIMIT.getMsg(),
-						VerifyStatus.MORETHAN_LIMIT.getMsg());
+						VerifyStatus.TOO_FAST.getMsg());
 			}
 		}
 	}

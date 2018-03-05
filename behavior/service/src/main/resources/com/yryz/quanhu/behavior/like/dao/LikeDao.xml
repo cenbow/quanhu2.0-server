@@ -7,6 +7,7 @@
         <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
         <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="like_flag" property="likeFlag" jdbcType="TINYINT"/>
         <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
         <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="VARCHAR"/>
         <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
@@ -16,7 +17,7 @@
     </resultMap>
 
     <sql id="Base_Like_Column_List">
-        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,user_id AS userId,create_date AS createDate,
+        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,user_id AS userId, like_flag as likeFlag,create_date AS createDate,
         last_update_user_id AS lastUpdateUserId,last_update_date AS lastUpdateDate,resource_user_id AS resourceUserId,
         coterie_id AS coterieId
     </sql>
@@ -35,6 +36,9 @@
             </if>
             <if test="userId != null">
                 user_id,
+            </if>
+            <if test="likeFlag != null">
+            	like_flag,
             </if>
             <if test="lastUpdateUserId != null and lastUpdateUserId != ''">
                 last_update_user_id,
@@ -61,6 +65,9 @@
             </if>
             <if test="userId != null">
                 #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="likeFlag != null">
+            	#{likeFlag},
             </if>
             <if test="lastUpdateUserId != null and lastUpdateUserId != ''">
                 #{lastUpdateUserId,jdbcType=VARCHAR},
@@ -91,9 +98,13 @@
     </select>
 
     <delete id="cleanLike" parameterType="com.yryz.quanhu.behavior.like.entity.Like">
-      DELETE FROM qh_like WHERE module_enum=#{moduleEnum,jdbcType=VARCHAR} AND resource_id=#{resourceId,jdbcType=BIGINT} AND user_id=#{userId,jdbcType=BIGINT}
+      delete from qh_like WHERE module_enum=#{moduleEnum,jdbcType=VARCHAR} AND resource_id=#{resourceId,jdbcType=BIGINT} AND user_id=#{userId,jdbcType=BIGINT}
     </delete>
-
+	
+	<delete id="update" parameterType="com.yryz.quanhu.behavior.like.entity.Like">
+      update qh_like set like_flag = #{likeFlag} WHERE module_enum=#{moduleEnum,jdbcType=VARCHAR} AND resource_id=#{resourceId,jdbcType=BIGINT} AND user_id=#{userId,jdbcType=BIGINT}
+    </delete>
+	
     <select id="queryLikers" parameterType="com.yryz.quanhu.behavior.like.dto.LikeFrontDTO" resultType="com.yryz.quanhu.behavior.like.vo.LikeVO">
         SELECT
         <include refid="Base_Like_Column_List"/>
@@ -102,6 +113,9 @@
             1=1
             <if test="resourceId != null">
                 AND resource_id=#{resourceId,jdbcType=BIGINT}
+            </if>
+            <if test="likeFlag != null">
+            	and like_flag = #{likeFlag}
             </if>
             ORDER BY create_date DESC
         </where>

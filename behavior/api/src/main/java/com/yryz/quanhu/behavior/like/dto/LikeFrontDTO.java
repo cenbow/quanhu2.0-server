@@ -18,7 +18,8 @@ public class LikeFrontDTO extends PageList {
      */
     
     private long resourceId;
-
+    
+    private Integer likeFlag;
     public long getResourceId() {
         return resourceId;
     }
@@ -26,4 +27,12 @@ public class LikeFrontDTO extends PageList {
     public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
     }
+
+	public Integer getLikeFlag() {
+		return likeFlag;
+	}
+
+	public void setLikeFlag(Integer likeFlag) {
+		this.likeFlag = likeFlag;
+	}
 }

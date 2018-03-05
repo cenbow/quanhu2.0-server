@@ -1,168 +1,105 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yryz.quanhu.behavior.report.dao.ReportDao">
-    <resultMap id="BaseReportResultMap" type="com.yryz.quanhu.behavior.report.entity.Report">
-        <id column="id" property="id" jdbcType="BIGINT"/>
-        <result column="kid" property="kid" jdbcType="BIGINT"/>
-        <result column="module_enum" property="moduleEnum" jdbcType="VARCHAR"/>
-        <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
-        <result column="inform_type_name" property="informTypeName" jdbcType="VARCHAR"/>
-        <result column="inform_desc" property="informDesc" jdbcType="VARCHAR"/>
-        <result column="inform_status" property="informStatus" jdbcType="TINYINT"/>
-        <result column="report_user_id" property="reportUserId" jdbcType="BIGINT"/>
-        <result column="be_report_user_id" property="beReportUserId" jdbcType="BIGINT"/>
-        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
-        <result column="dispose_time" property="disposeTime" jdbcType="TIMESTAMP"/>
-        <result column="last_update_user_id" property="lastUpdateUserId" jdbcType="VARCHAR"/>
-        <result column="last_update_date" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
-    </resultMap>
 
-    <sql id="Base_Report_Column_List">
-        id, kid, module_enum AS moduleEnum,resource_id AS resourceId,inform_type_name AS informTypeName,inform_desc AS informDesc,inform_status AS informStatus,
-        report_user_id AS reportUserId,be_report_user_id AS beReportUserId,dispose_time AS disposeTime,create_date AS createDate,last_update_user_id AS lastUpdateUserId,
-        last_update_date AS lastUpdateDate
+    <sql id="Base_Column_List">
+        id,kid,create_date,create_user_id,last_update_date,last_update_user_id,del_flag
+        ,module_enum,module_enum_name,resource_id,resource_user_id
+        ,report_type,report_desc,report_context,report_status
+        ,solution_type,solution_desc
+
     </sql>
 
-    <select id="queryReportForAdmin" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO"
-            resultType="com.yryz.quanhu.behavior.report.vo.ReportVoForAdmin">
-        SELECT
-        <include refid="Base_Report_Column_List"/>
-        FROM qh_inform
-        <where>
-            1=1
-            <if test="informStatus != null and informStatus != ''">
-                AND inform_status=#{informStatus,jdbcType=TINYINT}
-            </if>
-            <if test="informTypeName != null and informTypeName != ''">
-                AND inform_type_name=#{informTypeName,jdbcType=VARCHAR}
-            </if>
-            <if test="moduleEnum != null and moduleEnum != ''">
-                AND module_enum=#{moduleEnum,jdbcType=VARCHAR}
-            </if>
-            <if test="startTime != null and startTime != ''">
-                AND create_date &gt;= #{startTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endTime != null and endTime != ''">
-                AND create_date &lt;= #{endTime,jdbcType=TIMESTAMP}
-            </if>
-            ORDER BY
-            create_date DESC
-        </where>
-    </select>
 
-    <select id="queryReportForAdminCount" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO" resultType="java.lang.Long">
-        SELECT
-        COUNT(1)
-        FROM qh_inform
-        <where>
-            1=1
-            <if test="informStatus != null and informStatus != ''">
-                AND inform_status=#{informStatus,jdbcType=TINYINT}
-            </if>
-            <if test="informTypeName != null and informTypeName != ''">
-                AND inform_type_name=#{informTypeName,jdbcType=VARCHAR}
-            </if>
-            <if test="moduleEnum != null and moduleEnum != ''">
-                AND module_enum=#{moduleEnum,jdbcType=VARCHAR}
-            </if>
-            <if test="startTime != null and startTime != ''">
-                AND create_date &gt;= #{startTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endTime != null and endTime != ''">
-                AND create_date &lt;= #{endTime,jdbcType=TIMESTAMP}
-            </if>
-        </where>
-    </select>
+    <insert id="insert" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO">
 
-    <insert id="accretion" parameterType="com.yryz.quanhu.behavior.report.entity.Report">
-        insert into qh_inform
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="kid != null">
-                kid,
-            </if>
-            <if test="moduleEnum != null and moduleEnum != ''">
-                module_enum,
-            </if>
-            <if test="resourceId != null">
-                resource_id,
-            </if>
-            <if test="informTypeName != null">
-                inform_type_name,
-            </if>
-            <if test="informDesc != null and informDesc != ''">
-                inform_desc,
-            </if>
-            <if test="informStatus != null">
-                inform_status,
-            </if>
-            <if test="reportUserId != null">
-                report_user_id,
-            </if>
-            <if test="beReportUserId != null">
-                be_report_user_id,
-            </if>
-            <if test="disposeTime != null">
-                dispose_time,
-            </if>
-            <if test="lastUpdateUserId != null and lastUpdateUserId != ''">
-                last_update_user_id,
-            </if>
-            <if test="lastUpdateDate != null">
-                last_update_date,
-            </if>
-            <if test="lastUpdateDate != null">
-                last_update_date,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="kid != null">
-                #{kid,jdbcType=BIGINT},
-            </if>
-            <if test="moduleEnum != null and moduleEnum != ''">
-                #{moduleEnum,jdbcType=VARCHAR} ,
-            </if>
-            <if test="resourceId != null">
-                #{resourceId,jdbcType=BIGINT},
-            </if>
-            <if test="informTypeName != null">
-                #{informTypeName,jdbcType=VARCHAR},
-            </if>
-            <if test="informDesc != null and informDesc != ''">
-                #{informDesc,jdbcType=VARCHAR},
-            </if>
-            <if test="informStatus != null">
-                #{informStatus,jdbcType=TINYINT},
-            </if>
-            <if test="reportUserId != null">
-                #{reportUserId,jdbcType=BIGINT},
-            </if>
-            <if test="beReportUserId != null">
-                #{beReportUserId,jdbcType=BIGINT},
-            </if>
-            <if test="disposeTime != null">
-                #{disposeTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="lastUpdateUserId != null and lastUpdateUserId != ''">
-                #{lastUpdateUserId,jdbcType=VARCHAR},
-            </if>
-            <if test="lastUpdateDate != null">
-                #{lastUpdateDate,jdbcType=TIMESTAMP},
-            </if>
-        </trim>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO qh_report(
+        <include refid="Base_Column_List" />
+        )VALUES (
+        #{id,jdbcType=BIGINT}
+        ,#{kid,jdbcType=BIGINT}
+        ,now()
+        ,#{createUserId,jdbcType=BIGINT}
+        ,now()
+        ,#{lastUpdateUserId,jdbcType=VARCHAR}
+        ,#{delFlag,jdbcType=TINYINT}
+
+        ,#{moduleEnum,jdbcType=VARCHAR}
+        ,#{moduleEnumName,jdbcType=VARCHAR}
+        ,#{resourceId,jdbcType=VARCHAR}
+        ,#{resourceUserId,jdbcType=BIGINT}
+
+        ,#{reportType,jdbcType=VARCHAR}
+        ,#{reportDesc,jdbcType=VARCHAR}
+        ,#{reportContext,jdbcType=VARCHAR}
+        ,#{reportStatus,jdbcType=TINYINT}
+
+        ,#{solutionType,jdbcType=VARCHAR}
+        ,#{solutionDesc,jdbcType=VARCHAR}
+        )
     </insert>
 
-    <select id="querySingleReport" parameterType="com.yryz.quanhu.behavior.report.entity.Report"
-            resultType="com.yryz.quanhu.behavior.report.entity.Report">
-        SELECT
-        <include refid="Base_Report_Column_List"/>
-        FROM qh_inform
-        <where>
-            1=1
-            <if test="kid != null">
-              AND kid = #{kid,jdbcType=BIGINT}
-            </if>
-        </where>
 
+    <update id="update" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO">
+        UPDATE qh_report SET
+        last_update_date = NOW()
+        ,last_update_user_id = #{lastUpdateUserId,jdbcType=BIGINT}
+        ,report_status = #{reportStatus,jdbcType=TINYINT}
+        ,solution_type = #{solutionType,jdbcType=VARCHAR}
+        ,solution_desc = #{solutionDesc,jdbcType=VARCHAR}
+        WHERE kid = #{kid,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="selectByKid" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO"
+            resultType="com.yryz.quanhu.behavior.report.dto.ReportDTO">
+
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM qh_report WHERE kid = #{kid,jdbcType=BIGINT}
+
+    </select>
+
+    <!--查询用户一对一关系 -->
+    <select id="getList" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO"
+            resultType="com.yryz.quanhu.behavior.report.dto.ReportDTO">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM qh_report WHERE
+        del_flag = 10
+        <if test="reportStatus != null and reportStatus != ''">
+            AND report_status = #{reportStatus,jdbcType=TINYINT}
+        </if>
+        <if test="reportType != null and reportType != ''">
+            AND report_type = #{reportType,jdbcType=VARCHAR}
+        </if>
+        <if test="moduleEnum !=null and moduleEnum != ''">
+            AND module_enum = #{moduleEnum,jdbcType=VARCHAR}
+        </if>
+        <if test="startDate !=null and startDate != ''">
+            AND create_date &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null and endDate != ''">
+            AND create_date &lt;= #{endDate}
+        </if>
+        ORDER BY create_date DESC
+    </select>
+
+
+    <select id="selectByResource" parameterType="com.yryz.quanhu.behavior.report.dto.ReportDTO"
+            resultType="com.yryz.quanhu.behavior.report.dto.ReportDTO">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM qh_report WHERE
+        del_flag = 10
+        AND module_enum = #{moduleEnum,jdbcType=VARCHAR}
+        AND resource_id = #{resourceId,jdbcType=VARCHAR}
+        AND report_status = #{reportStatus,jdbcType=TINYINT}
+        ORDER BY create_date DESC
     </select>
 
 </mapper>

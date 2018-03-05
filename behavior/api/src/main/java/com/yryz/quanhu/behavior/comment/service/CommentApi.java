@@ -10,6 +10,7 @@ import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.vo.CommentDetailVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentInfoVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentListInfoVO;
+import com.yryz.quanhu.behavior.comment.vo.CommentSimpleVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVO;
 import com.yryz.quanhu.behavior.comment.vo.CommentVOForAdmin;
 
@@ -57,7 +58,14 @@ public interface CommentApi {
      * @return
      */
     Response<Comment> accretion(Comment comment);
-
+    
+    /**
+     * 添加评论
+     * @param comment
+     * @return
+     */
+    Response<CommentSimpleVO> saveComment(Comment comment);
+    
     /**
      * 删除评论
      * @param comment

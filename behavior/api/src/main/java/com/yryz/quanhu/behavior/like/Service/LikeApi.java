@@ -19,12 +19,12 @@ import java.util.Map;
  */
 public interface LikeApi {
 	/**
-	 * 点赞信息key
+	 * 点赞状态key
 	 * @param likeId
 	 * @return
 	 */
-	static String getLikeKey(Long likeId){
-		return String.format("%s:%s", Context.getProperty("like.info"),likeId.toString());
+	static String getLikeFlagKey(Long resourceId){
+		return String.format("%s:%s", Context.getProperty("like.flag"),resourceId.toString());
 	}
 	
 	/**
