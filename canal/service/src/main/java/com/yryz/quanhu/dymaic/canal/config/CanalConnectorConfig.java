@@ -2,6 +2,8 @@ package com.yryz.quanhu.dymaic.canal.config;
 
 import java.net.InetSocketAddress;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,6 +19,8 @@ import com.yryz.quanhu.dymaic.canal.service.CanalService;
 @ConditionalOnClass({ CanalConnector.class, CanalConnectors.class })
 @EnableConfigurationProperties(CanalProperties.class)
 public class CanalConnectorConfig {
+	private static Logger logger = LoggerFactory.getLogger(CanalConnectorConfig.class);
+	
 	private final CanalProperties properties;
 	public CanalConnectorConfig(CanalProperties properties){
 		this.properties=properties;
@@ -33,6 +37,7 @@ public class CanalConnectorConfig {
 	@Bean
 	@ConditionalOnProperty(prefix = "canal", name = {"zkServers","instance"}, matchIfMissing = false)
 	public CanalConnector clusterConnector(){
+		logger.info("canal zk servers:"+properties.getZkServers());
 		CanalConnector connector = CanalConnectors.newClusterConnector(properties.getZkServers(), properties.getInstance(), "", "");
 		return connector;
 	}
