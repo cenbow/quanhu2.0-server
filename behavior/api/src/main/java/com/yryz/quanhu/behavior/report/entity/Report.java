@@ -12,33 +12,48 @@ import com.yryz.common.entity.GenericEntity;
  */
 public class Report extends GenericEntity {
 
-    //资源类型
+    /**
+     * 举报资源类型
+     */
     private String moduleEnum;
-    //资源ID
-    
-    private long resourceId;
-    //举报类型
-    private String informTypeName;
-    //违规描述
-    private String informDesc;
-    //处理状态(10待处理，11已处理)
-    private byte informStatus;
-    //举报人
-    
-    private long reportUserId;
-    //被举报人
-    
-    private long beReportUserId;
-    //处理时间
-    private String disposeTime;
+    /**
+     * 举报资源名称
+     */
+    private String moduleEnumName;
+    /**
+     * 举报资源ID
+     */
+    private String resourceId;
+    /**
+     * 资源作者
+     */
+    private long resourceUserId;
+    /**
+     * 举报类型
+     */
+    private String reportType;
+    /**
+     * 举报类型名称
+     */
+    private String reportDesc;
+    /**
+     * 举报内容
+     */
+    private String reportContext;
+    /**
+     * 举报状态
+     */
+    private Integer reportStatus;
+    /**
+     * 解决方案
+     */
+    private String solutionType;
+    /**
+     * 解决方案说明
+     */
+    private String solutionDesc;
 
-    public String getInformTypeName() {
-        return informTypeName;
-    }
-
-    public void setInformTypeName(String informTypeName) {
-        this.informTypeName = informTypeName;
-    }
+    private Integer delFlag;
 
     public String getModuleEnum() {
         return moduleEnum;
@@ -48,51 +63,83 @@ public class Report extends GenericEntity {
         this.moduleEnum = moduleEnum;
     }
 
-    public long getResourceId() {
+    public String getModuleEnumName() {
+        return moduleEnumName;
+    }
+
+    public void setModuleEnumName(String moduleEnumName) {
+        this.moduleEnumName = moduleEnumName;
+    }
+
+    public String getResourceId() {
         return resourceId;
     }
 
-    public void setResourceId(long resourceId) {
+    public void setResourceId(String resourceId) {
         this.resourceId = resourceId;
     }
 
-    public String getInformDesc() {
-        return informDesc;
+    public long getResourceUserId() {
+        return resourceUserId;
     }
 
-    public void setInformDesc(String informDesc) {
-        this.informDesc = informDesc;
+    public void setResourceUserId(long resourceUserId) {
+        this.resourceUserId = resourceUserId;
     }
 
-    public byte getInformStatus() {
-        return informStatus;
+    public String getReportType() {
+        return reportType;
     }
 
-    public void setInformStatus(byte informStatus) {
-        this.informStatus = informStatus;
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
     }
 
-    public long getReportUserId() {
-        return reportUserId;
+    public String getReportDesc() {
+        return reportDesc;
     }
 
-    public void setReportUserId(long reportUserId) {
-        this.reportUserId = reportUserId;
+    public void setReportDesc(String reportDesc) {
+        this.reportDesc = reportDesc;
     }
 
-    public long getBeReportUserId() {
-        return beReportUserId;
+    public String getReportContext() {
+        return reportContext;
     }
 
-    public void setBeReportUserId(long beReportUserId) {
-        this.beReportUserId = beReportUserId;
+    public void setReportContext(String reportContext) {
+        this.reportContext = reportContext;
     }
 
-    public String getDisposeTime() {
-        return disposeTime;
+    public Integer getReportStatus() {
+        return reportStatus;
     }
 
-    public void setDisposeTime(String disposeTime) {
-        this.disposeTime = disposeTime;
+    public void setReportStatus(Integer reportStatus) {
+        this.reportStatus = reportStatus;
+    }
+
+    public String getSolutionType() {
+        return solutionType;
+    }
+
+    public void setSolutionType(String solutionType) {
+        this.solutionType = solutionType;
+    }
+
+    public String getSolutionDesc() {
+        return solutionDesc;
+    }
+
+    public void setSolutionDesc(String solutionDesc) {
+        this.solutionDesc = solutionDesc;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

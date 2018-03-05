@@ -18,31 +18,15 @@ import java.util.Set;
  * @Date:Created in 16:15 2018/1/20
  */
 public interface ReportApi {
-
     /**
      * desc:添加举报{前端}
      * @param:report
      * @return:map
      **/
-    Response<Map<String,Integer>> accretion(Report report);
-
-    /**
-     * desc:举报分页列表{管理后台}
-     * @param:reportDTO
-     * @return:PageList
-     **/
-    Response<PageList<ReportVoForAdmin>> queryReportForAdmin(ReportDTO reportDTO);
-
-    /**
-     * desc:详情{管理后台}
-     * @param:report
-     * @return:Report
-     **/
-    Response<Report> querySingleReport(Report report);
-
+    Response<Map<String,Integer>> submit(ReportDTO dto);
     /**
      * 违规描述列表
      * @return
      */
-    Response<List<ReportVo>> queryInformDesc();
+    Response<List<ReportVo>> getReportType(ReportDTO dto);
 }
