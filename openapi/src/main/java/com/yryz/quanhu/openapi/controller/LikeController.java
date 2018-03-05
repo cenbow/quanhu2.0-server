@@ -31,7 +31,7 @@ import java.util.Map;
 @RestController
 public class LikeController {
 
-    @Reference(check = false,url="dubbo://127.0.0.1:20882")
+    @Reference(check = false)
     private LikeApi likeApi;
 
     
