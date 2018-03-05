@@ -104,7 +104,7 @@ public class LikeNewProvider implements LikeApi{
 			Like like = new Like();
 			like.setResourceId(NumberUtils.createLong(map.get("resourceId").toString()));
 			like.setUserId(NumberUtils.createLong(map.get("userId").toString()));
-			return ResponseUtils.returnObjectSuccess(likeService.isLike(like) == 0 ? 10l : 11l);
+			return ResponseUtils.returnObjectSuccess((long)likeService.isLike(like));
         } catch (Exception e) {
             logger.error("[like_getLikeFlag]", e);
             return ResponseUtils.returnException(e);
