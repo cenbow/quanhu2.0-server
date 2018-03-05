@@ -172,7 +172,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 	}
 	
 	/**
-	 * 查询点赞列表
+	 * 查询点赞列表(只查询已点赞的数据)
 	 * @param likeFrontDTO
 	 * @return
 	 */
@@ -183,6 +183,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 		}
 		userIds = new HashSet<>();
 		PageHelper.startPage(likeFrontDTO.getCurrentPage(), likeFrontDTO.getPageSize(), false);
+		likeFrontDTO.setLikeFlag(LikeFlag.TRUE.getFlag());
 		List<LikeVO> likeVOS = likeDao.queryLikers(likeFrontDTO);
 		if(CollectionUtils.isNotEmpty(likeVOS)){
 			for(LikeVO vo : likeVOS){

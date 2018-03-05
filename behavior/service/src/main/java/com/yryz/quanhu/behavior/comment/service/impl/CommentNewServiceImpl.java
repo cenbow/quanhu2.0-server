@@ -27,6 +27,7 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.comment.dao.CommentDao;
 import com.yryz.quanhu.behavior.comment.dao.redis.CommentCache;
@@ -118,12 +119,19 @@ public class CommentNewServiceImpl implements CommentNewService {
 	@Override
 	public int delComment(Comment comment) {
 		Comment localComment = getComment(comment.getKid());
+		if(localComment == null){
+			throw QuanhuException.busiShowError("该评论不存在","该评论不存在");
+		}
+		if(localComment.getShelveFlag() == 11 || localComment.getDelFlag() == 11){
+			throw QuanhuException.busiShowError("该评论已下架","该评论已下架");
+		}
 		// 只有本人或者资源作者可以删除评论
 		if (!comment.getCreateUserId().equals(localComment.getCreateUserId())
 				&& !comment.getCreateUserId().equals(localComment.getTargetUserId())) {
 			throw QuanhuException.busiShowError("只有本人或者资源发布者可以删除评论", "只有本人或者资源发布者可以删除评论");
 		}
-
+		
+		
 		int result = commentDao.delComment(comment);
 		commentCache.delCommentList(comment);
 		commentCache.deleteComment(comment.getKid());
@@ -338,15 +346,23 @@ public class CommentNewServiceImpl implements CommentNewService {
 	@Transactional
 	public int updownSingle(Comment comment) {
 		Comment localComment = getComment(comment.getKid());
-		int result = commentDao.updownSingle(comment);
+		if(localComment == null){
+			throw QuanhuException.busiError("评论不存在");
+		}
+		if(localComment.getShelveFlag() == 11 || localComment.getDelFlag() == 11){
+			logger.info("[updownSingle]:comment:{} is updown",JsonUtils.toFastJson(localComment));
+			return 0;
+		}
+		localComment.setLastUpdateUserId(comment.getLastUpdateUserId());
+		int result = commentDao.updownSingle(localComment);
 
 		// 刪除缓存评论列表
-		commentCache.delCommentList(comment);
+		commentCache.delCommentList(localComment);
 		// 删除缓存评论
 		commentCache.deleteComment(comment.getKid());
 
 		// 评论总数-1
-		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", -1l);
+		countService.commitCount(BehaviorEnum.Comment, String.valueOf(localComment.getResourceId()), "-1", -1l);
 
 		if (localComment.getTopId() != 0l) {
 			// 删除回复
@@ -369,7 +385,9 @@ public class CommentNewServiceImpl implements CommentNewService {
 		if (comment != null) {
 			return comment;
 		}
-		comment = commentDao.querySingleCommentById(commentId);
+		comment = new Comment();
+		comment.setKid(commentId);
+		comment = commentDao.querySingleComment(comment);
 		if (comment != null) {
 			if(comment.getDelFlag() != 10 && comment.getShelveFlag() != 10){
 				commentCache.saveComment(comment);

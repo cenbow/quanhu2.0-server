@@ -114,6 +114,9 @@
             <if test="resourceId != null">
                 AND resource_id=#{resourceId,jdbcType=BIGINT}
             </if>
+            <if test="likeFlag != null">
+            	and like_flag = #{likeFlag}
+            </if>
             ORDER BY create_date DESC
         </where>
     </select>

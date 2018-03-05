@@ -70,10 +70,11 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
+    @Test
     public void updownComment(){
     	Comment comment = new Comment();
     	comment.setKid(367981230055424l);
-    	
+    	comment.setLastUpdateUserId(1l);
     	commentApi.updownSingle(comment);
     }
     
@@ -108,7 +109,7 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    @Test
+    //@Test
     public void listComment(){
     	CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
     	commentFrontDTO.setCurrentPage(1);
