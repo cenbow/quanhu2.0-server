@@ -44,6 +44,7 @@ import com.yryz.quanhu.behavior.common.manager.MessageManager;
 import com.yryz.quanhu.behavior.common.manager.UserRemote;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.count.service.CountService;
+import com.yryz.quanhu.behavior.like.contants.LikeContants.LikeFlag;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeNewService;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -216,6 +217,8 @@ public class CommentNewServiceImpl implements CommentNewService {
 			// 点赞状态
 			if (MapUtils.isNotEmpty(likeFlagMap)) {
 				listInfoVO.setLikeFlag(likeFlagMap.get(comment.getKid().toString()));
+			}else{
+				listInfoVO.setLikeFlag(LikeFlag.FALSE.getFlag());
 			}
 
 			// 获取回复总数
@@ -224,7 +227,11 @@ public class CommentNewServiceImpl implements CommentNewService {
 			
 			//设置点赞、评论总数
 			listInfoVO.setCommentCount(replycount.intValue());
-			listInfoVO.setLikeCount(likeCountMap.get(likeCountMap));
+			if(MapUtils.isNotEmpty(likeCountMap)){
+				listInfoVO.setLikeCount(likeCountMap.get(comment.getKid()));
+			}else{
+				listInfoVO.setLikeCount(0);
+			}
 			
 			List<Comment> replys = replyMap.get(comment.getKid());
 			// 聚合评论回复
@@ -498,7 +505,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 	 */
 	private Map<Long,Long> getLikeCount(Set<Long> topCommentIds){
 		if(CollectionUtils.isEmpty(topCommentIds)){
-			return new HashMap<>();
+			return null;
 		}
 		Map<Long,Long> countMap = new HashMap<>(topCommentIds.size());
 		for(Iterator<Long> iterator = topCommentIds.iterator();iterator.hasNext();){

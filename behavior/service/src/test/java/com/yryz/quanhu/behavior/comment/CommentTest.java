@@ -58,7 +58,7 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    @Test
+    //@Test
     public void like(){
     	Like like = new Like();
     	like.setUserId(378867848421376l);
@@ -108,7 +108,7 @@ public class CommentTest {
     	System.out.println(JsonUtils.toFastJson(response));
     }
     
-    //@Test
+    @Test
     public void listComment(){
     	CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
     	commentFrontDTO.setCurrentPage(1);
