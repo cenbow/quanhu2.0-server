@@ -31,7 +31,7 @@ import java.util.Map;
 @RestController
 public class LikeController {
 
-    @Reference(check = false,url="dubbo://127.0.0.1:20882")
+    @Reference(check = false)
     private LikeApi likeApi;
 
     
@@ -42,7 +42,7 @@ public class LikeController {
     @PostMapping(value = "/services/app/{version}/like/dian")
     public Response<Map<String, Object>> accretion(@RequestBody Like like, @RequestHeader Long userId) {
         like.setUserId(userId);
-        return likeApi.dian(like);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(likeApi.dian(like)));
     }
 
     
@@ -50,7 +50,7 @@ public class LikeController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     //@GetMapping(value = "/services/app/{version}/like/frontlist")
     public Response<PageList<LikeVO>> queryLikers(LikeFrontDTO likeFrontDTO){
-        return likeApi.queryLikers(likeFrontDTO);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(likeApi.queryLikers(likeFrontDTO)));
     }
 
     
@@ -58,6 +58,6 @@ public class LikeController {
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @GetMapping(value = "/services/app/{version}/like/frontlist")
     public Response<PageList<LikeInfoVO>> listLiker(LikeFrontDTO likeFrontDTO){
-        return likeApi.listLike(likeFrontDTO);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(likeApi.listLike(likeFrontDTO)));
     }
 }

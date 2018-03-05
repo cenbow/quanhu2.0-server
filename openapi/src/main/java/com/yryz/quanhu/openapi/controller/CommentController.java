@@ -43,13 +43,13 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 public class CommentController {
 
-    @Reference(url="dubbo://127.0.0.1:20882",cluster="failfast")
+    @Reference(cluster="failfast")
     private CommentApi commentApi;
 
     @ApiOperation("用户评论")
 
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
-    //@PostMapping(value = "/services/app/{version}/comment/accretion")
+    @PostMapping(value = "/services/app/{version}/comment/accretion")
     public Response<Comment> accretion(@RequestBody Comment comment, @RequestHeader Long userId, HttpServletRequest request) {
         comment.setCreateUserId(userId);
 
@@ -72,7 +72,7 @@ public class CommentController {
     @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
     @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
     private Response<Comment> coterieAccretion(Comment comment, Long userId, HttpServletRequest request) {
-        return commentApi.accretion(comment);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.accretion(comment)));
     }
 
     /**
@@ -85,7 +85,7 @@ public class CommentController {
     @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
     @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
     private Response<Comment> platformAccretion(Comment comment, Long userId, HttpServletRequest request) {
-        return commentApi.accretion(comment);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.accretion(comment)));
     }
 
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
@@ -128,7 +128,7 @@ public class CommentController {
     @PostMapping(value = "/services/app/{version}/comment/clean")
     public Response<Map<String, Integer>> delComment(@RequestBody Comment comment,@RequestHeader Long userId){
         comment.setCreateUserId(userId);
-        return commentApi.delComment(comment);
+        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.delComment(comment)));
     }
 
     
