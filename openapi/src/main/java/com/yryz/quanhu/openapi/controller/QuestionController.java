@@ -109,6 +109,16 @@ public class QuestionController {
     }
 
 
+    @ApiOperation("查询非私密的提问的详情")
+    @ApiImplicitParams(@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true))
+    @UserBehaviorValidation(event = "查询非私密提问的详情", login = true)
+    @GetMapping(value = "/services/app/{version}/coterie/question/singlePublic")
+    public Response<QuestionVo> queryQuestionAnswerPublic(Long kid, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        return questionApi.queryQuestionDetail(kid, null);
+    }
+
+
     @ApiOperation("查询问答列表")
     @ApiImplicitParams(
             {@ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true),
