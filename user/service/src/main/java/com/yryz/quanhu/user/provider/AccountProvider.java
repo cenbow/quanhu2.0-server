@@ -260,8 +260,9 @@ public class AccountProvider implements AccountApi {
 					throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
 				}
 			} else {
-				userId = accountService.loginThird(loginDTO, thirdUser, userId);
+				throw QuanhuException.busiError(ExceptionEnum.USER_MISSING);
 			}
+			userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId, header, null,
 					loginDTO.getRegLogDTO().getIp());
 			return ResponseUtils.returnObjectSuccess(registerLoginVO);
