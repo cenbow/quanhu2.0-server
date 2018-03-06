@@ -357,18 +357,16 @@ public class QuestionServiceImpl implements QuestionService {
      */
     @Override
     public QuestionVo getDetail(Long kid, Long userId) {
-        QuestionAnswerVo questionAnswerVo = new QuestionAnswerVo();
         /**
          * 参数校验
          */
-        if (null == kid || null == userId) {
+        if (null == kid) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
+        QuestionAnswerVo questionAnswerVo = new QuestionAnswerVo();
         QuestionExample example = new QuestionExample();
         QuestionExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
-        //  criteria.andDelFlagEqualTo(CommonConstants.DELETE_NO);
-        //  criteria.andShelveFlagEqualTo(CommonConstants.SHELVE_YES);
         List<Question> questions = this.questionDao.selectByExample(example);
         if (null == questions || questions.isEmpty()) {
             //throw QuanhuException.busiError("查询的问题不存在");
@@ -382,6 +380,9 @@ public class QuestionServiceImpl implements QuestionService {
         Long createUserId = questionBysearch.getCreateUserId();
         Long targetId = Long.valueOf(questionBysearch.getTargetId());
         if (questionBysearch.getIsOnlyShowMe().compareTo(QuestionAnswerConstants.showType.ONESELF) == 0) {
+            if (null == userId) {
+                throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
+            }
             if (createUserId.compareTo(userId) != 0 && targetId.compareTo(userId) != 0) {
                 throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TOREAD);
             }
