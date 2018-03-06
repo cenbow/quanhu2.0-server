@@ -12,10 +12,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.yryz.common.context.Context;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.framework.core.cache.RedisTemplateBuilder;
 import com.yryz.quanhu.behavior.like.Service.LikeApi;
 import com.yryz.quanhu.behavior.like.contants.LikeContants.LikeFlag;
 import com.yryz.quanhu.behavior.like.entity.Like;
+
+import ch.qos.logback.classic.Logger;
 
 @Component
 public class LikeCache {

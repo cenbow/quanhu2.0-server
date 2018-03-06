@@ -27,6 +27,7 @@ import com.yryz.common.constant.ExceptionEnum;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.ResponseUtils;
+import com.yryz.common.utils.JsonUtils;
 import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.comment.dao.CommentDao;
 import com.yryz.quanhu.behavior.comment.dao.redis.CommentCache;
@@ -44,6 +45,7 @@ import com.yryz.quanhu.behavior.common.manager.MessageManager;
 import com.yryz.quanhu.behavior.common.manager.UserRemote;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.count.service.CountService;
+import com.yryz.quanhu.behavior.like.contants.LikeContants.LikeFlag;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.behavior.like.service.LikeNewService;
 import com.yryz.quanhu.support.id.api.IdAPI;
@@ -117,12 +119,19 @@ public class CommentNewServiceImpl implements CommentNewService {
 	@Override
 	public int delComment(Comment comment) {
 		Comment localComment = getComment(comment.getKid());
+		if(localComment == null){
+			throw QuanhuException.busiShowError("该评论不存在","该评论不存在");
+		}
+		if(localComment.getShelveFlag() == 11 || localComment.getDelFlag() == 11){
+			throw QuanhuException.busiShowError("该评论已下架","该评论已下架");
+		}
 		// 只有本人或者资源作者可以删除评论
 		if (!comment.getCreateUserId().equals(localComment.getCreateUserId())
 				&& !comment.getCreateUserId().equals(localComment.getTargetUserId())) {
 			throw QuanhuException.busiShowError("只有本人或者资源发布者可以删除评论", "只有本人或者资源发布者可以删除评论");
 		}
-
+		
+		
 		int result = commentDao.delComment(comment);
 		commentCache.delCommentList(comment);
 		commentCache.deleteComment(comment.getKid());
@@ -184,13 +193,16 @@ public class CommentNewServiceImpl implements CommentNewService {
 		Map<String, UserSimpleNoneOtherVO> userMap = new HashMap<>(commentLength);
 		Map<Long, List<Comment>> replyMap = new HashMap<>(commentLength);
 		Map<String, Integer> likeFlagMap = new HashMap<>(commentLength);
-
+		Map<Long,Long> likeCountMap = new HashMap<>(commentLength);
+		
 		for (int i = 0; i < commentLength; i++) {
 			Comment comment = comments.get(i);
 			userIds.add(comment.getCreateUserId().toString());
 			topCommentIds.add(comment.getKid());
 		}
 		replyMap = getReply(topCommentIds);
+		likeCountMap = getLikeCount(topCommentIds);
+		
 		if (StringUtils.isNoneBlank(commentFrontDTO.getUserId())) {
 			likeFlagMap = likeService.getLikeFlagBatch(Lists.newArrayList(topCommentIds),
 					NumberUtils.createLong(commentFrontDTO.getUserId()));
@@ -199,6 +211,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		if (MapUtils.isNotEmpty(replyMap)) {
 			userIds.addAll(getUserIdByReplyMap(replyMap));
 		}
+		
 		userMap = userService.getUserInfo(userIds);
 		List<CommentListInfoVO> commentVOs = new ArrayList<>();
 
@@ -212,13 +225,22 @@ public class CommentNewServiceImpl implements CommentNewService {
 			// 点赞状态
 			if (MapUtils.isNotEmpty(likeFlagMap)) {
 				listInfoVO.setLikeFlag(likeFlagMap.get(comment.getKid().toString()));
+			}else{
+				listInfoVO.setLikeFlag(LikeFlag.FALSE.getFlag());
 			}
 
 			// 获取回复总数
 			Long replycount = commentCache.getCommentReplyCount(comment.getKid());
 			replycount = replycount == null ? 0l : replycount;
+			
+			//设置点赞、评论总数
 			listInfoVO.setCommentCount(replycount.intValue());
-
+			if(MapUtils.isNotEmpty(likeCountMap)){
+				listInfoVO.setLikeCount(likeCountMap.get(comment.getKid()));
+			}else{
+				listInfoVO.setLikeCount(0);
+			}
+			
 			List<Comment> replys = replyMap.get(comment.getKid());
 			// 聚合评论回复
 			if (CollectionUtils.isNotEmpty(replys)) {
@@ -324,15 +346,23 @@ public class CommentNewServiceImpl implements CommentNewService {
 	@Transactional
 	public int updownSingle(Comment comment) {
 		Comment localComment = getComment(comment.getKid());
-		int result = commentDao.updownSingle(comment);
+		if(localComment == null){
+			throw QuanhuException.busiError("评论不存在");
+		}
+		if(localComment.getShelveFlag() == 11 || localComment.getDelFlag() == 11){
+			logger.info("[updownSingle]:comment:{} is updown",JsonUtils.toFastJson(localComment));
+			return 0;
+		}
+		localComment.setLastUpdateUserId(comment.getLastUpdateUserId());
+		int result = commentDao.updownSingle(localComment);
 
 		// 刪除缓存评论列表
-		commentCache.delCommentList(comment);
+		commentCache.delCommentList(localComment);
 		// 删除缓存评论
 		commentCache.deleteComment(comment.getKid());
 
 		// 评论总数-1
-		countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", -1l);
+		countService.commitCount(BehaviorEnum.Comment, String.valueOf(localComment.getResourceId()), "-1", -1l);
 
 		if (localComment.getTopId() != 0l) {
 			// 删除回复
@@ -355,7 +385,9 @@ public class CommentNewServiceImpl implements CommentNewService {
 		if (comment != null) {
 			return comment;
 		}
-		comment = commentDao.querySingleCommentById(commentId);
+		comment = new Comment();
+		comment.setKid(commentId);
+		comment = commentDao.querySingleComment(comment);
 		if (comment != null) {
 			if(comment.getDelFlag() != 10 && comment.getShelveFlag() != 10){
 				commentCache.saveComment(comment);
@@ -482,5 +514,23 @@ public class CommentNewServiceImpl implements CommentNewService {
 			simpleVO.setParentUser(otherVO);
 		}
 		return simpleVO;
+	}
+	
+	/**
+	 * 获取点赞数量
+	 * @param topCommentIds
+	 * @return
+	 */
+	private Map<Long,Long> getLikeCount(Set<Long> topCommentIds){
+		if(CollectionUtils.isEmpty(topCommentIds)){
+			return null;
+		}
+		Map<Long,Long> countMap = new HashMap<>(topCommentIds.size());
+		for(Iterator<Long> iterator = topCommentIds.iterator();iterator.hasNext();){
+			Long commentId = iterator.next();
+			Long count = countService.getCount(commentId.toString(),  BehaviorEnum.Like.getCode(), "-1");
+			countMap.put(commentId, count == null ? 0: count);
+		}
+		return countMap;
 	}
 }

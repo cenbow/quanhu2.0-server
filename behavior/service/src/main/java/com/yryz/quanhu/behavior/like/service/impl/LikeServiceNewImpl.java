@@ -64,6 +64,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 			return cleanLike(like);
 		}
 		like.setLikeFlag(LikeFlag.TRUE.getFlag());
+		like.setCreateDate(new Date());
 		int result = saveLike(like);
 		if(result > 0){
 			likeCache.saveLike(like);
@@ -89,6 +90,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 			//同步点赞状态
 			if(likeVO != null){
 				like.setCreateDate(DateUtils.parseDate(likeVO.getCreateDate()));
+				like.setLikeFlag(likeVO.getLikeFlag());
 				likeCache.saveLike(like);
 				likeCache.saveLikeFlag(like);
 				return likeVO.getLikeFlag();
@@ -107,6 +109,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 	public int cleanLike(Like like) {
 		int result = 0;
 		like.setLikeFlag(LikeFlag.FALSE.getFlag());
+		like.setCreateDate(new Date());
 		result = saveLike(like);
 		//取消点赞更新缓存
 		likeCache.cancelLike(like.getResourceId(), like.getUserId());
@@ -124,8 +127,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 		int result = 0;
 		LikeVO likeVO = querySingleLiker(like);
 		//未点赞信息作为状态持久化保存
-		if(likeVO == null){
-			like.setCreateDate(new Date());
+		if(likeVO == null){			
 			like.setKid(ResponseUtils.getResponseData(idAPI.getSnowflakeId()));		
 			result = likeDao.accretion(like);
 		}else{
@@ -170,7 +172,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 	}
 	
 	/**
-	 * 查询点赞列表
+	 * 查询点赞列表(只查询已点赞的数据)
 	 * @param likeFrontDTO
 	 * @return
 	 */
@@ -181,6 +183,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 		}
 		userIds = new HashSet<>();
 		PageHelper.startPage(likeFrontDTO.getCurrentPage(), likeFrontDTO.getPageSize(), false);
+		likeFrontDTO.setLikeFlag(LikeFlag.TRUE.getFlag());
 		List<LikeVO> likeVOS = likeDao.queryLikers(likeFrontDTO);
 		if(CollectionUtils.isNotEmpty(likeVOS)){
 			for(LikeVO vo : likeVOS){
