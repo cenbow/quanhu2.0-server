@@ -130,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
             dbReport.setReportStatus(11);       //已处理的
             List<ReportDTO> existResources = reportDao.selectByResource(dbReport);
             if(!CollectionUtils.isEmpty(existResources)){
-                throw new RuntimeException("该资源已经处理被处理,处理结果:["+existResources.get(0).getSolutionDesc()+"]");
+                throw new RuntimeException("该资源已经被处理,处理结果:["+existResources.get(0).getSolutionDesc()+"]");
             }
 
             //判断解决方案
