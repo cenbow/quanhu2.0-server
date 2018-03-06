@@ -810,7 +810,7 @@ public class MessageManager {
 		body.setBodyTitle(commentAssemble.getBodyTitle());
 		try {
 			messageAPI.sendMessage(messageVo, false);
-			logger.info("[message_send]:messageVo:{}", JsonUtils.toFastJson(messageVo));
+			logger.info("[comment_message]:messageVo:{}", JsonUtils.toFastJson(messageVo));
 		} catch (Exception e) {
 			logger.error("[message_send]", e);
 		}
@@ -846,6 +846,7 @@ public class MessageManager {
 		body.setBodyTitle(likeAssemble.getBodyTitle());
 		try {
 			messageAPI.sendMessage(messageVo, false);
+			logger.info("[like_message]:mesasge:{}",JsonUtils.toFastJson(messageVo));
 		} catch (Exception e) {
 			logger.error("持久化消息失败:" , e);
 		}
