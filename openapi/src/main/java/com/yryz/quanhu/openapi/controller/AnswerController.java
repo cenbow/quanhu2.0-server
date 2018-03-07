@@ -57,4 +57,15 @@ public class AnswerController {
         return answerApi.getDetail(kid);
     }
 
+    @ApiOperation("查询非私密提问的回答详情")
+    @ApiImplicitParams(
+            @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
+            )
+    @UserBehaviorValidation(event = "回答详情",login = false)
+    @GetMapping(value = "/services/app/{version}/coterie/answer/singlePublic")
+    public Response<AnswerVo> saveAnswerPublic(Long kid, HttpServletRequest request) {
+        RequestHeader header = WebUtil.getHeader(request);
+        return answerApi.getDetail(kid);
+    }
+
 }
