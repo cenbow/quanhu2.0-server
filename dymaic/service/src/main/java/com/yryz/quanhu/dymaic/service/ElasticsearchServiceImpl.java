@@ -290,26 +290,26 @@ public class ElasticsearchServiceImpl implements ElasticsearchService {
                 }
             }
 
-            // 批量设置 帖子浏览数
-            if (CollectionUtils.isNotEmpty(rstList) && CollectionUtils.isNotEmpty(topicPostKids)) {
-                // 帖子阅读数
-                Map<Long, Map<String, Long>> topicPostCountMap = ResponseUtils
-                        .getResponseData(countApi.getCount(BehaviorEnum.Read.getCode(), topicPostKids, null));
-                // 话题帖子数
-                Map<Long, Map<String, Long>> topicCountMap = ResponseUtils
-                        .getResponseData(countApi.getCount(BehaviorEnum.TALK.getCode(), topicKids, null));
-                if (MapUtils.isNotEmpty(topicPostCountMap)) {
-                    for (ResourceInfoVo vo : rstList) {
-                        if (vo.getResourceType() == 2 && vo.getTopicPostInfo() != null) {
-                            // 帖子浏览数
-                            vo.setStatistics(topicPostCountMap.get(vo.getTopicPostInfo().getKid()));
-                        } else if (vo.getResourceType() == 1 && vo.getTopicInfo() != null) {
-                            // 话题帖子数
-                            vo.setStatistics(topicCountMap.get(vo.getTopicInfo().getKid()));
-                        }
-                    }
-                }
-            }
+			// 批量设置 帖子浏览数,话题帖子数
+			if (CollectionUtils.isNotEmpty(rstList) && (CollectionUtils.isNotEmpty(topicKids) || CollectionUtils.isNotEmpty(topicPostKids))) {
+				// 帖子阅读数
+				Map<Long, Map<String, Long>> topicPostCountMap = ResponseUtils
+						.getResponseData(countApi.getCount(BehaviorEnum.Read.getCode(), topicPostKids, null));
+				// 话题帖子数
+				Map<Long, Map<String, Long>> topicCountMap = ResponseUtils
+						.getResponseData(countApi.getCount(BehaviorEnum.TALK.getCode(), topicKids, null));
+				if (MapUtils.isNotEmpty(topicCountMap) || MapUtils.isNotEmpty(topicPostCountMap)) {
+					for (ResourceInfoVo vo : rstList) {
+						if (vo.getResourceType() == 2 && vo.getTopicPostInfo() != null) {
+							// 帖子浏览数
+							vo.setStatistics(topicPostCountMap.get(vo.getTopicPostInfo().getKid()));
+						} else if (vo.getResourceType() == 1 && vo.getTopicInfo() != null) {
+							// 话题帖子数
+							vo.setStatistics(topicCountMap.get(vo.getTopicInfo().getKid()));
+						}
+					}
+				}
+			}
 
             PageList<ResourceInfoVo> pageList = new PageList<ResourceInfoVo>();
             pageList.setEntities(rstList);

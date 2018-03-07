@@ -281,6 +281,9 @@ public class UserProvider implements UserApi{
 			if(infoDTO == null || infoDTO.getUserId() == null){
 				throw QuanhuException.busiError("用户id不能为空");
 			}
+			if(StringUtils.length(infoDTO.getUserNickName()) > 10){
+				return ResponseUtils.returnCommonException("昵称超过了10位");
+			}
 			UserSimpleVO info = userService.getUserSimple(infoDTO.getUserId());
 			if(info == null){
 				throw QuanhuException.busiError("用户不存在");
