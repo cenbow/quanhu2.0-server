@@ -255,6 +255,11 @@ public class AccountProvider implements AccountApi {
 			// 已存在账户直接登录
 			if (login != null) {
 				userId = login.getUserId();
+				// 兼容未绑定手机号的老用户
+				UserAccount account = accountService.getUserAccountByUserId(userId);
+				if (StringUtils.isBlank(account.getUserPhone())) {
+					throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
+				}
 				// 判断用户状态
 				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 					throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
@@ -697,7 +702,7 @@ public class AccountProvider implements AccountApi {
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
 			if (baseInfo == null) {
-				throw QuanhuException.busiError("参数为空");
+				return ResponseUtils.returnCommonException("该用户不存在");
 			}
 			if (ResponseUtils.getResponseData(checkUserDistory(userId))) {
 				return ResponseUtils.returnObjectSuccess(true);
@@ -728,7 +733,7 @@ public class AccountProvider implements AccountApi {
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
 			if (baseInfo == null) {
-				throw QuanhuException.busiError("用户不存在");
+				return ResponseUtils.returnCommonException("该用户不存在");
 			}
 			if (ResponseUtils.getResponseData(checkUserDistory(userId))) {
 				return ResponseUtils.returnObjectSuccess(true);
@@ -759,7 +764,7 @@ public class AccountProvider implements AccountApi {
 			}
 			UserBaseInfo baseInfo = userService.getUser(userId);
 			if (baseInfo == null) {
-				throw QuanhuException.busiError("参数为空");
+				return ResponseUtils.returnCommonException("该用户不存在");
 			}
 			if (baseInfo.getUserStatus().intValue() == UserAccountStatus.DISTORY.getStatus()) {
 				return ResponseUtils.returnObjectSuccess(true);
