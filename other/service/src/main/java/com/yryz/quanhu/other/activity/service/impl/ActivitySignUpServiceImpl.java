@@ -1,5 +1,20 @@
 package com.yryz.quanhu.other.activity.service.impl;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.SqlDateConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.yryz.common.constant.ExceptionEnum;
@@ -27,20 +42,6 @@ import com.yryz.quanhu.score.enums.EventEnum;
 import com.yryz.quanhu.score.service.ScoreAPI;
 import com.yryz.quanhu.support.id.api.IdAPI;
 import com.yryz.quanhu.support.illegalWord.api.IllegalWordsApi;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.converters.SqlDateConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class ActivitySignUpServiceImpl implements ActivitySignUpService {
@@ -157,6 +158,7 @@ public class ActivitySignUpServiceImpl implements ActivitySignUpService {
         ActivityInfo activityInfo = activityInfoService.getActivityInfoVo(activityInfoId, null);
         Assert.notNull(activityInfo, "获取活动id:" + activityInfoId + "信息为空");
         ActivityEnrolConfig activityEnrolConfig = new ActivityEnrolConfig();
+        activityEnrolConfig.setModuleEnum(activityInfo.getModuleEnum());
         if (activityInfo.getShelveFlag() == 11) {
             activityEnrolConfig.setShelveFlag(11);
             return activityEnrolConfig;

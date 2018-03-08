@@ -40,6 +40,8 @@ public interface ActivityInfoDao {
 
     int updateJoinCount(@Param("kid") Long kid, @Param("userNum") Integer userNum);
 
+    int adminUpdateJoinCount(@Param("kid") Long kid);
+
 
 
 

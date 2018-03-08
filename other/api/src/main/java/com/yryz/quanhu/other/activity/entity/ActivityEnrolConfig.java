@@ -50,6 +50,11 @@ public class ActivityEnrolConfig extends GenericEntity{
 	 */
 	private  Integer shelveFlag;
 
+    /**
+     * 功能枚举
+     */  
+    private  String moduleEnum;
+	
 	public Integer getShelveFlag() {
 		return shelveFlag;
 	}
@@ -105,5 +110,12 @@ public class ActivityEnrolConfig extends GenericEntity{
 	public void setConfigSources(String configSources) {
 		this.configSources = configSources;
 	}
-		
+
+    public String getModuleEnum() {
+        return moduleEnum;
+    }
+
+    public void setModuleEnum(String moduleEnum) {
+        this.moduleEnum = moduleEnum;
+    }
 }

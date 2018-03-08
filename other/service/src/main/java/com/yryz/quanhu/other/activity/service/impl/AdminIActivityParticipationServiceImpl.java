@@ -394,9 +394,9 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         AdminActivityInfoVo1 adminActivityInfoVo1 = activityInfoDao.selectByPrimaryKey(voteDetailDto.getActivityInfoId());
         ActivityVoteConfig config = activityVoteConfigDao.selectVoteByActivityInfoId(voteDetailDto.getActivityInfoId());
         //增加已参与人数
-        int flag = activityInfoDao.updateJoinCount(voteDetailDto.getActivityInfoId(), config.getUserNum());
+        int flag = activityInfoDao.adminUpdateJoinCount(voteDetailDto.getActivityInfoId());
         if(flag == 0) {
-            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"参加人数已满","参加人数已满");
+            throw new QuanhuException(ExceptionEnum.BusiException.getCode(),"活动不存在","活动不存在");
         }
         //在一个活动里一个用户只能参与一次
         List<AdminActivityVoteDetailVo> voteDetailVos = activityParticipationDao.selectByParam(voteDetailDto);
@@ -425,6 +425,7 @@ public class AdminIActivityParticipationServiceImpl implements AdminIActivityPar
         commitResource(voteDetailDto, adminActivityInfoVo1);
 		return null;
     }
+
     private void commitResource(ActivityVoteDetail activityVoteDetail,AdminActivityInfoVo1 activityInfo) {
         try {
             ActivityVoteDetailResourceVo activityVoteDetailResourceVo = new ActivityVoteDetailResourceVo();
