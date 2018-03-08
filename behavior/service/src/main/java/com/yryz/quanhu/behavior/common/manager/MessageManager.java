@@ -88,6 +88,7 @@ public class MessageManager {
 	 */
 	public void commentSendMsg(Comment comment) {
 		logger.info("[commentSendMsg]:start.............");
+		logger.info("[commentSendMsg]:params:{}",JsonUtils.toFastJson(comment));
 		switchSend(comment);
 		switchPushMsg(comment);
 	}
@@ -102,7 +103,7 @@ public class MessageManager {
 			return;
 		}
 		logger.info("[commentUpdownSendMsg]:start.............");
-
+		logger.info("[commentUpdownSendMsg]:params:{}",JsonUtils.toFastJson(comments));
 		try {
 			Set<String> userIds = new HashSet<>();
 			for (int i = 0; i < comments.size(); i++) {
@@ -122,6 +123,7 @@ public class MessageManager {
 	 */
 	public void likeSendMsg(Like like) {
 		logger.info("[likeSendMsg]:start.............");
+		logger.info("[likeSendMsg]:params:{}",JsonUtils.toFastJson(like));
 		switchSend(like);
 	}
 
@@ -415,6 +417,7 @@ public class MessageManager {
 			TopicPostVo topicPostVo = ResponseUtils.getResponseData(topicPostApi
 						.quetyDetail(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()));
 			if(topicPostVo == null){
+				logger.info("[topicPostPush]:commentAssemble:{},errorMsg:帖子查询失败",JsonUtils.toFastJson(commentAssemble));
 				throw QuanhuException.busiError("帖子查询失败");
 			}
 			if (contentType == 0) {
@@ -464,6 +467,7 @@ public class MessageManager {
 			TopicPostVo topicPostVo = ResponseUtils.getResponseData(
 					topicPostApi.quetyDetail(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()));
 			if(topicPostVo == null){
+				logger.info("[topicPostPush]:likeAssemble:{},errorMsg:帖子查询失败",JsonUtils.toFastJson(likeAssemble));
 				throw QuanhuException.busiError("帖子查询失败");
 			}
 			likeAssemble.setTargetUserId(topicPostVo.getUser().getUserId());
@@ -509,6 +513,7 @@ public class MessageManager {
 		try {
 			Dymaic dymaic = ResponseUtils.getResponseData(dymaicService.get(commentAssemble.getResourceId()));
 			if(dymaic == null){
+				logger.info("[dynamicPush]:commentAssemble:{},errorMsg:动态查询失败",JsonUtils.toFastJson(commentAssemble));
 				throw QuanhuException.busiError("动态查询失败");
 			}
 			if (StringUtils.isNotBlank(dymaic.getExtJson())) {
@@ -594,6 +599,7 @@ public class MessageManager {
 		try {
 			Dymaic dymaic = ResponseUtils.getResponseData(dymaicService.get(likeAssemble.getResourceId()));
 			if(dymaic == null ){
+				logger.info("[dynamicPush]:likeAssemble:{},errorMsg:动态查询失败",JsonUtils.toFastJson(likeAssemble));
 				throw QuanhuException.busiError("动态查询失败");
 			}
 			if (StringUtils.isNotBlank(dymaic.getExtJson())) {
@@ -673,6 +679,7 @@ public class MessageManager {
 			ReleaseInfoVo releaseInfoVo = ResponseUtils.getResponseData(releaseInfoApi
 					.infoByKid(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()));
 			if(releaseInfoVo == null){
+				logger.info("[releasePush]:commentAssemble:{},errorMsg:文章查询失败",JsonUtils.toFastJson(commentAssemble));
 				throw QuanhuException.busiError("文章查询失败");
 			}
 			commentAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
@@ -729,6 +736,7 @@ public class MessageManager {
 			ReleaseInfoVo releaseInfoVo = ResponseUtils.getResponseData(
 					releaseInfoApi.infoByKid(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()));
 			if(releaseInfoVo == null){
+				logger.info("[releasePush]:likeAssemble:{},errorMsg:文章查询失败",JsonUtils.toFastJson(likeAssemble));
 				throw QuanhuException.busiError("文章查询失败");
 			}
 			likeAssemble.setTitle(releaseInfoVo.getTitle());
