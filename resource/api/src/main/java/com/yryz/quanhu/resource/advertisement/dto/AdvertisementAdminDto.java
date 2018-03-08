@@ -15,7 +15,7 @@ public class AdvertisementAdminDto extends Advertisement {
     /**
      * 页码
      */
-    private Integer currentPage = 1;
+    private Integer pageNo = 1;
 
     /**
      * 每页大小
@@ -113,12 +113,12 @@ public class AdvertisementAdminDto extends Advertisement {
         this.nowTime = nowTime;
     }
 
-    public Integer getCurrentPage() {
-        return currentPage;
+    public Integer getPageNo() {
+        return pageNo;
     }
 
-    public void setCurrentPage(Integer currentPage) {
-        this.currentPage = currentPage;
+    public void setPageNo(Integer pageNo) {
+        this.pageNo = pageNo;
     }
 
     public Integer getPageSize() {
