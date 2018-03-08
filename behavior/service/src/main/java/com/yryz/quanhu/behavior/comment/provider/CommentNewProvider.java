@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.common.utils.Assert;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.google.common.collect.Sets;
+import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.response.ResponseUtils;
@@ -48,6 +49,9 @@ public class CommentNewProvider implements CommentApi {
 			Assert.notNull(comment.getCreateUserId(), "createUserId为空");
             Comment commentSuccess = commentService.accretion(comment);
             return ResponseUtils.returnObjectSuccess(commentSuccess);
+        } catch (QuanhuException e) {
+            logger.error("[comment]", e);
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
             logger.error("[comment]", e);
             return ResponseUtils.returnException(e);
