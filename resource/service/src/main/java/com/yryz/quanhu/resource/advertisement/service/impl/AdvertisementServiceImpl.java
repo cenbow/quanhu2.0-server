@@ -99,7 +99,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             return JSON.parseObject(s, new TypeReference<PageList<AdvertisementAdminVo>>(){});
         }*/
 
-        PageUtils.startPage(advertisementAdminDto.getCurrentPage(), advertisementAdminDto.getPageSize());
+        PageUtils.startPage(advertisementAdminDto.getPageNo(), advertisementAdminDto.getPageSize());
         List<AdvertisementAdminVo> list;
         advertisementAdminDto.setNowDate(DateUtils.getDate());
         advertisementAdminDto.setNowTime(DateUtils.getTime());
