@@ -184,7 +184,7 @@ public class Topic4AdminServiceImpl implements Topic4AdminService {
             criteriaOr.andDelFlagEqualTo(CommonConstants.DELETE_NO);
         }
         if (StringUtils.isNotBlank(dto.getStartTime()) && StringUtils.isNotBlank(dto.getEndTime())) {
-            criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()));
+            criteria.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()+" 23:59:59"));
             if(criteriaOr!=null) {
                 criteriaOr.andCreateDateBetween(DateUtil.parse(dto.getStartTime()), DateUtils.parseDate(dto.getEndTime()+" 23:59:59"));
             }
