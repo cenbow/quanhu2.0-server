@@ -223,6 +223,8 @@ public class ReleaseInfoProvider implements ReleaseInfoApi {
     public Response<Integer> deleteBykid(ReleaseInfo upInfo) {
         try {
             upInfo.setDelFlag(CommonConstants.DELETE_YES);
+            // 删除也标记为：下线
+            upInfo.setShelveFlag(CommonConstants.SHELVE_NO);
 
             // 校验记录是否存在
             Assert.notNull(upInfo.getKid(), "Kid is null !");
