@@ -26,7 +26,7 @@ public enum ExceptionEnum {
     USER_NO_RIGHT_TOREAD("1020", "您无权去查看。", "你无权执行此操作"),
     USER_NO_RIGHT_TODELETE("1021", "您无权执行删除操作。", "您无权执行删除操作。"),
     USER_NO_RIGHT_TOREJECT("1022", "您无权执行拒接回答操作。", "您无权执行拒接回答操作。"),
-    SMS_VERIFY_CODE_ERROR("1023","验证码错误","验证码错误"),
+    SMS_VERIFY_CODE_ERROR("1023","手机号与验证码不匹配","手机号与验证码不匹配"),
     COTERIE_USER_NO_TALK("1024", "该用户私圈内禁言，禁止访问！", "您已被圈主禁言！"),
     USER_NOT_SUFFICIENT_FUNDS("1025", "您的余额不足。", "您的余额不足。"),
     COTERIE_NOT_HAVE_COTERIE("1026", "您不是圈主,禁止操作！", "您不是私圈圈主！"),
