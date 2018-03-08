@@ -27,7 +27,7 @@ public class CategoryTest {
 
     @Test
     public void listById() {
-        Response<CategoryDiscoverVo> response = categoryAPI.listById(1L);
+        Response<CategoryDiscoverVo> response = categoryAPI.listById(367303078723584L);
         System.out.println(JsonUtils.toFastJson(response));
     }
 
