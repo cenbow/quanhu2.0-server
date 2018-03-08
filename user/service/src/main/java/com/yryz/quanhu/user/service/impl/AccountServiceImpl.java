@@ -157,7 +157,7 @@ public class AccountServiceImpl implements AccountService {
 	public Long login(LoginDTO loginDTO, String appId) {
 		UserAccount account = selectOne(null, loginDTO.getPhone(), appId);
 		if (account == null) {
-			throw QuanhuException.busiShowError("该手机号未注册","该手机号码未注册");
+			throw QuanhuException.busiShowError("该手机号尚未注册","该手机号尚未注册");
 		}
 		if (!StringUtils.equals(account.getUserPwd(), loginDTO.getPassword())) {
 			logger.info("[user_login]:params:{},appId:{},result:登录密码错误", JSON.toJSON(loginDTO), appId);
@@ -203,11 +203,6 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Long loginThird(ThirdLoginDTO loginDTO, ThirdUser thirdUser, Long userId) {
 		if (userId == null) {
-			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
-		}
-		// 兼容未绑定手机号的老用户
-		UserAccount account = getUserAccountByUserId(userId);
-		if (StringUtils.isBlank(account.getUserPhone())) {
 			throw QuanhuException.busiError(ExceptionEnum.NEED_PHONE);
 		}
 		// 更新设备号

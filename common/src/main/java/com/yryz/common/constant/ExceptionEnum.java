@@ -14,7 +14,7 @@ public enum ExceptionEnum {
     USER_NO_TALK("1007", "您已被平台禁言", "您已被平台禁言"),
     USER_FREEZE("1008", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被冻结"),
     USER_DISTORY("1009", "圈乎用户，您的账号因违规被冻结，如有疑问请联系客服处理。", "用户被注销"),
-    USER_LOGIN_PWD_ERROR("1010","登录密码错误","登录密码错误"),
+    USER_LOGIN_PWD_ERROR("1010","密码输入错误","密码输入错误"),
     
     USER_BLACK_TARGETUSER_ERROR("1011","您已把该资源作者拉黑，不允许操作","您已把该资源作者拉黑"),
     TARGETUSER_BLACK_USER_ERROR("1012","该资源作者已将您拉黑，不允许操作","该资源作者已将您拉黑"),

@@ -85,23 +85,23 @@ public class SmsServiceImpl implements SmsService {
 				break;
 			case SmsContants.CODE_FIND_PWD:
 				smsType = SmsType.CODE_FIND_PWD;
-				msg = !accountFlag ? "该手机用户不存在" : null;
+				msg = !accountFlag ? "该手机号尚未注册" : null;
 				break;
 			case SmsContants.CODE_IDENTITY:
 				smsType = SmsType.CODE_IDENTITY;
-				msg = !accountFlag ? "该手机用户不存在" : null;
+				msg = !accountFlag ? "该手机号尚未注册" : null;
 				break;
 			case SmsContants.CODE_TAKE_CASH:
 				smsType = SmsType.CODE_TAKE_CASH;
-				msg = !accountFlag ? "该手机用户不存在" : null;
+				msg = !accountFlag ? "该手机号尚未注册" : null;
 				break;
 			case SmsContants.CODE_SET_PAYPWD:
 				smsType = SmsType.CODE_SET_PAYPWD;
-				msg = !accountFlag ? "该手机用户不存在" : null;
+				msg = !accountFlag ? "该手机号尚未注册" : null;
 				break;
 			case SmsContants.CODE_CHANGE_PAYPWD:
 				smsType = SmsType.CODE_CHANGE_PAYPWD;
-				msg = !accountFlag ? "该手机用户不存在" : null;
+				msg = !accountFlag ? "该手机号尚未注册" : null;
 				break;
 			case SmsContants.CODE_OTHER:
 				smsType = SmsType.CODE_OTHER;

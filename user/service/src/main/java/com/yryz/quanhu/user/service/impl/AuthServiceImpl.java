@@ -183,15 +183,15 @@ public class AuthServiceImpl implements AuthService {
 				refreshDTO.setRefreshToken(tokenVO.getRefreshToken());
 
 				// 满足更新refreshToken的条件,更新refreshToken和过期时间并返回
-				if (checkRefreshTokenDelayUpdate(tokenVO.getRefreshExpireAt(), rangeConfig)) {
-					refreshToken = TokenUtils.constructToken(refreshDTO.getUserId().toString());
-					refreshDTO.setRefreshToken(refreshToken);
-					tokenVO.setRefreshToken(refreshToken);
-				}
+				//if (checkRefreshTokenDelayUpdate(tokenVO.getRefreshExpireAt(), rangeConfig)) {
+				//	refreshToken = TokenUtils.constructToken(refreshDTO.getUserId().toString());
+				//	refreshDTO.setRefreshToken(refreshToken);
+				//	tokenVO.setRefreshToken(refreshToken);
+				/*}
 				// 不满足refreshToken刷新，就不更新refresh任何参数，
 				else {
 					refreshExpireAt = tokenVO.getRefreshExpireAt();
-				}
+				}*/
 				redisDao.setToken(refreshDTO, expireAt, refreshExpireAt);
 				
 				pushOldTokenToTemp(refreshDTO, oldToken, rangeConfig.getTempTokenExpireTime());
