@@ -141,6 +141,7 @@ public class CoterieReleaseOrderNotifyService implements IOrderNotifyService {
             if (null != releaseInfo.getCoterieId() && 0L != releaseInfo.getCoterieId()) {
                 event.setCoterieId(String.valueOf(releaseInfo.getCoterieId()));
             }
+            event.setAmount(releaseInfo.getContentPrice() == null ? 0.0D : releaseInfo.getContentPrice().doubleValue());
             event.setCreateTime(DateUtils.formatDateTime(Calendar.getInstance().getTime()));
             event.setEventCode(EventEnum.RESOURCE_PAY.getCode());
             event.setOwnerId(String.valueOf(releaseInfo.getCreateUserId()));
