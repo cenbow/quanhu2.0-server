@@ -85,7 +85,7 @@ public class ElasticsearchSyncConsumer {
 	
 	public class MessageHandle{
 		public void handleMessage(String data) {
-			logger.info("canal Message:" + data);
+			logger.debug("canal Message:{}",data);
 			CanalMsgContent canalMsg = null;
 			try {
 				// 解析不了的垃圾信息忽略
