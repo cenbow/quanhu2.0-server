@@ -300,6 +300,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         Integer flag = this.topicPostDao.updateByPrimaryKey(topicPost);
         if (flag > 0) {
             resourceApi.deleteResourceById(String.valueOf(kid));
+            countApi.commitCount(BehaviorEnum.TALK, topicPost.getTopicId(), null, -1L);
         }
         return flag;
     }
