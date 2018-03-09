@@ -54,6 +54,21 @@ public enum  ResourceModuleEnum {
 	 */
 	ANSWER ("1007","答案"),
 
+	/**
+	 * 活动作品
+	 */
+	ACTIVITY_WORKS("10081","活动作品"),
+
+	/**
+	 * 动态（1010）
+	 */
+	DYNAMIC("1010","动态"),
+
+	/**
+	 * 评论
+	 */
+	COMMENT("1011","评论"),
+
 	;
 	private String code;
 	private String name;

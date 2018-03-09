@@ -67,16 +67,18 @@ public class LikeServiceNewImpl implements LikeNewService {
 		like.setCreateDate(new Date());
 		int result = saveLike(like);
 		if(result > 0){
-			likeCache.saveLike(like);
-			likeCache.saveLikeFlag(like);
-			//点赞数+1
-			countService.commitCount(BehaviorEnum.Like,String.valueOf(like.getResourceId()) ,"-1", 1l);
 			//发消息
 			messageService.likeSendMsg(like);
+
 			//对本人的点赞不计成长
 			if(like.getUserId() != like.getResourceUserId()){
 				eventService.likeCommitEvent(like);
 			}
+			likeCache.saveLike(like);
+			likeCache.saveLikeFlag(like);
+			//点赞数+1
+			countService.commitCount(BehaviorEnum.Like,String.valueOf(like.getResourceId()) ,"-1", 1l);
+
 		}
 		return result;
 	}
@@ -177,7 +179,7 @@ public class LikeServiceNewImpl implements LikeNewService {
 	 * @return
 	 */
 	private Set<String> getLike(LikeFrontDTO likeFrontDTO){
-		Set<String> userIds = likeCache.getLikeUserId(likeFrontDTO.getResourceId(), likeFrontDTO.getCurrentPage() * likeFrontDTO.getPageSize(), likeFrontDTO.getPageSize());
+		Set<String> userIds = likeCache.getLikeUserId(likeFrontDTO.getResourceId(), (likeFrontDTO.getCurrentPage() - 1) * likeFrontDTO.getPageSize(), likeFrontDTO.getPageSize());
 		if(CollectionUtils.isNotEmpty(userIds)){
 			return userIds;
 		}

@@ -14,6 +14,7 @@ import com.yryz.common.utils.JsonUtils;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.read.api.ReadApi;
+import com.yryz.quanhu.resource.api.ResourceApi;
 import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceEnum;
 import com.yryz.quanhu.resource.questionsAnswers.service.APIservice;
@@ -63,6 +64,9 @@ public class TopicPostServiceImpl implements TopicPostService {
     @Reference
     private ReadApi readApi;
 
+    @Reference
+    private ResourceApi resourceApi;
+
     @Autowired
     private SendMessageService sendMessageService;
 
@@ -71,6 +75,7 @@ public class TopicPostServiceImpl implements TopicPostService {
 
     /**
      * 发布帖子
+     *
      * @param topicPostDto
      * @return
      */
@@ -85,31 +90,31 @@ public class TopicPostServiceImpl implements TopicPostService {
         if (null == topicId || null == createUserId) {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
-        String imgUrl=topicPostDto.getImgUrl();
-        String viderUrl=topicPostDto.getVideoUrl();
-        String content=topicPostDto.getContent();
-        String contentSource=topicPostDto.getContentSource();
-        Topic topic=this.topicDao.selectByPrimaryKey(topicId);
-        if(null==topic){
-            throw QuanhuException.busiError("","跟帖的话题不存在","跟帖的话题不存在");
+        String imgUrl = topicPostDto.getImgUrl();
+        String viderUrl = topicPostDto.getVideoUrl();
+        String content = topicPostDto.getContent();
+        String contentSource = topicPostDto.getContentSource();
+        Topic topic = this.topicDao.selectByPrimaryKey(topicId);
+        if (null == topic) {
+            throw QuanhuException.busiError("", "跟帖的话题不存在", "跟帖的话题不存在");
         }
-        if(StringUtils.isNotBlank(imgUrl) && StringUtils.isNotBlank(viderUrl)){
-            throw QuanhuException.busiError("","图片和视频不能同时发布","图片和视频不能同时发布");
+        if (StringUtils.isNotBlank(imgUrl) && StringUtils.isNotBlank(viderUrl)) {
+            throw QuanhuException.busiError("", "图片和视频不能同时发布", "图片和视频不能同时发布");
         }
-        if(StringUtils.isBlank(imgUrl) && StringUtils.isBlank(viderUrl) && StringUtils.isBlank(content)){
-            throw QuanhuException.busiError("","文本，视频，图片不能都为空","图片和视频不能同时发布");
-        }
-
-        if(StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length>30){
-            throw QuanhuException.busiError("","图片不能超过30张","图片不能超过30张");
+        if (StringUtils.isBlank(imgUrl) && StringUtils.isBlank(viderUrl) && StringUtils.isBlank(content)) {
+            throw QuanhuException.busiError("", "文本，视频，图片不能都为空", "图片和视频不能同时发布");
         }
 
-        if(StringUtils.isNotBlank(content) && content.length()>10000){
-            throw QuanhuException.busiError("","帖子输入不能超过10000的文字","帖子输入不能超过10000的文字");
+        if (StringUtils.isNotBlank(imgUrl) && imgUrl.split(",").length > 30) {
+            throw QuanhuException.busiError("", "图片不能超过30张", "图片不能超过30张");
         }
 
-        if(StringUtils.isNotBlank(contentSource) && contentSource.length()>10000){
-            throw QuanhuException.busiError("","帖子输入不能超过10000的文字","帖子输入不能超过10000的文字");
+        if (StringUtils.isNotBlank(content) && content.length() > 10000) {
+            throw QuanhuException.busiError("", "帖子输入不能超过10000的文字", "帖子输入不能超过10000的文字");
+        }
+
+        if (StringUtils.isNotBlank(contentSource) && contentSource.length() > 10000) {
+            throw QuanhuException.busiError("", "帖子输入不能超过10000的文字", "帖子输入不能超过10000的文字");
         }
 
         TopicPostWithBLOBs topicPost = new TopicPostWithBLOBs();
@@ -120,11 +125,11 @@ public class TopicPostServiceImpl implements TopicPostService {
         topicPost.setGps("");
         topicPost.setDelFlag(CommonConstants.DELETE_NO);
         topicPost.setShelveFlag(CommonConstants.SHELVE_YES);
-        Integer result= this.topicPostDao.insertSelective(topicPost);
+        Integer result = this.topicPostDao.insertSelective(topicPost);
         /**
          * 发送消息
          */
-        MessageBusinessVo messageBusinessVo=new MessageBusinessVo();
+        MessageBusinessVo messageBusinessVo = new MessageBusinessVo();
         messageBusinessVo.setImgUrl(topicPost.getImgUrl());
         messageBusinessVo.setTitle(topicPost.getContent());
         messageBusinessVo.setFromUserId(topicPost.getCreateUserId());
@@ -133,16 +138,16 @@ public class TopicPostServiceImpl implements TopicPostService {
         messageBusinessVo.setKid(topicPost.getKid());
         messageBusinessVo.setIsAnonymity(null);
         messageBusinessVo.setCoterieId(null);
-        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST,true);
+        sendMessageService.sendNotify4Question(messageBusinessVo, MessageConstant.TOPIC_HAVE_POST, true);
 
         /**
          * 资源聚合
          */
-        ResourceTotal resourceTotal=new ResourceTotal();
+        ResourceTotal resourceTotal = new ResourceTotal();
         resourceTotal.setCreateDate(DateUtils.getDateTime());
-        TopicPostWithBLOBs post=this.topicPostDao.selectByPrimaryKey(topicPost.getKid());
-        TopicPostVo topicPostVo=new TopicPostVo();
-        if(post!=null) {
+        TopicPostWithBLOBs post = this.topicPostDao.selectByPrimaryKey(topicPost.getKid());
+        TopicPostVo topicPostVo = new TopicPostVo();
+        if (post != null) {
             BeanUtils.copyProperties(post, topicPostVo);
             topicPostVo.setModuleEnum(ModuleContants.TOPIC_POST);
             resourceTotal.setExtJson(JsonUtils.toFastJson(topicPostVo));
@@ -156,9 +161,9 @@ public class TopicPostServiceImpl implements TopicPostService {
         resourceDymaicApi.commitResourceDymaic(resourceTotal);
 
         //提交讨论数
-        countApi.commitCount(BehaviorEnum.TALK,topic.getKid(),null,1L);
+        countApi.commitCount(BehaviorEnum.TALK, topic.getKid(), null, 1L);
         //提交发布数
-        countApi.commitCount(BehaviorEnum.Release,post.getCreateUserId(),null,1L);
+        countApi.commitCount(BehaviorEnum.Release, post.getCreateUserId(), null, 1L);
         return result;
     }
 
@@ -180,14 +185,14 @@ public class TopicPostServiceImpl implements TopicPostService {
             throw new QuanhuException(ExceptionEnum.PARAM_MISSING);
         }
 
-        TopicPostExample example=new TopicPostExample();
-        TopicPostExample.Criteria criteria=example.createCriteria();
+        TopicPostExample example = new TopicPostExample();
+        TopicPostExample.Criteria criteria = example.createCriteria();
         criteria.andKidEqualTo(kid);
         List<TopicPostWithBLOBs> topicPostWithBLOBsList = this.topicPostDao.selectByExampleWithBLOBs(example);
         if (null == topicPostWithBLOBsList || topicPostWithBLOBsList.isEmpty()) {
             return null;
         }
-        TopicPostWithBLOBs topicPostWithBLOBs=topicPostWithBLOBsList.get(0);
+        TopicPostWithBLOBs topicPostWithBLOBs = topicPostWithBLOBsList.get(0);
         Long createUserId = topicPostWithBLOBs.getCreateUserId();
         TopicPostVo vo = new TopicPostVo();
         BeanUtils.copyProperties(topicPostWithBLOBs, vo);
@@ -197,7 +202,7 @@ public class TopicPostServiceImpl implements TopicPostService {
         vo.setModuleEnum(ModuleContants.TOPIC_POST);
 
         //虚拟阅读数
-        readApi.read(kid,topicPostWithBLOBs.getCreateUserId());
+        readApi.read(kid, topicPostWithBLOBs.getCreateUserId());
         return vo;
     }
 
@@ -242,15 +247,15 @@ public class TopicPostServiceImpl implements TopicPostService {
             /**
              * 点赞数和评论数
              */
-            Response<Map<String,Long>> countData=countApi.getCount(BehaviorEnum.Comment.getCode()+","+BehaviorEnum.Like.getCode(),vo.getKid(),null);
-            if(ResponseConstant.SUCCESS.getCode().equals(countData.getCode())){
-                Map<String,Long> count=countData.getData();
-                if(count!=null){
-                    BehaviorVo behaviorVo=new BehaviorVo();
-                    if(count.containsKey(BehaviorEnum.Like.getKey())){
+            Response<Map<String, Long>> countData = countApi.getCount(BehaviorEnum.Comment.getCode() + "," + BehaviorEnum.Like.getCode(), vo.getKid(), null);
+            if (ResponseConstant.SUCCESS.getCode().equals(countData.getCode())) {
+                Map<String, Long> count = countData.getData();
+                if (count != null) {
+                    BehaviorVo behaviorVo = new BehaviorVo();
+                    if (count.containsKey(BehaviorEnum.Like.getKey())) {
                         behaviorVo.setLikeCount(count.get(BehaviorEnum.Like.getKey()));
                     }
-                    if(count.containsKey(BehaviorEnum.Comment.getKey())){
+                    if (count.containsKey(BehaviorEnum.Comment.getKey())) {
                         behaviorVo.setCommentCount(count.get(BehaviorEnum.Comment.getKey()));
                     }
                     vo.setBehaviorVo(behaviorVo);
@@ -268,7 +273,8 @@ public class TopicPostServiceImpl implements TopicPostService {
     }
 
     /**
-     *发帖人和话题人都能删除帖子
+     * 发帖人和话题人都能删除帖子
+     *
      * @param kid
      * @param userId
      * @return
@@ -291,29 +297,33 @@ public class TopicPostServiceImpl implements TopicPostService {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
         }
         topicPost.setDelFlag(CommonConstants.DELETE_YES);
-        return this.topicPostDao.updateByPrimaryKey(topicPost);
+        Integer flag = this.topicPostDao.updateByPrimaryKey(topicPost);
+        if (flag > 0) {
+            resourceApi.deleteResourceById(String.valueOf(kid));
+        }
+        return flag;
     }
 
     @Override
     public Long countPostByTopicId(Long kid) {
-        TopicPostExample example=new TopicPostExample();
-        TopicPostExample.Criteria criteria=example.createCriteria();
+        TopicPostExample example = new TopicPostExample();
+        TopicPostExample.Criteria criteria = example.createCriteria();
         criteria.andTopicIdEqualTo(kid);
-        Long count=this.topicPostDao.countByExample(example);
+        Long count = this.topicPostDao.countByExample(example);
         return count;
     }
 
-	@Override
-	public List<Long> getKidByCreatedate(String startDate, String endDate) {
-		return topicPostDao.selectKidByCreatedate(startDate, endDate);
-	}
+    @Override
+    public List<Long> getKidByCreatedate(String startDate, String endDate) {
+        return topicPostDao.selectKidByCreatedate(startDate, endDate);
+    }
 
-	@Override
-	public List<TopicPostWithBLOBs> getByKids(List<Long> kidList) {
-        TopicPostExample example=new TopicPostExample();
-        TopicPostExample.Criteria criteria=example.createCriteria();
+    @Override
+    public List<TopicPostWithBLOBs> getByKids(List<Long> kidList) {
+        TopicPostExample example = new TopicPostExample();
+        TopicPostExample.Criteria criteria = example.createCriteria();
         criteria.andKidIn(kidList);
-		List<TopicPostWithBLOBs> list=topicPostDao.selectByExampleWithBLOBs(example);
+        List<TopicPostWithBLOBs> list = topicPostDao.selectByExampleWithBLOBs(example);
         return list;
-	}
+    }
 }

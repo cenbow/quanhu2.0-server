@@ -8,6 +8,8 @@ import com.yryz.common.response.PageList;
 import com.yryz.common.response.Response;
 import com.yryz.common.utils.PageModel;
 import com.yryz.common.utils.StringUtils;
+import com.yryz.quanhu.behavior.comment.entity.Comment;
+import com.yryz.quanhu.behavior.comment.service.CommentApi;
 import com.yryz.quanhu.behavior.count.api.CountApi;
 import com.yryz.quanhu.behavior.count.contants.BehaviorEnum;
 import com.yryz.quanhu.behavior.report.contants.ReportConstatns;
@@ -15,6 +17,13 @@ import com.yryz.quanhu.behavior.report.dao.ReportDao;
 import com.yryz.quanhu.behavior.report.dto.ReportDTO;
 import com.yryz.quanhu.behavior.report.service.ReportService;
 import com.yryz.quanhu.behavior.report.vo.ReportVo;
+import com.yryz.quanhu.dymaic.service.DymaicService;
+import com.yryz.quanhu.dymaic.vo.Dymaic;
+import com.yryz.quanhu.dymaic.vo.DymaicVo;
+import com.yryz.quanhu.other.activity.api.ActivityInfoApi;
+import com.yryz.quanhu.other.activity.api.AdminActivityVoteApi;
+import com.yryz.quanhu.other.activity.entity.ActivityInfo;
+import com.yryz.quanhu.resource.api.ResourceDymaicApi;
 import com.yryz.quanhu.resource.enums.ResourceModuleEnum;
 import com.yryz.quanhu.resource.questionsAnswers.api.AnswerApi;
 import com.yryz.quanhu.resource.questionsAnswers.api.QuestionApi;
@@ -180,18 +189,24 @@ public class ReportServiceImpl implements ReportService {
         return updateCount==1?true:false;
     }
 
-    @Reference
+    @Reference(check = false)
     private ReleaseInfoApi releaseInfoApi;
-    @Reference
+    @Reference(check = false)
     private TopicApi topicApi;
-    @Reference
+    @Reference(check = false)
     private TopicPostApi topicPostApi;
-    @Reference
+    @Reference(check = false)
     private QuestionApi questionApi;
-    @Reference
+    @Reference(check = false)
     private AnswerApi answerApi;
-    @Reference
+    @Reference(check = false)
     private ViolationApi violationApi;
+    @Reference(check = false)
+    private DymaicService dymaicService;
+    @Reference(check = false)
+    private CommentApi commentApi;
+    @Reference(check = false)
+    private AdminActivityVoteApi adminActivityVoteApi;
 
     /**
      * 举报解决实现
@@ -217,7 +232,7 @@ public class ReportServiceImpl implements ReportService {
                 case USER:                      //用户
                     throw new RuntimeException("暂不支持用户下架（未实现）");
                 case TRANSMIT:                  //转发
-                    throw new RuntimeException("暂不支持动态转发下架（未实现）");
+                    throw new RuntimeException("暂不支持转发下架（未实现）");
                 case RELEASE:                   //文字
 
                     ReleaseInfo info = new ReleaseInfo();
@@ -242,6 +257,32 @@ public class ReportServiceImpl implements ReportService {
                     answerDto.setLastUpdateUserId(dto.getLastUpdateUserId());
                     syncRpc = answerApi.deletetAnswer(answerDto);
 
+                    break;
+                case ACTIVITY_WORKS:            //活动作品
+                    ActivityInfo activityInfo = new ActivityInfo();
+                    activityInfo.setKid(Long.parseLong(dto.getResourceId()));
+                    activityInfo.setLastUpdateUserId(dto.getLastUpdateUserId());
+                    //下架
+                    activityInfo.setShelveFlag(11);
+                    syncRpc = adminActivityVoteApi.updateSave(activityInfo);
+                    break;
+                case DYNAMIC:                   //动态
+                    Response<Dymaic> dymaicRpc = dymaicService.get(Long.parseLong(dto.getResourceId()));
+                    if(dymaicRpc.success()){
+                        Dymaic dymaic = dymaicRpc.getData();
+                        if(dymaic==null){
+                            throw new RuntimeException("动态查询不存在");
+                        }
+                        dymaicService.delete(dymaic.getUserId(),dymaic.getKid());
+                    }
+                    //返回成功
+                    syncRpc = new Response<Integer>(true,"","","",1);
+                    break;
+                case COMMENT:                   //评论
+                    Comment comment = new Comment();
+                    comment.setKid(dto.getKid());
+                    comment.setLastUpdateUserId(dto.getLastUpdateUserId());
+                    syncRpc = commentApi.updownSingle(comment);
                     break;
                 default:
                     throw new RuntimeException("参数非法,moduleEnum："+moduleEnum);

@@ -59,6 +59,9 @@ public class LikeNewProvider implements LikeApi{
         	
 			map.put("likeFlag", likeService.isLike(like));
             return ResponseUtils.returnObjectSuccess(map);
+        } catch (QuanhuException e) {
+            logger.error("[like_dian]", e);
+            return ResponseUtils.returnException(e);
         } catch (Exception e) {
             logger.error("[like_dian]", e);
             return ResponseUtils.returnException(e);

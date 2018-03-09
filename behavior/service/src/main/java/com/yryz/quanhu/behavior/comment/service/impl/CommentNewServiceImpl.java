@@ -95,18 +95,17 @@ public class CommentNewServiceImpl implements CommentNewService {
 
 		int result = commentDao.accretion(comment);
 		if (result > 0) {
-			commentCache.saveComment(comment);
-			commentCache.addCommentList(comment);
-			// 增加统计数
-			countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", 1L);
-
 			// 发消息
 			messageService.commentSendMsg(comment);
-
 			// 给自己发的文章、帖子不发事件
 			if (comment.getTargetUserId() != comment.getCreateUserId()) {
 				eventService.commentCommitEvent(comment);
 			}
+			
+			commentCache.saveComment(comment);
+			commentCache.addCommentList(comment);
+			// 增加统计数
+			countService.commitCount(BehaviorEnum.Comment, String.valueOf(comment.getResourceId()), "-1", 1L);
 		}
 		return comment;
 	}
@@ -410,7 +409,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 		int topCommendLength = topCommentIds.size();
 		Map<Long, List<Comment>> map = new HashMap<>(topCommendLength);
 		CommentFrontDTO commentFrontDTO = new CommentFrontDTO();
-		commentFrontDTO.setCurrentPage(0);
+		commentFrontDTO.setCurrentPage(1);
 		commentFrontDTO.setPageSize(3);
 		for (Iterator<Long> iterator = topCommentIds.iterator(); iterator.hasNext();) {
 			Long topCommentId = iterator.next();
@@ -431,7 +430,7 @@ public class CommentNewServiceImpl implements CommentNewService {
 	 */
 	private List<Comment> getComment(CommentFrontDTO commentFrontDTO) {
 		List<Comment> comments = commentCache.listComment(commentFrontDTO.getResourceId(), commentFrontDTO.getTopId(),
-				commentFrontDTO.getCurrentPage() * commentFrontDTO.getPageSize(), commentFrontDTO.getPageSize());
+				(commentFrontDTO.getCurrentPage() - 1) * commentFrontDTO.getPageSize(), commentFrontDTO.getPageSize());
 
 		if (CollectionUtils.isNotEmpty(comments)) {
 			return comments;
