@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,36 +58,49 @@ public class CommentController {
          * 根据参数判断评论类型，私圈/平台
          */
         if(comment.getCoterieId()!=0){
-            return coterieAccretion(comment,userId,request);
+            return classicMute.coterieAccretion(comment,userId,request);
         }else{
-            return platformAccretion(comment,userId,request);
+            return classicMute.platformAccretion(comment,userId,request);
         }
     }
-    /**
-     * 私圈评论
-     * @param comment
-     * @param userId
-     * @param request
-     * @return
-     */
-    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
-    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
-    private Response<CommentSimpleVO> coterieAccretion(Comment comment, Long userId, HttpServletRequest request) {
-        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.saveComment(comment)));
-    }
+    
+    @Autowired
+    private ClassicMute classicMute;
+    
+    @Service
+    public class ClassicMute{
+    	
+    	/**
+         * 私圈评论
+         * @param comment
+         * @param userId
+         * @param request
+         * @return
+         */
+        @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
+        @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true,coterieMute=true)
+        public Response<CommentSimpleVO> coterieAccretion(Comment comment, Long userId, HttpServletRequest request) {
+            return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.saveComment(comment)));
+        }
 
-    /**
-     * 平台评论
-     * @param comment
-     * @param userId
-     * @param request
-     * @return
-     */
-    @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
-    @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
-    private Response<CommentSimpleVO> platformAccretion(Comment comment, Long userId, HttpServletRequest request) {
-        return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.saveComment(comment)));
+        /**
+         * 平台评论
+         * @param comment
+         * @param userId
+         * @param request
+         * @return
+         */
+        @UserBehaviorArgs(sourceUserId="object.Comment.targetUserId",contexts={"object.Comment.contentComment"},coterieId="object.Comment.coterieId")
+        @UserBehaviorValidation(login = true, mute = true, blacklist = true, illegalWords = true)
+        public Response<CommentSimpleVO> platformAccretion(Comment comment, Long userId, HttpServletRequest request) {
+            return ResponseUtils.returnApiObjectSuccess(ResponseUtils.getResponseData(commentApi.saveComment(comment)));
+        }
+    	
     }
+    
+    
+    
+    
 
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     //@PostMapping(value = "/services/app/{version}/comment/accretion")

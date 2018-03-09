@@ -264,8 +264,6 @@ public class AccountProvider implements AccountApi {
 				if (ResponseUtils.getResponseData(checkUserDisable(userId))) {
 					throw QuanhuException.busiError(ExceptionEnum.USER_FREEZE);
 				}
-			} else {
-				throw QuanhuException.busiError(ExceptionEnum.USER_MISSING);
 			}
 			userId = accountService.loginThird(loginDTO, thirdUser, userId);
 			RegisterLoginVO registerLoginVO = returnRegisterLoginVO(userId, header, null,

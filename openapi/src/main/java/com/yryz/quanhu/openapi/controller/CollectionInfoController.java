@@ -1,8 +1,21 @@
 package com.yryz.quanhu.openapi.controller;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Maps;
-import com.yryz.common.annotation.UserBehaviorArgs;
 import com.yryz.common.annotation.UserBehaviorValidation;
 import com.yryz.common.exception.QuanhuException;
 import com.yryz.common.response.PageList;
@@ -13,16 +26,10 @@ import com.yryz.quanhu.behavior.collection.dto.CollectionInfoDto;
 import com.yryz.quanhu.behavior.collection.vo.CollectionInfoVo;
 import com.yryz.quanhu.openapi.ApplicationOpenApi;
 import com.yryz.quanhu.score.service.EventAPI;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 @Api(description = "收藏")
 @RestController
@@ -42,8 +49,8 @@ public class CollectionInfoController {
      * @param collectionInfoDto
      * @return
      */
-    @UserBehaviorValidation(login = true, coterieMember = true)
-    @UserBehaviorArgs(coterieId = "object.CollectionInfo.coterieId")
+    @UserBehaviorValidation(login = true, coterieMember = false)
+    //@UserBehaviorArgs(coterieId = "object.CollectionInfo.coterieId")
     @ApiOperation("收藏")
     @ApiImplicitParam(name = "version", paramType = "path", allowableValues = ApplicationOpenApi.CURRENT_VERSION, required = true)
     @PostMapping(value = "services/app/{version}/collection/single")
