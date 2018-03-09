@@ -33,6 +33,7 @@ import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentService;
 import com.yryz.quanhu.behavior.common.service.RemoteResourceService;
 import com.yryz.quanhu.behavior.common.util.ThreadPoolUtil;
+import com.yryz.quanhu.behavior.common.vo.RemoteResource;
 import com.yryz.quanhu.behavior.like.dto.LikeAssemble;
 import com.yryz.quanhu.behavior.like.entity.Like;
 import com.yryz.quanhu.dymaic.service.DymaicService;
@@ -233,21 +234,14 @@ public class MessageManager {
 			commentAssembleAnswer.setUserImg(comment.getUserImg());
 			commentAssembleAnswer.setUserNickName(comment.getNickName());
 			if (commentAssembleAnswer.getCoterieId() != 0) {
-				if (null != answerVo.getContent() && answerVo.getContent().length() > 7) {
-					commentAssembleAnswer.setCoterieName(answerVo.getContent().substring(0, 7));
-				} else {
-					commentAssembleAnswer.setCoterieName(answerVo.getContent());
-				}
-				if (StringUtils.isNotBlank(answerVo.getImgUrl())) {
-					String img = getImgFirstUrl(answerVo.getImgUrl());
-					commentAssembleAnswer.setBodyImg(img);
-				}
-				if (null != answerVo.getContent() && answerVo.getContent().length() > 20) {
-					commentAssembleAnswer.setBodyTitle(answerVo.getContent().substring(0, 20));
-				} else {
-					commentAssembleAnswer.setBodyTitle(answerVo.getContent());
-				}
+				commentAssembleAnswer.setCoterieName(StringUtils.substring(answerVo.getContent(),0, 7));
 			}
+			if (StringUtils.isNotBlank(answerVo.getImgUrl())) {
+				String img = getImgFirstUrl(answerVo.getImgUrl());
+				commentAssembleAnswer.setBodyImg(img);
+			}
+			commentAssembleAnswer.setBodyTitle(StringUtils.substring(answerVo.getContent(),0, 20));
+			
 			this.sendMessage(commentAssembleAnswer);
 			Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
 			if (question == null) {
@@ -269,13 +263,9 @@ public class MessageManager {
 				} else {
 					commentAssembleQuestion.setCoterieName(question.getContent());
 				}
-				commentAssembleQuestion.setBodyImg("");
-				if (null != question.getContent() && question.getContent().length() > 20) {
-					commentAssembleQuestion.setBodyTitle(question.getContent().substring(0, 20));
-				} else {
-					commentAssembleQuestion.setBodyTitle(question.getContent());
-				}
 			}
+			commentAssembleQuestion.setBodyImg("");
+			commentAssembleQuestion.setBodyTitle(StringUtils.substring(question.getContent(),0, 20));
 			this.sendMessage(commentAssembleQuestion);
 		}
 	}
@@ -330,17 +320,14 @@ public class MessageManager {
 				} else {
 					likeAssembleAnswer.setCoterieName(answerVo.getContent());
 				}
-				if (StringUtils.isNotBlank(answerVo.getImgUrl())) {
-					String img = getImgFirstUrl(answerVo.getImgUrl());
-					likeAssembleAnswer.setBodyImg(img);
-				}
-				if (null != answerVo.getContent() && answerVo.getContent().length() > 20) {
-					likeAssembleAnswer.setBodyTitle(answerVo.getContent().substring(0, 20));
-				} else {
-					likeAssembleAnswer.setBodyTitle(answerVo.getContent());
-				}
 			}
+			if (StringUtils.isNotBlank(answerVo.getImgUrl())) {
+				String img = getImgFirstUrl(answerVo.getImgUrl());
+				likeAssembleAnswer.setBodyImg(img);
+			}
+			likeAssembleAnswer.setBodyTitle(StringUtils.substring(answerVo.getContent(),0, 20));
 			this.sendMessage(likeAssembleAnswer);
+			
 			Question question = ResponseUtils.getResponseData(questionApi.queryDetail(answerVo.getQuestionId()));
 			if (question == null) {
 				return;
@@ -361,14 +348,9 @@ public class MessageManager {
 				} else {
 					likeAssembleQuestion.setCoterieName(question.getContent());
 				}
-				likeAssembleQuestion.setBodyImg("");
-				if (null != question.getContent() && question.getContent().length() > 20) {
-					likeAssembleQuestion.setBodyTitle(question.getContent().substring(0, 20));
-				} else {
-					likeAssembleQuestion.setBodyTitle(question.getContent());
-				}
 			}
-
+			likeAssembleQuestion.setBodyImg("");
+			likeAssembleQuestion.setBodyTitle(StringUtils.substring(question.getContent(),0, 20));
 			this.sendMessage(likeAssembleQuestion);
 		}
 		if (like.getModuleEnum().equals(ModuleContants.DYNAMIC)) {
@@ -380,17 +362,19 @@ public class MessageManager {
 			this.dynamicPush(likeAssemble);
 		}
 		if (like.getModuleEnum().equals(ModuleContants.COMMENT)) {
-			String contentStr = nickName + "点赞了您的评论。";
+			/*String contentStr = nickName + "点赞了您的评论。";
 			LikeAssemble likeAssemble = getLikeAssemble(like, contentStr);
 			likeAssemble.setUserImg(userSimpleVO.getUserImg());
 			likeAssemble.setUserNickName(userSimpleVO.getUserNickName());
+			
+			RemoteResource resource = resourceService.get(resourceId);
 			this.releasePush(likeAssemble);
 			this.topicPostPush(likeAssemble);
 			if (like.getCoterieId() == 0) {
 				like.setResourceUserId(0);
 				this.dynamicPush(likeAssemble);
 			}
-
+*/
 		}
 
 	}
@@ -552,6 +536,7 @@ public class MessageManager {
 						});
 				String title = StringUtils.toString(maps.get("title"), "");
 				String image = StringUtils.toString(maps.get("imgUrl"), "");
+				commentAssemble.setTargetUserId(dymaic.getUserId());
 				String content = "";
 				if (contentType == 0) {
 					String imgUrl = "";
@@ -581,13 +566,6 @@ public class MessageManager {
 					 */
 					commentAssemble.setCoterieName(StringUtils.substring(title, 0, 7));
 
-					/*
-					 * if (!title.equals("") && title.length() > 20) {
-					 * commentAssemble.setBodyTitle(content.substring(0, 20)); }
-					 * else { commentAssemble.setBodyTitle(title); }
-					 */
-					commentAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
-
 					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
 						/*
 						 * if (content.length() > 7) {
@@ -597,20 +575,28 @@ public class MessageManager {
 						 */
 
 						commentAssemble.setCoterieName(StringUtils.substring(content, 0, 7));
-
-						/*
-						 * if (content.length() > 20) {
-						 * commentAssemble.setBodyTitle(content.substring(0,
-						 * 20)); } else { commentAssemble.setBodyTitle(content);
-						 * }
-						 */
-
-						commentAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
 					}
-					if (StringUtils.isNotBlank(image)) {
-						String imgUrl = getImgFirstUrl(image);
-						commentAssemble.setBodyImg(imgUrl);
-					}
+				}
+				/*
+				 * if (!title.equals("") && title.length() > 20) {
+				 * commentAssemble.setBodyTitle(content.substring(0, 20)); }
+				 * else { commentAssemble.setBodyTitle(title); }
+				 */
+				commentAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
+
+				if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
+					/*
+					 * if (content.length() > 20) {
+					 * commentAssemble.setBodyTitle(content.substring(0,
+					 * 20)); } else { commentAssemble.setBodyTitle(content);
+					 * }
+					 */
+
+					commentAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
+				}
+				if (StringUtils.isNotBlank(image)) {
+					String imgUrl = getImgFirstUrl(image);
+					commentAssemble.setBodyImg(imgUrl);
 				}
 				this.sendMessage(commentAssemble);
 			}
@@ -647,6 +633,7 @@ public class MessageManager {
 					imgUrl = getImgFirstUrl(image);
 					likeAssemble.setImg(imgUrl);
 				}
+				likeAssemble.setTargetUserId(dymaic.getUserId());
 				if (StringUtils.isNoneBlank(title)) {
 					likeAssemble.setTitle(title);
 				}
@@ -662,14 +649,6 @@ public class MessageManager {
 					 * 0, 7)); } else { likeAssemble.setCoterieName(title); }
 					 */
 					likeAssemble.setCoterieName(StringUtils.substring(title, 0, 7));
-
-					/*
-					 * if (!title.equals("") && title.length() > 20) {
-					 * likeAssemble.setBodyTitle(content.substring(0, 20)); }
-					 * else { likeAssemble.setBodyTitle(title); }
-					 */
-					likeAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
-
 					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
 						/*
 						 * if (content.length() > 7) {
@@ -677,19 +656,29 @@ public class MessageManager {
 						 * } else { likeAssemble.setCoterieName(content); }
 						 */
 						likeAssemble.setCoterieName(StringUtils.substring(content, 0, 7));
-
-						/*
-						 * if (content.length() > 20) {
-						 * likeAssemble.setBodyTitle(content.substring(0, 20));
-						 * } else { likeAssemble.setBodyTitle(content); }
-						 */
-						likeAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
 					}
-					if (StringUtils.isNotBlank(image)) {
-						String imgUrls = getImgFirstUrl(image);
-						likeAssemble.setBodyImg(imgUrls);
-					}
+					
 					likeAssemble.setCoterieId(Long.valueOf(coterieId));
+				}
+				/*
+				 * if (!title.equals("") && title.length() > 20) {
+				 * likeAssemble.setBodyTitle(content.substring(0, 20)); }
+				 * else { likeAssemble.setBodyTitle(title); }
+				 */
+				likeAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
+
+				if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
+
+					/*
+					 * if (content.length() > 20) {
+					 * likeAssemble.setBodyTitle(content.substring(0, 20));
+					 * } else { likeAssemble.setBodyTitle(content); }
+					 */
+					likeAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
+				}
+				if (StringUtils.isNotBlank(image)) {
+					String imgUrls = getImgFirstUrl(image);
+					likeAssemble.setBodyImg(imgUrls);
 				}
 				this.sendMessage(likeAssemble);
 			}
@@ -740,19 +729,18 @@ public class MessageManager {
 				 * commentAssemble.setCoterieName(releaseInfoVo.getTitle()); }
 				 */
 				commentAssemble.setCoterieName(StringUtils.substring(releaseInfoVo.getTitle(), 0, 7));
-
-				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
-					img = getImgFirstUrl(releaseInfoVo.getImgUrl());
-					commentAssemble.setBodyImg(img);
-				}
-				/*
-				 * if (releaseInfoVo.getTitle().length() > 20) {
-				 * commentAssemble.setBodyTitle(releaseInfoVo.getTitle().
-				 * substring(0, 20)); } else {
-				 * commentAssemble.setBodyTitle(releaseInfoVo.getTitle()); }
-				 */
-				commentAssemble.setBodyTitle(StringUtils.substring(releaseInfoVo.getTitle(), 0, 20));
 			}
+			if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
+				img = getImgFirstUrl(releaseInfoVo.getImgUrl());
+				commentAssemble.setBodyImg(img);
+			}
+			/*
+			 * if (releaseInfoVo.getTitle().length() > 20) {
+			 * commentAssemble.setBodyTitle(releaseInfoVo.getTitle().
+			 * substring(0, 20)); } else {
+			 * commentAssemble.setBodyTitle(releaseInfoVo.getTitle()); }
+			 */
+			commentAssemble.setBodyTitle(StringUtils.substring(releaseInfoVo.getTitle(), 0, 20));
 			this.sendMessage(commentAssemble);
 		} catch (QuanhuException e) {
 			logger.error("[comment_message_get_release_error]", e);
@@ -789,17 +777,13 @@ public class MessageManager {
 					likeAssemble.setCoterieName(releaseInfoVo.getTitle());
 				}
 
-				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
-					String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
-					likeAssemble.setBodyImg(img);
-				}
-				if (releaseInfoVo.getTitle().length() > 20) {
-					likeAssemble.setBodyTitle(releaseInfoVo.getTitle().substring(0, 20));
-				} else {
-					likeAssemble.setBodyTitle(releaseInfoVo.getTitle());
-				}
 				likeAssemble.setCoterieId(releaseInfoVo.getCoterieId());
 			}
+			if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
+				String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
+				likeAssemble.setBodyImg(img);
+			}
+			likeAssemble.setBodyTitle(StringUtils.substring(releaseInfoVo.getTitle(),0, 20));
 			this.sendMessage(likeAssemble);
 		} catch (QuanhuException e) {
 			logger.error("[like_message_get_release_error]", e);
