@@ -641,7 +641,7 @@ public class MessageManager {
 				if (StringUtils.isBlank(title) && StringUtils.isNoneBlank(content)) {
 					likeAssemble.setTitle(StringUtils.substring(content, 0, 20));
 				}
-				if (StringUtils.equals(coterieId, "0")) {
+				if (!StringUtils.equals(coterieId, "0")) {
 					/*
 					 * if (StringUtils.isNotBlank(title) && title.length() > 7)
 					 * {
