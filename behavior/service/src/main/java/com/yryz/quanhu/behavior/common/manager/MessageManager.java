@@ -31,6 +31,7 @@ import com.yryz.common.utils.StringUtils;
 import com.yryz.quanhu.behavior.comment.dto.CommentAssemble;
 import com.yryz.quanhu.behavior.comment.entity.Comment;
 import com.yryz.quanhu.behavior.comment.service.CommentService;
+import com.yryz.quanhu.behavior.common.service.RemoteResourceService;
 import com.yryz.quanhu.behavior.common.util.ThreadPoolUtil;
 import com.yryz.quanhu.behavior.like.dto.LikeAssemble;
 import com.yryz.quanhu.behavior.like.entity.Like;
@@ -74,7 +75,8 @@ public class MessageManager {
 	private DymaicService dymaicService;
 	@Autowired
 	private UserRemote userRemote;
-
+	@Autowired
+	private RemoteResourceService resourceService;
 	@Reference(check = false)
 	private AnswerApi answerApi;
 
@@ -88,9 +90,18 @@ public class MessageManager {
 	 */
 	public void commentSendMsg(Comment comment) {
 		logger.info("[commentSendMsg]:start.............");
-		logger.info("[commentSendMsg]:params:{}",JsonUtils.toFastJson(comment));
-		switchSend(comment);
-		switchPushMsg(comment);
+		logger.info("[commentSendMsg]:params:{}", JsonUtils.toFastJson(comment));
+		ThreadPoolUtil.execue(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					switchSend(comment);
+					switchPushMsg(comment);
+				} catch (Exception e) {
+					logger.error("持久化消息失败:", e);
+				}
+			}
+		});
 	}
 
 	/**
@@ -102,18 +113,24 @@ public class MessageManager {
 		if (CollectionUtils.isEmpty(comments)) {
 			return;
 		}
-		logger.info("[commentUpdownSendMsg]:start.............");
-		logger.info("[commentUpdownSendMsg]:params:{}",JsonUtils.toFastJson(comments));
-		try {
-			Set<String> userIds = new HashSet<>();
-			for (int i = 0; i < comments.size(); i++) {
-				userIds.add(comments.get(i).getCreateUserId().toString());
+		ThreadPoolUtil.execue(new Runnable() {
+			@Override
+			public void run() {
+
+				logger.info("[commentUpdownSendMsg]:start.............");
+				logger.info("[commentUpdownSendMsg]:params:{}", JsonUtils.toFastJson(comments));
+				try {
+					Set<String> userIds = new HashSet<>();
+					for (int i = 0; i < comments.size(); i++) {
+						userIds.add(comments.get(i).getCreateUserId().toString());
+					}
+					pushMessage(Lists.newArrayList(userIds), "您的评论有违纪嫌疑,已被管理员下架!");
+				} catch (Exception e) {
+					logger.error("[commentSendMsg]", e);
+				}
 			}
-			pushMessage(Lists.newArrayList(userIds), "您的评论有违纪嫌疑,已被管理员下架!");
-		} catch (Exception e) {
-			logger.error("[commentSendMsg]", e);
-		}
-			
+		});
+
 	}
 
 	/**
@@ -123,8 +140,17 @@ public class MessageManager {
 	 */
 	public void likeSendMsg(Like like) {
 		logger.info("[likeSendMsg]:start.............");
-		logger.info("[likeSendMsg]:params:{}",JsonUtils.toFastJson(like));
-		switchSend(like);
+		logger.info("[likeSendMsg]:params:{}", JsonUtils.toFastJson(like));
+		ThreadPoolUtil.execue(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					switchSend(like);
+				} catch (Exception e) {
+					logger.error("持久化消息失败:", e);
+				}
+			}
+		});
 	}
 
 	/**
@@ -189,7 +215,7 @@ public class MessageManager {
 
 		if (comment.getModuleEnum().equals(ModuleContants.ANSWER)) {
 			AnswerVo answerVo = answerApi.getDetail(comment.getResourceId()).getData();
-			if(answerVo == null){
+			if (answerVo == null) {
 				return;
 			}
 			CommentAssemble commentAssembleAnswer = new CommentAssemble();
@@ -224,7 +250,7 @@ public class MessageManager {
 			}
 			this.sendMessage(commentAssembleAnswer);
 			Question question = questionApi.queryDetail(answerVo.getQuestionId()).getData();
-			if(question == null){
+			if (question == null) {
 				return;
 			}
 			CommentAssemble commentAssembleQuestion = new CommentAssemble();
@@ -405,19 +431,21 @@ public class MessageManager {
 		}
 		return pingContent;
 	}
-	
+
 	/**
 	 * 帖子评论消息
+	 * 
 	 * @param commentAssemble
 	 * @param contentType
 	 * @param bePingContent
 	 */
 	private void topicPostPush(CommentAssemble commentAssemble, long contentType, String bePingContent) {
 		try {
-			TopicPostVo topicPostVo = ResponseUtils.getResponseData(topicPostApi
-						.quetyDetail(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()));
-			if(topicPostVo == null){
-				logger.info("[topicPostPush]:commentAssemble:{},errorMsg:帖子查询失败",JsonUtils.toFastJson(commentAssemble));
+			TopicPostVo topicPostVo = ResponseUtils.getResponseData(
+					topicPostApi.quetyDetail(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()));
+			if (topicPostVo == null) {
+				logger.info("[topicPostPush]:commentAssemble:{},errorMsg:帖子查询失败",
+						JsonUtils.toFastJson(commentAssemble));
 				throw QuanhuException.busiError("帖子查询失败");
 			}
 			if (contentType == 0) {
@@ -457,17 +485,18 @@ public class MessageManager {
 			throw QuanhuException.busiError(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 帖子点赞消息
+	 * 
 	 * @param likeAssemble
 	 */
 	private void topicPostPush(LikeAssemble likeAssemble) {
 		try {
 			TopicPostVo topicPostVo = ResponseUtils.getResponseData(
 					topicPostApi.quetyDetail(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()));
-			if(topicPostVo == null){
-				logger.info("[topicPostPush]:likeAssemble:{},errorMsg:帖子查询失败",JsonUtils.toFastJson(likeAssemble));
+			if (topicPostVo == null) {
+				logger.info("[topicPostPush]:likeAssemble:{},errorMsg:帖子查询失败", JsonUtils.toFastJson(likeAssemble));
 				throw QuanhuException.busiError("帖子查询失败");
 			}
 			likeAssemble.setTargetUserId(topicPostVo.getUser().getUserId());
@@ -502,9 +531,10 @@ public class MessageManager {
 			throw QuanhuException.busiError(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 动态评论消息
+	 * 
 	 * @param commentAssemble
 	 * @param contentType
 	 * @param bePingContent
@@ -512,16 +542,16 @@ public class MessageManager {
 	private void dynamicPush(CommentAssemble commentAssemble, long contentType, String bePingContent) {
 		try {
 			Dymaic dymaic = ResponseUtils.getResponseData(dymaicService.get(commentAssemble.getResourceId()));
-			if(dymaic == null){
-				logger.info("[dynamicPush]:commentAssemble:{},errorMsg:动态查询失败",JsonUtils.toFastJson(commentAssemble));
+			if (dymaic == null) {
+				logger.info("[dynamicPush]:commentAssemble:{},errorMsg:动态查询失败", JsonUtils.toFastJson(commentAssemble));
 				throw QuanhuException.busiError("动态查询失败");
 			}
 			if (StringUtils.isNotBlank(dymaic.getExtJson())) {
 				Map<String, Object> maps = JsonUtils.fromJson(dymaic.getExtJson(),
 						new TypeReference<Map<String, Object>>() {
 						});
-				String title = StringUtils.toString(maps.get("title"),"");
-				String image = StringUtils.toString(maps.get("imgUrl"),"");
+				String title = StringUtils.toString(maps.get("title"), "");
+				String image = StringUtils.toString(maps.get("imgUrl"), "");
 				String content = "";
 				if (contentType == 0) {
 					String imgUrl = "";
@@ -532,9 +562,9 @@ public class MessageManager {
 					if (StringUtils.isNotBlank(title)) {
 						commentAssemble.setTitle(title);
 					}
-					content = StringUtils.toString(maps.get("content"),"");
+					content = StringUtils.toString(maps.get("content"), "");
 					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
-						commentAssemble.setTitle(StringUtils.substring(content,0, 20));
+						commentAssemble.setTitle(StringUtils.substring(content, 0, 20));
 					}
 					commentAssemble.setViewCode((byte) 2);
 				}
@@ -544,36 +574,38 @@ public class MessageManager {
 					commentAssemble.setTitle(bePingContent);
 				}
 				if (commentAssemble.getCoterieId() != 0) {
-					/*if (!title.equals("") && title.length() > 7) {
-						commentAssemble.setCoterieName(title.substring(0, 7));
-					} else {
-						commentAssemble.setCoterieName(title);
-					}*/
-					commentAssemble.setCoterieName(StringUtils.substring(title,0, 7));
-					
-					/*if (!title.equals("") && title.length() > 20) {
-						commentAssemble.setBodyTitle(content.substring(0, 20));
-					} else {
-						commentAssemble.setBodyTitle(title);
-					}*/
-					commentAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
-					
+					/*
+					 * if (!title.equals("") && title.length() > 7) {
+					 * commentAssemble.setCoterieName(title.substring(0, 7)); }
+					 * else { commentAssemble.setCoterieName(title); }
+					 */
+					commentAssemble.setCoterieName(StringUtils.substring(title, 0, 7));
+
+					/*
+					 * if (!title.equals("") && title.length() > 20) {
+					 * commentAssemble.setBodyTitle(content.substring(0, 20)); }
+					 * else { commentAssemble.setBodyTitle(title); }
+					 */
+					commentAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
+
 					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
-						/*if (content.length() > 7) {
-							commentAssemble.setCoterieName(content.substring(0, 7));
-						} else {
-							commentAssemble.setCoterieName(content);
-						}*/
-						
-						commentAssemble.setCoterieName(StringUtils.substring(content,0, 7));
-						
-						/*if (content.length() > 20) {
-							commentAssemble.setBodyTitle(content.substring(0, 20));
-						} else {
-							commentAssemble.setBodyTitle(content);
-						}*/
-						
-						commentAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
+						/*
+						 * if (content.length() > 7) {
+						 * commentAssemble.setCoterieName(content.substring(0,
+						 * 7)); } else {
+						 * commentAssemble.setCoterieName(content); }
+						 */
+
+						commentAssemble.setCoterieName(StringUtils.substring(content, 0, 7));
+
+						/*
+						 * if (content.length() > 20) {
+						 * commentAssemble.setBodyTitle(content.substring(0,
+						 * 20)); } else { commentAssemble.setBodyTitle(content);
+						 * }
+						 */
+
+						commentAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
 					}
 					if (StringUtils.isNotBlank(image)) {
 						String imgUrl = getImgFirstUrl(image);
@@ -588,27 +620,28 @@ public class MessageManager {
 		} catch (Exception e) {
 			logger.error("[comment_message_get_dymaic_error]", e);
 			throw QuanhuException.busiError(e.getMessage());
-		} 
+		}
 	}
 
 	/**
 	 * 动态点赞消息
+	 * 
 	 * @param likeAssemble
 	 */
 	private void dynamicPush(LikeAssemble likeAssemble) {
 		try {
 			Dymaic dymaic = ResponseUtils.getResponseData(dymaicService.get(likeAssemble.getResourceId()));
-			if(dymaic == null ){
-				logger.info("[dynamicPush]:likeAssemble:{},errorMsg:动态查询失败",JsonUtils.toFastJson(likeAssemble));
+			if (dymaic == null) {
+				logger.info("[dynamicPush]:likeAssemble:{},errorMsg:动态查询失败", JsonUtils.toFastJson(likeAssemble));
 				throw QuanhuException.busiError("动态查询失败");
 			}
 			if (StringUtils.isNotBlank(dymaic.getExtJson())) {
 				Map<String, Object> maps = JsonUtils.fromJson(dymaic.getExtJson(),
 						new TypeReference<Map<String, Object>>() {
 						});
-				String title = StringUtils.toString(maps.get("title"),"");
-				String image = StringUtils.toString(maps.get("imgUrl"),"");
-				String coterieId = StringUtils.toString(maps.get("coterieId"),"0");
+				String title = StringUtils.toString(maps.get("title"), "");
+				String image = StringUtils.toString(maps.get("imgUrl"), "");
+				String coterieId = StringUtils.toString(maps.get("coterieId"), "0");
 				String imgUrl = "";
 				if (StringUtils.isNoneBlank(image)) {
 					imgUrl = getImgFirstUrl(image);
@@ -617,39 +650,40 @@ public class MessageManager {
 				if (StringUtils.isNoneBlank(title)) {
 					likeAssemble.setTitle(title);
 				}
-				String content = StringUtils.toString(maps.get("content"),"");
+				String content = StringUtils.toString(maps.get("content"), "");
 				if (StringUtils.isBlank(title) && StringUtils.isNoneBlank(content)) {
 					likeAssemble.setTitle(StringUtils.substring(content, 0, 20));
 				}
-				if (StringUtils.equals(coterieId,"0")) {
-					/*if (StringUtils.isNotBlank(title) && title.length() > 7) {
-						likeAssemble.setCoterieName(StringUtils.substring(title,0, 7));
-					} else {
-						likeAssemble.setCoterieName(title);
-					}*/
-					likeAssemble.setCoterieName(StringUtils.substring(title,0, 7));
-					
-					/*if (!title.equals("") && title.length() > 20) {
-					likeAssemble.setBodyTitle(content.substring(0, 20));
-					} else {
-						likeAssemble.setBodyTitle(title);
-					}*/
-					likeAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
-					
+				if (StringUtils.equals(coterieId, "0")) {
+					/*
+					 * if (StringUtils.isNotBlank(title) && title.length() > 7)
+					 * {
+					 * likeAssemble.setCoterieName(StringUtils.substring(title,
+					 * 0, 7)); } else { likeAssemble.setCoterieName(title); }
+					 */
+					likeAssemble.setCoterieName(StringUtils.substring(title, 0, 7));
+
+					/*
+					 * if (!title.equals("") && title.length() > 20) {
+					 * likeAssemble.setBodyTitle(content.substring(0, 20)); }
+					 * else { likeAssemble.setBodyTitle(title); }
+					 */
+					likeAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
+
 					if (StringUtils.isBlank(title) && StringUtils.isNotBlank(content)) {
-						/*if (content.length() > 7) {
-							likeAssemble.setCoterieName(content.substring(0, 7));
-						} else {
-							likeAssemble.setCoterieName(content);
-						}*/
-						likeAssemble.setCoterieName(StringUtils.substring(content,0, 7));
-						
-						/*if (content.length() > 20) {
-							likeAssemble.setBodyTitle(content.substring(0, 20));
-						} else {
-							likeAssemble.setBodyTitle(content);
-						}*/
-						likeAssemble.setBodyTitle(StringUtils.substring(content,0, 20));
+						/*
+						 * if (content.length() > 7) {
+						 * likeAssemble.setCoterieName(content.substring(0, 7));
+						 * } else { likeAssemble.setCoterieName(content); }
+						 */
+						likeAssemble.setCoterieName(StringUtils.substring(content, 0, 7));
+
+						/*
+						 * if (content.length() > 20) {
+						 * likeAssemble.setBodyTitle(content.substring(0, 20));
+						 * } else { likeAssemble.setBodyTitle(content); }
+						 */
+						likeAssemble.setBodyTitle(StringUtils.substring(content, 0, 20));
 					}
 					if (StringUtils.isNotBlank(image)) {
 						String imgUrls = getImgFirstUrl(image);
@@ -665,21 +699,22 @@ public class MessageManager {
 		} catch (Exception e) {
 			logger.error("[like_message_get_dymaic_error]", e);
 			throw QuanhuException.busiError(e.getMessage());
-		} 
+		}
 	}
-	
+
 	/**
 	 * 文章评论消息
+	 * 
 	 * @param commentAssemble
 	 * @param contentType
 	 * @param bePingContent
 	 */
 	private void releasePush(CommentAssemble commentAssemble, long contentType, String bePingContent) {
 		try {
-			ReleaseInfoVo releaseInfoVo = ResponseUtils.getResponseData(releaseInfoApi
-					.infoByKid(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()));
-			if(releaseInfoVo == null){
-				logger.info("[releasePush]:commentAssemble:{},errorMsg:文章查询失败",JsonUtils.toFastJson(commentAssemble));
+			ReleaseInfoVo releaseInfoVo = ResponseUtils.getResponseData(
+					releaseInfoApi.infoByKid(commentAssemble.getResourceId(), commentAssemble.getResourceUserId()));
+			if (releaseInfoVo == null) {
+				logger.info("[releasePush]:commentAssemble:{},errorMsg:文章查询失败", JsonUtils.toFastJson(commentAssemble));
 				throw QuanhuException.busiError("文章查询失败");
 			}
 			commentAssemble.setTargetUserId(releaseInfoVo.getCreateUserId());
@@ -698,24 +733,25 @@ public class MessageManager {
 				commentAssemble.setTitle(bePingContent);
 			}
 			if (commentAssemble.getCoterieId() != 0 && null != releaseInfoVo.getTitle()) {
-				/*if (releaseInfoVo.getTitle().length() > 7) {
-					commentAssemble.setCoterieName(releaseInfoVo.getTitle().substring(0, 7));
-				} else {
-					commentAssemble.setCoterieName(releaseInfoVo.getTitle());
-				}
-				*/
-				commentAssemble.setCoterieName(StringUtils.substring(releaseInfoVo.getTitle(),0, 7));
-				
+				/*
+				 * if (releaseInfoVo.getTitle().length() > 7) {
+				 * commentAssemble.setCoterieName(releaseInfoVo.getTitle().
+				 * substring(0, 7)); } else {
+				 * commentAssemble.setCoterieName(releaseInfoVo.getTitle()); }
+				 */
+				commentAssemble.setCoterieName(StringUtils.substring(releaseInfoVo.getTitle(), 0, 7));
+
 				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
 					img = getImgFirstUrl(releaseInfoVo.getImgUrl());
 					commentAssemble.setBodyImg(img);
 				}
-				/*if (releaseInfoVo.getTitle().length() > 20) {
-					commentAssemble.setBodyTitle(releaseInfoVo.getTitle().substring(0, 20));
-				} else {
-					commentAssemble.setBodyTitle(releaseInfoVo.getTitle());
-				}*/
-				commentAssemble.setBodyTitle(StringUtils.substring(releaseInfoVo.getTitle(),0, 20));
+				/*
+				 * if (releaseInfoVo.getTitle().length() > 20) {
+				 * commentAssemble.setBodyTitle(releaseInfoVo.getTitle().
+				 * substring(0, 20)); } else {
+				 * commentAssemble.setBodyTitle(releaseInfoVo.getTitle()); }
+				 */
+				commentAssemble.setBodyTitle(StringUtils.substring(releaseInfoVo.getTitle(), 0, 20));
 			}
 			this.sendMessage(commentAssemble);
 		} catch (QuanhuException e) {
@@ -724,19 +760,20 @@ public class MessageManager {
 		} catch (Exception e) {
 			logger.error("[comment_message_get_release_error]", e);
 			throw QuanhuException.busiError(e.getMessage());
-		} 
+		}
 	}
-	
+
 	/**
 	 * 文章点赞消息
+	 * 
 	 * @param likeAssemble
 	 */
 	private void releasePush(LikeAssemble likeAssemble) {
 		try {
 			ReleaseInfoVo releaseInfoVo = ResponseUtils.getResponseData(
 					releaseInfoApi.infoByKid(likeAssemble.getResourceId(), likeAssemble.getResourceUserId()));
-			if(releaseInfoVo == null){
-				logger.info("[releasePush]:likeAssemble:{},errorMsg:文章查询失败",JsonUtils.toFastJson(likeAssemble));
+			if (releaseInfoVo == null) {
+				logger.info("[releasePush]:likeAssemble:{},errorMsg:文章查询失败", JsonUtils.toFastJson(likeAssemble));
 				throw QuanhuException.busiError("文章查询失败");
 			}
 			likeAssemble.setTitle(releaseInfoVo.getTitle());
@@ -751,7 +788,7 @@ public class MessageManager {
 				} else {
 					likeAssemble.setCoterieName(releaseInfoVo.getTitle());
 				}
-				
+
 				if (StringUtils.isNoneBlank(releaseInfoVo.getImgUrl())) {
 					String img = getImgFirstUrl(releaseInfoVo.getImgUrl());
 					likeAssemble.setBodyImg(img);
@@ -764,7 +801,7 @@ public class MessageManager {
 				likeAssemble.setCoterieId(releaseInfoVo.getCoterieId());
 			}
 			this.sendMessage(likeAssemble);
-		}  catch (QuanhuException e) {
+		} catch (QuanhuException e) {
 			logger.error("[like_message_get_release_error]", e);
 			throw QuanhuException.busiError(e);
 		} catch (Exception e) {
@@ -822,22 +859,14 @@ public class MessageManager {
 		body.setBodyImg(commentAssemble.getBodyImg());
 		body.setBodyTitle(commentAssemble.getBodyTitle());
 		messageVo.setBody(body);
-		ThreadPoolUtil.execue(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					try {
-						messageAPI.sendMessage(messageVo, false);
-						logger.info("[comment_message]:messageVo:{}", JsonUtils.toFastJson(messageVo));
-					} catch (Exception e) {
-						logger.error("[message_send]", e);
-					}
-				} catch (Exception e) {
-					logger.error("[commentSendMsg]", e);
-				}
-			}
-		});
-		
+
+		try {
+			messageAPI.sendMessage(messageVo, false);
+			logger.info("[comment_message]:messageVo:{}", JsonUtils.toFastJson(messageVo));
+		} catch (Exception e) {
+			logger.error("[message_send]", e);
+		}
+
 	}
 
 	/**
@@ -866,21 +895,16 @@ public class MessageManager {
 		body.setUserNickName(likeAssemble.getUserNickName());
 		body.setCoterieId(String.valueOf(likeAssemble.getCoterieId()));
 		body.setCoterieName(likeAssemble.getCoterieName());
-		body.setBodyImg(StringUtils.isBlank(likeAssemble.getBodyImg()) ? likeAssemble.getImg() : likeAssemble.getBodyImg());
+		body.setBodyImg(
+				StringUtils.isBlank(likeAssemble.getBodyImg()) ? likeAssemble.getImg() : likeAssemble.getBodyImg());
 		body.setBodyTitle(likeAssemble.getBodyTitle());
 		messageVo.setBody(body);
-		ThreadPoolUtil.execue(new Runnable() {
-			@Override
-			public void run() {
-				
-				try {
-					messageAPI.sendMessage(messageVo, false);
-					logger.info("[like_message]:mesasge:{}",JsonUtils.toFastJson(messageVo));
-				} catch (Exception e) {
-					logger.error("持久化消息失败:" , e);
-				}
-			}
-		});
+		try {
+			messageAPI.sendMessage(messageVo, false);
+			logger.info("[like_message]:mesasge:{}", JsonUtils.toFastJson(messageVo));
+		} catch (Exception e) {
+			logger.error("持久化消息失败:", e);
+		}
 	}
 
 	private void pushMessage(String targetUserId, String msg) {
@@ -892,17 +916,12 @@ public class MessageManager {
 		pushReqVo.setCustIds(targetUserIds);
 		pushReqVo.setMsg(msg);
 		pushReqVo.setPushType(PushReqVo.CommonPushType.BY_ALIAS);
-		ThreadPoolUtil.execue(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					pushAPI.commonSendAlias(pushReqVo);
-					logger.info("[push_send]:pushReqVo:{}", JsonUtils.toFastJson(pushReqVo));
-				} catch (Exception e) {
-					logger.error("[push_send]", e);
-				}
-			}
-		});
+		try {
+			pushAPI.commonSendAlias(pushReqVo);
+			logger.info("[push_send]:pushReqVo:{}", JsonUtils.toFastJson(pushReqVo));
+		} catch (Exception e) {
+			logger.error("[push_send]", e);
+		}
 	}
 
 	private static String getImgFirstUrl(String imgs) {
