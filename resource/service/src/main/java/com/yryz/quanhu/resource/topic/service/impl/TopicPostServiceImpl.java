@@ -291,7 +291,12 @@ public class TopicPostServiceImpl implements TopicPostService {
             throw new QuanhuException(ExceptionEnum.USER_NO_RIGHT_TODELETE);
         }
         topicPost.setDelFlag(CommonConstants.DELETE_YES);
-        return this.topicPostDao.updateByPrimaryKey(topicPost);
+        int result= this.topicPostDao.updateByPrimaryKey(topicPost);
+        //提交讨论数
+        if(result>0){
+            countApi.commitCount(BehaviorEnum.TALK, topicPost.getTopicId(), null, -1L);
+        }
+        return result;
     }
 
     @Override
