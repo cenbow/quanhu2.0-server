@@ -265,6 +265,7 @@ public class ReportServiceImpl implements ReportService {
                     //下架
                     activityInfo.setShelveFlag(11);
                     syncRpc = adminActivityVoteApi.updateSave(activityInfo);
+                    break;
                 case DYNAMIC:                   //动态
                     Response<Dymaic> dymaicRpc = dymaicService.get(Long.parseLong(dto.getResourceId()));
                     if(dymaicRpc.success()){
@@ -276,11 +277,13 @@ public class ReportServiceImpl implements ReportService {
                     }
                     //返回成功
                     syncRpc = new Response<Integer>(true,"","","",1);
+                    break;
                 case COMMENT:                   //评论
                     Comment comment = new Comment();
                     comment.setKid(dto.getKid());
                     comment.setLastUpdateUserId(dto.getLastUpdateUserId());
                     syncRpc = commentApi.updownSingle(comment);
+                    break;
                 default:
                     throw new RuntimeException("参数非法,moduleEnum："+moduleEnum);
             }
